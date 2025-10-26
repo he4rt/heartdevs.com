@@ -1,3 +1,4 @@
+<!-- 
 ---
 title: He4rtBot Discord API
 description: Sistema de gamificação e gestão da comunidade He4rt Developers no Discord
@@ -5,7 +6,8 @@ version: 1.0.0
 author: He4rt Developers
 license: MIT
 tags: [discord, bot, laravel, gamification, api, ddd]
----
+--- 
+-->
 
 # He4rtBot Discord API
 

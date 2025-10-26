@@ -1,0 +1,11 @@
+@baseUrl = http://localhost:88/api
+
+### GET
+GET {{baseUrl}}/
+Accept: application/json
+Content-Type: application/json
+
+### GET
+GET {{baseUrl}}/auth/oauth
+Accept: application/json
+Content-Type: application/json
