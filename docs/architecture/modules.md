@@ -12,18 +12,25 @@ Este documento detalha cada módulo (Bounded Context) do He4rtBot Discord API, s
 
 ## 📋 Índice de Módulos
 
+> ⚠️ **Nota**: Esta documentação reflete o estado atual implementado. Funcionalidades planejadas (como Squads/Teams e Watchlist) estão listadas nas [Issues Abertas](https://github.com/he4rt/he4rt-bot-api/issues).
+
 - [Core](#-core) - Recursos compartilhados
 - [Authentication](#-authentication) - Autenticação OAuth
 - [User](#-user) - Gestão de usuários
 - [Badges](#-badges) - Sistema de badges
 - [Character](#-character) - Personagens e temáticas
-- [Ranking](#-ranking) - Sistema de rankings
+- [Ranking](#-ranking) - Sistema de rankings 🔄 *Em refatoração*
 - [Season](#-season) - Temporadas de ranking
 - [Meeting](#-meeting) - Gestão de meetings
 - [Message](#-message) - Rastreamento de mensagens
 - [Feedback](#-feedback) - Sistema de feedback
 - [Provider](#-provider) - Provedores OAuth
 - [Integrations](#-integrations) - Integrações externas
+
+### 🚧 Funcionalidades Planejadas (Não Implementadas)
+
+- **Squads/Teams** - Sistema de equipes ([#58](https://github.com/he4rt/he4rt-bot-api/issues/58), [#59](https://github.com/he4rt/he4rt-bot-api/issues/59), [#60](https://github.com/he4rt/he4rt-bot-api/issues/60))
+- **Watchlist** - Sistema de lista de observação ([#29](https://github.com/he4rt/he4rt-bot-api/issues/29))
 
 ---
 
@@ -315,6 +322,8 @@ POST   /api/users/{discordId}/claim-badge # Claim badge
 ---
 
 ## 📊 Ranking
+
+> 🔄 **Status**: Sistema em refatoração de XP ([Issue #19](https://github.com/he4rt/he4rt-bot-api/issues/19))
 
 ### Responsabilidades
 - Gerenciar rankings (geral, por mensagens, por nível)

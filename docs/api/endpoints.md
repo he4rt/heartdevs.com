@@ -12,6 +12,8 @@ Documentação completa de todos os endpoints da API do He4rtBot Discord.
 
 ## 📋 Informações Gerais
 
+> ⚠️ **Nota**: Esta documentação reflete os endpoints atualmente implementados. Consulte as [Issues Abertas](https://github.com/he4rt/he4rt-bot-api/issues) para funcionalidades planejadas.
+
 ### Base URL
 ```
 Development: http://localhost:88/api

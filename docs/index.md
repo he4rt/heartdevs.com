@@ -29,6 +29,12 @@ Bem-vindo à documentação completa do He4rtBot Discord API! Este guia fornece 
   - Messages
   - Providers & Integrations
 
+- **[Roadmap](./ROADMAP.md)** 🆕
+  - Funcionalidades implementadas
+  - Em refatoração (XP System)
+  - Planejadas (Squads, Watchlist)
+  - Issues abertas e priorização
+
 ### 🌐 API
 - **[Endpoints](./api/endpoints.md)**
   - Autenticação

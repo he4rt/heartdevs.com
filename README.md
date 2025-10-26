@@ -58,6 +58,8 @@ O **He4rtBot Discord API** é o backend da solução de gamificação e gestão 
 
 ## ✨ Funcionalidades
 
+> 💡 **Roadmap**: Funcionalidades planejadas como **Squads/Teams** e **Watchlist** estão nas [Issues Abertas](https://github.com/he4rt/he4rt-bot-api/issues). Sistema de XP em [refatoração ativa](https://github.com/he4rt/he4rt-bot-api/issues/19).
+
 ### 🎮 Gamificação
 - **Sistema de XP e Níveis**: Ganhe experiência por participação
 - **Daily Rewards**: Recompensas diárias para usuários ativos
