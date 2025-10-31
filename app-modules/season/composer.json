@@ -1,0 +1,24 @@
+{
+    "name": "he4rt/season",
+    "description": "",
+    "type": "library",
+    "version": "1.0.0",
+    "license": "proprietary",
+    "require": {},
+    "autoload": {
+        "psr-4": {
+            "He4rt\\Season\\": "src/",
+            "He4rt\\Season\\Tests\\": "tests/",
+            "He4rt\\Season\\Database\\Factories\\": "database/factories/",
+            "He4rt\\Season\\Database\\Seeders\\": "database/seeders/"
+        }
+    },
+    "minimum-stability": "stable",
+    "extra": {
+        "laravel": {
+            "providers": [
+                "He4rt\\Season\\Providers\\SeasonServiceProvider"
+            ]
+        }
+    }
+}

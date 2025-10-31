@@ -10,10 +10,11 @@
     "require": {
         "php": "^8.3",
         "guzzlehttp/guzzle": "^7.10.0",
-        "he4rt/badge": "^1.0",
+        "he4rt/badge": "^1.0.0",
         "he4rt/message": "^1.0.0",
+        "he4rt/season": "^1.0.0",
         "internachi/modular": "^2.3.0",
-        "laravel/framework": "^12.36.0",
+        "laravel/framework": "^12.36.1",
         "laravel/sanctum": "^4.2.0",
         "laravel/tinker": "^2.10.1",
         "marvinlabs/laravel-discord-logger": "^1.4.3",
