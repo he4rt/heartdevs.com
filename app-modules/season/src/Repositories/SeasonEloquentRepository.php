@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace Heart\Season\Infrastructure\Repositories;
+namespace He4rt\Season\Repositories;
 
-use Heart\Season\Domain\Collections\SeasonCollection;
-use Heart\Season\Domain\Entities\SeasonEntity;
-use Heart\Season\Domain\Repositories\SeasonRepository;
-use Heart\Season\Infrastructure\Models\Season;
+use He4rt\Season\Collections\SeasonCollection;
+use He4rt\Season\Contracts\SeasonRepository;
+use He4rt\Season\Entities\SeasonEntity;
+use He4rt\Season\Models\Season;
 use Illuminate\Database\Eloquent\Builder;
 
 final readonly class SeasonEloquentRepository implements SeasonRepository

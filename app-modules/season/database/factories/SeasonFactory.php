@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace He4rt\Season\Database\Factories;
 
 use He4rt\Season\Models\Season;
-use Heart\Shared\Infrastructure\Factory;
+use Illuminate\Database\Eloquent\Factories\Factory;
 
 final class SeasonFactory extends Factory
 {

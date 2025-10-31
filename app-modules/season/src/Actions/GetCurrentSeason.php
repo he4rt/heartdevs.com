@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Heart\Season\Application;
+namespace He4rt\Season\Actions;
 
-use Heart\Season\Domain\Entities\SeasonEntity;
-use Heart\Season\Domain\Repositories\SeasonRepository;
+use He4rt\Season\Contracts\SeasonRepository;
+use He4rt\Season\Entities\SeasonEntity;
 
 final readonly class GetCurrentSeason
 {

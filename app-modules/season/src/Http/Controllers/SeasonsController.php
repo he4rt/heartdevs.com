@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Heart\Season\Presentation\Controllers;
+namespace He4rt\Season\Http\Controllers;
 
 use App\Http\Controllers\Controller;
-use Heart\Season\Application\GetCurrentSeason;
-use Heart\Season\Application\GetSeasons;
+use He4rt\Season\Actions\GetCurrentSeason;
+use He4rt\Season\Actions\GetSeasons;
 use Symfony\Component\HttpFoundation\JsonResponse;
 
 final class SeasonsController extends Controller

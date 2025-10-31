@@ -2,14 +2,18 @@
 
 declare(strict_types=1);
 
-namespace Heart\Season\Domain\Collections;
+namespace He4rt\Season\Collections;
 
 use ArrayIterator;
-use Heart\Season\Domain\Entities\SeasonEntity;
+use DateMalformedStringException;
+use He4rt\Season\Entities\SeasonEntity;
 use JsonSerializable;
 
 final class SeasonCollection extends ArrayIterator implements JsonSerializable
 {
+    /**
+     * @throws DateMalformedStringException
+     */
     public static function make(array $seasonsPayload): self
     {
         $seasons = [];

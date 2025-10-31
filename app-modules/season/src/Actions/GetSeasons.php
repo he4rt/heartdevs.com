@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Heart\Season\Application;
+namespace He4rt\Season\Actions;
 
-use Heart\Season\Domain\Collections\SeasonCollection;
-use Heart\Season\Domain\Repositories\SeasonRepository;
+use He4rt\Season\Collections\SeasonCollection;
+use He4rt\Season\Contracts\SeasonRepository;
 
 final readonly class GetSeasons
 {

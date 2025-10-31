@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Heart\Season\Application\Exceptions;
+namespace He4rt\Season\Http\Exceptions;
 
 use Exception;
 use Symfony\Component\HttpFoundation\Response;

@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Heart\Season\Domain\Repositories;
+namespace He4rt\Season\Contracts;
 
-use Heart\Season\Domain\Collections\SeasonCollection;
-use Heart\Season\Domain\Entities\SeasonEntity;
+use He4rt\Season\Collections\SeasonCollection;
+use He4rt\Season\Entities\SeasonEntity;
 
 interface SeasonRepository
 {

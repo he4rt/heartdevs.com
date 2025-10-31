@@ -2,8 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Heart\Season\Domain\Entities;
+namespace He4rt\Season\Entities;
 
+use DateMalformedStringException;
 use DateTimeImmutable;
 
 final class SeasonEntity
@@ -20,9 +21,12 @@ final class SeasonEntity
         public ?DateTimeImmutable $endAt,
     ) {}
 
+    /**
+     * @throws DateMalformedStringException
+     */
     public static function make(array $payload): self
     {
-        $endsAt = empty($payload['ended_at'])
+        $endsAt = blank($payload['ended_at'])
             ? null
             : new DateTimeImmutable($payload['ended_at']);
 
