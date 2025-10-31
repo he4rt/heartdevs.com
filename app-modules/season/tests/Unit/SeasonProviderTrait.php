@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Tests\Unit\Season;
+namespace He4rt\Season\Tests\Unit;
 
-use Heart\Season\Domain\Entities\SeasonEntity;
+use He4rt\Season\Entities\SeasonEntity;
 use Illuminate\Support\Facades\Date;
 
 trait SeasonProviderTrait
