@@ -2,113 +2,113 @@
 
 declare(strict_types=1);
 
-use App\Http\Controllers\AuthController;
-use App\Http\Controllers\Events\BadgesController;
-use App\Http\Controllers\Events\MeetingsController;
-use App\Http\Controllers\Feedbacks\FeedbackController;
-use App\Http\Controllers\Feedbacks\FeedbackReviewController;
-use App\Http\Controllers\Gamification\GamblingController;
-use App\Http\Controllers\Gamification\RankingController;
-use App\Http\Controllers\Gamification\RewardController;
-use App\Http\Controllers\Gamification\SeasonsController;
-use App\Http\Controllers\Users\MessagesController;
-use App\Http\Controllers\Users\UsersController;
-use Laravel\Lumen\Routing\Router;
+// use App\Http\Controllers\AuthController;
+// use App\Http\Controllers\Events\BadgesController;
+// use App\Http\Controllers\Events\MeetingsController;
+// use App\Http\Controllers\Feedbacks\FeedbackController;
+// use App\Http\Controllers\Feedbacks\FeedbackReviewController;
+// use App\Http\Controllers\Gamification\GamblingController;
+// use App\Http\Controllers\Gamification\RankingController;
+// use App\Http\Controllers\Gamification\RewardController;
+// use App\Http\Controllers\Gamification\SeasonsController;
+// use App\Http\Controllers\Users\MessagesController;
+// use App\Http\Controllers\Users\UsersController;
+// use Laravel\Lumen\Routing\Router;
 
-/** @var Router $router */
+// /** @var Router $router */
 
-/*
-|--------------------------------------------------------------------------
-| Application Routes
-|--------------------------------------------------------------------------
-|
-| Here is where you can register all of the routes for an application.
-| It is a breeze. Simply tell Lumen the URIs it should respond to
-| and give it the Closure to call when that URI is requested.
-|
-*/
+// /*
+// |--------------------------------------------------------------------------
+// | Application Routes
+// |--------------------------------------------------------------------------
+// |
+// | Here is where you can register all of the routes for an application.
+// | It is a breeze. Simply tell Lumen the URIs it should respond to
+// | and give it the Closure to call when that URI is requested.
+// |
+// */
 
-$router->get('/', fn () => $router->app->version());
+// $router->get('/', fn () => $router->app->version());
 
-if (config('app.env') !== 'production') {
-    $router->get('swagger', fn () => view('swagger'));
-}
+// if (config('app.env') !== 'production') {
+//     $router->get('swagger', fn () => view('swagger'));
+// }
 
-$router->get('/auth/oauth/{provider}', AuthController::class.'@authenticate');
-$router->get('/auth/logout', AuthController::class.'@logout');
+// $router->get('/auth/oauth/{provider}', AuthController::class.'@authenticate');
+// $router->get('/auth/logout', AuthController::class.'@logout');
 
-$router->group(['prefix' => 'users', 'middleware' => 'bot-auth'], function (Router $router): void {
-    /*
-    |--------------------------------------------------------------------------
-    | Basic User Routes
-    |--------------------------------------------------------------------------
-    | Only for CRUD operations
-    */
+// $router->group(['prefix' => 'users', 'middleware' => 'bot-auth'], function (Router $router): void {
+//     /*
+//     |--------------------------------------------------------------------------
+//     | Basic User Routes
+//     |--------------------------------------------------------------------------
+//     | Only for CRUD operations
+//     */
 
-    $router->get('/', UsersController::class.'@getUsers');
-    $router->post('/', ['uses' => UsersController::class.'@postUser', 'as' => 'users.store']);
-    $router->get('/{discordId}', ['uses' => UsersController::class.'@getUser', 'as' => 'users.show']);
-    $router->put('/{discordId}', ['uses' => UsersController::class.'@putUser', 'as' => 'users.update']);
-    $router->delete('/{discordId}', ['uses' => UsersController::class.'@deleteUser', 'as' => 'users.destroy']);
+//     $router->get('/', UsersController::class.'@getUsers');
+//     $router->post('/', ['uses' => UsersController::class.'@postUser', 'as' => 'users.store']);
+//     $router->get('/{discordId}', ['uses' => UsersController::class.'@getUser', 'as' => 'users.show']);
+//     $router->put('/{discordId}', ['uses' => UsersController::class.'@putUser', 'as' => 'users.update']);
+//     $router->delete('/{discordId}', ['uses' => UsersController::class.'@deleteUser', 'as' => 'users.destroy']);
 
-    /*
-    |--------------------------------------------------------------------------
-    | Specific Gamefication Routes
-    |--------------------------------------------------------------------------
-    | For gamefication and other stuff
-    */
+//     /*
+//     |--------------------------------------------------------------------------
+//     | Specific Gamefication Routes
+//     |--------------------------------------------------------------------------
+//     | For gamefication and other stuff
+//     */
 
-    $router->post('/{discordId}/daily', ['uses' => UsersController::class.'@postDaily', 'as' => 'users.dailyPoints']);
-    $router->post('/{discordId}/message', ['uses' => MessagesController::class.'@postMessage', 'as' => 'users.messages.store']);
-    $router->post('/{discordId}/claim-badge', ['uses' => BadgesController::class.'@postClaimBadge', 'as' => 'users.badges.claim']);
-    $router->get('/{discordId}/voice', ['uses' => RewardController::class.'@claimVoiceXp', 'as' => 'users.voice.claim']);
-});
+//     $router->post('/{discordId}/daily', ['uses' => UsersController::class.'@postDaily', 'as' => 'users.dailyPoints']);
+//     $router->post('/{discordId}/message', ['uses' => MessagesController::class.'@postMessage', 'as' => 'users.messages.store']);
+//     $router->post('/{discordId}/claim-badge', ['uses' => BadgesController::class.'@postClaimBadge', 'as' => 'users.badges.claim']);
+//     $router->get('/{discordId}/voice', ['uses' => RewardController::class.'@claimVoiceXp', 'as' => 'users.voice.claim']);
+// });
 
-$router->group(['prefix' => 'events', 'middleware' => 'bot-auth'], function (Router $router): void {
-    $router->group(['prefix' => 'badges'], function (Router $router): void {
-        $router->post('/', ['uses' => BadgesController::class.'@postBadge', 'as' => 'events.badges.store']);
-    });
+// $router->group(['prefix' => 'events', 'middleware' => 'bot-auth'], function (Router $router): void {
+//     $router->group(['prefix' => 'badges'], function (Router $router): void {
+//         $router->post('/', ['uses' => BadgesController::class.'@postBadge', 'as' => 'events.badges.store']);
+//     });
 
-    $router->group(['prefix' => 'meeting'], function ($router): void {
-        $router->post('/end', ['uses' => MeetingsController::class.'@postEndMeeting', 'as' => 'events.meeting.postEndMeeting']);
-        $router->post('/attend', ['uses' => MeetingsController::class.'@postAttendMeeting', 'as' => 'events.meeting.postAttendMeeting']);
-        $router->patch(
-            '/{meetingId}/subject',
-            ['uses' => MeetingsController::class.'@postMeetingSubject', 'as' => 'events.meeting.postMeetingSubject']
-        );
-    });
-});
+//     $router->group(['prefix' => 'meeting'], function ($router): void {
+//         $router->post('/end', ['uses' => MeetingsController::class.'@postEndMeeting', 'as' => 'events.meeting.postEndMeeting']);
+//         $router->post('/attend', ['uses' => MeetingsController::class.'@postAttendMeeting', 'as' => 'events.meeting.postAttendMeeting']);
+//         $router->patch(
+//             '/{meetingId}/subject',
+//             ['uses' => MeetingsController::class.'@postMeetingSubject', 'as' => 'events.meeting.postMeetingSubject']
+//         );
+//     });
+// });
 
-$router->group(['prefix' => 'bot', 'middleware' => 'bot-auth'], function (Router $router): void {
-    $router->group(['prefix' => 'gambling'], function (Router $router): void {
-        $router->put('money', GamblingController::class.'@putMoney');
-    });
-});
+// $router->group(['prefix' => 'bot', 'middleware' => 'bot-auth'], function (Router $router): void {
+//     $router->group(['prefix' => 'gambling'], function (Router $router): void {
+//         $router->put('money', GamblingController::class.'@putMoney');
+//     });
+// });
 
-$router->group(['prefix' => 'ranking'], function (Router $router): void {
-    $router->get('general', RankingController::class.'@getGeneralLevelRanking');
-    $router->get('messages', RankingController::class.'@getGeneralMessageRanking');
-});
+// $router->group(['prefix' => 'ranking'], function (Router $router): void {
+//     $router->get('general', RankingController::class.'@getGeneralLevelRanking');
+//     $router->get('messages', RankingController::class.'@getGeneralMessageRanking');
+// });
 
-$router->group(['prefix' => 'feedback', 'as' => 'feedback'], function (Router $router): void {
-    $router->post('/', ['uses' => FeedbackController::class.'@create', 'as' => 'create']);
-    $router->post('/review/{feedbackId}/approve', ['uses' => FeedbackReviewController::class.'@approve', 'as' => 'review.approve']);
-    $router->post('/review/{feedbackId}/decline', ['uses' => FeedbackReviewController::class.'@decline', 'as' => 'review.decline']);
-});
+// $router->group(['prefix' => 'feedback', 'as' => 'feedback'], function (Router $router): void {
+//     $router->post('/', ['uses' => FeedbackController::class.'@create', 'as' => 'create']);
+//     $router->post('/review/{feedbackId}/approve', ['uses' => FeedbackReviewController::class.'@approve', 'as' => 'review.approve']);
+//     $router->post('/review/{feedbackId}/decline', ['uses' => FeedbackReviewController::class.'@decline', 'as' => 'review.decline']);
+// });
 
-if (config('features.gamification.badges')) {
-    $router->group(['prefix' => 'badges'], function (Router $router): void {
-        $router->get('/', BadgesController::class.'@getBadges');
-        $router->post('/', BadgesController::class.'@postBadge');
-        $router->get('/{badgeId}', BadgesController::class.'@getBadge');
-        $router->delete('/{badgeId}', BadgesController::class.'@deleteBadge');
-    });
-}
+// if (config('features.gamification.badges')) {
+//     $router->group(['prefix' => 'badges'], function (Router $router): void {
+//         $router->get('/', BadgesController::class.'@getBadges');
+//         $router->post('/', BadgesController::class.'@postBadge');
+//         $router->get('/{badgeId}', BadgesController::class.'@getBadge');
+//         $router->delete('/{badgeId}', BadgesController::class.'@deleteBadge');
+//     });
+// }
 
-$router->group(['prefix' => 'seasons'], function ($router): void {
-    $router->get('/', 'Gamification\SeasonsController@getSeasons');
-    $router->get('/current', [
-        'uses' => SeasonsController::class.'@getCurrentSeason',
-        'as' => 'seasons.current',
-    ]);
-});
+// $router->group(['prefix' => 'seasons'], function ($router): void {
+//     $router->get('/', 'Gamification\SeasonsController@getSeasons');
+//     $router->get('/current', [
+//         'uses' => SeasonsController::class.'@getCurrentSeason',
+//         'as' => 'seasons.current',
+//     ]);
+// });
