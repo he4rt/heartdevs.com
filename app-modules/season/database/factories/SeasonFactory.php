@@ -1,0 +1,28 @@
+<?php
+
+declare(strict_types=1);
+
+namespace He4rt\Season\Database\Factories;
+
+use He4rt\Season\Models\Season;
+use Heart\Shared\Infrastructure\Factory;
+
+final class SeasonFactory extends Factory
+{
+    protected $model = Season::class;
+
+    public function definition(): array
+    {
+        return [
+            'id' => fake()->uuid(),
+            'name' => fake()->name(),
+            'description' => fake()->text(),
+            'messages_count' => fake()->randomNumber(2),
+            'participants_count' => fake()->randomNumber(2),
+            'meeting_count' => fake()->randomNumber(2),
+            'badges_count' => fake()->randomNumber(2),
+            'started_at' => fake()->dateTimeBetween('-1 hour'),
+            'ended_at' => fake()->dateTimeBetween('+1 hour', '+2 hour'),
+        ];
+    }
+}

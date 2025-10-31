@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Database\Seeders;
+namespace He4rt\Season\Database\Seeders;
 
-use App\Models\Gamefication\Season;
+use He4rt\Season\Models\Season;
 use Illuminate\Database\Seeder;
 
 final class SeasonSeeder extends Seeder
