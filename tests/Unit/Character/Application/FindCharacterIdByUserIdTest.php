@@ -2,47 +2,27 @@
 
 declare(strict_types=1);
 
-namespace Tests\Unit\Character\Application;
-
+use Tests\Unit\Character\CharacterProviderTrait;
 use Heart\Character\Application\FindCharacterIdByUserId;
 use Heart\Character\Domain\Actions\GetCharacterByUserId;
-use Heart\Character\Domain\Entities\CharacterEntity;
-use Mockery as m;
-use Mockery\MockInterface;
-use Tests\TestCase;
-use Tests\Unit\Character\CharacterProviderTrait;
 
-final class FindCharacterIdByUserIdTest extends TestCase
-{
-    use CharacterProviderTrait;
+uses(CharacterProviderTrait::class);
 
-    private MockInterface $getCharacterIdByUserId;
+beforeEach(function (): void {
+    $this->getCharacterIdByUserId = m::mock(GetCharacterByUserId::class);
+    $this->characterEntity = $this->validCharacterEntity();
+});
+afterEach(function (): void {
+    m::close();
+});
+test('find character by user id', function (): void {
+    $this->getCharacterIdByUserId
+        ->shouldReceive('handle')
+        ->with('canhassi-id')
+        ->once()
+        ->andReturn($this->characterEntity);
 
-    private CharacterEntity $characterEntity;
+    $test = new FindCharacterIdByUserId($this->getCharacterIdByUserId);
 
-    protected function setUp(): void
-    {
-        parent::setUp();
-        $this->getCharacterIdByUserId = m::mock(GetCharacterByUserId::class);
-        $this->characterEntity = $this->validCharacterEntity();
-    }
-
-    protected function tearDown(): void
-    {
-        parent::tearDown();
-        m::close();
-    }
-
-    public function test_find_character_by_user_id(): void
-    {
-        $this->getCharacterIdByUserId
-            ->shouldReceive('handle')
-            ->with('canhassi-id')
-            ->once()
-            ->andReturn($this->characterEntity);
-
-        $test = new FindCharacterIdByUserId($this->getCharacterIdByUserId);
-
-        $test->handle('canhassi-id');
-    }
-}
+    $test->handle('canhassi-id');
+});

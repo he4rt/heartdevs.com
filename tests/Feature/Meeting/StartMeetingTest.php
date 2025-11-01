@@ -2,68 +2,61 @@
 
 declare(strict_types=1);
 
-namespace Tests\Feature\Meeting;
-
+use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Heart\Meeting\Infrastructure\Models\MeetingType;
 use Heart\Provider\Infrastructure\Models\Provider;
-use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Facades\Cache;
 use Symfony\Component\HttpFoundation\Response;
-use Tests\TestCase;
 
-final class StartMeetingTest extends TestCase
-{
-    use DatabaseTransactions;
+uses(DatabaseTransactions::class);
 
-    public function test_bot_can_start_new_meeting(): void
-    {
-        // Arrange
-        $providerName = 'discord';
-        /** @var Provider $provider */
-        $provider = Provider::factory()->create(['provider' => $providerName]);
+test('bot can start new meeting', function (): void {
+    // Arrange
+    $providerName = 'discord';
 
-        $meetingType = MeetingType::factory()->create();
-        $payload = [
-            'meeting_type_id' => $meetingType->getKey(),
-            'provider_id' => $provider->provider_id,
-        ];
+    /** @var Provider $provider */
+    $provider = Provider::factory()->create(['provider' => $providerName]);
 
-        $expectedResponse = [
-            'meeting_type_id' => $meetingType->getKey(),
-            'admin_id' => $provider->user_id,
-        ];
+    $meetingType = MeetingType::factory()->create();
+    $payload = [
+        'meeting_type_id' => $meetingType->getKey(),
+        'provider_id' => $provider->provider_id,
+    ];
 
-        // Act
-        $response = $this
-            ->actingAsAdmin()
-            ->postJson(route('events.meeting.postMeeting', ['provider' => $providerName]), $payload);
+    $expectedResponse = [
+        'meeting_type_id' => $meetingType->getKey(),
+        'admin_id' => $provider->user_id,
+    ];
 
-        // Assert
-        $response->assertStatus(Response::HTTP_CREATED)
-            ->assertSee($expectedResponse);
+    // Act
+    $response = $this
+        ->actingAsAdmin()
+        ->postJson(route('events.meeting.postMeeting', ['provider' => $providerName]), $payload);
 
-        $this->assertDatabaseHas('meetings', $expectedResponse);
-        $this->assertTrue(Cache::tags(['meetings'])->has('current-meeting'));
-    }
+    // Assert
+    $response->assertStatus(Response::HTTP_CREATED)
+        ->assertSee($expectedResponse);
 
-    public function test_meeting_type_not_found(): void
-    {
-        // Arrange
-        $providerName = 'discord';
-        /** @var Provider $provider */
-        $provider = Provider::factory()->create(['provider' => $providerName]);
+    $this->assertDatabaseHas('meetings', $expectedResponse);
+    expect(Cache::tags(['meetings'])->has('current-meeting'))->toBeTrue();
+});
+test('meeting type not found', function (): void {
+    // Arrange
+    $providerName = 'discord';
 
-        $payload = [
-            'meeting_type_id' => 12,
-            'provider_id' => $provider->provider_id,
-        ];
+    /** @var Provider $provider */
+    $provider = Provider::factory()->create(['provider' => $providerName]);
 
-        // Act
-        $response = $this
-            ->actingAsAdmin()
-            ->postJson(route('events.meeting.postMeeting', ['provider' => $providerName]), $payload);
+    $payload = [
+        'meeting_type_id' => 12,
+        'provider_id' => $provider->provider_id,
+    ];
 
-        // Assert
-        $response->assertStatus(Response::HTTP_UNPROCESSABLE_ENTITY);
-    }
-}
+    // Act
+    $response = $this
+        ->actingAsAdmin()
+        ->postJson(route('events.meeting.postMeeting', ['provider' => $providerName]), $payload);
+
+    // Assert
+    $response->assertStatus(Response::HTTP_UNPROCESSABLE_ENTITY);
+});

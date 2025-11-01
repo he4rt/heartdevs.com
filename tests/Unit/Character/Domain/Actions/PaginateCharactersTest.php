@@ -1,44 +1,24 @@
 <?php
 
 declare(strict_types=1);
-
-namespace Tests\Unit\Character\Domain\Actions;
-
 use Heart\Character\Domain\Actions\PaginateCharacters;
 use Heart\Character\Domain\Repositories\CharacterRepository;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
-use Mockery as m;
-use Mockery\MockInterface;
-use Tests\TestCase;
 
-final class PaginateCharactersTest extends TestCase
-{
-    private MockInterface $characterRepository;
+beforeEach(function (): void {
+    $this->characterRepository = m::mock(CharacterRepository::class);
+    $this->paginateCharactersAction = new PaginateCharacters($this->characterRepository);
+});
+afterEach(function (): void {
+    m::close();
+});
+test('can paginate', function (): void {
+    $this->characterRepository
+        ->shouldReceive('paginate')
+        ->once()
+        ->andReturn(m::mock(LengthAwarePaginator::class));
 
-    private PaginateCharacters $paginateCharactersAction;
+    $result = $this->paginateCharactersAction->handle();
 
-    protected function setUp(): void
-    {
-        parent::setUp();
-        $this->characterRepository = m::mock(CharacterRepository::class);
-        $this->paginateCharactersAction = new PaginateCharacters($this->characterRepository);
-    }
-
-    protected function tearDown(): void
-    {
-        parent::tearDown();
-        m::close();
-    }
-
-    public function test_can_paginate(): void
-    {
-        $this->characterRepository
-            ->shouldReceive('paginate')
-            ->once()
-            ->andReturn(m::mock(LengthAwarePaginator::class));
-
-        $result = $this->paginateCharactersAction->handle();
-
-        $this->assertInstanceOf(LengthAwarePaginator::class, $result);
-    }
-}
+    expect($result)->toBeInstanceOf(LengthAwarePaginator::class);
+});

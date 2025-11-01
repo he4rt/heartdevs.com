@@ -2,46 +2,26 @@
 
 declare(strict_types=1);
 
-namespace Tests\Unit\Badges\Domain\Actions;
-
 use He4rt\Badge\Tests\Unit\BadgeProviderTrait;
 use Heart\Badges\Domain\Actions\DeleteBadge;
-use Heart\Badges\Domain\Entities\BadgeEntity;
 use Heart\Badges\Domain\Repositories\BadgeRepository;
-use Mockery as m;
-use Mockery\MockInterface;
-use Tests\TestCase;
 
-final class DeleteBadgeTest extends TestCase
-{
-    use BadgeProviderTrait;
+uses(BadgeProviderTrait::class);
 
-    private MockInterface $badgeRepositoryStub;
+beforeEach(function (): void {
+    $this->badgeRepositoryStub = m::mock(BadgeRepository::class);
+    $this->badgeEntity = $this->validBadgeEntity();
+});
+afterEach(function (): void {
+    m::close();
+});
+test('delete badge success', function (): void {
+    $this->badgeRepositoryStub
+        ->shouldReceive('delete')
+        ->with($this->badgeEntity->id)
+        ->once();
 
-    private BadgeEntity $badgeEntity;
+    $test = new DeleteBadge($this->badgeRepositoryStub);
 
-    protected function setUp(): void
-    {
-        parent::setUp();
-        $this->badgeRepositoryStub = m::mock(BadgeRepository::class);
-        $this->badgeEntity = $this->validBadgeEntity();
-    }
-
-    protected function tearDown(): void
-    {
-        parent::tearDown();
-        m::close();
-    }
-
-    public function test_delete_badge_success(): void
-    {
-        $this->badgeRepositoryStub
-            ->shouldReceive('delete')
-            ->with($this->badgeEntity->id)
-            ->once();
-
-        $test = new DeleteBadge($this->badgeRepositoryStub);
-
-        $test->handle($this->badgeEntity->id);
-    }
-}
+    $test->handle($this->badgeEntity->id);
+});

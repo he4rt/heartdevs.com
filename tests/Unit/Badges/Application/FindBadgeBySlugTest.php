@@ -2,48 +2,28 @@
 
 declare(strict_types=1);
 
-namespace Tests\Unit\Badges\Application;
-
 use He4rt\Badge\Tests\Unit\BadgeProviderTrait;
 use Heart\Badges\Application\FindBadgeBySlug;
-use Heart\Badges\Domain\Entities\BadgeEntity;
 use Heart\Badges\Domain\Repositories\BadgeRepository;
-use Mockery as m;
-use Mockery\MockInterface;
-use Tests\TestCase;
 
-final class FindBadgeBySlugTest extends TestCase
-{
-    use BadgeProviderTrait;
+uses(BadgeProviderTrait::class);
 
-    private MockInterface $badgeRepositoryStub;
+beforeEach(function (): void {
+    $this->badgeRepositoryStub = m::mock(BadgeRepository::class);
+    $this->badgeEntity = $this->validBadgeEntity();
+});
+afterEach(function (): void {
+    m::close();
+});
+test('find badge by slug', function (): void {
+    $slug = 'é-o-canhas';
+    $this->badgeRepositoryStub
+        ->shouldReceive('findBySlug')
+        ->with($slug)
+        ->once()
+        ->andReturn($this->badgeEntity);
 
-    private BadgeEntity $badgeEntity;
+    $test = new FindBadgeBySlug($this->badgeRepositoryStub);
 
-    protected function setUp(): void
-    {
-        parent::setUp();
-        $this->badgeRepositoryStub = m::mock(BadgeRepository::class);
-        $this->badgeEntity = $this->validBadgeEntity();
-    }
-
-    protected function tearDown(): void
-    {
-        parent::tearDown();
-        m::close();
-    }
-
-    public function test_find_badge_by_slug(): void
-    {
-        $slug = 'é-o-canhas';
-        $this->badgeRepositoryStub
-            ->shouldReceive('findBySlug')
-            ->with($slug)
-            ->once()
-            ->andReturn($this->badgeEntity);
-
-        $test = new FindBadgeBySlug($this->badgeRepositoryStub);
-
-        $test->handle($slug);
-    }
-}
+    $test->handle($slug);
+});

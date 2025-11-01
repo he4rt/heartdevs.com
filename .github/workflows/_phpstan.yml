@@ -1,0 +1,55 @@
+name: Phpstan
+
+on:
+  workflow_call:
+    inputs:
+      PHP_VERSION:
+        required: true
+        type: string
+      PHP_EXTENSIONS:
+        required: true
+        type: string
+      PHP_INI_PROPERTIES:
+        required: true
+        type: string
+      COMPOSER_FLAGS:
+        required: true
+        type: string
+      CACHE_KEY:
+        required: true
+        type: string
+
+jobs:
+  run:
+    name: Run
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    concurrency:
+      group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}-phpstan
+      cancel-in-progress: true
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@bf6b4fbd49ca58e4608c9c89fba0b8d90bd2a39f # v2.35.5
+        with:
+          php-version: ${{ inputs.PHP_VERSION }}
+          extensions: ${{ inputs.PHP_EXTENSIONS }}
+          ini-values: ${{ inputs.PHP_INI_PROPERTIES }}
+          coverage: xdebug
+          tools: composer:v2
+
+      - name: Install composer dependencies
+        uses: ramsey/composer-install@3cf229dc2919194e9e36783941438d17239e8520 # v3.1.1
+        with:
+          composer-options: ${{ inputs.COMPOSER_FLAGS }}
+          custom-cache-key: ${{ inputs.CACHE_KEY }}
+
+      - name: Perform ide-helper
+        run: |
+          composer run ide-helper
+
+      - name: Run Phpstan
+        run: |
+          vendor/bin/phpstan analyse --ansi --error-format=github

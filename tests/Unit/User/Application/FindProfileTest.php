@@ -2,117 +2,85 @@
 
 declare(strict_types=1);
 
-namespace Tests\Unit\User\Application;
-
-use Heart\Provider\Domain\Entities\ProviderEntity;
+use Tests\Unit\User\ProfileProviderTrait;
+use Tests\Unit\Character\ProviderProviderTrait;
+use Tests\Unit\User\UserProviderTrait;
 use Heart\Provider\Domain\Repositories\ProviderRepository;
 use Heart\User\Application\Exceptions\ProfileException;
 use Heart\User\Application\FindProfile;
 use Heart\User\Domain\Actions\GetProfile;
-use Heart\User\Domain\Entities\ProfileEntity;
-use Heart\User\Domain\Entities\UserEntity;
 use Heart\User\Domain\Repositories\UserRepository;
-use Mockery as m;
-use Mockery\MockInterface;
-use Tests\TestCase;
-use Tests\Unit\Character\ProviderProviderTrait;
-use Tests\Unit\User\ProfileProviderTrait;
-use Tests\Unit\User\UserProviderTrait;
 
-final class FindProfileTest extends TestCase
-{
-    use ProfileProviderTrait;
-    use ProviderProviderTrait;
-    use UserProviderTrait;
+uses(ProfileProviderTrait::class);
 
-    private MockInterface $userRepositoryStub;
+uses(ProviderProviderTrait::class);
 
-    private MockInterface $getProfileStub;
+uses(UserProviderTrait::class);
 
-    private MockInterface $providerRepositoryStub;
+beforeEach(function (): void {
+    $this->userRepositoryStub = m::mock(UserRepository::class);
+    $this->getProfileStub = m::mock(GetProfile::class);
+    $this->providerRepositoryStub = m::mock(ProviderRepository::class);
+    $this->providerEntity = $this->validProviderEntity();
+    $this->userEntity = $this->validUserEntity();
+    $this->profileEntity = $this->validProfileEntity();
+});
+afterEach(function (): void {
+    m::close();
+});
+test('find profile with username success', function (): void {
+    $this->userRepositoryStub
+        ->shouldReceive('findByUsername')
+        ->with('canhassi')
+        ->once()
+        ->andReturn($this->userEntity);
 
-    private UserEntity $userEntity;
+    $this->getProfileStub
+        ->shouldReceive('handle')
+        ->with($this->userEntity->id)
+        ->once()
+        ->andReturn($this->profileEntity);
 
-    private ProviderEntity $providerEntity;
+    $test = new FindProfile($this->getProfileStub, $this->userRepositoryStub, $this->providerRepositoryStub);
 
-    private ProfileEntity $profileEntity;
+    $test->handle('canhassi');
+});
+test('find profile with provider id success', function (): void {
+    $this->userRepositoryStub
+        ->shouldReceive('findByUsername')
+        ->with('canhassi-id')
+        ->once();
 
-    protected function setUp(): void
-    {
-        parent::setUp();
-        $this->userRepositoryStub = m::mock(UserRepository::class);
-        $this->getProfileStub = m::mock(GetProfile::class);
-        $this->providerRepositoryStub = m::mock(ProviderRepository::class);
-        $this->providerEntity = $this->validProviderEntity();
-        $this->userEntity = $this->validUserEntity();
-        $this->profileEntity = $this->validProfileEntity();
-    }
+    $this->providerRepositoryStub
+        ->shouldReceive('findByProviderId')
+        ->with('canhassi-id')
+        ->once()
+        ->andReturn($this->providerEntity);
 
-    protected function tearDown(): void
-    {
-        parent::tearDown();
-        m::close();
-    }
+    $this->getProfileStub
+        ->shouldReceive('handle')
+        ->with($this->providerEntity->userId)
+        ->once()
+        ->andReturn($this->profileEntity);
 
-    public function test_find_profile_with_username_success(): void
-    {
-        $this->userRepositoryStub
-            ->shouldReceive('findByUsername')
-            ->with('canhassi')
-            ->once()
-            ->andReturn($this->userEntity);
+    $test = new FindProfile($this->getProfileStub, $this->userRepositoryStub, $this->providerRepositoryStub);
 
-        $this->getProfileStub
-            ->shouldReceive('handle')
-            ->with($this->userEntity->id)
-            ->once()
-            ->andReturn($this->profileEntity);
+    $test->handle('canhassi-id');
+});
+test('profile not found', function (): void {
+    $this->expectException(ProfileException::class);
 
-        $test = new FindProfile($this->getProfileStub, $this->userRepositoryStub, $this->providerRepositoryStub);
+    $this->userRepositoryStub
+        ->shouldReceive('findByUsername')
+        ->with('canhassi-id')
+        ->once();
 
-        $test->handle('canhassi');
-    }
+    $this->providerRepositoryStub
+        ->shouldReceive('findByProviderId')
+        ->with('canhassi-id')
+        ->once();
 
-    public function test_find_profile_with_provider_id_success(): void
-    {
-        $this->userRepositoryStub
-            ->shouldReceive('findByUsername')
-            ->with('canhassi-id')
-            ->once();
+    $test = new FindProfile($this->getProfileStub, $this->userRepositoryStub, $this->providerRepositoryStub);
 
-        $this->providerRepositoryStub
-            ->shouldReceive('findByProviderId')
-            ->with('canhassi-id')
-            ->once()
-            ->andReturn($this->providerEntity);
-
-        $this->getProfileStub
-            ->shouldReceive('handle')
-            ->with($this->providerEntity->userId)
-            ->once()
-            ->andReturn($this->profileEntity);
-
-        $test = new FindProfile($this->getProfileStub, $this->userRepositoryStub, $this->providerRepositoryStub);
-
-        $test->handle('canhassi-id');
-    }
-
-    public function test_profile_not_found(): void
-    {
-        $this->expectException(ProfileException::class);
-
-        $this->userRepositoryStub
-            ->shouldReceive('findByUsername')
-            ->with('canhassi-id')
-            ->once();
-
-        $this->providerRepositoryStub
-            ->shouldReceive('findByProviderId')
-            ->with('canhassi-id')
-            ->once();
-
-        $test = new FindProfile($this->getProfileStub, $this->userRepositoryStub, $this->providerRepositoryStub);
-
-        $test->handle('canhassi-id');
-    }
-}
+    $test->handle('canhassi-id');
+});

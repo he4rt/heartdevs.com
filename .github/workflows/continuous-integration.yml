@@ -1,0 +1,108 @@
+name: Continuous Integration
+
+on:
+  push:
+    branches:
+      - 3.x
+  pull_request:
+    branches:
+      - 3.x
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  setup:
+    name: Setup PHP
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    outputs:
+      CACHE_KEY: ${{ steps.cache.outputs.key }}
+      PHP_VERSION: ${{ steps.setup.outputs.PHP_VERSION }}
+      PHP_EXTENSIONS: ${{ steps.setup.outputs.PHP_EXTENSIONS }}
+      PHP_INI_PROPERTIES: ${{ steps.setup.outputs.PHP_INI_PROPERTIES }}
+      COMPOSER_FLAGS: ${{ steps.setup.outputs.COMPOSER_FLAGS }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+
+      - name: Setup job outputs
+        id: setup
+        run: |
+          echo "PHP_VERSION=8.4" >> "$GITHUB_OUTPUT"
+          echo "PHP_EXTENSIONS=mbstring,pdo,xml,ctype,fileinfo,json,curl,openssl,dom,zip" >> "$GITHUB_OUTPUT"
+          echo "PHP_INI_PROPERTIES=post_max_size=256M,upload_max_filesize=256M" >> "$GITHUB_OUTPUT"
+          echo "COMPOSER_FLAGS=--prefer-dist --optimize-autoloader" >> "$GITHUB_OUTPUT"
+
+      - name: Create cache key
+        id: cache
+        run: |
+          composer_hash=${{ hashFiles('**/composer.lock') }}
+          os_lower=$(echo ${{ runner.os }} | tr '[:upper:]' '[:lower:]')
+          arch_lower=$(echo ${{ runner.arch }} | tr '[:upper:]' '[:lower:]')
+          combined_key="${os_lower}-${arch_lower}-composer-${composer_hash}"
+          echo "key=${combined_key}" >> "$GITHUB_OUTPUT"
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@bf6b4fbd49ca58e4608c9c89fba0b8d90bd2a39f # v2.35.5
+        with:
+          php-version: ${{ steps.setup.outputs.PHP_VERSION }}
+          extensions: ${{ steps.setup.outputs.PHP_EXTENSIONS }}
+          ini-values: ${{ steps.setup.outputs.PHP_INI_PROPERTIES }}
+          coverage: xdebug
+          tools: composer:v2
+
+      - name: Install composer dependencies
+        uses: ramsey/composer-install@3cf229dc2919194e9e36783941438d17239e8520 # v3.1.1
+        with:
+          composer-options: ${{ steps.setup.outputs.COMPOSER_FLAGS }}
+          custom-cache-key: ${{ steps.cache.outputs.key }}
+
+  pint:
+    name: Perform Pint format
+    needs:
+      - setup
+    uses: ./.github/workflows/_pint.yml
+    with:
+      CACHE_KEY: ${{ needs.setup.outputs.CACHE_KEY }}
+      COMPOSER_FLAGS: ${{ needs.setup.outputs.COMPOSER_FLAGS }}
+      PHP_EXTENSIONS: ${{ needs.setup.outputs.PHP_EXTENSIONS }}
+      PHP_INI_PROPERTIES: ${{ needs.setup.outputs.PHP_INI_PROPERTIES }}
+      PHP_VERSION: ${{ needs.setup.outputs.PHP_VERSION }}
+
+  rector:
+    name: Perform Rector Check
+    needs:
+      - setup
+    uses: ./.github/workflows/_rector.yml
+    with:
+      CACHE_KEY: ${{ needs.setup.outputs.CACHE_KEY }}
+      COMPOSER_FLAGS: ${{ needs.setup.outputs.COMPOSER_FLAGS }}
+      PHP_EXTENSIONS: ${{ needs.setup.outputs.PHP_EXTENSIONS }}
+      PHP_INI_PROPERTIES: ${{ needs.setup.outputs.PHP_INI_PROPERTIES }}
+      PHP_VERSION: ${{ needs.setup.outputs.PHP_VERSION }}
+
+  phpstan:
+    name: Perform Phpstan Check
+    needs:
+      - setup
+    uses: ./.github/workflows/_phpstan.yml
+    with:
+      CACHE_KEY: ${{ needs.setup.outputs.CACHE_KEY }}
+      COMPOSER_FLAGS: ${{ needs.setup.outputs.COMPOSER_FLAGS }}
+      PHP_EXTENSIONS: ${{ needs.setup.outputs.PHP_EXTENSIONS }}
+      PHP_INI_PROPERTIES: ${{ needs.setup.outputs.PHP_INI_PROPERTIES }}
+      PHP_VERSION: ${{ needs.setup.outputs.PHP_VERSION }}
+
+  pest:
+    name: Perform Pest Tests
+    needs:
+      - setup
+    uses: ./.github/workflows/_pest.yml
+    with:
+      CACHE_KEY: ${{ needs.setup.outputs.CACHE_KEY }}
+      COMPOSER_FLAGS: ${{ needs.setup.outputs.COMPOSER_FLAGS }}
+      PHP_EXTENSIONS: ${{ needs.setup.outputs.PHP_EXTENSIONS }}
+      PHP_INI_PROPERTIES: ${{ needs.setup.outputs.PHP_INI_PROPERTIES }}
+      PHP_VERSION: ${{ needs.setup.outputs.PHP_VERSION }}

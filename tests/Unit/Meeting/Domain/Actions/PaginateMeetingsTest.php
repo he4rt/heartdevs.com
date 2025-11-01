@@ -2,50 +2,29 @@
 
 declare(strict_types=1);
 
-namespace Tests\Unit\Meeting\Domain\Actions;
-
+use Tests\Unit\Meeting\MeetingProviderTrait;
 use Heart\Meeting\Domain\Actions\PaginateMeetings;
-use Heart\Meeting\Domain\Entities\MeetingEntity;
 use Heart\Meeting\Domain\Repositories\MeetingRepository;
 use Heart\Shared\Domain\Paginator;
-use Mockery as m;
-use Mockery\MockInterface;
-use Tests\TestCase;
-use Tests\Unit\Meeting\MeetingProviderTrait;
 
-final class PaginateMeetingsTest extends TestCase
-{
-    use MeetingProviderTrait;
-    private MockInterface $meetingRepositoryStub;
+uses(MeetingProviderTrait::class);
 
-    private MeetingEntity $meetingEntity;
+beforeEach(function (): void {
+    $this->meetingRepositoryStub = m::mock(MeetingRepository::class);
+    $this->meetingEntity = $this->validMeetingEntity();
+    $this->paginatorStub = m::mock(Paginator::class);
+});
+afterEach(function (): void {
+    m::close();
+});
+test('paginate meetings', function (): void {
+    $this->meetingRepositoryStub
+        ->shouldReceive('paginate')
+        ->with(['meetingType'])
+        ->once()
+        ->andReturn($this->paginatorStub);
 
-    private Paginator $paginatorStub;
+    $test = new PaginateMeetings($this->meetingRepositoryStub);
 
-    protected function setUp(): void
-    {
-        parent::setUp();
-        $this->meetingRepositoryStub = m::mock(MeetingRepository::class);
-        $this->meetingEntity = $this->validMeetingEntity();
-        $this->paginatorStub = m::mock(Paginator::class);
-    }
-
-    protected function tearDown(): void
-    {
-        parent::tearDown();
-        m::close();
-    }
-
-    public function test_paginate_meetings(): void
-    {
-        $this->meetingRepositoryStub
-            ->shouldReceive('paginate')
-            ->with(['meetingType'])
-            ->once()
-            ->andReturn($this->paginatorStub);
-
-        $test = new PaginateMeetings($this->meetingRepositoryStub);
-
-        $test->handle();
-    }
-}
+    $test->handle();
+});

@@ -2,49 +2,27 @@
 
 declare(strict_types=1);
 
-namespace Tests\Unit\Character\Domain\Actions;
-
-use Heart\Character\Domain\Actions\FindCharacter;
-use Heart\Character\Domain\Entities\CharacterEntity;
-use Heart\Character\Domain\Repositories\CharacterRepository;
-use Mockery as m;
-use Mockery\MockInterface;
-use Tests\TestCase;
 use Tests\Unit\Character\CharacterProviderTrait;
+use Heart\Character\Domain\Actions\FindCharacter;
+use Heart\Character\Domain\Repositories\CharacterRepository;
 
-final class FindCharacterTest extends TestCase
-{
-    use CharacterProviderTrait;
+uses(CharacterProviderTrait::class);
 
-    private MockInterface $characterRepositoryStub;
+beforeEach(function (): void {
+    $this->characterRepositoryStub = m::mock(CharacterRepository::class);
+    $this->characterEntity = $this->validCharacterEntity();
+});
+afterEach(function (): void {
+    m::close();
+});
+test('find character success', function (): void {
+    $this->characterRepositoryStub
+        ->shouldReceive('findById')
+        ->with($this->characterEntity->id)
+        ->once()
+        ->andReturn($this->characterEntity);
 
-    private CharacterEntity $characterEntity;
+    $test = new FindCharacter($this->characterRepositoryStub);
 
-    private MockInterface $findCharacterStub;
-
-    protected function setUp(): void
-    {
-        parent::setUp();
-        $this->characterRepositoryStub = m::mock(CharacterRepository::class);
-        $this->characterEntity = $this->validCharacterEntity();
-    }
-
-    protected function tearDown(): void
-    {
-        parent::tearDown();
-        m::close();
-    }
-
-    public function test_find_character_success(): void
-    {
-        $this->characterRepositoryStub
-            ->shouldReceive('findById')
-            ->with($this->characterEntity->id)
-            ->once()
-            ->andReturn($this->characterEntity);
-
-        $test = new FindCharacter($this->characterRepositoryStub);
-
-        $test->handle($this->characterEntity->id);
-    }
-}
+    $test->handle($this->characterEntity->id);
+});

@@ -2,59 +2,46 @@
 
 declare(strict_types=1);
 
-namespace Tests\Feature\Feedback;
-
+use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Heart\Feedback\Infrastructure\Models\Feedback;
 use Heart\Provider\Infrastructure\Models\Provider;
-use Illuminate\Foundation\Testing\DatabaseTransactions;
-use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\HttpFoundation\Response;
-use Tests\TestCase;
 
-final class ReviewFeedbackTest extends TestCase
-{
-    use DatabaseTransactions;
+uses(DatabaseTransactions::class);
 
-    public static function dataProvider(): array
-    {
-        return [
-            'approve feedback' => [
-                'action' => 'approved',
-                'payload' => [],
-                'expected' => [
-                    'status' => 'approved',
-                ],
-            ],
-            'decline feedback' => [
-                'action' => 'declined',
-                'payload' => [
-                    'reason' => 'bobo',
-                ],
-                'expected' => [
-                    'status' => 'declined',
-                    'reason' => 'bobo',
-                ],
-            ],
-        ];
-    }
+dataset('dataProvider', fn() => [
+    'approve feedback' => [
+        'action' => 'approved',
+        'payload' => [],
+        'expected' => [
+            'status' => 'approved',
+        ],
+    ],
+    'decline feedback' => [
+        'action' => 'declined',
+        'payload' => [
+            'reason' => 'bobo',
+        ],
+        'expected' => [
+            'status' => 'declined',
+            'reason' => 'bobo',
+        ],
+    ],
+]);
+test('can handle feedback', function (string $action, array $payload, array $expected): void {
+    $feedback = Feedback::factory()->create();
+    $staffProvider = Provider::factory()->create(['provider' => 'discord']);
 
-    #[DataProvider('dataProvider')]
-    public function test_can_handle_feedback(string $action, array $payload, array $expected): void
-    {
-        $feedback = Feedback::factory()->create();
-        $staffProvider = Provider::factory()->create(['provider' => 'discord']);
+    $payload['staff_id'] = $staffProvider->provider_id;
+    $response = $this
+        ->actingAsAdmin()
+        ->postJson(route('feedbacks.review', [
+            'feedbackId' => $feedback->id,
+            'action' => $action,
+        ]), $payload);
 
-        $payload['staff_id'] = $staffProvider->provider_id;
-        $response = $this
-            ->actingAsAdmin()
-            ->postJson(route('feedbacks.review', [
-                'feedbackId' => $feedback->id,
-                'action' => $action,
-            ]), $payload);
+    $response->assertStatus(Response::HTTP_CREATED);
 
-        $response->assertStatus(Response::HTTP_CREATED);
-
-        $expected['staff_id'] = $staffProvider->user_id;
-        $this->assertDatabaseHas('feedback_reviews', $expected);
-    }
-}
+    $expected['staff_id'] = $staffProvider->user_id;
+    $this->assertDatabaseHas('feedback_reviews', $expected);
+})->with('dataProvider');
