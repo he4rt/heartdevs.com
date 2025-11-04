@@ -11,7 +11,6 @@
         "php": "^8.3",
         "filament/filament": "^4.0",
         "guzzlehttp/guzzle": "^7.10.0",
-        "he4rt/admin": ">=1",
         "he4rt/authentication": ">=1",
         "he4rt/badge": "^1.0.0",
         "he4rt/character": ">=1",
