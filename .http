@@ -1,0 +1,304 @@
+### REST Client variables
+@baseUrl = https://he4rt-bot-api.test
+@botSecret = he4rt
+@json = application/json
+@path = example.txt
+@badgeId = 1
+@provider = discord
+@providerId = 1432083296296374366
+@feedbackId = 1
+@action = approve
+@id = 1
+@value = 1
+@filename = sample.txt
+
+### Notes
+# - Ajuste @baseUrl conforme seu servidor (ex.: http://localhost, http://127.0.0.1:8000)
+# - Substitua @botSecret pelo valor de HE4RT_BOT_SECRET do seu .env
+# - Os corpos de requisição abaixo são exemplos; adapte conforme necessário
+
+######################################################################
+# Raiz e utilidades
+######################################################################
+
+### GET /
+GET {{baseUrl}}/
+
+### GET /up (healthcheck padrão Laravel Sail)
+GET {{baseUrl}}/up
+
+### GET storage/{path}
+GET {{baseUrl}}/storage/{{path}}
+
+### GET sanctum/csrf-cookie
+GET {{baseUrl}}/sanctum/csrf-cookie
+
+### GET|POST broadcasting/auth
+GET {{baseUrl}}/broadcasting/auth
+
+### POST broadcasting/auth
+POST {{baseUrl}}/broadcasting/auth
+Accept: application/json
+Content-Type: {{json}}
+
+{
+	// Exemplo: autenticar canal privado/presença
+	"channel_name": "private-updates",
+	"socket_id": "1234.5678"
+}
+
+######################################################################
+# Documentação (Scramble)
+######################################################################
+
+### GET docs/api (UI)
+GET {{baseUrl}}/docs/api
+
+### GET docs/api.json (OpenAPI)
+GET {{baseUrl}}/docs/api.json
+
+######################################################################
+# Badges
+######################################################################
+
+### GET api/badges
+GET {{baseUrl}}/api/badges
+Accept: application/json
+
+### POST api/badges
+POST {{baseUrl}}/api/badges
+Accept: application/json
+Content-Type: {{json}}
+X-He4rt-Authorization: {{botSecret}}
+
+{
+	"provider": "discord",
+	"name": "Helper",
+	"description": "Contribuiu com a comunidade",
+	"image_url": "https://example.com/badges/helper.png",
+	"redeem_code": "HELPER2025",
+	"active": true
+}
+
+### DELETE api/badges/{badgeId}
+DELETE {{baseUrl}}/api/badges/{{badgeId}}
+Accept: application/json
+X-He4rt-Authorization: {{botSecret}}
+
+######################################################################
+# Characters
+######################################################################
+
+### GET api/characters
+GET {{baseUrl}}/api/characters
+Accept: application/json
+
+### GET api/characters/{provider}
+GET {{baseUrl}}/api/characters/{{provider}}
+Accept: application/json
+
+### POST api/characters/{provider}/{providerId}/claimBadge
+POST {{baseUrl}}/api/characters/{{provider}}/{{providerId}}/claimBadge
+Accept: application/json
+Content-Type: {{json}}
+X-He4rt-Authorization: {{botSecret}}
+
+{
+	"redeem_code": "HELPER2025"
+}
+
+### POST api/characters/{provider}/{providerId}/daily
+POST {{baseUrl}}/api/characters/{{provider}}/{{providerId}}/daily
+Accept: application/json
+X-He4rt-Authorization: {{botSecret}}
+
+######################################################################
+# Events - Meeting
+######################################################################
+
+### GET api/events/{provider}/meeting
+GET {{baseUrl}}/api/events/{{provider}}/meeting
+Accept: application/json
+
+### POST api/events/{provider}/meeting/start
+POST {{baseUrl}}/api/events/{{provider}}/meeting/start
+Accept: application/json
+Content-Type: {{json}}
+X-He4rt-Authorization: {{botSecret}}
+
+{
+	"provider_id": "1432083296296374366",
+	"meeting_type_id": 1
+}
+
+### POST api/events/{provider}/meeting/end
+POST {{baseUrl}}/api/events/{{provider}}/meeting/end
+Accept: application/json
+X-He4rt-Authorization: {{botSecret}}
+
+######################################################################
+# Feedbacks
+######################################################################
+
+### POST api/feedbacks
+POST {{baseUrl}}/api/feedbacks
+Accept: application/json
+Content-Type: {{json}}
+
+{
+	"sender_id": "1",
+	"target_id": "2",
+	"message": "Ótima apresentação no evento de hoje! Parabéns pelo trabalho.",
+	"type": "positive"
+}
+
+### GET api/feedbacks/{feedbackId}
+GET {{baseUrl}}/api/feedbacks/{{feedbackId}}
+Accept: application/json
+
+### POST api/feedbacks/{feedbackId}/{action}
+POST {{baseUrl}}/api/feedbacks/{{feedbackId}}/{{action}}
+Accept: application/json
+Content-Type: {{json}}
+X-He4rt-Authorization: {{botSecret}}
+
+{
+	"staff_id": "1",
+	"reason": "Feedback apropriado e construtivo"
+}
+
+######################################################################
+# Messages e Voices (integração com bot)
+######################################################################
+
+### POST api/messages/{provider}
+POST {{baseUrl}}/api/messages/{{provider}}
+Accept: application/json
+Content-Type: {{json}}
+X-He4rt-Authorization: {{botSecret}}
+
+{
+	"provider_id": "1432083296296374366",
+	"provider_message_id": "1234567890123456789",
+	"channel_id": "1435254698260041768",
+	"content": "Olá mundo! Como estão?",
+	"sent_at": "2025-11-04 10:30:00"
+}
+
+### POST api/voices/{provider}
+POST {{baseUrl}}/api/voices/{{provider}}
+Accept: application/json
+Content-Type: {{json}}
+X-He4rt-Authorization: {{botSecret}}
+
+{
+	"provider_id": "1432083296296374366",
+	"state": "unmuted",
+	"channel_name": "Geral"
+}
+
+######################################################################
+# Providers
+######################################################################
+
+### POST api/providers/{provider}
+POST {{baseUrl}}/api/providers/{{provider}}
+Accept: application/json
+Content-Type: {{json}}
+X-He4rt-Authorization: {{botSecret}}
+
+{
+	"provider_id": "1432083296296374366",
+	"username": "danielhe4rt"
+}
+
+######################################################################
+# Ranking
+######################################################################
+
+### GET api/ranking/leveling
+GET {{baseUrl}}/api/ranking/leveling
+Accept: application/json
+
+######################################################################
+# Users
+######################################################################
+
+### GET api/users
+GET {{baseUrl}}/api/users
+Accept: application/json
+
+### GET api/users/{id}
+GET {{baseUrl}}/api/users/{{id}}
+Accept: application/json
+
+### GET api/users/profile/{value}
+GET {{baseUrl}}/api/users/profile/{{value}}
+Accept: application/json
+
+### PUT api/users/profile/{value}
+PUT {{baseUrl}}/api/users/profile/{{value}}
+Accept: application/json
+Content-Type: {{json}}
+
+{
+	"info": {
+		"name": "Daniel Reis",
+		"nickname": "danielhe4rt",
+		"linkedin_url": "https://linkedin.com/in/danielheart",
+		"github_url": "https://github.com/danielhe4rt",
+		"birthdate": "1995-06-15",
+		"about": "Desenvolvedor Full Stack apaixonado por comunidades tech"
+	}
+}
+
+######################################################################
+# Season
+######################################################################
+
+### GET season/v2/seasons
+GET {{baseUrl}}/season/v2/seasons
+Accept: application/json
+
+### GET season/v2/seasons/current
+GET {{baseUrl}}/season/v2/seasons/current
+Accept: application/json
+
+######################################################################
+# Auth OAuth
+######################################################################
+
+### GET auth/oauth/{provider}/redirect (inicia OAuth)
+GET {{baseUrl}}/auth/oauth/{{provider}}/redirect
+
+### GET auth/oauth/{provider} (callback)
+GET {{baseUrl}}/auth/oauth/{{provider}}
+
+######################################################################
+# Livewire (internos – normalmente não necessários para API)
+######################################################################
+
+### GET livewire/livewire.js
+GET {{baseUrl}}/livewire/livewire.js
+
+### GET livewire/livewire.min.js.map
+GET {{baseUrl}}/livewire/livewire.min.js.map
+
+### GET livewire/preview-file/{filename}
+GET {{baseUrl}}/livewire/preview-file/{{filename}}
+
+### POST livewire/update
+POST {{baseUrl}}/livewire/update
+Accept: application/json
+Content-Type: {{json}}
+
+{
+}
+
+### POST livewire/upload-file
+POST {{baseUrl}}/livewire/upload-file
+Accept: application/json
+Content-Type: multipart/form-data
+
+< ./path/to/file
+
