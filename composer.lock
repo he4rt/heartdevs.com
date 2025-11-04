@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "e984227e3dd65248df6735ec3a6adb28",
+    "content-hash": "595a8048d664ea881016bc7b052015f6",
     "packages": [
         {
             "name": "anourvalar/eloquent-serialize",
@@ -2722,6 +2722,38 @@
                     "He4rt\\Character\\": "src/",
                     "He4rt\\Character\\Tests\\": "tests/",
                     "He4rt\\Character\\Database\\Factories\\": "database/factories/"
+                }
+            },
+            "license": [
+                "proprietary"
+            ],
+            "transport-options": {
+                "symlink": true,
+                "relative": true
+            }
+        },
+        {
+            "name": "he4rt/events",
+            "version": "1.0",
+            "dist": {
+                "type": "path",
+                "url": "app-modules/events",
+                "reference": "4249137e2058d09a1fe035a615daf30642d28526"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "He4rt\\Events\\Providers\\EventsServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "He4rt\\Events\\": "src/",
+                    "He4rt\\Events\\Tests\\": "tests/",
+                    "He4rt\\Events\\Database\\Factories\\": "database/factories/",
+                    "He4rt\\Events\\Database\\Seeders\\": "database/seeders/"
                 }
             },
             "license": [
