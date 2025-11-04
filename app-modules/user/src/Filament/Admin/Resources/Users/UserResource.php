@@ -2,18 +2,18 @@
 
 declare(strict_types=1);
 
-namespace He4rt\Admin\Filament\Admin\Resources\Users;
+namespace He4rt\User\Filament\Admin\Resources\Users;
 
 use BackedEnum;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
-use He4rt\Admin\Filament\Admin\Resources\Users\Pages\CreateUser;
-use He4rt\Admin\Filament\Admin\Resources\Users\Pages\EditUser;
-use He4rt\Admin\Filament\Admin\Resources\Users\Pages\ListUsers;
-use He4rt\Admin\Filament\Admin\Resources\Users\Schemas\UserForm;
-use He4rt\Admin\Filament\Admin\Resources\Users\Tables\UsersTable;
+use He4rt\User\Filament\Admin\Resources\Users\Pages\CreateUser;
+use He4rt\User\Filament\Admin\Resources\Users\Pages\EditUser;
+use He4rt\User\Filament\Admin\Resources\Users\Pages\ListUsers;
+use He4rt\User\Filament\Admin\Resources\Users\Schemas\UserForm;
+use He4rt\User\Filament\Admin\Resources\Users\Tables\UsersTable;
 use He4rt\User\Models\User;
 
 class UserResource extends Resource

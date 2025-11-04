@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace He4rt\Admin\Filament\Admin\Resources\Users\Schemas;
+namespace He4rt\User\Filament\Admin\Resources\Users\Schemas;
 
 use Filament\Schemas\Schema;
 

@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace He4rt\Admin\Filament\Admin\Resources\Users\Pages;
+namespace He4rt\User\Filament\Admin\Resources\Users\Pages;
 
 use Filament\Actions\DeleteAction;
 use Filament\Resources\Pages\EditRecord;
-use He4rt\Admin\Filament\Admin\Resources\Users\UserResource;
+use He4rt\User\Filament\Admin\Resources\Users\UserResource;
 
 class EditUser extends EditRecord
 {

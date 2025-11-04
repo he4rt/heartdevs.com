@@ -2,17 +2,17 @@
 
 declare(strict_types=1);
 
-namespace He4rt\Admin\Plugins;
+namespace He4rt\User\Plugins;
 
 use App\Providers\Filament\FilamentPanel;
 use Filament\Contracts\Plugin;
 use Filament\Panel;
 
-class GuestPanelPlugin implements Plugin
+class AdminUserPanelPlugin implements Plugin
 {
     public function getId(): string
     {
-        return FilamentPanel::Guest->value;
+        return FilamentPanel::Admin->moduleName('user');
     }
 
     public function register(Panel $panel): void
