@@ -23,6 +23,7 @@
         "he4rt/ranking": ">=1",
         "he4rt/season": "^1.0.0",
         "he4rt/shared": ">=1",
+        "he4rt/sponsors": ">=1",
         "he4rt/tenant": ">=1",
         "he4rt/user": ">=1",
         "internachi/modular": "^2.3.0",
@@ -34,7 +35,7 @@
     },
     "require-dev": {
         "barryvdh/laravel-ide-helper": "^3.6.0",
-        "driftingly/rector-laravel": "^2.1.2",
+        "driftingly/rector-laravel": "^2.1.3",
         "fakerphp/faker": "^1.24.1",
         "larastan/larastan": "^3.8.0",
         "laravel/pail": "^1.2.3",

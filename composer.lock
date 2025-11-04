@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "595a8048d664ea881016bc7b052015f6",
+    "content-hash": "85987fccecc974b9229220f2faed665e",
     "packages": [
         {
             "name": "anourvalar/eloquent-serialize",
@@ -2738,7 +2738,7 @@
             "dist": {
                 "type": "path",
                 "url": "app-modules/events",
-                "reference": "4249137e2058d09a1fe035a615daf30642d28526"
+                "reference": "c54f6839f91b5c8e03521a824b652bcbddd25caa"
             },
             "type": "library",
             "extra": {
@@ -2999,6 +2999,38 @@
             "autoload": {
                 "psr-4": {
                     "He4rt\\Shared\\": "src/"
+                }
+            },
+            "license": [
+                "proprietary"
+            ],
+            "transport-options": {
+                "symlink": true,
+                "relative": true
+            }
+        },
+        {
+            "name": "he4rt/sponsors",
+            "version": "1.0",
+            "dist": {
+                "type": "path",
+                "url": "app-modules/sponsors",
+                "reference": "7a9b2e3c9252ee2da6aaeeb89989551051627b63"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "He4rt\\Sponsors\\Providers\\SponsorsServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "He4rt\\Sponsors\\": "src/",
+                    "He4rt\\Sponsors\\Tests\\": "tests/",
+                    "He4rt\\Sponsors\\Database\\Factories\\": "database/factories/",
+                    "He4rt\\Sponsors\\Database\\Seeders\\": "database/seeders/"
                 }
             },
             "license": [
@@ -10389,21 +10421,22 @@
         },
         {
             "name": "driftingly/rector-laravel",
-            "version": "2.1.2",
+            "version": "2.1.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/driftingly/rector-laravel.git",
-                "reference": "d7cd932cff9e398a43393f1a1a63b27d574e35ef"
+                "reference": "2f1e9c3997bf45592d58916f0cedd775e844b9c6"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/driftingly/rector-laravel/zipball/d7cd932cff9e398a43393f1a1a63b27d574e35ef",
-                "reference": "d7cd932cff9e398a43393f1a1a63b27d574e35ef",
+                "url": "https://api.github.com/repos/driftingly/rector-laravel/zipball/2f1e9c3997bf45592d58916f0cedd775e844b9c6",
+                "reference": "2f1e9c3997bf45592d58916f0cedd775e844b9c6",
                 "shasum": ""
             },
             "require": {
                 "php": "^7.4 || ^8.0",
-                "rector/rector": "^2.2.7"
+                "rector/rector": "^2.2.7",
+                "webmozart/assert": "^1.11"
             },
             "type": "rector-extension",
             "autoload": {
@@ -10418,9 +10451,9 @@
             "description": "Rector upgrades rules for Laravel Framework",
             "support": {
                 "issues": "https://github.com/driftingly/rector-laravel/issues",
-                "source": "https://github.com/driftingly/rector-laravel/tree/2.1.2"
+                "source": "https://github.com/driftingly/rector-laravel/tree/2.1.3"
             },
-            "time": "2025-10-31T21:56:58+00:00"
+            "time": "2025-11-04T18:32:57+00:00"
         },
         {
             "name": "fakerphp/faker",
