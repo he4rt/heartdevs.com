@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace He4rt\Admin\Filament\Admin\Resources\Users;
 
 use BackedEnum;
@@ -13,7 +15,6 @@ use He4rt\Admin\Filament\Admin\Resources\Users\Pages\ListUsers;
 use He4rt\Admin\Filament\Admin\Resources\Users\Schemas\UserForm;
 use He4rt\Admin\Filament\Admin\Resources\Users\Tables\UsersTable;
 use He4rt\User\Models\User;
-
 
 class UserResource extends Resource
 {
