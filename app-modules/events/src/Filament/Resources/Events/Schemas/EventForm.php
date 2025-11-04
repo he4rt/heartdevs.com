@@ -19,6 +19,10 @@ class EventForm
     {
         return $schema
             ->components([
+                Select::make('tenant_id')
+                    ->label('Tenant')
+                    ->relationship('tenant', 'name')
+                    ->required(),
                 TextInput::make('title')
                     ->label('Title')
                     ->minLength(5)
@@ -41,7 +45,11 @@ class EventForm
                 Select::make('event_type')
                     ->label('Event Type')
                     ->enum(EventTypeEnum::class)
-                    ->options([EventTypeEnum::class])
+                    ->options(EventTypeEnum::class)
+                    ->required(),
+                TextInput::make('max_attendees')
+                    ->numeric()
+                    ->minValue(1)
                     ->required(),
                 Select::make('active')
                     ->label('Active')
@@ -58,6 +66,7 @@ class EventForm
                     ->required(),
                 DateTimePicker::make('end_at')
                     ->label('Event End Hour')
+                    ->after('start_at')
                     ->required(),
             ]);
     }
