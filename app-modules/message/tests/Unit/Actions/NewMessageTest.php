@@ -34,6 +34,7 @@ test('new message', function (string $provider, array $payload): void {
     $obtainedExperience = 1;
     $providerEntityMock = new ProviderEntity(
         '1',
+        '1',
         'id-user-foda',
         'twitch',
         '12312312',
@@ -48,7 +49,7 @@ test('new message', function (string $provider, array $payload): void {
     $findCharacterStub
         ->shouldReceive('handle')
         ->once()
-        ->with($providerEntityMock->userId)
+        ->with($providerEntityMock->modelId)
         ->andReturn('id-character-foda');
 
     $characterExperienceStub
@@ -65,7 +66,7 @@ test('new message', function (string $provider, array $payload): void {
     $attendMeetingStub
         ->shouldReceive('handle')
         ->once()
-        ->with($providerEntityMock->userId);
+        ->with($providerEntityMock->modelId);
 
     $action = new NewMessage(
         $persistMessageStub,
@@ -84,6 +85,7 @@ dataset('data provider', fn () => [
         'provider' => 'twitch',
         'payload' => [
             'provider' => 'twitch',
+            'tenant_id' => 1,
             'provider_id' => '1234',
             'provider_message_id' => '78781237',
             'channel_id' => '31231267312',

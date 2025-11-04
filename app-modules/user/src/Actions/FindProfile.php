@@ -33,7 +33,7 @@ final readonly class FindProfile
         $providerEntity = $this->providerRepository->findByProviderId($value);
 
         if ($providerEntity instanceof ProviderEntity) {
-            return $this->profile->handle($providerEntity->userId);
+            return $this->profile->handle($providerEntity->modelId);
         }
 
         throw ProfileException::notFound();

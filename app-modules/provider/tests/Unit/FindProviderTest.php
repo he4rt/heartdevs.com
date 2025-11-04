@@ -14,7 +14,7 @@ test('cached provider', function (): void {
 
     $providerRepositoryStub = Mockery::mock(ProviderRepository::class);
     $getProvider = new GetProviderById($providerRepositoryStub);
-    $providerEntity = new ProviderEntity('1', '1', '1', '1', '1');
+    $providerEntity = new ProviderEntity('1', '1', '1', '1', '1', '1');
 
     Cache::shouldReceive('remember')
         ->once()

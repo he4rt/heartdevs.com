@@ -43,7 +43,7 @@ final class User extends Model
 
     public function providers(): HasMany
     {
-        return $this->hasMany(Provider::class);
+        return $this->hasMany(Provider::class, 'model_id');
     }
 
     public function character(): HasOne

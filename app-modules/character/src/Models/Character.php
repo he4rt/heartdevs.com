@@ -32,6 +32,7 @@ final class Character extends Model
 
     protected $fillable = [
         'id',
+        'tenant_id',
         'user_id',
         'reputation',
         'experience',

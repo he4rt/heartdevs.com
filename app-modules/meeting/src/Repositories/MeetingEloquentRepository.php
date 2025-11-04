@@ -25,6 +25,7 @@ final readonly class MeetingEloquentRepository implements MeetingRepository
     public function create(NewMeetingDTO $dto, string $adminId): MeetingEntity
     {
         $meeting = $this->model->newQuery()->create([
+            'tenant_id' => request()->input('tenant_id'),
             'meeting_type_id' => $dto->meetingTypeId,
             'admin_id' => $adminId,
             'starts_at' => now(),

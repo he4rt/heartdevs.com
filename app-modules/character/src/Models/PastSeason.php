@@ -24,6 +24,7 @@ final class PastSeason extends Model
         'messages_count',
         'badges_count',
         'meetings_count',
+        'tenant_id',
     ];
 
     protected static function newFactory(): PastSeasonFactory

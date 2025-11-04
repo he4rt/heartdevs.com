@@ -15,7 +15,7 @@ test('get provider by id', function (): void {
         ->shouldReceive('findByProvider')
         ->once()
         ->with('twitch', '12345678')
-        ->andReturn(new ProviderEntity('1', '1', '1', '1', 'email@foda.com'));
+        ->andReturn(new ProviderEntity('1', '1', '1', '1', '1', 'email@foda.com'));
 
     $action = new GetProviderById($providerRepositoryStub);
 

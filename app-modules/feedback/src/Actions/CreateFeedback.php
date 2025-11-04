@@ -30,8 +30,8 @@ final readonly class CreateFeedback
         $senderUserEntity = $this->findProvider->handle(ProviderEnum::Discord->value, $payload['sender_id']);
         $targetUserEntity = $this->findProvider->handle(ProviderEnum::Discord->value, $payload['target_id']);
 
-        $payload['sender_id'] = $senderUserEntity->userId;
-        $payload['target_id'] = $targetUserEntity->userId;
+        $payload['sender_id'] = $senderUserEntity->modelId;
+        $payload['target_id'] = $targetUserEntity->modelId;
 
         return $payload;
     }

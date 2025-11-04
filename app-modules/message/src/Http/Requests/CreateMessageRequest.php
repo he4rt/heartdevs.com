@@ -16,6 +16,7 @@ final class CreateMessageRequest extends FormRequest
     public function rules(): array
     {
         return [
+            'tenant_id' => ['required'],
             'provider' => ['required', 'in:twitch,discord'],
             'provider_id' => ['required'],
             'provider_message_id' => ['required'],

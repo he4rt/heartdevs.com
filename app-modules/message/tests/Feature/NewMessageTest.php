@@ -5,16 +5,28 @@ declare(strict_types=1);
 use He4rt\Character\Models\Character;
 use He4rt\Meeting\Models\Meeting;
 use He4rt\Provider\Models\Provider;
+use He4rt\Tenant\Models\Tenant;
 use He4rt\User\Models\User;
 use Illuminate\Support\Facades\Cache;
 
 test('can create amessage', function (): void {
     Cache::tags(['meetings'])->flush();
 
-    $user = User::factory()
-        ->has(Character::factory(['experience' => 1]), 'character')
-        ->has(Provider::factory(), 'providers')
+    $tenant = Tenant::factory()
+        ->afterCreating(function (Tenant $tenant): void {
+            Provider::factory([
+                'tenant_id' => $tenant->getKey(),
+                'provider' => 'discord',
+                'provider_id' => '123',
+            ])->create();
+        })
         ->create();
+
+    $user = User::factory()
+        ->has(Character::factory(['tenant_id' => $tenant->getKey(), 'experience' => 1]), 'character')
+        ->has(Provider::factory(['tenant_id' => $tenant->getKey()]), 'providers')
+        ->create();
+
     $provider = $user->providers[0];
     $payload = [
         'provider' => $provider->provider,
@@ -27,7 +39,10 @@ test('can create amessage', function (): void {
 
     $this
         ->actingAsAdmin()
-        ->postJson(route('messages.create', ['provider' => $provider->provider]), $payload)
+        ->postJson(route('messages.create', ['provider' => $provider->provider]), $payload, [
+            'X-He4rt-Provider' => 'discord',
+            'X-He4rt-Provider-Id' => '123',
+        ])
         ->assertNoContent();
 
     $this->assertDatabaseMissing('characters', [
@@ -38,10 +53,19 @@ test('can create amessage', function (): void {
 
 test('can create amessage with level zero', function (): void {
     Cache::tags(['meetings'])->flush();
+    $tenant = Tenant::factory()
+        ->afterCreating(function (Tenant $tenant): void {
+            Provider::factory([
+                'tenant_id' => $tenant->getKey(),
+                'provider' => 'discord',
+                'provider_id' => '123',
+            ])->create();
+        })
+        ->create();
 
     $user = User::factory()
-        ->has(Character::factory(['experience' => 0]), 'character')
-        ->has(Provider::factory(), 'providers')
+        ->has(Character::factory(['tenant_id' => $tenant->getKey(), 'experience' => 0]), 'character')
+        ->has(Provider::factory(['tenant_id' => $tenant->getKey()]), 'providers')
         ->create();
     $provider = $user->providers[0];
     $payload = [
@@ -67,9 +91,19 @@ test('can create amessage with level zero', function (): void {
 test('can create amessage and receive ameeting check', function (): void {
     Cache::tags(['meetings'])->flush();
 
+    $tenant = Tenant::factory()
+        ->afterCreating(function (Tenant $tenant): void {
+            Provider::factory([
+                'tenant_id' => $tenant->getKey(),
+                'provider' => 'discord',
+                'provider_id' => '123',
+            ])->create();
+        })
+        ->create();
+
     $user = User::factory()
-        ->has(Character::factory(['experience' => 1]), 'character')
-        ->has(Provider::factory(), 'providers')
+        ->has(Character::factory(['tenant_id' => $tenant->getKey(), 'experience' => 1]), 'character')
+        ->has(Provider::factory(['tenant_id' => $tenant->getKey()]), 'providers')
         ->create();
 
     $meeting = Meeting::factory()

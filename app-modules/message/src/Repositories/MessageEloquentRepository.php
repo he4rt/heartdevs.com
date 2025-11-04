@@ -22,6 +22,7 @@ final readonly class MessageEloquentRepository implements MessageRepository
     public function create(NewMessageDTO $messageDTO, string $providerId, int $obtainedExperience): MessageEntity
     {
         $model = $this->query->create([
+            'tenant_id' => $messageDTO->tenantId,
             'provider_id' => $providerId,
             'provider_message_id' => $messageDTO->providerMessageId,
             'season_id' => config()->integer('he4rt.season.id'),

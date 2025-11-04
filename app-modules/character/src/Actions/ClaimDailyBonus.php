@@ -18,7 +18,7 @@ final readonly class ClaimDailyBonus
     {
         $providerEntity = $this->findProvider->handle($provider, $providerId);
 
-        $characterId = $this->findCharacter->handle($providerEntity->userId);
+        $characterId = $this->findCharacter->handle($providerEntity->modelId);
 
         $this->dailyBonus->handle($characterId);
     }

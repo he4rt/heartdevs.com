@@ -35,7 +35,7 @@ final readonly class FeedbackReviewDTO implements JsonSerializable
     {
         return [
             'feedback_id' => $this->feedbackId,
-            'staff_id' => $this->adminProviderEntity->userId,
+            'staff_id' => $this->adminProviderEntity->modelId,
             'status' => $this->reviewTypeEnum->value,
             'reason' => $this->reason,
             'received_at' => $this->reason,

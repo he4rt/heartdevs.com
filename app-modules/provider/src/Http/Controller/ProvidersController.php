@@ -19,6 +19,7 @@ final class ProvidersController extends Controller
         NewAccountByProvider $action,
     ): JsonResponse {
         $response = $action->handle(
+            $request->input('tenant_id'),
             ProviderEnum::from($provider),
             $request->input('provider_id'),
             $request->input('username')

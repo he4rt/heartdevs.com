@@ -10,6 +10,7 @@ use JsonSerializable;
 final readonly class NewProviderDTO implements JsonSerializable
 {
     public function __construct(
+        private int $tenantId,
         private ProviderEnum $provider,
         private string $providerId
     ) {}
@@ -17,6 +18,7 @@ final readonly class NewProviderDTO implements JsonSerializable
     public function jsonSerialize(): array
     {
         return [
+            'tenant_id' => $this->tenantId,
             'provider' => $this->provider->value,
             'provider_id' => $this->providerId,
         ];

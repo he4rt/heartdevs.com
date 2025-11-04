@@ -16,6 +16,7 @@ final readonly class VoiceEloquentRepository implements VoiceRepository
     public function create(NewVoiceMessageDTO $messageDTO, string $providerId, int $obtainedExperience): VoiceEntity
     {
         $model = $this->model->newQuery()->create([
+            'tenant_id' => request()->input('tenant_id'),
             'provider_id' => $providerId,
             'season_id' => config('he4rt.season.id'),
             'channel_name' => $messageDTO->channelName,

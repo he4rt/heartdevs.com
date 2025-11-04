@@ -34,5 +34,6 @@ test('create badge application success', function (): void {
         'image_url' => 'https://canhassi.tech',
         'redeem_code' => 'he4rtDevelopers',
         'active' => true,
+        'tenant_id' => 1,
     ]);
 });

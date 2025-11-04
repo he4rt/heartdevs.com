@@ -19,7 +19,7 @@ final readonly class ClaimCharacterBadge
     public function handle(string $provider, string $providerId, string $badgeSlug): void
     {
         $providerEntity = $this->findProvider->handle($provider, $providerId);
-        $characterId = $this->findCharacter->handle($providerEntity->userId);
+        $characterId = $this->findCharacter->handle($providerEntity->modelId);
         $badgeEntity = $this->findBadgeBySlug->handle($badgeSlug);
 
         $this->claimBadge->handle($characterId, $badgeEntity->id);

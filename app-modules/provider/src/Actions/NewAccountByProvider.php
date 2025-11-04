@@ -17,7 +17,7 @@ class NewAccountByProvider
         private readonly ProviderRepository $providerRepository,
     ) {}
 
-    public function handle(ProviderEnum $providerEnum, string $providerId, string $username): ProviderEntity
+    public function handle(int $tenantId, ProviderEnum $providerEnum, string $providerId, string $username): ProviderEntity
     {
         $existentProvider = $this->providerRepository->getProvider($providerEnum->value, $providerId);
 
@@ -28,6 +28,7 @@ class NewAccountByProvider
         $userEntity = $this->userRepository->createUser($username);
 
         return $this->providerRepository->create($userEntity->id, new NewProviderDTO(
+            tenantId: $tenantId,
             provider: $providerEnum,
             providerId: $providerId
         ));

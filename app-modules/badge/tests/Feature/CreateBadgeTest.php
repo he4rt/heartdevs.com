@@ -2,9 +2,11 @@
 
 declare(strict_types=1);
 
+use He4rt\Tenant\Models\Tenant;
 use Symfony\Component\HttpFoundation\Response;
 
 test('can create badge', function (): void {
+    $tenant = Tenant::factory()->withDiscordProvider()->create();
     $payload = [
         'provider' => 'twitch',
         'name' => 'Aula foda',
@@ -12,6 +14,7 @@ test('can create badge', function (): void {
         'image_url' => 'https://http.cat/200',
         'redeem_code' => '123',
         'active' => true,
+        'tenant_id' => $tenant->getKey(),
     ];
 
     $this->actingAsAdmin()

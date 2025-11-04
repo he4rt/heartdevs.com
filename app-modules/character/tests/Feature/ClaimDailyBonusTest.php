@@ -4,13 +4,25 @@ declare(strict_types=1);
 
 use He4rt\Character\Models\Character;
 use He4rt\Provider\Models\Provider;
+use He4rt\Tenant\Models\Tenant;
 use He4rt\User\Models\User;
 use Symfony\Component\HttpFoundation\Response;
 
 test('success', function (): void {
+
+    $tenant = Tenant::factory()
+        ->afterCreating(function (Tenant $tenant): void {
+            Provider::factory([
+                'tenant_id' => $tenant->getKey(),
+                'provider' => 'discord',
+                'provider_id' => '123',
+            ])->create();
+        })
+        ->create();
+
     $user = User::factory()
-        ->has(Provider::factory(), 'providers')
-        ->has(Character::factory(), 'character')
+        ->has(Provider::factory(['tenant_id' => $tenant]), 'providers')
+        ->has(Character::factory(['tenant_id' => $tenant]), 'character')
         ->create();
 
     $provider = $user->providers[0];
@@ -31,9 +43,20 @@ test('success', function (): void {
 });
 
 test('should not claim before24 hours', function (): void {
+
+    $tenant = Tenant::factory()
+        ->afterCreating(function (Tenant $tenant): void {
+            Provider::factory([
+                'tenant_id' => $tenant->getKey(),
+                'provider' => 'discord',
+                'provider_id' => '123',
+            ])->create();
+        })
+        ->create();
+
     $user = User::factory()
-        ->has(Provider::factory(), 'providers')
-        ->has(Character::factory(), 'character')
+        ->has(Provider::factory(['tenant_id' => $tenant->getKey()]), 'providers')
+        ->has(Character::factory(['tenant_id' => $tenant->getKey()]), 'character')
         ->create();
 
     $provider = $user->providers[0];

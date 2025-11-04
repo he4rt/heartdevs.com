@@ -36,7 +36,7 @@ test('claim daily bonus success', function (): void {
 
     $this->findCharacterIdByUserIdStub
         ->shouldReceive('handle')
-        ->with($this->providerEntity->userId)
+        ->with($this->providerEntity->modelId)
         ->once()
         ->andReturn('character-id');
 

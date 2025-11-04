@@ -3,11 +3,23 @@
 declare(strict_types=1);
 
 use He4rt\Provider\Models\Provider;
+use He4rt\Tenant\Models\Tenant;
 use Symfony\Component\HttpFoundation\Response;
 
 test('can create', function (): void {
-    $providerSender = Provider::factory()->create(['provider' => 'discord']);
-    $providerTarget = Provider::factory()->create(['provider' => 'discord']);
+
+    $tenant = Tenant::factory()
+        ->afterCreating(function (Tenant $tenant): void {
+            Provider::factory([
+                'tenant_id' => $tenant->getKey(),
+                'provider' => 'discord',
+                'provider_id' => '123',
+            ])->create();
+        })
+        ->create();
+
+    $providerSender = Provider::factory()->create(['tenant_id' => $tenant->getKey(), 'provider' => 'discord']);
+    $providerTarget = Provider::factory()->create(['tenant_id' => $tenant->getKey(), 'provider' => 'discord']);
 
     $payload = [
         'sender_id' => $providerSender->provider_id,

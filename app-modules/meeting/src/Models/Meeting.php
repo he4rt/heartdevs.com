@@ -21,6 +21,7 @@ final class Meeting extends Model
 
     protected $fillable = [
         'id',
+        'tenant_id',
         'meeting_type_id',
         'content',
         'admin_id',

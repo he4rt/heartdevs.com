@@ -59,7 +59,7 @@ test('find profile with provider id success', function (): void {
 
     $this->userRepositoryStub
         ->shouldReceive('findProfile')
-        ->with($this->providerEntity->userId)
+        ->with($this->providerEntity->modelId)
         ->once()
         ->andReturn($this->profileEntity);
 

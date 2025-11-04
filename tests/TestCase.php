@@ -1,7 +1,11 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Tests;
 
+use He4rt\Provider\Models\Provider;
+use He4rt\Tenant\Models\Tenant;
 use Illuminate\Foundation\Testing\TestCase as BaseTestCase;
 
 abstract class TestCase extends BaseTestCase
@@ -10,8 +14,20 @@ abstract class TestCase extends BaseTestCase
 
     protected function actingAsAdmin(): self
     {
+        Tenant::factory()
+            ->afterCreating(function (Tenant $tenant): void {
+                Provider::factory([
+                    'tenant_id' => $tenant->getKey(),
+                    'provider' => 'discord',
+                    'provider_id' => '123',
+                ])->create();
+            })
+            ->create();
+
         return $this->withHeaders([
             'X-He4rt-Authorization' => config('he4rt.server_key'),
+            'X-He4rt-Provider' => 'discord',
+            'X-He4rt-Provider-Id' => '123',
         ]);
     }
 }

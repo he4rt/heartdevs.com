@@ -18,6 +18,7 @@ final class Message extends Model
 
     protected $fillable = [
         'id',
+        'tenant_id',
         'provider_id',
         'provider_message_id',
         'season_id',

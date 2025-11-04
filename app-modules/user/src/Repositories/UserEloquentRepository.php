@@ -82,7 +82,9 @@ final readonly class UserEloquentRepository implements UserRepository
 
         $model->address()->create();
         $model->information()->create();
-        $model->character()->create();
+        $model->character()->create([
+            'tenant_id' => request()->input('tenant_id'),
+        ]);
 
         return UserEntity::fromArray($model->toArray());
     }

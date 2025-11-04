@@ -28,7 +28,10 @@ final readonly class FeedbackEloquentRepository implements FeedbackRepository
 
     public function create(NewFeedbackDTO $dto): FeedbackEntity
     {
-        $model = $this->model->newQuery()->create($dto->jsonSerialize());
+        $model = $this->model->newQuery()->create([
+            ...$dto->jsonSerialize(),
+            'tenant_id' => request()->input('tenant_id'),
+        ]);
 
         return FeedbackEntity::make($model->toArray());
     }
@@ -40,6 +43,7 @@ final readonly class FeedbackEloquentRepository implements FeedbackRepository
             ->review()
             ->create([
                 ...$dto->jsonSerialize(),
+                'tenant_id' => request()->input('tenant_id'),
                 'received_at' => now(),
             ]);
     }

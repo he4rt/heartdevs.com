@@ -13,6 +13,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\MorphTo;
 
 /**
  * @property string $id
@@ -31,7 +32,9 @@ final class Provider extends Model
 
     protected $fillable = [
         'id',
-        'user_id',
+        'tenant_id',
+        'model_type',
+        'model_id',
         'provider',
         'provider_id',
         'email',
@@ -41,9 +44,14 @@ final class Provider extends Model
         'messages_count',
     ];
 
+    public function model(): MorphTo
+    {
+        return $this->morphTo();
+    }
+
     public function user(): BelongsTo
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(User::class, 'model_id', 'id');
     }
 
     public function tokens(): HasMany

@@ -4,20 +4,24 @@ declare(strict_types=1);
 
 namespace He4rt\Feedback\Models;
 
+use He4rt\Feedback\Database\Factories\ReviewFactory;
 use He4rt\Feedback\Enum\ReviewTypeEnum;
 use He4rt\User\Models\User;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 final class Review extends Model
 {
+    use HasFactory;
     use HasUuids;
 
     protected $table = 'feedback_reviews';
 
     protected $fillable = [
         'id',
+        'tenant_id',
         'feedback_id',
         'staff_id',
         'status',
@@ -33,6 +37,11 @@ final class Review extends Model
     public function staff(): BelongsTo
     {
         return $this->belongsTo(User::class, 'staff_id');
+    }
+
+    protected static function newFactory(): ReviewFactory
+    {
+        return ReviewFactory::new();
     }
 
     protected function casts(): array

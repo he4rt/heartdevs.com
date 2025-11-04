@@ -49,7 +49,7 @@ test('claim character badge success', function (): void {
 
     $this->findCharacterIdByUserId
         ->shouldReceive('handle')
-        ->with($this->providerEntity->userId)
+        ->with($this->providerEntity->modelId)
         ->once()
         ->andReturn('character-id');
 

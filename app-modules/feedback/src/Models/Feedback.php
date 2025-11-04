@@ -21,6 +21,7 @@ final class Feedback extends Model
 
     protected $fillable = [
         'id',
+        'tenant_id',
         'sender_id',
         'target_id',
         'type',

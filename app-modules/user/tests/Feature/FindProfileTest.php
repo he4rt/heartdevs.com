@@ -63,7 +63,7 @@ test('can find profile with provider id', function (): void {
     $badge = Badge::factory()->create();
 
     $character = $user->character;
-    $character->badges()->attach($badge->id, ['claimed_at' => now()]);
+    $character->badges()->attach($badge->id, ['claimed_at' => now(), 'tenant_id' => 1]);
 
     $this
         ->actingAsAdmin()

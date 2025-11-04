@@ -27,7 +27,7 @@ final readonly class NewVoiceMessage
             $voiceDTO->providerId
         );
 
-        $characterId = $this->findCharacterId->handle($provider->userId);
+        $characterId = $this->findCharacterId->handle($provider->modelId);
         $obtainedExperience = $this->characterExperience->incrementByVoiceMessage(
             $characterId,
             $voiceDTO->voiceState

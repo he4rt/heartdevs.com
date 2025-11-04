@@ -16,6 +16,7 @@ trait ProfileProviderTrait
             'is_donator' => 0,
             'created_at' => '2023-01-28T22:11:45.000000Z',
             'updated_at' => '2023-01-28T22:11:45.000000Z',
+
             'character' => [
                 'id' => 'c58fde47-ec6f-31c2-82e1-0c929a9e181d',
                 'user_id' => '6ed043a2-c567-333d-abe8-ccf4f86eb4a6',
@@ -36,6 +37,7 @@ trait ProfileProviderTrait
                         'active' => true,
                         'created_at' => '2023-01-28T22:11:45.000000Z',
                         'updated_at' => '2023-01-28T22:11:45.000000Z',
+                        'tenant_id' => 1,
                         'pivot' => [
                             'character_id' => 'c58fde47-ec6f-31c2-82e1-0c929a9e181d',
                             'badge_id' => 1,

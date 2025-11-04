@@ -12,7 +12,7 @@ trait ProviderProviderTrait
     {
         return [
             'id' => 'canhassi-id',
-            'user_id' => 'user-id',
+            'model_id' => 'user-id',
             'provider' => 'he4rt',
             'provider_id' => 'provider-id',
             'email' => 'canhas@gmail.com',

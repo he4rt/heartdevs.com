@@ -10,6 +10,7 @@ use He4rt\Provider\Enums\ProviderEnum;
 final class NewMessageDTO
 {
     public function __construct(
+        public int $tenantId,
         public ProviderEnum $provider,
         public string $providerId,
         public string $providerMessageId,
@@ -21,6 +22,7 @@ final class NewMessageDTO
     public static function make(array $payload): self
     {
         return new self(
+            tenantId: $payload['tenant_id'],
             provider: ProviderEnum::from($payload['provider']),
             providerId: $payload['provider_id'],
             providerMessageId: $payload['provider_message_id'],

@@ -15,6 +15,7 @@ beforeEach(function (): void {
     $this->messageRepositoryStub = Mockery::mock(MessageRepository::class);
     $this->messageEntity = $this->validMessageEntity();
     $this->messageDTO = new NewMessageDTO(
+        1,
         ProviderEnum::Discord,
         $this->messageEntity->providerId,
         $this->messageEntity->providerMessageId,

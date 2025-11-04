@@ -24,7 +24,7 @@ final readonly class StartMeeting
 
         $meetingDTO = NewMeetingDTO::make($provider, $providerId, $meetingTypeId);
         $providerEntity = $this->findProvider->handle($provider, $providerId);
-        $currentMeeting = $this->createMeetingAction->handle($meetingDTO, $providerEntity->userId);
+        $currentMeeting = $this->createMeetingAction->handle($meetingDTO, $providerEntity->modelId);
         $this->setMeetingCache($currentMeeting);
 
         return $currentMeeting;

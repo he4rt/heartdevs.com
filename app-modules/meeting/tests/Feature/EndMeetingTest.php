@@ -15,6 +15,6 @@ test('end meeting', function (): void {
 
     $this->assertDatabaseMissing('meetings', [
         'id' => $meeting->id,
-        'ends_at' => 'null',
+        'ends_at' => null,
     ]);
 });

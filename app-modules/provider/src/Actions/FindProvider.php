@@ -5,13 +5,13 @@ declare(strict_types=1);
 namespace He4rt\Provider\Actions;
 
 use He4rt\Provider\Entities\ProviderEntity;
+use He4rt\Provider\Exceptions\ProviderException;
+use He4rt\Provider\Models\Provider;
 use He4rt\Shared\TTL;
 use Illuminate\Support\Facades\Cache;
 
 class FindProvider
 {
-    public function __construct(private readonly GetProviderById $action) {}
-
     public function handle(string $provider, string $providerId): ProviderEntity
     {
         $providerCacheKey = sprintf('provider-%s-%s', $provider, $providerId);
@@ -25,6 +25,14 @@ class FindProvider
 
     private function findProvider(string $provider, string $providerId): ProviderEntity
     {
-        return $this->action->handle($provider, $providerId);
+        $model = Provider::query()
+            ->where('tenant_id', request()->input('tenant_id'))
+            ->where('provider', $provider)
+            ->where('provider_id', $providerId)
+            ->first();
+
+        throw_unless($model, ProviderException::notFound($provider, $providerId));
+
+        return ProviderEntity::make($model->toArray());
     }
 }

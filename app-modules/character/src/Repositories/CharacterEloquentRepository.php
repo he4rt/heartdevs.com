@@ -51,6 +51,9 @@ final class CharacterEloquentRepository implements CharacterRepository
 
     public function claimBadge(string $characterId, int $badgeId): void
     {
-        Character::query()->find($characterId)->badges()->attach($badgeId, ['claimed_at' => now()]);
+        Character::query()->find($characterId)->badges()->attach($badgeId, [
+            'claimed_at' => now(),
+            'tenant_id' => request()->input('tenant_id'),
+        ]);
     }
 }
