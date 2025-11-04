@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace He4rt\Admin\Plugins;
 
 use App\Providers\Filament\FilamentPanel;
@@ -8,7 +10,6 @@ use Filament\Panel;
 
 class AppPanelPlugin implements Plugin
 {
-
     public function getId(): string
     {
         return FilamentPanel::User->value;
