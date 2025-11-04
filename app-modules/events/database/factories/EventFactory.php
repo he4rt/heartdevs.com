@@ -2,11 +2,13 @@
 
 declare(strict_types=1);
 
-namespace factories;
+namespace He4rt\Events\Database\Factories;
 
-use Illuminate\Support\Facades\Date;
+use He4rt\Events\Enums\EventTypeEnum;
 use He4rt\Events\Models\Event;
+use He4rt\Tenant\Models\Tenant;
 use Illuminate\Database\Eloquent\Factories\Factory;
+use Illuminate\Support\Facades\Date;
 
 class EventFactory extends Factory
 {
@@ -15,7 +17,8 @@ class EventFactory extends Factory
     public function definition(): array
     {
         return [
-            'event_type' => fake()->word(),
+            'tenant_id' => Tenant::factory(),
+            'event_type' => fake()->randomElement(EventTypeEnum::cases()),
             'slug' => fake()->slug(),
             'active' => true,
             'title' => fake()->word(),

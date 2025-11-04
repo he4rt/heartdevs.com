@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace App\Enums;
 
-enum FilamentPanel
+enum FilamentPanel: string
 {
-    case Admin;
-    case Partner;
-    case User;
-    case Guest;
+    case Admin = 'admin';
+    case Partner = 'partner';
+    case User = 'user';
+    case Guest = 'guest';
 }

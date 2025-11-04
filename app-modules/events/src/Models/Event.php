@@ -5,8 +5,9 @@ declare(strict_types=1);
 namespace He4rt\Events\Models;
 
 use Exception;
-use factories\EventFactory;
+use He4rt\Events\Database\Factories\EventFactory;
 use He4rt\Events\Enums\AttendingStatusEnum;
+use He4rt\Events\Enums\EventTypeEnum;
 use He4rt\Events\Models\Pivot\EventAttend;
 use He4rt\User\Models\User;
 use Illuminate\Database\Eloquent\Attributes\Scope;
@@ -15,6 +16,18 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
+/**
+ * @property bool $active
+ * @property string $slug
+ * @property EventTypeEnum $event_type
+ * @property string $title
+ * @property string $description
+ * @property string $location
+ * @property int $max_attendees
+ * @property int $attendees_count
+ * @property int $waitlist_count
+ * @property int $tenant_id
+ */
 #[UseFactory(EventFactory::class)]
 class Event extends Model
 {
@@ -96,6 +109,7 @@ class Event extends Model
             'event_at' => 'datetime',
             'start_at' => 'datetime',
             'end_at' => 'datetime',
+            'event_type' => EventTypeEnum::class,
         ];
     }
 }

@@ -18,7 +18,7 @@ return new class extends Migration
             $table->foreignId('tenant_id')
                 ->constrained('tenants')
                 ->nullOnDelete();
-            $table->smallInteger('event_type'); // Meetup or Workshop
+            $table->string('event_type'); // Meetup or Workshop
             $table->boolean('active');
             $table->string('slug');
             $table->string('title');
