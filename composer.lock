@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "e984227e3dd65248df6735ec3a6adb28",
+    "content-hash": "b1a7bea324218d4b9bced561e74ef15b",
     "packages": [
         {
             "name": "anourvalar/eloquent-serialize",
@@ -2850,6 +2850,38 @@
                 "proprietary"
             ],
             "description": "Message module for He4rt community bot",
+            "transport-options": {
+                "symlink": true,
+                "relative": true
+            }
+        },
+        {
+            "name": "he4rt/portal",
+            "version": "1.0",
+            "dist": {
+                "type": "path",
+                "url": "app-modules/portal",
+                "reference": "8f7b5adbd4f3d137429c350528db52c4583b148a"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "He4rt\\Portal\\Providers\\PortalServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "He4rt\\Portal\\": "src/",
+                    "He4rt\\Portal\\Tests\\": "tests/",
+                    "He4rt\\Portal\\Database\\Factories\\": "database/factories/",
+                    "He4rt\\Portal\\Database\\Seeders\\": "database/seeders/"
+                }
+            },
+            "license": [
+                "proprietary"
+            ],
             "transport-options": {
                 "symlink": true,
                 "relative": true

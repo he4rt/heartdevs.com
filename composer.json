@@ -18,6 +18,7 @@
         "he4rt/integrations": ">=1",
         "he4rt/meeting": ">=1",
         "he4rt/message": "^1.0.0",
+        "he4rt/portal": ">=1",
         "he4rt/provider": ">=1",
         "he4rt/ranking": ">=1",
         "he4rt/season": "^1.0.0",
