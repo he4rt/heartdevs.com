@@ -33,8 +33,8 @@
             "prettier --write"
         ],
         "*.php": [
-            "vendor/bin/pint",
-            "vendor/bin/rector process"
+            "composer pint",
+            "composer rector process"
         ]
     }
 }
