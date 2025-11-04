@@ -13,10 +13,13 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('events_c4p', function (Blueprint $table): void {
+        Schema::create('events_talks', function (Blueprint $table): void {
             $table->id();
             $table->foreignId('event_id')->constrained('events')->onDelete('cascade');
             $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
+            $table->foreignId('tenant_id')
+                ->constrained('tenants')
+                ->nullOnDelete();
             $table->string('status');
             $table->string('field_type'); // IA, Dev, Design, etc.
             $table->string('title');

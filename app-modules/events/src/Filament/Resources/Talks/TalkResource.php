@@ -1,0 +1,52 @@
+<?php
+
+declare(strict_types=1);
+
+namespace He4rt\Events\Filament\Resources\Talks;
+
+use BackedEnum;
+use Filament\Resources\Resource;
+use Filament\Schemas\Schema;
+use Filament\Support\Icons\Heroicon;
+use Filament\Tables\Table;
+use He4rt\Events\Filament\Resources\Talks\Pages\CreateTalk;
+use He4rt\Events\Filament\Resources\Talks\Pages\EditTalk;
+use He4rt\Events\Filament\Resources\Talks\Pages\ListTalks;
+use He4rt\Events\Filament\Resources\Talks\Schemas\TalkForm;
+use He4rt\Events\Filament\Resources\Talks\Tables\TalksTable;
+use He4rt\Events\Models\Talk;
+
+class TalkResource extends Resource
+{
+    protected static ?string $model = Talk::class;
+
+    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
+
+    protected static ?string $recordTitleAttribute = 'title';
+
+    public static function form(Schema $schema): Schema
+    {
+        return TalkForm::configure($schema);
+    }
+
+    public static function table(Table $table): Table
+    {
+        return TalksTable::configure($table);
+    }
+
+    public static function getRelations(): array
+    {
+        return [
+            //
+        ];
+    }
+
+    public static function getPages(): array
+    {
+        return [
+            'index' => ListTalks::route('/'),
+            'create' => CreateTalk::route('/create'),
+            'edit' => EditTalk::route('/{record}/edit'),
+        ];
+    }
+}

@@ -7,6 +7,7 @@ namespace He4rt\Events;
 use Filament\Contracts\Plugin;
 use Filament\Panel;
 use He4rt\Events\Filament\Resources\Events\EventResource;
+use He4rt\Events\Filament\Resources\Talks\TalkResource;
 
 class AdminEventPanelPlugin implements Plugin
 {
@@ -19,6 +20,7 @@ class AdminEventPanelPlugin implements Plugin
     {
         $panel->resources([
             EventResource::class,
+            TalkResource::class,
         ]);
     }
 
