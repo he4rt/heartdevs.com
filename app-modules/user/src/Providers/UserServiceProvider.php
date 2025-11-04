@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace He4rt\User\Providers;
 
-use App\Providers\Filament\FilamentPanel;
+use App\Enums\FilamentPanel;
 use Filament\Panel;
 use He4rt\User\Contracts\UserRepository;
 use He4rt\User\Plugins\AdminUserPanelPlugin;

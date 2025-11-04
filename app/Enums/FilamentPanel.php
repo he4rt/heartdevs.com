@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace App\Providers\Filament;
+namespace App\Enums;
 
 enum FilamentPanel: string
 {
     case Admin = 'admin';
     case Partner = 'partner';
-    case User = 'app';
+    case User = 'user';
     case Guest = 'guest';
 
     public function moduleName(string $module): string
