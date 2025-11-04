@@ -1,0 +1,22 @@
+{
+    "name": "he4rt/admin",
+    "description": "",
+    "type": "library",
+    "version": "1.0",
+    "license": "proprietary",
+    "require": {},
+    "autoload": {
+        "psr-4": {
+            "He4rt\\Admin\\": "src/",
+            "He4rt\\Admin\\Database\\Factories\\": "database/factories/"
+        }
+    },
+    "minimum-stability": "stable",
+    "extra": {
+        "laravel": {
+            "providers": [
+                "He4rt\\Admin\\Providers\\AdminServiceProvider"
+            ]
+        }
+    }
+}

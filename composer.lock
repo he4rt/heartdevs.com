@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "e984227e3dd65248df6735ec3a6adb28",
+    "content-hash": "cd63d0cf2162244edc24d6a6a9bb33d2",
     "packages": [
         {
             "name": "anourvalar/eloquent-serialize",
@@ -2640,6 +2640,38 @@
                 }
             ],
             "time": "2025-08-22T14:27:06+00:00"
+        },
+        {
+            "name": "he4rt/admin",
+            "version": "1.0",
+            "dist": {
+                "type": "path",
+                "url": "app-modules/admin",
+                "reference": "7337b59118f9ffbd2a64aaf211b4b67534c8e3d3"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "He4rt\\Admin\\Providers\\AdminServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "He4rt\\Admin\\": "src/",
+                    "He4rt\\Admin\\Tests\\": "tests/",
+                    "He4rt\\Admin\\Database\\Factories\\": "database/factories/",
+                    "He4rt\\Admin\\Database\\Seeders\\": "database/seeders/"
+                }
+            },
+            "license": [
+                "proprietary"
+            ],
+            "transport-options": {
+                "symlink": true,
+                "relative": true
+            }
         },
         {
             "name": "he4rt/authentication",
@@ -14026,12 +14058,12 @@
     ],
     "aliases": [],
     "minimum-stability": "stable",
-    "stability-flags": {},
+    "stability-flags": [],
     "prefer-stable": true,
     "prefer-lowest": false,
     "platform": {
         "php": "^8.3"
     },
-    "platform-dev": {},
+    "platform-dev": [],
     "plugin-api-version": "2.6.0"
 }
