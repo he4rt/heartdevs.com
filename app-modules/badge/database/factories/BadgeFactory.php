@@ -8,6 +8,9 @@ use He4rt\Badge\Models\Badge;
 use He4rt\Tenant\Models\Tenant;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
+/**
+ * @extends Factory<Badge>
+ */
 final class BadgeFactory extends Factory
 {
     protected $model = Badge::class;

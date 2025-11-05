@@ -10,6 +10,9 @@ use He4rt\Tenant\Models\Tenant;
 use He4rt\User\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
+/**
+ * @extends Factory<Meeting>
+ */
 final class MeetingFactory extends Factory
 {
     protected $model = Meeting::class;

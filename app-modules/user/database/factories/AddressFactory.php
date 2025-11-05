@@ -8,6 +8,9 @@ use He4rt\User\Models\Address;
 use He4rt\User\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
+/**
+ * @extends Factory<Address>
+ */
 final class AddressFactory extends Factory
 {
     protected $model = Address::class;

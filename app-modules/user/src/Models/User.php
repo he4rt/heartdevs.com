@@ -38,21 +38,33 @@ final class User extends Authenticatable implements HasName
         'is_donator',
     ];
 
+    /**
+     * @return HasOne<Address, $this>
+     */
     public function address(): HasOne
     {
         return $this->hasOne(Address::class);
     }
 
+    /**
+     * @return HasOne<Information, $this>
+     */
     public function information(): HasOne
     {
         return $this->hasOne(Information::class);
     }
 
+    /**
+     * @return HasMany<Provider, $this>
+     */
     public function providers(): HasMany
     {
         return $this->hasMany(Provider::class, 'model_id');
     }
 
+    /**
+     * @return HasOne<Character, $this>
+     */
     public function character(): HasOne
     {
         return $this->hasOne(Character::class);

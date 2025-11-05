@@ -7,6 +7,9 @@ namespace He4rt\Season\Database\Factories;
 use He4rt\Season\Models\Season;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
+/**
+ * @extends Factory<Season>
+ */
 final class SeasonFactory extends Factory
 {
     protected $model = Season::class;
