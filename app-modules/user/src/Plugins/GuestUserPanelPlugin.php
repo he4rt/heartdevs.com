@@ -15,13 +15,7 @@ class GuestUserPanelPlugin implements Plugin
         return FilamentPanel::Guest->moduleName('user');
     }
 
-    public function register(Panel $panel): void
-    {
-        // TODO: Implement register() method.
-    }
+    public function register(Panel $panel): void {}
 
-    public function boot(Panel $panel): void
-    {
-        // TODO: Implement boot() method.
-    }
+    public function boot(Panel $panel): void {}
 }

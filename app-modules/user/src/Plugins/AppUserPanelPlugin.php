@@ -15,13 +15,7 @@ class AppUserPanelPlugin implements Plugin
         return FilamentPanel::User->moduleName('user');
     }
 
-    public function register(Panel $panel): void
-    {
-        // TODO: Implement register() method.
-    }
+    public function register(Panel $panel): void {}
 
-    public function boot(Panel $panel): void
-    {
-        // TODO: Implement boot() method.
-    }
+    public function boot(Panel $panel): void {}
 }
