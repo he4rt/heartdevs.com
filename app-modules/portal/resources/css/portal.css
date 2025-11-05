@@ -19,6 +19,10 @@
     src: url('/fonts/FiraCode-Regular.ttf') format('truetype');
 }
 
+.fi-page-header-main-ctn {
+    @apply p-0;
+}
+
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
