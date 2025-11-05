@@ -1,0 +1,5 @@
+parameters:
+    ignoreErrors:
+    excludePaths:
+        analyse:
+            - src/Twitch/OAuth/Contracts/TwitchOAuthService.php

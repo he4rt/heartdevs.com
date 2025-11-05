@@ -1,10 +1,13 @@
 includes:
-    - vendor/larastan/larastan/extension.neon
-    - vendor/nesbot/carbon/extension.neon
-    - vendor/pestphp/pest/extension.neon
+    - phpstan.modules.php
+    - phpstan.ignore.neon
 
 parameters:
     reportUnmatchedIgnoredErrors: false
+
     level: 1
+
     paths:
-        - app
+        - app/
+        - database/
+        - routes/
