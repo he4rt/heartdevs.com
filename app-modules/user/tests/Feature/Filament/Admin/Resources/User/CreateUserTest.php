@@ -14,6 +14,7 @@ it('can create a user', function (): void {
     $this->livewire(CreateUser::class)
         ->fillForm([
             'username' => 'newuser',
+            'name' => 'New User',
             'email' => 'emailmaneiro@example.com',
             'password' => 'password',
         ])
@@ -23,6 +24,7 @@ it('can create a user', function (): void {
 
     $this->assertDatabaseHas(User::class, [
         'username' => 'newuser',
+        'name' => 'New User',
         'email' => 'emailmaneiro@example.com',
     ]);
 });

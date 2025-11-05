@@ -77,6 +77,7 @@ final readonly class UserEloquentRepository implements UserRepository
             ->create([
                 'id' => Uuid::uuid4()->toString(),
                 'username' => $username,
+                'name' => $username,
                 'is_donator' => false,
             ]);
 

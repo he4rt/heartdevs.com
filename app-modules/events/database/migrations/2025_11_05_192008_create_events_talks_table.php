@@ -16,7 +16,7 @@ return new class extends Migration
         Schema::create('events_talks', function (Blueprint $table): void {
             $table->id();
             $table->foreignId('event_id')->constrained('events')->onDelete('cascade');
-            $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
+            $table->foreignUuid('user_id')->constrained('users')->onDelete('cascade');
             $table->foreignId('tenant_id')
                 ->constrained('tenants')
                 ->nullOnDelete();

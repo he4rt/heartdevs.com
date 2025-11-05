@@ -15,7 +15,7 @@ return new class extends Migration
     {
         Schema::create('events_attendees', function (Blueprint $table): void {
             $table->foreignId('event_id')->constrained('events')->onDelete('cascade');
-            $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
+            $table->foreignUuid('user_id')->constrained('users')->onDelete('cascade');
             $table->string('status'); // Pending, Confirmed, Rejected
             $table->timestamps();
         });

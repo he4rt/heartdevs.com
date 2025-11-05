@@ -47,7 +47,7 @@ it('should be able to create an event', function (): void {
         'tenant_id' => 1,
         'title' => 'event title',
         'slug' => 'event-slug',
-        'description' => '<p>event description</p>',
+        'description' => 'event description',
         'location' => 'event location',
         'max_attendees' => 5,
         'event_type' => EventTypeEnum::Workshop->value,
