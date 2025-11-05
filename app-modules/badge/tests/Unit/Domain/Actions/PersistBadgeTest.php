@@ -17,7 +17,6 @@ beforeEach(function (): void {
         'canhassi', // provider
         $this->badgeEntity->name,
         $this->badgeEntity->description,
-        'https://canhassi.tech', // image URL
         $this->badgeEntity->redeemCode,
         $this->badgeEntity->active,
         $this->badgeEntity->tenantId

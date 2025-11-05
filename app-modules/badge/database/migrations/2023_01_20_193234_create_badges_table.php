@@ -19,7 +19,6 @@ return new class extends Migration
                 $table->string('provider');
                 $table->string('name');
                 $table->text('description');
-                $table->string('image_url');
                 $table->string('redeem_code');
                 $table->boolean('active');
                 $table->timestamps();

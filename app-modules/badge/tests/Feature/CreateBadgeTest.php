@@ -11,7 +11,6 @@ test('can create badge', function (): void {
         'provider' => 'twitch',
         'name' => 'Aula foda',
         'description' => 'aula foda do dia foda',
-        'image_url' => 'https://http.cat/200',
         'redeem_code' => '123',
         'active' => true,
         'tenant_id' => $tenant->getKey(),
