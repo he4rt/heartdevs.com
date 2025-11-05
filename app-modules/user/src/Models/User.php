@@ -9,16 +9,16 @@ use He4rt\Provider\Models\Provider;
 use He4rt\User\Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Foundation\Auth\User as Authenticatable;
 
 /**
  * @property string $id
  * @property string $username
  * @property bool $is_donator
  */
-final class User extends Model
+final class User extends Authenticatable
 {
     use HasFactory;
     use HasUuids;
@@ -28,6 +28,8 @@ final class User extends Model
     protected $fillable = [
         'id',
         'username',
+        'email',
+        'password',
         'is_donator',
     ];
 

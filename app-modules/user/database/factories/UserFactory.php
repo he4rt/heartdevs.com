@@ -16,6 +16,8 @@ final class UserFactory extends Factory
         return [
             'id' => fake()->uuid(),
             'username' => fake()->userName(),
+            'email' => fake()->email(),
+            'password' => fake()->password(),
             'is_donator' => false,
         ];
     }

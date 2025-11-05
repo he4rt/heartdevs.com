@@ -63,6 +63,10 @@ jobs:
           npm ci
           npm run build
 
+      - name: Copy .env file
+        run: |
+          cp .env.testing.example .env.testing
+
       - name: Run Tests
         env:
           XDEBUG_MODE: coverage

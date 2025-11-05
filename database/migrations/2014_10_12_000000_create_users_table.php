@@ -17,6 +17,8 @@ return new class extends Migration
             Schema::create('users', function (Blueprint $table): void {
                 $table->uuid('id')->primary();
                 $table->string('username')->unique()->index();
+                $table->string('email')->nullable();
+                $table->string('password')->nullable();
                 $table->boolean('is_donator')->default(false);
                 $table->timestamps();
             });
