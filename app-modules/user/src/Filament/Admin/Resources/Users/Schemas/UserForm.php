@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace He4rt\User\Filament\Admin\Resources\Users\Schemas;
 
+use Filament\Forms\Components\TextInput;
 use Filament\Schemas\Schema;
 
 class UserForm
@@ -12,7 +13,9 @@ class UserForm
     {
         return $schema
             ->components([
-                //
+                TextInput::make('username'),
+                TextInput::make('email'),
+                TextInput::make('password'),
             ]);
     }
 }
