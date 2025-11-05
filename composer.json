@@ -10,6 +10,7 @@
     "require": {
         "php": "^8.3",
         "dedoc/scramble": "^0.13.2",
+        "filament/filament": "^4.0",
         "guzzlehttp/guzzle": "^7.10.0",
         "he4rt/authentication": ">=1",
         "he4rt/badge": "^1.0.0",
