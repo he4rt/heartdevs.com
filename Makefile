@@ -6,7 +6,7 @@ help: ## Show available commands
 
 .PHONY: route-list
 route-list: ## List all registered routes
-	@php artisan route:list
+	@php artisan route:list --ansi
 
 .PHONY: pint
 pint: ## Run Pint code style fixer
@@ -32,6 +32,9 @@ test-rector: ## Run Rector in test mode
 phpstan: ## Run PHPStan
 	@$(CURDIR)/vendor/bin/phpstan analyse --ansi
 
+.PHONY: p
+p: phpstan ## Alias for phpstan
+
 .PHONY: test-phpstan
 test-phpstan: ## Run PHPStan in test mode
 	@$(CURDIR)/vendor/bin/phpstan analyse --ansi
@@ -39,12 +42,18 @@ test-phpstan: ## Run PHPStan in test mode
 .PHONY: format
 format: rector pint ## Run Pint and Rector and try to fixes the source code
 
+.PHONY: f
+f: format ## Alias for format
+
 .PHONY: check
 check: test-rector test-pint test-phpstan ## Run Pint, PHPStan with Rector in dry-run mode
 
 .PHONY: test
 test: ## Run all tests
 	@$(CURDIR)/vendor/bin/pest --parallel --compact
+
+.PHONY: t
+t: test ## Alias for test
 
 .PHONY: test-unit
 test-unit: ## Run unit tests
