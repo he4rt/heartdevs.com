@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 use He4rt\User\Filament\Admin\Resources\Users\Pages\ListUsers;

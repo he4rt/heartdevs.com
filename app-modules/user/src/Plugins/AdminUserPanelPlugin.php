@@ -21,7 +21,7 @@ class AdminUserPanelPlugin implements Plugin
     {
         $panel->resources([
             UserResource::class,
-            TenantResource::class
+            TenantResource::class,
         ]);
     }
 

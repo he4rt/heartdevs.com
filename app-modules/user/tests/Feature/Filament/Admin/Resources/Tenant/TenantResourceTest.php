@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 use Filament\Facades\Filament;
@@ -8,5 +9,3 @@ it('can register resources', function (): void {
     expect(Filament::getResources())
         ->toContain(TenantResource::class);
 });
-
-

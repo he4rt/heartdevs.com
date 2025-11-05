@@ -9,8 +9,3 @@ it('can register resources', function (): void {
     expect(Filament::getResources())
         ->toContain(UserResource::class);
 });
-
-
-
-
-

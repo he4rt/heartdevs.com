@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace He4rt\User\Filament\Admin\Resources\Tenants\Tables;
 
 use Filament\Actions\BulkActionGroup;
