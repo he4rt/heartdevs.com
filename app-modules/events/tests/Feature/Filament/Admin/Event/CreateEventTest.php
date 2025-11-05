@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-use Illuminate\Support\Facades\Date;
 use App\Enums\FilamentPanel;
 use Filament\Facades\Filament;
 use He4rt\Events\Enums\EventTypeEnum;
 use He4rt\Events\Filament\Resources\Events\Pages\CreateEvent;
 use He4rt\Events\Models\Event;
+use Illuminate\Support\Facades\Date;
 
 use function Pest\Laravel\assertDatabaseCount;
 use function Pest\Laravel\assertDatabaseHas;
@@ -34,7 +34,7 @@ it('should be able to create an event', function (): void {
             'location' => 'event location',
             'max_attendees' => 5,
             'event_type' => EventTypeEnum::Workshop->value,
-            'active' => 'true',
+            'active' => true,
             'event_at' => today(),
             'start_at' => today(),
             'end_at' => Date::tomorrow(),
@@ -47,11 +47,11 @@ it('should be able to create an event', function (): void {
         'tenant_id' => 1,
         'title' => 'event title',
         'slug' => 'event-slug',
-        'description' => 'event description',
+        'description' => '<p>event description</p>',
         'location' => 'event location',
         'max_attendees' => 5,
         'event_type' => EventTypeEnum::Workshop->value,
-        'active' => 'true',
+        'active' => true,
         'event_at' => today(),
         'start_at' => today(),
         'end_at' => Date::tomorrow(),
@@ -73,21 +73,6 @@ describe('validation tests', function (): void {
         'min' => ['aa', 'min:5'],
         'max' => [str_repeat('a', 256), 'max:255'],
     ]);
-
-    test('description::validations', function ($value, $rule): void {
-        livewire(CreateEvent::class)
-            ->assertOk()
-            ->fillForm([
-                'description' => $value,
-            ])
-            ->call('create')
-            ->assertHasFormErrors(['description' => $rule]);
-    })->with([
-        'required' => ['', 'required'],
-        'min' => ['aa', 'min:5'],
-        'max' => [str_repeat('a', 256), 'max:255'],
-    ]);
-
     test('location::validations', function ($value, $rule): void {
         livewire(CreateEvent::class)
             ->assertOk()

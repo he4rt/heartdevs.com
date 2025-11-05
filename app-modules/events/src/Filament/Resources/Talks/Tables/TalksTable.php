@@ -26,9 +26,6 @@ class TalksTable
                     ->badge()
                     ->searchable(),
             ])
-            ->filters([
-                //
-            ])
             ->recordActions([
                 EditAction::make(),
             ])

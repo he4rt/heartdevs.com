@@ -20,7 +20,7 @@ class TalkResource extends Resource
 {
     protected static ?string $model = Talk::class;
 
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
+    protected static string|BackedEnum|null $navigationIcon = Heroicon::Microphone;
 
     protected static ?string $recordTitleAttribute = 'title';
 
@@ -32,13 +32,6 @@ class TalkResource extends Resource
     public static function table(Table $table): Table
     {
         return TalksTable::configure($table);
-    }
-
-    public static function getRelations(): array
-    {
-        return [
-            //
-        ];
     }
 
     public static function getPages(): array

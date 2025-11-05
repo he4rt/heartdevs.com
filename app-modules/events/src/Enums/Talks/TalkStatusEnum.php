@@ -13,14 +13,14 @@ use Filament\Support\Icons\Heroicon;
 enum TalkStatusEnum: string implements HasColor, HasIcon, HasLabel
 {
     case Pending = 'pending';
-    case Live = 'live';
+    case Accepted = 'accepted';
     case Done = 'done';
 
     public function getColor(): array
     {
         return match ($this) {
             self::Pending => Color::Yellow,
-            self::Live => Color::Blue,
+            self::Accepted => Color::Blue,
             self::Done => Color::Green,
         };
     }
@@ -29,7 +29,7 @@ enum TalkStatusEnum: string implements HasColor, HasIcon, HasLabel
     {
         return match ($this) {
             self::Pending => Heroicon::Clock,
-            self::Live => Heroicon::CircleStack,
+            self::Accepted => Heroicon::CircleStack,
             self::Done => Heroicon::ArrowUpCircle,
         };
     }
@@ -38,7 +38,7 @@ enum TalkStatusEnum: string implements HasColor, HasIcon, HasLabel
     {
         return match ($this) {
             self::Pending => 'Pending',
-            self::Live => 'Live',
+            self::Accepted => 'Live',
             self::Done => 'Done',
         };
     }

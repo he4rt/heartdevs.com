@@ -28,12 +28,13 @@ class EventsTable
                 TextColumn::make('active')
                     ->searchable(),
                 TextColumn::make('max_attendees'),
-                TextColumn::make('event_at')
-                    ->toggledHiddenByDefault(false),
+                TextColumn::make('event_at'),
+
                 TextColumn::make('start_at')
-                    ->toggledHiddenByDefault(),
-                TextColumn::make('end_at')
-                    ->toggledHiddenByDefault(),
+                    ->label('Event Hour')
+                    ->formatStateUsing(fn ($state) => $state->format('d/m/Y H:i'))
+                    ->description(fn ($record) => $record->end_at->format('d/m/Y H:i'))
+                    ->sortable(),
             ])
             ->filters([
                 //

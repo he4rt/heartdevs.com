@@ -19,7 +19,6 @@ return new class extends Migration
                 ->constrained('tenants')
                 ->nullOnDelete();
             $table->string('name');
-            $table->string('logo_path');
             $table->string('homepage_url')->nullable();
             $table->timestamps();
         });

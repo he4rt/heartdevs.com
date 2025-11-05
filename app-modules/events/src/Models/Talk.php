@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace He4rt\Events\Models;
 
 use He4rt\Events\Database\Factories\TalkFactory;
+use He4rt\Tenant\Models\Tenant;
 use He4rt\User\Models\User;
 use Illuminate\Database\Eloquent\Attributes\UseFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -28,13 +29,18 @@ class Talk extends Model
         'description',
     ];
 
-    public function users(): BelongsTo
+    public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
     }
 
-    public function events(): BelongsTo
+    public function event(): BelongsTo
     {
         return $this->belongsTo(Event::class);
+    }
+
+    public function tenant(): BelongsTo
+    {
+        return $this->belongsTo(Tenant::class);
     }
 }
