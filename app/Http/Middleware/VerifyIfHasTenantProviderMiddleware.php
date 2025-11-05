@@ -13,16 +13,16 @@ use Symfony\Component\HttpFoundation\Response;
 
 final class VerifyIfHasTenantProviderMiddleware
 {
-    public function handle(Request $request, Closure $next)
+    public function handle(Request $request, Closure $next): mixed
     {
         if (! $request->hasHeader('X-He4rt-Provider') || ! $request->hasHeader('X-He4rt-Provider-Id')) {
-            return response()->json(['error' => 'Provider not registed for any tenant.'], Response::HTTP_UNAUTHORIZED);
+            return response()->json(['error' => 'Provider not registered for any tenant.'], Response::HTTP_UNAUTHORIZED);
         }
 
         $provider = ProviderEnum::tryFrom($request->header('X-He4rt-Provider') ?? 'not-found');
 
         if (! $provider) {
-            return response()->json(['error' => 'Provider not registed for any tenant.'], Response::HTTP_UNAUTHORIZED);
+            return response()->json(['error' => 'Provider not registered for any tenant.'], Response::HTTP_UNAUTHORIZED);
         }
 
         $providerId = $request->header('X-He4rt-Provider-Id');
@@ -35,7 +35,7 @@ final class VerifyIfHasTenantProviderMiddleware
         );
 
         if (! $providerModel) {
-            return response()->json(['error' => 'Provider not registed for any tenant.'], Response::HTTP_UNAUTHORIZED);
+            return response()->json(['error' => 'Provider not registered for any tenant.'], Response::HTTP_UNAUTHORIZED);
         }
 
         $request->merge(['tenant_id' => $providerModel->tenant_id]);
