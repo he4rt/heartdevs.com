@@ -1,5 +1,6 @@
 {
     "name": "@he4rt/he4rtdevs",
+    "version": "3.0.0",
     "license": "MIT",
     "$schema": "https://json.schemastore.org/package.json",
     "private": true,

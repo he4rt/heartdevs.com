@@ -11,7 +11,7 @@ He4rt Discord Bot API
 </h1>
 <p align="center">
   <a href="https://discord.gg/he4rt"><img src="https://img.shields.io/endpoint?url=https://github.com/he4rt/he4rt-bot-api/blob/main/version.json"></a>
-  <a href="https://discord.gg/he4rt"><img src="https://img.shields.io/github/license/he4rt/he4rt-bot-api?color=A655FF&style=for-the-badge"></a>
+  <a href="https://discord.gg/he4rt"><img src="https://img.shields.io/github/package-json/v/he4rt/https://github.com/he4rt/he4rt-bot-api?style=for-the-badge&color=6342ED&label="></a>
 <p>
 
 ## Features
