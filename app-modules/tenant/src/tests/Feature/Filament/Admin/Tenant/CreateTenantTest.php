@@ -2,8 +2,8 @@
 
 declare(strict_types=1);
 
+use He4rt\Tenant\Filament\Admin\Resources\Tenants\Pages\CreateTenant;
 use He4rt\Tenant\Models\Tenant;
-use He4rt\User\Filament\Admin\Resources\Tenants\Pages\CreateTenant;
 use He4rt\User\Models\User;
 
 it('can load the create page', function (): void {

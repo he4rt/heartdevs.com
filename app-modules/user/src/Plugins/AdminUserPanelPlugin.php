@@ -7,7 +7,7 @@ namespace He4rt\User\Plugins;
 use App\Enums\FilamentPanel;
 use Filament\Contracts\Plugin;
 use Filament\Panel;
-use He4rt\User\Filament\Admin\Resources\Tenants\TenantResource;
+use He4rt\Tenant\Filament\Admin\Resources\Tenants\TenantResource;
 use He4rt\User\Filament\Admin\Resources\Users\UserResource;
 
 class AdminUserPanelPlugin implements Plugin

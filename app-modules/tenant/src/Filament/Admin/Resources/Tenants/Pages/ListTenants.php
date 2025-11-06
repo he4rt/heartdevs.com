@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace He4rt\User\Filament\Admin\Resources\Tenants\Pages;
+namespace He4rt\Tenant\Filament\Admin\Resources\Tenants\Pages;
 
 use Filament\Actions\CreateAction;
 use Filament\Resources\Pages\ListRecords;
-use He4rt\User\Filament\Admin\Resources\Tenants\TenantResource;
+use He4rt\Tenant\Filament\Admin\Resources\Tenants\TenantResource;
 
 class ListTenants extends ListRecords
 {

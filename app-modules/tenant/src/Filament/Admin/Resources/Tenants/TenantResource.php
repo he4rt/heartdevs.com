@@ -2,19 +2,19 @@
 
 declare(strict_types=1);
 
-namespace He4rt\User\Filament\Admin\Resources\Tenants;
+namespace He4rt\Tenant\Filament\Admin\Resources\Tenants;
 
 use BackedEnum;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
+use He4rt\Tenant\Filament\Admin\Resources\Tenants\Pages\CreateTenant;
+use He4rt\Tenant\Filament\Admin\Resources\Tenants\Pages\EditTenant;
+use He4rt\Tenant\Filament\Admin\Resources\Tenants\Pages\ListTenants;
+use He4rt\Tenant\Filament\Admin\Resources\Tenants\Schemas\TenantForm;
+use He4rt\Tenant\Filament\Admin\Resources\Tenants\Tables\TenantsTable;
 use He4rt\Tenant\Models\Tenant;
-use He4rt\User\Filament\Admin\Resources\Tenants\Pages\CreateTenant;
-use He4rt\User\Filament\Admin\Resources\Tenants\Pages\EditTenant;
-use He4rt\User\Filament\Admin\Resources\Tenants\Pages\ListTenants;
-use He4rt\User\Filament\Admin\Resources\Tenants\Schemas\TenantForm;
-use He4rt\User\Filament\Admin\Resources\Tenants\Tables\TenantsTable;
 
 class TenantResource extends Resource
 {

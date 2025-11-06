@@ -3,8 +3,8 @@
 declare(strict_types=1);
 
 use Filament\Actions\DeleteAction;
+use He4rt\Tenant\Filament\Admin\Resources\Tenants\Pages\EditTenant;
 use He4rt\Tenant\Models\Tenant;
-use He4rt\User\Filament\Admin\Resources\Tenants\Pages\EditTenant;
 
 it('can load the edit page', function (): void {
     $tenant = Tenant::factory()->create();
