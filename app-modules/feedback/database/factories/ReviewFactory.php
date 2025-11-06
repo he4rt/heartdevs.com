@@ -11,6 +11,9 @@ use He4rt\Tenant\Models\Tenant;
 use He4rt\User\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
+/**
+ * @extends Factory<Review>
+ */
 final class ReviewFactory extends Factory
 {
     protected $model = Review::class;

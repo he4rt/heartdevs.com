@@ -28,16 +28,25 @@ final class Feedback extends Model
         'message',
     ];
 
+    /**
+     * @return HasOne<Review, $this>
+     */
     public function review(): HasOne
     {
         return $this->hasOne(Review::class);
     }
 
+    /**
+     * @return BelongsTo<User, $this>
+     */
     public function sender(): BelongsTo
     {
         return $this->belongsTo(User::class, 'sender_id');
     }
 
+    /**
+     * @return BelongsTo<User, $this>
+     */
     public function target(): BelongsTo
     {
         return $this->belongsTo(User::class, 'target_id');

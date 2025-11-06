@@ -9,6 +9,9 @@ use He4rt\Tenant\Models\Tenant;
 use He4rt\User\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
+/**
+ * @extends Factory<Feedback>
+ */
 final class FeedbackFactory extends Factory
 {
     protected $model = Feedback::class;

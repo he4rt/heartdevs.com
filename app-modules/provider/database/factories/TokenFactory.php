@@ -8,6 +8,9 @@ use He4rt\Provider\Models\Provider;
 use He4rt\Provider\Models\Token;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
+/**
+ * @extends Factory<Token>
+ */
 final class TokenFactory extends Factory
 {
     protected $model = Token::class;

@@ -9,6 +9,9 @@ use He4rt\Provider\Models\Provider;
 use He4rt\Tenant\Models\Tenant;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
+/**
+ * @extends Factory<Message>
+ */
 final class MessageFactory extends Factory
 {
     protected $model = Message::class;

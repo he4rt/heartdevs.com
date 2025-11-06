@@ -1,0 +1,26 @@
+parameters:
+    ignoreErrors:
+        - message: '#^Parameter \$action of method He4rt\\Authentication\\Http\\Controllers\\OAuthController::getRedirect\(\) has invalid type He4rt\\Authentication\\OAuth\\Domain\\Actions\\RedirectOAuthUrl\.$#'
+          identifier: class.notFound
+          count: 1
+          path: src/Http/Controllers/OAuthController.php
+
+        - message: '#^Parameter \$getUserAction of method Heart\\Autentication\\Services\\OAuthService::__construct\(\) has invalid type Kingdom\\Authentication\\OAuth\\Domain\\Actions\\GetOAuthUser\.$#'
+          identifier: class.notFound
+          count: 1
+          path: src/Services/OAuthService.php
+
+        - message: '#^Property Heart\\Autentication\\Services\\OAuthService::\$getUserAction has unknown class Kingdom\\Authentication\\OAuth\\Domain\\Actions\\GetOAuthUser as its type\.$#'
+          identifier: class.notFound
+          count: 1
+          path: src/Services/OAuthService.php
+
+        - message: '#^Parameter \$subscribersRepository of method Heart\\Autentication\\Services\\OAuthService::__construct\(\) has invalid type He4rt\\Authentication\\OAuth\\Application\\SubscribersRepository\.$#'
+          identifier: class.notFound
+          count: 1
+          path: src/Services/OAuthService.php
+
+        - message: '#^Property Heart\\Autentication\\Services\\OAuthService::\$subscribersRepository has unknown class He4rt\\Authentication\\OAuth\\Application\\SubscribersRepository as its type\.$#'
+          identifier: class.notFound
+          count: 1
+          path: src/Services/OAuthService.php

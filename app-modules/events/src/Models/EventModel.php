@@ -17,6 +17,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\Pivot;
 
 /**
  * @property bool $active
@@ -31,7 +32,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
  * @property int $tenant_id
  */
 #[UseFactory(EventFactory::class)]
-class Event extends Model
+class EventModel extends Model
 {
     use HasFactory;
     protected $table = 'events';
@@ -52,6 +53,9 @@ class Event extends Model
         'tenant_id',
     ];
 
+    /**
+     * @return BelongsToMany<User, $this, Pivot>
+     */
     public function attendees(): BelongsToMany
     {
         return $this
@@ -99,6 +103,9 @@ class Event extends Model
         return true;
     }
 
+    /**
+     * @return BelongsTo<Tenant, $this>
+     */
     public function tenant(): BelongsTo
     {
         return $this->belongsTo(Tenant::class);

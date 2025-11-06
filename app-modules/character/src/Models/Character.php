@@ -16,6 +16,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Database\Eloquent\Relations\Pivot;
 
 /**
  * @property int $user_id
@@ -44,16 +45,25 @@ final class Character extends Model
         'level',
     ];
 
+    /**
+     * @return BelongsTo<User, $this>
+     */
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
     }
 
+    /**
+     * @return HasOne<Wallet, $this>
+     */
     public function wallet(): HasOne
     {
         return $this->hasOne(Wallet::class);
     }
 
+    /**
+     * @return BelongsToMany<Badge, $this, Pivot>
+     */
     public function badges(): BelongsToMany
     {
         return $this->belongsToMany(
@@ -64,6 +74,9 @@ final class Character extends Model
         )->withPivot(['claimed_at']);
     }
 
+    /**
+     * @return HasMany<PastSeason, $this>
+     */
     public function pastSeasons(): HasMany
     {
         return $this->hasMany(PastSeason::class);

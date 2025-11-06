@@ -28,8 +28,7 @@ final readonly class ProviderEntity
             User::class,
             $payload['model_id'],
             $payload['provider'],
-            $payload['provider_id'],
-            $payload['email'] ?? null,
+            $payload['provider_id']
         );
     }
 }
