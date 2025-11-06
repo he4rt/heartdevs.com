@@ -31,7 +31,9 @@ final class Token extends Model
     ];
 
     // TODO: expires token should have an human interface and auto refresh
-
+    /**
+     * @return BelongsTo<Provider, $this>
+     */
     public function provider(): BelongsTo
     {
         return $this->belongsTo(Provider::class);

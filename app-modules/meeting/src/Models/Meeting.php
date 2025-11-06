@@ -11,6 +11,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Database\Eloquent\Relations\Pivot;
 
 final class Meeting extends Model
 {
@@ -39,11 +40,17 @@ final class Meeting extends Model
         return (bool) $this->attributes['ends_at'];
     }
 
+    /**
+     * @return HasOne<MeetingType, $this>
+     */
     public function meetingType(): HasOne
     {
         return $this->hasOne(MeetingType::class, 'id', 'meeting_type_id');
     }
 
+    /**
+     * @return BelongsToMany<User, $this, Pivot>
+     */
     public function users(): BelongsToMany
     {
         return $this->belongsToMany(

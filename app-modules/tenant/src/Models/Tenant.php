@@ -26,11 +26,17 @@ class Tenant extends Model
         'active',
     ];
 
+    /**
+     * @return BelongsTo<User, $this>
+     */
     public function owner(): BelongsTo
     {
         return $this->belongsTo(User::class, 'owner_id');
     }
 
+    /**
+     * @return MorphMany<Provider, $this>
+     */
     public function providers(): MorphMany
     {
         return $this->morphMany(Provider::class, 'model');

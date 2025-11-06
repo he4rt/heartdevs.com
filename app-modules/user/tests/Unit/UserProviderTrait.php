@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace He4rt\User\Tests\Unit;
 
 use He4rt\User\Entities\UserEntity;
-use He4rt\User\ValueObjects\UserName;
 
 trait UserProviderTrait
 {
@@ -13,7 +12,7 @@ trait UserProviderTrait
     {
         return [
             'id' => '12',
-            'username' => new UserName('canhassi'),
+            'username' => 'canhassi',
             'isDonator' => false,
             ...$fields,
         ];

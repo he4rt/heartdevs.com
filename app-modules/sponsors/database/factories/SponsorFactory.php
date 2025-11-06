@@ -9,7 +9,10 @@ use He4rt\Tenant\Models\Tenant;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Facades\Date;
 
-class SponsorFactory extends Factory
+/**
+ * @extends Factory<Sponsor>
+ */
+final class SponsorFactory extends Factory
 {
     protected $model = Sponsor::class;
 

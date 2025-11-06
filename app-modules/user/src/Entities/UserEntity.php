@@ -6,13 +6,12 @@ namespace He4rt\User\Entities;
 
 use Exception;
 use He4rt\User\Exceptions\UserEntityException;
-use He4rt\User\ValueObjects\UserName;
 
 final readonly class UserEntity
 {
     public function __construct(
         public string $id,
-        public UserName $name,
+        public string $name,
         public bool $isDonator,
     ) {}
 
@@ -34,7 +33,7 @@ final readonly class UserEntity
     {
         return new self(
             id: $user['id'],
-            name: new UserName($user['username']),
+            name: $user['username'],
             isDonator: $user['is_donator']
         );
     }

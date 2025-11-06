@@ -31,11 +31,17 @@ final class Season extends Model
         'ended_at',
     ];
 
+    /**
+     * @return HasMany<Badge, $this>
+     */
     public function badges(): HasMany
     {
         return $this->hasMany(Badge::class);
     }
 
+    /**
+     * @return HasMany<Meeting, $this>
+     */
     public function meetings(): HasMany
     {
         return $this->hasMany(Meeting::class);
