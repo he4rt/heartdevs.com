@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace He4rt\User\Filament\Admin\Resources\Tenants\Schemas;
+namespace He4rt\Tenant\Filament\Admin\Resources\Tenants\Schemas;
 
 use Filament\Forms\Components\TextInput;
 use Filament\Schemas\Schema;

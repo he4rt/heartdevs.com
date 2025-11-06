@@ -3,13 +3,16 @@
 declare(strict_types=1);
 
 use Filament\Actions\DeleteAction;
+use He4rt\Tenant\Filament\Admin\Resources\Tenants\Pages\EditTenant;
 use He4rt\Tenant\Models\Tenant;
-use He4rt\User\Filament\Admin\Resources\Tenants\Pages\EditTenant;
+
+use function Pest\Laravel\assertDatabaseHas;
+use function Pest\Livewire\livewire;
 
 it('can load the edit page', function (): void {
     $tenant = Tenant::factory()->create();
 
-    $this->livewire(EditTenant::class, [
+    livewire(EditTenant::class, [
         'record' => $tenant->id,
     ])
         ->assertOk()
@@ -25,7 +28,7 @@ it('can update a tenant', function (): void {
     $tenant = Tenant::factory()->create();
     $newTenantData = Tenant::factory()->make();
 
-    $this->livewire(EditTenant::class, [
+    livewire(EditTenant::class, [
         'record' => $tenant->id,
     ])
         ->fillForm([
@@ -36,7 +39,7 @@ it('can update a tenant', function (): void {
         ->call('save')
         ->assertNotified();
 
-    $this->assertDatabaseHas(Tenant::class, [
+    assertDatabaseHas(Tenant::class, [
         'id' => $tenant->id,
         'name' => $newTenantData->name,
         'slug' => $newTenantData->slug,
@@ -46,7 +49,7 @@ it('can update a tenant', function (): void {
 it('can delete a tenant', function (): void {
     $tenant = Tenant::factory()->create();
 
-    $this->livewire(EditTenant::class, [
+    livewire(EditTenant::class, [
         'record' => $tenant->id,
     ])
         ->callAction(DeleteAction::class)
