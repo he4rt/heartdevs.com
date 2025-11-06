@@ -7,6 +7,7 @@ namespace He4rt\Meeting;
 use Filament\Contracts\Plugin;
 use Filament\Panel;
 use He4rt\Meeting\Filament\Resources\Meetings\MeetingResource;
+use He4rt\Meeting\Filament\Resources\MeetingTypes\MeetingTypeResource;
 
 class AdminMeetingPanelPlugin implements Plugin
 {
@@ -19,6 +20,7 @@ class AdminMeetingPanelPlugin implements Plugin
     {
         $panel->resources([
             MeetingResource::class,
+            MeetingTypeResource::class,
         ]);
     }
 

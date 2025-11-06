@@ -15,12 +15,15 @@ use He4rt\Meeting\Filament\Resources\Meetings\Pages\ListMeetings;
 use He4rt\Meeting\Filament\Resources\Meetings\Schemas\MeetingForm;
 use He4rt\Meeting\Filament\Resources\Meetings\Tables\MeetingsTable;
 use He4rt\Meeting\Models\Meeting;
+use UnitEnum;
 
 class MeetingResource extends Resource
 {
     protected static ?string $model = Meeting::class;
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::UserGroup;
+
+    protected static string|UnitEnum|null $navigationGroup = 'Meetings';
 
     public static function form(Schema $schema): Schema
     {
