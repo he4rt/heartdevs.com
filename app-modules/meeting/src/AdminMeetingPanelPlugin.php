@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace He4rt\Meeting;
 
+use App\Enums\FilamentPanel;
 use Filament\Contracts\Plugin;
 use Filament\Panel;
 use He4rt\Meeting\Filament\Resources\Meetings\MeetingResource;
@@ -13,7 +14,7 @@ class AdminMeetingPanelPlugin implements Plugin
 {
     public function getId(): string
     {
-        return 'admin-meeting';
+        return FilamentPanel::Admin->moduleName('meeting');
     }
 
     public function register(Panel $panel): void
