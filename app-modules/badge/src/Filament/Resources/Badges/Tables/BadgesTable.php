@@ -40,9 +40,6 @@ class BadgesTable
                     ->numeric()
                     ->sortable(),
             ])
-            ->filters([
-                //
-            ])
             ->recordActions([
                 EditAction::make(),
             ])

@@ -29,6 +29,9 @@ final class Badge extends Model implements HasMedia
         'tenant_id',
     ];
 
+    /**
+     * @return BelongsTo<Tenant, $this>
+     */
     public function tenant(): BelongsTo
     {
         return $this->belongsTo(Tenant::class);
