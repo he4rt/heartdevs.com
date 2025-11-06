@@ -9,6 +9,9 @@ use He4rt\Character\Models\PastSeason;
 use He4rt\Tenant\Models\Tenant;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
+/**
+ * @extends Factory<PastSeason>
+ */
 final class PastSeasonFactory extends Factory
 {
     protected $model = PastSeason::class;

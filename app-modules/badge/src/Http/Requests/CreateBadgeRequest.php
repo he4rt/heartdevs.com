@@ -19,7 +19,6 @@ final class CreateBadgeRequest extends FormRequest
             'provider' => ['required', 'in:discord,twitch'],
             'name' => ['required', 'string'],
             'description' => ['required', 'string'],
-            'image_url' => ['required', 'url'],
             'redeem_code' => ['required', 'string'],
             'active' => ['required', 'boolean'],
             'tenant_id' => ['required', 'int'],

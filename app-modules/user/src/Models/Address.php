@@ -26,6 +26,9 @@ final class Address extends Model
         'zip_code',
     ];
 
+    /**
+     * @return BelongsTo<User, $this>
+     */
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);

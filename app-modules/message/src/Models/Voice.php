@@ -21,6 +21,9 @@ final class Voice extends Model
         'obtained_experience',
     ];
 
+    /**
+     * @return BelongsTo<Provider, $this>
+     */
     public function provider(): BelongsTo
     {
         return $this->belongsTo(Provider::class);

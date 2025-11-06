@@ -5,9 +5,13 @@ declare(strict_types=1);
 namespace He4rt\Badge\Database\Factories;
 
 use He4rt\Badge\Models\Badge;
+use He4rt\Provider\Enums\ProviderEnum;
 use He4rt\Tenant\Models\Tenant;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
+/**
+ * @extends Factory<Badge>
+ */
 final class BadgeFactory extends Factory
 {
     protected $model = Badge::class;
@@ -15,11 +19,10 @@ final class BadgeFactory extends Factory
     public function definition(): array
     {
         return [
-            'provider' => 'default',
+            'provider' => fake()->randomElement(ProviderEnum::cases()),
             'tenant_id' => Tenant::factory(),
             'name' => fake()->name(),
             'description' => fake()->sentence(),
-            'image_url' => fake()->imageUrl(),
             'redeem_code' => fake()->slug(2),
             'active' => true,
         ];

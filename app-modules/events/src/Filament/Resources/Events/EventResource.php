@@ -14,7 +14,7 @@ use He4rt\Events\Filament\Resources\Events\Pages\EditEvent;
 use He4rt\Events\Filament\Resources\Events\Pages\ListEvents;
 use He4rt\Events\Filament\Resources\Events\Schemas\EventForm;
 use He4rt\Events\Filament\Resources\Events\Tables\EventsTable;
-use He4rt\Events\Models\Event;
+use He4rt\Events\Models\EventModel as Event;
 use UnitEnum;
 
 class EventResource extends Resource

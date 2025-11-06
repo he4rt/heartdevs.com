@@ -14,7 +14,6 @@ final readonly class BadgeEntity implements JsonSerializable
         public string $description,
         public string $redeemCode,
         public bool $active,
-        public string $imageUrl,
         public int $tenantId
     ) {}
 
@@ -26,7 +25,6 @@ final readonly class BadgeEntity implements JsonSerializable
             description: $payload['description'],
             redeemCode: $payload['redeem_code'],
             active: $payload['active'],
-            imageUrl: $payload['image_url'],
             tenantId: $payload['tenant_id']
         );
     }
@@ -37,7 +35,6 @@ final readonly class BadgeEntity implements JsonSerializable
             'id' => $this->id,
             'name' => $this->name,
             'description' => $this->description,
-            'image_url' => $this->imageUrl,
         ];
     }
 }

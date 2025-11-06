@@ -29,11 +29,17 @@ final class Review extends Model
         'received_at',
     ];
 
+    /**
+     * @return BelongsTo<Feedback, $this>
+     */
     public function feedback(): BelongsTo
     {
         return $this->belongsTo(Feedback::class);
     }
 
+    /**
+     * @return BelongsTo<User, $this>
+     */
     public function staff(): BelongsTo
     {
         return $this->belongsTo(User::class, 'staff_id');

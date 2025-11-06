@@ -7,6 +7,9 @@ namespace He4rt\Meeting\Database\Factories;
 use He4rt\Meeting\Models\MeetingType;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
+/**
+ * @extends Factory<MeetingType>
+ */
 final class MeetingTypeFactory extends Factory
 {
     protected $model = MeetingType::class;

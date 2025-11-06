@@ -28,6 +28,9 @@ final class Information extends Model
         'about',
     ];
 
+    /**
+     * @return BelongsTo<User, $this>
+     */
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);

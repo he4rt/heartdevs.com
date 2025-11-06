@@ -6,7 +6,7 @@ use App\Enums\FilamentPanel;
 use Filament\Facades\Filament;
 use He4rt\Events\Enums\Talks\TalkStatusEnum;
 use He4rt\Events\Filament\Resources\Talks\Pages\CreateTalk;
-use He4rt\Events\Models\Event;
+use He4rt\Events\Models\EventModel as Event;
 use He4rt\Events\Models\Talk;
 use He4rt\User\Models\User;
 
