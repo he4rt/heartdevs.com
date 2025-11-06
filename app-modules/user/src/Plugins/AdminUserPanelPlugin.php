@@ -21,11 +21,9 @@ class AdminUserPanelPlugin implements Plugin
     {
         $panel->resources([
             UserResource::class,
-            TenantResource::class
+            TenantResource::class,
         ]);
     }
 
-    public function boot(Panel $panel): void
-    {
-    }
+    public function boot(Panel $panel): void {}
 }

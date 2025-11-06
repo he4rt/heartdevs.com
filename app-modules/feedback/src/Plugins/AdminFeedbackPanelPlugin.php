@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace He4rt\Feedback\Plugins;
 
 use App\Enums\FilamentPanel;
@@ -9,7 +11,6 @@ use He4rt\Feedback\Filament\Admin\Resources\Feedback\FeedbackResource;
 
 class AdminFeedbackPanelPlugin implements Plugin
 {
-
     public function getId(): string
     {
         return FilamentPanel::Admin->moduleName('feedback');
@@ -18,11 +19,9 @@ class AdminFeedbackPanelPlugin implements Plugin
     public function register(Panel $panel): void
     {
         $panel->resources([
-            FeedbackResource::class
+            FeedbackResource::class,
         ]);
     }
 
-    public function boot(Panel $panel): void
-    {
-    }
+    public function boot(Panel $panel): void {}
 }

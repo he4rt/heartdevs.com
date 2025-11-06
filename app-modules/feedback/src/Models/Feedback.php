@@ -52,6 +52,7 @@ final class Feedback extends Model
     {
         return $this->belongsTo(User::class, 'target_id');
     }
+
     /**
      * @return BelongsTo<Tenant, $this>
      */
