@@ -6,6 +6,7 @@ use App\Enums\FilamentPanel;
 use Filament\Facades\Filament;
 use He4rt\Season\Filament\Resources\Seasons\Pages\CreateSeason;
 use He4rt\Season\Models\Season;
+use He4rt\Tenant\Models\Tenant;
 use Illuminate\Support\Facades\Date;
 
 use function Pest\Laravel\assertDatabaseCount;
@@ -23,9 +24,11 @@ it('should render', function (): void {
 });
 
 it('should be able to create a new season', function (): void {
+    $tenant = Tenant::factory()->create();
     livewire(CreateSeason::class)
         ->assertOk()
         ->fillForm([
+            'tenant_id' => $tenant->getKey(),
             'name' => 'season 1',
             'description' => 'description da season',
             'started_at' => Date::yesterday(),
@@ -40,6 +43,7 @@ it('should be able to create a new season', function (): void {
 
     assertDatabaseCount(Season::class, 1);
     assertDatabaseHas(Season::class, [
+        'tenant_id' => $tenant->getKey(),
         'name' => 'season 1',
         'started_at' => Date::yesterday(),
         'ended_at' => Date::tomorrow(),

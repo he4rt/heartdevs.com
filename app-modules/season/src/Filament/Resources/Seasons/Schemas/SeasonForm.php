@@ -6,6 +6,7 @@ namespace He4rt\Season\Filament\Resources\Seasons\Schemas;
 
 use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\RichEditor;
+use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Schemas\Schema;
 
@@ -15,6 +16,9 @@ class SeasonForm
     {
         return $schema
             ->components([
+                Select::make('tenant_id')
+                    ->relationship('tenant', 'name')
+                    ->required(),
                 TextInput::make('name')
                     ->required(),
                 RichEditor::make('description')

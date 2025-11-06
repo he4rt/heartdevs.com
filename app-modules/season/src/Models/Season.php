@@ -7,9 +7,11 @@ namespace He4rt\Season\Models;
 use He4rt\Badge\Models\Badge;
 use He4rt\Meeting\Models\Meeting;
 use He4rt\Season\Database\Factories\SeasonFactory;
+use He4rt\Tenant\Models\Tenant;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 final class Season extends Model
@@ -21,6 +23,7 @@ final class Season extends Model
 
     protected $fillable = [
         'id',
+        'tenant_id',
         'name',
         'description',
         'messages_count',
@@ -45,6 +48,14 @@ final class Season extends Model
     public function meetings(): HasMany
     {
         return $this->hasMany(Meeting::class);
+    }
+
+    /**
+     * @return BelongsTo<Tenant, $this>
+     */
+    public function tenant(): BelongsTo
+    {
+        return $this->belongsTo(Tenant::class);
     }
 
     protected static function newFactory(): SeasonFactory
