@@ -6,15 +6,17 @@ use He4rt\Tenant\Filament\Admin\Resources\Tenants\Pages\CreateTenant;
 use He4rt\Tenant\Models\Tenant;
 use He4rt\User\Models\User;
 
+use function Pest\Livewire\livewire;
+
 it('can load the create page', function (): void {
-    $this->livewire(CreateTenant::class)
+    livewire(CreateTenant::class)
         ->assertOk();
 });
 
 it('can create a tenant', function (): void {
     $owner = User::factory()->create();
 
-    $this->livewire(CreateTenant::class)
+    livewire(CreateTenant::class)
         ->fillForm([
             'name' => 'My Tenant',
             'slug' => 'my-tenant',
