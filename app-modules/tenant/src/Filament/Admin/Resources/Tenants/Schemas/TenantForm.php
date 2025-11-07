@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace He4rt\Tenant\Filament\Admin\Resources\Tenants\Schemas;
 
+use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Schemas\Schema;
 
@@ -15,8 +16,9 @@ class TenantForm
             ->components([
                 TextInput::make('name'),
                 TextInput::make('slug'),
-                TextInput::make('owner_id'),
-                TextInput::make('active'),
+                Select::make('owner_id')
+                    ->relationship('owner', 'name'),
+                Select::make('active')->boolean(),
             ]);
     }
 }
