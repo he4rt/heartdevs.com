@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace He4rt\Events\Database\Factories;
 
-use He4rt\Events\Models\EventModel as Event;
+use He4rt\Events\Models\Event;
 use He4rt\Events\Models\Talk;
 use He4rt\Tenant\Models\Tenant;
 use He4rt\User\Models\User;

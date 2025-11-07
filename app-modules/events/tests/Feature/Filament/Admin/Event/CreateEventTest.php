@@ -6,7 +6,7 @@ use App\Enums\FilamentPanel;
 use Filament\Facades\Filament;
 use He4rt\Events\Enums\EventTypeEnum;
 use He4rt\Events\Filament\Resources\Events\Pages\CreateEvent;
-use He4rt\Events\Models\EventModel as Event;
+use He4rt\Events\Models\Event;
 use Illuminate\Support\Facades\Date;
 
 use function Pest\Laravel\assertDatabaseCount;

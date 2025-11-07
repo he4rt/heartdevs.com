@@ -32,7 +32,7 @@ use Illuminate\Database\Eloquent\Relations\Pivot;
  * @property int $tenant_id
  */
 #[UseFactory(EventFactory::class)]
-class EventModel extends Model
+class Event extends Model
 {
     use HasFactory;
     protected $table = 'events';
@@ -120,6 +120,7 @@ class EventModel extends Model
     protected function casts(): array
     {
         return [
+            'active' => 'boolean',
             'event_at' => 'datetime',
             'start_at' => 'datetime',
             'end_at' => 'datetime',

@@ -15,6 +15,7 @@ use He4rt\Events\Filament\Resources\Talks\Pages\ListTalks;
 use He4rt\Events\Filament\Resources\Talks\Schemas\TalkForm;
 use He4rt\Events\Filament\Resources\Talks\Tables\TalksTable;
 use He4rt\Events\Models\Talk;
+use UnitEnum;
 
 class TalkResource extends Resource
 {
@@ -22,7 +23,11 @@ class TalkResource extends Resource
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::Microphone;
 
+    protected static string|UnitEnum|null $navigationGroup = 'Events';
+
     protected static ?string $recordTitleAttribute = 'title';
+
+    protected static ?string $label = 'Submissions';
 
     public static function form(Schema $schema): Schema
     {

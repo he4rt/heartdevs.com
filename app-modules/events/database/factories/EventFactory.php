@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace He4rt\Events\Database\Factories;
 
 use He4rt\Events\Enums\EventTypeEnum;
-use He4rt\Events\Models\EventModel as Event;
+use He4rt\Events\Models\Event;
 use He4rt\Tenant\Models\Tenant;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Facades\Date;
