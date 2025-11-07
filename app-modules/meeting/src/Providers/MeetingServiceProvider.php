@@ -11,7 +11,6 @@ use He4rt\Meeting\Contracts\MeetingRepository;
 use He4rt\Meeting\Contracts\MeetingTypeRepository;
 use He4rt\Meeting\Repositories\MeetingEloquentRepository;
 use He4rt\Meeting\Repositories\MeetingTypeEloquentRepository;
-use He4rt\Message\Plugins\AdminMessagePanelPlugin;
 use Illuminate\Support\ServiceProvider;
 
 class MeetingServiceProvider extends ServiceProvider
@@ -23,7 +22,7 @@ class MeetingServiceProvider extends ServiceProvider
 
         Panel::configureUsing(function (Panel $panel): void {
             match ($panel->currentPanel()) {
-                FilamentPanel::Admin => $panel->plugin(new AdminMessagePanelPlugin()),
+                FilamentPanel::Admin => $panel->plugin(new AdminMeetingPanelPlugin),
                 default => null,
             };
         });
