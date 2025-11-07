@@ -13,7 +13,7 @@ final class AdminBadgePanelPlugin implements Plugin
 {
     public function getId(): string
     {
-        return FilamentPanel::Admin->moduleName('bedge');
+        return FilamentPanel::Admin->moduleName('badge');
     }
 
     public function register(Panel $panel): void
