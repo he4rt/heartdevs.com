@@ -32,6 +32,7 @@
         "laravel/sanctum": "^4.2.0",
         "laravel/tinker": "^2.10.1",
         "marvinlabs/laravel-discord-logger": "^1.4.3",
+        "owenvoke/blade-fontawesome": "^3.0",
         "predis/predis": "^2.4.0",
         "spatie/laravel-medialibrary": "^11.17.3"
     },
@@ -40,6 +41,7 @@
         "driftingly/rector-laravel": "^2.1.3",
         "fakerphp/faker": "^1.24.1",
         "larastan/larastan": "^3.8.0",
+        "laravel/boost": "^1.7",
         "laravel/pail": "^1.2.3",
         "laravel/pint": "^1.25.1",
         "laravel/sail": "^1.47.0",
