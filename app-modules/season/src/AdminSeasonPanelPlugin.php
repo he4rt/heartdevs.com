@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace He4rt\Season;
 
+use App\Enums\FilamentPanel;
 use Filament\Contracts\Plugin;
 use Filament\Panel;
 use He4rt\Season\Filament\Resources\Seasons\SeasonResource;
@@ -12,7 +13,7 @@ class AdminSeasonPanelPlugin implements Plugin
 {
     public function getId(): string
     {
-        return 'admin-season';
+        return FilamentPanel::Admin->moduleName('season');
     }
 
     public function register(Panel $panel): void
