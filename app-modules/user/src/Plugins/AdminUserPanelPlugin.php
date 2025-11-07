@@ -20,8 +20,7 @@ class AdminUserPanelPlugin implements Plugin
     public function register(Panel $panel): void
     {
         $panel->resources([
-            UserResource::class,
-            TenantResource::class,
+            UserResource::class
         ]);
     }
 
