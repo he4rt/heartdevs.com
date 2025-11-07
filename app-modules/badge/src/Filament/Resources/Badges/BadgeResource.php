@@ -15,10 +15,13 @@ use He4rt\Badge\Filament\Resources\Badges\Pages\ListBadges;
 use He4rt\Badge\Filament\Resources\Badges\Schemas\BadgeForm;
 use He4rt\Badge\Filament\Resources\Badges\Tables\BadgesTable;
 use He4rt\Badge\Models\Badge;
+use UnitEnum;
 
 class BadgeResource extends Resource
 {
     protected static ?string $model = Badge::class;
+
+    protected static string|UnitEnum|null $navigationGroup = 'Gamefication';
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::Tag;
 

@@ -15,10 +15,13 @@ use He4rt\Sponsors\Filament\Resources\Sponsors\Pages\ListSponsors;
 use He4rt\Sponsors\Filament\Resources\Sponsors\Schemas\SponsorForm;
 use He4rt\Sponsors\Filament\Resources\Sponsors\Tables\SponsorsTable;
 use He4rt\Sponsors\Models\Sponsor;
+use UnitEnum;
 
 class SponsorResource extends Resource
 {
     protected static ?string $model = Sponsor::class;
+
+    protected static string|UnitEnum|null $navigationGroup = 'General';
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
 

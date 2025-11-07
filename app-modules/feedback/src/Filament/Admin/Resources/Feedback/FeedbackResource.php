@@ -15,10 +15,13 @@ use He4rt\Feedback\Filament\Admin\Resources\Feedback\Pages\ListFeedback;
 use He4rt\Feedback\Filament\Admin\Resources\Feedback\Schemas\FeedbackForm;
 use He4rt\Feedback\Filament\Admin\Resources\Feedback\Tables\FeedbackTable;
 use He4rt\Feedback\Models\Feedback;
+use UnitEnum;
 
 class FeedbackResource extends Resource
 {
     protected static ?string $model = Feedback::class;
+
+    protected static string|UnitEnum|null $navigationGroup = 'General';
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
 

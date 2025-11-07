@@ -15,10 +15,13 @@ use He4rt\Season\Filament\Resources\Seasons\Pages\ListSeasons;
 use He4rt\Season\Filament\Resources\Seasons\Schemas\SeasonForm;
 use He4rt\Season\Filament\Resources\Seasons\Tables\SeasonsTable;
 use He4rt\Season\Models\Season;
+use UnitEnum;
 
 class SeasonResource extends Resource
 {
     protected static ?string $model = Season::class;
+
+    protected static string|UnitEnum|null $navigationGroup = 'Gamefication';
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::RectangleGroup;
 

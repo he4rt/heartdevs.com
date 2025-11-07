@@ -15,10 +15,13 @@ use He4rt\Tenant\Filament\Admin\Resources\Tenants\Pages\ListTenants;
 use He4rt\Tenant\Filament\Admin\Resources\Tenants\Schemas\TenantForm;
 use He4rt\Tenant\Filament\Admin\Resources\Tenants\Tables\TenantsTable;
 use He4rt\Tenant\Models\Tenant;
+use UnitEnum;
 
 class TenantResource extends Resource
 {
     protected static ?string $model = Tenant::class;
+
+    protected static string|UnitEnum|null $navigationGroup = 'Administration';
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
 

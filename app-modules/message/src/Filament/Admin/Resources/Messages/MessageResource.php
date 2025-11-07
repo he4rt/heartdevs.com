@@ -15,10 +15,13 @@ use He4rt\Message\Filament\Admin\Resources\Messages\Pages\ListMessages;
 use He4rt\Message\Filament\Admin\Resources\Messages\Schemas\MessageForm;
 use He4rt\Message\Filament\Admin\Resources\Messages\Tables\MessagesTable;
 use He4rt\Message\Models\Message;
+use UnitEnum;
 
 class MessageResource extends Resource
 {
     protected static ?string $model = Message::class;
+
+    protected static string|UnitEnum|null $navigationGroup = 'Gamefication';
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
 

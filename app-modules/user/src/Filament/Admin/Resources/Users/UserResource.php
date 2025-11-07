@@ -16,10 +16,13 @@ use He4rt\User\Filament\Admin\Resources\Users\RelationManagers\ProvidersRelation
 use He4rt\User\Filament\Admin\Resources\Users\Schemas\UserForm;
 use He4rt\User\Filament\Admin\Resources\Users\Tables\UsersTable;
 use He4rt\User\Models\User;
+use UnitEnum;
 
 class UserResource extends Resource
 {
     protected static ?string $model = User::class;
+
+    protected static string|UnitEnum|null $navigationGroup = 'Administration';
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
 
