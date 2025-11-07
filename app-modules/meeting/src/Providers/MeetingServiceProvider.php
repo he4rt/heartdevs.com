@@ -6,6 +6,7 @@ namespace He4rt\Meeting\Providers;
 
 use App\Enums\FilamentPanel;
 use Filament\Panel;
+use He4rt\Meeting\AdminMeetingPanelPlugin;
 use He4rt\Meeting\Contracts\MeetingRepository;
 use He4rt\Meeting\Contracts\MeetingTypeRepository;
 use He4rt\Meeting\Repositories\MeetingEloquentRepository;

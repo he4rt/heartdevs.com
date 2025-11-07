@@ -18,7 +18,7 @@ return new class extends Migration
                 $table->id();
                 $table->string('name');
                 $table->integer('week_day')->comment('Week day of event');
-                $table->integer('start_at')->comment('Number of minutes past midnight');
+                $table->time('start_at')->comment('Number of minutes past midnight');
                 $table->timestamps();
             });
         }
