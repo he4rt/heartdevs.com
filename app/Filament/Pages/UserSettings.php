@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace App\Filament\Pages;
 
-use Filament\Schemas\Components\Tabs\Tab;
 use App\Livewire\ConnectionHub;
 use Filament\Auth\Pages\EditProfile;
 use Filament\Schemas\Components\Livewire;
 use Filament\Schemas\Components\Tabs;
+use Filament\Schemas\Components\Tabs\Tab;
 use Filament\Schemas\Schema;
 
 class UserSettings extends EditProfile

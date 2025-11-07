@@ -4,13 +4,13 @@ declare(strict_types=1);
 
 namespace He4rt\Authentication\Actions;
 
-use Illuminate\Support\Facades\Date;
 use He4rt\Authentication\DTO\OAuthUserDTO;
 use He4rt\Authentication\Enums\OAuthProviderEnum;
 use He4rt\Provider\Models\Provider;
 use He4rt\Tenant\Models\Tenant;
 use He4rt\User\Models\User;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\Hash;
 use Ramsey\Uuid\Uuid;
 
