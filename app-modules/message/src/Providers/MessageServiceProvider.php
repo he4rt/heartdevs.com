@@ -17,4 +17,9 @@ final class MessageServiceProvider extends ServiceProvider
         $this->app->bind(MessageRepository::class, MessageEloquentRepository::class);
         $this->app->bind(VoiceRepository::class, VoiceEloquentRepository::class);
     }
+
+    public function boot(): void
+    {
+        $this->loadMigrationsFrom(__DIR__.'/../../database/migrations');
+    }
 }

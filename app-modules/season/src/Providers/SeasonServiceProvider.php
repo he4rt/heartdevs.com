@@ -25,5 +25,8 @@ class SeasonServiceProvider extends ServiceProvider
         });
     }
 
-    public function boot(): void {}
+    public function boot(): void
+    {
+        $this->loadMigrationsFrom(__DIR__.'/../../database/migrations');
+    }
 }

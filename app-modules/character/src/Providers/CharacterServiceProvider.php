@@ -15,5 +15,8 @@ class CharacterServiceProvider extends ServiceProvider
         $this->app->bind(CharacterRepository::class, CharacterEloquentRepository::class);
     }
 
-    public function boot(): void {}
+    public function boot(): void
+    {
+        $this->loadMigrationsFrom(__DIR__.'/../../database/migrations');
+    }
 }

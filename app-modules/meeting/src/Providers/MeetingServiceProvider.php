@@ -18,5 +18,8 @@ class MeetingServiceProvider extends ServiceProvider
         $this->app->bind(MeetingTypeRepository::class, MeetingTypeEloquentRepository::class);
     }
 
-    public function boot(): void {}
+    public function boot(): void
+    {
+        $this->loadMigrationsFrom(__DIR__.'/../../database/migrations');
+    }
 }

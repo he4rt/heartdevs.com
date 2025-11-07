@@ -15,5 +15,8 @@ class ProviderServiceProvider extends ServiceProvider
         $this->app->bind(ProviderRepository::class, ProviderEloquentRepository::class);
     }
 
-    public function boot(): void {}
+    public function boot(): void
+    {
+        $this->loadMigrationsFrom(__DIR__.'/../../database/migrations');
+    }
 }
