@@ -5,21 +5,24 @@ declare(strict_types=1);
 namespace He4rt\Authentication\Http\Controllers;
 
 use App\Http\Controllers\Controller;
-use He4rt\Authentication\OAuth\Domain\Actions\RedirectOAuthUrl;
-use Heart\Autentication\Services\OAuthService;
+use He4rt\Authentication\Actions\AuthenticateAction;
+use He4rt\Authentication\Enums\OAuthProviderEnum;
 use Illuminate\Http\RedirectResponse;
 
 final class OAuthController extends Controller
 {
-    public function getRedirect(string $provider, RedirectOAuthUrl $action): RedirectResponse
+    public function getRedirect(OAuthProviderEnum $provider): RedirectResponse
     {
-        return redirect()->to($action->handle($provider));
+        session()->put('tenant', request()->query('tenant'));
+
+        return redirect()->to($provider->getClient()->redirectUrl());
     }
 
-    public function getAuthenticate(string $provider, OAuthService $action): RedirectResponse
+    public function getAuthenticate(OAuthProviderEnum $provider, AuthenticateAction $action): RedirectResponse
     {
-        $action->handle($provider, request()->input('code'));
+        $tenantSlug = session()->get('tenant');
+        $action->withOAuth($tenantSlug, $provider, request()->input('code'));
 
-        return redirect()->intended('/profile');
+        return redirect()->intended('/admin');
     }
 }
