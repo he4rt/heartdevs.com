@@ -14,6 +14,7 @@ use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 
 /**
@@ -57,9 +58,9 @@ final class User extends Authenticatable implements HasName
     /**
      * @return HasMany<Provider, $this>
      */
-    public function providers(): HasMany
+    public function providers(): MorphMany
     {
-        return $this->hasMany(Provider::class, 'model_id');
+        return $this->morphMany(Provider::class, 'model');
     }
 
     /**
