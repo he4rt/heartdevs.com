@@ -6,6 +6,7 @@
 /public/js
 /public/fonts
 /storage/*.key
+/storage/debugbar
 /vendor
 .env
 .env.testing
