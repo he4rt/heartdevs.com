@@ -1,5 +1,6 @@
 @import 'tw-animate-css';
 @import './support/index.css';
+
 @import './base.css' layer(base);
 
 .fi-page-header-main-ctn {
