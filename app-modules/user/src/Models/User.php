@@ -5,8 +5,10 @@ declare(strict_types=1);
 namespace He4rt\User\Models;
 
 use Filament\Models\Contracts\HasName;
+use Filament\Models\Contracts\HasTenants;
 use He4rt\Character\Models\Character;
 use He4rt\Provider\Models\Provider;
+use He4rt\Tenant\Models\Concerns\InteractsWithTenants;
 use He4rt\User\Database\Factories\UserFactory;
 use He4rt\User\Observers\UserObserver;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
@@ -23,10 +25,11 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
  * @property bool $is_donator
  */
 #[ObservedBy(UserObserver::class)]
-final class User extends Authenticatable implements HasName
+final class User extends Authenticatable implements HasName, HasTenants
 {
     use HasFactory;
     use HasUuids;
+    use InteractsWithTenants;
 
     protected $table = 'users';
 

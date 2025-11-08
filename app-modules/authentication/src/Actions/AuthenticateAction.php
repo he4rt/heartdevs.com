@@ -49,6 +49,8 @@ class AuthenticateAction
             'is_donator' => false,
         ]);
 
+        $user->tenants()->attach($tenant);
+
         /** @var Provider $provider */
         $provider = $user->providers()->updateOrCreate([
             'tenant_id' => $tenant->getKey(),
