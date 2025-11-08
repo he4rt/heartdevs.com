@@ -1,0 +1,41 @@
+@import './fonts.css';
+@import './themes.css';
+
+@theme inline {
+    --font-family-primary: Satoshi, sans-serif;
+    --font-family-secondary: Cal-Sans, sans-serif;
+    --font-family-code: Fira-Code, monospace;
+
+    --radius-sm: calc(var(--radius) - 4px);
+    --radius-md: calc(var(--radius) - 2px);
+    --radius-lg: var(--radius);
+    --radius-xl: calc(var(--radius) + 4px);
+
+    --color-primary-50: #f3f3f4;
+    --color-primary-100: #dddddd;
+    --color-primary-200: #c6c6c7;
+    --color-primary-300: #b0b0b1;
+    --color-primary-400: #9b9b9c;
+    --color-primary-500: #868687;
+    --color-primary-600: #727273;
+    --color-primary-700: #5e5e5f;
+    --color-primary-800: #4b4b4c;
+    --color-primary-900: #393939;
+
+    --color-helper-success: #03ad00;
+    --color-helper-warning: #ecc707;
+    --color-helper-error: #e72323;
+
+    --color-text-high: #fdfdfd;
+    --color-text-medium: #9c9c9c;
+    --color-text-low: #7a7a7a;
+
+    --color-icon-high: #f5f5ff;
+    --color-icon-medium: #707070;
+    --color-icon-low: #353535;
+
+    --color-primary-purple: #782bf1;
+    --color-primary-pink: #9828bd;
+
+    --radius: 0.625rem;
+}

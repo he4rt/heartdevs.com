@@ -1,0 +1,13 @@
+@import 'tw-animate-css';
+@import './support/index.css';
+@import './base.css' layer(base);
+
+.fi-page-header-main-ctn {
+    @apply p-0;
+}
+
+.fi-main {
+    @apply p-0;
+}
+
+@variant dark (&:where(.dark, .dark *));
