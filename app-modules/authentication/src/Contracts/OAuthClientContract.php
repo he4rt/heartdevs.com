@@ -9,7 +9,7 @@ use He4rt\Authentication\DTO\OAuthUserDTO;
 
 interface OAuthClientContract
 {
-    public function redirectUrl(): string;
+    public function redirectUrl(?string $state = null): string;
 
     public function auth(string $code): OAuthAccessDTO;
 

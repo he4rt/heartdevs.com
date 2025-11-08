@@ -9,18 +9,21 @@ use He4rt\Authentication\DTO\OAuthAccessDTO;
 use He4rt\Integrations\Twitch\OAuth\Contracts\TwitchOAuthService;
 use He4rt\Integrations\Twitch\OAuth\DTO\TwitchOAuthAccessDTO;
 use He4rt\Integrations\Twitch\OAuth\DTO\TwitchOAuthDTO;
+use Illuminate\Support\Facades\Crypt;
+use Illuminate\Support\Facades\Date;
 
 final readonly class TwitchOAuthClient implements TwitchOAuthService
 {
     public function __construct(private Client $client) {}
 
-    public function redirectUrl(): string
+    public function redirectUrl(?string $state = null): string
     {
         return sprintf(
-            'https://id.twitch.tv/oauth2/authorize?client_id=%s&redirect_uri=%s&response_type=code&scope=%s',
+            'https://id.twitch.tv/oauth2/authorize?client_id=%s&redirect_uri=%s&response_type=code&scope=%s&state=%s',
             config('services.twitch.client_id'),
             config('services.twitch.redirect_uri'),
-            config('services.twitch.scopes')
+            config('services.twitch.scopes'),
+            Crypt::encryptString($state ?? Date::now()->getTimestamp())
         );
     }
 
