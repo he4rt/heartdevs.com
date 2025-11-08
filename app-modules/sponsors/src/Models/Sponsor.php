@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace He4rt\Sponsors\Models;
 
-use He4rt\Events\Models\Event;
+use He4rt\Events\Models\EventModel;
 use He4rt\Sponsors\Database\Factories\SponsorFactory;
 use He4rt\Sponsors\Models\Pivot\SponsorAttend;
 use He4rt\Tenant\Models\Tenant;
@@ -46,13 +46,13 @@ class Sponsor extends Model implements HasMedia
     }
 
     /**
-     * @return BelongsToMany<Event, $this, Pivot>
+     * @return BelongsToMany<EventModel, $this, Pivot>
      */
     public function events(): BelongsToMany
     {
         return $this
             ->belongsToMany(
-                Event::class,
+                EventModel::class,
                 'events_sponsors',
                 'sponsor_id',
                 'event_id'

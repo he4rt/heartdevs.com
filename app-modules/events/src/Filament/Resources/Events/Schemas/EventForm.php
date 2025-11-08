@@ -42,7 +42,7 @@ class EventForm
                     ->maxLength(255)
                     ->required(),
                 Select::make('event_type')
-                    ->label('Event Type')
+                    ->label('EventModel Type')
                     ->enum(EventTypeEnum::class)
                     ->options(EventTypeEnum::class)
                     ->required(),
@@ -58,13 +58,13 @@ class EventForm
                     ])
                     ->required(),
                 DateTimePicker::make('event_at')
-                    ->label('Event Date')
+                    ->label('EventModel Date')
                     ->required(),
                 DateTimePicker::make('start_at')
-                    ->label('Event Start Hour')
+                    ->label('EventModel Start Hour')
                     ->required(),
                 DateTimePicker::make('end_at')
-                    ->label('Event End Hour')
+                    ->label('EventModel End Hour')
                     ->after('start_at')
                     ->required(),
             ]);

@@ -32,7 +32,7 @@ use Illuminate\Database\Eloquent\Relations\Pivot;
  * @property int $tenant_id
  */
 #[UseFactory(EventFactory::class)]
-class Event extends Model
+class EventModel extends Model
 {
     use HasFactory;
     protected $table = 'events';

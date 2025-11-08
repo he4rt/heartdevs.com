@@ -14,12 +14,12 @@ use He4rt\Events\Filament\Resources\Events\Pages\EditEvent;
 use He4rt\Events\Filament\Resources\Events\Pages\ListEvents;
 use He4rt\Events\Filament\Resources\Events\Schemas\EventForm;
 use He4rt\Events\Filament\Resources\Events\Tables\EventsTable;
-use He4rt\Events\Models\Event;
+use He4rt\Events\Models\EventModel;
 use UnitEnum;
 
 class EventResource extends Resource
 {
-    protected static ?string $model = Event::class;
+    protected static ?string $model = EventModel::class;
 
     protected static string|UnitEnum|null $navigationGroup = 'Events';
 

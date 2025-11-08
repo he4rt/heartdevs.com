@@ -25,7 +25,7 @@ class TalkForm
                     ->relationship('user', 'username')
                     ->required(),
                 Select::make('event_id')
-                    ->label('Event')
+                    ->label('EventModel')
                     ->relationship('event', 'title')
                     ->required(),
                 TextInput::make('title')

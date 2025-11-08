@@ -6,7 +6,7 @@ use App\Enums\FilamentPanel;
 use Filament\Facades\Filament;
 use He4rt\Events\Enums\Talks\TalkStatusEnum;
 use He4rt\Events\Filament\Resources\Talks\Pages\CreateTalk;
-use He4rt\Events\Models\Event;
+use He4rt\Events\Models\EventModel;
 use He4rt\Events\Models\Talk;
 use He4rt\User\Models\User;
 
@@ -24,7 +24,7 @@ it('should render', function (): void {
 it('should be able to register a talk', function (): void {
     Filament::setCurrentPanel(FilamentPanel::Admin->value);
     $this->actingAsAdmin();
-    $event = Event::factory()->create();
+    $event = EventModel::factory()->create();
     $user = User::factory()->create();
     livewire(CreateTalk::class)
         ->assertOk()

@@ -39,11 +39,11 @@ class Talk extends Model
     }
 
     /**
-     * @return BelongsTo<\He4rt\Events\Models\Event, $this>
+     * @return BelongsTo<EventModel, $this>
      */
     public function event(): BelongsTo
     {
-        return $this->belongsTo(Event::class);
+        return $this->belongsTo(EventModel::class);
     }
 
     /**

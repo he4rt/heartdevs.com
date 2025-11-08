@@ -31,7 +31,7 @@ class EventsTable
                 TextColumn::make('event_at'),
 
                 TextColumn::make('start_at')
-                    ->label('Event Hour')
+                    ->label('EventModel Hour')
                     ->formatStateUsing(fn ($state) => $state->format('d/m/Y H:i'))
                     ->description(fn ($record) => $record->end_at->format('d/m/Y H:i'))
                     ->sortable(),

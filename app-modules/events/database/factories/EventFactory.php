@@ -5,17 +5,17 @@ declare(strict_types=1);
 namespace He4rt\Events\Database\Factories;
 
 use He4rt\Events\Enums\EventTypeEnum;
-use He4rt\Events\Models\Event;
+use He4rt\Events\Models\EventModel;
 use He4rt\Tenant\Models\Tenant;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Facades\Date;
 
 /**
- * @extends Factory<Event>
+ * @extends Factory<EventModel>
  */
 final class EventFactory extends Factory
 {
-    protected $model = Event::class;
+    protected $model = EventModel::class;
 
     public function definition(): array
     {

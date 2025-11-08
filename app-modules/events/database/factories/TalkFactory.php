@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace He4rt\Events\Database\Factories;
 
-use He4rt\Events\Models\Event;
+use He4rt\Events\Models\EventModel;
 use He4rt\Events\Models\Talk;
 use He4rt\Tenant\Models\Tenant;
 use He4rt\User\Models\User;
@@ -22,7 +22,7 @@ final class TalkFactory extends Factory
     {
         return [
             'tenant_id' => Tenant::factory(),
-            'event_id' => Event::factory(),
+            'event_id' => EventModel::factory(),
             'user_id' => User::factory(),
             'status' => fake()->word(),
             'field_type' => fake()->word(),
