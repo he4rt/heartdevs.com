@@ -1,0 +1,7 @@
+.hp-section {
+    @apply flex min-h-[92vh] flex-col items-center justify-center;
+
+    .hp-container {
+        @apply container;
+    }
+}

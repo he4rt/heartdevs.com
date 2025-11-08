@@ -2,13 +2,14 @@
 @import './support/index.css';
 
 @import './base.css';
+@import './components/section.css' layer(components);
 
 .fi-topbar {
     @apply bg-background p-4 px-12 shadow-none ring-0;
 }
 
 .fi-page-content {
-    @apply from-primary-purple/12 to-background bg-gradient-to-br;
+    @apply from-primary-purple/12 to-background gap-0 bg-gradient-to-br;
 }
 
 .fi-page-header-main-ctn {
