@@ -76,20 +76,21 @@ Este projeto utiliza **arquitetura modular** implementada com [InternaChi Modula
 
 ### Módulos Disponíveis
 
-| Módulo           | Descrição                              |
-| ---------------- | -------------------------------------- |
-| `authentication` | Gerenciamento de autenticação e tokens |
-| `badge`          | Sistema de badges e conquistas         |
-| `character`      | Gerenciamento de personagens/avatares  |
-| `feedback`       | Sistema de feedback da comunidade      |
-| `integrations`   | Integrações com serviços externos      |
-| `meeting`        | Gerenciamento de reuniões e eventos    |
-| `message`        | Sistema de mensagens                   |
-| `provider`       | Provedores de serviços                 |
-| `ranking`        | Sistema de ranking e pontuação         |
-| `season`         | Gerenciamento de temporadas            |
-| `shared`         | Funcionalidades compartilhadas         |
-| `user`           | Gerenciamento de usuários              |
+| Módulo           | Descrição                                      |
+| ---------------- | ---------------------------------------------- |
+| `authentication` | Gerenciamento de autenticação e tokens         |
+| `badge`          | Sistema de badges e conquistas                 |
+| `character`      | Gerenciamento de personagens/avatares          |
+| `feedback`       | Sistema de feedback da comunidade              |
+| `integrations`   | Integrações com serviços externos              |
+| `meeting`        | Gerenciamento de reuniões e eventos            |
+| `message`        | Sistema de mensagens                           |
+| `provider`       | Provedores de serviços                         |
+| `ranking`        | Sistema de ranking e pontuação                 |
+| `season`         | Gerenciamento de temporadas                    |
+| `shared`         | Funcionalidades compartilhadas                 |
+| `tenant`         | Sistema multi-tenancy para isolamento de dados |
+| `user`           | Gerenciamento de usuários                      |
 
 Cada módulo possui sua própria estrutura:
 
