@@ -1,4 +1,8 @@
 @import '../../../../vendor/filament/filament/resources/css/theme.css';
 
 @source '../../../../app/Filament/**/*';
-@source '../../../../resources/views/filament/**/*';
+@source '../../../../resources/views/**/*';
+
+.fi-sidebar {
+    @apply bg-gray-100 dark:bg-gray-900;
+}

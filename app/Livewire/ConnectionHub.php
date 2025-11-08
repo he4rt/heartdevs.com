@@ -14,7 +14,7 @@ class ConnectionHub extends Component
     #[Computed]
     public function userProviders()
     {
-        return auth()->user()->providers;
+        return auth()->user()->providers()->where('tenant_id', filament()->getTenant()->getKey())->get();
     }
 
     public function render(): View
@@ -27,7 +27,8 @@ class ConnectionHub extends Component
 
     public function connect(OAuthProviderEnum $provider)
     {
-        $redirectUri = $provider->getClient()->redirectUrl();
+        session()->put('tenant', filament()->getTenant()->slug);
+        $redirectUri = $provider->getClient()->redirectUrl(filament()->getTenant()->slug);
 
         return redirect()->away($redirectUri);
     }
