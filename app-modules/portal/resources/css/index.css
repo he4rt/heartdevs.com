@@ -3,6 +3,10 @@
 
 @import './base.css';
 
+.fi-topbar {
+    @apply bg-background p-6 px-12 shadow-none ring-0;
+}
+
 .fi-page-content {
     @apply from-primary-purple/16 to-background bg-gradient-to-br;
 }
