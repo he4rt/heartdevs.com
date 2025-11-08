@@ -1,7 +1,11 @@
 @import 'tw-animate-css';
 @import './support/index.css';
 
-@import './base.css' layer(base);
+@import './base.css';
+
+.fi-page-content {
+    @apply from-primary-purple/16 to-background bg-gradient-to-br;
+}
 
 .fi-page-header-main-ctn {
     @apply p-0;

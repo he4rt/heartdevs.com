@@ -38,4 +38,8 @@
     --color-primary-pink: #9828bd;
 
     --radius: 0.625rem;
+    --color-border: var(--border);
+    --color-ring: var(--ring);
+    --color-background: var(--background);
+    --color-foreground: var(--foreground);
 }
