@@ -8,6 +8,7 @@ use App\Enums\FilamentPanel;
 use Filament\Panel;
 use He4rt\User\Contracts\UserRepository;
 use He4rt\User\Plugins\AdminUserPanelPlugin;
+use He4rt\User\Plugins\AppUserPanelPlugin;
 use He4rt\User\Repositories\UserEloquentRepository;
 use Illuminate\Support\ServiceProvider;
 
@@ -20,6 +21,7 @@ class UserServiceProvider extends ServiceProvider
         Panel::configureUsing(function (Panel $panel): void {
             match ($panel->currentPanel()) {
                 FilamentPanel::Admin => $panel->plugin(new AdminUserPanelPlugin()),
+                FilamentPanel::User => $panel->plugin(new AppUserPanelPlugin()),
                 default => null,
             };
         });
