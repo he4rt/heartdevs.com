@@ -29,6 +29,7 @@
         "laravel/framework": "^12.37.0",
         "laravel/sanctum": "^4.2.0",
         "laravel/tinker": "^2.10.1",
+        "livewire/flux": "^2.6",
         "marvinlabs/laravel-discord-logger": "^1.4.3",
         "predis/predis": "^2.4.0"
     },
