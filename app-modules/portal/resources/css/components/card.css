@@ -1,0 +1,46 @@
+.hp-card {
+    @apply flex flex-col items-center justify-center rounded-lg;
+    @apply gap-4;
+    @apply p-6;
+    @apply border-border border;
+}
+
+.hp-card-density-compact {
+    @apply p-4;
+}
+
+.hp-card-variant-solid {
+    @apply bg-transparent;
+}
+
+.hp-card-interactive {
+    @apply transition-all duration-500 hover:scale-[1.02];
+}
+
+.hp-card-icon {
+    @apply flex w-full items-start justify-start;
+}
+
+.hp-card-body {
+    @apply flex flex-col gap-y-1;
+}
+
+.hp-card-title {
+    @apply font-semibold tracking-tight lg:text-xl;
+}
+
+.hp-card-description {
+    @apply text-text-medium text-sm;
+}
+
+.hp-card-actions {
+    @apply mt-2;
+}
+
+.hp-card-footer {
+    @apply border-border mt-4 border-t pt-4;
+}
+
+.hp-card-disabled {
+    @apply pointer-events-none cursor-not-allowed opacity-60;
+}
