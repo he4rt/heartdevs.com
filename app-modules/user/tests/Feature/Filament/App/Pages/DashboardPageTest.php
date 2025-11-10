@@ -2,7 +2,6 @@
 
 declare(strict_types=1);
 
-use Illuminate\Support\Facades\Date;
 use Filament\Facades\Filament;
 use He4rt\Character\Models\Character;
 use He4rt\Events\Models\EventModel;
@@ -10,6 +9,7 @@ use He4rt\Season\Models\Season;
 use He4rt\Tenant\Models\Tenant;
 use He4rt\User\Filament\User\Pages\Dashboard;
 use He4rt\User\Models\User;
+use Illuminate\Support\Facades\Date;
 
 use function Pest\Laravel\actingAs;
 use function Pest\Livewire\livewire;
