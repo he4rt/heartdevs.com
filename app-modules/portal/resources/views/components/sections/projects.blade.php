@@ -12,5 +12,11 @@
                 Contribua com projetos open source e desenvolva habilidades reais enquanto constrói seu portfólio.
             </x-slot>
         </x-portal::headline>
+
+        <div class="grid w-full grid-cols-1 items-center justify-center sm:grid-cols-3">
+            <p class="text-center">card 1</p>
+            <p class="text-center">card 2</p>
+            <p class="text-center">card 3</p>
+        </div>
     </div>
 </section>
