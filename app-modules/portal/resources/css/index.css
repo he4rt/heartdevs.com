@@ -3,6 +3,11 @@
 
 @import './base.css';
 @import './components/section.css' layer(components);
+@import './components/headline.css' layer(components);
+
+.hp-title {
+    @apply text-2xl;
+}
 
 .fi-topbar {
     @apply bg-background p-4 px-12 shadow-none ring-0;
