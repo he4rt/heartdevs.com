@@ -57,7 +57,7 @@
 }
 
 .hp-headline-size-2xl .hp-headline-description {
-    @apply text-text-medium text-md sm:text-md max-w-full font-medium delay-200 md:text-lg lg:text-lg;
+    @apply text-text-medium max-w-full text-base font-medium delay-200 md:text-lg lg:text-lg;
 }
 
 /* ========= ANIMATION ========= */
@@ -81,5 +81,9 @@
 
 /* ========= BADGE ========= */
 .hp-headline-badge {
-    @apply mb-4;
+    @apply bg-primary-purple/5 border-primary-purple/32 mb-4 w-fit rounded-full border px-4 py-2 text-sm font-medium;
+}
+
+.hp-headline-badge:hover {
+    @apply bg-primary-purple/32;
 }
