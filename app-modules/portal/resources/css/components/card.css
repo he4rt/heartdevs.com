@@ -14,7 +14,7 @@
 }
 
 .hp-card-interactive {
-    @apply transition-all duration-500 hover:scale-[1.02];
+    @apply hover:border-primary-purple transition-all duration-500 hover:scale-[1.02];
 }
 
 .hp-card-icon {

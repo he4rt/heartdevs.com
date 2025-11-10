@@ -1,5 +1,5 @@
 .hp-headline {
-    @apply mx-auto flex max-w-2xl flex-col md:max-w-3xl lg:max-w-7xl;
+    @apply flex max-w-2xl flex-col md:max-w-3xl lg:max-w-7xl;
 }
 
 .hp-headline-container {
@@ -26,8 +26,12 @@
     @apply text-text-medium max-w-full font-medium delay-200;
 }
 
+.hp-headline-size-sm .hp-headline-description {
+    @apply text-sm;
+}
+
 .hp-headline-size-sm .hp-headline-title {
-    @apply text-lg sm:text-xl md:text-2xl lg:text-3xl;
+    @apply text-lg sm:text-xl md:text-2xl;
 }
 
 .hp-headline-size-md .hp-headline-title {
@@ -67,7 +71,7 @@
 }
 
 .hp-headline-actions {
-    @apply mt-2 flex w-full flex-col items-center justify-center gap-6 sm:flex-row sm:gap-x-4;
+    @apply mt-2 flex w-full flex-col items-center justify-center gap-6 sm:flex-row sm:gap-x-8;
 }
 
 .hp-headline-align-left .hp-headline-actions {
