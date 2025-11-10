@@ -270,6 +270,15 @@ final class UserProfile extends Page
                 ->all());
     }
 
+    protected function getLayoutData(): array
+    {
+        return [
+            'hasTopbar' => $this->hasTopbar(),
+            'maxContentWidth' => $maxContentWidth = $this->getMaxWidth() ?? $this->getMaxContentWidth(),
+            'maxWidth' => $maxContentWidth,
+        ];
+    }
+
     private function fillForm(): void
     {
         $data = $this->getUser()->attributesToArray();
@@ -338,7 +347,7 @@ final class UserProfile extends Page
         Notification::route('mail', $newEmail)
             ->notify($notification);
 
-        $this->getEmailChangeVerificationSentNotification($newEmail)?->send();
+        $this->getEmailChangeVerificationSentNotification($newEmail)->send();
 
         $this->data['email'] = $record->getAttributeValue('email');
     }
@@ -465,14 +474,5 @@ final class UserProfile extends Page
     private function hasFullWidthFormActions(): bool
     {
         return false;
-    }
-
-    protected function getLayoutData(): array
-    {
-        return [
-            'hasTopbar' => $this->hasTopbar(),
-            'maxContentWidth' => $maxContentWidth = $this->getMaxWidth() ?? $this->getMaxContentWidth(),
-            'maxWidth' => $maxContentWidth,
-        ];
     }
 }
