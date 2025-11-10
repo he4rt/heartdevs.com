@@ -13,10 +13,54 @@
             </x-slot>
         </x-portal::headline>
 
-        <div class="grid w-full grid-cols-1 items-center justify-center sm:grid-cols-3">
-            <p class="text-center">card 1</p>
-            <p class="text-center">card 2</p>
-            <p class="text-center">card 3</p>
+        <div class="grid w-full grid-cols-1 items-center justify-center gap-8 sm:grid-cols-3 lg:gap-12">
+            <x-portal::card>
+                <x-slot:description>
+                    "A comunidade Coração Dev mudou completamente minha trajetória profissional. Através dos projetos e
+                    mentorias, consegui meu primeiro emprego como desenvolvedor e hoje faço parte de uma empresa
+                    incrível."
+                </x-slot>
+                <x-slot:footer>
+                    <x-portal::partials.author
+                        size="lg"
+                        src="https://avatars.githubusercontent.com/u/103362"
+                        name="Daniel Reis"
+                        title="DevRel"
+                    />
+                </x-slot>
+            </x-portal::card>
+
+            <x-portal::card>
+                <x-slot:description>
+                    "A comunidade Coração Dev mudou completamente minha trajetória profissional. Através dos projetos e
+                    mentorias, consegui meu primeiro emprego como desenvolvedor e hoje faço parte de uma empresa
+                    incrível."
+                </x-slot>
+                <x-slot:footer>
+                    <x-portal::partials.author
+                        size="lg"
+                        src="https://avatars.githubusercontent.com/u/103362"
+                        name="Daniel Reis"
+                        title="DevRel"
+                    />
+                </x-slot>
+            </x-portal::card>
+
+            <x-portal::card>
+                <x-slot:description>
+                    "A comunidade Coração Dev mudou completamente minha trajetória profissional. Através dos projetos e
+                    mentorias, consegui meu primeiro emprego como desenvolvedor e hoje faço parte de uma empresa
+                    incrível."
+                </x-slot>
+                <x-slot:footer>
+                    <x-portal::partials.author
+                        size="lg"
+                        src="https://avatars.githubusercontent.com/u/103362"
+                        name="Daniel Reis"
+                        title="DevRel"
+                    />
+                </x-slot>
+            </x-portal::card>
         </div>
     </div>
 </section>

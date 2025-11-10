@@ -26,7 +26,7 @@
 }
 
 .hp-card-body {
-    @apply flex flex-col gap-y-1;
+    @apply flex flex-col gap-y-2;
 }
 
 .hp-card-title {
@@ -34,7 +34,7 @@
 }
 
 .hp-card-description {
-    @apply text-text-medium text-sm;
+    @apply text-text-medium;
 }
 
 .hp-card-tags {
@@ -46,7 +46,7 @@
 }
 
 .hp-card-footer {
-    @apply border-border mt-4 border-t pt-4;
+    @apply border-border border-t pt-4;
 }
 
 .hp-card-disabled {
