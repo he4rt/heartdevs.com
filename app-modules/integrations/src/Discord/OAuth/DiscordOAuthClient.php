@@ -11,7 +11,7 @@ use Illuminate\Support\Facades\Http;
 
 class DiscordOAuthClient implements OAuthClientContract
 {
-    public function redirectUrl(): string
+    public function redirectUrl(?string $state = null): string
     {
         return sprintf(
             'https://discord.com/oauth2/authorize?client_id=%s&response_type=code&redirect_uri=%s&scope=%s',
