@@ -2,7 +2,6 @@
 
 declare(strict_types=1);
 
-use App\Http\Controllers\DocsController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -17,5 +16,3 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::get('/', fn () => view('welcome'));
-
-Route::get('/docs', [DocsController::class, 'index'])->name('docs');

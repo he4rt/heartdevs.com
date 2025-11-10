@@ -8,6 +8,7 @@ use App\Providers\Filament\AdminPanelProvider;
 use App\Providers\Filament\GuestPanelProvider;
 use App\Providers\Filament\PartnerPanelProvider;
 use App\Providers\Filament\UserPanelProvider;
+use App\Providers\FolioServiceProvider;
 use App\Providers\RouteServiceProvider;
 
 return [
@@ -17,5 +18,6 @@ return [
     GuestPanelProvider::class,
     PartnerPanelProvider::class,
     UserPanelProvider::class,
+    FolioServiceProvider::class,
     RouteServiceProvider::class,
 ];
