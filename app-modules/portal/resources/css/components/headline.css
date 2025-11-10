@@ -3,7 +3,15 @@
 }
 
 .hp-headline-container {
-    @apply flex w-full flex-col items-center justify-center gap-4 sm:items-start sm:text-left;
+    @apply flex w-full flex-col gap-4;
+}
+
+.hp-headline-align-center .hp-headline-container {
+    @apply items-center text-center sm:items-center sm:text-center;
+}
+
+.hp-headline-align-left .hp-headline-container {
+    @apply items-center text-center sm:items-start sm:text-left;
 }
 
 .hp-headline-content {
@@ -16,14 +24,6 @@
 
 .hp-headline-description {
     @apply text-text-medium max-w-full font-medium delay-200;
-}
-
-.hp-headline-align-center {
-    @apply items-center text-center sm:items-center sm:text-center;
-}
-
-.hp-headline-align-left {
-    @apply items-center text-center sm:items-start sm:text-left;
 }
 
 .hp-headline-size-sm .hp-headline-title {
