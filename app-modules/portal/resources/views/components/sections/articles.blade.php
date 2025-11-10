@@ -13,13 +13,120 @@
             </x-slot>
         </x-portal::headline>
 
-        <div class="grid w-full grid-cols-1 items-center justify-center sm:grid-cols-3">
-            <p class="text-center">card 1</p>
-            <p class="text-center">card 2</p>
-            <p class="text-center">card 3</p>
-            <p class="text-center">card 4</p>
-            <p class="text-center">card 5</p>
-            <p class="text-center">card 6</p>
+        <div class="grid w-full grid-cols-1 items-center justify-center gap-8 sm:grid-cols-3 lg:gap-12">
+            <x-portal::card>
+                <x-slot:header>
+                    <x-portal::partials.author
+                        size="lg"
+                        src="https://avatars.githubusercontent.com/u/103362"
+                        name="Daniel Reis"
+                        title="DevRel"
+                    />
+                </x-slot>
+                <x-slot:title>Lorem ipsum dolor sit amet, consectetur</x-slot>
+                <x-slot:description>
+                    Lorem ipsum dolor sit amet, consectetur adipiscing elit. In bibendum ut urna eleifend auctor...
+                </x-slot>
+                <x-slot:tags>
+                    <x-portal::tag>#webdev</x-portal::tag>
+                    <x-portal::tag>#software</x-portal::tag>
+                </x-slot>
+            </x-portal::card>
+
+            <x-portal::card>
+                <x-slot:header>
+                    <x-portal::partials.author
+                        size="lg"
+                        src="https://avatars.githubusercontent.com/u/103362"
+                        name="Daniel Reis"
+                        title="DevRel"
+                    />
+                </x-slot>
+                <x-slot:title>Lorem ipsum dolor sit amet, consectetur</x-slot>
+                <x-slot:description>
+                    Lorem ipsum dolor sit amet, consectetur adipiscing elit. In bibendum ut urna eleifend auctor...
+                </x-slot>
+                <x-slot:tags>
+                    <x-portal::tag>#webdev</x-portal::tag>
+                    <x-portal::tag>#software</x-portal::tag>
+                </x-slot>
+            </x-portal::card>
+
+            <x-portal::card>
+                <x-slot:header>
+                    <x-portal::partials.author
+                        size="lg"
+                        src="https://avatars.githubusercontent.com/u/103362"
+                        name="Daniel Reis"
+                        title="DevRel"
+                    />
+                </x-slot>
+                <x-slot:title>Lorem ipsum dolor sit amet, consectetur</x-slot>
+                <x-slot:description>
+                    Lorem ipsum dolor sit amet, consectetur adipiscing elit. In bibendum ut urna eleifend auctor...
+                </x-slot>
+                <x-slot:tags>
+                    <x-portal::tag>#webdev</x-portal::tag>
+                    <x-portal::tag>#software</x-portal::tag>
+                </x-slot>
+            </x-portal::card>
+
+            <x-portal::card>
+                <x-slot:header>
+                    <x-portal::partials.author
+                        size="lg"
+                        src="https://avatars.githubusercontent.com/u/103362"
+                        name="Daniel Reis"
+                        title="DevRel"
+                    />
+                </x-slot>
+                <x-slot:title>Lorem ipsum dolor sit amet, consectetur</x-slot>
+                <x-slot:description>
+                    Lorem ipsum dolor sit amet, consectetur adipiscing elit. In bibendum ut urna eleifend auctor...
+                </x-slot>
+                <x-slot:tags>
+                    <x-portal::tag>#webdev</x-portal::tag>
+                    <x-portal::tag>#software</x-portal::tag>
+                </x-slot>
+            </x-portal::card>
+
+            <x-portal::card>
+                <x-slot:header>
+                    <x-portal::partials.author
+                        size="lg"
+                        src="https://avatars.githubusercontent.com/u/103362"
+                        name="Daniel Reis"
+                        title="DevRel"
+                    />
+                </x-slot>
+                <x-slot:title>Lorem ipsum dolor sit amet, consectetur</x-slot>
+                <x-slot:description>
+                    Lorem ipsum dolor sit amet, consectetur adipiscing elit. In bibendum ut urna eleifend auctor...
+                </x-slot>
+                <x-slot:tags>
+                    <x-portal::tag>#webdev</x-portal::tag>
+                    <x-portal::tag>#software</x-portal::tag>
+                </x-slot>
+            </x-portal::card>
+
+            <x-portal::card>
+                <x-slot:header>
+                    <x-portal::partials.author
+                        size="lg"
+                        src="https://avatars.githubusercontent.com/u/103362"
+                        name="Daniel Reis"
+                        title="DevRel"
+                    />
+                </x-slot>
+                <x-slot:title>Lorem ipsum dolor sit amet, consectetur</x-slot>
+                <x-slot:description>
+                    Lorem ipsum dolor sit amet, consectetur adipiscing elit. In bibendum ut urna eleifend auctor...
+                </x-slot>
+                <x-slot:tags>
+                    <x-portal::tag>#webdev</x-portal::tag>
+                    <x-portal::tag>#software</x-portal::tag>
+                </x-slot>
+            </x-portal::card>
         </div>
     </div>
 </section>

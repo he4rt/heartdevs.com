@@ -50,6 +50,13 @@
         </div>
     @endisset
 
+    {{-- Slot do Header --}}
+    @isset($header)
+        <div {{ $header->attributes->class('hp-card-header') }}>
+            {{ $header }}
+        </div>
+    @endisset
+
     {{-- Corpo do Card (Título e Descrição) --}}
     <div class="hp-card-body">
         @isset($title)
