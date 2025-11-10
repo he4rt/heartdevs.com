@@ -3,11 +3,11 @@
 }
 
 .hp-headline-container {
-    @apply flex w-full flex-col;
+    @apply flex w-full flex-col items-center justify-center gap-4 sm:items-start sm:text-left;
 }
 
 .hp-headline-content {
-    @apply flex flex-col gap-4;
+    @apply flex flex-col gap-6;
 }
 
 .hp-headline-title {
@@ -72,7 +72,7 @@
 
 /* ========= ACTIONS ========= */
 .hp-headline-actions {
-    @apply flex w-full flex-col items-center justify-center gap-6 sm:flex-row sm:gap-x-4;
+    @apply mt-2 flex w-full flex-col items-center justify-center gap-6 sm:flex-row sm:gap-x-4;
 }
 
 .hp-headline-align-left .hp-headline-actions {
@@ -81,7 +81,7 @@
 
 /* ========= BADGE ========= */
 .hp-headline-badge {
-    @apply bg-primary-purple/5 border-primary-purple/32 mb-4 w-fit rounded-full border px-4 py-2 text-sm font-medium;
+    @apply bg-primary-purple/5 border-primary-purple/32 flex w-fit items-center justify-center gap-2 rounded-full border px-4 py-2 text-xs font-medium sm:text-sm;
 }
 
 .hp-headline-badge:hover {

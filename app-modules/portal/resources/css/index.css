@@ -4,6 +4,7 @@
 @import './base.css';
 @import './components/section.css' layer(components);
 @import './components/headline.css' layer(components);
+@import './components/button.css' layer(components);
 
 .hp-title {
     @apply text-2xl;

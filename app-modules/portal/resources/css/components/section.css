@@ -2,6 +2,6 @@
     @apply flex min-h-[92vh] flex-col items-center justify-center;
 
     .hp-container {
-        @apply container;
+        @apply container p-8 lg:p-0;
     }
 }
