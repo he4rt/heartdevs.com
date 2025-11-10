@@ -36,7 +36,7 @@
                     Mais de 9.000 desenvolvedores já fazem parte
                 </x-portal::avatar-stack>
             </div>
-            <div>Image</div>
+            <div>Code component</div>
         </div>
     </div>
 </section>
