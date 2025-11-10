@@ -18,7 +18,6 @@
     @apply text-text-medium max-w-full font-medium delay-200;
 }
 
-/* ========= ALIGNMENTS ========= */
 .hp-headline-align-center {
     @apply items-center text-center sm:items-center sm:text-center;
 }
@@ -27,7 +26,6 @@
     @apply items-center text-center sm:items-start sm:text-left;
 }
 
-/* ========= SIZES ========= */
 .hp-headline-size-sm .hp-headline-title {
     @apply text-lg sm:text-xl md:text-2xl lg:text-3xl;
 }
@@ -60,17 +58,14 @@
     @apply text-text-medium max-w-full text-base font-medium delay-200 md:text-lg lg:text-lg;
 }
 
-/* ========= ANIMATION ========= */
 /*.hp-headline-animated {*/
 /* @apply animate-fade-in;*/
 /*}*/
 
-/* ========= HIGHLIGHT ========= */
 .hp-headline-highlight {
     @apply text-primary-purple;
 }
 
-/* ========= ACTIONS ========= */
 .hp-headline-actions {
     @apply mt-2 flex w-full flex-col items-center justify-center gap-6 sm:flex-row sm:gap-x-4;
 }
@@ -79,7 +74,6 @@
     @apply justify-center sm:justify-start;
 }
 
-/* ========= BADGE ========= */
 .hp-headline-badge {
     @apply bg-primary-purple/5 border-primary-purple/32 flex w-fit items-center justify-center gap-2 rounded-full border px-4 py-2 text-xs font-medium sm:text-sm;
 }
