@@ -8,6 +8,7 @@
 @import './components/button.css' layer(components);
 @import './components/avatar.css' layer(components);
 @import './components/avatar-stack.css' layer(components);
+@import './components/tag.css' layer(components);
 
 .fi-topbar {
     @apply bg-background p-4 px-12 shadow-none ring-0;

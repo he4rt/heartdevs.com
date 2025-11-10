@@ -1,5 +1,5 @@
 .hp-card {
-    @apply flex flex-col items-center justify-center rounded-lg;
+    @apply flex flex-col rounded-lg;
     @apply gap-4;
     @apply p-6;
     @apply border-border border;
@@ -33,8 +33,12 @@
     @apply text-text-medium text-sm;
 }
 
+.hp-card-tags {
+    @apply flex gap-2;
+}
+
 .hp-card-actions {
-    @apply mt-2;
+    @apply mt-2 w-full;
 }
 
 .hp-card-footer {
