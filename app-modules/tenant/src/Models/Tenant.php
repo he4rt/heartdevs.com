@@ -4,13 +4,17 @@ declare(strict_types=1);
 
 namespace He4rt\Tenant\Models;
 
+use He4rt\Character\Models\PastSeason;
+use He4rt\Events\Models\EventModel;
 use He4rt\Provider\Models\Provider;
+use He4rt\Season\Models\Season;
 use He4rt\Tenant\Database\Factories\TenantFactory;
 use He4rt\User\Models\User;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\Relations\Pivot;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -50,6 +54,30 @@ class Tenant extends Model
     public function providers(): MorphMany
     {
         return $this->morphMany(Provider::class, 'model');
+    }
+
+    /**
+     * @return HasMany<EventModel, $this>
+     */
+    public function events(): HasMany
+    {
+        return $this->hasMany(EventModel::class);
+    }
+
+    /**
+     * @return HasMany<Season, $this>
+     */
+    public function seasons(): HasMany
+    {
+        return $this->hasMany(Season::class);
+    }
+
+    /**
+     * @return HasMany<PastSeason, $this>
+     */
+    public function pastSeasons(): HasMany
+    {
+        return $this->hasMany(PastSeason::class);
     }
 
     protected static function newFactory(): TenantFactory

@@ -101,4 +101,19 @@ final class Character extends Model
     {
         return (new LevelEntity($this->experience))->getLevel();
     }
+
+    protected function getExperienceProgressAttribute(): int
+    {
+        return (new LevelEntity($this->experience))->getLevelUpStatus();
+    }
+
+    protected function getPercentageExperienceAttribute(): float
+    {
+        return (new LevelEntity($this->experience))->getPercentageExperience();
+    }
+
+    protected function getExperiencePercentageRemainingAttribute(): float
+    {
+        return (new LevelEntity($this->experience))->experiencePercentageRemaining();
+    }
 }
