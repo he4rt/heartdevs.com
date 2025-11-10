@@ -11,6 +11,8 @@ class PortalPage extends Dashboard
 {
     protected string $view = 'portal::homepage';
 
+    protected static bool $shouldRegisterNavigation = false;
+
     protected Width|string|null $maxContentWidth = Width::Full;
 
     public function getHeading(): string

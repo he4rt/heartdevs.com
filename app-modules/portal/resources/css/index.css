@@ -16,6 +16,18 @@
     @apply bg-background p-4 px-12 shadow-none ring-0;
 }
 
+.fi-topbar-start {
+    margin-inline-end: unset;
+}
+
+.fi-topbar {
+    justify-content: space-between;
+}
+
+.fi-topbar-end {
+    margin-inline-start: unset;
+}
+
 .fi-page-content {
     @apply from-primary-purple/12 to-background gap-0 bg-gradient-to-br;
 }
