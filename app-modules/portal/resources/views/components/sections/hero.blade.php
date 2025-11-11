@@ -8,7 +8,10 @@
     ];
 @endphp
 
-<section class="hp-section">
+<section class="hp-section relative">
+    <div class="absolute -z-1 flex h-[150%] w-[150%] sm:h-full sm:w-full sm:p-16">
+        <img src="{{ asset('images/landingLogo.svg') }}" alt="Logo" class="h-full w-full" />
+    </div>
     <div class="hp-container">
         <div class="grid grid-cols-1 gap-8 lg:grid-cols-2 lg:gap-12">
             <div class="space-y-6">
@@ -36,7 +39,58 @@
                     Mais de 9.000 desenvolvedores já fazem parte
                 </x-portal::avatar-stack>
             </div>
-            <div>Code component</div>
+            <div class="flex flex-col items-center justify-center">
+                <div class="mx-auto flex w-full max-w-lg flex-col">
+                    <div class="overflow-hidden rounded-lg bg-gray-900 shadow-xl">
+                        <div class="flex items-center gap-2 bg-gray-800 p-4">
+                            <div class="h-3 w-3 rounded-full bg-red-500"></div>
+                            <div class="h-3 w-3 rounded-full bg-yellow-500"></div>
+                            <div class="h-3 w-3 rounded-full bg-green-500"></div>
+                        </div>
+
+                        <div class="flex flex-col gap-2 p-6 font-mono text-sm text-gray-300">
+                            <div class="flex items-center">
+                                <span class="mr-2 text-gray-500">$</span>
+                                <span class="text-gray-100">he4rtdevs.exe</span>
+                            </div>
+                            <div class="mt-1 flex items-center">
+                                <span class="mr-2 text-gray-500">$</span>
+                                <span class="text-gray-100">he4rt --init</span>
+                            </div>
+                            <div class="mt-2">
+                                <span class="text-gray-400">Conectando recursos...</span>
+                            </div>
+                            <div class="mt-1">
+                                <span class="text-gray-400">Preparando ambiente...</span>
+                            </div>
+                            <div class="mt-2">
+                                <span class="text-green-400">Bem-vindo à comunidade Coração.dev!</span>
+                            </div>
+                            <div class="mt-4">
+                                <span class="text-cyan-400">Recursos disponíveis</span>
+                            </div>
+                            <div class="mt-2 pl-2">
+                                <div class="flex items-center">
+                                    <span class="mr-2 text-gray-500">*</span>
+                                    <span>Projetos open-source</span>
+                                </div>
+                                <div class="mt-1 flex items-center">
+                                    <span class="mr-2 text-gray-500">*</span>
+                                    <span>Comunidade ativa</span>
+                                </div>
+                                <div class="mt-1 flex items-center">
+                                    <span class="mr-2 text-gray-500">*</span>
+                                    <span>Mentorias</span>
+                                </div>
+                                <div class="mt-1 flex items-center">
+                                    <span class="mr-2 text-gray-500">*</span>
+                                    <span>Eventos e WorkShops</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 </section>

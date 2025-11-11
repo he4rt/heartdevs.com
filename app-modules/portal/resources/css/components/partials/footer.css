@@ -30,5 +30,5 @@
 }
 
 .hp-footer-bottom {
-    @apply text-text-high flex w-full items-center justify-between font-bold;
+    @apply text-text-high flex w-full flex-col items-center justify-between gap-2 font-bold sm:flex-row;
 }
