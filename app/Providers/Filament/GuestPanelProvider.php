@@ -39,7 +39,7 @@ final class GuestPanelProvider extends PanelProvider
             ->renderHook(PanelsRenderHook::FOOTER, fn (): View => view('portal::components.partials.footer'))
             ->renderHook(PanelsRenderHook::TOPBAR_END, fn () => Blade::render(<<<'BLADE'
                @guest
-                    <div class="flex items-center space-x-4">
+                    <div class="hidden md:flex items-center space-x-4">
                         <x-portal::button icon="heroicon-s-arrow-top-right-on-square" variant="outline">
                             Github
                         </x-portal::button>

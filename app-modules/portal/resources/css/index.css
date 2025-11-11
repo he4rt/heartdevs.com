@@ -1,6 +1,8 @@
 @import 'tw-animate-css';
 @import './support/index.css';
 
+@import '../../../../vendor/filament/filament/resources/css/theme.css';
+
 @import './base.css';
 @import './components/card.css' layer(components);
 @import './components/section.css' layer(components);
@@ -11,6 +13,13 @@
 @import './components/text-input.css' layer(components);
 @import './components/tag.css' layer(components);
 @import './components/partials/author.css' layer(components);
+@import './components/partials/footer.css' layer(components);
+
+@source '../../../../resources/views/**/*.blade.php';
+@source '../../../../app/Filament/**/*';
+@source '../../../../vendor/filament/**/*.blade.php';
+@source '../**/*.blade.php';
+@source '../**/*.php';
 
 .fi-topbar {
     @apply bg-background p-4 px-12 shadow-none ring-0;

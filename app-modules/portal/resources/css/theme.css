@@ -1,9 +1,2 @@
 @import 'tailwindcss';
-@import '../../../../vendor/filament/filament/resources/css/theme.css';
 @import './index.css';
-
-@source '../../../../resources/views/**/*.blade.php';
-@source '../../../../app/Filament/**/*';
-@source '../../../../vendor/filament/**/*.blade.php';
-@source '../**/*.blade.php';
-@source '../**/*.php';

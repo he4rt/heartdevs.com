@@ -1,5 +1,5 @@
 .hp-headline {
-    @apply flex max-w-2xl flex-col md:max-w-3xl lg:max-w-7xl;
+    @apply mx-auto flex max-w-2xl flex-col md:max-w-3xl lg:max-w-7xl;
 }
 
 .hp-headline-container {

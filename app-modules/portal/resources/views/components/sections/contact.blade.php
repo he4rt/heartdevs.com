@@ -32,7 +32,7 @@
                     </x-portal::headline>
 
                     <div class="border-border flex flex-col gap-4 rounded-lg border p-8">
-                        <x-portal::headline size="sm">
+                        <x-portal::headline class="mx-0" size="sm">
                             <x-slot:title>Redes sociais</x-slot>
                             <x-slot:description>Lorem ipsum dolor sit amet, consectetur</x-slot>
                             <x-slot:actions>
