@@ -38,6 +38,18 @@ final class GuestPanelProvider extends PanelProvider
             ->topNavigation()
             ->brandLogo(fn (): View => view('portal::components.logo'))
             ->renderHook(PanelsRenderHook::FOOTER, fn (): View => view('portal::components.partials.footer'))
+            ->renderHook(PanelsRenderHook::SIDEBAR_NAV_END, fn () => Blade::render(<<<'BLADE'
+               @guest
+                    <div class="flex flex-col md:hidden mt-auto items-center space-y-4">
+                        <x-portal::button icon="heroicon-s-arrow-top-right-on-square" variant="outline">
+                            Github
+                        </x-portal::button>
+
+                        <x-portal::button icon-position="leading" icon="heroicon-o-user">Entrar agora</x-portal::button>
+                    </div>
+               @endguest
+            BLADE
+            ))
             ->renderHook(PanelsRenderHook::TOPBAR_END, fn () => Blade::render(<<<'BLADE'
                @guest
                     <div class="hidden md:flex items-center space-x-4">
