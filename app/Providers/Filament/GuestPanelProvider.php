@@ -36,6 +36,7 @@ final class GuestPanelProvider extends PanelProvider
             ])
             ->defaultThemeMode(ThemeMode::Dark)
             ->topNavigation()
+            ->brandLogo(fn (): View => view('portal::components.logo'))
             ->renderHook(PanelsRenderHook::FOOTER, fn (): View => view('portal::components.partials.footer'))
             ->renderHook(PanelsRenderHook::TOPBAR_END, fn () => Blade::render(<<<'BLADE'
                @guest
