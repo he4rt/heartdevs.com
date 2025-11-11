@@ -21,6 +21,7 @@ return new class() extends Migration
             'badges' => [],
             'characters_badges' => [],
             'seasons_rankings' => [],
+            'seasons' => [],
         ];
 
         foreach ($tables as $table => $indexableColumns) {

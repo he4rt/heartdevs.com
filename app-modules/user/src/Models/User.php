@@ -4,51 +4,79 @@ declare(strict_types=1);
 
 namespace He4rt\User\Models;
 
+use Filament\Models\Contracts\HasName;
+use Filament\Models\Contracts\HasTenants;
 use He4rt\Character\Models\Character;
 use He4rt\Provider\Models\Provider;
+use He4rt\Tenant\Models\Concerns\InteractsWithTenants;
 use He4rt\User\Database\Factories\UserFactory;
+use He4rt\User\Observers\UserObserver;
+use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
+use Illuminate\Foundation\Auth\User as Authenticatable;
 
 /**
  * @property string $id
  * @property string $username
  * @property bool $is_donator
  */
-final class User extends Model
+#[ObservedBy(UserObserver::class)]
+final class User extends Authenticatable implements HasName, HasTenants
 {
     use HasFactory;
     use HasUuids;
+    use InteractsWithTenants;
 
     protected $table = 'users';
 
     protected $fillable = [
         'id',
         'username',
+        'name',
+        'email',
+        'password',
         'is_donator',
     ];
 
+    /**
+     * @return HasOne<Address, $this>
+     */
     public function address(): HasOne
     {
         return $this->hasOne(Address::class);
     }
 
+    /**
+     * @return HasOne<Information, $this>
+     */
     public function information(): HasOne
     {
         return $this->hasOne(Information::class);
     }
 
-    public function providers(): HasMany
+    /**
+     * @return HasMany<Provider, $this>
+     */
+    public function providers(): MorphMany
     {
-        return $this->hasMany(Provider::class, 'model_id');
+        return $this->morphMany(Provider::class, 'model');
     }
 
+    /**
+     * @return HasOne<Character, $this>
+     */
     public function character(): HasOne
     {
         return $this->hasOne(Character::class);
+    }
+
+    public function getFilamentName(): string
+    {
+        return $this->username;
     }
 
     protected static function newFactory(): UserFactory

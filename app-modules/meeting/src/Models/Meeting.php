@@ -5,12 +5,14 @@ declare(strict_types=1);
 namespace He4rt\Meeting\Models;
 
 use He4rt\Meeting\Database\Factories\MeetingFactory;
+use He4rt\Tenant\Models\Tenant;
 use He4rt\User\Models\User;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
-use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Database\Eloquent\Relations\Pivot;
 
 final class Meeting extends Model
 {
@@ -39,11 +41,17 @@ final class Meeting extends Model
         return (bool) $this->attributes['ends_at'];
     }
 
-    public function meetingType(): HasOne
+    /**
+     * @return BelongsTo<MeetingType, $this>
+     */
+    public function meetingType(): BelongsTo
     {
-        return $this->hasOne(MeetingType::class, 'id', 'meeting_type_id');
+        return $this->belongsTo(MeetingType::class, 'meeting_type_id', 'id');
     }
 
+    /**
+     * @return BelongsToMany<User, $this, Pivot>
+     */
     public function users(): BelongsToMany
     {
         return $this->belongsToMany(
@@ -52,6 +60,22 @@ final class Meeting extends Model
             'meeting_id',
             'user_id'
         )->withPivot(['attend_at']);
+    }
+
+    /**
+     * @return BelongsTo<Tenant, $this>
+     */
+    public function tenant(): BelongsTo
+    {
+        return $this->belongsTo(Tenant::class);
+    }
+
+    /**
+     * @return BelongsTo<User, $this>
+     */
+    public function admin(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'admin_id');
     }
 
     protected static function newFactory(): MeetingFactory

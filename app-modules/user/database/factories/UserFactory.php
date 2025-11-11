@@ -7,6 +7,9 @@ namespace He4rt\User\Database\Factories;
 use He4rt\User\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
+/**
+ * @extends Factory<User>
+ */
 final class UserFactory extends Factory
 {
     protected $model = User::class;
@@ -16,6 +19,9 @@ final class UserFactory extends Factory
         return [
             'id' => fake()->uuid(),
             'username' => fake()->userName(),
+            'name' => fake()->name(),
+            'email' => fake()->email(),
+            'password' => fake()->password(),
             'is_donator' => false,
         ];
     }

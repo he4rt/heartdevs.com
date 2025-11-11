@@ -33,4 +33,17 @@ return [
         'region' => env('AWS_DEFAULT_REGION', 'us-east-1'),
     ],
 
+    'discord' => [
+        'client_id' => env('DISCORD_OAUTH_CLIENT_ID'),
+        'client_secret' => env('DISCORD_OAUTH_CLIENT_SECRET'),
+        'redirect_uri' => env('DISCORD_OAUTH_REDIRECT_URI', 'https://localhost:8000/auth/oauth/discord'),
+        'scopes' => env('DISCORD_OAUTH_SCOPES', 'identify email'),
+    ],
+    'twitch' => [
+        'client_id' => env('TWITCH_OAUTH_CLIENT_ID'),
+        'client_secret' => env('TWITCH_OAUTH_CLIENT_SECRET'),
+        'redirect_uri' => env('TWITCH_OAUTH_REDIRECT_URI', 'https://localhost:8000/auth/oauth/twitch'),
+        'scopes' => env('TWITCH_OAUTH_SCOPES', ''),
+    ],
+
 ];

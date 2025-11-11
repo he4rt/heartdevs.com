@@ -43,6 +43,7 @@ tasks:
 
   phpstan:
     desc: Run PHPStan
+    aliases: [p]
     cmds:
       - '{{ .ROOT_DIR }}/vendor/bin/phpstan analyse --ansi'
 

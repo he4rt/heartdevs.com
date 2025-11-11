@@ -9,18 +9,21 @@ use He4rt\Authentication\DTO\OAuthAccessDTO;
 use He4rt\Integrations\Twitch\OAuth\Contracts\TwitchOAuthService;
 use He4rt\Integrations\Twitch\OAuth\DTO\TwitchOAuthAccessDTO;
 use He4rt\Integrations\Twitch\OAuth\DTO\TwitchOAuthDTO;
+use Illuminate\Support\Facades\Crypt;
+use Illuminate\Support\Facades\Date;
 
 final readonly class TwitchOAuthClient implements TwitchOAuthService
 {
     public function __construct(private Client $client) {}
 
-    public function redirectUrl(): string
+    public function redirectUrl(?string $state = null): string
     {
         return sprintf(
-            'https://id.twitch.tv/oauth2/authorize?client_id=%s&redirect_uri=%s&response_type=code&scope=%s',
-            config('kingdom.integrations.twitch.client_id'),
-            config('kingdom.integrations.twitch.redirect_uri'),
-            config('kingdom.integrations.twitch.scopes')
+            'https://id.twitch.tv/oauth2/authorize?client_id=%s&redirect_uri=%s&response_type=code&scope=%s&state=%s',
+            config('services.twitch.client_id'),
+            config('services.twitch.redirect_uri'),
+            config('services.twitch.scopes'),
+            Crypt::encryptString($state ?? Date::now()->getTimestamp())
         );
     }
 
@@ -29,11 +32,11 @@ final readonly class TwitchOAuthClient implements TwitchOAuthService
         $uri = 'https://id.twitch.tv/oauth2/token';
         $response = $this->client->request('POST', $uri, [
             'form_params' => [
-                'client_id' => config('kingdom.integrations.twitch.client_id'),
-                'client_secret' => config('kingdom.integrations.twitch.client_secret'),
+                'client_id' => config('services.twitch.client_id'),
+                'client_secret' => config('services.twitch.client_secret'),
                 'grant_type' => 'authorization_code',
                 'code' => $code,
-                'redirect_uri' => config('kingdom.integrations.twitch.redirect_uri'),
+                'redirect_uri' => config('services.twitch.redirect_uri'),
             ],
         ]);
 
@@ -47,7 +50,7 @@ final readonly class TwitchOAuthClient implements TwitchOAuthService
         $uri = 'https://api.twitch.tv/helix/users';
         $response = $this->client->request('GET', $uri, [
             'headers' => [
-                'Client-ID' => config('kingdom.integrations.twitch.client_id'),
+                'Client-ID' => config('services.twitch.client_id'),
                 'Authorization' => 'Bearer '.$credentials->accessToken,
             ],
         ]);

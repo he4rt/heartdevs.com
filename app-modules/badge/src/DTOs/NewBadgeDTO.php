@@ -12,7 +12,6 @@ final readonly class NewBadgeDTO implements JsonSerializable
         private string $provider,
         private string $name,
         private string $description,
-        private string $imageUrl,
         private string $redeemCode,
         private bool $active,
         private int $tenant_id
@@ -24,7 +23,6 @@ final readonly class NewBadgeDTO implements JsonSerializable
             provider: $payload['provider'],
             name: $payload['name'],
             description: $payload['description'],
-            imageUrl: $payload['image_url'],
             redeemCode: $payload['redeem_code'],
             active: $payload['active'],
             tenant_id: $payload['tenant_id']
@@ -37,7 +35,6 @@ final readonly class NewBadgeDTO implements JsonSerializable
             'provider' => $this->provider,
             'name' => $this->name,
             'description' => $this->description,
-            'image_url' => $this->imageUrl,
             'redeem_code' => $this->redeemCode,
             'active' => $this->active,
             'tenant_id' => $this->tenant_id,

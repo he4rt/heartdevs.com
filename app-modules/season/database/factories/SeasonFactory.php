@@ -5,8 +5,12 @@ declare(strict_types=1);
 namespace He4rt\Season\Database\Factories;
 
 use He4rt\Season\Models\Season;
+use He4rt\Tenant\Models\Tenant;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
+/**
+ * @extends Factory<Season>
+ */
 final class SeasonFactory extends Factory
 {
     protected $model = Season::class;
@@ -15,6 +19,7 @@ final class SeasonFactory extends Factory
     {
         return [
             'id' => fake()->uuid(),
+            'tenant_id' => Tenant::factory(),
             'name' => fake()->name(),
             'description' => fake()->text(),
             'messages_count' => fake()->randomNumber(2),

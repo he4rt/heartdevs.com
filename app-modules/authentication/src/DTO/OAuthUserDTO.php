@@ -4,12 +4,14 @@ declare(strict_types=1);
 
 namespace He4rt\Authentication\DTO;
 
+use He4rt\Authentication\Enums\OAuthProviderEnum;
+
 abstract class OAuthUserDTO
 {
     public function __construct(
         public OAuthAccessDTO $credentials,
         public string $providerId,
-        public string $providerName,
+        public OAuthProviderEnum $provider,
         public string $username,
         public string $name,
         public ?string $email,
@@ -21,7 +23,7 @@ abstract class OAuthUserDTO
     final public function toDatabase(): array
     {
         return [
-            'provider' => $this->providerName,
+            'provider' => $this->provider,
             'provider_id' => $this->providerId,
             'email' => $this->email,
         ];

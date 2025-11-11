@@ -8,6 +8,9 @@ use He4rt\User\Models\Information;
 use He4rt\User\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
+/**
+ * @extends Factory<Information>
+ */
 final class InformationFactory extends Factory
 {
     protected $model = Information::class;
