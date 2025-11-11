@@ -8,11 +8,11 @@ order: 2
 
 ## Pré-requisitos
 
-- PHP 8.2 ou superior
+- PHP 8.3 ou superior
 - Composer
-- PostgreSQL 14+
+- PostgreSQL 18+
 - Redis
-- Node.js 18+
+- Node.js 22+
 
 ## Passo a Passo
 

@@ -22,8 +22,8 @@ O He4rt Bot é uma API desenvolvida em Laravel para gerenciar interações, gami
 
 ## Tecnologias Utilizadas
 
-- Laravel 11.x
-- PHP 8.2+
+- Laravel 12.x
+- PHP 8.3+
 - PostgreSQL
 - Redis
 - Livewire/Flux
