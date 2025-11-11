@@ -8,7 +8,7 @@
     ];
 @endphp
 
-<section class="hp-section relative">
+<section class="hp-section relative" id="community">
     <div class="absolute -z-1 flex h-[150%] w-[150%] sm:h-full sm:w-full sm:p-16">
         <img src="{{ asset('images/landingLogo.svg') }}" alt="Logo" class="h-full w-full" />
     </div>

@@ -1,7 +1,7 @@
-<section class="hp-section">
+<section class="hp-section" id="about">
     <div class="hp-container">
         <div class="grid grid-cols-1 gap-8 sm:grid-cols-2 sm:gap-16">
-            <div class="grid grid-cols-1 gap-8 sm:grid-cols-2">
+            <div class="order-2 grid grid-cols-1 gap-8 sm:order-1 sm:grid-cols-2">
                 <x-portal::card>
                     <x-slot:icon>
                         <div
@@ -55,7 +55,7 @@
                     </x-slot>
                 </x-portal::card>
             </div>
-            <div class="flex flex-col items-center justify-center">
+            <div class="order-1 flex flex-col items-center justify-center sm:order-2">
                 <x-portal::headline size="md" :keywords="['jornada']">
                     <x-slot:badge>
                         <x-filament::icon icon="heroicon-o-cursor-arrow-ripple" class="h-5 w-5" />

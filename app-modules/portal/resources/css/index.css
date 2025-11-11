@@ -30,7 +30,32 @@
 }
 
 .fi-topbar {
-    justify-content: space-between;
+    @apply justify-between;
+
+    & .fi-topbar-nav-groups {
+        @apply m-auto;
+
+        & .fi-topbar-item {
+            & .fi-topbar-item-btn {
+                @apply relative hover:bg-transparent;
+
+                & .fi-topbar-item-label {
+                    @apply text-text-high font-bold;
+                }
+
+                &::after {
+                    content: '';
+                    @apply bg-primary-purple absolute bottom-0 left-0 h-0.5 w-full;
+                    @apply origin-left scale-x-0 transform;
+                    @apply transition-transform duration-200 ease-in-out;
+                }
+
+                &:hover::after {
+                    @apply scale-x-100;
+                }
+            }
+        }
+    }
 }
 
 .fi-topbar-end {

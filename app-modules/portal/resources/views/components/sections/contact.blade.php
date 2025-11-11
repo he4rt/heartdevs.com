@@ -1,4 +1,4 @@
-<section class="hp-section">
+<section class="hp-section" id="contact">
     <div class="hp-container">
         <div class="grid grid-cols-1 gap-8 lg:grid-cols-2">
             <div class="border-border flex flex-1 flex-col gap-8 rounded-lg border p-8">

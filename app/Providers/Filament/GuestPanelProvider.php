@@ -8,6 +8,7 @@ use Filament\Enums\ThemeMode;
 use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
+use Filament\Navigation\NavigationItem;
 use Filament\Panel;
 use Filament\PanelProvider;
 use Filament\Support\Colors\Color;
@@ -62,6 +63,23 @@ final class GuestPanelProvider extends PanelProvider
                @endguest
             BLADE
             ))
+            ->navigationItems([
+                NavigationItem::make('Sobre')
+                    ->url('#about')
+                    ->sort(0),
+                NavigationItem::make('Comunidades')
+                    ->url('#community')
+                    ->sort(2),
+                NavigationItem::make('Projetos')
+                    ->url('#projects')
+                    ->sort(3),
+                NavigationItem::make('Depoimentos')
+                    ->url('#testimonials')
+                    ->sort(4),
+                NavigationItem::make('Contato')
+                    ->url('#contact')
+                    ->sort(5),
+            ])
             ->viteTheme('app-modules/portal/resources/css/theme.css')
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\Filament\Resources')
             ->discoverPages(in: app_path('Filament/Pages'), for: 'App\Filament\Pages')

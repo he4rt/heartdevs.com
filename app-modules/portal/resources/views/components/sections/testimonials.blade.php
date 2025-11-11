@@ -1,4 +1,4 @@
-<section class="hp-section">
+<section class="hp-section" id="testimonials">
     <div class="hp-container">
         <x-portal::headline align="center" size="md" :keywords="['membros']">
             <x-slot:badge>
