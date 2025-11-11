@@ -10,9 +10,9 @@ use Livewire\Attributes\Computed;
 
 class Dashboard extends \Filament\Pages\Dashboard
 {
-    public Tenant $tenant;
-
     protected string $view = 'users::filament.app-dashboard';
+
+    private Tenant $tenant;
 
     public function mount(): void
     {

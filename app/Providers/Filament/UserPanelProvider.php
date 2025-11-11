@@ -32,7 +32,7 @@ final class UserPanelProvider extends PanelProvider
             ->path('app')
             ->login()
             ->sidebarCollapsibleOnDesktop()
-            ->viteTheme('resources/css/filament/admin/theme.css')
+            ->viteTheme('resources/css/filament/user/theme.css')
             ->tenant(Tenant::class, 'slug', 'ownedTenants')
             ->userMenuItems([
                 Action::make('settings')
