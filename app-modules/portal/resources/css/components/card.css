@@ -27,18 +27,22 @@
 
 .hp-card-body {
     @apply flex flex-col gap-y-2;
+    @apply min-w-0;
 }
 
 .hp-card-title {
     @apply font-semibold tracking-tight lg:text-xl;
+    @apply break-words;
 }
 
 .hp-card-description {
     @apply text-text-medium;
+    @apply break-words;
 }
 
 .hp-card-tags {
     @apply flex gap-2;
+    @apply flex-wrap;
 }
 
 .hp-card-actions {

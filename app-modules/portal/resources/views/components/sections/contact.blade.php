@@ -1,7 +1,7 @@
 <section class="hp-section">
     <div class="hp-container">
         <div class="grid grid-cols-1 gap-8 lg:grid-cols-2">
-            <div class="border-border flex flex-col gap-8 rounded-lg border p-8">
+            <div class="border-border flex flex-1 flex-col gap-8 rounded-lg border p-8">
                 <x-portal::headline size="md">
                     <x-slot:title>Entre em contato conosco</x-slot>
                     <x-slot:description>
@@ -18,18 +18,27 @@
                 <x-portal::button>Enviar mensagem</x-portal::button>
             </div>
 
-            <div class="flex flex-col gap-8">
-                <div class="flex flex-col gap-8 p-8">
-                    <x-portal::headline align="center" size="md">
-                        <x-slot:title>Venha fazer parte do nosso discord</x-slot>
-                        <x-slot:description>
-                            Histórias reais de desenvolvedores que transformaram suas carreiras através da nossa
-                            comunidade.
-                        </x-slot>
-                        <x-slot:actions>
-                            <x-portal::button>Entrar no Discord</x-portal::button>
-                        </x-slot>
-                    </x-portal::headline>
+            <div class="flex h-full flex-col gap-8">
+                <div class="flex h-full flex-col gap-16">
+                    <div class="relative flex flex-1 flex-col items-center justify-center">
+                        <div class="absolute flex h-full w-full">
+                            <img
+                                src="{{ asset('images/contact-image.svg') }}"
+                                alt="contact-image"
+                                class="h-full w-full object-cover"
+                            />
+                        </div>
+                        <x-portal::headline align="center" size="md">
+                            <x-slot:title>Venha fazer parte do nosso discord</x-slot>
+                            <x-slot:description>
+                                Histórias reais de desenvolvedores que transformaram suas carreiras através da nossa
+                                comunidade.
+                            </x-slot>
+                            <x-slot:actions>
+                                <x-portal::button>Entrar no Discord</x-portal::button>
+                            </x-slot>
+                        </x-portal::headline>
+                    </div>
 
                     <div class="border-border flex flex-col gap-4 rounded-lg border p-8">
                         <x-portal::headline class="mx-0" size="sm">
