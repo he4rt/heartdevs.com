@@ -19,6 +19,8 @@
                         >
                             {{ $event->end_at < now() ? 'Past' : 'Upcoming' }}
                         </x-filament::badge>
+
+                        <x-filament::icon wire:click="view({{$event->getKey()}})" icon="heroicon-m-ellipsis-vertical" />
                     </div>
 
                     <x-filament::badge

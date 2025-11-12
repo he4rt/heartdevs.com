@@ -8,6 +8,7 @@ use BackedEnum;
 use Filament\Resources\Resource;
 use Filament\Support\Icons\Heroicon;
 use He4rt\Events\Filament\App\EventModels\Pages\ListEventModels;
+use He4rt\Events\Filament\App\EventModels\Pages\ViewEventModel;
 use He4rt\Events\Models\EventModel;
 
 class EventModelResource extends Resource
@@ -26,6 +27,7 @@ class EventModelResource extends Resource
     {
         return [
             'index' => ListEventModels::route('/'),
+            'show' => ViewEventModel::route('/{record}'),
         ];
     }
 }

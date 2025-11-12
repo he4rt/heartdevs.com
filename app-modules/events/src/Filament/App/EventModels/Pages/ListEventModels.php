@@ -10,6 +10,7 @@ use He4rt\Events\Actions\AttendEventAction;
 use He4rt\Events\Filament\App\EventModels\EventModelResource;
 use He4rt\Events\Models\EventModel;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Facades\Redirect;
 
 class ListEventModels extends ListRecords
 {
@@ -39,8 +40,15 @@ class ListEventModels extends ListRecords
             ->send();
     }
 
+    public function view(string|int $eventId)
+    {
+        $url = EventModelResource::getUrl('show', ['record' => $eventId]);
+
+        return Redirect::to($url);
+    }
+
     protected function modifyQueryWithActiveTab(Builder $query): Builder
     {
-        return $query->where('active', true)->with('attendees');
+        return $query->where('active', true)->with('attendees')->latest('end_at');
     }
 }
