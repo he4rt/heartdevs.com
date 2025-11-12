@@ -1,0 +1,45 @@
+.hp-author {
+    @apply inline-flex items-center text-left;
+}
+
+.hp-author-content {
+    @apply flex flex-col;
+}
+
+.hp-author-name {
+    @apply text-text-high font-semibold;
+}
+
+.hp-author-title {
+    @apply text-text-medium;
+}
+
+.hp-author-size-sm {
+    @apply gap-2;
+}
+.hp-author-size-sm .hp-author-name {
+    @apply text-sm;
+}
+.hp-author-size-sm .hp-author-title {
+    @apply text-xs;
+}
+
+.hp-author-size-md {
+    @apply gap-3;
+}
+.hp-author-size-md .hp-author-name {
+    @apply text-base;
+}
+.hp-author-size-md .hp-author-title {
+    @apply text-sm;
+}
+
+.hp-author-size-lg {
+    @apply gap-4;
+}
+.hp-author-size-lg .hp-author-name {
+    @apply text-lg font-bold;
+}
+.hp-author-size-lg .hp-author-title {
+    @apply text-sm;
+}

@@ -1,0 +1,111 @@
+.hp-button {
+    @apply relative inline-flex cursor-pointer items-center justify-center font-medium;
+
+    @apply w-full lg:w-auto;
+
+    @apply gap-2;
+
+    @apply transition-all duration-300 hover:scale-[1.02] active:scale-95;
+
+    @apply disabled:pointer-events-none disabled:opacity-60;
+    &[aria-disabled='true'] {
+        @apply pointer-events-none opacity-60;
+    }
+}
+
+.hp-button-solid {
+    @apply from-primary-purple to-primary-pink text-text-high bg-gradient-to-br font-semibold;
+}
+
+.hp-button-outline {
+    @apply text-text-high border-border hover:border-primary-purple hover:bg-primary-purple/10 border bg-transparent;
+}
+
+.hp-button-size-xs {
+    @apply px-2.5 py-1.5 text-xs;
+
+    & .hp-button-icon,
+    & .hp-button-spinner svg {
+        @apply h-4 w-4;
+    }
+
+    &.hp-button-icon-only {
+        @apply p-1.5;
+    }
+}
+
+.hp-button-size-sm {
+    @apply px-3.5 py-2 text-sm;
+
+    & .hp-button-icon,
+    & .hp-button-spinner svg {
+        @apply h-4 w-4;
+    }
+
+    &.hp-button-icon-only {
+        @apply p-2;
+    }
+}
+
+.hp-button-size-md {
+    @apply px-4 py-2.5 text-sm;
+
+    & .hp-button-icon,
+    & .hp-button-spinner svg {
+        @apply h-4 w-4;
+    }
+
+    &.hp-button-icon-only {
+        @apply p-2.5;
+    }
+}
+
+.hp-button-size-lg {
+    @apply px-5 py-3 text-base;
+
+    & .hp-button-icon,
+    & .hp-button-spinner svg {
+        @apply h-5 w-5;
+    }
+
+    &.hp-button-icon-only {
+        @apply p-3;
+    }
+}
+
+.hp-button-rounded-sm {
+    @apply rounded-md;
+}
+.hp-button-rounded-md {
+    @apply rounded-lg;
+}
+.hp-button-rounded-lg {
+    @apply rounded-xl;
+}
+.hp-button-rounded-full {
+    @apply rounded-full;
+}
+
+.hp-button-block {
+    @apply w-full;
+}
+
+.hp-button-icon-only {
+    @apply gap-0;
+}
+
+.hp-button-icon {
+    @apply mt-0.5 shrink-0;
+    @apply transition-transform duration-200 ease-in-out;
+}
+
+.hp-button-label {
+}
+
+.hp-button-spinner {
+    @apply absolute inline-flex items-center justify-center;
+}
+
+.hp-button:hover .hp-button-icon {
+    @apply translate-x-0.5;
+}

@@ -17,7 +17,7 @@ He4rt Discord Bot API
 ## Features
 
 ## Endpoints
- 
+
 TODO: documentar
 
 ### Requirements
