@@ -10,6 +10,8 @@ use He4rt\Events\Enums\AttendingStatusEnum;
 use He4rt\Events\Models\EventModel;
 use He4rt\Season\Models\Season;
 use He4rt\Tenant\Models\Tenant;
+use He4rt\User\Models\Address;
+use He4rt\User\Models\Information;
 use He4rt\User\Models\User;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
@@ -23,12 +25,17 @@ final class DatabaseSeeder extends Seeder
     {
         // \App\Models\User::factory(10)->create();
 
-        $user = User::factory()->create([
-            'username' => 'admin',
-            'name' => 'admin',
-            'email' => 'admin@admin.com',
-            'password' => Hash::make('admin'),
-        ]);
+        $user = User::factory()
+            ->create([
+                'username' => 'admin',
+                'name' => 'admin',
+                'email' => 'admin@admin.com',
+                'password' => Hash::make('admin'),
+            ]);
+
+        Information::factory()->recycle($user)->create();
+        Address::factory()->recycle($user)->create();
+
         $tenant = Tenant::factory()
             ->for($user, 'owner')
             ->afterCreating(fn (Tenant $tenant) => $tenant->members()->attach($user))
@@ -62,5 +69,6 @@ final class DatabaseSeeder extends Seeder
                 'started_at' => now()->subMonth(),
                 'ended_at' => today(),
             ]);
+
     }
 }
