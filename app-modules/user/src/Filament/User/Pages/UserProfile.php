@@ -44,6 +44,7 @@ use Illuminate\Support\Js;
 use Illuminate\Validation\Rules\Password;
 use League\Uri\Components\Query;
 use LogicException;
+use OtavioAraujo\FilamentSmartCep\Forms\Components\SmartCep;
 use Throwable;
 
 /**
@@ -175,6 +176,11 @@ final class UserProfile extends Page
     {
         $this->validate([
             'informationData.name' => ['required', 'string', 'max:255'],
+            'informationData.nickname' => ['nullable', 'string', 'max:255'],
+            'informationData.linkedin_url' => ['nullable', 'string', 'url', 'max:255'],
+            'informationData.github_url' => ['nullable', 'string', 'url', 'max:255'],
+            'informationData.birthdate' => ['nullable', 'date'],
+            'informationData.about' => ['nullable', 'string', 'max:1000'],
         ]);
 
         $user = $this->getUser();
@@ -194,6 +200,9 @@ final class UserProfile extends Page
     {
         $this->validate([
             'addressData.country' => ['nullable', 'string', 'max:255'],
+            'addressData.state' => ['nullable', 'string', 'max:255'],
+            'addressData.city' => ['nullable', 'string', 'max:255'],
+            'addressData.zip_code' => ['nullable', 'string', 'max:20', 'regex:/^[A-Za-z0-9\- ]+$/'],
         ]);
 
         $user = $this->getUser();
@@ -331,23 +340,33 @@ final class UserProfile extends Page
                         Tab::make('Address')
                             ->schema([
                                 Section::make('Address Information')
-                                    ->description('Your current residence details.')
+                                    ->description('Fill in your current address. The ZIP Code will automatically fetch your city and state.')
                                     ->schema([
+                                        SmartCep::make('addressData.zip_code')
+                                            ->label('ZIP Code')
+                                            ->placeholder('Enter your ZIP Code (e.g., 13000-000)')
+                                            ->mask('99999-999')
+                                            ->required()
+                                            ->bindCityField('addressData.city')
+                                            ->bindStateField('addressData.state')
+                                            ->bindCountryField('addressData.country')
+                                            ->live()
+                                            ->columnSpan(1),
+
                                         TextInput::make('addressData.country')
                                             ->label('Country')
-                                            ->placeholder('Ex: Brazil'),
+                                            ->placeholder('Brazil')
+                                            ->columnSpan(1),
 
                                         TextInput::make('addressData.state')
                                             ->label('State')
-                                            ->placeholder('Ex: São Paulo'),
+                                            ->placeholder('São Paulo')
+                                            ->columnSpan(1),
 
                                         TextInput::make('addressData.city')
                                             ->label('City')
-                                            ->placeholder('Ex: Campinas'),
-
-                                        TextInput::make('addressData.zip_code')
-                                            ->label('ZIP Code')
-                                            ->placeholder('Ex: 13000-000'),
+                                            ->placeholder('Campinas')
+                                            ->columnSpan(1),
                                     ])
                                     ->columns([
                                         'sm' => 2,
