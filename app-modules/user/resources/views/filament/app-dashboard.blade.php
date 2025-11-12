@@ -2,94 +2,89 @@
     use Carbon\Carbon;
     use Illuminate\Support\Facades\Date;
     $userExperience = $this->stats->experience;
-    $nextLevelXp = $this->stats->percentageExperience + $this->stats->experience;
     $level = $this->stats->level;
 
     $reputation = $this->stats->reputation;
-    $xpProgress = $this->stats->experienceProgress;
-    $xpRemaining = $this->stats->experiencePercentageRemaining;
+    $experienceRequiredForNextLevel = $this->stats->experienceProgress;
+    $experienceRemaining = $this->stats->experiencePercentageRemaining;
+    $nextLevelExperience = $experienceRequiredForNextLevel + $this->stats->experience;
+    $experiencePercentage = $nextLevelExperience > 0 ? ($userExperience / $nextLevelExperience) * 100 : 0;
 
-    $address = auth()->user()?->address;
-    $about = auth()->user()?->information?->about;
+    $user = auth()->user();
+
+    $address = $user?->address;
+
+    $userFullAddress = $address ? implode(', ', array_filter([$address->city ?? null, $address->state ?? null, $address->country ?? null])) : '';
+
+    $userName = $user?->name ?? '';
+    $profileAbout = $user?->information?->about ?? '';
+    $profileAvatarUrl = 'https://ui-avatars.com/api/?name=' . urlencode($user?->name ?? '') . '&background=0D8ABC&color=fff';
+    $githubUrl = $user?->information?->github_url ?? null;
+    $linkedinUrl = $user?->information?->linkedin_url ?? null;
 @endphp
 
 <x-filament-panels::page>
     <div class="w-full max-w-sm lg:flex lg:max-w-full lg:gap-4">
         <!-- Profile area -->
         <x-filament::card class="lg:w-1/2">
-            <div
-                data-slot="card-header"
-                class="grid auto-rows-min grid-rows-[auto_auto] items-start gap-2 px-6 pb-3 has-data-[slot=card-action]:grid-cols-[1fr_auto] [.border-b]:pb-6"
-            >
-                <div data-slot="card-title" class="text-base font-semibold">Profile</div>
-            </div>
-            <div data-slot="card-content" class="space-y-3 px-6">
+            <h2 class="mb-2 text-base font-semibold">Profile</h2>
+
+            <div data-slot="card-content" class="">
                 <div class="flex items-start gap-3">
                     <span
                         data-slot="avatar"
                         class="relative flex size-8 h-12 w-12 shrink-0 overflow-hidden rounded-full"
                     >
-                        <img
-                            data-slot="avatar-image"
-                            class="aspect-square size-full"
-                            src="/placeholder.svg?height=64&amp;width=64"
-                        />
+                        <img data-slot="avatar-image" class="aspect-square size-full" src="{{ $profileAvatarUrl }}" />
                     </span>
-                    <div class="flex-1"><h3 class="text-base font-bold">{{ auth()->user()->name }}</h3></div>
+                    <div class="flex-1"><h3 class="text-base font-bold">{{ $userName }}</h3></div>
                 </div>
-                <p class="text-foreground text-xs">
-                    Full-stack developer passionate about open source and community building.
+                <p class="text-foreground my-2 text-xs">
+                    {{ $profileAbout }}
                 </p>
-                <div class="text-muted-foreground flex items-center gap-1.5 text-xs">
-                    <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        width="24"
-                        height="24"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        stroke-width="2"
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        class="lucide lucide-map-pin h-3 w-3"
-                    >
-                        <path
-                            d="M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0"
-                        ></path>
-                        <circle cx="12" cy="10" r="3"></circle>
-                    </svg>
-                    <span>São Paulo, SP, Brazil</span>
-                </div>
-                <div class="flex gap-2">
-                    <a
-                        href="https://github.com/paula"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        data-slot="button"
-                        class="focus-visible:border-ring focus-visible:ring-ring/50 aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive hover:bg-accent hover:text-accent-foreground dark:bg-input/30 dark:border-input dark:hover:bg-input/50 has-[&gt;svg]:px-2.5 inline-flex h-7 shrink-0 items-center justify-center gap-1.5 rounded-md border bg-transparent px-3 text-xs font-medium whitespace-nowrap shadow-xs transition-all outline-none focus-visible:ring-[3px] disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4"
-                    >
-                        <x-filament::icon icon="fab-github" />
-                        GitHub
-                    </a>
-                    <a
-                        href="https://linkedin.com/in/paula"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        data-slot="button"
-                        class="focus-visible:border-ring focus-visible:ring-ring/50 aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive hover:bg-accent hover:text-accent-foreground dark:bg-input/30 dark:border-input dark:hover:bg-input/50 has-[&gt;svg]:px-2.5 inline-flex h-7 shrink-0 items-center justify-center gap-1.5 rounded-md border bg-transparent px-3 text-xs font-medium whitespace-nowrap shadow-xs transition-all outline-none focus-visible:ring-[3px] disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4"
-                    >
-                        <x-filament::icon icon="fab-linkedin" />
-                        LinkedIn
-                    </a>
-                </div>
+
+                @if (! empty($userFullAddress))
+                    <div class="text-muted-foreground my-2 flex items-center gap-1.5 text-xs">
+                        <x-heroicon-c-map-pin class="text-chart-1 h-4 w-4" />
+                        <span>{{ $userFullAddress }}</span>
+                    </div>
+                @endif
+
+                @if (! empty($githubUrl) || ! empty($linkedinUrl))
+                    <div class="flex gap-2">
+                        @if (! empty($githubUrl))
+                            <a
+                                href="{{ $githubUrl }}"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                data-slot="button"
+                                class="focus-visible:border-ring focus-visible:ring-ring/50 aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive hover:bg-accent hover:text-accent-foreground dark:bg-input/30 dark:border-input dark:hover:bg-input/50 has-[&gt;svg]:px-2.5 inline-flex h-7 shrink-0 items-center justify-center gap-1.5 rounded-md border bg-transparent px-3 text-xs font-medium whitespace-nowrap shadow-xs transition-all outline-none focus-visible:ring-[3px] disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4"
+                            >
+                                <x-filament::icon icon="fab-github" />
+                                GitHub
+                            </a>
+                        @endif
+
+                        @if (! empty($linkedinUrl))
+                            <a
+                                href="{{ $linkedinUrl }}"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                data-slot="button"
+                                class="focus-visible:border-ring focus-visible:ring-ring/50 aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive hover:bg-accent hover:text-accent-foreground dark:bg-input/30 dark:border-input dark:hover:bg-input/50 has-[&gt;svg]:px-2.5 inline-flex h-7 shrink-0 items-center justify-center gap-1.5 rounded-md border bg-transparent px-3 text-xs font-medium whitespace-nowrap shadow-xs transition-all outline-none focus-visible:ring-[3px] disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4"
+                            >
+                                <x-filament::icon icon="fab-linkedin" />
+                                LinkedIn
+                            </a>
+                        @endif
+                    </div>
+                @endif
             </div>
         </x-filament::card>
 
         <!--Character Stats -->
         <x-filament::card class="lg:w-1/2">
-            <x-slot name="header" class="pb-3">
-                <x-filament::section.heading class="text-base">Character Stats</x-filament::section.heading>
-            </x-slot>
+            <h2 class="mb-2 text-base font-semibold">Character Stats</h2>
 
             <div class="space-y-4">
                 <!-- Level and XP -->
@@ -105,7 +100,7 @@
                         <span class="text-muted-foreground text-xs">
                             <span>{{ $userExperience }}</span>
                             /
-                            <span>{{ $nextLevelXp }}</span>
+                            <span>{{ $nextLevelExperience }}</span>
                             XP
                         </span>
                     </div>
@@ -116,12 +111,12 @@
                     >
                         <div
                             class="fi-progress-bar bg-primary-500 absolute top-0 left-0 h-full transition-all duration-500"
-                            style="width: {{ $xpRemaining }}%"
+                            style="width: {{ $experiencePercentage }}%"
                         ></div>
                     </div>
 
-                    <div class="mt-0.5 text-right text-[10px] text-gray-500 dark:text-gray-400">
-                        <span>{{ (int) $xpRemaining }}%</span>
+                    <div class="mt-0.5 text-right text-sm text-gray-500 dark:text-gray-400">
+                        <span>{{ (int) $experienceRequiredForNextLevel }}</span>
                         to next level
                     </div>
                 </div>
@@ -132,7 +127,7 @@
                         <x-heroicon-o-trophy class="text-chart-2 h-6 w-6" />
                         <div>
                             <p class="text-sm font-bold">Reputation</p>
-                            <p class="text-muted-foreground text-[10px]">{{ $reputation }}</p>
+                            <p class="text-muted-foreground">{{ $reputation }}</p>
                         </div>
                     </div>
 
@@ -140,7 +135,7 @@
                         <x-heroicon-o-gift class="text-chart-3 h-6 w-6" />
                         <div>
                             <p class="text-xs font-semibold">Daily Bonus</p>
-                            <p class="text-muted-foreground text-[10px]">
+                            <p class="text-muted-foreground text-sm">
                                 {{ Date::today()->format('d/M/Y') }}
                             </p>
                         </div>
