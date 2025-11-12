@@ -36,16 +36,16 @@ final class GuestPanelProvider extends PanelProvider
             ])
             ->defaultThemeMode(ThemeMode::Dark)
             ->topNavigation()
-            ->brandLogo(fn (): View => view('portal::components.logo'))
-            ->renderHook(PanelsRenderHook::FOOTER, fn (): View => view('portal::components.partials.footer'))
+            ->brandLogo(fn (): View => view('he4rt::components.logo'))
+            ->renderHook(PanelsRenderHook::FOOTER, fn (): View => view('he4rt::components.partials.footer'))
             ->renderHook(PanelsRenderHook::SIDEBAR_NAV_END, fn () => Blade::render(<<<'BLADE'
                @guest
                     <div class="flex flex-col md:hidden mt-auto items-center space-y-4">
-                        <x-portal::button icon="heroicon-s-arrow-top-right-on-square" variant="outline">
+                        <x-he4rt::button icon="heroicon-s-arrow-top-right-on-square" variant="outline">
                             Github
-                        </x-portal::button>
+                        </x-he4rt::button>
 
-                        <x-portal::button icon-position="leading" icon="heroicon-o-user">Entrar agora</x-portal::button>
+                        <x-he4rt::button icon-position="leading" icon="heroicon-o-user">Entrar agora</x-he4rt::button>
                     </div>
                @endguest
             BLADE
@@ -53,11 +53,11 @@ final class GuestPanelProvider extends PanelProvider
             ->renderHook(PanelsRenderHook::TOPBAR_END, fn () => Blade::render(<<<'BLADE'
                @guest
                     <div class="hidden md:flex items-center space-x-4">
-                        <x-portal::button icon="heroicon-s-arrow-top-right-on-square" variant="outline">
+                        <x-he4rt::button icon="heroicon-s-arrow-top-right-on-square" variant="outline">
                             Github
-                        </x-portal::button>
+                        </x-he4rt::button>
 
-                        <x-portal::button icon-position="leading" icon="heroicon-o-user">Entrar agora</x-portal::button>
+                        <x-he4rt::button icon-position="leading" icon="heroicon-o-user">Entrar agora</x-he4rt::button>
                     </div>
                @endguest
             BLADE
@@ -79,7 +79,7 @@ final class GuestPanelProvider extends PanelProvider
                     ->url('#contact')
                     ->sort(5),
             ])
-            ->viteTheme('app-modules/portal/resources/css/theme.css')
+            ->viteTheme('app-modules/he4rt/resources/css/theme.css')
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\Filament\Resources')
             ->discoverPages(in: app_path('Filament/Pages'), for: 'App\Filament\Pages')
             ->pages([

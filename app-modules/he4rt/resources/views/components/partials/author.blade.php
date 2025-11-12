@@ -34,7 +34,7 @@
 
 <{{ $tag }} {{ $attributes->merge(['class' => $classes])->merge($linkAttrs) }}>
     <div>
-        <x-portal::avatar :src="$src" alt="{{ $name }}" :size="$size" :circular="true" />
+        <x-he4rt::avatar :src="$src" alt="{{ $name }}" :size="$size" :circular="true" />
     </div>
 
     <div class="hp-author-content">

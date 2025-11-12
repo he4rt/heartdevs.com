@@ -2,20 +2,20 @@
     <div class="hp-container">
         <div class="grid grid-cols-1 gap-8 lg:grid-cols-2">
             <div class="border-border flex flex-1 flex-col gap-8 rounded-lg border p-8">
-                <x-portal::headline size="md">
+                <x-he4rt::headline size="md">
                     <x-slot:title>Entre em contato conosco</x-slot>
                     <x-slot:description>
                         Histórias reais de desenvolvedores que transformaram suas carreiras através da nossa comunidade.
                     </x-slot>
-                </x-portal::headline>
+                </x-he4rt::headline>
 
                 <hr />
 
-                <x-portal::input label="Nome completo" />
-                <x-portal::input label="Email" />
-                <x-portal::textarea label="Mensagem" />
+                <x-he4rt::input label="Nome completo" />
+                <x-he4rt::input label="Email" />
+                <x-he4rt::textarea label="Mensagem" />
 
-                <x-portal::button>Enviar mensagem</x-portal::button>
+                <x-he4rt::button>Enviar mensagem</x-he4rt::button>
             </div>
 
             <div class="flex h-full flex-col gap-8">
@@ -28,20 +28,20 @@
                                 class="h-full w-full object-cover"
                             />
                         </div>
-                        <x-portal::headline align="center" size="md">
+                        <x-he4rt::headline align="center" size="md">
                             <x-slot:title>Venha fazer parte do nosso discord</x-slot>
                             <x-slot:description>
                                 Histórias reais de desenvolvedores que transformaram suas carreiras através da nossa
                                 comunidade.
                             </x-slot>
                             <x-slot:actions>
-                                <x-portal::button>Entrar no Discord</x-portal::button>
+                                <x-he4rt::button>Entrar no Discord</x-he4rt::button>
                             </x-slot>
-                        </x-portal::headline>
+                        </x-he4rt::headline>
                     </div>
 
                     <div class="border-border flex flex-col gap-4 rounded-lg border p-8">
-                        <x-portal::headline class="mx-0" size="sm">
+                        <x-he4rt::headline class="mx-0" size="sm">
                             <x-slot:title>Redes sociais</x-slot>
                             <x-slot:description>Lorem ipsum dolor sit amet, consectetur</x-slot>
                             <x-slot:actions>
@@ -66,7 +66,7 @@
                                     class="h-6 w-6 transition-all duration-500 hover:scale-105"
                                 />
                             </x-slot>
-                        </x-portal::headline>
+                        </x-he4rt::headline>
                     </div>
                 </div>
             </div>

@@ -22,7 +22,7 @@
 <div {{ $attributes->class('hp-avatar-stack') }}>
     <div class="hp-avatar-stack-images">
         @foreach ($visibleImages as $index => $image)
-            <x-portal::avatar
+            <x-he4rt::avatar
                 :src="$image"
                 :size="$size"
                 :circular="$circular"

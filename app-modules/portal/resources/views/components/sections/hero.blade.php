@@ -15,7 +15,7 @@
     <div class="hp-container">
         <div class="grid grid-cols-1 gap-8 lg:grid-cols-2 lg:gap-12">
             <div class="space-y-6">
-                <x-portal::headline size="2xl" :keywords="['potencial']">
+                <x-he4rt::headline size="2xl" :keywords="['potencial']">
                     <x-slot:badge>
                         <x-filament::icon icon="heroicon-o-book-open" class="h-5 w-5" />
                         Comunidade Open Source
@@ -28,16 +28,16 @@
                         através de projetos, mentorias e networking.
                     </x-slot>
                     <x-slot:actions>
-                        <x-portal::button icon="heroicon-s-chevron-right">Começar agora</x-portal::button>
+                        <x-he4rt::button icon="heroicon-s-chevron-right">Começar agora</x-he4rt::button>
 
-                        <x-portal::button icon="heroicon-s-chevron-right" variant="outline">
+                        <x-he4rt::button icon="heroicon-s-chevron-right" variant="outline">
                             Explorar projetos
-                        </x-portal::button>
+                        </x-he4rt::button>
                     </x-slot>
-                </x-portal::headline>
-                <x-portal::avatar-stack :images="$usersImages" limit="5">
+                </x-he4rt::headline>
+                <x-he4rt::avatar-stack :images="$usersImages" limit="5">
                     Mais de 9.000 desenvolvedores já fazem parte
-                </x-portal::avatar-stack>
+                </x-he4rt::avatar-stack>
             </div>
             <div class="flex flex-col items-center justify-center">
                 <div class="mx-auto flex w-full max-w-lg flex-col">

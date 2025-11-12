@@ -1,0 +1,21 @@
+{
+    "name": "he4rt/he4rt-core",
+    "description": "",
+    "type": "library",
+    "version": "1.0",
+    "license": "proprietary",
+    "require": {},
+    "autoload": {
+        "psr-4": {
+            "He4rt\\Core\\": "src/"
+        }
+    },
+    "minimum-stability": "stable",
+    "extra": {
+        "laravel": {
+            "providers": [
+                "He4rt\\Core\\Providers\\He4rtServiceProvider"
+            ]
+        }
+    }
+}

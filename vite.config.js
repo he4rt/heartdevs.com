@@ -9,7 +9,7 @@ export default defineConfig({
                 'resources/css/app.css',
                 'resources/js/app.js',
                 'resources/css/filament/admin/theme.css',
-                'app-modules/portal/resources/css/theme.css',
+                'app-modules/he4rt/resources/css/theme.css',
             ],
             refresh: true,
         }),

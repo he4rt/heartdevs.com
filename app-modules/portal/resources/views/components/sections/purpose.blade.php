@@ -2,7 +2,7 @@
     <div class="hp-container">
         <div class="grid grid-cols-1 gap-8 sm:grid-cols-2 sm:gap-16">
             <div class="order-2 grid grid-cols-1 gap-8 sm:order-1 sm:grid-cols-2">
-                <x-portal::card>
+                <x-he4rt::card>
                     <x-slot:icon>
                         <div
                             class="bg-primary-purple/8 border-primary-purple/16 flex w-fit items-center justify-center rounded-lg border p-2"
@@ -14,8 +14,8 @@
                     <x-slot:description>
                         Mais de 2.000 membros ativos compartilhando conhecimento.
                     </x-slot>
-                </x-portal::card>
-                <x-portal::card>
+                </x-he4rt::card>
+                <x-he4rt::card>
                     <x-slot:icon>
                         <div
                             class="bg-primary-purple/8 border-primary-purple/16 flex w-fit items-center justify-center rounded-lg border p-2"
@@ -27,8 +27,8 @@
                     <x-slot:description>
                         Workshops, lives e encontros virtuais com especialistas.
                     </x-slot>
-                </x-portal::card>
-                <x-portal::card>
+                </x-he4rt::card>
+                <x-he4rt::card>
                     <x-slot:icon>
                         <div
                             class="bg-primary-purple/8 border-primary-purple/16 flex w-fit items-center justify-center rounded-lg border p-2"
@@ -40,8 +40,8 @@
                     <x-slot:description>
                         Dezenas de projetos open source para contribuir e aprender.
                     </x-slot>
-                </x-portal::card>
-                <x-portal::card>
+                </x-he4rt::card>
+                <x-he4rt::card>
                     <x-slot:icon>
                         <div
                             class="bg-primary-purple/8 border-primary-purple/16 flex w-fit items-center justify-center rounded-lg border p-2"
@@ -53,10 +53,10 @@
                     <x-slot:description>
                         Orientação personalizada para acelerar seu desenvolvimento.
                     </x-slot>
-                </x-portal::card>
+                </x-he4rt::card>
             </div>
             <div class="order-1 flex flex-col items-center justify-center sm:order-2">
-                <x-portal::headline size="md" :keywords="['jornada']">
+                <x-he4rt::headline size="md" :keywords="['jornada']">
                     <x-slot:badge>
                         <x-filament::icon icon="heroicon-o-cursor-arrow-ripple" class="h-5 w-5" />
                         Nossa missão
@@ -77,11 +77,11 @@
                         criam oportunidades.
                     </x-slot>
                     <x-slot:actions>
-                        <x-portal::button icon="heroicon-s-chevron-right" variant="outline">
+                        <x-he4rt::button icon="heroicon-s-chevron-right" variant="outline">
                             Conheça nossa história
-                        </x-portal::button>
+                        </x-he4rt::button>
                     </x-slot>
-                </x-portal::headline>
+                </x-he4rt::headline>
             </div>
         </div>
     </div>

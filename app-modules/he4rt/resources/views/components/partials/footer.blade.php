@@ -2,14 +2,14 @@
     <div class="hp-footer-container">
         <div class="grid grid-cols-1 gap-8 sm:grid-cols-[2fr_1.5fr] sm:gap-24">
             <div>
-                <x-portal::headline size="md">
+                <x-he4rt::headline size="md">
                     <x-slot:description>
-                        <x-portal::logo />
+                        <x-he4rt::logo />
                         Conheça MeuGuia.app! Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus sed
                         egestas nisl. Vivamus blandit vehicula eleifend. Phasellus vulputate elit leo, porta vehicula
                         nunc placerat placerat.
                     </x-slot>
-                </x-portal::headline>
+                </x-he4rt::headline>
             </div>
 
             <div class="grid grid-cols-1 gap-4 sm:grid-cols-3">

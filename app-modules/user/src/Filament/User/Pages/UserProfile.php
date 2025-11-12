@@ -236,7 +236,7 @@ final class UserProfile extends Page
             ]);
     }
 
-    public function getFormContentComponent(): Component
+    public function getFormContentComponent(): Form
     {
         return Form::make([EmbeddedSchema::make('form')])
             ->id('form')
@@ -383,7 +383,7 @@ final class UserProfile extends Page
         return null;
     }
 
-    private function getNameFormComponent(): Component
+    private function getNameFormComponent(): TextInput
     {
         return TextInput::make('name')
             ->label(__('filament-panels::auth/pages/edit-profile.form.name.label'))
@@ -392,7 +392,7 @@ final class UserProfile extends Page
             ->autofocus();
     }
 
-    private function getEmailFormComponent(): Component
+    private function getEmailFormComponent(): TextInput
     {
         return TextInput::make('email')
             ->label(__('filament-panels::auth/pages/edit-profile.form.email.label'))
@@ -403,7 +403,7 @@ final class UserProfile extends Page
             ->live(debounce: 500);
     }
 
-    private function getPasswordFormComponent(): Component
+    private function getPasswordFormComponent(): TextInput
     {
         return TextInput::make('password')
             ->label(__('filament-panels::auth/pages/edit-profile.form.password.label'))
@@ -419,7 +419,7 @@ final class UserProfile extends Page
             ->same('passwordConfirmation');
     }
 
-    private function getPasswordConfirmationFormComponent(): Component
+    private function getPasswordConfirmationFormComponent(): TextInput
     {
         return TextInput::make('passwordConfirmation')
             ->label(__('filament-panels::auth/pages/edit-profile.form.password_confirmation.label'))
@@ -432,7 +432,7 @@ final class UserProfile extends Page
             ->dehydrated(false);
     }
 
-    private function getCurrentPasswordFormComponent(): Component
+    private function getCurrentPasswordFormComponent(): TextInput
     {
         return TextInput::make('currentPassword')
             ->label(__('filament-panels::auth/pages/edit-profile.form.current_password.label'))
