@@ -46,6 +46,6 @@ test('can claim badge', function (): void {
         'tenant_id' => $tenant->getKey(),
         'character_id' => $user->character->id,
         'badge_id' => $badge->id,
-        'claimed_at' => now(),
+        'claimed_at' => now()->toDateTimeString(),
     ]);
 });
