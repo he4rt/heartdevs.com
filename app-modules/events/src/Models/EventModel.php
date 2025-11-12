@@ -84,6 +84,11 @@ class EventModel extends Model
         return true;
     }
 
+    public function isPast(): bool
+    {
+        return $this->end_at < now();
+    }
+
     public function leave(mixed $userId): bool
     {
         $eventAttend = $this->attendees()->where('user_id', $userId)->first();
@@ -101,6 +106,11 @@ class EventModel extends Model
         $this->attendees()->detach($userId);
 
         return true;
+    }
+
+    public function participate($userId): bool
+    {
+        return $this->attendees()->where('user_id', $userId)->exists();
     }
 
     /**

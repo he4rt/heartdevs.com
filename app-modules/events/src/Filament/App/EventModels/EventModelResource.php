@@ -14,7 +14,7 @@ class EventModelResource extends Resource
 {
     protected static ?string $model = EventModel::class;
 
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
+    protected static string|BackedEnum|null $navigationIcon = Heroicon::Ticket;
 
     protected static ?string $recordTitleAttribute = 'title';
 
