@@ -5,7 +5,7 @@ declare(strict_types=1);
 use App\Enums\FilamentPanel;
 use Filament\Facades\Filament;
 use He4rt\Events\Enums\EventTypeEnum;
-use He4rt\Events\Filament\Resources\Events\Pages\CreateEvent;
+use He4rt\Events\Filament\Admin\Resources\Events\Pages\CreateEvent;
 use He4rt\Events\Models\EventModel;
 use Illuminate\Support\Facades\Date;
 

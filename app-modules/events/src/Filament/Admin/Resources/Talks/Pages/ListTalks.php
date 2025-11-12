@@ -2,15 +2,15 @@
 
 declare(strict_types=1);
 
-namespace He4rt\Events\Filament\Resources\Events\Pages;
+namespace He4rt\Events\Filament\Admin\Resources\Talks\Pages;
 
 use Filament\Actions\CreateAction;
 use Filament\Resources\Pages\ListRecords;
-use He4rt\Events\Filament\Resources\Events\EventResource;
+use He4rt\Events\Filament\Admin\Resources\Talks\TalkResource;
 
-class ListEvents extends ListRecords
+class ListTalks extends ListRecords
 {
-    protected static string $resource = EventResource::class;
+    protected static string $resource = TalkResource::class;
 
     protected function getHeaderActions(): array
     {

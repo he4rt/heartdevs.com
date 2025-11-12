@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace He4rt\Events\Filament\Resources\Talks\Tables;
+namespace He4rt\Events\Filament\Admin\Resources\Talks\Tables;
 
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;

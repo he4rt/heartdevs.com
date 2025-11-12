@@ -2,18 +2,18 @@
 
 declare(strict_types=1);
 
-namespace He4rt\Events\Filament\Resources\Talks;
+namespace He4rt\Events\Filament\Admin\Resources\Talks;
 
 use BackedEnum;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
-use He4rt\Events\Filament\Resources\Talks\Pages\CreateTalk;
-use He4rt\Events\Filament\Resources\Talks\Pages\EditTalk;
-use He4rt\Events\Filament\Resources\Talks\Pages\ListTalks;
-use He4rt\Events\Filament\Resources\Talks\Schemas\TalkForm;
-use He4rt\Events\Filament\Resources\Talks\Tables\TalksTable;
+use He4rt\Events\Filament\Admin\Resources\Talks\Pages\CreateTalk;
+use He4rt\Events\Filament\Admin\Resources\Talks\Pages\EditTalk;
+use He4rt\Events\Filament\Admin\Resources\Talks\Pages\ListTalks;
+use He4rt\Events\Filament\Admin\Resources\Talks\Schemas\TalkForm;
+use He4rt\Events\Filament\Admin\Resources\Talks\Tables\TalksTable;
 use He4rt\Events\Models\Talk;
 use UnitEnum;
 

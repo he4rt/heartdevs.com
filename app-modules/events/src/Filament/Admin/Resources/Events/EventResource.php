@@ -2,18 +2,18 @@
 
 declare(strict_types=1);
 
-namespace He4rt\Events\Filament\Resources\Events;
+namespace He4rt\Events\Filament\Admin\Resources\Events;
 
 use BackedEnum;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
-use He4rt\Events\Filament\Resources\Events\Pages\CreateEvent;
-use He4rt\Events\Filament\Resources\Events\Pages\EditEvent;
-use He4rt\Events\Filament\Resources\Events\Pages\ListEvents;
-use He4rt\Events\Filament\Resources\Events\Schemas\EventForm;
-use He4rt\Events\Filament\Resources\Events\Tables\EventsTable;
+use He4rt\Events\Filament\Admin\Resources\Events\Pages\CreateEvent;
+use He4rt\Events\Filament\Admin\Resources\Events\Pages\EditEvent;
+use He4rt\Events\Filament\Admin\Resources\Events\Pages\ListEvents;
+use He4rt\Events\Filament\Admin\Resources\Events\Schemas\EventForm;
+use He4rt\Events\Filament\Admin\Resources\Events\Tables\EventsTable;
 use He4rt\Events\Models\EventModel;
 use UnitEnum;
 

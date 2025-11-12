@@ -6,6 +6,7 @@ namespace Database\Seeders;
 
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use He4rt\Character\Models\Character;
+use He4rt\Events\Enums\AttendingStatusEnum;
 use He4rt\Events\Models\EventModel;
 use He4rt\Season\Models\Season;
 use He4rt\Tenant\Models\Tenant;
@@ -40,9 +41,19 @@ final class DatabaseSeeder extends Seeder
             'user_id' => $user->getKey(),
             'tenant_id' => $tenant->getKey(),
         ]);
-        EventModel::factory()->count(10)->create([
-            'tenant_id' => $tenant->getKey(),
-        ]);
+        EventModel::factory()->count(10)
+            ->afterCreating(function (EventModel $event): void {
+                $attendees = User::factory()->count(fake()->numberBetween(3, 10))->create();
+
+                foreach ($attendees as $user) {
+                    $event->attendees()->attach($user->id, [
+                        'status' => fake()->randomElement(AttendingStatusEnum::cases()),
+                    ]);
+                }
+            })
+            ->create([
+                'tenant_id' => $tenant->getKey(),
+            ]);
 
         Season::factory()
             ->recycle($tenant)

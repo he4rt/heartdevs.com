@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace He4rt\Events\Filament\Resources\Talks\Pages;
+namespace He4rt\Events\Filament\Admin\Resources\Talks\Pages;
 
 use Filament\Resources\Pages\CreateRecord;
-use He4rt\Events\Filament\Resources\Talks\TalkResource;
+use He4rt\Events\Filament\Admin\Resources\Talks\TalkResource;
 
 class CreateTalk extends CreateRecord
 {

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace He4rt\Events\Filament\Resources\Events\Schemas;
+namespace He4rt\Events\Filament\Admin\Resources\Events\Schemas;
 
 use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\RichEditor;

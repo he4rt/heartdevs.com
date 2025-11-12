@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace He4rt\Events\Filament\Resources\Talks\Schemas;
+namespace He4rt\Events\Filament\Admin\Resources\Talks\Schemas;
 
 use Filament\Forms\Components\RichEditor;
 use Filament\Forms\Components\Select;

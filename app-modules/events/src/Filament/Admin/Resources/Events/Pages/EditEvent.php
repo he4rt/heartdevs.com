@@ -2,15 +2,15 @@
 
 declare(strict_types=1);
 
-namespace He4rt\Events\Filament\Resources\Talks\Pages;
+namespace He4rt\Events\Filament\Admin\Resources\Events\Pages;
 
 use Filament\Actions\DeleteAction;
 use Filament\Resources\Pages\EditRecord;
-use He4rt\Events\Filament\Resources\Talks\TalkResource;
+use He4rt\Events\Filament\Admin\Resources\Events\EventResource;
 
-class EditTalk extends EditRecord
+class EditEvent extends EditRecord
 {
-    protected static string $resource = TalkResource::class;
+    protected static string $resource = EventResource::class;
 
     protected function getHeaderActions(): array
     {

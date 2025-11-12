@@ -7,21 +7,19 @@ namespace He4rt\Events;
 use App\Enums\FilamentPanel;
 use Filament\Contracts\Plugin;
 use Filament\Panel;
-use He4rt\Events\Filament\Admin\Resources\Events\EventResource;
-use He4rt\Events\Filament\Admin\Resources\Talks\TalkResource;
+use He4rt\Events\Filament\App\EventModels\EventModelResource;
 
-class AdminEventPanelPlugin implements Plugin
+class AppEventPanelPlugin implements Plugin
 {
     public function getId(): string
     {
-        return FilamentPanel::Admin->moduleName('event');
+        return FilamentPanel::User->moduleName('event');
     }
 
     public function register(Panel $panel): void
     {
         $panel->resources([
-            EventResource::class,
-            TalkResource::class,
+            EventModelResource::class,
         ]);
     }
 
