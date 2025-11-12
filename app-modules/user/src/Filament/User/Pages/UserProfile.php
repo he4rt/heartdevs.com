@@ -191,7 +191,7 @@ final class UserProfile extends Page
         );
 
         FilamentNotification::make()
-            ->title('Informações atualizadas com sucesso.')
+            ->title('Information updated successfully.')
             ->success()
             ->send();
     }
@@ -199,10 +199,14 @@ final class UserProfile extends Page
     public function saveAddress(): void
     {
         $this->validate([
+            'addressData.zip_code' => [
+                'required',
+                'string',
+                'regex:/^\d{5}-\d{3}$/',
+            ],
             'addressData.country' => ['nullable', 'string', 'max:255'],
             'addressData.state' => ['nullable', 'string', 'max:255'],
             'addressData.city' => ['nullable', 'string', 'max:255'],
-            'addressData.zip_code' => ['nullable', 'string', 'max:20', 'regex:/^[A-Za-z0-9\- ]+$/'],
         ]);
 
         $user = $this->getUser();
@@ -213,7 +217,7 @@ final class UserProfile extends Page
         );
 
         FilamentNotification::make()
-            ->title('Endereço atualizado com sucesso.')
+            ->title('Address updated successfully.')
             ->success()
             ->send();
     }
