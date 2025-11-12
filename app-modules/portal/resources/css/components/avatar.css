@@ -1,0 +1,15 @@
+.hp-avatar {
+    @apply size-8 rounded-md object-cover object-center;
+
+    &.hp-circular {
+        @apply rounded-full;
+    }
+
+    &.hp-size-sm {
+        @apply size-6;
+    }
+
+    &.hp-size-lg {
+        @apply size-10;
+    }
+}
