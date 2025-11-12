@@ -1,0 +1,80 @@
+<?php
+
+declare(strict_types=1);
+
+use App\Enums\FilamentPanel;
+use Filament\Facades\Filament;
+use He4rt\Events\Filament\App\Talks\Pages\CreateTalk;
+use He4rt\Events\Models\EventModel;
+use He4rt\Events\Models\Talk;
+use He4rt\Tenant\Models\Tenant;
+use He4rt\User\Models\User;
+
+use function Pest\Laravel\actingAs;
+use function Pest\Laravel\assertDatabaseHas;
+use function Pest\Livewire\livewire;
+
+beforeEach(function (): void {
+    Filament::setCurrentPanel(FilamentPanel::User->value);
+    actingAs(User::factory()->create());
+    $this->tenant = Tenant::factory()->create();
+    Filament::setTenant($this->tenant);
+    $this->event = EventModel::factory()->recycle($this->tenant)->create();
+});
+
+it('should render', function (): void {
+    livewire(CreateTalk::class)
+        ->assertOk();
+});
+
+it('should send a talk call for paper', function (): void {
+    livewire(CreateTalk::class)
+        ->assertOk()
+        ->fillForm([
+            'event_id' => $this->event->getKey(),
+            'field_type' => 'whatever',
+            'title' => 'title whatever',
+            'description' => 'description whatever',
+        ])
+        ->call('create')
+        ->assertHasNoFormErrors();
+
+    assertDatabaseHas(Talk::class, [
+        'event_id' => $this->event->getKey(),
+        'field_type' => 'whatever',
+        'title' => 'title whatever',
+        'user_id' => auth()->user()->getKey(),
+        'tenant_id' => Filament::getTenant()->getKey(),
+    ]);
+});
+
+describe('validation rules', function (): void {
+    test('field_type::validations', function ($rule, $value): void {
+        livewire(CreateTalk::class)
+            ->assertOk()
+            ->fillForm([
+                'field_type' => $value,
+
+            ])
+            ->call('create')
+            ->assertHasNoFormErrors(['field_type' => $rule]);
+    })->with([
+        'required' => ['', 'required'],
+        'min:3' => ['aa', 'min:3'],
+        'max:256' => [str_repeat('a', 256), 'max:255'],
+    ]);
+    test('title::validations', function ($rule, $value): void {
+        livewire(CreateTalk::class)
+            ->assertOk()
+            ->fillForm([
+                'title' => $value,
+
+            ])
+            ->call('create')
+            ->assertHasNoFormErrors(['title' => $rule]);
+    })->with([
+        'required' => ['', 'required'],
+        'min:3' => ['aa', 'min:3'],
+        'max:256' => [str_repeat('a', 256), 'max:255'],
+    ]);
+});

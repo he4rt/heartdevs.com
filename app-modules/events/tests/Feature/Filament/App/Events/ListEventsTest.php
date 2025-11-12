@@ -76,6 +76,12 @@ it('should see Register or Join Waitlist based on status', function ($status, $t
 
 it('should be able to participate to an event', function (): void {
     $event = $this->events->first();
+    $attendeeIds = $event->attendees->pluck('id');
+
+    $event->attendees()->updateExistingPivot(
+        $attendeeIds,
+        ['status' => AttendingStatusEnum::Waitlist],
+    );
     livewire(ListEventModels::class, ['tenant' => $this->tenant->slug])
         ->assertOk()
         ->call('attend', $event->getKey())

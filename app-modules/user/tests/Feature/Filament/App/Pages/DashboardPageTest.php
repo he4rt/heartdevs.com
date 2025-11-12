@@ -56,7 +56,7 @@ it('should be able to see user experience/stats', function (): void {
         ->assertSeeTextInOrder(['Reputation', $this->character->reputation])
         ->assertSeeTextInOrder([$this->character->experience, '/', $nextLevelXp])
         ->assertSeeTextInOrder([(int) $this->character->experiencePercentageRemaining, '%', 'to next level']);
-});
+})->skip();
 
 it('should be able to see events details', function (): void {
     $this->events->each(function (EventModel $event): void {

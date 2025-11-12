@@ -8,6 +8,7 @@ use App\Enums\FilamentPanel;
 use Filament\Contracts\Plugin;
 use Filament\Panel;
 use He4rt\Events\Filament\App\EventModels\EventModelResource;
+use He4rt\Events\Filament\App\Talks\TalkResource;
 
 class AppEventPanelPlugin implements Plugin
 {
@@ -20,6 +21,7 @@ class AppEventPanelPlugin implements Plugin
     {
         $panel->resources([
             EventModelResource::class,
+            TalkResource::class,
         ]);
     }
 

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace He4rt\Events\Database\Factories;
 
+use He4rt\Events\Enums\Talks\TalkStatusEnum;
 use He4rt\Events\Models\EventModel;
 use He4rt\Events\Models\Talk;
 use He4rt\Tenant\Models\Tenant;
@@ -24,7 +25,7 @@ final class TalkFactory extends Factory
             'tenant_id' => Tenant::factory(),
             'event_id' => EventModel::factory(),
             'user_id' => User::factory(),
-            'status' => fake()->word(),
+            'status' => fake()->randomElement(TalkStatusEnum::cases()),
             'field_type' => fake()->word(),
             'title' => fake()->word(),
             'description' => fake()->text(),
