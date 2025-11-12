@@ -62,10 +62,6 @@
     @apply text-text-medium max-w-full text-base font-medium delay-200 md:text-lg lg:text-lg;
 }
 
-/*.hp-headline-animated {*/
-/* @apply animate-fade-in;*/
-/*}*/
-
 .hp-headline-highlight {
     @apply text-primary-purple;
 }

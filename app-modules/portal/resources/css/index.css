@@ -1,9 +1,8 @@
-@import 'tw-animate-css';
-@import './support/index.css';
-
 @import '../../../../vendor/filament/filament/resources/css/theme.css';
 
+@import './support/index.css';
 @import './base.css';
+
 @import './components/card.css' layer(components);
 @import './components/section.css' layer(components);
 @import './components/headline.css' layer(components);
