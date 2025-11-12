@@ -16,7 +16,7 @@ class TalksTable
     public static function configure(Table $table): Table
     {
         return $table
-            ->modifyQueryUsing(fn ($query) => $query->where('tenant_id', Filament::getTenant()->getKey()))
+            ->modifyQueryUsing(fn ($query) => $query->where('user_id', auth()->user()->getKey())->where('tenant_id', Filament::getTenant()->getKey()))
             ->columns([
                 TextColumn::make('event.title')
                     ->searchable(),

@@ -12,6 +12,7 @@ use He4rt\User\Models\User;
 
 use function Pest\Laravel\actingAs;
 use function Pest\Laravel\assertDatabaseHas;
+use function Pest\Laravel\assertDatabaseMissing;
 use function Pest\Livewire\livewire;
 
 beforeEach(function (): void {
@@ -45,6 +46,24 @@ it('should send a talk call for paper', function (): void {
         'title' => 'title whatever',
         'user_id' => auth()->user()->getKey(),
         'tenant_id' => Filament::getTenant()->getKey(),
+    ]);
+});
+it('should create talk that only  events that belongs to the tenant', function (): void {
+    livewire(CreateTalk::class)
+        ->assertOk()
+        ->fillForm([
+            'event_id' => EventModel::factory()->create()->getKey(),
+            'field_type' => 'whatever',
+            'title' => 'title whatever',
+            'description' => 'description whatever',
+        ])
+        ->call('create')
+        ->assertHasFormErrors(['event_id']);
+
+    assertDatabaseMissing(Talk::class, [
+        'event_id' => EventModel::factory()->create()->getKey(),
+        'field_type' => 'whatever',
+        'title' => 'title whatever',
     ]);
 });
 
