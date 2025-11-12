@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "c8ad99dd700cf06fd0810efa461d10df",
+    "content-hash": "fbdc3852d543e0eb43c0efc86f7fbee0",
     "packages": [
         {
             "name": "anourvalar/eloquent-serialize",
@@ -2838,7 +2838,7 @@
             "dist": {
                 "type": "path",
                 "url": "app-modules/he4rt",
-                "reference": "b85d254c7a9377cec57f1cc729f3334dc7cad7f3"
+                "reference": "c2dae2577742891fc5268261792efc1cb0e4d14a"
             },
             "type": "library",
             "extra": {
@@ -15122,12 +15122,12 @@
     ],
     "aliases": [],
     "minimum-stability": "stable",
-    "stability-flags": [],
+    "stability-flags": {},
     "prefer-stable": true,
     "prefer-lowest": false,
     "platform": {
         "php": "^8.3"
     },
-    "platform-dev": [],
+    "platform-dev": {},
     "plugin-api-version": "2.6.0"
 }
