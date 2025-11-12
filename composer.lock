@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "333ffb3a83e7bbf3fb61c5c4c76cbf06",
+    "content-hash": "dd1453d7714b6ad29ad3f39993e0efc3",
     "packages": [
         {
             "name": "anourvalar/eloquent-serialize",
@@ -5581,6 +5581,84 @@
                 }
             ],
             "time": "2025-09-03T16:03:54+00:00"
+        },
+        {
+            "name": "otavio-araujo/filament-smart-cep",
+            "version": "4.0.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/otavio-araujo/filament-smart-cep.git",
+                "reference": "4bf7bf64ed7d619112858e5eb7cfbd34ce7ac252"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/otavio-araujo/filament-smart-cep/zipball/4bf7bf64ed7d619112858e5eb7cfbd34ce7ac252",
+                "reference": "4bf7bf64ed7d619112858e5eb7cfbd34ce7ac252",
+                "shasum": ""
+            },
+            "require": {
+                "filament/forms": "^4.0",
+                "php": "^8.2|^8.3",
+                "spatie/laravel-package-tools": "^1.15.0"
+            },
+            "require-dev": {
+                "larastan/larastan": "^3.0",
+                "laravel/pint": "^1.0",
+                "nunomaduro/collision": "^8.0",
+                "orchestra/testbench": "^9.0|^10.0",
+                "pestphp/pest": "^3.0",
+                "pestphp/pest-plugin-arch": "^3.0",
+                "pestphp/pest-plugin-laravel": "^3.0",
+                "pestphp/pest-plugin-livewire": "^3.0",
+                "phpstan/extension-installer": "^1.1",
+                "phpstan/phpstan-deprecation-rules": "^2.0",
+                "phpstan/phpstan-phpunit": "^2.0",
+                "rector/rector": "^2.0",
+                "roave/security-advisories": "dev-latest"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "OtavioAraujo\\FilamentSmartCep\\FilamentSmartCepServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "OtavioAraujo\\FilamentSmartCep\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Otávio Araújo",
+                    "email": "otavio_araujo@hotmail.com",
+                    "role": "Developer"
+                }
+            ],
+            "description": "A FilamentPHP plugin that validates Brazilian postal codes (CEP) and automatically fills address fields (street, neighborhood, city, state, country) using ViaCEP as the primary source, with multiple API fallbacks for reliability.",
+            "homepage": "https://github.com/otavio-araujo/filament-smart-cep",
+            "keywords": [
+                "brazil",
+                "cep",
+                "filament",
+                "laravel"
+            ],
+            "support": {
+                "issues": "https://github.com/otavio-araujo/filament-smart-cep/issues",
+                "source": "https://github.com/otavio-araujo/filament-smart-cep"
+            },
+            "funding": [
+                {
+                    "url": "https://github.com/otavio-araujo",
+                    "type": "github"
+                }
+            ],
+            "time": "2025-08-27T14:59:38+00:00"
         },
         {
             "name": "owenvoke/blade-fontawesome",
@@ -14983,12 +15061,12 @@
     ],
     "aliases": [],
     "minimum-stability": "stable",
-    "stability-flags": {},
+    "stability-flags": [],
     "prefer-stable": true,
     "prefer-lowest": false,
     "platform": {
         "php": "^8.3"
     },
-    "platform-dev": {},
+    "platform-dev": [],
     "plugin-api-version": "2.6.0"
 }
