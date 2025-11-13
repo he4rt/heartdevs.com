@@ -7,6 +7,7 @@ namespace He4rt\Events\Filament\App\EventModels\Pages;
 use Filament\Notifications\Notification;
 use Filament\Resources\Pages\ListRecords;
 use He4rt\Events\Actions\AttendEventAction;
+use He4rt\Events\Actions\LeaveEventAction;
 use He4rt\Events\Filament\App\EventModels\EventModelResource;
 use He4rt\Events\Models\EventModel;
 use Illuminate\Database\Eloquent\Builder;
@@ -32,8 +33,7 @@ class ListEventModels extends ListRecords
     public function leave(string|int $eventModelId): void
     {
         $eventModel = EventModel::query()->find($eventModelId);
-        $eventModel->leave(auth()->user()->getKey());
-
+        app(LeaveEventAction::class)->execute($eventModel);
         Notification::make()
             ->success()
             ->body('Leaved Event Successfully')

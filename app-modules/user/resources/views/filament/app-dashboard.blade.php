@@ -148,10 +148,7 @@
     <!-- Events -->
     <div class="mt-4 w-full">
         <x-filament::card>
-            <x-slot name="header" class="pb-3">
-                <x-filament::section.heading class="text-white">Events</x-filament::section.heading>
-            </x-slot>
-
+            <x-filament::section.heading class="text-white">Events</x-filament::section.heading>
             <div class="space-y-2">
                 @forelse ($this->events as $event)
                     <div
