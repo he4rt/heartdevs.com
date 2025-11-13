@@ -19,8 +19,7 @@
                         >
                             {{ $event->end_at < now() ? 'Past' : 'Upcoming' }}
                         </x-filament::badge>
-
-                        <x-filament::icon wire:click="view({{$event->getKey()}})" icon="heroicon-m-ellipsis-vertical" />
+                        <x-filament::icon wire:click="view({{$event->getKey()}})" icon="heroicon-m-eye" />
                     </div>
 
                     <x-filament::badge
@@ -61,14 +60,14 @@
                             <span>{{ $event->attendees_count }} / {{ $event->max_attendees }} participants</span>
                         </div>
                     </div>
-                    @if ($event->attendees()->first()->pivot->status === \He4rt\Events\Enums\AttendingStatusEnum::Attending && ! $event->isPast())
+                    @if ($event->isAttending() && ! $event->isPast())
                         <x-filament::button
                             wire:click="attend({{$event->getKey()}})"
                             class="focus-visible:ring-ring bg-primary text-shadow-black-500 hover:bg-primary/90 mt-2 inline-flex h-9 w-full items-center justify-center rounded-md px-3 py-2 text-sm font-medium transition-colors focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none disabled:pointer-events-none disabled:opacity-50"
                         >
                             Join
                         </x-filament::button>
-                    @elseif ($event->attendees()->first()->pivot->status === \He4rt\Events\Enums\AttendingStatusEnum::Waitlist && ! $event->isPast())
+                    @elseif ($event->onWaitlist() && ! $event->isPast())
                         <x-filament::button
                             wire:click="attend({{$event->getKey()}})"
                             class="focus-visible:ring-ring bg-primary hover:bg-primary/90 mt-2 inline-flex h-9 w-full items-center justify-center rounded-md px-3 py-2 text-sm font-medium transition-colors text-shadow-black focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none disabled:pointer-events-none disabled:opacity-50"

@@ -35,6 +35,7 @@ use Illuminate\Database\Eloquent\Relations\Pivot;
 class EventModel extends Model
 {
     use HasFactory;
+
     protected $table = 'events';
 
     protected $fillable = [
@@ -111,6 +112,16 @@ class EventModel extends Model
     public function participate($userId): bool
     {
         return $this->attendees()->where('user_id', $userId)->exists();
+    }
+
+    public function isAttending(): bool
+    {
+        return $this->attendees()->first()->pivot->status === AttendingStatusEnum::Attending;
+    }
+
+    public function onWaitlist(): bool
+    {
+        return $this->attendees()->first()->pivot->status === AttendingStatusEnum::Waitlist;
     }
 
     /**
