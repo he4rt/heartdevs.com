@@ -1,13 +1,13 @@
 @php
     use Carbon\Carbon;
     use Illuminate\Support\Facades\Date;
-    $userExperience = $this->stats->experience;
-    $level = $this->stats->level;
+    $userExperience = $this->stats->experience ?? 0;
+    $level = $this->stats->level ?? 1;
 
-    $reputation = $this->stats->reputation;
-    $experienceRequiredForNextLevel = $this->stats->experienceProgress;
-    $experienceRemaining = $this->stats->experiencePercentageRemaining;
-    $nextLevelExperience = $experienceRequiredForNextLevel + $this->stats->experience;
+    $reputation = $this->stats->reputation ?? 0;
+    $experienceRequiredForNextLevel = $this->stats->experienceProgress ?? 0;
+    $experienceRemaining = $this->stats->experiencePercentageRemaining ?? 0;
+    $nextLevelExperience = $experienceRequiredForNextLevel + $userExperience;
     $experiencePercentage = $nextLevelExperience > 0 ? ($userExperience / $nextLevelExperience) * 100 : 0;
 
     $user = auth()->user();
