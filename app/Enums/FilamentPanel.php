@@ -11,6 +11,8 @@ enum FilamentPanel: string
     case User = 'user';
     case Guest = 'guest';
 
+    case Event = 'event';
+
     public function moduleName(string $module): string
     {
         return sprintf('%s-%s', $this->value, $module);

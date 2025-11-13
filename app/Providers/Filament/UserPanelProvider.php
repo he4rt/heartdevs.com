@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Providers\Filament;
 
+use App\Filament\Pages\Login;
 use Filament\Actions\Action;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
@@ -30,7 +31,7 @@ final class UserPanelProvider extends PanelProvider
             ->default()
             ->id('user')
             ->path('app')
-            ->login()
+            ->login(Login::class)
             ->sidebarCollapsibleOnDesktop()
             ->viteTheme('resources/css/filament/user/theme.css')
             ->tenant(Tenant::class, 'slug', 'ownedTenants')

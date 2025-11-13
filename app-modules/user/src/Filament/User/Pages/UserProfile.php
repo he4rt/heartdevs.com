@@ -11,6 +11,8 @@ use Filament\Auth\MultiFactor\Contracts\MultiFactorAuthenticationProvider;
 use Filament\Auth\Notifications\NoticeOfEmailChangeRequest;
 use Filament\Auth\Notifications\VerifyEmailChange;
 use Filament\Facades\Filament;
+use Filament\Forms\Components\DatePicker;
+use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Notifications\Notification as FilamentNotification;
 use Filament\Pages\Concerns\CanUseDatabaseTransactions;
@@ -42,6 +44,7 @@ use Illuminate\Support\Js;
 use Illuminate\Validation\Rules\Password;
 use League\Uri\Components\Query;
 use LogicException;
+use OtavioAraujo\FilamentSmartCep\Forms\Components\SmartCep;
 use Throwable;
 
 /**
@@ -57,6 +60,10 @@ final class UserProfile extends Page
      * @var array<string, mixed> | null
      */
     public ?array $data = [];
+
+    public ?array $informationData = [];
+
+    public ?array $addressData = [];
 
     protected static bool $isDiscovered = false;
 
@@ -100,13 +107,19 @@ final class UserProfile extends Page
     public function mount(): void
     {
         $this->fillForm();
+
+        $user = $this->getUser();
+
+        $this->informationData = $user->information?->toArray() ?? [];
+        $this->addressData = $user->address?->toArray() ?? [];
     }
 
     public function getUser(): Authenticatable&Model
     {
         $user = Filament::auth()->user();
 
-        throw_unless($user instanceof Model, LogicException::class, 'The authenticated user object must be an Eloquent model to allow the profile page to update it.');
+        throw_unless($user instanceof Model, LogicException::class,
+            'The authenticated user object must be an Eloquent model to allow the profile page to update it.');
 
         return $user;
     }
@@ -157,6 +170,56 @@ final class UserProfile extends Page
         if ($redirectUrl = $this->getRedirectUrl()) {
             $this->redirect($redirectUrl, navigate: FilamentView::hasSpaMode($redirectUrl));
         }
+    }
+
+    public function saveInformation(): void
+    {
+        $this->validate([
+            'informationData.name' => ['required', 'string', 'max:255'],
+            'informationData.nickname' => ['nullable', 'string', 'max:255'],
+            'informationData.linkedin_url' => ['nullable', 'string', 'url', 'max:255'],
+            'informationData.github_url' => ['nullable', 'string', 'url', 'max:255'],
+            'informationData.birthdate' => ['nullable', 'date'],
+            'informationData.about' => ['nullable', 'string', 'max:1000'],
+        ]);
+
+        $user = $this->getUser();
+
+        $user->information()->updateOrCreate(
+            ['user_id' => $user->id],
+            $this->informationData
+        );
+
+        FilamentNotification::make()
+            ->title('Information updated successfully.')
+            ->success()
+            ->send();
+    }
+
+    public function saveAddress(): void
+    {
+        $this->validate([
+            'addressData.zip_code' => [
+                'required',
+                'string',
+                'regex:/^\d{5}-\d{3}$/',
+            ],
+            'addressData.country' => ['nullable', 'string', 'max:255'],
+            'addressData.state' => ['nullable', 'string', 'max:255'],
+            'addressData.city' => ['nullable', 'string', 'max:255'],
+        ]);
+
+        $user = $this->getUser();
+
+        $user->address()->updateOrCreate(
+            ['user_id' => $user->id],
+            $this->addressData
+        );
+
+        FilamentNotification::make()
+            ->title('Address updated successfully.')
+            ->success()
+            ->send();
     }
 
     public function defaultForm(Schema $schema): Schema
@@ -231,12 +294,102 @@ final class UserProfile extends Page
                             ->schema([
                                 Livewire::make(ConnectionHub::class),
                             ]),
+                        Tab::make('Information')
+                            ->schema([
+                                Section::make('Personal Information')
+                                    ->description('Basic profile details and social links.')
+                                    ->schema([
+                                        TextInput::make('informationData.name')
+                                            ->label('Full Name')
+                                            ->placeholder('Enter your full name')
+                                            ->required(),
+
+                                        TextInput::make('informationData.nickname')
+                                            ->label('Nickname')
+                                            ->placeholder('How do you like to be called?'),
+
+                                        DatePicker::make('informationData.birthdate')
+                                            ->label('Birthdate')
+                                            ->placeholder('Select your birth date'),
+
+                                        Textarea::make('informationData.about')
+                                            ->label('About')
+                                            ->placeholder('Write a short description about yourself...')
+                                            ->rows(4)
+                                            ->columnSpanFull(),
+
+                                        TextInput::make('informationData.linkedin_url')
+                                            ->label('LinkedIn URL')
+                                            ->placeholder('https://linkedin.com/in/username')
+                                            ->url(),
+
+                                        TextInput::make('informationData.github_url')
+                                            ->label('GitHub URL')
+                                            ->placeholder('https://github.com/username')
+                                            ->url(),
+                                    ])
+                                    ->columns([
+                                        'sm' => 2,
+                                        'md' => 3,
+                                    ])
+                                    ->footerActions([
+                                        Action::make('saveInformation')
+                                            ->label('Save Information')
+                                            ->action(fn () => $this->saveInformation())
+                                            ->color('primary')
+                                            ->icon('heroicon-o-check'),
+                                    ]),
+                            ]),
+
+                        Tab::make('Address')
+                            ->schema([
+                                Section::make('Address Information')
+                                    ->description('Fill in your current address. The ZIP Code will automatically fetch your city and state.')
+                                    ->schema([
+                                        SmartCep::make('addressData.zip_code')
+                                            ->label('ZIP Code')
+                                            ->placeholder('Enter your ZIP Code (e.g., 13000-000)')
+                                            ->mask('99999-999')
+                                            ->required()
+                                            ->bindCityField('addressData.city')
+                                            ->bindStateField('addressData.state')
+                                            ->bindCountryField('addressData.country')
+                                            ->live()
+                                            ->columnSpan(1),
+
+                                        TextInput::make('addressData.country')
+                                            ->label('Country')
+                                            ->placeholder('Brazil')
+                                            ->columnSpan(1),
+
+                                        TextInput::make('addressData.state')
+                                            ->label('State')
+                                            ->placeholder('São Paulo')
+                                            ->columnSpan(1),
+
+                                        TextInput::make('addressData.city')
+                                            ->label('City')
+                                            ->placeholder('Campinas')
+                                            ->columnSpan(1),
+                                    ])
+                                    ->columns([
+                                        'sm' => 2,
+                                        'md' => 4,
+                                    ])
+                                    ->footerActions([
+                                        Action::make('saveAddress')
+                                            ->label('Save Address')
+                                            ->action(fn () => $this->saveAddress())
+                                            ->color('primary')
+                                            ->icon('heroicon-o-map-pin'),
+                                    ]),
+                            ]),
                     ]),
                 ...Arr::wrap($this->getMultiFactorAuthenticationContentComponent()),
             ]);
     }
 
-    public function getFormContentComponent(): Component
+    public function getFormContentComponent(): Form
     {
         return Form::make([EmbeddedSchema::make('form')])
             ->id('form')
@@ -264,8 +417,10 @@ final class UserProfile extends Page
             ->divided()
             ->secondary()
             ->schema(collect(Filament::getMultiFactorAuthenticationProviders())
-                ->sort(fn (MultiFactorAuthenticationProvider $multiFactorAuthenticationProvider): int => $multiFactorAuthenticationProvider->isEnabled($user) ? 0 : 1)
-                ->map(fn (MultiFactorAuthenticationProvider $multiFactorAuthenticationProvider): Component => Group::make($multiFactorAuthenticationProvider->getManagementSchemaComponents())
+                ->sort(fn (MultiFactorAuthenticationProvider $multiFactorAuthenticationProvider
+                ): int => $multiFactorAuthenticationProvider->isEnabled($user) ? 0 : 1)
+                ->map(fn (MultiFactorAuthenticationProvider $multiFactorAuthenticationProvider
+                ): Component => Group::make($multiFactorAuthenticationProvider->getManagementSchemaComponents())
                     ->statePath($multiFactorAuthenticationProvider->getId()))
                 ->all());
     }
@@ -339,8 +494,10 @@ final class UserProfile extends Page
 
         cache()->put($verificationSignature, true, ttl: now()->addHour());
 
-        $record->notify(app(NoticeOfEmailChangeRequest::class, [/** @phpstan-ignore-line */
-            'blockVerificationUrl' => Filament::getBlockEmailChangeVerificationUrl($record, $newEmail, $verificationSignature),
+        $record->notify(app(NoticeOfEmailChangeRequest::class, [
+            /** @phpstan-ignore-line */
+            'blockVerificationUrl' => Filament::getBlockEmailChangeVerificationUrl($record, $newEmail,
+                $verificationSignature),
             'newEmail' => $newEmail,
         ]));
 
@@ -369,8 +526,10 @@ final class UserProfile extends Page
     {
         return FilamentNotification::make()
             ->success()
-            ->title(__('filament-panels::auth/pages/edit-profile.notifications.email_change_verification_sent.title', ['email' => $newEmail]))
-            ->body(__('filament-panels::auth/pages/edit-profile.notifications.email_change_verification_sent.body', ['email' => $newEmail]));
+            ->title(__('filament-panels::auth/pages/edit-profile.notifications.email_change_verification_sent.title',
+                ['email' => $newEmail]))
+            ->body(__('filament-panels::auth/pages/edit-profile.notifications.email_change_verification_sent.body',
+                ['email' => $newEmail]));
     }
 
     private function getSavedNotificationTitle(): ?string
@@ -383,7 +542,7 @@ final class UserProfile extends Page
         return null;
     }
 
-    private function getNameFormComponent(): Component
+    private function getNameFormComponent(): TextInput
     {
         return TextInput::make('name')
             ->label(__('filament-panels::auth/pages/edit-profile.form.name.label'))
@@ -392,7 +551,7 @@ final class UserProfile extends Page
             ->autofocus();
     }
 
-    private function getEmailFormComponent(): Component
+    private function getEmailFormComponent(): TextInput
     {
         return TextInput::make('email')
             ->label(__('filament-panels::auth/pages/edit-profile.form.email.label'))
@@ -403,7 +562,7 @@ final class UserProfile extends Page
             ->live(debounce: 500);
     }
 
-    private function getPasswordFormComponent(): Component
+    private function getPasswordFormComponent(): TextInput
     {
         return TextInput::make('password')
             ->label(__('filament-panels::auth/pages/edit-profile.form.password.label'))
@@ -419,7 +578,7 @@ final class UserProfile extends Page
             ->same('passwordConfirmation');
     }
 
-    private function getPasswordConfirmationFormComponent(): Component
+    private function getPasswordConfirmationFormComponent(): TextInput
     {
         return TextInput::make('passwordConfirmation')
             ->label(__('filament-panels::auth/pages/edit-profile.form.password_confirmation.label'))
@@ -432,7 +591,7 @@ final class UserProfile extends Page
             ->dehydrated(false);
     }
 
-    private function getCurrentPasswordFormComponent(): Component
+    private function getCurrentPasswordFormComponent(): TextInput
     {
         return TextInput::make('currentPassword')
             ->label(__('filament-panels::auth/pages/edit-profile.form.current_password.label'))
@@ -443,7 +602,8 @@ final class UserProfile extends Page
             ->currentPassword(guard: Filament::getAuthGuard())
             ->revealable(filament()->arePasswordsRevealable())
             ->required()
-            ->visible(fn (Get $get): bool => filled($get('password')) || ($get('email') !== $this->getUser()->getAttributeValue('email')))
+            ->visible(fn (Get $get
+            ): bool => filled($get('password')) || ($get('email') !== $this->getUser()->getAttributeValue('email')))
             ->dehydrated(false);
     }
 
