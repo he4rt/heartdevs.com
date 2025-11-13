@@ -71,8 +71,11 @@ class EventModel extends Model
             ->withTimestamps();
     }
 
-    public function attend(mixed $userId, AttendingStatusEnum $status = AttendingStatusEnum::Attending): bool
+    public function attend(mixed $userId, AttendingStatusEnum $status = AttendingStatusEnum::Attending): void
     {
+        if ($this->isParticipating($userId)) {
+            return;
+        }
 
         $this->attendees()->attach($userId, ['status' => $status]);
 
@@ -81,8 +84,6 @@ class EventModel extends Model
             AttendingStatusEnum::Waitlist => $this->increment('waitlist_count'),
             default => throw new Exception('Unexpected match value'),
         };
-
-        return true;
     }
 
     public function isPast(): bool
@@ -109,19 +110,19 @@ class EventModel extends Model
         return true;
     }
 
-    public function participate($userId): bool
+    public function isParticipating($userId): bool
     {
         return $this->attendees()->where('user_id', $userId)->exists();
     }
 
     public function isAttending(): bool
     {
-        return $this->attendees()->first()->pivot->status === AttendingStatusEnum::Attending;
+        return $this->attendees->first()->pivot->status === AttendingStatusEnum::Attending;
     }
 
     public function onWaitlist(): bool
     {
-        return $this->attendees()->first()->pivot->status === AttendingStatusEnum::Waitlist;
+        return $this->attendees->first()->pivot->status === AttendingStatusEnum::Waitlist;
     }
 
     /**

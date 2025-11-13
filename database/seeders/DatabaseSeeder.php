@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace Database\Seeders;
 
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
+use Illuminate\Support\Facades\Date;
 use He4rt\Character\Models\Character;
-use He4rt\Events\Enums\AttendingStatusEnum;
 use He4rt\Events\Models\EventModel;
 use He4rt\Season\Models\Season;
 use He4rt\Tenant\Models\Tenant;
@@ -23,8 +23,6 @@ final class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // \App\Models\User::factory(10)->create();
-
         $user = User::factory()
             ->create([
                 'username' => 'admin',
@@ -44,22 +42,16 @@ final class DatabaseSeeder extends Seeder
                 'slug' => 'he4rt',
             ]);
 
-        Character::factory()->create([
-            'user_id' => $user->getKey(),
-            'tenant_id' => $tenant->getKey(),
-        ]);
-        EventModel::factory()->count(10)
-            ->afterCreating(function (EventModel $event): void {
-                $attendees = User::factory()->count(fake()->numberBetween(3, 10))->create();
+        Character::factory()
+            ->recycle($user)
+            ->recycle($tenant)
+            ->createOne();
 
-                foreach ($attendees as $user) {
-                    $event->attendees()->attach($user->id, [
-                        'status' => fake()->randomElement(AttendingStatusEnum::cases()),
-                    ]);
-                }
-            })
+        EventModel::factory()->count(10)
+            ->withStatus()
+            ->recycle($tenant)
             ->create([
-                'tenant_id' => $tenant->getKey(),
+                'end_at' => Date::tomorrow(),
             ]);
 
         Season::factory()
@@ -69,6 +61,5 @@ final class DatabaseSeeder extends Seeder
                 'started_at' => now()->subMonth(),
                 'ended_at' => today(),
             ]);
-
     }
 }

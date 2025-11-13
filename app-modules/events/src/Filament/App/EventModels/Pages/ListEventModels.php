@@ -11,7 +11,6 @@ use He4rt\Events\Actions\LeaveEventAction;
 use He4rt\Events\Filament\App\EventModels\EventModelResource;
 use He4rt\Events\Models\EventModel;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Support\Facades\Redirect;
 
 class ListEventModels extends ListRecords
 {
@@ -33,18 +32,12 @@ class ListEventModels extends ListRecords
     public function leave(string|int $eventModelId): void
     {
         $eventModel = EventModel::query()->find($eventModelId);
+
         app(LeaveEventAction::class)->execute($eventModel);
         Notification::make()
             ->success()
             ->body('Leaved Event Successfully')
             ->send();
-    }
-
-    public function view(string|int $eventId)
-    {
-        $url = EventModelResource::getUrl('show', ['record' => $eventId]);
-
-        return Redirect::to($url);
     }
 
     protected function modifyQueryWithActiveTab(Builder $query): Builder

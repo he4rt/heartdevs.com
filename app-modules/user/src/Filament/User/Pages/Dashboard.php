@@ -22,12 +22,6 @@ class Dashboard extends \Filament\Pages\Dashboard
     }
 
     #[Computed]
-    public function events()
-    {
-        return $this->tenant->events->where('active', true)->take(5);
-    }
-
-    #[Computed]
     public function stats()
     {
         return auth()->user()->character()->where('tenant_id', '=', $this->tenant->getKey())->first();

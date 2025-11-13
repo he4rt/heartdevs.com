@@ -4,9 +4,12 @@ declare(strict_types=1);
 
 namespace He4rt\Events\Database\Factories;
 
+use Exception;
+use He4rt\Events\Enums\AttendingStatusEnum;
 use He4rt\Events\Enums\EventTypeEnum;
 use He4rt\Events\Models\EventModel;
 use He4rt\Tenant\Models\Tenant;
+use He4rt\User\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Facades\Date;
 
@@ -36,5 +39,26 @@ final class EventFactory extends Factory
             'created_at' => Date::now(),
             'updated_at' => Date::now(),
         ];
+    }
+
+    public function withStatus(AttendingStatusEnum $status = AttendingStatusEnum::Attending): self
+    {
+        return $this->afterCreating(function (EventModel $model) use ($status): void {
+            $attendees = User::factory()->count(fake()->numberBetween(3, 10))->create();
+            $column = match ($status) {
+                AttendingStatusEnum::Attending => 'attendees_count',
+                AttendingStatusEnum::Waitlist => 'waitlist_count',
+                AttendingStatusEnum::NotAttending => throw new Exception('Event is not attending anymore'),
+            };
+            $model->update([
+                $column => $attendees->count(),
+            ]);
+
+            foreach ($attendees as $user) {
+                $model->attendees()->attach($user->getKey(), [
+                    'status' => $status,
+                ]);
+            }
+        });
     }
 }

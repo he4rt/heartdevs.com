@@ -63,8 +63,7 @@ it('should be able to see events details', function (): void {
         livewire(Dashboard::class)
             ->assertOk()
             ->assertSeeText($event->title)
-            ->assertSeeText('Past')
-            ->assertSeeText(Date::parse($event->starts_at)->format('h:i A'))
-            ->assertSeeText(Date::parse($event->ends_at)->format('h:i A'));
+            ->assertSeeText(Date::parse($event->starts_at)->format('d/m/Y H:i'))
+            ->assertSeeText(Date::parse($event->ends_at)->format('d/m/Y H:i'));
     });
 });

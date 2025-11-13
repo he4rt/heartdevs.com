@@ -1,5 +1,6 @@
 @php
     use Carbon\Carbon;
+    use He4rt\Events\Filament\App\EventModels\Widgets\LatestEvents;
     use Illuminate\Support\Facades\Date;
     $userExperience = $this->stats->experience ?? 0;
     $level = $this->stats->level ?? 1;
@@ -145,52 +146,5 @@
         </x-filament::card>
     </div>
 
-    <!-- Events -->
-    <div class="mt-4 w-full">
-        <x-filament::card>
-            <x-filament::section.heading class="text-white">Events</x-filament::section.heading>
-            <div class="space-y-2">
-                @forelse ($this->events as $event)
-                    <div
-                        class="meeting-card border-border hover:bg-muted/50 translate-y-2 transform rounded-lg border p-3 transition-colors"
-                    >
-                        <!-- Header -->
-                        <div class="mb-2 flex items-start justify-between">
-                            <h4 class="text-sm font-semibold">{{ $event->title }}</h4>
-                            <x-filament::badge color="primary" size="sm">
-                                {{ $event->end_at < now() ? 'Past' : 'Upcoming' }}
-                            </x-filament::badge>
-                        </div>
-
-                        <!-- Details -->
-                        <div class="text-muted-foreground space-y-1 text-xs">
-                            <!-- Day -->
-                            <div class="flex items-center gap-1.5">
-                                <x-heroicon-o-calendar class="h-3 w-3" />
-                                <span>{{ Carbon::parse($event->start_at)->format('l') }}</span>
-                            </div>
-
-                            <!-- Time -->
-                            <div class="flex items-center gap-1.5">
-                                <x-heroicon-o-clock class="h-3 w-3" />
-                                <span>
-                                    {{ Carbon::parse($event->starts_at)->format('h:i A') }}
-                                    -
-                                    {{ Carbon::parse($event->ends_at)->format('h:i A') }}
-                                </span>
-                            </div>
-
-                            <!-- Participants -->
-                            <div class="flex items-center gap-1.5">
-                                <x-heroicon-o-users class="h-3 w-3" />
-                                <span>{{ $event->participants_count }} participants</span>
-                            </div>
-                        </div>
-                    </div>
-                @empty
-                    <p class="text-muted-foreground text-center text-xs">No events scheduled for now.</p>
-                @endforelse
-            </div>
-        </x-filament::card>
-    </div>
+    @livewire(LatestEvents::class)
 </x-filament-panels::page>

@@ -115,7 +115,7 @@ it('should go to waitlist', function (): void {
 
     expect($event->attendees()->count())->toBe(5)
         ->and($event->fresh()->waitlist_count)->toBe(1)
-        ->and($event->participate(auth()->user()->id))->toBeTrue();
+        ->and($event->isParticipating(auth()->user()->id))->toBeTrue();
 });
 
 it('should be able to leave an event', function (): void {
@@ -134,5 +134,5 @@ it('should be able to leave an event', function (): void {
 
     $event->refresh();
     expect($event->attendees()->count())->toBe(4)
-        ->and($event->participate(auth()->user()->id))->tobeFalse();
+        ->and($event->isParticipating(auth()->user()->id))->tobeFalse();
 });
