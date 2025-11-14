@@ -1,0 +1,7 @@
+@import './support/index.css';
+
+@import './components/headline.css' layer(components);
+
+.fi-page-content {
+    @apply bg-elevation-surface bg-none;
+}
