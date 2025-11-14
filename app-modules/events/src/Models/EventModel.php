@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace He4rt\Events\Models;
 
+use Carbon\Traits\Date;
 use Exception;
 use He4rt\Events\Database\Factories\EventFactory;
 use He4rt\Events\Enums\AttendingStatusEnum;
@@ -30,6 +31,7 @@ use Illuminate\Database\Eloquent\Relations\Pivot;
  * @property int $attendees_count
  * @property int $waitlist_count
  * @property int $tenant_id
+ * @property Date $end_at
  */
 #[UseFactory(EventFactory::class)]
 class EventModel extends Model

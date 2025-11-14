@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Database\Seeders;
 
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
-use Illuminate\Support\Facades\Date;
 use He4rt\Character\Models\Character;
 use He4rt\Events\Models\EventModel;
 use He4rt\Season\Models\Season;
@@ -14,6 +13,7 @@ use He4rt\User\Models\Address;
 use He4rt\User\Models\Information;
 use He4rt\User\Models\User;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\Hash;
 
 final class DatabaseSeeder extends Seeder
