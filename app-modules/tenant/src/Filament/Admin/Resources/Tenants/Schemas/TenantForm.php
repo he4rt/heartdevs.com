@@ -6,6 +6,7 @@ namespace He4rt\Tenant\Filament\Admin\Resources\Tenants\Schemas;
 
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Toggle;
 use Filament\Schemas\Schema;
 
 class TenantForm
@@ -18,7 +19,8 @@ class TenantForm
                 TextInput::make('slug'),
                 Select::make('owner_id')
                     ->relationship('owner', 'name'),
-                Select::make('active')->boolean(),
+                Toggle::make('active')
+                    ->required(),
             ]);
     }
 }

@@ -7,6 +7,8 @@ namespace He4rt\Tenant\Filament\Admin\Resources\Tenants\Tables;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
+use Filament\Tables\Columns\IconColumn;
+use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 
 class TenantsTable
@@ -15,10 +17,14 @@ class TenantsTable
     {
         return $table
             ->columns([
-                //
-            ])
-            ->filters([
-                //
+                TextColumn::make('name')
+                    ->searchable(),
+                TextColumn::make('slug')
+                    ->searchable(),
+                TextColumn::make('owner.name')
+                    ->searchable(),
+                IconColumn::make('active')
+                    ->boolean(),
             ])
             ->recordActions([
                 EditAction::make(),

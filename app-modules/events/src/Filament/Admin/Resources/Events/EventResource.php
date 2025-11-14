@@ -25,6 +25,8 @@ class EventResource extends Resource
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::Calendar;
 
+    protected static ?string $label = 'Events';
+
     public static function form(Schema $schema): Schema
     {
         return EventForm::configure($schema);

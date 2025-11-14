@@ -23,7 +23,7 @@ class FeedbackResource extends Resource
 
     protected static string|UnitEnum|null $navigationGroup = 'General';
 
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
+    protected static string|BackedEnum|null $navigationIcon = Heroicon::SpeakerWave;
 
     protected static ?string $recordTitleAttribute = 'message';
 

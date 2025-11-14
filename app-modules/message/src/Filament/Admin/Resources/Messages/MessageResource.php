@@ -23,7 +23,7 @@ class MessageResource extends Resource
 
     protected static string|UnitEnum|null $navigationGroup = 'Gamefication';
 
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
+    protected static string|BackedEnum|null $navigationIcon = Heroicon::ChatBubbleBottomCenter;
 
     protected static ?string $recordTitleAttribute = 'content';
 
