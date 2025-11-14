@@ -9,8 +9,8 @@
     "license": "MIT",
     "require": {
         "php": "^8.3",
-        "filament/filament": "^4.2.0",
-        "filament/spatie-laravel-media-library-plugin": "^4.2.0",
+        "filament/filament": "^4.2.2",
+        "filament/spatie-laravel-media-library-plugin": "^4.2.2",
         "guzzlehttp/guzzle": "^7.10.0",
         "he4rt/authentication": ">=1",
         "he4rt/badge": ">=1",
