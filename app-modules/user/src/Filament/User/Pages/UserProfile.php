@@ -50,7 +50,7 @@ use Throwable;
 /**
  * @property-read Schema $form
  */
-final class UserProfile extends Page
+class UserProfile extends Page
 {
     use CanUseDatabaseTransactions;
     use HasMaxWidth;
