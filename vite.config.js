@@ -10,6 +10,7 @@ export default defineConfig({
                 'resources/js/app.js',
                 'resources/css/filament/admin/theme.css',
                 'app-modules/he4rt/resources/css/theme.css',
+                'app-modules/he4rt/resources/css/3pontos/theme.css',
             ],
             refresh: true,
         }),
