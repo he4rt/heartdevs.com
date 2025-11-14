@@ -2,7 +2,7 @@
     @apply flex h-full flex-col justify-between rounded-lg;
     @apply gap-4;
     @apply p-6;
-    @apply border-border border;
+    @apply border-outline-low border;
 }
 
 .hp-card-density-compact {
@@ -14,7 +14,7 @@
 }
 
 .hp-card-interactive {
-    @apply hover:border-primary-purple transition-all duration-500 hover:scale-[1.02];
+    @apply hover:border-primary transition-all duration-500 hover:scale-[1.02];
 }
 
 .hp-card-icon {
@@ -22,7 +22,7 @@
 }
 
 .hp-card-header {
-    @apply border-border border-b pb-4;
+    @apply border-outline-low border-b pb-4;
 }
 
 .hp-card-body {
@@ -50,7 +50,7 @@
 }
 
 .hp-card-footer {
-    @apply border-border border-t pt-4;
+    @apply border-outline-low border-t pt-4;
 }
 
 .hp-card-disabled {

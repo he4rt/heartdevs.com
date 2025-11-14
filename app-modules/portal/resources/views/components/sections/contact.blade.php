@@ -1,7 +1,7 @@
 <section class="hp-section" id="contact">
     <div class="hp-container">
         <div class="grid grid-cols-1 gap-8 lg:grid-cols-2">
-            <div class="border-border flex flex-1 flex-col gap-8 rounded-lg border p-8">
+            <div class="border-outline-low flex flex-1 flex-col gap-8 rounded-lg border p-8">
                 <x-he4rt::headline size="md">
                     <x-slot:title>Entre em contato conosco</x-slot>
                     <x-slot:description>
@@ -9,7 +9,7 @@
                     </x-slot>
                 </x-he4rt::headline>
 
-                <hr />
+                <hr class="border-outline-low" />
 
                 <x-he4rt::input label="Nome completo" />
                 <x-he4rt::input label="Email" />
@@ -40,7 +40,7 @@
                         </x-he4rt::headline>
                     </div>
 
-                    <div class="border-border flex flex-col gap-4 rounded-lg border p-8">
+                    <div class="border-outline-low flex flex-col gap-4 rounded-lg border p-8">
                         <x-he4rt::headline class="mx-0" size="sm">
                             <x-slot:title>Redes sociais</x-slot>
                             <x-slot:description>Lorem ipsum dolor sit amet, consectetur</x-slot>

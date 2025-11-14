@@ -5,9 +5,9 @@
                 <x-he4rt::card>
                     <x-slot:icon>
                         <div
-                            class="bg-primary-purple/8 border-primary-purple/16 flex w-fit items-center justify-center rounded-lg border p-2"
+                            class="bg-primary/8 border-primary/16 flex w-fit items-center justify-center rounded-lg border p-2"
                         >
-                            <x-filament::icon icon="heroicon-o-code-bracket" class="text-primary-purple h-4 w-4" />
+                            <x-filament::icon icon="heroicon-o-code-bracket" class="text-primary h-4 w-4" />
                         </div>
                     </x-slot>
                     <x-slot:title>Comunidade</x-slot>
@@ -18,9 +18,9 @@
                 <x-he4rt::card>
                     <x-slot:icon>
                         <div
-                            class="bg-primary-purple/8 border-primary-purple/16 flex w-fit items-center justify-center rounded-lg border p-2"
+                            class="bg-primary/8 border-primary/16 flex w-fit items-center justify-center rounded-lg border p-2"
                         >
-                            <x-filament::icon icon="heroicon-o-code-bracket" class="text-primary-purple h-4 w-4" />
+                            <x-filament::icon icon="heroicon-o-code-bracket" class="text-primary h-4 w-4" />
                         </div>
                     </x-slot>
                     <x-slot:title>Comunidade</x-slot>
@@ -31,9 +31,9 @@
                 <x-he4rt::card>
                     <x-slot:icon>
                         <div
-                            class="bg-primary-purple/8 border-primary-purple/16 flex w-fit items-center justify-center rounded-lg border p-2"
+                            class="bg-primary/8 border-primary/16 flex w-fit items-center justify-center rounded-lg border p-2"
                         >
-                            <x-filament::icon icon="heroicon-o-code-bracket" class="text-primary-purple h-4 w-4" />
+                            <x-filament::icon icon="heroicon-o-code-bracket" class="text-primary h-4 w-4" />
                         </div>
                     </x-slot>
                     <x-slot:title>Comunidade</x-slot>
@@ -44,9 +44,9 @@
                 <x-he4rt::card>
                     <x-slot:icon>
                         <div
-                            class="bg-primary-purple/8 border-primary-purple/16 flex w-fit items-center justify-center rounded-lg border p-2"
+                            class="bg-primary/8 border-primary/16 flex w-fit items-center justify-center rounded-lg border p-2"
                         >
-                            <x-filament::icon icon="heroicon-o-code-bracket" class="text-primary-purple h-4 w-4" />
+                            <x-filament::icon icon="heroicon-o-code-bracket" class="text-primary h-4 w-4" />
                         </div>
                     </x-slot>
                     <x-slot:title>Comunidade</x-slot>

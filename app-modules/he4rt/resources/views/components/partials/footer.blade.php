@@ -43,7 +43,7 @@
             </div>
         </div>
 
-        <hr />
+        <hr class="border-outline-low" />
 
         <div class="hp-footer-bottom">
             <span>© 2025 He4rtDevs</span>

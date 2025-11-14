@@ -8,7 +8,7 @@
 }
 
 .hp-avatar-stack-images > .hp-avatar {
-    @apply ring-background ring-2;
+    @apply ring-elevation-surface ring-2;
     @apply transition-all duration-200 ease-in-out;
 }
 

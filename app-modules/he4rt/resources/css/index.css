@@ -21,7 +21,7 @@
 @source '../**/*.php';
 
 .fi-topbar {
-    @apply bg-background p-4 px-12 shadow-none ring-0;
+    @apply bg-elevation-surface p-4 px-12 shadow-none ring-0;
 }
 
 .fi-topbar-start {
@@ -44,7 +44,7 @@
 
                 &::after {
                     content: '';
-                    @apply bg-primary-purple absolute bottom-0 left-0 h-0.5 w-full;
+                    @apply bg-primary absolute bottom-0 left-0 h-0.5 w-full;
                     @apply origin-left scale-x-0 transform;
                     @apply transition-transform duration-200 ease-in-out;
                 }
@@ -67,7 +67,7 @@
 
         &::after {
             content: '';
-            @apply bg-primary-purple absolute bottom-0 left-0 h-0.5 w-full;
+            @apply bg-primary absolute bottom-0 left-0 h-0.5 w-full;
             @apply origin-left scale-x-0 transform;
             @apply transition-transform duration-200 ease-in-out;
         }
@@ -83,7 +83,7 @@
 }
 
 .fi-page-content {
-    @apply from-primary-purple/12 to-background gap-0 bg-gradient-to-br;
+    @apply from-primary/12 to-elevation-surface gap-0 bg-gradient-to-br;
 }
 
 .fi-page-header-main-ctn {
