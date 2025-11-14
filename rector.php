@@ -35,10 +35,7 @@ return RectorConfig::configure()
         __DIR__.'/app-modules/*/routes',
         __DIR__.'/app-modules/*/tests',
     ])
-    ->withSkip([
-        __DIR__.'/bootstrap/cache',
-        __DIR__.'/storage',
-    ])
+    ->withSkip([__DIR__.'/bootstrap/cache'])
     ->withCache(cacheDirectory: sys_get_temp_dir().'/rector_cache', cacheClass: FileCacheStorage::class)
     ->withImportNames(importShortClasses: false, removeUnusedImports: true)
     ->withRootFiles()
