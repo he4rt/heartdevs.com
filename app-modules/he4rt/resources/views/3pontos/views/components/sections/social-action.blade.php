@@ -1,10 +1,20 @@
 <section class="hp-section relative">
-    <div class="hp-container relative z-10 grid grid-cols-1 items-start gap-12 lg:grid-cols-[1fr_4fr]">
-        <div class="flex">
+    <div
+        class="absolute bottom-0 left-0 z-1 flex -translate-x-[5%] justify-start sm:origin-top sm:translate-y-32 sm:rotate-90 lg:rotate-0"
+    >
+        <img
+            src="{{ asset('images/3pontos/logo-chain.png') }}"
+            alt=""
+            class="hidden h-auto w-full object-contain sm:block sm:max-w-full lg:max-w-[80%]"
+        />
+    </div>
+
+    <div class="hp-container relative z-10 grid grid-cols-1 items-start gap-x-12 lg:grid-cols-[1fr_4fr]">
+        <div class="mb-4 flex items-center justify-center sm:justify-start">
             <x-3pontos::section-title size="lg">Prova social</x-3pontos::section-title>
         </div>
 
-        <div class="flex flex-col">
+        <div class="flex flex-col gap-8">
             <div>
                 <x-he4rt::headline>
                     <x-slot:title>Contribua com nossa ação social</x-slot>
@@ -15,6 +25,37 @@
                         <x-he4rt::button>Button</x-he4rt::button>
                     </x-slot>
                 </x-he4rt::headline>
+            </div>
+
+            <div class="grid grid-cols-1 gap-8 lg:grid-cols-4">
+                <x-he4rt::card>
+                    <x-slot:icon class="font-family-secondary text-4xl">01</x-slot>
+                    <x-slot:title>Primeiro Passo</x-slot>
+                    <x-slot:description>
+                        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent vestibulum a augue at ornare.
+                    </x-slot>
+                </x-he4rt::card>
+                <x-he4rt::card>
+                    <x-slot:icon class="font-family-secondary text-4xl">02</x-slot>
+                    <x-slot:title>Primeiro Passo</x-slot>
+                    <x-slot:description>
+                        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent vestibulum a augue at ornare.
+                    </x-slot>
+                </x-he4rt::card>
+                <x-he4rt::card>
+                    <x-slot:icon class="font-family-secondary text-4xl">03</x-slot>
+                    <x-slot:title>Primeiro Passo</x-slot>
+                    <x-slot:description>
+                        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent vestibulum a augue at ornare.
+                    </x-slot>
+                </x-he4rt::card>
+                <x-he4rt::card>
+                    <x-slot:icon class="font-family-secondary text-4xl">04</x-slot>
+                    <x-slot:title>Primeiro Passo</x-slot>
+                    <x-slot:description>
+                        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent vestibulum a augue at ornare.
+                    </x-slot>
+                </x-he4rt::card>
             </div>
         </div>
     </div>

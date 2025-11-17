@@ -5,3 +5,7 @@
 .hp-headline-highlight {
     @apply text-text-medium;
 }
+
+.hp-headline-actions {
+    @apply mt-8;
+}
