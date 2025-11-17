@@ -1,5 +1,9 @@
+.hp-card {
+    @apply lg:gap-6;
+}
+
 .hp-card-interactive {
-    @apply border-b-outline-low/32 hover:border-outline-medium/60 transition-all duration-500 hover:scale-[1.02];
+    @apply border-outline-low/80 hover:border-outline-medium/32 transition-all duration-500 hover:scale-[1.02];
 }
 
 .hp-card-variant-solid {

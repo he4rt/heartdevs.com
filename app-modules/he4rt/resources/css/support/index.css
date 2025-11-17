@@ -76,6 +76,8 @@
     --color-icon-high: var(--icon-high);
     --color-icon-medium: var(--icon-medium);
     --color-icon-low: var(--icon-low);
+    --color-icon-dark: var(--icon-dark);
+    --color-icon-light: var(--icon-light);
 
     --color-outline-high: var(--outline-high);
     --color-outline-medium: var(--outline-medium);

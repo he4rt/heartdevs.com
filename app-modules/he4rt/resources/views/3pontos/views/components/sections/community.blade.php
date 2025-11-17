@@ -1,6 +1,6 @@
 <section class="hp-section">
     <div class="hp-container grid grid-cols-1 items-start gap-x-12 lg:grid-cols-[1fr_4fr]">
-        <div class="mb-4 flex items-center justify-center sm:justify-start">
+        <div class="mb-4 ml-2 flex items-center justify-center sm:justify-start">
             <x-3pontos::section-title size="lg">Comunidade 3 pontos</x-3pontos::section-title>
         </div>
 
@@ -18,8 +18,8 @@
             </x-he4rt::headline>
         </div>
 
-        <div class="col-span-2 grid grid-cols-8 gap-4">
-            <x-he4rt::card class="col-span-5">
+        <div class="grid grid-cols-1 gap-8 lg:col-span-2 lg:grid-cols-8 lg:gap-4">
+            <x-he4rt::card class="lg:col-span-5">
                 <x-slot:title>Participe de Desafios que Importam</x-slot>
                 <x-slot:description>
                     Esqueça exercícios de código genéricos. Na comunidade 3 Pontos, você trabalha em projetos reais
@@ -28,7 +28,7 @@
                 </x-slot>
             </x-he4rt::card>
 
-            <x-he4rt::card class="col-span-3">
+            <x-he4rt::card class="lg:col-span-3">
                 <x-slot:title>Networking com Líderes e Pares</x-slot>
                 <x-slot:description>
                     Aqui você não é apenas um número. Você é parte de uma comunidade onde líderes de mercado, founders e
@@ -37,7 +37,7 @@
                 </x-slot>
             </x-he4rt::card>
 
-            <x-he4rt::card class="col-span-3">
+            <x-he4rt::card class="lg:col-span-3">
                 <x-slot:title>Educação Que Acompanha o Mercado</x-slot>
                 <x-slot:description>
                     O mercado de tecnologia evolui a cada dia. Nós também. Acesso a webinars, workshops e discussões
@@ -46,7 +46,7 @@
                 </x-slot>
             </x-he4rt::card>
 
-            <x-he4rt::card class="col-span-5">
+            <x-he4rt::card class="lg:col-span-5">
                 <x-slot:title>Vagas e Projetos Exclusivos</x-slot>
                 <x-slot:description>
                     Empresas parceiras buscam talentos na comunidade 3 Pontos. Vagas de emprego, projetos freelancer e

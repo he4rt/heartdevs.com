@@ -10,7 +10,7 @@
     </div>
 
     <div class="hp-container relative z-10 grid grid-cols-1 items-start gap-x-12 lg:grid-cols-[1fr_4fr]">
-        <div class="mb-4 flex items-center justify-center sm:justify-start">
+        <div class="mb-4 ml-2 flex items-center justify-center sm:justify-start">
             <x-3pontos::section-title size="lg">Prova social</x-3pontos::section-title>
         </div>
 
