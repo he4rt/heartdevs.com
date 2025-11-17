@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace App\Rules;
 
-use Illuminate\Support\Facades\Date;
-use Illuminate\Translation\PotentiallyTranslatedString;
 use Closure;
 use He4rt\Events\Models\EventModel;
 use Illuminate\Contracts\Validation\ValidationRule;
+use Illuminate\Support\Facades\Date;
+use Illuminate\Translation\PotentiallyTranslatedString;
 
 class AvailableTalkSchedule implements ValidationRule
 {
@@ -20,7 +20,7 @@ class AvailableTalkSchedule implements ValidationRule
     /**
      * Run the validation rule.
      *
-     * @param Closure(string, ?string=):PotentiallyTranslatedString $fail
+     * @param  Closure(string, ?string=):PotentiallyTranslatedString  $fail
      */
     public function validate(string $attribute, mixed $value, Closure $fail): void
     {
