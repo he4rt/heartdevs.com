@@ -24,6 +24,8 @@ return new class extends Migration
             $table->string('field_type'); // IA, Dev, Design, etc.
             $table->string('title');
             $table->text('description');
+            $table->timestamp('starts_at');
+            $table->timestamp('ends_at');
             $table->timestamps();
         });
     }

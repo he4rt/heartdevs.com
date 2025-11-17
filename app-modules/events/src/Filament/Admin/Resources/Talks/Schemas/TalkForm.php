@@ -7,8 +7,10 @@ namespace He4rt\Events\Filament\Admin\Resources\Talks\Schemas;
 use Filament\Forms\Components\RichEditor;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
+use Filament\Schemas\Components\Flex;
+use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
-use He4rt\Events\Enums\Talks\TalkStatusEnum;
+use He4rt\Events\Filament\Shared\Schemas\StartEndFieldsSchema;
 
 class TalkForm
 {
@@ -16,34 +18,58 @@ class TalkForm
     {
         return $schema
             ->components([
-                Select::make('tenant_id')
-                    ->label('Tenant')
-                    ->relationship('tenant', 'name')
-                    ->required(),
-                Select::make('user_id')
-                    ->label('User')
-                    ->relationship('user', 'username')
-                    ->required(),
-                Select::make('event_id')
-                    ->label('EventModel')
-                    ->relationship('event', 'title')
-                    ->required(),
-                TextInput::make('title')
-                    ->label('Title')
-                    ->minLength(3)
-                    ->maxLength(255)
-                    ->required(),
-                Select::make('status')
-                    ->enum(TalkStatusEnum::class)
-                    ->options(TalkStatusEnum::class)
-                    ->required(),
-                TextInput::make('field_type')
-                    ->maxLength(255)
-                    ->required(),
-                RichEditor::make('description')
-                    ->minLength(5)
-                    ->maxLength(255)
-                    ->required(),
+
+                Flex::make([
+                    Section::make('Proposta da Palestra')
+                        ->description('Defina o evento, título e tipo da sua proposta.')
+                        ->icon('heroicon-m-clipboard-document-list')
+                        ->schema([
+                            Select::make('tenant_id')
+                                ->label('Tenant')
+                                ->relationship('tenant', 'name')
+                                ->required()
+                                ->live()
+                                ->columnSpan(1),
+                            Select::make('user_id')
+                                ->label('User')
+                                ->relationship('user', 'username')
+                                ->required()
+                                ->live()
+                                ->columnSpan(1),
+
+                            TextInput::make('field_type')
+                                ->label('Tipo')
+                                ->minLength(3)
+                                ->maxlength(255)
+                                ->required()
+                                ->columnSpan(1),
+                            TextInput::make('title')
+                                ->label('Título da Proposta')
+                                ->minLength(3)
+                                ->maxlength(255)
+                                ->required()
+                                ->columnSpanFull(),
+                            Section::make('Horários da Palestra')
+                                ->description('Forneça os horários da sua palestra')
+                                ->schema(
+                                    StartEndFieldsSchema::make(),
+                                ),
+                        ])->columnSpan(3),
+
+                ])
+                    ->columnSpanFull(),
+
+                Section::make('Detalhes e Conteúdo')
+                    ->description('Forneça a descrição completa da sua palestra e o que o público aprenderá.')
+                    ->icon('heroicon-m-document-text')
+                    ->schema([
+                        RichEditor::make('description')
+                            ->label('Descrição Completa')
+                            ->required()
+                            ->columnSpanFull(),
+                    ])
+                    ->columnSpanFull(),
+
             ]);
     }
 }
