@@ -1,7 +1,7 @@
 .hp-button {
     @apply relative inline-flex cursor-pointer items-center justify-center font-medium;
 
-    @apply w-full lg:w-auto;
+    @apply w-full sm:w-auto;
 
     @apply gap-2;
 

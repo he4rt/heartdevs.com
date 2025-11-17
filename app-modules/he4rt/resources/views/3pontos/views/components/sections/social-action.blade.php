@@ -1,22 +1,22 @@
 <section class="hp-section relative">
     <div
-        class="absolute bottom-0 left-0 z-1 flex origin-top -translate-x-[5%] rotate-90 justify-start sm:translate-y-32 lg:translate-y-24 lg:rotate-0"
+        class="absolute bottom-0 left-0 z-1 flex origin-top rotate-90 justify-start sm:-translate-x-[20%] sm:translate-y-32 lg:-translate-x-[5%] lg:translate-y-24 lg:rotate-0"
     >
         <img
             src="{{ asset('images/3pontos/logo-chain.png') }}"
             alt=""
-            class="hidden h-auto w-full object-contain sm:block sm:max-w-full lg:max-w-[80%]"
+            class="hidden h-auto w-full object-contain sm:block sm:max-w-[80%]"
         />
     </div>
 
     <div class="hp-container relative z-10 grid grid-cols-1 items-start gap-x-12 lg:grid-cols-[1fr_4fr]">
-        <div class="mb-4 ml-2 flex items-center justify-center sm:justify-start">
+        <div class="mb-4 flex items-center justify-center sm:justify-start">
             <x-3pontos::section-title size="lg">Prova social</x-3pontos::section-title>
         </div>
 
         <div class="flex flex-col gap-8">
             <div>
-                <x-he4rt::headline>
+                <x-he4rt::headline class="mx-0">
                     <x-slot:title>Contribua com nossa ação social</x-slot>
                     <x-slot:description>
                         Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent vestibulum a augue at ornare.
