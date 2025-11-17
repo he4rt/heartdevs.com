@@ -3,7 +3,7 @@
 }
 
 .hp-section-title.hp-section-title-size-lg {
-    @apply text-xl;
+    @apply text-sm sm:text-lg lg:text-xl;
 }
 
 .hp-section-title::after {
