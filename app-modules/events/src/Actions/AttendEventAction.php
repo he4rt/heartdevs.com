@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace He4rt\Events\Actions;
 
+use Exception;
 use He4rt\Events\Models\EventModel;
 
 final class AttendEventAction
