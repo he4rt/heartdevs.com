@@ -17,6 +17,7 @@ use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
 use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Session\Middleware\StartSession;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
+use Illuminate\View\View;
 
 class EventPanelProvider extends PanelProvider
 {
@@ -34,6 +35,12 @@ class EventPanelProvider extends PanelProvider
             ->pages([
                 He4rtPage::class,
             ])
+            ->brandLogo(fn (): View => view('he4rt::components.logo',
+                [
+                    'href' => '/event',
+                    'path' => 'images/3pontos/logo.svg',
+                ])
+            )
             ->topNavigation()
             ->discoverWidgets(in: app_path('Filament/Event/Widgets'), for: 'App\Filament\Event\Widgets')
             ->middleware([

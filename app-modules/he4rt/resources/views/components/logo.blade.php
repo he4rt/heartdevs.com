@@ -1,7 +1,9 @@
 @props([
+    'href' => '/',
+    'path' => 'images/logo.svg',
     'size' => 'md',
 ])
 
-<a href="/">
-    <img src="{{ asset('images/logo.svg') }}" alt="logo" class="mb-4 w-40 cursor-pointer" />
+<a href="{{ $href }}">
+    <img src="{{ asset($path) }}" alt="logo" class="mb-4 w-full max-w-40 cursor-pointer" />
 </a>
