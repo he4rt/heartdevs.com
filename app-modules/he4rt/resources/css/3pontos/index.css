@@ -4,6 +4,7 @@
 @import './components/button.css' layer(components);
 @import './components/card.css' layer(components);
 @import './components/section-title.css' layer(components);
+@import './components/section.css' layer(components);
 
 .fi-topbar {
     @apply ring-1;
