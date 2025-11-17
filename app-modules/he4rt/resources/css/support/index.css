@@ -70,6 +70,8 @@
     --color-text-high: var(--text-high);
     --color-text-medium: var(--text-medium);
     --color-text-low: var(--text-low);
+    --color-text-dark: var(--text-dark);
+    --color-text-light: var(--text-light);
 
     --color-icon-high: var(--icon-high);
     --color-icon-medium: var(--icon-medium);
