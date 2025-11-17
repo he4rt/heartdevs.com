@@ -1,5 +1,9 @@
 .hp-section-title {
-    @apply bg-elevation-surface text-text-medium relative flex w-fit font-semibold;
+    @apply bg-elevation-surface text-text-medium relative mt-3 flex w-fit font-semibold;
+}
+
+.hp-section-title.hp-section-title-size-lg {
+    @apply text-xl;
 }
 
 .hp-section-title::after {
