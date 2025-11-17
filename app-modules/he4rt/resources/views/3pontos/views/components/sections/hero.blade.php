@@ -7,7 +7,7 @@
     </div>
 
     <div
-        class="pointer-events-none absolute top-1/2 right-0 z-5 hidden w-[600px] translate-x-1/2 -translate-y-1/2 xl:block"
+        class="pointer-events-none absolute top-1/2 right-0 z-5 hidden w-[600px] translate-x-1/3 -translate-y-1/2 xl:block"
     >
         <img
             src="{{ asset('images/3pontos/logo-rounded.svg') }}"
