@@ -20,6 +20,16 @@
 @source '../**/*.blade.php';
 @source '../**/*.php';
 
+@keyframes spin-slow {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.spin-slow {
+    animation: spin-slow 40s linear infinite;
+}
+
 .fi-topbar {
     @apply bg-elevation-surface p-4 px-12 shadow-none ring-0;
 }
