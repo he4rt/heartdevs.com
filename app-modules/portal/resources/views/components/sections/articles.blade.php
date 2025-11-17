@@ -2,8 +2,10 @@
     <div class="hp-container">
         <x-he4rt::headline align="center" size="md" :keywords="['fodas']">
             <x-slot:badge>
-                <x-filament::icon icon="heroicon-o-document-text" class="h-5 w-5" />
-                Nossos artigos
+                <x-he4rt::badge>
+                    <x-filament::icon icon="heroicon-o-document-text" class="h-5 w-5" />
+                    Nossos artigos
+                </x-he4rt::badge>
             </x-slot>
 
             <x-slot:title>Artigos fodas da comunidade</x-slot>

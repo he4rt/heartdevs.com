@@ -18,7 +18,9 @@
 
     <div class="hp-container relative z-10 max-w-6xl px-6 lg:px-12">
         <x-he4rt::headline>
-            <x-slot:badge>Section name</x-slot>
+            <x-slot:badge>
+                <x-3pontos::section-title>Section name</x-3pontos::section-title>
+            </x-slot>
             <x-slot:title>Participe do primeiro evento presencial da 3Pontos</x-slot>
             <x-slot:description>
                 O Meetup da He4rt é um evento que reúne os nosso membros presencialmente e virtualmente pra trocarmos

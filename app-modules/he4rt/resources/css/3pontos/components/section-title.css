@@ -1,0 +1,8 @@
+.hp-section-title {
+    @apply bg-elevation-surface text-text-medium relative flex w-fit font-semibold;
+}
+
+.hp-section-title::after {
+    content: '';
+    @apply bg-icon-high absolute -top-3 right-0 left-0 h-1.5 w-full rounded-full;
+}

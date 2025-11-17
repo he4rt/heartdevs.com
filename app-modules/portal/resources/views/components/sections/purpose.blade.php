@@ -58,8 +58,10 @@
             <div class="order-1 flex flex-col items-center justify-center sm:order-2">
                 <x-he4rt::headline size="md" :keywords="['jornada']">
                     <x-slot:badge>
-                        <x-filament::icon icon="heroicon-o-cursor-arrow-ripple" class="h-5 w-5" />
-                        Nossa missão
+                        <x-he4rt::badge>
+                            <x-filament::icon icon="heroicon-o-cursor-arrow-ripple" class="h-5 w-5" />
+                            Nossa missão
+                        </x-he4rt::badge>
                     </x-slot>
 
                     <x-slot:title>Transformando a jornada em desenvolvimento</x-slot>

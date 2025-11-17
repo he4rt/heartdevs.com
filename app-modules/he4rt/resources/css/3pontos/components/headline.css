@@ -5,16 +5,3 @@
 .hp-headline-highlight {
     @apply text-text-medium;
 }
-
-.hp-headline-badge {
-    @apply bg-elevation-surface text-text-medium relative flex w-fit items-start justify-start rounded-none border-0 p-0 font-semibold;
-}
-
-.hp-headline-badge::after {
-    content: '';
-    @apply bg-icon-high absolute -top-3 right-0 left-0 h-1.5 w-full rounded-full;
-}
-
-.hp-headline-badge:hover {
-    @apply bg-elevation-surface;
-}
