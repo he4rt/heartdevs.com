@@ -1,6 +1,6 @@
 <section class="hp-section relative">
     <div
-        class="absolute bottom-0 left-0 z-1 flex -translate-x-[5%] justify-start sm:origin-top sm:translate-y-32 sm:rotate-90 lg:rotate-0"
+        class="absolute bottom-0 left-0 z-1 flex origin-top -translate-x-[5%] rotate-90 justify-start sm:translate-y-32 lg:translate-y-24 lg:rotate-0"
     >
         <img
             src="{{ asset('images/3pontos/logo-chain.png') }}"
