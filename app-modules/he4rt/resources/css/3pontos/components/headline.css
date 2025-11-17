@@ -2,6 +2,10 @@
     @apply font-family-secondary font-regular leading-[150%];
 }
 
+.hp-headline-highlight {
+    @apply text-text-medium;
+}
+
 .hp-headline-badge {
     @apply bg-elevation-surface text-text-medium relative flex w-fit items-start justify-start rounded-none border-0 p-0 font-semibold;
 }
