@@ -3,13 +3,17 @@
 }
 
 .hp-card-variant-solid {
-    @apply bg-elevation-01dp/32 backdrop-blur-md;
+    @apply bg-elevation-surface/32 backdrop-blur-md;
 }
 
 .hp-card-title {
     @apply font-family-secondary font-regular text-base;
 }
 
+.hp-card-description {
+    @apply text-sm;
+}
+
 .hp-card-body {
-    @apply gap-y-4;
+    @apply mt-auto gap-y-4;
 }
