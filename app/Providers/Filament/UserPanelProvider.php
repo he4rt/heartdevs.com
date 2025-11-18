@@ -10,11 +10,11 @@ use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
-use Filament\Pages\Dashboard;
 use Filament\Panel;
 use Filament\PanelProvider;
 use Filament\Support\Colors\Color;
 use He4rt\Tenant\Models\Tenant;
+use He4rt\User\Filament\User\Pages\Dashboard;
 use He4rt\User\Filament\User\Pages\UserProfile;
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
 use Illuminate\Cookie\Middleware\EncryptCookies;
@@ -33,7 +33,7 @@ final class UserPanelProvider extends PanelProvider
             ->path('app')
             ->login(Login::class)
             ->sidebarCollapsibleOnDesktop()
-            ->viteTheme('resources/css/filament/admin/theme.css')
+            ->viteTheme('resources/css/filament/user/theme.css')
             ->tenant(Tenant::class, 'slug', 'ownedTenants')
             ->userMenuItems([
                 Action::make('settings')

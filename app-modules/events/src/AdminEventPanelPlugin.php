@@ -7,8 +7,8 @@ namespace He4rt\Events;
 use App\Enums\FilamentPanel;
 use Filament\Contracts\Plugin;
 use Filament\Panel;
-use He4rt\Events\Filament\Resources\Events\EventResource;
-use He4rt\Events\Filament\Resources\Talks\TalkResource;
+use He4rt\Events\Filament\Admin\Resources\Events\EventResource;
+use He4rt\Events\Filament\Admin\Resources\Talks\TalkResource;
 
 class AdminEventPanelPlugin implements Plugin
 {

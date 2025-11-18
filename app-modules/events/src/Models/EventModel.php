@@ -4,19 +4,24 @@ declare(strict_types=1);
 
 namespace He4rt\Events\Models;
 
+use Carbon\Traits\Date;
 use Exception;
 use He4rt\Events\Database\Factories\EventFactory;
 use He4rt\Events\Enums\AttendingStatusEnum;
 use He4rt\Events\Enums\EventTypeEnum;
+use He4rt\Events\Enums\Talks\TalkStatusEnum;
 use He4rt\Events\Models\Pivot\EventAttend;
 use He4rt\Tenant\Models\Tenant;
 use He4rt\User\Models\User;
 use Illuminate\Database\Eloquent\Attributes\Scope;
 use Illuminate\Database\Eloquent\Attributes\UseFactory;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 use Illuminate\Database\Eloquent\Relations\Pivot;
 
 /**
@@ -30,11 +35,14 @@ use Illuminate\Database\Eloquent\Relations\Pivot;
  * @property int $attendees_count
  * @property int $waitlist_count
  * @property int $tenant_id
+ * @property Date $end_at
+ * @property Date $start_at
  */
 #[UseFactory(EventFactory::class)]
 class EventModel extends Model
 {
     use HasFactory;
+
     protected $table = 'events';
 
     protected $fillable = [
@@ -70,8 +78,11 @@ class EventModel extends Model
             ->withTimestamps();
     }
 
-    public function attend(mixed $userId, AttendingStatusEnum $status = AttendingStatusEnum::Attending): bool
+    public function attend(mixed $userId, AttendingStatusEnum $status = AttendingStatusEnum::Attending): void
     {
+        if ($this->isParticipating($userId)) {
+            return;
+        }
 
         $this->attendees()->attach($userId, ['status' => $status]);
 
@@ -80,8 +91,11 @@ class EventModel extends Model
             AttendingStatusEnum::Waitlist => $this->increment('waitlist_count'),
             default => throw new Exception('Unexpected match value'),
         };
+    }
 
-        return true;
+    public function isPast(): bool
+    {
+        return $this->end_at < now();
     }
 
     public function leave(mixed $userId): bool
@@ -103,12 +117,58 @@ class EventModel extends Model
         return true;
     }
 
+    public function isParticipating($userId): bool
+    {
+        return $this->attendees()->where('user_id', $userId)->exists();
+    }
+
+    public function isAttending(): bool
+    {
+        return $this->attendees->first()->pivot->status === AttendingStatusEnum::Attending;
+    }
+
+    public function onWaitlist(): bool
+    {
+        return $this->attendees->first()->pivot->status === AttendingStatusEnum::Waitlist;
+    }
+
     /**
      * @return BelongsTo<Tenant, $this>
      */
     public function tenant(): BelongsTo
     {
         return $this->belongsTo(Tenant::class);
+    }
+
+    /**
+     * @return HasMany<Talk, $this>
+     */
+    public function talks(): HasMany
+    {
+        return $this->hasMany(Talk::class, 'event_id');
+    }
+
+    /**
+     * @return HasManyThrough<User, Talk>
+     */
+    public function speakers(): HasManyThrough
+    {
+        return $this->hasManyThrough(User::class, Talk::class, 'user_id');
+    }
+
+    #[Scope]
+    protected function availableHours(Builder $query, string $start, string $end): Builder
+    {
+        $query->where('start_at', '<=', $start)
+            ->where('end_at', '>=', $end);
+
+        return $query->whereDoesntHave('talks', function (Builder $talkQuery) use ($start, $end): void {
+            $talkQuery
+                ->whereIn('status', [TalkStatusEnum::Accepted->value, TalkStatusEnum::Done->value]);
+
+            $talkQuery->where('starts_at', '<', $end)
+                ->where('ends_at', '>', $start);
+        });
     }
 
     #[Scope]

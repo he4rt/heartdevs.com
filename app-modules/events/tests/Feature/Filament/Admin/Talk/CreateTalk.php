@@ -5,7 +5,7 @@ declare(strict_types=1);
 use App\Enums\FilamentPanel;
 use Filament\Facades\Filament;
 use He4rt\Events\Enums\Talks\TalkStatusEnum;
-use He4rt\Events\Filament\Resources\Talks\Pages\CreateTalk;
+use He4rt\Events\Filament\Admin\Resources\Talks\Pages\CreateTalk;
 use He4rt\Events\Models\EventModel;
 use He4rt\Events\Models\Talk;
 use He4rt\User\Models\User;
@@ -36,6 +36,8 @@ it('should be able to register a talk', function (): void {
             'status' => TalkStatusEnum::Pending->value,
             'field_type' => 'some text right there',
             'description' => 'description you know',
+            'starts_at' => now(),
+            'ends_at' => now()->addHour(),
         ])
         ->call('create')
         ->assertHasNoFormErrors();

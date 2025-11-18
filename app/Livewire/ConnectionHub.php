@@ -5,7 +5,9 @@ declare(strict_types=1);
 namespace App\Livewire;
 
 use He4rt\Authentication\Enums\OAuthProviderEnum;
+use He4rt\Tenant\Models\Tenant;
 use Illuminate\Contracts\View\View;
+use Illuminate\Http\RedirectResponse;
 use Livewire\Attributes\Computed;
 use Livewire\Component;
 
@@ -25,10 +27,13 @@ class ConnectionHub extends Component
         ]);
     }
 
-    public function connect(OAuthProviderEnum $provider)
+    public function connect(OAuthProviderEnum $provider): RedirectResponse
     {
-        session()->put('tenant', filament()->getTenant()->slug);
-        $redirectUri = $provider->getClient()->redirectUrl(filament()->getTenant()->slug);
+        /** @var Tenant $tenant */
+        $tenant = filament()->getTenant();
+
+        session()->put('tenant', $tenant->slug);
+        $redirectUri = $provider->getClient()->redirectUrl($tenant->slug);
 
         return redirect()->away($redirectUri);
     }

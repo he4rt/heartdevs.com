@@ -28,6 +28,8 @@ class Talk extends Model
         'field_type',
         'title',
         'description',
+        'starts_at',
+        'ends_at',
     ];
 
     /**
@@ -58,6 +60,8 @@ class Talk extends Model
     {
         return [
             'status' => TalkStatusEnum::class,
+            'starts_at' => 'datetime',
+            'ends_at' => 'datetime',
         ];
     }
 }

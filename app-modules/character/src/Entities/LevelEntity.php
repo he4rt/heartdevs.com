@@ -73,6 +73,11 @@ final class LevelEntity
         return floor($difference / (100 * 89) * 100);
     }
 
+    public function experiencePercentageRemaining(): float
+    {
+        return ($this->experience * ($this->getPercentageExperience())) / 100;
+    }
+
     private function addExperience(int $experience): void
     {
         $this->experience += $experience;

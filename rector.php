@@ -27,8 +27,6 @@ return RectorConfig::configure()
         __DIR__.'/database',
         __DIR__.'/routes',
         __DIR__.'/tests',
-    ])
-    ->withPaths([
         __DIR__.'/app-modules/*/src',
         __DIR__.'/app-modules/*/config',
         __DIR__.'/app-modules/*/database',

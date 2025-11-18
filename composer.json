@@ -9,8 +9,8 @@
     "license": "MIT",
     "require": {
         "php": "^8.3",
-        "filament/filament": "^4.2.0",
-        "filament/spatie-laravel-media-library-plugin": "^4.2.0",
+        "filament/filament": "^4.2.2",
+        "filament/spatie-laravel-media-library-plugin": "^4.2.2",
         "guzzlehttp/guzzle": "^7.10.0",
         "he4rt/authentication": ">=1",
         "he4rt/badge": ">=1",
@@ -30,14 +30,14 @@
         "he4rt/tenant": ">=1",
         "he4rt/user": ">=1",
         "internachi/modular": "^2.3.0",
-        "laravel/framework": "^12.38.0",
+        "laravel/framework": "^12.38.1",
         "laravel/sanctum": "^4.2.0",
         "laravel/tinker": "^2.10.1",
         "marvinlabs/laravel-discord-logger": "^1.4.3",
         "otavio-araujo/filament-smart-cep": "^4.0.1",
         "owenvoke/blade-fontawesome": "^3.0",
         "predis/predis": "^2.4.1",
-        "spatie/laravel-medialibrary": "^11.17.4"
+        "spatie/laravel-medialibrary": "^11.17.5"
     },
     "require-dev": {
         "barryvdh/laravel-debugbar": "^3.16",
@@ -57,7 +57,7 @@
         "pestphp/pest-plugin-laravel": "^4.0.0",
         "pestphp/pest-plugin-livewire": "^4.0.1",
         "phpstan/extension-installer": "^1.4.3",
-        "rector/rector": "2.2.7"
+        "rector/rector": "^2.2.8"
     },
     "autoload": {
         "psr-4": {
@@ -94,7 +94,7 @@
         "ide-helper": [
             "@php artisan ide-helper:generate -q",
             "@php artisan ide-helper:meta -q",
-            "@php artisan ide-helper:models -q -N"
+            "@php artisan ide-helper:models -q -N --dir='app-modules/*/src/Models' --dir='app/Models'"
         ],
         "setup": [
             "composer install",

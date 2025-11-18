@@ -17,7 +17,7 @@ tasks:
   route-list:
     desc: List all registered routes
     aliases: [rl]
-    cmd: 'php artisan route:list --ansi'
+    cmd: 'php artisan route:list --except-vendor --ansi'
 
   pint:
     desc: Run Pint code style fixer

@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 use App\Enums\FilamentPanel;
 use Filament\Facades\Filament;
-use He4rt\Events\Filament\Resources\Talks\Pages\EditTalk;
 use He4rt\Events\Models\Talk;
 
 use function Pest\Livewire\livewire;

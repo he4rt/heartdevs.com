@@ -13,7 +13,19 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Facades\Date;
 
+/**
+ * @property int $tenant_id
+ * @property string $name
+ * @property string $description
+ * @property int $messages_count
+ * @property int $participants_count
+ * @property int $meetings_count
+ * @property int $badges_count
+ * @property Date $started_at
+ * @property Date $ended_at
+ */
 final class Season extends Model
 {
     use HasFactory;
@@ -61,5 +73,13 @@ final class Season extends Model
     protected static function newFactory(): SeasonFactory
     {
         return SeasonFactory::new();
+    }
+
+    protected function casts(): array
+    {
+        return [
+            'started_at' => 'datetime',
+            'ended_at' => 'datetime',
+        ];
     }
 }
