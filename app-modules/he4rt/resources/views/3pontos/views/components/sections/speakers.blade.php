@@ -15,7 +15,7 @@
                     <div class="flex flex-col items-center gap-2">
                         <x-he4rt::avatar size="2xl" src="https://avatars.githubusercontent.com/u/85951158?v=4" />
                         <x-he4rt::heading level="3" size="xs">Gabriel Vieira</x-he4rt::heading>
-                        <span class="text-text-medium text-sm">Product Designer</span>
+                        <x-he4rt::text size="sm">Product Designer</x-he4rt::text>
                     </div>
                 </x-slot>
                 <x-slot:description class="pb-4 text-center">
@@ -29,7 +29,7 @@
                     <div class="flex flex-col items-center gap-2">
                         <x-he4rt::avatar size="2xl" src="https://avatars.githubusercontent.com/u/85951158?v=4" />
                         <x-he4rt::heading level="3" size="xs">Gabriel Vieira</x-he4rt::heading>
-                        <span class="text-text-medium text-sm">Product Designer</span>
+                        <x-he4rt::text size="sm">Product Designer</x-he4rt::text>
                     </div>
                 </x-slot>
                 <x-slot:description class="pb-4 text-center">
@@ -43,7 +43,7 @@
                     <div class="flex flex-col items-center gap-2">
                         <x-he4rt::avatar size="2xl" src="https://avatars.githubusercontent.com/u/85951158?v=4" />
                         <x-he4rt::heading level="3" size="xs">Gabriel Vieira</x-he4rt::heading>
-                        <span class="text-text-medium text-sm">Product Designer</span>
+                        <x-he4rt::text size="sm">Product Designer</x-he4rt::text>
                     </div>
                 </x-slot>
                 <x-slot:description class="pb-4 text-center">
@@ -57,7 +57,7 @@
                     <div class="flex flex-col items-center gap-2">
                         <x-he4rt::avatar size="2xl" src="https://avatars.githubusercontent.com/u/85951158?v=4" />
                         <x-he4rt::heading level="3" size="xs">Gabriel Vieira</x-he4rt::heading>
-                        <span class="text-text-medium text-sm">Product Designer</span>
+                        <x-he4rt::text size="sm">Product Designer</x-he4rt::text>
                     </div>
                 </x-slot>
                 <x-slot:description class="pb-4 text-center">

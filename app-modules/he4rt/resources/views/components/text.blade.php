@@ -5,7 +5,7 @@
 @php
     $classes = collect([
         'hp-text',
-        'hp-text-' . $size,
+        'hp-text-size-' . $size,
     ])
         ->filter()
         ->implode(' ');
