@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\Relations\Pivot;
 
 class SponsorAttend extends Pivot
 {
-    protected $table = 'sponsor_attend';
+    protected $table = 'events_sponsors';
 
     protected $fillable = [
         'level',
