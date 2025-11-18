@@ -7,10 +7,9 @@ namespace He4rt\Character\Database\Factories;
 use He4rt\Character\Models\Character;
 use He4rt\Character\Models\Wallet;
 use Illuminate\Database\Eloquent\Factories\Factory;
-use Illuminate\Database\Eloquent\Model;
 
 /**
- * @extends Factory<Model>
+ * @extends Factory<Wallet>
  */
 final class WalletFactory extends Factory
 {
