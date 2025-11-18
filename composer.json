@@ -94,7 +94,7 @@
         "ide-helper": [
             "@php artisan ide-helper:generate -q",
             "@php artisan ide-helper:meta -q",
-            "@php artisan ide-helper:models -q -N"
+            "@php artisan ide-helper:models -q -N --dir='app-modules/*/src/Models' --dir='app/Models'"
         ],
         "setup": [
             "composer install",
