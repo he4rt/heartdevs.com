@@ -13,7 +13,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  */
 final class Wallet extends Model
 {
-    protected $table = 'character_wallet';
+    protected $table = 'characters_wallet';
 
     protected $fillable = [
         'character_id',
