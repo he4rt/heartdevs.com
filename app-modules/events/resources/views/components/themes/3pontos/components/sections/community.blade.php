@@ -1,7 +1,7 @@
 <section class="hp-section">
     <div class="hp-container grid grid-cols-1 items-start gap-x-12 lg:grid-cols-[1fr_4fr]">
         <div class="mb-4 flex items-center justify-center sm:justify-start">
-            <x-3pontos::section-title size="lg">Comunidade 3 pontos</x-3pontos::section-title>
+            <x-he4rt::section-title size="lg">Comunidade 3 pontos</x-he4rt::section-title>
         </div>
 
         <div class="flex flex-col gap-8">

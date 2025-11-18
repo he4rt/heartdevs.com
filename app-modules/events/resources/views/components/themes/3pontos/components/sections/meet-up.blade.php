@@ -3,7 +3,7 @@
         <div>
             <x-he4rt::headline align="center" :keywords="['Presencial?']">
                 <x-slot:badge>
-                    <x-3pontos::section-title>Section name</x-3pontos::section-title>
+                    <x-he4rt::section-title>Section name</x-he4rt::section-title>
                 </x-slot>
                 <x-slot:title>O que esperar da 3pontos Meetup Presencial?</x-slot>
                 <x-slot:description>
@@ -16,7 +16,7 @@
         <div class="grid grid-cols-1 gap-x-8 gap-y-8 lg:grid-cols-2 lg:gap-y-12">
             <x-he4rt::card class="lg:flex-row">
                 <x-slot:icon class="w-fit items-center justify-center p-2">
-                    <x-3pontos::icon />
+                    <x-he4rt::icon />
                 </x-slot>
                 <x-slot:title>Networking</x-slot>
                 <x-slot:description>
@@ -27,7 +27,7 @@
 
             <x-he4rt::card class="lg:flex-row">
                 <x-slot:icon class="w-fit items-center justify-center p-2">
-                    <x-3pontos::icon />
+                    <x-he4rt::icon />
                 </x-slot>
                 <x-slot:title>Brindes</x-slot>
                 <x-slot:description>
@@ -38,7 +38,7 @@
 
             <x-he4rt::card class="lg:flex-row">
                 <x-slot:icon class="w-fit items-center justify-center p-2">
-                    <x-3pontos::icon />
+                    <x-he4rt::icon />
                 </x-slot>
                 <x-slot:title>CoffeeBreak</x-slot>
                 <x-slot:description>
@@ -49,7 +49,7 @@
 
             <x-he4rt::card class="lg:flex-row">
                 <x-slot:icon class="w-fit items-center justify-center p-2">
-                    <x-3pontos::icon />
+                    <x-he4rt::icon />
                 </x-slot>
                 <x-slot:title>Conteúdos Exclusivos</x-slot>
                 <x-slot:description>

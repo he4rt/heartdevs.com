@@ -19,7 +19,7 @@
     <div class="hp-container relative z-10 max-w-7xl">
         <x-he4rt::headline>
             <x-slot:badge>
-                <x-3pontos::section-title>Section name</x-3pontos::section-title>
+                <x-he4rt::section-title>Section name</x-he4rt::section-title>
             </x-slot>
             <x-slot:title>Participe do primeiro evento presencial da 3Pontos</x-slot>
             <x-slot:description>

@@ -4,13 +4,19 @@ declare(strict_types=1);
 
 namespace App\Providers\Filament;
 
+use App\Filament\Pages\Login;
+use App\Http\Middleware\GuestTenantIdentifier;
+use Filament\Facades\Filament;
 use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
+use Filament\Http\Middleware\IdentifyTenant;
 use Filament\Panel;
 use Filament\PanelProvider;
 use Filament\Support\Colors\Color;
-use He4rt\Core\Filament\Pages\He4rtPage;
+use He4rt\Events\Filament\Events\GuestSidebar;
+use He4rt\Events\Filament\Events\GuestTopbar;
+use He4rt\Tenant\Models\Tenant;
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
 use Illuminate\Cookie\Middleware\EncryptCookies;
 use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
@@ -26,15 +32,17 @@ class EventPanelProvider extends PanelProvider
         return $panel
             ->id('event')
             ->path('event')
+            ->tenant(Tenant::class, 'slug', 'ownedTenants')
+            ->login(Login::class)
+            ->tenantDomain(app()->isLocal() ? null : sprintf('{tenant:slug}.%s', config('app.domain')))
             ->colors([
                 'primary' => Color::Amber,
             ])
-            ->viteTheme('app-modules/he4rt/resources/css/3pontos/theme.css')
+            ->tenantViteTheme()
+            ->topbarLivewireComponent(GuestTopbar::class)
+            ->sidebarLivewireComponent(GuestSidebar::class)
             ->discoverResources(in: app_path('Filament/Event/Resources'), for: 'App\Filament\Event\Resources')
             ->discoverPages(in: app_path('Filament/Event/Pages'), for: 'App\Filament\Event\Pages')
-            ->pages([
-                He4rtPage::class,
-            ])
             ->brandLogo(fn (): View => view('he4rt::components.logo',
                 [
                     'href' => '/event',
@@ -54,5 +62,14 @@ class EventPanelProvider extends PanelProvider
                 DisableBladeIconComponents::class,
                 DispatchServingFilamentEvent::class,
             ]);
+    }
+
+    public function register(): void
+    {
+        Filament::registerPanel(
+            fn (): Panel => $this->panel(Panel::make()),
+        );
+
+        $this->app->bind(IdentifyTenant::class, GuestTenantIdentifier::class);
     }
 }
