@@ -5,6 +5,8 @@
     <x-3pontos::sections.meet-up />
     <x-3pontos::sections.speakers />
     <x-3pontos::sections.schedule />
+    <x-3pontos::sections.watch-live />
     <x-3pontos::sections.partners />
     <x-3pontos::sections.about />
+    <x-3pontos::sections.info />
 </x-filament-panels::page>
