@@ -4,13 +4,13 @@ declare(strict_types=1);
 
 namespace Database\Seeders;
 
-use Illuminate\Support\Facades\Date;
 use He4rt\Events\Enums\EventTypeEnum;
 use He4rt\Events\Models\EventModel;
 use He4rt\Events\Models\Talk;
 use He4rt\Tenant\Models\Tenant;
 use He4rt\User\Models\User;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\Date;
 
 class ThreeDotsSeeder extends Seeder
 {
