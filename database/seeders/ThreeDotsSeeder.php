@@ -31,7 +31,7 @@ class ThreeDotsSeeder extends Seeder
 
         $event = EventModel::factory()
             ->withStatus()
-            ->create([
+            ->state([
                 'title' => 'Evento Da Três Pontos',
                 'event_type' => EventTypeEnum::Workshop,
                 'slug' => '3-pontos-evento',
@@ -43,11 +43,13 @@ class ThreeDotsSeeder extends Seeder
                 'max_attendees' => 50,
                 'attendees_count' => 30,
                 'tenant_id' => $tenant->getKey(),
-            ]);
+            ])
+            ->create();
 
         Talk::factory()
             ->recycle($tenant)
             ->recycle($event)
-            ->count(4);
+            ->count(4)
+            ->create();
     }
 }

@@ -164,8 +164,7 @@ class EventModel extends Model
 
         return $query->whereDoesntHave('talks', function (Builder $talkQuery) use ($start, $end): void {
             $talkQuery
-                ->where('status', '=', TalkStatusEnum::Accepted->value)
-                ->orWhere('status', '=', TalkStatusEnum::Done->value);
+                ->whereIn('status', [TalkStatusEnum::Accepted->value, TalkStatusEnum::Done->value]);
 
             $talkQuery->where('starts_at', '<', $end)
                 ->where('ends_at', '>', $start);
