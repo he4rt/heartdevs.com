@@ -30,7 +30,7 @@ final class GuestPanelProvider extends PanelProvider
         return $panel
             ->default()
             ->id('guest')
-            ->path('fodase')
+            ->path('')
             ->colors([
                 'primary' => Color::Purple,
             ])
