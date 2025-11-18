@@ -10,7 +10,7 @@
         </div>
 
         <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 sm:gap-8 lg:grid-cols-4">
-            <x-he4rt::card :interactive="false" class="border-b-8">
+            <x-he4rt::card class="hover:border-b-outline-light border-b-8">
                 <x-slot:header class="flex flex-col items-center justify-center border-none pb-0">
                     <div class="flex flex-col items-center gap-2">
                         <x-he4rt::avatar size="2xl" src="https://avatars.githubusercontent.com/u/85951158?v=4" />
@@ -24,7 +24,7 @@
                 </x-slot>
             </x-he4rt::card>
 
-            <x-he4rt::card :interactive="false" class="border-b-8">
+            <x-he4rt::card class="hover:border-b-outline-light border-b-8">
                 <x-slot:header class="flex flex-col items-center justify-center border-none pb-0">
                     <div class="flex flex-col items-center gap-2">
                         <x-he4rt::avatar size="2xl" src="https://avatars.githubusercontent.com/u/85951158?v=4" />
@@ -38,7 +38,7 @@
                 </x-slot>
             </x-he4rt::card>
 
-            <x-he4rt::card :interactive="false" class="border-b-8">
+            <x-he4rt::card class="hover:border-b-outline-light border-b-8">
                 <x-slot:header class="flex flex-col items-center justify-center border-none pb-0">
                     <div class="flex flex-col items-center gap-2">
                         <x-he4rt::avatar size="2xl" src="https://avatars.githubusercontent.com/u/85951158?v=4" />
@@ -52,7 +52,7 @@
                 </x-slot>
             </x-he4rt::card>
 
-            <x-he4rt::card :interactive="false" class="border-b-8">
+            <x-he4rt::card class="hover:border-b-outline-light border-b-8">
                 <x-slot:header class="flex flex-col items-center justify-center border-none pb-0">
                     <div class="flex flex-col items-center gap-2">
                         <x-he4rt::avatar size="2xl" src="https://avatars.githubusercontent.com/u/85951158?v=4" />

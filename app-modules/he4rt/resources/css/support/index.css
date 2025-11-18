@@ -82,6 +82,8 @@
     --color-outline-high: var(--outline-high);
     --color-outline-medium: var(--outline-medium);
     --color-outline-low: var(--outline-low);
+    --color-outline-dark: var(--outline-dark);
+    --color-outline-light: var(--outline-light);
 
     --color-elevation-surface: var(--elevation-surface);
     --color-elevation-01dp: var(--elevation-01dp);
