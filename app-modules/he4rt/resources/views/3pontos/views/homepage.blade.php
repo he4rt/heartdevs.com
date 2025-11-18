@@ -4,4 +4,5 @@
     <x-3pontos::sections.community />
     <x-3pontos::sections.meet-up />
     <x-3pontos::sections.speakers />
+    <x-3pontos::sections.schedule />
 </x-filament-panels::page>
