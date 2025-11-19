@@ -15,7 +15,6 @@ final class UserAddressForm
     {
         return $schema
             ->components([
-
                 Section::make('Location Information')
                     ->description('Basic address details')
                     ->schema([
@@ -48,7 +47,8 @@ final class UserAddressForm
                             ->live()
                             ->placeholder('Campinas')
                             ->columnSpan(1),
-                    ]),
+                    ])
+                    ->columnSpanFull(),
             ]);
     }
 }
