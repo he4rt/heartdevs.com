@@ -19,9 +19,14 @@
         </div>
 
         <div class="grid grid-cols-1 gap-8 lg:col-span-2 lg:grid-cols-8 lg:gap-4">
-            <x-he4rt::card class="lg:col-span-5">
-                <x-slot:title>Participe de Desafios que Importam</x-slot>
-                <x-slot:description>
+            <x-he4rt::card class="relative overflow-hidden lg:col-span-5">
+                <div class="absolute top-0 left-0 z-0 h-1/2 w-1/2 -translate-x-[50%] -translate-y-[150%]">
+                    <img src="{{ asset('images/3pontos/wave.svg') }}" alt="wave-image" />
+                </div>
+                <x-slot:title class="relative z-1">
+                    Participe de Desafios que Importam
+                </x-slot>
+                <x-slot:description class="relative z-1">
                     Esqueça exercícios de código genéricos. Na comunidade 3 Pontos, você trabalha em projetos reais
                     propostos por empresas aceleradas. Eventos enriquecedores, desafios técnicos e colaborações que
                     constroem seu portfólio enquanto resolvem problemas do mercado. Sua visão faz a diferença.
@@ -37,18 +42,24 @@
                 </x-slot>
             </x-he4rt::card>
 
-            <x-he4rt::card class="lg:col-span-3">
-                <x-slot:title>Educação Que Acompanha o Mercado</x-slot>
-                <x-slot:description>
+            <x-he4rt::card class="relative overflow-hidden lg:col-span-3">
+                <div class="absolute right-0 bottom-0 z-0 translate-x-[50%] translate-y-[60%]">
+                    <img src="{{ asset('images/3pontos/donut.svg') }}" alt="donut-image" />
+                </div>
+                <x-slot:title class="relative z-1">Educação Que Acompanha o Mercado</x-slot>
+                <x-slot:description class="relative z-1">
                     O mercado de tecnologia evolui a cada dia. Nós também. Acesso a webinars, workshops e discussões
                     sobre as últimas tendências: inteligência artificial, desenvolvimento web, fintech, cloud computing
                     e muito mais. Aprenda com especialistas e colegas em um ambiente colaborativo.
                 </x-slot>
             </x-he4rt::card>
 
-            <x-he4rt::card class="lg:col-span-5">
-                <x-slot:title>Vagas e Projetos Exclusivos</x-slot>
-                <x-slot:description>
+            <x-he4rt::card class="relative overflow-hidden lg:col-span-5">
+                <div class="absolute top-0 left-0 z-0 h-1/2 w-1/2 -translate-x-[50%] -translate-y-[150%]">
+                    <img src="{{ asset('images/3pontos/wave.svg') }}" alt="wave-image" />
+                </div>
+                <x-slot:title class="relative z-1">Vagas e Projetos Exclusivos</x-slot>
+                <x-slot:description class="relative z-1">
                     Empresas parceiras buscam talentos na comunidade 3 Pontos. Vagas de emprego, projetos freelancer e
                     parcerias chegam primeiro para os membros. Sua próxima grande oportunidade pode estar a um clique de
                     distância.

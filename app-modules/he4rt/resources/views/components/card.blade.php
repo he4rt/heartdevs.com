@@ -73,6 +73,8 @@
         @endisset
     </div>
 
+    {{ $slot }}
+
     {{-- Slot de Tags --}}
     @isset($tags)
         <div {{ $tags->attributes->class('hp-card-tags') }}>
