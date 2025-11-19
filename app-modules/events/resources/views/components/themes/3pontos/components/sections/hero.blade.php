@@ -16,8 +16,8 @@
         />
     </div>
 
-    <div class="hp-container relative z-10 max-w-7xl">
-        <x-he4rt::headline>
+    <div class="hp-container relative z-10 items-start">
+        <x-he4rt::headline class="mx-0 max-w-5xl">
             <x-slot:badge>
                 <x-he4rt::section-title>3 Pontos Start</x-he4rt::section-title>
             </x-slot>
@@ -30,5 +30,41 @@
                 <x-he4rt::button>Faça sua inscrição</x-he4rt::button>
             </x-slot>
         </x-he4rt::headline>
+
+        <div
+            class="bg-elevation-surface/32 border-outline-dark/60 grid w-full grid-cols-1 gap-8 rounded-xl border p-8 backdrop-blur-md lg:grid-cols-3"
+        >
+            <x-he4rt::card :interactive="false">
+                <x-slot:icon>
+                    <div class="flex items-center gap-2">
+                        <x-he4rt::icon icon="heroicon-o-clock" class="text-text-medium bg-transparent p-0" />
+                        <x-he4rt::text size="sm" class="font-semibold">Horário</x-he4rt::text>
+                    </div>
+                </x-slot>
+                <x-slot:title>15h ~ 20h - Duração: 5h</x-slot>
+            </x-he4rt::card>
+
+            <x-he4rt::card :interactive="false">
+                <x-slot:icon>
+                    <div class="flex items-center gap-2">
+                        <x-he4rt::icon icon="heroicon-o-tv" class="text-text-medium bg-transparent p-0" />
+                        <x-he4rt::text size="sm" class="font-semibold">Transmissão ao vivo na Twitch</x-he4rt::text>
+                    </div>
+                </x-slot>
+                <x-slot:title>
+                    <a href="/">Clique aqui para assistir ao vivo</a>
+                </x-slot>
+            </x-he4rt::card>
+
+            <x-he4rt::card :interactive="false">
+                <x-slot:icon>
+                    <div class="flex items-center gap-2">
+                        <x-he4rt::icon icon="heroicon-o-tv" class="text-text-medium bg-transparent p-0" />
+                        <x-he4rt::text size="sm" class="font-semibold">Vagas limitadas</x-he4rt::text>
+                    </div>
+                </x-slot>
+                <x-slot:title>50 inscrições com camisetas exclusivas</x-slot>
+            </x-he4rt::card>
+        </div>
     </div>
 </section>
