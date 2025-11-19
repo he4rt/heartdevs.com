@@ -8,7 +8,7 @@
 
     $classes = collect([
         'hp-heading',
-        'hp-heading-' . $size,
+        'hp-heading-size-' . $size,
     ])
         ->filter()
         ->implode(' ');
