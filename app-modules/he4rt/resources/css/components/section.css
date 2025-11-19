@@ -1,5 +1,5 @@
 .hp-section {
-    @apply flex min-h-[92vh] scroll-mt-20 flex-col items-center justify-center lg:scroll-mt-8;
+    @apply flex min-h-[100vh] scroll-mt-20 flex-col items-center justify-center lg:scroll-mt-8;
 
     .hp-container {
         @apply container flex h-full flex-col items-center justify-center space-y-12 p-8 lg:p-0;
