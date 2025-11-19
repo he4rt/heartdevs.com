@@ -12,6 +12,19 @@
             </x-he4rt::headline>
         </div>
 
-        <div></div>
+        <div class="overflow-hidden mask-r-from-95% mask-r-to-99% mask-l-from-95% mask-l-to-99%">
+            <div class="animate-infinite-scroll flex gap-6">
+                @for ($i = 0; $i < 2; $i++)
+                    <p class="w-40 shrink-0 hover:scale-105">Teste</p>
+                    <p class="w-40 shrink-0">Teste</p>
+                    <p class="w-40 shrink-0">Teste</p>
+                    <p class="w-40 shrink-0">Teste</p>
+                    <p class="w-40 shrink-0">Teste</p>
+                    <p class="w-40 shrink-0">Teste</p>
+                    <p class="w-40 shrink-0">Teste</p>
+                    <p class="w-40 shrink-0 transition-transform duration-300 ease-in-out hover:scale-105">Bom dia</p>
+                @endfor
+            </div>
+        </div>
     </div>
 </section>

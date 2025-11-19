@@ -33,6 +33,26 @@
     animation: spin-slow 40s linear infinite;
 }
 
+@keyframes infinite-scroll {
+    0% {
+        transform: translateX(0);
+    }
+    100% {
+        transform: translateX(-50%);
+    }
+}
+
+.animate-infinite-scroll {
+    display: flex;
+    width: max-content;
+    animation: infinite-scroll 30s linear infinite;
+    will-change: transform;
+}
+
+.animate-infinite-scroll:hover {
+    animation-play-state: paused;
+}
+
 .fi-topbar {
     @apply bg-elevation-surface p-4 px-12 shadow-none ring-0;
 }
