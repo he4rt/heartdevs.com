@@ -19,7 +19,7 @@
     <div class="hp-container relative z-10 max-w-7xl">
         <x-he4rt::headline>
             <x-slot:badge>
-                <x-he4rt::section-title>Section name</x-he4rt::section-title>
+                <x-he4rt::section-title>3 Pontos Start</x-he4rt::section-title>
             </x-slot>
             <x-slot:title>Participe do primeiro evento presencial da 3Pontos</x-slot>
             <x-slot:description>
@@ -27,7 +27,7 @@
                 conhecimentos, fazer networking e unir cada vez mais nossa comunidade.
             </x-slot>
             <x-slot:actions>
-                <x-he4rt::button>Button</x-he4rt::button>
+                <x-he4rt::button>Faça sua inscrição</x-he4rt::button>
             </x-slot>
         </x-he4rt::headline>
     </div>

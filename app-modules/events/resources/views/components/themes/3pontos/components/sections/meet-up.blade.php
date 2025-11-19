@@ -1,14 +1,17 @@
 <section class="hp-section">
     <div class="hp-container">
         <div>
-            <x-he4rt::headline align="center" :keywords="['Presencial?']">
+            <x-he4rt::headline align="center" :keywords="['Futuro?']">
                 <x-slot:badge>
-                    <x-he4rt::section-title>Section name</x-he4rt::section-title>
+                    <x-he4rt::section-title>Propósito</x-he4rt::section-title>
                 </x-slot>
-                <x-slot:title>O que esperar da 3pontos Meetup Presencial?</x-slot>
+                <x-slot:title>
+                    O que esperar do evento 3 Pontos Star: O Lançamento da Comunidade que Acelera o Futuro?
+                </x-slot>
                 <x-slot:description>
-                    O Meetup da He4rt é um evento que reúne os nosso membros presencialmente e virtualmente pra
-                    trocarmos conhecimentos, fazer networking e unir cada vez mais nossa comunidade.
+                    O 3 Pontos Start é o marco zero da nossa comunidade. É a sua chance de se aprofundar no ecossistema
+                    3 Pontos - a aceleradora que une negócios e tecnologia e se conectar com profissionais que estão no
+                    topo do mercado.
                 </x-slot>
             </x-he4rt::headline>
         </div>
@@ -18,10 +21,31 @@
                 <x-slot:icon class="w-fit items-center justify-center p-2">
                     <x-he4rt::icon />
                 </x-slot>
+                <x-slot:title>Conteúdos Exclusivos</x-slot>
+                <x-slot:description>
+                    Insights de parceiros e líderes sobre Fintech, Inovação e Carreira Dev.
+                </x-slot>
+            </x-he4rt::card>
+
+            <x-he4rt::card class="lg:flex-row">
+                <x-slot:icon class="w-fit items-center justify-center p-2">
+                    <x-he4rt::icon />
+                </x-slot>
                 <x-slot:title>Networking</x-slot>
                 <x-slot:description>
-                    Teremos na festa o estande de acessórios da Punky Kills & de roupas da Lobo Bobo! Você curte a festa
-                    já num lookinho renovado!
+                    Interaja ao vivo com convidados e a comunidade He4rt. 5 horas de conteúdo, uma imersão completa para
+                    quem quer acelerar o mercado.
+                </x-slot>
+            </x-he4rt::card>
+
+            <x-he4rt::card class="lg:flex-row">
+                <x-slot:icon class="w-fit items-center justify-center p-2">
+                    <x-he4rt::icon />
+                </x-slot>
+                <x-slot:title>Missão Social</x-slot>
+                <x-slot:description>
+                    Seu código pode transforma vidas, acreditamos que a tecnologia tem o poder de transformar, e isso
+                    começa pela comunidade.
                 </x-slot>
             </x-he4rt::card>
 
@@ -31,30 +55,7 @@
                 </x-slot>
                 <x-slot:title>Brindes</x-slot>
                 <x-slot:description>
-                    Teremos na festa o estande de acessórios da Punky Kills & de roupas da Lobo Bobo! Você curte a festa
-                    já num lookinho renovado!
-                </x-slot>
-            </x-he4rt::card>
-
-            <x-he4rt::card class="lg:flex-row">
-                <x-slot:icon class="w-fit items-center justify-center p-2">
-                    <x-he4rt::icon />
-                </x-slot>
-                <x-slot:title>CoffeeBreak</x-slot>
-                <x-slot:description>
-                    Teremos na festa o estande de acessórios da Punky Kills & de roupas da Lobo Bobo! Você curte a festa
-                    já num lookinho renovado!
-                </x-slot>
-            </x-he4rt::card>
-
-            <x-he4rt::card class="lg:flex-row">
-                <x-slot:icon class="w-fit items-center justify-center p-2">
-                    <x-he4rt::icon />
-                </x-slot>
-                <x-slot:title>Conteúdos Exclusivos</x-slot>
-                <x-slot:description>
-                    Teremos na festa o estande de acessórios da Punky Kills & de roupas da Lobo Bobo! Você curte a festa
-                    já num lookinho renovado!
+                    Quem faz parte, ganha mais: sorteio de brindes exclusivo para nossa comunidade!
                 </x-slot>
             </x-he4rt::card>
         </div>

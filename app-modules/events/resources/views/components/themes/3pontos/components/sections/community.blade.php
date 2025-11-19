@@ -13,7 +13,7 @@
                     ambiente qualificado e propício para que o melhor aconteça.
                 </x-slot>
                 <x-slot:actions>
-                    <x-he4rt::button>Button</x-he4rt::button>
+                    <x-he4rt::button href="https://discord.gg/dbFkFkaC">Junte-se a nós</x-he4rt::button>
                 </x-slot>
             </x-he4rt::headline>
         </div>
