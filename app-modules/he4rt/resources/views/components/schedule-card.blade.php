@@ -24,7 +24,7 @@
     };
 @endphp
 
-<div class="border-outline-dark mt-6 border-b px-4 pb-3">
+<div class="border-outline-dark mt-6 border-b px-4 pb-3 transition-all duration-300 ease-in-out hover:px-5">
     <div class="grid grid-cols-2 gap-x-4 gap-y-4 lg:grid-cols-[auto_1fr_auto]">
         <div class="flex items-center gap-2 lg:order-1">
             <x-he4rt::icon size="md" class="text-icon-light bg-transparent p-0!" icon="heroicon-o-clock" />
