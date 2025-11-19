@@ -1,4 +1,4 @@
-<x-he4rt::layouts.page class="relative overflow-hidden" full-height="true">
+<x-he4rt::layouts.page class="relative" full-height="true">
     <x-events::themes.3pontos.components.sections.hero />
     <x-events::themes.3pontos.components.sections.social-action />
     <x-events::themes.3pontos.components.sections.community />

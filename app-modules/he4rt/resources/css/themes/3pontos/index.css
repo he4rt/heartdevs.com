@@ -6,6 +6,7 @@
 @import './components/section-title.css' layer(components);
 @import './components/section.css' layer(components);
 @import './components/heading.css' layer(components);
+@import './components/partials/footer.css' layer(components);
 
 .fi-topbar {
     @apply ring-1;
