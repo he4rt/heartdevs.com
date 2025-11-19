@@ -4,7 +4,7 @@
 }
 
 .hp-heading-size-2xs {
-    @apply text-sm sm:text-base md:text-base lg:text-lg xl:text-lg;
+    @apply text-base sm:text-base md:text-base lg:text-lg xl:text-lg;
 }
 
 .hp-heading-size-xs {

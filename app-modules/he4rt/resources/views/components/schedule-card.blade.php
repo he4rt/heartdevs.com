@@ -25,20 +25,23 @@
 @endphp
 
 <div class="border-outline-dark mt-6 border-b px-4 pb-3">
-    <div class="flex items-center justify-between gap-2">
-        <div class="flex items-center justify-center gap-3">
+    <div class="grid grid-cols-2 gap-x-4 gap-y-4 lg:grid-cols-[auto_1fr_auto]">
+        <div class="flex items-center gap-2 lg:order-1">
             <x-he4rt::icon size="md" class="text-icon-light bg-transparent p-0!" icon="heroicon-o-clock" />
             <x-he4rt::text size="xs" class="font-semibold">{{ $startsAt }}</x-he4rt::text>
-            <x-he4rt::heading size="2xs">
-                {{ $title }}
-            </x-he4rt::heading>
         </div>
 
-        <div class="flex items-center justify-center gap-2">
+        <div class="flex items-center justify-end gap-2 lg:order-3 lg:justify-center">
             <x-he4rt::icon size="md" :icon="$config['icon']" class="{{ $config['color'] }} bg-transparent p-0!" />
             <x-he4rt::text size="xs" class="{{ $config['color'] }} font-semibold">
                 {{ $config['text'] }}
             </x-he4rt::text>
+        </div>
+
+        <div class="col-span-2 flex items-center gap-2 lg:order-2 lg:col-span-1">
+            <x-he4rt::heading size="2xs">
+                {{ $title }}
+            </x-he4rt::heading>
         </div>
     </div>
 </div>
