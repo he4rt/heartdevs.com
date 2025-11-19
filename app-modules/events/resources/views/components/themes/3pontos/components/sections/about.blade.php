@@ -7,7 +7,7 @@
         <div>
             <x-he4rt::headline :keywords="['Lorem', 'ipsum']">
                 <x-slot:badge>
-                    <x-3pontos::section-title>Section name</x-3pontos::section-title>
+                    <x-he4rt::section-title>Section name</x-he4rt::section-title>
                 </x-slot>
                 <x-slot:title>Lorem ipsum um pouco da 3 pontos</x-slot>
                 <x-slot:description>
