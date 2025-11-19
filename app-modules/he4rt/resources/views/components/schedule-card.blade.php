@@ -27,7 +27,7 @@
 <div class="border-outline-dark mt-6 border-b px-4 pb-3">
     <div class="flex items-center justify-between">
         <div class="flex items-center justify-center gap-3">
-            <x-filament::icon icon="heroicon-o-clock" class="text-icon-high h-5 w-5" />
+            <x-he4rt::icon size="md" class="text-icon-light bg-transparent p-0!" icon="heroicon-o-clock" />
             <span class="text-text-medium text-xs font-semibold">{{ $startsAt }}</span>
             <x-he4rt::heading>
                 {{ $title }}
@@ -35,7 +35,7 @@
         </div>
 
         <div class="flex items-center justify-center gap-2">
-            <x-filament::icon :icon="$config['icon']" class="w-5 h-5 {{ $config['color'] }}" />
+            <x-he4rt::icon size="md" :icon="$config['icon']" class="{{ $config['color'] }} bg-transparent p-0!" />
             <span class="{{ $config['color'] }} font-semibold">
                 {{ $config['text'] }}
             </span>
