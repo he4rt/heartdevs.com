@@ -10,6 +10,14 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
+/**
+ * @property string $id
+ * @property string $user_id
+ * @property string $state
+ * @property string $city
+ * @property string $zip_code
+ * @property string $country
+ */
 final class Address extends Model
 {
     use HasFactory;

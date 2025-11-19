@@ -301,6 +301,7 @@ class UserProfile extends Page
                                     ->schema([
                                         TextInput::make('informationData.name')
                                             ->label('Full Name')
+
                                             ->placeholder('Enter your full name')
                                             ->required(),
 
