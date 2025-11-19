@@ -25,7 +25,7 @@
                     <div class="flex flex-col items-center gap-2">
                         <x-he4rt::avatar size="2xl" src="https://avatars.githubusercontent.com/u/85951158?v=4" />
                         <x-he4rt::heading level="3" size="xs">Juliana Gaioso</x-he4rt::heading>
-                        <x-he4rt::text size="sm">DevSec</x-he4rt::text>
+                        <x-he4rt::text class="text-center" size="sm">DevSec</x-he4rt::text>
                     </div>
                 </x-slot>
                 <x-slot:description class="pb-4 text-center">
@@ -39,7 +39,7 @@
                     <div class="flex flex-col items-center gap-2">
                         <x-he4rt::avatar size="2xl" src="https://avatars.githubusercontent.com/u/85951158?v=4" />
                         <x-he4rt::heading level="3" size="xs">Tatiana Barros</x-he4rt::heading>
-                        <x-he4rt::text size="sm">Technology Evangelist</x-he4rt::text>
+                        <x-he4rt::text class="text-center" size="sm">Technology Evangelist</x-he4rt::text>
                     </div>
                 </x-slot>
                 <x-slot:description class="pb-4 text-center">
@@ -54,7 +54,9 @@
                     <div class="flex flex-col items-center gap-2">
                         <x-he4rt::avatar size="2xl" src="https://avatars.githubusercontent.com/u/6912596?v=4" />
                         <x-he4rt::heading level="3" size="xs">Daniel Reis</x-he4rt::heading>
-                        <x-he4rt::text size="sm">Tech Lead & Fundador da He4rt Developers</x-he4rt::text>
+                        <x-he4rt::text class="text-center" size="sm">
+                            Tech Lead & Fundador da He4rt Developers
+                        </x-he4rt::text>
                     </div>
                 </x-slot>
                 <x-slot:description class="pb-4 text-center">
@@ -69,7 +71,7 @@
                     <div class="flex flex-col items-center gap-2">
                         <x-he4rt::avatar size="2xl" src="https://avatars.githubusercontent.com/u/85951158?v=4" />
                         <x-he4rt::heading level="3" size="xs">Gabriel Vieira</x-he4rt::heading>
-                        <x-he4rt::text size="sm">Product Designer</x-he4rt::text>
+                        <x-he4rt::text class="text-center" size="sm">Product Designer</x-he4rt::text>
                     </div>
                 </x-slot>
                 <x-slot:description class="pb-4 text-center">

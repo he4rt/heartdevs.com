@@ -19,5 +19,5 @@
 }
 
 .hp-card-body {
-    @apply mt-auto gap-y-4;
+    @apply justify-center gap-y-4;
 }
