@@ -14,6 +14,7 @@ use Filament\Http\Middleware\IdentifyTenant;
 use Filament\Panel;
 use Filament\PanelProvider;
 use Filament\Support\Colors\Color;
+use Filament\View\PanelsRenderHook;
 use He4rt\Events\Filament\Events\GuestSidebar;
 use He4rt\Events\Filament\Events\GuestTopbar;
 use He4rt\Tenant\Models\Tenant;
@@ -41,6 +42,7 @@ class EventPanelProvider extends PanelProvider
             ->tenantViteTheme()
             ->topbarLivewireComponent(GuestTopbar::class)
             ->sidebarLivewireComponent(GuestSidebar::class)
+            ->renderHook(PanelsRenderHook::FOOTER, fn (): View => view('he4rt::components.partials.footer'))
             ->discoverResources(in: app_path('Filament/Event/Resources'), for: 'App\Filament\Event\Resources')
             ->discoverPages(in: app_path('Filament/Event/Pages'), for: 'App\Filament\Event\Pages')
             ->brandLogo(fn (): View => view('he4rt::components.logo',

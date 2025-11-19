@@ -1,8 +1,8 @@
-<section class="hp-section">
+<section class="hp-section relative z-1">
     <div class="hp-container">
-        <div class="grid grid-cols-1 lg:grid-cols-2">
+        <div class="grid grid-cols-1 gap-y-8 lg:grid-cols-2">
             <div class="h-full w-full bg-red-500">map</div>
-            <div class="flex flex-col items-center justify-center pl-16">
+            <div class="flex flex-col items-center justify-center lg:pl-16">
                 <x-he4rt::headline>
                     <x-slot:title>Informações sobre o evento</x-slot>
                     <x-slot:description>
