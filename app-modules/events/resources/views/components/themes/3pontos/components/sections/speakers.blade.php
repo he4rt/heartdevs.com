@@ -1,5 +1,15 @@
-<section class="hp-section">
-    <div class="hp-container">
+<section class="hp-section relative">
+    <div
+        class="absolute bottom-0 left-0 z-1 flex origin-top rotate-90 justify-start sm:-translate-x-[20%] sm:translate-y-32 lg:-translate-x-[5%] lg:translate-y-24 lg:rotate-0 xl:translate-y-0"
+    >
+        <img
+            src="{{ asset('images/3pontos/logo-chain.png') }}"
+            alt=""
+            class="hidden h-auto w-full object-contain sm:block sm:max-w-[60%]"
+        />
+    </div>
+
+    <div class="hp-container relative z-10">
         <div>
             <x-he4rt::headline align="center">
                 <x-slot:badge>
