@@ -12,19 +12,46 @@
             </x-he4rt::headline>
         </div>
 
-        <div class="overflow-hidden mask-r-from-95% mask-r-to-99% mask-l-from-95% mask-l-to-99%">
-            <div class="animate-infinite-scroll flex gap-6">
-                @for ($i = 0; $i < 2; $i++)
-                    <p class="w-40 shrink-0 hover:scale-105">Teste</p>
-                    <p class="w-40 shrink-0">Teste</p>
-                    <p class="w-40 shrink-0">Teste</p>
-                    <p class="w-40 shrink-0">Teste</p>
-                    <p class="w-40 shrink-0">Teste</p>
-                    <p class="w-40 shrink-0">Teste</p>
-                    <p class="w-40 shrink-0">Teste</p>
-                    <p class="w-40 shrink-0 transition-transform duration-300 ease-in-out hover:scale-105">Bom dia</p>
-                @endfor
-            </div>
+        <div
+            x-data="{}"
+            x-init="
+                $nextTick(() => {
+                    let ul = $refs.partners
+                    ul.insertAdjacentHTML('afterend', ul.outerHTML)
+                    ul.nextSibling.setAttribute('aria-hidden', 'true')
+                })
+            "
+            class="inline-flex w-full flex-nowrap overflow-hidden mask-r-from-95% mask-r-to-99% mask-l-from-95% mask-l-to-99%"
+        >
+            <ul
+                x-ref="partners"
+                class="animate-infinite-scroll flex items-center justify-center md:justify-start [&_li]:mx-8"
+            >
+                <li class="w-[280px]">
+                    <img src="./facebook.svg" alt="Facebook" />
+                </li>
+                <li class="w-[280px]">
+                    <img src="./disney.svg" alt="Disney" />
+                </li>
+                <li class="w-[280px]">
+                    <img src="./airbnb.svg" alt="Airbnb" />
+                </li>
+                <li class="w-[280px]">
+                    <img src="./apple.svg" alt="Apple" />
+                </li>
+                <li class="w-[280px]">
+                    <img src="./spark.svg" alt="Spark" />
+                </li>
+                <li class="w-[280px]">
+                    <img src="./samsung.svg" alt="Samsung" />
+                </li>
+                <li class="w-[280px]">
+                    <img src="./quora.svg" alt="Quora" />
+                </li>
+                <li class="w-[280px]">
+                    <img src="./sass.svg" alt="Sass" />
+                </li>
+            </ul>
         </div>
     </div>
 </section>

@@ -38,14 +38,14 @@
         transform: translateX(0);
     }
     100% {
-        transform: translateX(-50%);
+        transform: translateX(-100%);
     }
 }
 
 .animate-infinite-scroll {
     display: flex;
     width: max-content;
-    animation: infinite-scroll 30s linear infinite;
+    animation: infinite-scroll 25s linear infinite;
     will-change: transform;
 }
 
