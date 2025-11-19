@@ -24,6 +24,10 @@
 @source '../**/*.blade.php';
 @source '../**/*.php';
 
+[x-cloak] {
+    display: none !important;
+}
+
 @keyframes spin-slow {
     to {
         transform: rotate(360deg);
