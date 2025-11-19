@@ -48,6 +48,12 @@
                 </h1>
             @endisset
 
+            @isset($subtitle)
+                <div {{ $subtitle->attributes->class('hp-headline-subtitle') }}>
+                    {{ $subtitle }}
+                </div>
+            @endisset
+
             @isset($description)
                 <p class="hp-headline-description">
                     {{ $description }}

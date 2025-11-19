@@ -22,6 +22,10 @@
     @apply font-bold drop-shadow-lg;
 }
 
+.hp-headline-subtitle {
+    @apply flex flex-col;
+}
+
 .hp-headline-description {
     @apply text-text-medium max-w-full font-medium delay-200;
 }
