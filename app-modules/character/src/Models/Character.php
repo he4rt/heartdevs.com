@@ -8,6 +8,7 @@ use Carbon\Carbon;
 use He4rt\Badge\Models\Badge;
 use He4rt\Character\Database\Factories\CharacterFactory;
 use He4rt\Character\Entities\LevelEntity;
+use He4rt\Tenant\Models\Tenant;
 use He4rt\User\Models\User;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -51,6 +52,14 @@ final class Character extends Model
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
+    }
+
+    /**
+     * @return BelongsTo<Tenant, $this>
+     */
+    public function tenant(): BelongsTo
+    {
+        return $this->belongsTo(Tenant::class);
     }
 
     /**

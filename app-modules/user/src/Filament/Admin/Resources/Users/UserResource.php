@@ -13,6 +13,7 @@ use He4rt\User\Filament\Admin\Resources\Users\Pages\CreateUser;
 use He4rt\User\Filament\Admin\Resources\Users\Pages\EditUser;
 use He4rt\User\Filament\Admin\Resources\Users\Pages\ListUsers;
 use He4rt\User\Filament\Admin\Resources\Users\RelationManagers\AddressRelationManager;
+use He4rt\User\Filament\Admin\Resources\Users\RelationManagers\CharacterRelationManager;
 use He4rt\User\Filament\Admin\Resources\Users\RelationManagers\InformationRelationManager;
 use He4rt\User\Filament\Admin\Resources\Users\RelationManagers\ProvidersRelationManager;
 use He4rt\User\Filament\Admin\Resources\Users\Schemas\UserForm;
@@ -46,6 +47,7 @@ class UserResource extends Resource
             ProvidersRelationManager::class,
             AddressRelationManager::class,
             InformationRelationManager::class,
+            CharacterRelationManager::class,
         ];
     }
 
