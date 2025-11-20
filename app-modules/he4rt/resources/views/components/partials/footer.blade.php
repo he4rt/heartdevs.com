@@ -1,52 +1,70 @@
+@props([
+    'logoPath' => 'images/logo.svg',
+    'logoSize' => 'md',
+    'description' => '',
+    'columns' => [],
+    'company' => 'He4rtDevs',
+])
+
+@php
+    $totalVisualColumns = collect($columns)
+        ->map(fn ($links) => ceil(count($links) / 3))
+        ->sum();
+
+    $gridClass = 'sm:grid-cols-' . $totalVisualColumns;
+@endphp
+
 <footer class="hp-footer">
     <div class="hp-footer-container">
         <div class="grid grid-cols-1 gap-8 sm:grid-cols-[2fr_1.5fr] sm:gap-24">
             <div>
-                <x-he4rt::headline size="md">
-                    <x-slot:description>
-                        <x-he4rt::logo />
-                        Conheça MeuGuia.app! Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus sed
-                        egestas nisl. Vivamus blandit vehicula eleifend. Phasellus vulputate elit leo, porta vehicula
-                        nunc placerat placerat.
-                    </x-slot>
-                </x-he4rt::headline>
+                <x-he4rt::logo :size="$logoSize" :path="$logoPath" />
+                <x-he4rt::text size="md" class="mt-4">
+                    {{ $description }}
+                </x-he4rt::text>
             </div>
 
-            <div class="grid grid-cols-1 gap-4 sm:grid-cols-3">
-                <div class="hp-footer-col">
-                    <h4 class="hp-footer-heading">Sobre nós</h4>
-                    <ul class="hp-footer-list">
-                        <li><a href="/" class="hp-footer-link">Home</a></li>
-                        <li><a href="/" class="hp-footer-link">Home</a></li>
-                        <li><a href="/" class="hp-footer-link">Home</a></li>
-                    </ul>
-                </div>
+            @if (count($columns) > 0)
+                <div
+                    @class([
+                        'grid grid-cols-1 gap-4',
+                        $gridClass,
+                    ])
+                >
+                    @foreach ($columns as $title => $links)
+                        @foreach (array_chunk($links, 3, true) as $index => $chunk)
+                            <div class="hp-footer-col">
+                                <x-he4rt::heading
+                                    level="4"
+                                    size="sm"
+                                    class="hp-footer-heading mb-4 {{ $index > 0 ? 'invisible' : '' }}"
+                                >
+                                    {{ $title }}
+                                </x-he4rt::heading>
 
-                <div class="hp-footer-col">
-                    <h4 class="hp-footer-heading">Suporte</h4>
-                    <ul class="hp-footer-list">
-                        <li><a href="/" class="hp-footer-link">Termos e Privacidade</a></li>
-                        <li><a href="/" class="hp-footer-link">Junte-se à nós</a></li>
-                    </ul>
+                                <ul class="hp-footer-list">
+                                    @foreach ($chunk as $label => $url)
+                                        <li>
+                                            <a
+                                                href="{{ $url }}"
+                                                class="hp-footer-link hover:text-text-high transition-colors"
+                                            >
+                                                {{ $label }}
+                                            </a>
+                                        </li>
+                                    @endforeach
+                                </ul>
+                            </div>
+                        @endforeach
+                    @endforeach
                 </div>
-
-                <div class="hp-footer-col">
-                    <h4 class="hp-footer-heading">Social Media</h4>
-                    <ul class="hp-footer-list">
-                        <li><a href="/" class="hp-footer-link">Discord</a></li>
-                        <li><a href="/" class="hp-footer-link">Instagram</a></li>
-                        <li><a href="/" class="hp-footer-link">X</a></li>
-                        <li><a href="/" class="hp-footer-link">LinkedIn</a></li>
-                        <li><a href="/" class="hp-footer-link">Github</a></li>
-                    </ul>
-                </div>
-            </div>
+            @endif
         </div>
 
-        <hr class="border-outline-low" />
+        <hr class="border-outline-low my-8" />
 
         <div class="hp-footer-bottom">
-            <span>© 2025 He4rtDevs</span>
+            <span>© {{ date('Y') }} {{ $company }}</span>
             <span>Todos os direitos reservados</span>
         </div>
     </div>

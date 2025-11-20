@@ -42,7 +42,26 @@ class EventPanelProvider extends PanelProvider
             ->tenantViteTheme()
             ->topbarLivewireComponent(GuestTopbar::class)
             ->sidebarLivewireComponent(GuestSidebar::class)
-            ->renderHook(PanelsRenderHook::FOOTER, fn (): View => view('he4rt::components.partials.footer'))
+            ->renderHook(PanelsRenderHook::FOOTER, fn (): View => view('he4rt::components.partials.footer', [
+                'logoPath' => 'images/3pontos/logo.svg',
+                'logoSize' => 'sm',
+                'description' => 'Somos o ecossistema que une solução e conhecimento em um único lugar. Aceleramos
+                sua empresa. Fortalecemos sua carreira.',
+                'company' => '3 Pontos',
+                'columns' => [
+                    'Navegação' => [
+                        'Home' => '/',
+                        'Missão social' => '/about',
+                        'Comunidade' => '/',
+                        'Propósito' => '/about',
+                        'Palestrantes' => '/',
+                        'Lineup' => '/about',
+                        'Ao vivo' => '/',
+                        'Parceiros' => '/about',
+                        'Saiba mais' => '/',
+                    ],
+                ],
+            ]))
             ->discoverResources(in: app_path('Filament/Event/Resources'), for: 'App\Filament\Event\Resources')
             ->discoverPages(in: app_path('Filament/Event/Pages'), for: 'App\Filament\Event\Pages')
             ->brandLogo(fn (): View => view('he4rt::components.logo',

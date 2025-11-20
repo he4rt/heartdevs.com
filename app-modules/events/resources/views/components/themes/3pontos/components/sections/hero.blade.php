@@ -32,39 +32,47 @@
         </x-he4rt::headline>
 
         <div
+            x-data="{ visible: false }"
+            x-intersect.threshold.20.once="visible = true"
             class="bg-elevation-surface/32 border-outline-dark/60 grid w-full grid-cols-1 gap-8 rounded-xl border p-8 backdrop-blur-md lg:grid-cols-3"
         >
-            <x-he4rt::card :interactive="false">
-                <x-slot:icon>
-                    <div class="flex items-center gap-2">
-                        <x-he4rt::icon icon="heroicon-o-clock" class="text-text-medium bg-transparent p-0" />
-                        <x-he4rt::text size="sm" class="font-semibold">Horário</x-he4rt::text>
-                    </div>
-                </x-slot>
-                <x-slot:title>15h ~ 20h - Duração: 5h</x-slot>
-            </x-he4rt::card>
+            <x-he4rt::animate-block type="fade-right">
+                <x-he4rt::card :interactive="false">
+                    <x-slot:icon>
+                        <div class="flex items-center gap-2">
+                            <x-he4rt::icon icon="heroicon-o-clock" class="text-text-medium bg-transparent p-0" />
+                            <x-he4rt::text size="sm" class="font-semibold">Horário</x-he4rt::text>
+                        </div>
+                    </x-slot>
+                    <x-slot:title>15h ~ 20h - Duração: 5h</x-slot>
+                </x-he4rt::card>
+            </x-he4rt::animate-block>
 
-            <x-he4rt::card :interactive="false">
-                <x-slot:icon>
-                    <div class="flex items-center gap-2">
-                        <x-he4rt::icon icon="heroicon-o-tv" class="text-text-medium bg-transparent p-0" />
-                        <x-he4rt::text size="sm" class="font-semibold">Transmissão ao vivo na Twitch</x-he4rt::text>
-                    </div>
-                </x-slot>
-                <x-slot:title>
-                    <a href="/">Clique aqui para assistir ao vivo</a>
-                </x-slot>
-            </x-he4rt::card>
+            <x-he4rt::animate-block delay="100" type="fade-right">
+                <x-he4rt::card :interactive="false">
+                    <x-slot:icon>
+                        <div class="flex items-center gap-2">
+                            <x-he4rt::icon icon="heroicon-o-tv" class="text-text-medium bg-transparent p-0" />
+                            <x-he4rt::text size="sm" class="font-semibold">Transmissão ao vivo na Twitch</x-he4rt::text>
+                        </div>
+                    </x-slot>
+                    <x-slot:title>
+                        <a href="/">Clique aqui para assistir ao vivo</a>
+                    </x-slot>
+                </x-he4rt::card>
+            </x-he4rt::animate-block>
 
-            <x-he4rt::card :interactive="false">
-                <x-slot:icon>
-                    <div class="flex items-center gap-2">
-                        <x-he4rt::icon icon="heroicon-o-tv" class="text-text-medium bg-transparent p-0" />
-                        <x-he4rt::text size="sm" class="font-semibold">Vagas limitadas</x-he4rt::text>
-                    </div>
-                </x-slot>
-                <x-slot:title>50 inscrições com camisetas exclusivas</x-slot>
-            </x-he4rt::card>
+            <x-he4rt::animate-block delay="200" type="fade-right">
+                <x-he4rt::card :interactive="false">
+                    <x-slot:icon>
+                        <div class="flex items-center gap-2">
+                            <x-he4rt::icon icon="heroicon-o-tv" class="text-text-medium bg-transparent p-0" />
+                            <x-he4rt::text size="sm" class="font-semibold">Vagas limitadas</x-he4rt::text>
+                        </div>
+                    </x-slot>
+                    <x-slot:title>50 inscrições com camisetas exclusivas</x-slot>
+                </x-he4rt::card>
+            </x-he4rt::animate-block>
         </div>
     </div>
 </section>

@@ -4,6 +4,13 @@
     'size' => 'md',
 ])
 
+@php
+    $sizeCls = match ($size) {
+        'sm' => 'max-w-20',
+        'md' => 'max-w-40',
+    };
+@endphp
+
 <a href="{{ $href }}">
-    <img src="{{ asset($path) }}" alt="logo" class="mb-4 w-full max-w-40 cursor-pointer" />
+    <img src="{{ asset($path) }}" alt="logo" class="{{ $sizeCls }} mb-4 w-full cursor-pointer" />
 </a>

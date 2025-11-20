@@ -10,8 +10,14 @@
     </div>
 
     <div class="hp-container relative z-10 grid grid-cols-1 items-start gap-x-12 lg:grid-cols-[1fr_4fr]">
-        <div class="mb-4 flex items-center justify-center sm:justify-start">
-            <x-he4rt::section-title size="lg">Missão Social</x-he4rt::section-title>
+        <div
+            x-data="{ visible: false }"
+            x-intersect.once="visible = true"
+            class="mb-4 flex items-center justify-center sm:justify-start"
+        >
+            <x-he4rt::animate-block duration="700">
+                <x-he4rt::section-title size="lg">Missão Social</x-he4rt::section-title>
+            </x-he4rt::animate-block>
         </div>
 
         <div class="flex flex-col gap-8">
@@ -29,38 +35,53 @@
                 </x-he4rt::headline>
             </div>
 
-            <div class="grid grid-cols-1 gap-8 lg:grid-cols-4">
-                <x-he4rt::card>
-                    <x-slot:icon class="font-family-secondary text-4xl">01</x-slot>
-                    <x-slot:title>Primeiro Passo</x-slot>
-                    <x-slot:description>
-                        Você faz um PIX de R$60,00 (valor simbólico que cobre uma cesta básica)
-                    </x-slot>
-                </x-he4rt::card>
-                <x-he4rt::card>
-                    <x-slot:icon class="font-family-secondary text-4xl">02</x-slot>
-                    <x-slot:title>Segundo Passo</x-slot>
-                    <x-slot:description>
-                        Você garante sua vaga na transmissão ao vivo e recebe a Camiseta Exclusiva de Lançamento
-                        (entregue em sua casa)
-                    </x-slot>
-                </x-he4rt::card>
-                <x-he4rt::card>
-                    <x-slot:icon class="font-family-secondary text-4xl">03</x-slot>
-                    <x-slot:title>Terceiro Passo</x-slot>
-                    <x-slot:description>
-                        Ao seguir nossas redes e compartilhar o post oficial do evento, você fortalece a Comunidade 3
-                        Pts e amplia o impacto dessa ação.
-                    </x-slot>
-                </x-he4rt::card>
-                <x-he4rt::card>
-                    <x-slot:icon class="font-family-secondary text-4xl">04</x-slot>
-                    <x-slot:title>Quarto Passo</x-slot>
-                    <x-slot:description>
-                        Você se torna um agente de transformação, ajudando a garantir o suporte e o cuidado dessas
-                        crianças.
-                    </x-slot>
-                </x-he4rt::card>
+            <div
+                x-data="{ visible: false }"
+                x-intersect.threshold.20.once="visible = true"
+                class="grid grid-cols-1 gap-8 lg:grid-cols-4"
+            >
+                <x-he4rt::animate-block>
+                    <x-he4rt::card>
+                        <x-slot:icon class="font-family-secondary text-4xl">01</x-slot>
+                        <x-slot:title>Primeiro Passo</x-slot>
+                        <x-slot:description>
+                            Você faz um PIX de R$60,00 (valor simbólico que cobre uma cesta básica)
+                        </x-slot>
+                    </x-he4rt::card>
+                </x-he4rt::animate-block>
+
+                <x-he4rt::animate-block delay="100">
+                    <x-he4rt::card>
+                        <x-slot:icon class="font-family-secondary text-4xl">02</x-slot>
+                        <x-slot:title>Segundo Passo</x-slot>
+                        <x-slot:description>
+                            Você garante sua vaga na transmissão ao vivo e recebe a Camiseta Exclusiva de Lançamento
+                            (entregue em sua casa)
+                        </x-slot>
+                    </x-he4rt::card>
+                </x-he4rt::animate-block>
+
+                <x-he4rt::animate-block delay="200">
+                    <x-he4rt::card>
+                        <x-slot:icon class="font-family-secondary text-4xl">03</x-slot>
+                        <x-slot:title>Terceiro Passo</x-slot>
+                        <x-slot:description>
+                            Ao seguir nossas redes e compartilhar o post oficial do evento, você fortalece a Comunidade
+                            3 Pts e amplia o impacto dessa ação.
+                        </x-slot>
+                    </x-he4rt::card>
+                </x-he4rt::animate-block>
+
+                <x-he4rt::animate-block delay="300">
+                    <x-he4rt::card>
+                        <x-slot:icon class="font-family-secondary text-4xl">04</x-slot>
+                        <x-slot:title>Quarto Passo</x-slot>
+                        <x-slot:description>
+                            Você se torna um agente de transformação, ajudando a garantir o suporte e o cuidado dessas
+                            crianças.
+                        </x-slot>
+                    </x-he4rt::card>
+                </x-he4rt::animate-block>
             </div>
         </div>
     </div>

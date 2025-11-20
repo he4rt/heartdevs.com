@@ -15,7 +15,7 @@
 }
 
 .hp-footer-list {
-    @apply space-y-2 text-sm sm:space-y-6 sm:text-base;
+    @apply space-y-2 sm:space-y-6 sm:text-base;
 }
 
 .hp-footer-link {
