@@ -1,4 +1,4 @@
-<section class="hp-section">
+<section class="hp-section" id="partners">
     <div class="hp-container">
         <div>
             <x-he4rt::headline align="center">

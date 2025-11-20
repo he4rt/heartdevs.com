@@ -1,4 +1,4 @@
-<section class="hp-section relative">
+<section class="hp-section relative" id="watch-live">
     <div class="absolute inset-0">
         <img
             src="{{ asset('images/3pontos/grids-horizontal.svg') }}"

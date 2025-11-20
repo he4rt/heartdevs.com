@@ -1,4 +1,7 @@
-<section class="hp-section bg-elevation-01dp border-outline-dark relative min-h-0 overflow-hidden border-t border-b">
+<section
+    class="hp-section bg-elevation-01dp border-outline-dark relative min-h-0 overflow-hidden border-t border-b"
+    id="about"
+>
     <div class="absolute right-0 bottom-0 z-1 h-1/2 w-1/2 translate-x-1/2 lg:-translate-y-[110%]">
         <img src="{{ asset('images/3pontos/3pontos-ball.svg') }}" alt="" class="h-auto w-full object-cover" />
     </div>

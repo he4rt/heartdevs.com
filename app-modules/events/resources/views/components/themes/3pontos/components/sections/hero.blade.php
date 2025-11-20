@@ -1,4 +1,4 @@
-<section class="hp-section relative items-start">
+<section class="hp-section relative items-start" id="hero">
     <div class="absolute inset-0 -left-[20%] z-0 h-full w-[150%]">
         <img src="{{ asset('images/3pontos/logo-chain.png') }}" alt="" class="h-full w-full object-cover" />
 

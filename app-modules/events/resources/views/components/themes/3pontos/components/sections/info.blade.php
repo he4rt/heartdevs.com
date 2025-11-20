@@ -1,4 +1,4 @@
-<section class="hp-section relative z-1">
+<section class="hp-section relative z-1" id="info">
     <div class="hp-container">
         <div class="grid grid-cols-1 gap-y-8 lg:grid-cols-2">
             <div class="relative h-full w-full">
