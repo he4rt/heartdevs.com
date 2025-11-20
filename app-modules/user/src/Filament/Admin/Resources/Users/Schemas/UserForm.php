@@ -6,6 +6,7 @@ namespace He4rt\User\Filament\Admin\Resources\Users\Schemas;
 
 use Filament\Forms\Components\TextInput;
 use Filament\Schemas\Schema;
+use Illuminate\Support\Facades\Hash;
 
 class UserForm
 {
@@ -16,7 +17,7 @@ class UserForm
                 TextInput::make('name'),
                 TextInput::make('username'),
                 TextInput::make('email'),
-                TextInput::make('password'),
+                TextInput::make('password')->password()->dehydrateStateUsing(fn ($state) => Hash::make($state)),
             ]);
     }
 }
