@@ -36,8 +36,5 @@
             "composer pint",
             "composer rector process"
         ]
-    },
-    "dependencies": {
-        "shiki": "^3.15.0"
     }
 }

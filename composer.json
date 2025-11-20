@@ -9,7 +9,6 @@
     "license": "MIT",
     "require": {
         "php": "^8.3",
-        "dedoc/scramble": "^0.13.2",
         "filament/filament": "^4.0",
         "guzzlehttp/guzzle": "^7.10.0",
         "he4rt/authentication": ">=1",
@@ -26,16 +25,11 @@
         "he4rt/tenant": ">=1",
         "he4rt/user": ">=1",
         "internachi/modular": "^2.3.0",
-        "laravel/folio": "^1.1",
         "laravel/framework": "^12.37.0",
         "laravel/sanctum": "^4.2.0",
         "laravel/tinker": "^2.10.1",
-        "livewire/flux": "^2.6",
         "marvinlabs/laravel-discord-logger": "^1.4.3",
-        "predis/predis": "^2.4.0",
-        "spatie/laravel-markdown": "^2.7",
-        "spatie/shiki-php": "^2.3",
-        "spatie/yaml-front-matter": "^2.1"
+        "predis/predis": "^2.4.0"
     },
     "require-dev": {
         "barryvdh/laravel-ide-helper": "^3.6.0",
