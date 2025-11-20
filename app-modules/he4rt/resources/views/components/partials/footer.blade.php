@@ -37,7 +37,7 @@
                                 <x-he4rt::heading
                                     level="4"
                                     size="sm"
-                                    class="hp-footer-heading mb-4 {{ $index > 0 ? 'invisible' : '' }}"
+                                    class="hp-footer-heading mb-4 {{ $index > 0 ? 'hidden sm:block sm:invisible' : '' }}"
                                 >
                                     {{ $title }}
                                 </x-he4rt::heading>
