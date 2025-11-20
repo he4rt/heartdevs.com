@@ -14,6 +14,7 @@
         "he4rt/authentication": ">=1",
         "he4rt/badge": "^1.0.0",
         "he4rt/character": ">=1",
+        "he4rt/documentation": ">=1",
         "he4rt/feedback": ">=1",
         "he4rt/integrations": ">=1",
         "he4rt/meeting": ">=1",

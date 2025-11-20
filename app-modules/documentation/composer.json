@@ -1,0 +1,23 @@
+{
+    "name": "he4rt/documentation",
+    "description": "",
+    "type": "library",
+    "version": "1.0",
+    "license": "proprietary",
+    "autoload": {
+        "psr-4": {
+            "He4rt\\Documentation\\": "src/",
+            "He4rt\\Documentation\\Tests\\": "tests/",
+            "He4rt\\Documentation\\Database\\Factories\\": "database/factories/",
+            "He4rt\\Documentation\\Database\\Seeders\\": "database/seeders/"
+        }
+    },
+    "minimum-stability": "stable",
+    "extra": {
+        "laravel": {
+            "providers": [
+                "He4rt\\Documentation\\Providers\\DocumentationServiceProvider"
+            ]
+        }
+    }
+}
