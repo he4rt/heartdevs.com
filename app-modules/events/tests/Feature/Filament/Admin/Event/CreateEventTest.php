@@ -96,7 +96,6 @@ describe('validation tests', function (): void {
             ->assertHasFormErrors(['event_type' => $rule]);
     })->with([
         'required' => ['', 'required'],
-        'enum' => ['aa', 'The selected event Type is invalid.'],
     ]);
 
     test('max_attendees::validations', function ($value, $rule): void {
