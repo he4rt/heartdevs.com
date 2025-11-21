@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
+use App\Filament\Shared\RelationManagers\EventsRelationManager;
 use Filament\Actions\CreateAction;
 use Filament\Actions\Testing\TestAction;
 use Filament\Facades\Filament;
 use He4rt\Events\Enums\EventTypeEnum;
 use He4rt\Events\Models\EventModel;
 use He4rt\Tenant\Filament\Admin\Resources\Tenants\Pages\EditTenant;
-use He4rt\Tenant\Filament\Admin\Resources\Tenants\RelationManagers\EventsRelationManager;
 use He4rt\Tenant\Models\Tenant;
 use He4rt\User\Models\User;
 use Illuminate\Support\Facades\Date;

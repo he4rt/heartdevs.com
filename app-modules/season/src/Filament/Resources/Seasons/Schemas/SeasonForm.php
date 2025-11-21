@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace He4rt\Season\Filament\Resources\Seasons\Schemas;
 
+use App\Filament\Shared\RelationManagers\SeasonsRelationManager;
 use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\RichEditor;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Schemas\Schema;
-use He4rt\Tenant\Filament\Admin\Resources\Tenants\RelationManagers\SeasonsRelationManager;
 
 class SeasonForm
 {

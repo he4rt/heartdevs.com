@@ -7,6 +7,7 @@ namespace He4rt\Sponsors\Filament\Resources\Sponsors\Schemas;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\SpatieMediaLibraryFileUpload;
 use Filament\Forms\Components\TextInput;
+use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 
 class SponsorForm
@@ -15,20 +16,28 @@ class SponsorForm
     {
         return $schema
             ->components([
-                Select::make('tenant_id')
-                    ->label('Tenant')
-                    ->relationship('tenant', 'name')
-                    ->required(),
-                TextInput::make('name')
-                    ->minLength(5)
-                    ->maxLength(255)
-                    ->required(),
-                SpatieMediaLibraryFileUpload::make('receipt')
-                    ->label('Sponsor Logo')
-                    ->collection('receipt')
-                    ->image()
-                    ->required(),
-                TextInput::make('homepage_url'),
+                Section::make('Sponsors')
+                    ->description('Sponsors Information')
+                    ->schema([
+                        Select::make('tenant_id')
+                            ->label('Tenant')
+                            ->preload()
+                            ->searchable()
+                            ->relationship('tenant', 'name')
+                            ->required(),
+                        TextInput::make('name')
+                            ->minLength(5)
+                            ->maxLength(255)
+                            ->required(),
+                        SpatieMediaLibraryFileUpload::make('receipt')
+                            ->label('Sponsor Logo')
+                            ->collection('receipt')
+                            ->image()
+                            ->required(),
+                        TextInput::make('homepage_url')
+                            ->url(),
+                    ])
+                    ->columnSpanFull(),
             ]);
     }
 }

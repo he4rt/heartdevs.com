@@ -2,16 +2,13 @@
 
 declare(strict_types=1);
 
-namespace He4rt\Tenant\Filament\Admin\Resources\Tenants\RelationManagers;
+namespace App\Filament\Shared\RelationManagers;
 
-use Filament\Actions\AttachAction;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DetachAction;
 use Filament\Actions\DetachBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
-use Filament\Forms\Components\TextInput;
-use Filament\Forms\Components\Toggle;
 use Filament\Infolists\Components\IconEntry;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Resources\RelationManagers\RelationManager;
@@ -23,24 +20,6 @@ use Filament\Tables\Table;
 class MembersRelationManager extends RelationManager
 {
     protected static string $relationship = 'members';
-
-    public function form(Schema $schema): Schema
-    {
-        return $schema
-            ->components([
-                TextInput::make('username')
-                    ->required(),
-                TextInput::make('name')
-                    ->required(),
-                TextInput::make('email')
-                    ->label('Email address')
-                    ->email(),
-                TextInput::make('password')
-                    ->password(),
-                Toggle::make('is_donator')
-                    ->required(),
-            ]);
-    }
 
     public function infolist(Schema $schema): Schema
     {
@@ -89,9 +68,6 @@ class MembersRelationManager extends RelationManager
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
-            ])
-            ->headerActions([
-                AttachAction::make(),
             ])
             ->recordActions([
                 ViewAction::make(),

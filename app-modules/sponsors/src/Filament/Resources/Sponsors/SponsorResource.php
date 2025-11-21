@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace He4rt\Sponsors\Filament\Resources\Sponsors;
 
+use App\Filament\Shared\RelationManagers\EventsRelationManager;
 use BackedEnum;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
@@ -35,6 +36,13 @@ class SponsorResource extends Resource
     public static function table(Table $table): Table
     {
         return SponsorsTable::configure($table);
+    }
+
+    public static function getRelations(): array
+    {
+        return [
+            EventsRelationManager::class,
+        ];
     }
 
     public static function getPages(): array

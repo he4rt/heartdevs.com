@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace He4rt\Tenant\Filament\Admin\Resources\Tenants\RelationManagers;
+namespace App\Filament\Shared\RelationManagers;
 
 use Filament\Actions\CreateAction;
 use Filament\Resources\RelationManagers\RelationManager;
@@ -10,6 +10,7 @@ use Filament\Schemas\Schema;
 use Filament\Tables\Table;
 use He4rt\Events\Filament\Admin\Resources\Events\Schemas\EventForm;
 use He4rt\Events\Filament\Admin\Resources\Events\Tables\EventsTable;
+use He4rt\Sponsors\Filament\Resources\Sponsors\Pages\EditSponsor;
 
 class EventsRelationManager extends RelationManager
 {
@@ -28,7 +29,8 @@ class EventsRelationManager extends RelationManager
     protected function getTableHeaderActions(): array
     {
         return [
-            CreateAction::make(),
+            CreateAction::make()
+                ->visible(fn ($livewire) => $livewire->pageClass !== EditSponsor::class),
         ];
     }
 }

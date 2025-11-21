@@ -47,7 +47,7 @@ final class Meeting extends Model
     /**
      * @return BelongsToMany<User, $this, Pivot>
      */
-    public function users(): BelongsToMany
+    public function members(): BelongsToMany
     {
         return $this->belongsToMany(
             User::class,

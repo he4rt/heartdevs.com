@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace He4rt\Events\Filament\Admin\Resources\Events\Schemas;
 
+use App\Filament\Shared\RelationManagers\EventsRelationManager;
 use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\RichEditor;
 use Filament\Forms\Components\Select;
@@ -11,7 +12,6 @@ use Filament\Forms\Components\TextInput;
 use Filament\Schemas\Components\Utilities\Set;
 use Filament\Schemas\Schema;
 use He4rt\Events\Enums\EventTypeEnum;
-use He4rt\Tenant\Filament\Admin\Resources\Tenants\RelationManagers\EventsRelationManager;
 use Illuminate\Support\Str;
 
 class EventForm
