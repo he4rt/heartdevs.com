@@ -11,6 +11,7 @@ use Filament\Forms\Components\TextInput;
 use Filament\Schemas\Components\Utilities\Set;
 use Filament\Schemas\Schema;
 use He4rt\Events\Enums\EventTypeEnum;
+use He4rt\Tenant\Filament\Admin\Resources\Tenants\RelationManagers\EventsRelationManager;
 use Illuminate\Support\Str;
 
 class EventForm
@@ -22,6 +23,7 @@ class EventForm
                 Select::make('tenant_id')
                     ->label('Tenant')
                     ->relationship('tenant', 'name')
+                    ->visible(fn ($livewire) => ! ($livewire instanceof EventsRelationManager))
                     ->required(),
                 TextInput::make('title')
                     ->label('Title')
