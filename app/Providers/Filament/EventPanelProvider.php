@@ -12,6 +12,7 @@ use Filament\Http\Middleware\DispatchServingFilamentEvent;
 use Filament\Http\Middleware\IdentifyTenant;
 use Filament\Panel;
 use Filament\PanelProvider;
+use Filament\View\PanelsRenderHook;
 use He4rt\Events\Filament\Shared\EventLogin;
 use He4rt\Events\Filament\Shared\GuestSidebar;
 use He4rt\Events\Filament\Shared\GuestTopbar;
@@ -21,6 +22,7 @@ use Illuminate\Cookie\Middleware\EncryptCookies;
 use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
 use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Session\Middleware\StartSession;
+use Illuminate\Support\Facades\Blade;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
 use Illuminate\View\View;
 
@@ -35,12 +37,12 @@ class EventPanelProvider extends PanelProvider
             ->login(EventLogin::class)
             ->loginRouteSlug('{tenantSlug}/login')
             ->tenantDomain(app()->isLocal() ? null : sprintf('{tenant:slug}.%s', config('app.domain')))
-//            ->renderHook(PanelsRenderHook::TOPBAR_END, fn () => Blade::render(sprintf(<<<'BLADE'
-//               @guest
-//                    <x-he4rt::button href="%s">Fazer Login</x-he4rt::button>
-//               @endguest
-//            BLADE, Filament::getLoginUrl(['tenantSlug' => session()->get('tenant')]))
-//            ))
+            ->renderHook(PanelsRenderHook::TOPBAR_END, fn () => Blade::render(sprintf(<<<'BLADE'
+               @guest
+                    <x-he4rt::button href="%s">Fazer Login</x-he4rt::button>
+               @endguest
+            BLADE, Filament::getLoginUrl(['tenantSlug' => session()->get('tenant')]))
+            ))
             ->tenantViteTheme()
             ->topbarLivewireComponent(GuestTopbar::class)
             ->sidebarLivewireComponent(GuestSidebar::class)
