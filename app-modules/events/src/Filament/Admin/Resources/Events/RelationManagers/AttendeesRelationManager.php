@@ -4,15 +4,13 @@ declare(strict_types=1);
 
 namespace He4rt\Events\Filament\Admin\Resources\Events\RelationManagers;
 
-use Filament\Actions\AttachAction;
 use Filament\Actions\DetachAction;
-use Filament\Forms\Components\Select;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
-use He4rt\Events\Enums\AttendingStatusEnum;
 use He4rt\User\Filament\Admin\Resources\Users\UserResource;
+use He4rt\User\Models\User;
 
 class AttendeesRelationManager extends RelationManager
 {
@@ -36,19 +34,8 @@ class AttendeesRelationManager extends RelationManager
                     ->badge(),
             ])
             ->recordActions([
-                DetachAction::make(),
-            ])
-            ->headerActions([
-                AttachAction::make()
-                    ->preloadRecordSelect()
-                    ->form(fn (AttachAction $action): array => [
-                        $action->getRecordSelect(),
-                        Select::make('status')
-                            ->label('Status')
-                            ->options(AttendingStatusEnum::class)
-                            ->required()
-                            ->default(AttendingStatusEnum::Attending),
-                    ]),
+                DetachAction::make()
+                    ->using(fn (User $record) => $this->getOwnerRecord()->leave($record->getKey())),
             ]);
     }
 }
