@@ -97,7 +97,7 @@ describe('validation tests', function (): void {
     })->with([
         'required' => ['', 'required'],
         'enum' => ['aa', 'The selected event Type is invalid.'],
-    ])->skip();
+    ]);
 
     test('max_attendees::validations', function ($value, $rule): void {
         livewire(CreateEvent::class)
@@ -109,7 +109,7 @@ describe('validation tests', function (): void {
             ->assertHasFormErrors(['max_attendees' => $rule]);
     })->with([
         'required' => [null, 'required'],
-        'min 1' => [-1, 'The max attendees must be at least 1.'],
+        'min 1' => [-1, 'min'],
     ]);
 
     test('active::validations', function ($value, $rule): void {
