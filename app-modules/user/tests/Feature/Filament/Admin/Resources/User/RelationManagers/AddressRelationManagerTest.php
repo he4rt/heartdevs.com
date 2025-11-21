@@ -59,3 +59,13 @@ it('should be able to register an address for an user', function (): void {
         ->and($address->city)->toBe('tiradentes')
         ->and($address->zip_code)->toBe('091204200');
 });
+
+test('should not be able to register an address twice', function (): void {
+    Address::factory()
+        ->recycle($this->user)
+        ->create();
+    $action = TestAction::make(CreateAction::class)->table();
+    livewire(AddressRelationManager::class, ['ownerRecord' => $this->user, 'pageClass' => EditUser::class])
+        ->assertOk()
+        ->assertActionDisabled($action);
+});

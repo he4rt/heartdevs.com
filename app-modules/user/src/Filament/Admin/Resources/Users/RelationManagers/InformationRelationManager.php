@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace He4rt\User\Filament\Admin\Resources\Users\RelationManagers;
 
 use Filament\Actions\CreateAction;
+use Filament\Actions\ViewAction;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Schemas\Schema;
 use Filament\Tables\Columns\TextColumn;
@@ -23,6 +24,7 @@ class InformationRelationManager extends RelationManager
     public function table(Table $table): Table
     {
         return $table
+            ->paginated(false)
             ->columns([
                 TextColumn::make('name')
                     ->label('Name')
@@ -40,8 +42,12 @@ class InformationRelationManager extends RelationManager
                     ->label('Name')
                     ->searchable(),
             ])
+            ->recordActions([
+                ViewAction::make(),
+            ])
             ->headerActions([
-                CreateAction::make(),
+                CreateAction::make()
+                    ->visible(fn ($livewire) => ! $livewire->ownerRecord->information()->exists()),
             ]);
     }
 }

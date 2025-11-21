@@ -15,6 +15,7 @@ class CharacterRelationManager extends RelationManager
     public function table(Table $table): Table
     {
         return $table
+            ->paginated(false)
             ->columns([
                 TextColumn::make('tenant.name')
                     ->searchable()

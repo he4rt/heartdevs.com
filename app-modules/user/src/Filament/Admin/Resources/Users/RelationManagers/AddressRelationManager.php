@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace He4rt\User\Filament\Admin\Resources\Users\RelationManagers;
 
 use Filament\Actions\CreateAction;
+use Filament\Actions\ViewAction;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Schemas\Schema;
 use Filament\Tables\Columns\TextColumn;
@@ -23,6 +24,7 @@ class AddressRelationManager extends RelationManager
     public function table(Table $table): Table
     {
         return $table
+            ->paginated(false)
             ->columns([
                 TextColumn::make('country')
                     ->badge()
@@ -37,8 +39,12 @@ class AddressRelationManager extends RelationManager
                     ->badge()
                     ->searchable(),
             ])
+            ->recordActions([
+                ViewAction::make(),
+            ])
             ->headerActions([
-                CreateAction::make(),
+                CreateAction::make()
+                    ->visible(fn ($livewire) => ! $livewire->ownerRecord->address()->exists()),
             ]);
     }
 }

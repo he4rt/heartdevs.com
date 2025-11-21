@@ -56,3 +56,13 @@ it('should be able to register information about the user', function (): void {
         ->and($information->linkedin_url)->toBe('https://linkedin.com/in/johndoe')
         ->and($information->birthdate)->toBe('2000-01-01');
 });
+
+test('should not be able to register user information twice', function (): void {
+    Information::factory()
+        ->recycle($this->user)
+        ->create();
+    $action = TestAction::make(CreateAction::class)->table();
+    livewire(InformationRelationManager::class, ['ownerRecord' => $this->user, 'pageClass' => EditUser::class])
+        ->assertOk()
+        ->assertActionDisabled($action);
+});
