@@ -9,7 +9,6 @@ use Filament\Forms\Components\RichEditor;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Schemas\Schema;
-use He4rt\Tenant\Filament\Admin\Resources\Tenants\RelationManagers\SeasonsRelationManager;
 
 class SeasonForm
 {
@@ -19,7 +18,6 @@ class SeasonForm
             ->components([
                 Select::make('tenant_id')
                     ->relationship('tenant', 'name')
-                    ->visible(fn ($livewire) => ! ($livewire instanceof SeasonsRelationManager))
                     ->required(),
                 TextInput::make('name')
                     ->required(),
