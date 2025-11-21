@@ -18,11 +18,8 @@ class UsersTable
         return $table
             ->columns([
                 TextColumn::make('username'),
-
+                TextColumn::make('email'),
                 IconColumn::make('is_donator'),
-            ])
-            ->filters([
-                //
             ])
             ->recordActions([
                 EditAction::make(),
