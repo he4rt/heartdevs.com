@@ -8,6 +8,7 @@ use App\Enums\FilamentPanel;
 use Filament\Contracts\Plugin;
 use Filament\Panel;
 use He4rt\Events\Filament\Events\EventLandingPage;
+use He4rt\Events\Filament\Events\ParticipantDashboard;
 
 class EventPanelPlugin implements Plugin
 {
@@ -20,6 +21,7 @@ class EventPanelPlugin implements Plugin
     {
         $panel->pages([
             EventLandingPage::class,
+            ParticipantDashboard::class,
         ]);
     }
 

@@ -6,6 +6,7 @@ namespace App\Providers;
 
 use App\Enums\FilamentPanel;
 use Filament\Panel;
+use Filament\Support\Colors\Color;
 use Illuminate\Support\ServiceProvider;
 
 class FilamentServiceProvider extends ServiceProvider
@@ -36,6 +37,16 @@ class FilamentServiceProvider extends ServiceProvider
                 $themeDirectory = 'app-modules/he4rt/resources/css/theme.css';
             }
 
+            $color = match ($tenantSlug) {
+                '3pontos' => Color::Gray,
+                default => Color::Indigo
+            };
+
+            $this->colors([
+                'primary' => $color,
+            ]);
+
+            session()->put('tenant', $tenantSlug);
             $this->viteTheme($themeDirectory);
 
             return $this;

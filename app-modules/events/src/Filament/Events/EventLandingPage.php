@@ -13,8 +13,11 @@ class EventLandingPage extends Dashboard
 
     protected Width|string|null $maxContentWidth = Width::Full;
 
+    public function mount(): void {}
+
     public function getView(): string
     {
+
         if (app()->isLocal()) {
             $tenantSlug = str(request()->path())->explode('/')
                 ->get(1);

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace He4rt\Events\Filament\Events;
+namespace He4rt\Events\Filament\Shared;
 
 use Filament\Actions\Concerns\InteractsWithActions;
 use Filament\Actions\Contracts\HasActions;
@@ -14,18 +14,18 @@ use Illuminate\Contracts\View\View;
 use Livewire\Attributes\On;
 use Livewire\Component;
 
-class GuestSidebar extends Component implements HasActions, HasSchemas
+class GuestTopbar extends Component implements HasActions, HasSchemas
 {
     use HasTenantMenu;
     use HasUserMenu;
     use InteractsWithActions;
     use InteractsWithSchemas;
 
-    #[On('refresh-sidebar')]
+    #[On('refresh-topbar')]
     public function refresh(): void {}
 
     public function render(): View
     {
-        return view('events::filament.sidebar');
+        return view('events::filament.topbar');
     }
 }
