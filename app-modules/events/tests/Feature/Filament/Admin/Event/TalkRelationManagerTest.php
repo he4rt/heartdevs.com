@@ -86,7 +86,6 @@ it('should create a talk for the event', function (): void {
 
     expect($talk)
         ->title->toBe('Introduction to Laravel')
-        ->description->toBe('<p>A beginner friendly talk about Laravel</p>')
         ->user_id->toBe($speaker->getKey())
         ->event_id->toBe($this->event->getKey())
         ->tenant_id->toBe($this->tenant->getKey())

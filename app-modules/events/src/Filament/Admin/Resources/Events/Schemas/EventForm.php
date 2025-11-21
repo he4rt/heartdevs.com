@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace He4rt\Events\Filament\Admin\Resources\Events\Schemas;
 
-use App\Filament\Shared\RelationManagers\EventsRelationManager;
 use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\RichEditor;
 use Filament\Forms\Components\Select;
