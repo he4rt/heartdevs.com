@@ -30,7 +30,7 @@ class ThreeDotsSeeder extends Seeder
             ]);
 
         $event = EventModel::factory()
-            ->withAttendees()
+            ->withStatus()
             ->state([
                 'title' => 'Evento Da Três Pontos',
                 'event_type' => EventTypeEnum::Workshop,
