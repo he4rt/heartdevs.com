@@ -52,10 +52,10 @@
                             </div>
                         </div>
                         <x-slot:actions class="mt-0 flex w-fit items-center justify-center gap-8">
-                            <x-he4rt::button size="xs" class="text-helper-error bg-transparent">
+                            <x-he4rt::button rounded="sm" size="xs" class="text-helper-error bg-transparent">
                                 Desconectar conta
                             </x-he4rt::button>
-                            <x-he4rt::button size="xs">Deslogar</x-he4rt::button>
+                            <x-he4rt::button rounded="sm" size="xs">Deslogar</x-he4rt::button>
                         </x-slot>
                     </x-he4rt::card>
                 </x-he4rt::animate-block>
@@ -72,7 +72,7 @@
                                     <x-he4rt::text size="sm" class="mt-0.5">0 Mensagens</x-he4rt::text>
                                 </div>
                                 <div>
-                                    <x-he4rt::button size="xs">Desconectar</x-he4rt::button>
+                                    <x-he4rt::button rounded="sm" size="xs">Desconectar</x-he4rt::button>
                                 </div>
                             </div>
                             <div class="flex items-center justify-between gap-4">
