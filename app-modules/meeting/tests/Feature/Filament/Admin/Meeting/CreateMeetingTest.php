@@ -48,7 +48,5 @@ it('should be able to create a meet', function (): void {
         'tenant_id' => $tenant->getKey(),
         'admin_id' => $admin->getKey(),
         'meeting_type_id' => $meetingType->getKey(),
-        'starts_at' => Date::yesterday(),
-        'ends_at' => Date::tomorrow(),
     ]);
 });

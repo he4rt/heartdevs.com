@@ -34,3 +34,25 @@ it('can create a tenant', function (): void {
         'active' => true,
     ]);
 });
+
+test('name field should fill slug after updated ', function (): void {
+    $owner = User::factory()->create();
+
+    livewire(CreateTenant::class)
+        ->fillForm([
+            'name' => 'My Tenant',
+            'owner_id' => $owner->id,
+            'active' => true,
+        ])
+        ->assertSchemaComponentStateSet('slug', 'my-tenant')
+        ->call('create')
+        ->assertNotified()
+        ->assertRedirect();
+
+    $this->assertDatabaseHas(Tenant::class, [
+        'name' => 'My Tenant',
+        'slug' => 'my-tenant',
+        'owner_id' => $owner->id,
+        'active' => true,
+    ]);
+});
