@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace He4rt\Events\Database\Factories;
 
-use Exception;
 use He4rt\Events\Enums\AttendingStatusEnum;
 use He4rt\Events\Enums\EventTypeEnum;
 use He4rt\Events\Models\EventModel;
@@ -41,22 +40,34 @@ final class EventFactory extends Factory
         ];
     }
 
-    public function withStatus(AttendingStatusEnum $status = AttendingStatusEnum::Attending): self
+    public function withAttendees(?int $count = null, AttendingStatusEnum $status = AttendingStatusEnum::Attending): self
     {
-        return $this->afterCreating(function (EventModel $model) use ($status): void {
-            $attendees = User::factory()->count(fake()->numberBetween(3, 10))->create();
-            $column = match ($status) {
-                AttendingStatusEnum::Attending => 'attendees_count',
-                AttendingStatusEnum::Waitlist => 'waitlist_count',
-                AttendingStatusEnum::NotAttending => throw new Exception('Event is not attending anymore'),
-            };
-            $model->update([
-                $column => $attendees->count(),
-            ]);
+        return $this->afterCreating(function (EventModel $model) use ($count, $status): void {
+            $attendeesCount = $count ?? fake()->numberBetween(3, 10);
+            $attendees = User::factory()->count($attendeesCount)->create();
 
             foreach ($attendees as $user) {
                 $model->attendees()->attach($user->getKey(), [
                     'status' => $status,
+                ]);
+            }
+        });
+    }
+
+    public function withMixedAttendees(): self
+    {
+        return $this->afterCreating(function (EventModel $model): void {
+            $attending = User::factory()->count(fake()->numberBetween(5, 8))->create();
+            foreach ($attending as $user) {
+                $model->attendees()->attach($user->getKey(), [
+                    'status' => AttendingStatusEnum::Attending,
+                ]);
+            }
+
+            $waitlist = User::factory()->count(fake()->numberBetween(2, 5))->create();
+            foreach ($waitlist as $user) {
+                $model->attendees()->attach($user->getKey(), [
+                    'status' => AttendingStatusEnum::Waitlist,
                 ]);
             }
         });
