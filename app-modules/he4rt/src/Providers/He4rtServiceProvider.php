@@ -8,10 +8,11 @@ use Illuminate\Support\ServiceProvider;
 
 class He4rtServiceProvider extends ServiceProvider
 {
-    public function register(): void
+    public function register(): void {}
+
+    public function boot(): void
     {
         $this->loadViewsFrom(__DIR__.'/../../resources/views', 'he4rt');
+        $this->loadViewsFrom(__DIR__.'/../../resources/views/3pontos/views', '3pontos');
     }
-
-    public function boot(): void {}
 }

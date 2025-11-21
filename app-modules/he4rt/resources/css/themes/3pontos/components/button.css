@@ -1,0 +1,3 @@
+.hp-button-solid {
+    @apply bg-icon-high text-text-dark bg-none font-semibold;
+}

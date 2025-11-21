@@ -35,6 +35,7 @@
     $classes = collect([
         'hp-card',
         'hp-card-density-' . $density,
+        'hp-card-variant-' . $variant,
         $isInteractive ? 'hp-card-interactive' : null,
         $disabled ? 'hp-card-disabled' : null,
     ])
@@ -71,6 +72,8 @@
             </p>
         @endisset
     </div>
+
+    {{ $slot }}
 
     {{-- Slot de Tags --}}
     @isset($tags)

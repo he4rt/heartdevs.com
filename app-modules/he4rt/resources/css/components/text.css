@@ -1,0 +1,19 @@
+.hp-text {
+    @apply text-text-medium;
+}
+
+.hp-text-size-xs {
+    @apply text-xs;
+}
+
+.hp-text-size-sm {
+    @apply text-xs sm:text-sm;
+}
+
+.hp-text-size-md {
+    @apply text-sm sm:text-base;
+}
+
+.hp-text-size-lg {
+    @apply text-base sm:text-lg;
+}

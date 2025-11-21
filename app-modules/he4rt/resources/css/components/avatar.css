@@ -12,4 +12,8 @@
     &.hp-size-lg {
         @apply size-10;
     }
+
+    &.hp-size-2xl {
+        @apply size-20;
+    }
 }

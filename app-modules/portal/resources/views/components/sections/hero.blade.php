@@ -14,11 +14,13 @@
     </div>
     <div class="hp-container">
         <div class="grid grid-cols-1 gap-8 lg:grid-cols-2 lg:gap-12">
-            <div class="space-y-6">
+            <div class="flex flex-col gap-4">
                 <x-he4rt::headline size="2xl" :keywords="['potencial']">
                     <x-slot:badge>
-                        <x-filament::icon icon="heroicon-o-book-open" class="h-5 w-5" />
-                        Comunidade Open Source
+                        <x-he4rt::badge>
+                            <x-filament::icon icon="heroicon-o-book-open" class="h-5 w-5" />
+                            Comunidade Open Source
+                        </x-he4rt::badge>
                     </x-slot>
 
                     <x-slot:title>Desenvolva seu potencial na comunidade</x-slot>
@@ -48,7 +50,7 @@
                             <div class="h-3 w-3 rounded-full bg-green-500"></div>
                         </div>
 
-                        <div class="flex flex-col gap-2 p-6 font-mono text-sm text-gray-300">
+                        <div class="flex w-full flex-col gap-2 p-6 font-mono text-sm text-gray-300">
                             <div class="flex items-center">
                                 <span class="mr-2 text-gray-500">$</span>
                                 <span class="text-gray-100">he4rtdevs.exe</span>
