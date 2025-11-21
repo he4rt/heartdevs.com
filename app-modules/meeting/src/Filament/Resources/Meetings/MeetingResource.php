@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace He4rt\Meeting\Filament\Resources\Meetings;
 
+use App\Filament\Shared\RelationManagers\MembersRelationManager;
 use BackedEnum;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
@@ -33,6 +34,13 @@ class MeetingResource extends Resource
     public static function table(Table $table): Table
     {
         return MeetingsTable::configure($table);
+    }
+
+    public static function getRelations(): array
+    {
+        return [
+            MembersRelationManager::class,
+        ];
     }
 
     public static function getPages(): array

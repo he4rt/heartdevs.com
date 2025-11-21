@@ -16,11 +16,15 @@ class MeetingsTable
     {
         return $table
             ->columns([
-                TextColumn::make('id')
-                    ->label('ID'),
-                TextColumn::make('admin_id'),
-                TextColumn::make('meeting_type_id')
-                    ->numeric()
+                TextColumn::make('tenant.name')
+                    ->badge()
+                    ->searchable()
+                    ->sortable(),
+                TextColumn::make('admin.name')
+                    ->label('Admin')
+                    ->searchable()
+                    ->badge(),
+                TextColumn::make('meetingType.name')
                     ->sortable(),
                 TextColumn::make('starts_at')
                     ->label('Meeting Hour')
@@ -35,9 +39,6 @@ class MeetingsTable
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
-                TextColumn::make('tenant_id')
-                    ->numeric()
-                    ->sortable(),
             ])
             ->recordActions([
                 EditAction::make(),

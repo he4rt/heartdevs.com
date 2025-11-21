@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace He4rt\Tenant\Filament\Admin\Resources\Tenants;
 
+use App\Filament\Shared\RelationManagers\EventsRelationManager;
+use App\Filament\Shared\RelationManagers\MembersRelationManager;
 use BackedEnum;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
@@ -35,6 +37,14 @@ class TenantResource extends Resource
     public static function table(Table $table): Table
     {
         return TenantsTable::configure($table);
+    }
+
+    public static function getRelations(): array
+    {
+        return [
+            EventsRelationManager::class,
+            MembersRelationManager::class,
+        ];
     }
 
     public static function getPages(): array

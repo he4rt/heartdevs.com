@@ -7,6 +7,8 @@ namespace He4rt\User\Models;
 use Filament\Models\Contracts\HasName;
 use Filament\Models\Contracts\HasTenants;
 use He4rt\Character\Models\Character;
+use He4rt\Events\Models\EventModel;
+use He4rt\Events\Models\Pivot\EventAttend;
 use He4rt\Provider\Models\Provider;
 use He4rt\Tenant\Models\Concerns\InteractsWithTenants;
 use He4rt\User\Database\Factories\UserFactory;
@@ -14,6 +16,7 @@ use He4rt\User\Observers\UserObserver;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
@@ -48,6 +51,23 @@ final class User extends Authenticatable implements HasName, HasTenants
     public function address(): HasOne
     {
         return $this->hasOne(Address::class);
+    }
+
+    /**
+     * @return BelongsToMany<EventModel, $this>
+     */
+    public function events(): BelongsToMany
+    {
+        return $this
+            ->belongsToMany(
+                EventModel::class,
+                'events_attendees',
+                'user_id',
+                'event_id'
+            )
+            ->using(EventAttend::class)
+            ->withPivot('status')
+            ->withTimestamps();
     }
 
     /**
@@ -88,6 +108,7 @@ final class User extends Authenticatable implements HasName, HasTenants
     {
         return [
             'is_donator' => 'boolean',
+            'password' => 'hashed',
         ];
     }
 }

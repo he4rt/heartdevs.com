@@ -52,7 +52,7 @@ final readonly class MeetingEloquentRepository implements MeetingRepository
     {
         $this->model->newQuery()
             ->find($meetingId)
-            ->users()
+            ->members()
             ->attach($userId, ['attend_at' => now()]);
     }
 }

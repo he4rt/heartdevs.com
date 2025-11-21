@@ -6,6 +6,7 @@ namespace He4rt\Character\Database\Factories;
 
 use He4rt\Character\Models\Character;
 use He4rt\Character\Models\PastSeason;
+use He4rt\Season\Models\Season;
 use He4rt\Tenant\Models\Tenant;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
@@ -19,7 +20,7 @@ final class PastSeasonFactory extends Factory
     public function definition(): array
     {
         return [
-            'season_id' => 2,
+            'season_id' => Season::factory(),
             'tenant_id' => Tenant::factory(),
             'character_id' => Character::factory(),
             'ranking_position' => fake()->numberBetween(1, 1000),

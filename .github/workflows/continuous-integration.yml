@@ -2,11 +2,10 @@ name: Continuous Integration
 
 on:
   push:
-    branches:
-      - 3.x
+    branches: [3.x]
   pull_request:
-    branches:
-      - 3.x
+    branches: [3.x]
+    types: [opened, reopened, synchronize, ready_for_review]
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
@@ -16,6 +15,7 @@ jobs:
   setup:
     name: Setup PHP
     runs-on: ubuntu-latest
+    if: ${{ !github.event.pull_request.draft }}
     timeout-minutes: 5
     outputs:
       CACHE_KEY: ${{ steps.cache.outputs.key }}
@@ -61,8 +61,8 @@ jobs:
 
   pint:
     name: Perform Pint format
-    needs:
-      - setup
+    needs: [setup]
+    if: ${{ !github.event.pull_request.draft }}
     uses: ./.github/workflows/_pint.yml
     with:
       CACHE_KEY: ${{ needs.setup.outputs.CACHE_KEY }}
@@ -73,8 +73,8 @@ jobs:
 
   rector:
     name: Perform Rector Check
-    needs:
-      - setup
+    needs: [setup]
+    if: ${{ !github.event.pull_request.draft }}
     uses: ./.github/workflows/_rector.yml
     with:
       CACHE_KEY: ${{ needs.setup.outputs.CACHE_KEY }}
@@ -85,8 +85,8 @@ jobs:
 
   phpstan:
     name: Perform Phpstan Check
-    needs:
-      - setup
+    needs: [setup]
+    if: ${{ !github.event.pull_request.draft }}
     uses: ./.github/workflows/_phpstan.yml
     with:
       CACHE_KEY: ${{ needs.setup.outputs.CACHE_KEY }}
@@ -97,8 +97,8 @@ jobs:
 
   pest:
     name: Perform Pest Tests
-    needs:
-      - setup
+    needs: [setup]
+    if: ${{ !github.event.pull_request.draft }}
     uses: ./.github/workflows/_pest.yml
     with:
       CACHE_KEY: ${{ needs.setup.outputs.CACHE_KEY }}

@@ -31,11 +31,6 @@ final class Meeting extends Model
         'ends_at',
     ];
 
-    private array $dates = [
-        'starts_at',
-        'ends_at',
-    ];
-
     public function isEnded(): bool
     {
         return (bool) $this->attributes['ends_at'];
@@ -52,7 +47,7 @@ final class Meeting extends Model
     /**
      * @return BelongsToMany<User, $this, Pivot>
      */
-    public function users(): BelongsToMany
+    public function members(): BelongsToMany
     {
         return $this->belongsToMany(
             User::class,
@@ -87,6 +82,8 @@ final class Meeting extends Model
     {
         return [
             'meeting_type_id' => 'integer',
+            'starts_at' => 'datetime',
+            'ends_at' => 'datetime',
         ];
     }
 }

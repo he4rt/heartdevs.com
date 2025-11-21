@@ -6,6 +6,7 @@ namespace He4rt\User\Database\Factories;
 
 use He4rt\User\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
+use Illuminate\Support\Facades\Hash;
 
 /**
  * @extends Factory<User>
@@ -21,7 +22,7 @@ final class UserFactory extends Factory
             'username' => fake()->userName(),
             'name' => fake()->name(),
             'email' => fake()->email(),
-            'password' => fake()->password(),
+            'password' => Hash::make('password'),
             'is_donator' => false,
         ];
     }

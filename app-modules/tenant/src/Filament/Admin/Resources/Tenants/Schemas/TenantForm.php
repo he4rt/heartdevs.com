@@ -7,7 +7,10 @@ namespace He4rt\Tenant\Filament\Admin\Resources\Tenants\Schemas;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
+use Filament\Schemas\Components\Section;
+use Filament\Schemas\Components\Utilities\Set;
 use Filament\Schemas\Schema;
+use Illuminate\Support\Str;
 
 class TenantForm
 {
@@ -15,12 +18,25 @@ class TenantForm
     {
         return $schema
             ->components([
-                TextInput::make('name'),
-                TextInput::make('slug'),
-                Select::make('owner_id')
-                    ->relationship('owner', 'name'),
-                Toggle::make('active')
-                    ->required(),
+                Section::make()
+                    ->schema([
+                        TextInput::make('name')
+                            ->minLength(3)
+                            ->maxLength(255)
+                            ->afterStateUpdated(fn ($state, Set $set) => $set('slug', Str::slug($state)))
+                            ->live()
+                            ->required(),
+                        TextInput::make('slug')
+                            ->readonly()
+                            ->partiallyRenderComponentsAfterStateUpdated(['name'])
+                            ->required(),
+                        Select::make('owner_id')
+                            ->relationship('owner', 'name')
+                            ->required(),
+                        Toggle::make('active')
+                            ->required(),
+                    ])
+                    ->columnSpanFull(),
             ]);
     }
 }

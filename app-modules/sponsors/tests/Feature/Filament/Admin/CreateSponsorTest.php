@@ -33,7 +33,7 @@ it('should be able to register a sponsor', function (): void {
             'tenant_id' => 1,
             'name' => 'sponsor name',
             'receipt' => $image,
-            'homepage_url' => 'url da homepage',
+            'homepage_url' => 'https://www.google.com',
         ])
         ->call('create')
         ->assertHasNoFormErrors();
@@ -43,7 +43,7 @@ it('should be able to register a sponsor', function (): void {
     assertDatabaseHas(Sponsor::class, [
         'tenant_id' => 1,
         'name' => 'sponsor name',
-        'homepage_url' => 'url da homepage',
+        'homepage_url' => 'https://www.google.com',
     ]);
 
     $sponsor = Sponsor::query()->first();

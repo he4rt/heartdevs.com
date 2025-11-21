@@ -12,6 +12,8 @@ use Filament\Tables\Table;
 use He4rt\Events\Filament\Admin\Resources\Events\Pages\CreateEvent;
 use He4rt\Events\Filament\Admin\Resources\Events\Pages\EditEvent;
 use He4rt\Events\Filament\Admin\Resources\Events\Pages\ListEvents;
+use He4rt\Events\Filament\Admin\Resources\Events\RelationManagers\AttendeesRelationManager;
+use He4rt\Events\Filament\Admin\Resources\Events\RelationManagers\TalksRelationManager;
 use He4rt\Events\Filament\Admin\Resources\Events\Schemas\EventForm;
 use He4rt\Events\Filament\Admin\Resources\Events\Tables\EventsTable;
 use He4rt\Events\Models\EventModel;
@@ -27,6 +29,11 @@ class EventResource extends Resource
 
     protected static ?string $label = 'Events';
 
+    public static function getNavigationBadge(): ?string
+    {
+        return (string) self::$model::count();
+    }
+
     public static function form(Schema $schema): Schema
     {
         return EventForm::configure($schema);
@@ -35,6 +42,14 @@ class EventResource extends Resource
     public static function table(Table $table): Table
     {
         return EventsTable::configure($table);
+    }
+
+    public static function getRelations(): array
+    {
+        return [
+            TalksRelationManager::class,
+            AttendeesRelationManager::class,
+        ];
     }
 
     public static function getPages(): array

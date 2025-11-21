@@ -29,6 +29,11 @@ class TalkResource extends Resource
 
     protected static ?string $label = 'Submissions';
 
+    public static function getNavigationBadge(): ?string
+    {
+        return (string) self::$model::count();
+    }
+
     public static function form(Schema $schema): Schema
     {
         return TalkForm::configure($schema);
