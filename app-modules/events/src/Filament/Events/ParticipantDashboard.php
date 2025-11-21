@@ -5,12 +5,18 @@ declare(strict_types=1);
 namespace He4rt\Events\Filament\Events;
 
 use Filament\Pages\Page;
+use Illuminate\Contracts\Support\Htmlable;
 
 class ParticipantDashboard extends Page
 {
     public static function shouldRegisterNavigation(): bool
     {
         return auth()->check();
+    }
+
+    public function getTitle(): string|Htmlable
+    {
+        return '';
     }
 
     public function getView(): string
