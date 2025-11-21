@@ -6,19 +6,21 @@ namespace He4rt\Integrations\Discord\OAuth;
 
 use He4rt\Authentication\Contracts\OAuthClientContract;
 use He4rt\Authentication\DTO\OAuthAccessDTO;
+use He4rt\Authentication\DTO\OAuthStateDTO;
 use He4rt\Authentication\DTO\OAuthUserDTO;
 use Illuminate\Support\Facades\Http;
 
 class DiscordOAuthClient implements OAuthClientContract
 {
-    public function redirectUrl(?string $state = null): string
+    public function redirectUrl(?OAuthStateDTO $state = null): string
     {
-        return sprintf(
-            'https://discord.com/oauth2/authorize?client_id=%s&response_type=code&redirect_uri=%s&scope=%s',
-            config('services.discord.client_id'),
-            config('services.discord.redirect_uri'),
-            config('services.discord.scopes'),
-        );
+        return 'https://discord.com/oauth2/authorize?'.http_build_query([
+            'client_id' => config('services.discord.client_id'),
+            'response_type' => 'code',
+            'redirect_uri' => config('services.discord.redirect_uri'),
+            'scope' => config('services.discord.scopes'),
+            'state' => (string) $state,
+        ]);
     }
 
     public function auth(string $code): OAuthAccessDTO

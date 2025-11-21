@@ -46,7 +46,9 @@ class FilamentServiceProvider extends ServiceProvider
                 'primary' => $color,
             ]);
 
+            session()->put('panel', $this->getId());
             session()->put('tenant', $tenantSlug);
+
             $this->viteTheme($themeDirectory);
 
             return $this;

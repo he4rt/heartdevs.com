@@ -26,9 +26,12 @@ use Filament\Schemas\Components\Group;
 use Filament\Schemas\Components\RenderHook;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Components\Utilities\Get;
+use Filament\Schemas\Components\View;
 use Filament\Schemas\Schema;
 use Filament\Support\Enums\Alignment;
 use Filament\View\PanelsRenderHook;
+use He4rt\Authentication\Enums\OAuthProviderEnum;
+use He4rt\Tenant\Models\Tenant;
 use Illuminate\Auth\Events\Failed;
 use Illuminate\Auth\SessionGuard;
 use Illuminate\Contracts\Auth\Authenticatable;
@@ -52,8 +55,13 @@ class EventLogin extends SimplePage
     #[Locked]
     public ?string $userUndertakingMultiFactorAuthentication = null;
 
+    public ?string $tenantSlug = null;
+
     public function mount(?string $tenantSlug = null): void
     {
+        abort_unless(Tenant::query()->where('slug', $tenantSlug)->exists(), 404);
+
+        $this->tenantSlug = $tenantSlug;
         if (Filament::auth()->check()) {
             redirect()->intended(Filament::getUrl());
         }
@@ -142,6 +150,9 @@ class EventLogin extends SimplePage
     {
         return $schema
             ->components([
+                View::make('he4rt::components.partials.oauth-connect')->viewData([
+                    'providers' => OAuthProviderEnum::cases(),
+                ]),
                 $this->getEmailFormComponent(),
                 $this->getPasswordFormComponent(),
                 $this->getRememberFormComponent(),

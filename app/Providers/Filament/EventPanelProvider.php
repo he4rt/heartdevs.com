@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Providers\Filament;
 
 use App\Http\Middleware\GuestTenantIdentifier;
+use Filament\Actions\Action;
 use Filament\Facades\Filament;
 use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
@@ -12,6 +13,9 @@ use Filament\Http\Middleware\DispatchServingFilamentEvent;
 use Filament\Http\Middleware\IdentifyTenant;
 use Filament\Panel;
 use Filament\PanelProvider;
+use Filament\Support\Facades\FilamentIcon;
+use Filament\Support\Icons\Heroicon;
+use Filament\View\PanelsIconAlias;
 use Filament\View\PanelsRenderHook;
 use He4rt\Events\Filament\Shared\EventLogin;
 use He4rt\Events\Filament\Shared\GuestSidebar;
@@ -54,6 +58,14 @@ class EventPanelProvider extends PanelProvider
                     'path' => 'images/3pontos/logo.svg',
                 ])
             )
+            ->userMenuItems([
+                'logout' => Action::make('logout')
+                    ->label(__('filament-panels::layout.actions.logout.label'))
+                    ->icon(FilamentIcon::resolve(PanelsIconAlias::USER_MENU_LOGOUT_BUTTON) ?? Heroicon::ArrowLeftEndOnRectangle)
+                    ->url(fn () => route('tenant.logout', ['tenantSlug' => filament()->getTenant()?->slug]))
+                    ->postToUrl()
+                    ->sort(PHP_INT_MAX),
+            ])
             ->topNavigation()
             ->discoverWidgets(in: app_path('Filament/Event/Widgets'), for: 'App\Filament\Event\Widgets')
             ->middleware([
@@ -74,7 +86,6 @@ class EventPanelProvider extends PanelProvider
         Filament::registerPanel(
             fn (): Panel => $this->panel(Panel::make()),
         );
-
         $this->app->bind(IdentifyTenant::class, GuestTenantIdentifier::class);
     }
 }
