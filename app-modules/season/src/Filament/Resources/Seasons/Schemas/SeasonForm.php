@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace He4rt\Season\Filament\Resources\Seasons\Schemas;
 
-use App\Filament\Shared\RelationManagers\SeasonsRelationManager;
 use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\RichEditor;
 use Filament\Forms\Components\Select;
@@ -19,7 +18,6 @@ class SeasonForm
             ->components([
                 Select::make('tenant_id')
                     ->relationship('tenant', 'name')
-                    ->visible(fn ($livewire) => ! ($livewire instanceof SeasonsRelationManager))
                     ->required(),
                 TextInput::make('name')
                     ->required(),
