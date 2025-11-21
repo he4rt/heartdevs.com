@@ -17,14 +17,22 @@ class TalksTable
         return $table
             ->columns([
                 TextColumn::make('title')
+                    ->description(fn ($record) => $record->user->name)
                     ->searchable(),
                 TextColumn::make('description')
+                    ->limit(30)
                     ->searchable(),
                 TextColumn::make('field_type')
                     ->searchable(),
                 TextColumn::make('status')
                     ->badge()
                     ->searchable(),
+                TextColumn::make('starts_at')
+                    ->dateTime()
+                    ->sortable(),
+                TextColumn::make('ends_at')
+                    ->dateTime()
+                    ->sortable(),
             ])
             ->recordActions([
                 EditAction::make(),
