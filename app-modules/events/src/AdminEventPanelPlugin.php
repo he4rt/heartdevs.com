@@ -23,6 +23,7 @@ class AdminEventPanelPlugin implements Plugin
             EventResource::class,
             TalkResource::class,
         ]);
+
     }
 
     public function boot(Panel $panel): void {}

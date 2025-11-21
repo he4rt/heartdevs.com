@@ -6,6 +6,7 @@ namespace Database\Seeders;
 
 use He4rt\Character\Models\Character;
 use He4rt\Events\Models\EventModel;
+use He4rt\Events\Models\Talk;
 use He4rt\Season\Models\Season;
 use He4rt\Tenant\Models\Tenant;
 use He4rt\User\Models\Address;
@@ -46,12 +47,21 @@ class BaseSeeder extends Seeder
             ->recycle($tenant)
             ->createOne();
 
-        EventModel::factory()->count(10)
+        EventModel::factory()
             ->withStatus()
             ->recycle($tenant)
             ->create([
                 'end_at' => Date::tomorrow(),
             ]);
+
+        EventModel::factory()->count(5)
+            ->withStatus()
+            ->afterCreating(function ($event): void {
+                Talk::factory()->count(5)->create([
+                    'event_id' => $event->id,
+                ]);
+            })
+            ->create();
 
         Season::factory()
             ->recycle($tenant)
