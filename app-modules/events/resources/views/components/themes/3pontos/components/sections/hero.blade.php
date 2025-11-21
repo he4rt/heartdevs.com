@@ -23,8 +23,8 @@
             </x-slot>
             <x-slot:title>Participe do primeiro evento presencial da 3Pontos</x-slot>
             <x-slot:description>
-                O Meetup da He4rt é um evento que reúne os nosso membros presencialmente e virtualmente pra trocarmos
-                conhecimentos, fazer networking e unir cada vez mais nossa comunidade.
+                Um evento híbrido de 5 horas, em parceria com a He4rt, com palestras exclusivas, networking e uma missão
+                social que transforma.
             </x-slot>
             <x-slot:actions>
                 <x-he4rt::button>Faça sua inscrição</x-he4rt::button>
