@@ -10,7 +10,7 @@ class Login extends \Filament\Auth\Pages\Login
     {
         parent::mount();
 
-        if (app()->isLocal()) {
+        if (app()->environment(['local', 'staging'])) {
             $this->form->fill([
                 'email' => 'admin@admin.com',
                 'password' => 'admin',

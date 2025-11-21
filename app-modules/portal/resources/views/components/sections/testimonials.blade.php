@@ -2,8 +2,10 @@
     <div class="hp-container">
         <x-he4rt::headline align="center" size="md" :keywords="['membros']">
             <x-slot:badge>
-                <x-filament::icon icon="heroicon-o-chat-bubble-oval-left-ellipsis" class="h-5 w-5" />
-                Depoimentos
+                <x-he4rt::badge>
+                    <x-filament::icon icon="heroicon-o-chat-bubble-oval-left-ellipsis" class="h-5 w-5" />
+                    Depoimentos
+                </x-he4rt::badge>
             </x-slot>
 
             <x-slot:title>O que dizem nossos membros</x-slot>

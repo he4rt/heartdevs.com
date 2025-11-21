@@ -1,7 +1,16 @@
 @props([
+    'href' => '/',
+    'path' => 'images/logo.svg',
     'size' => 'md',
 ])
 
-<a href="/">
-    <img src="{{ asset('images/logo.svg') }}" alt="logo" class="mb-4 w-40 cursor-pointer" />
+@php
+    $sizeCls = match ($size) {
+        'sm' => 'max-w-20',
+        'md' => 'max-w-40',
+    };
+@endphp
+
+<a href="{{ $href }}">
+    <img src="{{ asset($path) }}" alt="logo" class="{{ $sizeCls }} mb-4 w-full cursor-pointer" />
 </a>

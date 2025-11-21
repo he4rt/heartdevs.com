@@ -2,8 +2,10 @@
     <div class="hp-container">
         <x-he4rt::headline align="center" size="md" :keywords="['prática']">
             <x-slot:badge>
-                <x-filament::icon icon="heroicon-o-cube" class="h-5 w-5" />
-                Nossos projetos
+                <x-he4rt::badge>
+                    <x-filament::icon icon="heroicon-o-cube" class="h-5 w-5" />
+                    Nossos projetos
+                </x-he4rt::badge>
             </x-slot>
 
             <x-slot:title>Aprenda na prática</x-slot>
