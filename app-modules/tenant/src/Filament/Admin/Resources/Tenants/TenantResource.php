@@ -14,6 +14,8 @@ use Filament\Tables\Table;
 use He4rt\Tenant\Filament\Admin\Resources\Tenants\Pages\CreateTenant;
 use He4rt\Tenant\Filament\Admin\Resources\Tenants\Pages\EditTenant;
 use He4rt\Tenant\Filament\Admin\Resources\Tenants\Pages\ListTenants;
+use He4rt\Tenant\Filament\Admin\Resources\Tenants\RelationManagers\EventsRelationManager;
+use He4rt\Tenant\Filament\Admin\Resources\Tenants\RelationManagers\MembersRelationManager;
 use He4rt\Tenant\Filament\Admin\Resources\Tenants\Schemas\TenantForm;
 use He4rt\Tenant\Filament\Admin\Resources\Tenants\Tables\TenantsTable;
 use He4rt\Tenant\Models\Tenant;

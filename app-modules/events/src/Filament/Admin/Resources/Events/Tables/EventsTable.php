@@ -18,6 +18,7 @@ class EventsTable
         return $table
             ->columns([
                 TextColumn::make('title')
+                    ->limit(20)
                     ->searchable(),
                 TextColumn::make('slug')
                     ->visible(false)
@@ -28,6 +29,26 @@ class EventsTable
                     ->badge()
                     ->searchable(),
                 IconColumn::make('active')
+                    ->sortable()
+                    ->boolean(),
+
+                TextColumn::make('attendees_count')
+                    ->label('Inscritos')
+                    ->sortable()
+                    ->formatStateUsing(fn (string $state, $record) => sprintf('%s/%s', $state, $record->max_attendees)),
+
+                TextColumn::make('talks_count')
+                    ->label('Submissions')
+                    ->sortable()
+                    ->counts('talks'),
+
+                TextColumn::make('event_at')
+                    ->sortable()
+                    ->date(),
+                IconColumn::make('active')
+                    ->searchable(),
+                TextColumn::make('max_attendees'),
+                TextColumn::make('event_at')
                     ->searchable(),
                 TextColumn::make('max_attendees'),
                 TextColumn::make('event_at'),
@@ -37,9 +58,6 @@ class EventsTable
                     ->formatStateUsing(fn ($state) => $state->format('d/m/Y H:i'))
                     ->description(fn ($record) => $record->end_at->format('d/m/Y H:i'))
                     ->sortable(),
-            ])
-            ->filters([
-                //
             ])
             ->recordActions([
                 EditAction::make(),
