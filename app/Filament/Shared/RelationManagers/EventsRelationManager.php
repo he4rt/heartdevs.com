@@ -11,10 +11,16 @@ use Filament\Tables\Table;
 use He4rt\Events\Filament\Admin\Resources\Events\Schemas\EventForm;
 use He4rt\Events\Filament\Admin\Resources\Events\Tables\EventsTable;
 use He4rt\Sponsors\Filament\Resources\Sponsors\Pages\EditSponsor;
+use Illuminate\Database\Eloquent\Model;
 
 class EventsRelationManager extends RelationManager
 {
     protected static string $relationship = 'events';
+
+    public static function getBadge(Model $ownerRecord, string $pageClass): ?string
+    {
+        return (string) ($ownerRecord->events->where('active', true)->count());
+    }
 
     public function form(Schema $schema): Schema
     {
