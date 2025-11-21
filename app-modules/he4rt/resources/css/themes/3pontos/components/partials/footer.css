@@ -1,0 +1,3 @@
+.hp-footer {
+    @apply bg-elevation-surface/32 border-outline-dark/80 border-t shadow-[0_-20px_50px_var(--elevation-surface)] backdrop-blur-md;
+}

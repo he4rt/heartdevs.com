@@ -1,7 +1,7 @@
 .hp-button {
     @apply relative inline-flex cursor-pointer items-center justify-center font-medium;
 
-    @apply w-full lg:w-auto;
+    @apply w-full sm:w-auto;
 
     @apply gap-2;
 
@@ -14,11 +14,11 @@
 }
 
 .hp-button-solid {
-    @apply from-primary-purple to-primary-pink text-text-high bg-gradient-to-br font-semibold;
+    @apply from-primary to-secondary text-text-high bg-gradient-to-br font-semibold;
 }
 
 .hp-button-outline {
-    @apply text-text-high border-border hover:border-primary-purple hover:bg-primary-purple/10 border bg-transparent;
+    @apply text-text-high border-outline-low hover:border-primary hover:bg-primary/10 border bg-transparent;
 }
 
 .hp-button-size-xs {

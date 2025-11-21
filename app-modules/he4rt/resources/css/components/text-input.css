@@ -9,10 +9,10 @@
 
 .hp-input {
     @apply w-full;
-    @apply border-border rounded-md border p-2;
+    @apply border-outline-low rounded-md border p-2;
     @apply bg-transparent;
     @apply text-text-high;
     @apply transition-all duration-200 ease-in-out;
-    @apply focus:border-primary-purple focus:ring-primary-purple focus:ring-1;
+    @apply focus:border-primary focus:ring-primary focus:ring-1;
     @apply disabled:cursor-not-allowed disabled:bg-gray-50 disabled:opacity-60 dark:disabled:bg-gray-800;
 }

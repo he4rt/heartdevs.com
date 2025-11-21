@@ -10,10 +10,7 @@
         $attributes->class([
             'hp-avatar',
             'hp-circular' => $circular,
-            match ($size) {
-                'sm', 'md', 'lg' => "hp-size-{$size}",
-                default => $size,
-            },
+            'hp-size-' . $size,
         ])
     }}
     alt="{{ $alt }}"

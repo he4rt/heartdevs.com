@@ -8,6 +8,7 @@ use App\Enums\FilamentPanel;
 use Filament\Panel;
 use He4rt\Events\AdminEventPanelPlugin;
 use He4rt\Events\AppEventPanelPlugin;
+use He4rt\Events\EventPanelPlugin;
 use Illuminate\Support\ServiceProvider;
 
 class EventsServiceProvider extends ServiceProvider
@@ -18,6 +19,7 @@ class EventsServiceProvider extends ServiceProvider
             match ($panel->currentPanel()) {
                 FilamentPanel::Admin => $panel->plugin(new AdminEventPanelPlugin),
                 FilamentPanel::User => $panel->plugin(new AppEventPanelPlugin),
+                FilamentPanel::Event => $panel->plugin(new EventPanelPlugin()),
                 default => null,
             };
         });
