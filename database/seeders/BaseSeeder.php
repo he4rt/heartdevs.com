@@ -48,14 +48,14 @@ class BaseSeeder extends Seeder
             ->createOne();
 
         EventModel::factory()
-            ->withAttendees()
+            ->withStatus()
             ->recycle($tenant)
             ->create([
                 'end_at' => Date::tomorrow(),
             ]);
 
         EventModel::factory()->count(5)
-            ->withAttendees()
+            ->withStatus()
             ->afterCreating(function ($event): void {
                 Talk::factory()->count(5)->create([
                     'event_id' => $event->id,
