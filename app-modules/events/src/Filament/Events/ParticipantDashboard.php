@@ -5,10 +5,13 @@ declare(strict_types=1);
 namespace He4rt\Events\Filament\Events;
 
 use Filament\Pages\Page;
+use Filament\Support\Enums\Width;
 use Illuminate\Contracts\Support\Htmlable;
 
 class ParticipantDashboard extends Page
 {
+    protected Width|string|null $maxContentWidth = Width::Full;
+
     public static function shouldRegisterNavigation(): bool
     {
         return auth()->check();
