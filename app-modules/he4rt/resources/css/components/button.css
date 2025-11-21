@@ -22,7 +22,7 @@
 }
 
 .hp-button-size-xs {
-    @apply px-2.5 py-1.5 text-xs;
+    @apply px-2.5 py-2 text-xs;
 
     & .hp-button-icon,
     & .hp-button-spinner svg {
@@ -74,12 +74,15 @@
 }
 
 .hp-button-rounded-sm {
-    @apply rounded-md;
+    @apply rounded-sm;
 }
 .hp-button-rounded-md {
-    @apply rounded-lg;
+    @apply rounded-md;
 }
 .hp-button-rounded-lg {
+    @apply rounded-lg;
+}
+.hp-button-rounded-xl {
     @apply rounded-xl;
 }
 .hp-button-rounded-full {
