@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace He4rt\User\Filament\Admin\Resources\Users\Pages;
 
-use Illuminate\Support\Facades\Date;
 use Filament\Actions\DeleteAction;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Repeater;
@@ -17,6 +16,7 @@ use Filament\Schemas\Components\Tabs;
 use Filament\Schemas\Components\Tabs\Tab;
 use Filament\Schemas\Schema;
 use He4rt\User\Filament\Admin\Resources\Users\UserResource;
+use Illuminate\Support\Facades\Date;
 
 class EditUser extends EditRecord
 {
