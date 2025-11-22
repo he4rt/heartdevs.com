@@ -75,10 +75,11 @@ class BaseSeeder extends Seeder
 
         Meeting::factory()
             ->count(5)
+            ->recycle($tenant)
             ->create();
 
         Message::factory()
-            ->count(10)
+            ->count(5)
             ->recycle($tenant)
             ->create();
     }
