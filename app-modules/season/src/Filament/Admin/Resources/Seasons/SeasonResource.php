@@ -2,18 +2,18 @@
 
 declare(strict_types=1);
 
-namespace He4rt\Season\Filament\Resources\Seasons;
+namespace He4rt\Season\Filament\Admin\Resources\Seasons;
 
 use BackedEnum;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
-use He4rt\Season\Filament\Resources\Seasons\Pages\CreateSeason;
-use He4rt\Season\Filament\Resources\Seasons\Pages\EditSeason;
-use He4rt\Season\Filament\Resources\Seasons\Pages\ListSeasons;
-use He4rt\Season\Filament\Resources\Seasons\Schemas\SeasonForm;
-use He4rt\Season\Filament\Resources\Seasons\Tables\SeasonsTable;
+use He4rt\Season\Filament\Admin\Resources\Seasons\Pages\CreateSeason;
+use He4rt\Season\Filament\Admin\Resources\Seasons\Pages\EditSeason;
+use He4rt\Season\Filament\Admin\Resources\Seasons\Pages\ListSeasons;
+use He4rt\Season\Filament\Admin\Resources\Seasons\Schemas\SeasonForm;
+use He4rt\Season\Filament\Admin\Resources\Seasons\Tables\SeasonsTable;
 use He4rt\Season\Models\Season;
 use UnitEnum;
 

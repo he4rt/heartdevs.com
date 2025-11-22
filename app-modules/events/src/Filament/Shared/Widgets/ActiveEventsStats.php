@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace He4rt\User\Filament\Shared\Widgets;
+namespace He4rt\Events\Filament\Shared\Widgets;
 
 use Filament\Facades\Filament;
 use Filament\Widgets\StatsOverviewWidget as BaseWidget;

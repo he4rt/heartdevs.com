@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace He4rt\Season\Filament\Resources\Seasons\Pages;
+namespace He4rt\Season\Filament\Admin\Resources\Seasons\Pages;
 
 use Filament\Resources\Pages\CreateRecord;
-use He4rt\Season\Filament\Resources\Seasons\SeasonResource;
+use He4rt\Season\Filament\Admin\Resources\Seasons\SeasonResource;
 
 class CreateSeason extends CreateRecord
 {

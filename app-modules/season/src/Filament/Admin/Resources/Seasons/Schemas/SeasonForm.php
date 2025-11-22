@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace He4rt\Season\Filament\Resources\Seasons\Schemas;
+namespace He4rt\Season\Filament\Admin\Resources\Seasons\Schemas;
 
 use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\RichEditor;

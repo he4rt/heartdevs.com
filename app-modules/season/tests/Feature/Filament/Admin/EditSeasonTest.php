@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 use App\Enums\FilamentPanel;
 use Filament\Facades\Filament;
-use He4rt\Season\Filament\Resources\Seasons\Pages\EditSeason;
+use He4rt\Season\Filament\Admin\Resources\Seasons\Pages\EditSeason;
 use He4rt\Season\Models\Season;
 
 use function Pest\Livewire\livewire;

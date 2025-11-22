@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 use App\Enums\FilamentPanel;
 use Filament\Facades\Filament;
-use He4rt\Season\Filament\Resources\Seasons\Pages\CreateSeason;
+use He4rt\Season\Filament\Admin\Resources\Seasons\Pages\CreateSeason;
 use He4rt\Season\Models\Season;
 use He4rt\Tenant\Models\Tenant;
 use Illuminate\Support\Facades\Date;

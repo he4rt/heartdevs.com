@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace He4rt\Season\Filament\Resources\Seasons\Tables;
+namespace He4rt\Season\Filament\Admin\Resources\Seasons\Tables;
 
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
@@ -24,7 +24,7 @@ class SeasonsTable
                 TextColumn::make('started_at')
                     ->label('Season')
                     ->formatStateUsing(fn ($state) => $state->format('d/m/Y H:i'))
-                    ->description(fn ($record) => $record->ended_at->format('d/m/Y H:i'))
+                    ->description(fn ($record) => $record->ended_at?->format('d/m/Y H:i'))
                     ->sortable(),
                 TextColumn::make('messages_count')
                     ->numeric()

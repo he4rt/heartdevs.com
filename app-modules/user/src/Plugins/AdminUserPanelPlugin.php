@@ -8,7 +8,6 @@ use App\Enums\FilamentPanel;
 use Filament\Contracts\Plugin;
 use Filament\Panel;
 use He4rt\User\Filament\Admin\Resources\Users\UserResource;
-use He4rt\User\Filament\Shared\Widgets\ActiveEventsStats;
 use He4rt\User\Filament\Shared\Widgets\UsersStatsOverview;
 
 class AdminUserPanelPlugin implements Plugin
@@ -26,7 +25,6 @@ class AdminUserPanelPlugin implements Plugin
 
         $panel->widgets([
             UsersStatsOverview::class,
-            ActiveEventsStats::class,
         ]);
     }
 
