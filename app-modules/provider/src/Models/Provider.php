@@ -6,6 +6,7 @@ namespace He4rt\Provider\Models;
 
 use He4rt\Message\Models\Message;
 use He4rt\Provider\Database\Factories\ProviderFactory;
+use He4rt\Provider\Enums\ProviderEnum;
 use He4rt\User\Models\User;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
@@ -76,6 +77,13 @@ final class Provider extends Model
     protected static function newFactory(): ProviderFactory
     {
         return ProviderFactory::new();
+    }
+
+    protected function casts(): array
+    {
+        return [
+            'provider' => ProviderEnum::class,
+        ];
     }
 
     protected function getMessagesCountAttribute(): int

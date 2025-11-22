@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace He4rt\Provider\Database\Factories;
 
+use He4rt\Provider\Enums\ProviderEnum;
 use He4rt\Provider\Models\Provider;
 use He4rt\Tenant\Models\Tenant;
 use He4rt\User\Models\User;
@@ -23,7 +24,7 @@ final class ProviderFactory extends Factory
             'tenant_id' => Tenant::factory(),
             'model_type' => User::class,
             'model_id' => User::factory(),
-            'provider' => fake()->randomElement(['discord', 'twitch']),
+            'provider' => fake()->randomElement(ProviderEnum::cases())->value,
             'provider_id' => fake()->numerify('######'),
             'email' => fake()->unique()->email(),
         ];
