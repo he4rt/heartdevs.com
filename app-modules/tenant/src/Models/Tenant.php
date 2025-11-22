@@ -6,6 +6,7 @@ namespace He4rt\Tenant\Models;
 
 use He4rt\Character\Models\PastSeason;
 use He4rt\Events\Models\EventModel;
+use He4rt\Message\Models\Message;
 use He4rt\Provider\Models\Provider;
 use He4rt\Season\Models\Season;
 use He4rt\Tenant\Database\Factories\TenantFactory;
@@ -38,6 +39,14 @@ class Tenant extends Model
     public function owner(): BelongsTo
     {
         return $this->belongsTo(User::class, 'owner_id');
+    }
+
+    /**
+     * @return HasMany<Message, $this>
+     */
+    public function messages(): HasMany
+    {
+        return $this->hasMany(Message::class);
     }
 
     /**
