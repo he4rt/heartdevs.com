@@ -80,7 +80,6 @@ class BaseSeeder extends Seeder
 
         Message::factory()
             ->count(5)
-            ->recycle($tenant)
             ->create();
     }
 }
