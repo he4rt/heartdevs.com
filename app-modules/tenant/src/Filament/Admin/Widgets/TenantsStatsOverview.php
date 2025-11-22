@@ -15,7 +15,9 @@ class TenantsStatsOverview extends BaseWidget
     {
         $totalActive = Tenant::query()->where('active', true)->count();
 
-        $createdThisMonth = Tenant::query()->whereMonth('created_at', now()->month)->count();
+        $createdThisMonth = Tenant::query()
+            ->whereBetween('created_at', [now()->startOfMonth(), now()->endOfMonth()])
+            ->count();
 
         $tenantMostUsers = Tenant::query()
             ->withCount('members')
