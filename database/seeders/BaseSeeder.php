@@ -7,6 +7,7 @@ namespace Database\Seeders;
 use He4rt\Character\Models\Character;
 use He4rt\Events\Models\EventModel;
 use He4rt\Events\Models\Talk;
+use He4rt\Provider\Models\Provider;
 use He4rt\Season\Models\Season;
 use He4rt\Tenant\Models\Tenant;
 use He4rt\User\Models\Address;
@@ -70,5 +71,11 @@ class BaseSeeder extends Seeder
                 'started_at' => now()->subMonth(),
                 'ended_at' => today(),
             ]);
+
+        Provider::factory()
+            ->recycle($user)
+            ->recycle($tenant)
+            ->count(4)
+            ->create(['email' => $user->email]);
     }
 }
