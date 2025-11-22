@@ -57,11 +57,6 @@ class ActiveEventsStats extends BaseWidget
                 ->description('Sessões confirmadas')
                 ->descriptionIcon('heroicon-o-presentation-chart-bar')
                 ->color('primary'),
-
-            Stat::make('Sponsors', $event->attendees()->count())
-                ->description('Patrocinadores do evento')
-                ->descriptionIcon('heroicon-o-banknotes')
-                ->color('primary'),
         ];
     }
 }
