@@ -23,14 +23,8 @@ class TenantsStatsOverview extends BaseWidget
             ->orderByDesc('members_count')
             ->first();
 
-        $tenantMostMessages = Tenant::query()
-            ->select('tenants.*')
-            ->selectRaw(
-                '(SELECT COUNT(*) FROM messages WHERE messages.tenant_id = tenants.id)
-               + (SELECT COUNT(*) FROM voice_messages WHERE voice_messages.tenant_id = tenants.id)
-             AS total_messages'
-            )
-            ->orderByDesc('total_messages')
+        $tenantMostMessages = Tenant::query()->withCount('messages')
+            ->orderByDesc('messages_count')
             ->first();
 
         return [
@@ -50,7 +44,7 @@ class TenantsStatsOverview extends BaseWidget
                 ->color('warning'),
 
             Stat::make('Mais mensagens', $tenantMostMessages?->name ?? 'Nenhum')
-                ->description($tenantMostMessages ? $tenantMostMessages->total_messages.' msgs' : '')
+                ->description($tenantMostMessages ? $tenantMostMessages->messages_count.' msgs' : '')
                 ->descriptionIcon('heroicon-o-chat-bubble-left-right')
                 ->color('info'),
         ];
