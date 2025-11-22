@@ -9,6 +9,7 @@ use Filament\Contracts\Plugin;
 use Filament\Panel;
 use He4rt\Events\Filament\Admin\Resources\Events\EventResource;
 use He4rt\Events\Filament\Admin\Resources\Talks\TalkResource;
+use He4rt\Events\Filament\Shared\Widgets\ActiveEventsStats;
 
 class AdminEventPanelPlugin implements Plugin
 {
@@ -22,6 +23,10 @@ class AdminEventPanelPlugin implements Plugin
         $panel->resources([
             EventResource::class,
             TalkResource::class,
+        ]);
+
+        $panel->widgets([
+            ActiveEventsStats::class,
         ]);
 
     }
