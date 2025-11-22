@@ -4,13 +4,15 @@ declare(strict_types=1);
 
 namespace He4rt\Season\Filament\Shared\Widgets;
 
-use Illuminate\Contracts\Database\Query\Builder;
 use Filament\Widgets\StatsOverviewWidget as BaseWidget;
 use Filament\Widgets\StatsOverviewWidget\Stat;
 use He4rt\Season\Models\Season;
+use Illuminate\Contracts\Database\Query\Builder;
 
 class SeasonStatsOverview extends BaseWidget
 {
+    protected static ?int $sort = 2;
+
     protected function getStats(): array
     {
         $season = Season::query()

@@ -11,6 +11,8 @@ use He4rt\Events\Models\EventModel;
 
 class ActiveEventsStats extends BaseWidget
 {
+    protected static ?int $sort = 3;
+
     protected function getStats(): array
     {
         $user = Filament::auth()->user();

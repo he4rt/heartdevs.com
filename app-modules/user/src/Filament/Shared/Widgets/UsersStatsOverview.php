@@ -12,6 +12,8 @@ use Illuminate\Contracts\Database\Query\Builder;
 
 class UsersStatsOverview extends BaseWidget
 {
+    protected static ?int $sort = 1;
+
     protected function getStats(): array
     {
         $user = Filament::auth()->user();
