@@ -19,7 +19,7 @@ final class MeetingTypeFactory extends Factory
         return [
             'name' => fake()->name(),
             'week_day' => fake()->numberBetween(0, 6),
-            'start_at' => fake()->time('H:i'),
+            'start_at' => fake()->numberBetween(0, 1439),
         ];
     }
 }
