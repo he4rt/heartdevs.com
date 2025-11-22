@@ -7,7 +7,6 @@ namespace He4rt\Tenant\Filament\Admin\Widgets;
 use Filament\Widgets\StatsOverviewWidget as BaseWidget;
 use Filament\Widgets\StatsOverviewWidget\Stat;
 use He4rt\Tenant\Models\Tenant;
-use Illuminate\Support\Facades\DB;
 
 class TenantsStatsOverview extends BaseWidget
 {
@@ -25,10 +24,12 @@ class TenantsStatsOverview extends BaseWidget
             ->first();
 
         $tenantMostMessages = Tenant::query()
-            ->leftJoin('messages', 'tenants.id', '=', 'messages.tenant_id')
-            ->leftJoin('voice_messages', 'tenants.id', '=', 'voice_messages.tenant_id')
-            ->select('tenants.*', DB::raw('COUNT(messages.id) + COUNT(voice_messages.id) as total_messages'))
-            ->groupBy('tenants.id')
+            ->select('tenants.*')
+            ->selectRaw(
+                '(SELECT COUNT(*) FROM messages WHERE messages.tenant_id = tenants.id)
+               + (SELECT COUNT(*) FROM voice_messages WHERE voice_messages.tenant_id = tenants.id)
+             AS total_messages'
+            )
             ->orderByDesc('total_messages')
             ->first();
 
