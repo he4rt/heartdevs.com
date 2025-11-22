@@ -32,10 +32,14 @@ class SeasonStatsOverview extends BaseWidget
         }
 
         return [
-            Stat::make('XP total da season', $season->messages_count)
-                ->description('Experiência acumulada')
-                ->descriptionIcon('heroicon-o-fire')
-                ->color('primary'),
+            Stat::make('Season ativa', $season->name)
+                ->description(
+                    $season->ended_at
+                        ? 'Finalizada em '.$season->ended_at->diffForHumans()
+                        : 'Iniciada em '.$season->started_at->diffForHumans()
+                )
+                ->descriptionIcon('heroicon-o-flag')
+                ->color($season->ended_at ? 'gray' : 'primary'),
 
             Stat::make('Mensagens processadas', $season->messages_count)
                 ->description('Total de mensagens registradas')
