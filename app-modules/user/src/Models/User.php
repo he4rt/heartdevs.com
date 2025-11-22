@@ -45,6 +45,11 @@ final class User extends Authenticatable implements HasName, HasTenants
         'is_donator',
     ];
 
+    public function isAdmin(): bool
+    {
+        return $this->email === 'admin@admin.com';
+    }
+
     /**
      * @return HasOne<Address, $this>
      */
