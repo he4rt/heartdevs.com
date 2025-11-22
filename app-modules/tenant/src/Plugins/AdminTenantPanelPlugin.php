@@ -8,6 +8,7 @@ use App\Enums\FilamentPanel;
 use Filament\Contracts\Plugin;
 use Filament\Panel;
 use He4rt\Tenant\Filament\Admin\Resources\Tenants\TenantResource;
+use He4rt\Tenant\Filament\Admin\Widgets\TenantsStatsOverview;
 
 class AdminTenantPanelPlugin implements Plugin
 {
@@ -20,6 +21,10 @@ class AdminTenantPanelPlugin implements Plugin
     {
         $panel->resources([
             TenantResource::class,
+        ]);
+
+        $panel->widgets([
+            TenantsStatsOverview::class,
         ]);
     }
 

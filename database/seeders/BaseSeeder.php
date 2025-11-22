@@ -8,6 +8,7 @@ use He4rt\Character\Models\Character;
 use He4rt\Events\Models\EventModel;
 use He4rt\Events\Models\Talk;
 use He4rt\Meeting\Models\Meeting;
+use He4rt\Message\Models\Message;
 use He4rt\Season\Models\Season;
 use He4rt\Tenant\Models\Tenant;
 use He4rt\User\Models\Address;
@@ -69,11 +70,16 @@ class BaseSeeder extends Seeder
             ->create([
                 'name' => 'Season 1',
                 'started_at' => now()->subMonth(),
-                'ended_at' => today(),
+                'ended_at' => now()->addMonth(),
             ]);
 
         Meeting::factory()
             ->count(5)
+            ->create();
+
+        Message::factory()
+            ->count(10)
+            ->recycle($tenant)
             ->create();
     }
 }
