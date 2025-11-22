@@ -79,6 +79,7 @@ class BaseSeeder extends Seeder
             ->create();
 
         Message::factory()
+            ->recycle($tenant)
             ->count(5)
             ->create();
     }
