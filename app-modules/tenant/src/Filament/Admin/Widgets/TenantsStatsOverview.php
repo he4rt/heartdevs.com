@@ -42,12 +42,12 @@ class TenantsStatsOverview extends BaseWidget
                 ->color('primary'),
 
             Stat::make('Mais usuários', $tenantMostUsers?->name ?? 'Nenhum')
-                ->description($tenantMostUsers ? $tenantMostUsers->members_count . ' usuários' : '')
+                ->description($tenantMostUsers ? $tenantMostUsers->members_count.' usuários' : '')
                 ->descriptionIcon('heroicon-o-user-group')
                 ->color('warning'),
 
             Stat::make('Mais mensagens', $tenantMostMessages?->name ?? 'Nenhum')
-                ->description($tenantMostMessages ? $tenantMostMessages->total_messages . ' msgs' : '')
+                ->description($tenantMostMessages ? $tenantMostMessages->total_messages.' msgs' : '')
                 ->descriptionIcon('heroicon-o-chat-bubble-left-right')
                 ->color('info'),
         ];
