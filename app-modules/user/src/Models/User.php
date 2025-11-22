@@ -25,6 +25,7 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 /**
  * @property string $id
  * @property string $username
+ * @property string $email
  * @property bool $is_donator
  */
 #[ObservedBy(UserObserver::class)]
