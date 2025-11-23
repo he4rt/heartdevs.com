@@ -158,6 +158,7 @@ class EventLogin extends SimplePage
             ->components([
                 View::make('he4rt::components.partials.oauth-connect')->viewData([
                     'providers' => OAuthProviderEnum::cases(),
+                    'tenantSlug' => $this->tenantSlug,
                 ]),
                 $this->getEmailFormComponent(),
                 $this->getPasswordFormComponent(),
