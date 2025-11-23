@@ -65,7 +65,7 @@ it('authenticates a new user via Discord and persists provider + token', functio
     // Assert provider created and linked
     $provider = Provider::query()->first();
     expect($provider)->not->toBeNull();
-    expect($provider->provider)->toBe('discord');
+    expect($provider->provider->value)->toBe('discord');
     expect($provider->provider_id)->toBe('1234567890');
     expect($provider->user->is($user))->toBeTrue();
 
