@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use He4rt\Character\Models\Character;
 use He4rt\Meeting\Models\Meeting;
+use He4rt\Provider\Enums\ProviderEnum;
 use He4rt\Provider\Models\Provider;
 use He4rt\Tenant\Models\Tenant;
 use He4rt\User\Models\User;
@@ -16,7 +17,7 @@ test('can create amessage', function (): void {
         ->afterCreating(function (Tenant $tenant): void {
             Provider::factory([
                 'tenant_id' => $tenant->getKey(),
-                'provider' => 'discord',
+                'provider' => ProviderEnum::Discord,
                 'provider_id' => '123',
             ])->create();
         })
@@ -29,7 +30,7 @@ test('can create amessage', function (): void {
 
     $provider = $user->providers[0];
     $payload = [
-        'provider' => $provider->provider,
+        'provider' => $provider->provider->value,
         'provider_id' => $provider->provider_id,
         'provider_message_id' => '12312312',
         'channel_id' => '312321',
@@ -39,7 +40,7 @@ test('can create amessage', function (): void {
 
     $this
         ->actingAsAdmin()
-        ->postJson(route('messages.create', ['provider' => $provider->provider]), $payload, [
+        ->postJson(route('messages.create', ['provider' => $provider->provider->value]), $payload, [
             'X-He4rt-Provider' => 'discord',
             'X-He4rt-Provider-Id' => '123',
         ])
@@ -57,7 +58,7 @@ test('can create amessage with level zero', function (): void {
         ->afterCreating(function (Tenant $tenant): void {
             Provider::factory([
                 'tenant_id' => $tenant->getKey(),
-                'provider' => 'discord',
+                'provider' => ProviderEnum::Discord,
                 'provider_id' => '123',
             ])->create();
         })
@@ -69,7 +70,7 @@ test('can create amessage with level zero', function (): void {
         ->create();
     $provider = $user->providers[0];
     $payload = [
-        'provider' => $provider->provider,
+        'provider' => $provider->provider->value,
         'provider_id' => $provider->provider_id,
         'provider_message_id' => '12312312',
         'channel_id' => '312321',
@@ -79,7 +80,7 @@ test('can create amessage with level zero', function (): void {
 
     $this
         ->actingAsAdmin()
-        ->postJson(route('messages.create', ['provider' => $provider->provider]), $payload)
+        ->postJson(route('messages.create', ['provider' => $provider->provider->value]), $payload)
         ->assertNoContent();
 
     $this->assertDatabaseMissing('characters', [
@@ -95,7 +96,7 @@ test('can create amessage and receive ameeting check', function (): void {
         ->afterCreating(function (Tenant $tenant): void {
             Provider::factory([
                 'tenant_id' => $tenant->getKey(),
-                'provider' => 'discord',
+                'provider' => ProviderEnum::Discord,
                 'provider_id' => '123',
             ])->create();
         })
@@ -114,7 +115,7 @@ test('can create amessage and receive ameeting check', function (): void {
 
     $provider = $user->providers[0];
     $payload = [
-        'provider' => $provider->provider,
+        'provider' => $provider->provider->value,
         'provider_id' => $provider->provider_id,
         'provider_message_id' => '12312312',
         'channel_id' => '312321',
