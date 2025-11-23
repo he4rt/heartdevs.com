@@ -59,19 +59,21 @@
     @endisset
 
     {{-- Corpo do Card (Título e Descrição) --}}
-    <div class="hp-card-body">
-        @isset($title)
-            <h3 {{ $title->attributes->class('hp-card-title') }}>
-                {{ $title }}
-            </h3>
-        @endisset
+    @if (isset($title) || isset($description))
+        <div class="hp-card-body">
+            @isset($title)
+                <h3 {{ $title->attributes->class('hp-card-title') }}>
+                    {{ $title }}
+                </h3>
+            @endisset
 
-        @isset($description)
-            <p {{ $description->attributes->class('hp-card-description') }}>
-                {{ $description }}
-            </p>
-        @endisset
-    </div>
+            @isset($description)
+                <p {{ $description->attributes->class('hp-card-description') }}>
+                    {{ $description }}
+                </p>
+            @endisset
+        </div>
+    @endif
 
     {{ $slot }}
 

@@ -8,6 +8,7 @@ use Filament\Support\Contracts\HasDescription;
 use Filament\Support\Contracts\HasIcon;
 use Filament\Support\Contracts\HasLabel;
 use He4rt\Authentication\Contracts\OAuthClientContract;
+use He4rt\Authentication\DTO\OAuthStateDTO;
 use He4rt\Integrations\Discord\OAuth\DiscordOAuthClient;
 use He4rt\Integrations\Twitch\OAuth\Contracts\TwitchOAuthService;
 use Illuminate\Contracts\Support\Htmlable;
@@ -55,5 +56,20 @@ enum OAuthProviderEnum: string implements HasDescription, HasIcon, HasLabel
         };
 
         return explode(' ', $scopes);
+    }
+
+    public function isEnabled(): bool
+    {
+        return config(sprintf('services.%s.enabled', $this->value));
+    }
+
+    public function getRedirectUri(?string $tenant = null): string
+    {
+        return $this->getClient()->redirectUrl(
+            new OAuthStateDTO(
+                filament()->getCurrentPanel()->getId(),
+                $tenant
+            )
+        );
     }
 }
