@@ -6,6 +6,7 @@ namespace He4rt\Authentication\Actions;
 
 use He4rt\Authentication\DTO\OAuthUserDTO;
 use He4rt\Authentication\Enums\OAuthProviderEnum;
+use He4rt\Provider\Enums\ProviderEnum;
 use He4rt\Provider\Models\Provider;
 use He4rt\Tenant\Models\Tenant;
 use He4rt\User\Models\User;
@@ -57,7 +58,7 @@ class AuthenticateAction
         /** @var Provider $provider */
         $provider = $user->providers()->updateOrCreate([
             'tenant_id' => $tenant->getKey(),
-            'provider' => $userDTO->provider,
+            'provider' => ProviderEnum::from($userDTO->provider->value),
             'provider_id' => $userDTO->providerId,
         ], [
             'email' => $userDTO->email,
