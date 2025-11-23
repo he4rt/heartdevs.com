@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use He4rt\Badge\Models\Badge;
 use He4rt\Character\Models\Character;
+use He4rt\Provider\Enums\ProviderEnum;
 use He4rt\Provider\Models\Provider;
 use He4rt\Tenant\Models\Tenant;
 use He4rt\User\Models\User;
@@ -17,7 +18,7 @@ test('can claim badge', function (): void {
         ->afterCreating(function (Tenant $tenant): void {
             Provider::factory([
                 'tenant_id' => $tenant->getKey(),
-                'provider' => 'discord',
+                'provider' => ProviderEnum::Discord,
                 'provider_id' => '123',
             ])->create();
         })
@@ -33,10 +34,10 @@ test('can claim badge', function (): void {
     $response = $this
         ->actingAsAdmin()
         ->postJson(route('characters.claimBadge', [
-            'provider' => $provider->provider,
+            'provider' => $provider->provider->value,
             'providerId' => $provider->provider_id,
         ]), ['redeem_code' => $badge->redeem_code], [
-            'X-He4rt-Provider' => $provider->provider,
+            'X-He4rt-Provider' => $provider->provider->value,
             'X-He4rt-Provider-Id' => $provider->provider_id,
         ]);
 
