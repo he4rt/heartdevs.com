@@ -1,3 +1,14 @@
+@php
+    $profileData = [
+        'name' => 'NextuRhe4rt',
+        'level' => 1,
+        'exp_current' => 33,
+        'exp_total' => 100,
+    ];
+
+    $expPercent = floor(($profileData['exp_current'] / $profileData['exp_total']) * 100);
+@endphp
+
 <section class="hp-section relative" id="social-action">
     <div
         class="absolute bottom-0 left-0 z-1 flex origin-top rotate-90 justify-start sm:-translate-x-[20%] sm:translate-y-32 lg:-translate-x-[5%] lg:translate-y-24 lg:rotate-0"
@@ -44,15 +55,33 @@
                                     <x-he4rt::avatar size="xl" />
                                 </div>
 
-                                <div class="flex flex-col items-center justify-center gap-2">
+                                <div class="flex flex-col items-center justify-center gap-4">
                                     <div class="flex w-full justify-between gap-4">
-                                        <x-he4rt::heading size="2xs">NextuRhe4rt</x-he4rt::heading>
-                                        <x-he4rt::text size="sm" class="mt-0.5">Nível 01</x-he4rt::text>
+                                        <x-he4rt::heading size="2xs">
+                                            {{ $profileData['name'] }}
+                                        </x-he4rt::heading>
+
+                                        <x-he4rt::text size="sm" class="mt-0.5">
+                                            Nível {{ sprintf('%02d', $profileData['level']) }}
+                                        </x-he4rt::text>
+                                    </div>
+
+                                    <div
+                                        class="bg-outline-dark relative h-2 w-full overflow-hidden rounded-full"
+                                        style="--p: {{ $expPercent }}%"
+                                    >
+                                        <div
+                                            class="bg-outline-light absolute top-0 left-0 h-full rounded-full"
+                                            style="width: var(--p)"
+                                        ></div>
                                     </div>
 
                                     <div class="flex w-full justify-between gap-4">
-                                        <x-he4rt::text size="sm" class="mt-0.5">Exp 0/100</x-he4rt::text>
-                                        <x-he4rt::text size="sm" class="mt-0.5">0%</x-he4rt::text>
+                                        <x-he4rt::text size="sm" class="mt-0.5">
+                                            Exp {{ $profileData['exp_current'] }}/{{ $profileData['exp_total'] }}
+                                        </x-he4rt::text>
+
+                                        <x-he4rt::text size="sm" class="mt-0.5">{{ $expPercent }}%</x-he4rt::text>
                                     </div>
                                 </div>
 
