@@ -9,6 +9,7 @@ use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Schemas\Schema;
+use He4rt\Provider\Models\Provider;
 
 class MessageForm
 {
@@ -18,8 +19,8 @@ class MessageForm
             ->components([
                 Select::make('provider_id')
                     ->label('Provider')
+                    ->getOptionLabelFromRecordUsing(fn (Provider $record) => $record->provider->getLabel())
                     ->relationship('provider', 'provider')
-                    ->searchable()
                     ->required(),
 
                 Select::make('season_id')
