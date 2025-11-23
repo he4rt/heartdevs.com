@@ -46,6 +46,5 @@ test('can create voice message', function (): void {
     $this->assertDatabaseHas('voice_messages', [
         'state' => $payload['state'],
         'channel_name' => $payload['channel_name'],
-        'season_id' => 2,
     ]);
 });

@@ -14,7 +14,6 @@ return new class extends Migration
             Schema::create('voice_messages', function (Blueprint $table): void {
                 $table->id();
                 $table->foreignUuid('provider_id')->constrained('providers');
-                $table->integer('season_id');
                 $table->string('channel_name');
                 $table->string('state');
                 $table->integer('obtained_experience');

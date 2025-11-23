@@ -19,7 +19,6 @@ it('can create a message', function (): void {
     $data = [
         'tenant_id' => $tenant->getKey(),
         'provider_id' => $provider->getKey(),
-        'season_id' => $season->getKey(),
         'channel_id' => 1,
         'provider_message_id' => 'prov-msg-123',
         'content' => 'Mensagem de teste enviada',

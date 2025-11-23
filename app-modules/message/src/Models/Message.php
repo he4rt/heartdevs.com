@@ -6,7 +6,6 @@ namespace He4rt\Message\Models;
 
 use He4rt\Message\Database\Factories\MessageFactory;
 use He4rt\Provider\Models\Provider;
-use He4rt\Season\Models\Season;
 use He4rt\Tenant\Models\Tenant;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -25,7 +24,6 @@ final class Message extends Model
         'tenant_id',
         'provider_id',
         'provider_message_id',
-        'season_id',
         'channel_id',
         'content',
         'sent_at',
@@ -46,14 +44,6 @@ final class Message extends Model
     public function tenant(): BelongsTo
     {
         return $this->belongsTo(Tenant::class, 'tenant_id');
-    }
-
-    /**
-     * @return BelongsTo<Season, $this>
-     */
-    public function season(): BelongsTo
-    {
-        return $this->belongsTo(Season::class, 'season_id');
     }
 
     protected static function newFactory(): MessageFactory

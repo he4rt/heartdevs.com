@@ -15,7 +15,6 @@ return new class extends Migration
     {
         Schema::create('characters_leveling_logs', function (Blueprint $table): void {
             $table->uuid('id')->primary();
-            $table->integer('season_id');
             $table->foreignUuid('character_id')->constrained('characters');
             $table->integer('level');
             $table->timestamps();

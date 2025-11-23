@@ -23,7 +23,6 @@ final class MessageFactory extends Factory
             'tenant_id' => Tenant::factory(),
             'provider_id' => Provider::factory(),
             'provider_message_id' => fake()->randomNumber(4),
-            'season_id' => 2,
             'channel_id' => fake()->randomNumber(4),
             'content' => fake()->sentence(),
             'sent_at' => now(),

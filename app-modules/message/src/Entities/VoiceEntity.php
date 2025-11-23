@@ -11,7 +11,6 @@ final class VoiceEntity
     public function __construct(
         public int $id,
         public string $providerId,
-        public int $seasonId,
         public string $channelName,
         public VoiceStatesEnum $voiceState,
         public int $obtainedExperience,
@@ -22,7 +21,6 @@ final class VoiceEntity
         return new self(
             id: $payload['id'],
             providerId: $payload['provider_id'],
-            seasonId: $payload['season_id'],
             channelName: $payload['channel_name'],
             voiceState: VoiceStatesEnum::from($payload['state']),
             obtainedExperience: $payload['obtained_experience']
