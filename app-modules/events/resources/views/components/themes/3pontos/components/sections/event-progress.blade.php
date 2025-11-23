@@ -1,6 +1,6 @@
 <section class="hp-section relative" id="social-action">
     <div
-        class="absolute bottom-40 left-0 z-1 flex origin-top rotate-90 justify-start sm:-translate-x-[20%] sm:translate-y-32 lg:-translate-x-[5%] lg:translate-y-24 lg:rotate-0"
+        class="absolute bottom-0 left-0 z-1 flex origin-top rotate-90 justify-start sm:-translate-x-[20%] sm:translate-y-32 lg:-translate-x-[5%] lg:translate-y-24 lg:rotate-0"
     >
         <img
             src="{{ asset('images/3pontos/logo-chain.png') }}"
@@ -9,87 +9,98 @@
         />
     </div>
 
-    <div class="hp-container relative z-10 grid grid-cols-1 items-start gap-x-12 lg:grid-cols-[1fr_4fr]">
-        <div
-            x-data="{ visible: false }"
-            x-intersect.once="visible = true"
-            class="mb-4 flex items-center justify-center sm:justify-start"
-        >
-            <x-he4rt::animate-block duration="700">
-                <x-he4rt::section-title size="lg">Prova Social</x-he4rt::section-title>
-            </x-he4rt::animate-block>
-        </div>
-
-        <div class="flex flex-col gap-20">
-            <div>
-                <x-he4rt::headline class="mx-0">
-                    <x-slot:title>Seu progresso no evento</x-slot>
-                    <x-slot:description>
-                        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent vestibulum a augue at ornare.
-                    </x-slot>
-                </x-he4rt::headline>
-            </div>
-
+    <div class="hp-container relative z-10">
+        <div class="grid grid-cols-1 items-start gap-x-12 lg:grid-cols-[1fr_5fr]">
             <div
                 x-data="{ visible: false }"
-                x-intersect.threshold.20.once="visible = true"
-                class="grid grid-cols-1 gap-8 lg:grid-cols-2"
+                x-intersect.once="visible = true"
+                class="mb-4 flex items-center justify-center sm:justify-start"
             >
-                <x-he4rt::animate-block>
-                    <x-he4rt::card :interactive="false" class="flex-row gap-8 py-10">
-                        <x-slot:icon class="w-fit items-center">
-                            <x-he4rt::avatar size="xl" />
-                        </x-slot>
-                        <div class="flex flex-1 flex-col items-center justify-center gap-2">
-                            <div class="flex w-full justify-between gap-4">
-                                <x-he4rt::heading size="2xs">NextuRhe4rt</x-he4rt::heading>
-                                <x-he4rt::text size="sm" class="mt-0.5">Nível 01</x-he4rt::text>
-                            </div>
-
-                            <div class="flex w-full justify-between gap-4">
-                                <x-he4rt::text size="sm" class="mt-0.5">Exp 0/100</x-he4rt::text>
-                                <x-he4rt::text size="sm" class="mt-0.5">0%</x-he4rt::text>
-                            </div>
-                        </div>
-                        <x-slot:actions class="mt-0 flex w-fit items-center justify-center gap-8">
-                            <x-he4rt::button rounded="sm" size="xs" class="text-helper-error bg-transparent">
-                                Desconectar conta
-                            </x-he4rt::button>
-                            <x-he4rt::button rounded="sm" size="xs">Deslogar</x-he4rt::button>
-                        </x-slot>
-                    </x-he4rt::card>
+                <x-he4rt::animate-block duration="700">
+                    <x-he4rt::section-title size="lg">Prova Social</x-he4rt::section-title>
                 </x-he4rt::animate-block>
+            </div>
 
-                <x-he4rt::animate-block>
-                    <x-he4rt::card :interactive="false" class="flex-row gap-8 py-10">
-                        <div class="grid w-full grid-cols-1 gap-8 lg:grid-cols-2">
-                            <div class="flex items-center justify-between gap-4">
-                                <div>
+            <div class="flex flex-col gap-20">
+                <div>
+                    <x-he4rt::headline class="mx-0">
+                        <x-slot:title>Seu progresso no evento</x-slot>
+                        <x-slot:description>
+                            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent vestibulum a augue at
+                            ornare.
+                        </x-slot>
+                    </x-he4rt::headline>
+                </div>
+
+                <div
+                    x-data="{ visible: false }"
+                    x-intersect.threshold.20.once="visible = true"
+                    class="grid grid-cols-1 gap-8 lg:grid-cols-[1fr_1.2fr]"
+                >
+                    <x-he4rt::animate-block>
+                        <x-he4rt::card :interactive="false">
+                            <div class="grid grid-cols-1 gap-8 px-4 py-6 sm:grid-cols-[auto_1fr_auto]">
+                                <div class="flex flex-col items-center justify-center">
                                     <x-he4rt::avatar size="xl" />
                                 </div>
-                                <div class="flex flex-1 flex-col gap-2">
-                                    <x-he4rt::heading size="2xs">Twitch</x-he4rt::heading>
-                                    <x-he4rt::text size="sm" class="mt-0.5">0 Mensagens</x-he4rt::text>
+
+                                <div class="flex flex-col items-center justify-center gap-2">
+                                    <div class="flex w-full justify-between gap-4">
+                                        <x-he4rt::heading size="2xs">NextuRhe4rt</x-he4rt::heading>
+                                        <x-he4rt::text size="sm" class="mt-0.5">Nível 01</x-he4rt::text>
+                                    </div>
+
+                                    <div class="flex w-full justify-between gap-4">
+                                        <x-he4rt::text size="sm" class="mt-0.5">Exp 0/100</x-he4rt::text>
+                                        <x-he4rt::text size="sm" class="mt-0.5">0%</x-he4rt::text>
+                                    </div>
                                 </div>
-                                <div>
-                                    <x-he4rt::button rounded="sm" size="xs">Desconectar</x-he4rt::button>
+
+                                <div class="flex flex-col items-center gap-4">
+                                    <x-he4rt::button rounded="sm" size="xs" class="text-helper-error bg-transparent">
+                                        Desconectar conta
+                                    </x-he4rt::button>
+                                    <x-he4rt::button rounded="sm" size="xs" block>Deslogar</x-he4rt::button>
                                 </div>
                             </div>
-                            <div class="flex items-center justify-between gap-4">
-                                <div>
-                                    <x-he4rt::avatar size="xl" />
+                        </x-he4rt::card>
+                    </x-he4rt::animate-block>
+
+                    <x-he4rt::animate-block>
+                        <x-he4rt::card :interactive="false" class="flex-row gap-8">
+                            <div class="grid w-full grid-cols-1 gap-8 px-4 py-6 lg:grid-cols-2">
+                                <div
+                                    class="grid grid-cols-1 items-center justify-between gap-8 sm:grid-cols-[auto_1fr_auto]"
+                                >
+                                    <div class="flex flex-col items-center justify-center">
+                                        <x-he4rt::avatar size="xl" />
+                                    </div>
+                                    <div class="flex flex-col items-center justify-center gap-2 sm:items-start">
+                                        <x-he4rt::heading size="2xs">Twitch</x-he4rt::heading>
+                                        <x-he4rt::text size="sm" class="mt-0.5">0 Mensagens</x-he4rt::text>
+                                    </div>
+                                    <div>
+                                        <x-he4rt::button rounded="sm" size="xs">Desconectar</x-he4rt::button>
+                                    </div>
                                 </div>
-                                <div class="flex flex-1 flex-col gap-2">
-                                    <x-he4rt::heading size="2xs">Discord</x-he4rt::heading>
-                                    <x-he4rt::text size="sm" class="mt-0.5">0 Mensagens</x-he4rt::text>
-                                </div>
-                                <div>
-                                    <x-he4rt::button rounded="sm" size="xs">Desconectar</x-he4rt::button>
+                                <div
+                                    class="grid grid-cols-1 items-center justify-between gap-8 sm:grid-cols-[auto_1fr_auto]"
+                                >
+                                    <div class="flex flex-col items-center justify-center">
+                                        <x-he4rt::avatar size="xl" />
+                                    </div>
+                                    <div class="flex flex-col items-center justify-center gap-2 sm:items-start">
+                                        <x-he4rt::heading size="2xs">Discord</x-he4rt::heading>
+                                        <x-he4rt::text size="sm" class="mt-0.5">0 Mensagens</x-he4rt::text>
+                                    </div>
+                                    <div>
+                                        <x-he4rt::button rounded="sm" size="xs">Desconectar</x-he4rt::button>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                    </x-he4rt::card>
-                </x-he4rt::animate-block>
+                        </x-he4rt::card>
+                    </x-he4rt::animate-block>
+                </div>
             </div>
         </div>
     </div>
