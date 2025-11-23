@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use He4rt\Character\Enums\VoiceStatesEnum;
 use He4rt\Character\Models\Character;
+use He4rt\Provider\Enums\ProviderEnum;
 use He4rt\Provider\Models\Provider;
 use He4rt\Tenant\Models\Tenant;
 use He4rt\User\Models\User;
@@ -15,7 +16,7 @@ test('can create voice message', function (): void {
         ->afterCreating(function (Tenant $tenant): void {
             Provider::factory([
                 'tenant_id' => $tenant->getKey(),
-                'provider' => 'discord',
+                'provider' => ProviderEnum::Discord,
                 'provider_id' => '123',
             ])->create();
         })
@@ -28,14 +29,14 @@ test('can create voice message', function (): void {
 
     $provider = $user->providers[0];
     $payload = [
-        'provider' => $provider->provider,
+        'provider' => $provider->provider->value,
         'provider_id' => $provider->provider_id,
         'state' => VoiceStatesEnum::Muted->value,
         'channel_name' => 'Estudando',
     ];
 
     $this->actingAsAdmin()
-        ->post(route('voices.create', $provider->provider), $payload)
+        ->post(route('voices.create', $provider->provider->value), $payload)
         ->assertNoContent();
 
     $this->assertDatabaseMissing('characters', [
