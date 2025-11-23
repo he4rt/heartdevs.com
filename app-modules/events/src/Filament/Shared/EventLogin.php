@@ -42,7 +42,13 @@ use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\HtmlString;
 use Illuminate\Validation\ValidationException;
 use Livewire\Attributes\Locked;
+use SensitiveParameter;
 
+/**
+ * @property Action $registerAction
+ * @property Schema $multiFactorChallengeForm
+ * @property Schema $form
+ */
 class EventLogin extends SimplePage
 {
     use WithRateLimiting;

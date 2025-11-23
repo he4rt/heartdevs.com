@@ -5,6 +5,11 @@ parameters:
           count: 1
           path: app/Providers/FilamentServiceProvider.php
 
+        - message: '#^Call to an undefined method App\\Providers\\FilamentServiceProvider::colors\(\)\.$#'
+          identifier: method.notFound
+          count: 1
+          path: app/Providers/FilamentServiceProvider.php
+
         - message: '#^Call to an undefined method App\\Providers\\FilamentServiceProvider::discoverResources\(\)\.$#'
           identifier: method.notFound
           count: 1

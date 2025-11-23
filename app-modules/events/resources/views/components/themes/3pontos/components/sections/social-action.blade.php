@@ -9,7 +9,7 @@
         />
     </div>
 
-    <div class="hp-container relative z-10 grid grid-cols-1 items-start gap-x-12 lg:grid-cols-[1fr_4fr]">
+    <div class="hp-container relative z-10 grid grid-cols-1 items-start gap-x-12 lg:grid-cols-[1fr_5fr]">
         <div
             x-data="{ visible: false }"
             x-intersect.once="visible = true"

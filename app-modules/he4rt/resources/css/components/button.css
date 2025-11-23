@@ -18,7 +18,7 @@
 }
 
 .hp-button-outline {
-    @apply text-text-high border-outline-low hover:border-primary hover:bg-primary/10 border bg-transparent;
+    @apply text-text-high border-outline-dark hover:border-primary hover:bg-primary/10 border bg-transparent;
 }
 
 .hp-button-size-xs {

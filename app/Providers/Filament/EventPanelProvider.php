@@ -41,9 +41,15 @@ class EventPanelProvider extends PanelProvider
             ->login(EventLogin::class)
             ->loginRouteSlug('{tenantSlug}/login')
             ->tenantDomain(app()->isLocal() ? null : sprintf('{tenant:slug}.%s', config('app.domain')))
+            ->renderHook(PanelsRenderHook::SIDEBAR_NAV_END, fn () => Blade::render(sprintf(<<<'BLADE'
+               @guest
+                    <x-he4rt::button href="%s" class="mt-auto block sm:hidden text-center">Fazer Login</x-he4rt::button>
+               @endguest
+            BLADE, Filament::getLoginUrl(['tenantSlug' => session()->get('tenant')]))
+            ))
             ->renderHook(PanelsRenderHook::TOPBAR_END, fn () => Blade::render(sprintf(<<<'BLADE'
                @guest
-                    <x-he4rt::button href="%s">Fazer Login</x-he4rt::button>
+                    <x-he4rt::button href="%s" class="w-fit hidden sm:block">Fazer Login</x-he4rt::button>
                @endguest
             BLADE, Filament::getLoginUrl(['tenantSlug' => session()->get('tenant')]))
             ))
@@ -86,6 +92,7 @@ class EventPanelProvider extends PanelProvider
         Filament::registerPanel(
             fn (): Panel => $this->panel(Panel::make()),
         );
+
         $this->app->bind(IdentifyTenant::class, GuestTenantIdentifier::class);
     }
 }
