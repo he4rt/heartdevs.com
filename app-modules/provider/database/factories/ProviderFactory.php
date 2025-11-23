@@ -24,7 +24,7 @@ final class ProviderFactory extends Factory
             'tenant_id' => Tenant::factory(),
             'model_type' => User::class,
             'model_id' => User::factory(),
-            'provider' => fake()->randomElement(ProviderEnum::cases())->value,
+            'provider' => fake()->randomElement(ProviderEnum::cases()),
             'provider_id' => fake()->numerify('######'),
             'email' => fake()->unique()->email(),
         ];
