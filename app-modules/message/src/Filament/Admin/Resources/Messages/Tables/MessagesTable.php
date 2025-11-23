@@ -16,7 +16,8 @@ class MessagesTable
     {
         return $table
             ->columns([
-                TextColumn::make('provider_id')
+                TextColumn::make('provider.provider')
+                    ->badge()
                     ->label('Provider')
                     ->sortable()
                     ->searchable(),
