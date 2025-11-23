@@ -12,5 +12,16 @@
 @endphp
 
 <a href="{{ $href }}">
-    <img src="{{ asset($path) }}" alt="logo" class="{{ $sizeCls }} mb-4 w-full cursor-pointer" />
+    <img
+        src="{{ asset($path) }}"
+        alt="logo"
+        {{
+            $attributes->class([
+                $sizeCls,
+                'mb-4',
+                'w-full',
+                'cursor-pointer',
+            ])
+        }}
+    />
 </a>

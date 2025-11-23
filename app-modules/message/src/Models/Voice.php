@@ -15,7 +15,6 @@ final class Voice extends Model
     protected $fillable = [
         'tenant_id',
         'provider_id',
-        'season_id',
         'channel_name',
         'state',
         'obtained_experience',

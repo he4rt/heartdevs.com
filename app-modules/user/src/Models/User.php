@@ -25,6 +25,7 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 /**
  * @property string $id
  * @property string $username
+ * @property string $email
  * @property bool $is_donator
  */
 #[ObservedBy(UserObserver::class)]
@@ -44,6 +45,11 @@ final class User extends Authenticatable implements HasName, HasTenants
         'password',
         'is_donator',
     ];
+
+    public function isAdmin(): bool
+    {
+        return $this->email === 'admin@admin.com';
+    }
 
     /**
      * @return HasOne<Address, $this>

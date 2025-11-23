@@ -20,7 +20,6 @@ trait MessageProviderTrait
             'id' => 'canhassi-id',
             'provider_id' => 'é-o-canhas-id',
             'provider_message_id' => 'he4rtDevelopers',
-            'season_id' => 12,
             'channel_id' => 'canal-foda',
             'content' => 'conteudo-foda',
             'sent_at' => new DateTimeImmutable(Date::now()->toString()),

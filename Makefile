@@ -30,7 +30,7 @@ test-rector: ## Run Rector in test mode
 
 .PHONY: phpstan
 phpstan: ## Run PHPStan
-	@$(CURDIR)/vendor/bin/phpstan analyse --ansi
+	@$(CURDIR)/vendor/bin/phpstan analyse --ansi --memory-limit=2G
 
 .PHONY: p
 p: phpstan ## Alias for phpstan

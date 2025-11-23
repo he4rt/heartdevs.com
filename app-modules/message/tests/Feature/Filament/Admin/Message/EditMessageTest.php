@@ -14,7 +14,6 @@ it('can update a message', function (): void {
     $season = Season::factory()->create();
 
     $newData = [
-        'season_id' => $season->getKey(),
         'content' => 'Conteúdo atualizado',
         'obtained_experience' => 200,
     ];
@@ -43,7 +42,6 @@ it('can load the edit page', function (): void {
         ->assertOk()
         ->assertSchemaStateSet([
             'provider_id' => $message->provider_id,
-            'season_id' => $message->season_id,
             'channel_id' => $message->channel_id,
             'content' => $message->content,
             'provider_message_id' => $message->provider_message_id,

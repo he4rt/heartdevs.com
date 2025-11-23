@@ -23,12 +23,6 @@ class MessageForm
                     ->relationship('provider', 'provider')
                     ->required(),
 
-                Select::make('season_id')
-                    ->label('Season')
-                    ->relationship('season', 'name')
-                    ->searchable()
-                    ->nullable(),
-
                 TextInput::make('channel_id')
                     ->label('Chanel')
                     ->nullable(),

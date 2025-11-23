@@ -1,5 +1,5 @@
 <section class="hp-section" id="community">
-    <div class="hp-container grid grid-cols-1 items-start gap-x-12 lg:grid-cols-[1fr_4fr]">
+    <div class="hp-container grid grid-cols-1 items-start gap-x-12 lg:grid-cols-[1fr_5fr]">
         <div
             x-data="{ visible: false }"
             x-intersect.once="visible = true"

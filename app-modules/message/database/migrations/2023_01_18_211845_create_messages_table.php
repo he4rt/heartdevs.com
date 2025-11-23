@@ -18,7 +18,6 @@ return new class extends Migration
                 $table->uuid('id')->primary();
                 $table->foreignUuid('provider_id')->constrained('providers');
                 $table->string('provider_message_id')->nullable();
-                $table->integer('season_id');
                 $table->string('channel_id')->nullable();
                 $table->text('content');
                 $table->integer('obtained_experience');

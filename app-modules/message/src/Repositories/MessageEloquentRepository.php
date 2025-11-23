@@ -25,7 +25,6 @@ final readonly class MessageEloquentRepository implements MessageRepository
             'tenant_id' => $messageDTO->tenantId,
             'provider_id' => $providerId,
             'provider_message_id' => $messageDTO->providerMessageId,
-            'season_id' => config()->integer('he4rt.season.id'),
             'channel_id' => $messageDTO->channelId,
             'content' => $messageDTO->content,
             'sent_at' => $messageDTO->sentAt,

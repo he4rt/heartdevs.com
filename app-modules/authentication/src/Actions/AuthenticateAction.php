@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace He4rt\Authentication\Actions;
 
+use He4rt\Authentication\DTO\OAuthStateDTO;
 use He4rt\Authentication\DTO\OAuthUserDTO;
 use He4rt\Authentication\Enums\OAuthProviderEnum;
 use He4rt\Provider\Enums\ProviderEnum;
@@ -17,9 +18,20 @@ use Ramsey\Uuid\Uuid;
 
 class AuthenticateAction
 {
-    public function withOAuth(string $tenantSlug, OAuthProviderEnum $oauthProvider, string $code): void
+    public function withOAuth(OAuthStateDTO $state, OAuthProviderEnum $oauthProvider, string $code): void
     {
-        $tenant = $this->findTenantBySlug($tenantSlug);
+        if ($state->tenant) {
+            $this->authenticateTenant($state, $oauthProvider, $code);
+
+            return;
+        }
+
+        // TODO: implement admin login only.
+    }
+
+    private function authenticateTenant(OAuthStateDTO $state, OAuthProviderEnum $oauthProvider, string $code): void
+    {
+        $tenant = $this->findTenantBySlug($state->tenant);
 
         $clientProvider = $oauthProvider->getClient();
         $accessData = $clientProvider->auth($code);

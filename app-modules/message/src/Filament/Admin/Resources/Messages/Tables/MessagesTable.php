@@ -22,11 +22,6 @@ class MessagesTable
                     ->sortable()
                     ->searchable(),
 
-                TextColumn::make('season_id')
-                    ->label('Season')
-                    ->sortable()
-                    ->searchable(),
-
                 TextColumn::make('channel_id')
                     ->label('Channel')
                     ->sortable()

@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use He4rt\Authentication\Actions\AuthenticateAction;
+use He4rt\Authentication\DTO\OAuthStateDTO;
 use He4rt\Authentication\Enums\OAuthProviderEnum;
 use He4rt\Provider\Models\Provider;
 use He4rt\Tenant\Models\Tenant;
@@ -56,7 +57,7 @@ it('authenticates a new user via Discord and persists provider + token', functio
 
     $action = app(AuthenticateAction::class);
 
-    $action->withOAuth(tenantSlug: $tenant->slug, oauthProvider: OAuthProviderEnum::Discord, code: 'dummy_code');
+    $action->withOAuth(state: new OAuthStateDTO('admin', 'he4rt'), oauthProvider: OAuthProviderEnum::Discord, code: 'dummy_code');
 
     $user = Auth::user();
     expect($user)->not->toBeNull();
@@ -98,7 +99,7 @@ it('authenticates an existing provider without duplicating records', function ()
     $initialProviders = Provider::query()->count();
 
     $action = app(AuthenticateAction::class);
-    $action->withOAuth(tenantSlug: $tenant->slug, oauthProvider: OAuthProviderEnum::Discord, code: 'dummy_code');
+    $action->withOAuth(state: new OAuthStateDTO('123', 'he4rt'), oauthProvider: OAuthProviderEnum::Discord, code: 'dummy_code');
 
     // Should log in the same existing user
     $user = Auth::user();

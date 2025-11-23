@@ -4,7 +4,7 @@
     "type" => "button",
     "variant" => "solid", // solid | outline
     "size" => "md", // xs | sm | md | lg
-    "rounded" => "sm", // sm | md | lg | full
+    "rounded" => "md", // sm | md | lg | full
     "block" => false,
     "disabled" => false,
     "loading" => false,

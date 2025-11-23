@@ -159,10 +159,10 @@
     --outline-low: #909098;
     --outline-light: #e8e9f1;
     --outline-dark: #2c2c2d;
-    --helper-success: var(--green-800);
-    --helper-warning: var(--yellow-800);
-    --helper-error: var(--red-800);
-    --helper-info: var(--blue-800);
+    --helper-success: var(--green-300);
+    --helper-warning: var(--yellow-300);
+    --helper-error: var(--red-300);
+    --helper-info: var(--blue-300);
     --elevation-surface: #fbfbff;
     --elevation-01dp: #f7f8fc;
     --elevation-02dp: #f2f4fa;

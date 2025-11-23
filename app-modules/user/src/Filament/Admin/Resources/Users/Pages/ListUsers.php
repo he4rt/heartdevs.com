@@ -7,10 +7,18 @@ namespace He4rt\User\Filament\Admin\Resources\Users\Pages;
 use Filament\Actions\CreateAction;
 use Filament\Resources\Pages\ListRecords;
 use He4rt\User\Filament\Admin\Resources\Users\UserResource;
+use He4rt\User\Filament\Shared\Widgets\UsersStatsOverview;
 
 class ListUsers extends ListRecords
 {
     protected static string $resource = UserResource::class;
+
+    protected function getHeaderWidgets(): array
+    {
+        return [
+            UsersStatsOverview::class,
+        ];
+    }
 
     protected function getHeaderActions(): array
     {
