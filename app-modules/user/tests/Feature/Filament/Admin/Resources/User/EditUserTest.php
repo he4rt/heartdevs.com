@@ -22,22 +22,22 @@ it('can load the page edit page', function (): void {
 it('can update a user', function (): void {
     $user = User::factory()->create();
 
-    $newUserData = User::factory()->make();
-
     $this->livewire(EditUser::class, [
         'record' => $user->id,
     ])
         ->fillForm([
-            'username' => $newUserData->username,
-            'email' => $newUserData->email,
+            'username' => 'fulano',
+            'email' => 'fulano@email.com',
+            'zip_code' => '13000-000',
         ])
         ->call('save')
+        ->assertHasNoFormErrors()
         ->assertNotified();
 
     $this->assertDatabaseHas(User::class, [
         'id' => $user->id,
-        'username' => $newUserData->username,
-        'email' => $newUserData->email,
+        'username' => 'fulano',
+        'email' => 'fulano@email.com',
     ]);
 });
 
