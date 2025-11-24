@@ -53,18 +53,18 @@ class ThreeDotsSeeder extends Seeder
     private function talks(Tenant $tenant, EventModel $event): void
     {
         $talks = [
-            ['time' => '15:00', 'speaker' => '3 Pontos', 'title' => 'Abertura e Início da Live (Twitch)', 'field_type' => 'twitch', 'description' => 'twitch'],
+            ['time' => '15:00', 'speaker' => $event->slug, 'title' => 'Abertura e Início da Live (Twitch)', 'field_type' => 'twitch', 'description' => 'twitch'],
             ['time' => '15:30', 'speaker' => 'Juliana Gaioso', 'title' => 'Talk Juliana Gaioso (DevSec PicPay) - Tema', 'field_type' => 'Devsec', 'description' => 'Por mais de quinze anos, solucionando problemas na indústria através de automação, IoT e desenvolvimento de software. Atualmente focada em solucionar problemas de software de segurança.'],
             ['time' => '15:50', 'speaker' => 'Fernanda Fagundes', 'title' => 'Talk Fernanda Fagundes (Ipê) - Tema', 'field_type' => 'Lady', 'description' => 'Talk da Fefa'],
-            ['time' => '16:10', 'speaker' => '3 Pontos', 'title' => 'Ações social I (Cestas Básicas)', 'field_type' => '3pontos', 'description' => 'Ação Social I'],
-            ['time' => '16:30', 'speaker' => '3 Pontos', 'title' => 'Coffee Break', 'field_type' => '3pontos', 'description' => 'coffee break'],
+            ['time' => '16:10', 'speaker' => $event->slug, 'title' => 'Ações social I (Cestas Básicas)', 'field_type' => '3pontos', 'description' => 'Ação Social I'],
+            ['time' => '16:30', 'speaker' => $event->slug, 'title' => 'Coffee Break', 'field_type' => '3pontos', 'description' => 'coffee break'],
             ['time' => '17:00', 'speaker' => 'Tatiana Barros', 'title' => 'Talk Tatiana Barros - Tema', 'field_type' => 'Technology Evangelist', 'description' => 'Há mais de uma década unindo tecnologia, criatividade e impacto social. Evangelista de Tecnologia focada em fortalecer comunidades dev e ampliar o acesso à educação tecnológica por meio de workshops, mentorias e iniciativas premiadas.'],
             ['time' => '17:20', 'speaker' => 'Daniel Reis', 'title' => 'Talk Daniel Reis - Tema', 'field_type' => 'Tech Lead & Fundador da He4rt Developers', 'description' => 'Linha de frente na criação de softwares e fortalecendo comunidades dev. DevRel focado em conteúdo técnico, live coding e educação, sempre impulsionando novos talentos. Fundador da He4rt Developers e apaixonado por ensinar, programar e construir espaços onde desenvolvedores crescem juntos.'],
-            ['time' => '17:40', 'speaker' => '3 Pontos', 'title' => 'Ações social II (Materiais Escolares)', 'field_type' => '3pontos', 'description' => 'Ação Social II'],
-            ['time' => '17:45', 'speaker' => '?????', 'title' => 'Roda de Conversa com ?????????? - IA como ferramenta do dia a dia', 'field_type' => 'IA', 'description' => ' ????'],
-            ['time' => '18:50', 'speaker' => '3 Pontos', 'title' => 'Lançamento da comunidade 3 Pontos', 'field_type' => '3 pontos', 'description' => 'Lançamento 3 pontos'],
-            ['time' => '19:20', 'speaker' => '3 Pontos', 'title' => 'Hunting de Oportunidades para Comunidade', 'field_type' => '3pontos', 'description' => 'oportunidades para comunidade'],
-            ['time' => '20:00', 'speaker' => '3 Pontos', 'title' => 'Encerramento e Agradecimentos', 'field_type' => '3pontos', 'description' => 'Agradecimentos'],
+            ['time' => '17:40', 'speaker' => $event->slug, 'title' => 'Ações social II (Materiais Escolares)', 'field_type' => '3pontos', 'description' => 'Ação Social II'],
+            ['time' => '17:45', 'speaker' => $event->slug, 'title' => 'Roda de Conversa com ?????????? - IA como ferramenta do dia a dia', 'field_type' => 'IA', 'description' => ' ????'],
+            ['time' => '18:50', 'speaker' => $event->slug, 'title' => 'Lançamento da comunidade 3 Pontos', 'field_type' => '3 pontos', 'description' => 'Lançamento 3 pontos'],
+            ['time' => '19:20', 'speaker' => $event->slug, 'title' => 'Hunting de Oportunidades para Comunidade', 'field_type' => '3pontos', 'description' => 'oportunidades para comunidade'],
+            ['time' => '20:00', 'speaker' => $event->slug, 'title' => 'Encerramento e Agradecimentos', 'field_type' => '3pontos', 'description' => 'Agradecimentos'],
         ];
 
         foreach ($talks as $item) {

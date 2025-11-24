@@ -2,7 +2,7 @@
     'event',
     'speakers' => $event->speakers->where('name',
     '!=',
-    '3 Pontos'),
+    $event->slug),
 ])
 <section class="hp-section relative" id="speakers">
     <div
