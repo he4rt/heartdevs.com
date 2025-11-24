@@ -1,7 +1,9 @@
 ---
 title: Introdução
 description: Bem-vindo à documentação oficial do He4rt Bot API
-order: 1
+order: 2
+group: Geral
+icon: document-text
 ---
 
 # Introdução ao He4rt Bot API

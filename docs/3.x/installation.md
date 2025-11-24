@@ -1,7 +1,9 @@
 ---
 title: Instalação
 description: Guia completo de instalação do He4rt Bot API
-order: 2
+order: 3
+group: Primeiros Passos
+icon: cloud-arrow-down
 ---
 
 # Instalação
