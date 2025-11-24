@@ -40,6 +40,7 @@ class BaseSeeder extends Seeder
         $tenant = Tenant::factory()
             ->for($user, 'owner')
             ->afterCreating(fn (Tenant $tenant) => $tenant->members()->attach($user))
+            ->withDiscordProvider('1442327864052547656')
             ->create([
                 'name' => 'He4rt Developers',
                 'slug' => 'he4rt',

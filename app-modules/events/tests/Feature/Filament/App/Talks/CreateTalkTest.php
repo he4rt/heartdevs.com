@@ -94,8 +94,10 @@ describe('TalkTimeIsAvailable Rule', function (): void {
             ->assertHasFormErrors(['ends_at']);
     });
     it('should should be able to create a talk if there is already one but is not accepted yet', function (): void {
+
         $start = now()->addHour();
         $end = now()->addhours(3);
+
         Talk::factory()->recycle($this->event)->create([
             'starts_at' => $start,
             'ends_at' => $end,
