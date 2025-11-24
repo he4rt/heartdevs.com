@@ -22,6 +22,8 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
+use Spatie\MediaLibrary\HasMedia;
+use Spatie\MediaLibrary\InteractsWithMedia;
 
 /**
  * @property string $id
@@ -30,10 +32,11 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
  * @property bool $is_donator
  */
 #[ObservedBy(UserObserver::class)]
-final class User extends Authenticatable implements HasName, HasTenants
+final class User extends Authenticatable implements HasMedia, HasName, HasTenants
 {
     use HasFactory;
     use HasUuids;
+    use InteractsWithMedia;
     use InteractsWithTenants;
 
     protected $table = 'users';
@@ -112,6 +115,12 @@ final class User extends Authenticatable implements HasName, HasTenants
     public function getFilamentName(): string
     {
         return $this->username;
+    }
+
+    public function registerMediaCollections(): void
+    {
+        $this->addMediaCollection('avatar')
+            ->useDisk('public');
     }
 
     protected static function newFactory(): UserFactory

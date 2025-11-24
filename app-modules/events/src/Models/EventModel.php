@@ -38,6 +38,7 @@ use Illuminate\Database\Eloquent\Relations\Pivot;
  * @property int $tenant_id
  * @property Date $end_at
  * @property Date $start_at
+ * @property Date $event_at
  */
 #[UseFactory(EventFactory::class)]
 class EventModel extends Model

@@ -35,10 +35,7 @@
                     <x-he4rt::card class="hover:border-b-outline-light border-b-8">
                         <x-slot:header class="flex flex-col items-center justify-center border-none pb-0">
                             <div class="flex flex-col items-center gap-2">
-                                <x-he4rt::avatar
-                                    size="2xl"
-                                    src="https://avatars.githubusercontent.com/u/85951158?v=4"
-                                />
+                                <x-he4rt::avatar size="2xl" src="{{$speaker->getFirstMediaUrl('avatar')}}" />
                                 <x-he4rt::heading level="3" size="xs">{{ $speaker->name }}</x-he4rt::heading>
                                 <x-he4rt::text class="text-center" size="sm">
                                     {{ $speaker->talks->first()->field_type }}

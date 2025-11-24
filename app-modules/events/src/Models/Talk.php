@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace He4rt\Events\Models;
 
+use Carbon\Carbon;
 use He4rt\Events\Database\Factories\TalkFactory;
 use He4rt\Events\Enums\Talks\TalkStatusEnum;
 use He4rt\Tenant\Models\Tenant;
@@ -14,6 +15,16 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
+/**
+ * @property int|string $event_id
+ * @property int|string $user_id
+ * @property TalkStatusEnum $status
+ * @property string $field_type
+ * @property string $title
+ * @property string $description
+ * @property Carbon $starts_at
+ * @property Carbon $ends_at
+ */
 #[UseFactory(TalkFactory::class)]
 class Talk extends Model
 {
