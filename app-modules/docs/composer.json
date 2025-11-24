@@ -1,0 +1,24 @@
+{
+    "name": "he4rt/docs",
+    "description": "",
+    "type": "library",
+    "version": "1.0",
+    "license": "proprietary",
+    "require": {
+        "symfony/browser-kit": "v7.0.8"
+    },
+    "autoload": {
+        "psr-4": {
+            "He4rt\\Docs\\": "src/",
+            "He4rt\\Docs\\Tests\\": "tests/"
+        }
+    },
+    "minimum-stability": "stable",
+    "extra": {
+        "laravel": {
+            "providers": [
+                "He4rt\\Docs\\DocsServiceProvider"
+            ]
+        }
+    }
+}
