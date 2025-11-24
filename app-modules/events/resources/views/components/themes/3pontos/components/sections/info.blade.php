@@ -1,3 +1,6 @@
+@props([
+    'event',
+])
 <section class="hp-section relative z-1" id="info">
     <div class="hp-container">
         <div class="grid grid-cols-1 gap-y-8 lg:grid-cols-2">
@@ -15,9 +18,7 @@
                                 icon="heroicon-o-map-pin"
                                 class="text-icon-light bg-transparent p-0!"
                             />
-                            <x-he4rt::text class="font-bold">
-                                Endereço: R. Aspicuelta, 422 - Vila Madalena, São Paulo - SP, 05416-011
-                            </x-he4rt::text>
+                            <x-he4rt::text class="font-bold">Endereço: {{ $event->location }}</x-he4rt::text>
                         </div>
                         <div class="flex gap-2">
                             <x-he4rt::icon
@@ -25,7 +26,10 @@
                                 icon="heroicon-o-clock"
                                 class="text-icon-light bg-transparent p-0!"
                             />
-                            <x-he4rt::text class="font-bold">Horário: Sábado (3/12) - 14:00 até 19:00</x-he4rt::text>
+                            <x-he4rt::text class="font-bold">
+                                Horário: {{ $event->start_at->format('D') }} {{ $event->day }} - {{ $event->start }}
+                                até {{ $event->end }}
+                            </x-he4rt::text>
                         </div>
                         <div class="flex gap-8">
                             <x-he4rt::icon icon="fab-instagram" class="text-icon-light bg-transparent p-0!" />

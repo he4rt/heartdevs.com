@@ -9,6 +9,7 @@ use He4rt\Events\Enums\Talks\TalkStatusEnum;
 use He4rt\Tenant\Models\Tenant;
 use He4rt\User\Models\User;
 use Illuminate\Database\Eloquent\Attributes\UseFactory;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -54,6 +55,20 @@ class Talk extends Model
     public function tenant(): BelongsTo
     {
         return $this->belongsTo(Tenant::class);
+    }
+
+    protected function start(): Attribute
+    {
+        return Attribute::make(
+            get: fn () => $this->starts_at?->format('H:i'),
+        );
+    }
+
+    protected function end(): Attribute
+    {
+        return Attribute::make(
+            get: fn () => $this->ends_at?->format('H:i'),
+        );
     }
 
     protected function casts(): array

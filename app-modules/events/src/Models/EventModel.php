@@ -16,6 +16,7 @@ use He4rt\User\Models\User;
 use Illuminate\Database\Eloquent\Attributes\Scope;
 use Illuminate\Database\Eloquent\Attributes\UseFactory;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -154,6 +155,34 @@ class EventModel extends Model
     public function speakers(): HasManyThrough
     {
         return $this->hasManyThrough(User::class, Talk::class, 'user_id');
+    }
+
+    protected function duration(): Attribute
+    {
+        return Attribute::make(
+            get: fn () => $this->start_at->diffInHours($this->end_at),
+        );
+    }
+
+    protected function start(): Attribute
+    {
+        return Attribute::make(
+            get: fn () => $this->start_at?->format('H:i'),
+        );
+    }
+
+    protected function day(): Attribute
+    {
+        return Attribute::make(
+            get: fn () => $this->event_at?->format('d/m'),
+        );
+    }
+
+    protected function end(): Attribute
+    {
+        return Attribute::make(
+            get: fn () => $this->end_at?->format('H:i'),
+        );
     }
 
     #[Scope]

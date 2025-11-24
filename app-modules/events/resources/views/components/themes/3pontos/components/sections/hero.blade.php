@@ -1,3 +1,16 @@
+@php
+    use Illuminate\Support\Facades\Date;
+@endphp
+
+@props([
+    'event',
+])
+@php
+    $eventStart = $event->start;
+    $eventEnd = $event->end;
+    $diffHours = $event->duration;
+@endphp
+
 <section class="hp-section relative items-start" id="hero">
     <div class="absolute inset-0 -left-[20%] z-0 h-full w-[150%]">
         <img src="{{ asset('images/3pontos/logo-chain.png') }}" alt="" class="h-full w-full object-cover" />
@@ -21,10 +34,9 @@
             <x-slot:badge>
                 <x-he4rt::section-title>3 Pontos Start</x-he4rt::section-title>
             </x-slot>
-            <x-slot:title>Participe do primeiro evento presencial da 3Pontos</x-slot>
+            <x-slot:title>{{ $event->title }}</x-slot>
             <x-slot:description>
-                Um evento híbrido de 5 horas, em parceria com a He4rt, com palestras exclusivas, networking e uma missão
-                social que transforma.
+                {{ $event->description }}
             </x-slot>
             <x-slot:actions>
                 <x-he4rt::button>Faça sua inscrição</x-he4rt::button>
@@ -44,7 +56,9 @@
                             <x-he4rt::text size="sm" class="font-semibold">Horário</x-he4rt::text>
                         </div>
                     </x-slot>
-                    <x-slot:title>15h ~ 20h - Duração: 5h</x-slot>
+                    <x-slot:title>
+                        {{ $eventStart }} ~ {{ $eventEnd }} Duração: {{ $diffHours }}h
+                    </x-slot>
                 </x-he4rt::card>
             </x-he4rt::animate-block>
 

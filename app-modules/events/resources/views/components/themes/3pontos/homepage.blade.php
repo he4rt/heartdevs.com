@@ -1,14 +1,14 @@
 <x-he4rt::layouts.page class="relative" full-height="true">
-    <x-events::themes.3pontos.components.sections.hero />
+    <x-events::themes.3pontos.components.sections.hero :$event />
     <x-events::themes.3pontos.components.sections.social-action />
     <x-events::themes.3pontos.components.sections.community />
     <x-events::themes.3pontos.components.sections.meet-up />
-    <x-events::themes.3pontos.components.sections.speakers />
-    <x-events::themes.3pontos.components.sections.schedule />
+    <x-events::themes.3pontos.components.sections.speakers :$event />
+    <x-events::themes.3pontos.components.sections.schedule :$event />
     <x-events::themes.3pontos.components.sections.watch-live />
     <x-events::themes.3pontos.components.sections.partners />
     <x-events::themes.3pontos.components.sections.about />
-    <x-events::themes.3pontos.components.sections.info />
+    <x-events::themes.3pontos.components.sections.info :$event />
     <div class="absolute bottom-[2%] z-0 translate-x-[90%] lg:-translate-x-[60%] lg:translate-y-1/3">
         <img src="{{ asset('images/3pontos/logo-creation.png') }}" class="max-h-[500px] lg:max-h-[700px]" alt="" />
     </div>
