@@ -29,7 +29,7 @@
     <flux:header :sticky="true" class="lg:hidden">
         <flux:sidebar.toggle class="lg:hidden" icon="bars-2" inset="left" />
         <flux:spacer />
-        <flux:dropdown position="top" alignt="start">
+        <flux:dropdown position="top" align="start">
             <flux:button x-data="" x-on:click="$flux.dark = ! $flux.dark">Toggle</flux:button>
         </flux:dropdown>
     </flux:header>

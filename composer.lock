@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "e68b5bbd4c1b186a6c1ebf08f4054912",
+    "content-hash": "b0644be2e42ba50e2b6134bafed71801",
     "packages": [
         {
             "name": "anourvalar/eloquent-serialize",
@@ -224,16 +224,16 @@
         },
         {
             "name": "brick/math",
-            "version": "0.14.0",
+            "version": "0.14.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/brick/math.git",
-                "reference": "113a8ee2656b882d4c3164fa31aa6e12cbb7aaa2"
+                "reference": "f05858549e5f9d7bb45875a75583240a38a281d0"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/brick/math/zipball/113a8ee2656b882d4c3164fa31aa6e12cbb7aaa2",
-                "reference": "113a8ee2656b882d4c3164fa31aa6e12cbb7aaa2",
+                "url": "https://api.github.com/repos/brick/math/zipball/f05858549e5f9d7bb45875a75583240a38a281d0",
+                "reference": "f05858549e5f9d7bb45875a75583240a38a281d0",
                 "shasum": ""
             },
             "require": {
@@ -272,7 +272,7 @@
             ],
             "support": {
                 "issues": "https://github.com/brick/math/issues",
-                "source": "https://github.com/brick/math/tree/0.14.0"
+                "source": "https://github.com/brick/math/tree/0.14.1"
             },
             "funding": [
                 {
@@ -280,7 +280,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2025-08-29T12:40:03+00:00"
+            "time": "2025-11-24T14:40:29+00:00"
         },
         {
             "name": "carbonphp/carbon-doctrine-types",
@@ -353,16 +353,16 @@
         },
         {
             "name": "chillerlan/php-qrcode",
-            "version": "5.0.4",
+            "version": "5.0.5",
             "source": {
                 "type": "git",
                 "url": "https://github.com/chillerlan/php-qrcode.git",
-                "reference": "390393e97a6e42ccae0e0d6205b8d4200f7ddc43"
+                "reference": "7b66282572fc14075c0507d74d9837dab25b38d6"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/chillerlan/php-qrcode/zipball/390393e97a6e42ccae0e0d6205b8d4200f7ddc43",
-                "reference": "390393e97a6e42ccae0e0d6205b8d4200f7ddc43",
+                "url": "https://api.github.com/repos/chillerlan/php-qrcode/zipball/7b66282572fc14075c0507d74d9837dab25b38d6",
+                "reference": "7b66282572fc14075c0507d74d9837dab25b38d6",
                 "shasum": ""
             },
             "require": {
@@ -373,7 +373,7 @@
             "require-dev": {
                 "chillerlan/php-authenticator": "^4.3.1 || ^5.2.1",
                 "ext-fileinfo": "*",
-                "phan/phan": "^5.5.1",
+                "phan/phan": "^5.5.2",
                 "phpcompatibility/php-compatibility": "10.x-dev",
                 "phpmd/phpmd": "^2.15",
                 "phpunit/phpunit": "^9.6",
@@ -442,7 +442,7 @@
                     "type": "Ko-Fi"
                 }
             ],
-            "time": "2025-09-19T17:30:27+00:00"
+            "time": "2025-11-23T23:51:44+00:00"
         },
         {
             "name": "chillerlan/php-settings-container",
@@ -1242,16 +1242,16 @@
         },
         {
             "name": "dedoc/scramble",
-            "version": "v0.13.4",
+            "version": "v0.13.5",
             "source": {
                 "type": "git",
                 "url": "https://github.com/dedoc/scramble.git",
-                "reference": "773f9d41b68a9bd52120648e55068bfbe9be567e"
+                "reference": "b827b5f96fb9f0f6069af65faeefdde9fedf4b9e"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/dedoc/scramble/zipball/773f9d41b68a9bd52120648e55068bfbe9be567e",
-                "reference": "773f9d41b68a9bd52120648e55068bfbe9be567e",
+                "url": "https://api.github.com/repos/dedoc/scramble/zipball/b827b5f96fb9f0f6069af65faeefdde9fedf4b9e",
+                "reference": "b827b5f96fb9f0f6069af65faeefdde9fedf4b9e",
                 "shasum": ""
             },
             "require": {
@@ -1310,7 +1310,7 @@
             ],
             "support": {
                 "issues": "https://github.com/dedoc/scramble/issues",
-                "source": "https://github.com/dedoc/scramble/tree/v0.13.4"
+                "source": "https://github.com/dedoc/scramble/tree/v0.13.5"
             },
             "funding": [
                 {
@@ -1318,7 +1318,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2025-11-16T07:10:35+00:00"
+            "time": "2025-11-24T09:09:10+00:00"
         },
         {
             "name": "dflydev/dot-access-data",
@@ -2858,10 +2858,7 @@
             "dist": {
                 "type": "path",
                 "url": "app-modules/docs",
-                "reference": "b19aca50b8fc0d8521b51b466cb16f13b2801005"
-            },
-            "require": {
-                "symfony/browser-kit": "v7.0.8"
+                "reference": "0eb6b693c3220f60d5c7e2f64c3dd4c0b264952f"
             },
             "type": "library",
             "extra": {
@@ -4736,16 +4733,16 @@
         },
         {
             "name": "livewire/flux",
-            "version": "v2.7.0",
+            "version": "v2.7.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/livewire/flux.git",
-                "reference": "17acef4be6cb0f9551e399b546cd5b903ae90c6a"
+                "reference": "bf38c5002161034adaa4ec0c6cd1ca0ec61a2618"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/livewire/flux/zipball/17acef4be6cb0f9551e399b546cd5b903ae90c6a",
-                "reference": "17acef4be6cb0f9551e399b546cd5b903ae90c6a",
+                "url": "https://api.github.com/repos/livewire/flux/zipball/bf38c5002161034adaa4ec0c6cd1ca0ec61a2618",
+                "reference": "bf38c5002161034adaa4ec0c6cd1ca0ec61a2618",
                 "shasum": ""
             },
             "require": {
@@ -4796,9 +4793,9 @@
             ],
             "support": {
                 "issues": "https://github.com/livewire/flux/issues",
-                "source": "https://github.com/livewire/flux/tree/v2.7.0"
+                "source": "https://github.com/livewire/flux/tree/v2.7.1"
             },
-            "time": "2025-11-24T02:21:55+00:00"
+            "time": "2025-11-24T12:49:39+00:00"
         },
         {
             "name": "livewire/livewire",
@@ -7579,16 +7576,16 @@
         },
         {
             "name": "spatie/image",
-            "version": "3.8.6",
+            "version": "3.8.7",
             "source": {
                 "type": "git",
                 "url": "https://github.com/spatie/image.git",
-                "reference": "0872c5968a7f044fe1e960c26433e54ceaede696"
+                "reference": "4d35db207c4b317bc221d02ab7ba94aa78b44c24"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/spatie/image/zipball/0872c5968a7f044fe1e960c26433e54ceaede696",
-                "reference": "0872c5968a7f044fe1e960c26433e54ceaede696",
+                "url": "https://api.github.com/repos/spatie/image/zipball/4d35db207c4b317bc221d02ab7ba94aa78b44c24",
+                "reference": "4d35db207c4b317bc221d02ab7ba94aa78b44c24",
                 "shasum": ""
             },
             "require": {
@@ -7598,18 +7595,18 @@
                 "php": "^8.2",
                 "spatie/image-optimizer": "^1.7.5",
                 "spatie/temporary-directory": "^2.2",
-                "symfony/process": "^6.4|^7.0"
+                "symfony/process": "^6.4|^7.0|^8.0"
             },
             "require-dev": {
                 "ext-gd": "*",
                 "ext-imagick": "*",
                 "laravel/sail": "^1.34",
-                "pestphp/pest": "^2.28",
+                "pestphp/pest": "^3.0|^4.0",
                 "phpstan/phpstan": "^1.10.50",
                 "spatie/pest-plugin-snapshots": "^2.1",
                 "spatie/pixelmatch-php": "^1.0",
                 "spatie/ray": "^1.40.1",
-                "symfony/var-dumper": "^6.4|7.0"
+                "symfony/var-dumper": "^6.4|^7.0|^8.0"
             },
             "type": "library",
             "autoload": {
@@ -7636,7 +7633,7 @@
                 "spatie"
             ],
             "support": {
-                "source": "https://github.com/spatie/image/tree/3.8.6"
+                "source": "https://github.com/spatie/image/tree/3.8.7"
             },
             "funding": [
                 {
@@ -7648,7 +7645,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2025-09-25T12:06:17+00:00"
+            "time": "2025-11-24T15:10:50+00:00"
         },
         {
             "name": "spatie/image-optimizer",
