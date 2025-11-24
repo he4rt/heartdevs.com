@@ -25,18 +25,15 @@ class UsersStatsOverview extends BaseWidget
             );
         }
 
-        $totalDonators = $query
-            ->clone()
+        $totalDonators = (clone $query)
             ->where('is_donator', true)
             ->count();
 
-        $totalUsersToday = $query
-            ->clone()
+        $totalUsersToday = (clone $query)
             ->whereDate('created_at', today())
             ->count();
 
-        $totalUsersMonth = $query
-            ->clone()
+        $totalUsersMonth = (clone $query)
             ->whereYear('created_at', now()->year)
             ->whereMonth('created_at', now()->month)
             ->count();
