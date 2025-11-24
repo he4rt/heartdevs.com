@@ -154,7 +154,7 @@ class EventModel extends Model
      */
     public function speakers(): HasManyThrough
     {
-        return $this->hasManyThrough(User::class, Talk::class, 'user_id');
+        return $this->hasManyThrough(User::class, Talk::class, 'event_id', 'id', 'id', 'user_id');
     }
 
     protected function duration(): Attribute

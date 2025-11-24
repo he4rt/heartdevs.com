@@ -9,6 +9,7 @@ use Filament\Models\Contracts\HasTenants;
 use He4rt\Character\Models\Character;
 use He4rt\Events\Models\EventModel;
 use He4rt\Events\Models\Pivot\EventAttend;
+use He4rt\Events\Models\Talk;
 use He4rt\Provider\Models\Provider;
 use He4rt\Tenant\Models\Concerns\InteractsWithTenants;
 use He4rt\User\Database\Factories\UserFactory;
@@ -90,6 +91,14 @@ final class User extends Authenticatable implements HasName, HasTenants
     public function providers(): MorphMany
     {
         return $this->morphMany(Provider::class, 'model');
+    }
+
+    /**
+     * @return HasMany<Talk, $this>
+     */
+    public function talks(): HasMany
+    {
+        return $this->hasMany(Talk::class, 'user_id');
     }
 
     /**
