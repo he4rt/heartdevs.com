@@ -9,6 +9,7 @@
     "license": "MIT",
     "require": {
         "php": "^8.3",
+        "dedoc/scramble": "^0.13.4",
         "filament/filament": "^4.0",
         "guzzlehttp/guzzle": "^7.10.0",
         "he4rt/authentication": ">=1",

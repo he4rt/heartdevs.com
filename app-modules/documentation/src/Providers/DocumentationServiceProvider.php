@@ -8,7 +8,10 @@ use Illuminate\Support\ServiceProvider;
 
 class DocumentationServiceProvider extends ServiceProvider
 {
-    public function register(): void {}
+    public function register(): void
+    {
+        $this->app->register(FolioServiceProvider::class);
+    }
 
     public function boot(): void {}
 }
