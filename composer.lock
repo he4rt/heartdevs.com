@@ -3031,7 +3031,7 @@
             "dist": {
                 "type": "path",
                 "url": "app-modules/bot-discord",
-                "reference": "04c9e579c3071a0b1bb9f1194d02f6cb5275ce89"
+                "reference": "84d2dac97e123b15e8c593a1c565770f4db7f576"
             },
             "type": "library",
             "extra": {
@@ -12557,12 +12557,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/discord-php/DiscordPHP.git",
-                "reference": "33e54d0e7d3547a3ccdebd93dd919546d68019fe"
+                "reference": "e8be3960822773c7eb115037b7bdce35f4ff2c00"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/discord-php/DiscordPHP/zipball/33e54d0e7d3547a3ccdebd93dd919546d68019fe",
-                "reference": "33e54d0e7d3547a3ccdebd93dd919546d68019fe",
+                "url": "https://api.github.com/repos/discord-php/DiscordPHP/zipball/e8be3960822773c7eb115037b7bdce35f4ff2c00",
+                "reference": "e8be3960822773c7eb115037b7bdce35f4ff2c00",
                 "shasum": ""
             },
             "require": {
@@ -12642,7 +12642,7 @@
                     "type": "patreon"
                 }
             ],
-            "time": "2025-11-24T20:45:19+00:00"
+            "time": "2025-11-25T20:01:35+00:00"
         },
         {
             "name": "tijsverkoyen/css-to-inline-styles",
