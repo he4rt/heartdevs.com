@@ -23,6 +23,6 @@ class DynamicVoiceTask extends Task
      */
     public function handle(): void
     {
-        $this->logger()->info('Hello world.');
+        //        $this->logger()->info('Hello world.');
     }
 }
