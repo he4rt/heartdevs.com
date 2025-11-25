@@ -40,3 +40,4 @@ _ide_helper.php
 _ide_helper_models.php
 tests/Browser/Screenshots
 /.github/git-commit-instructions.md
+/.laracord

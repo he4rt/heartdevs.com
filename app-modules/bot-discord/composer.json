@@ -1,0 +1,22 @@
+{
+    "name": "he4rt/bot-discord",
+    "description": "",
+    "type": "library",
+    "version": "1.0",
+    "license": "proprietary",
+    "require": {},
+    "autoload": {
+        "psr-4": {
+            "He4rt\\BotDiscord\\": "src/",
+            "He4rt\\BotDiscord\\Tests\\": "tests/"
+        }
+    },
+    "minimum-stability": "stable",
+    "extra": {
+        "laravel": {
+            "providers": [
+                "He4rt\\BotDiscord\\Providers\\BotDiscordServiceProvider"
+            ]
+        }
+    }
+}

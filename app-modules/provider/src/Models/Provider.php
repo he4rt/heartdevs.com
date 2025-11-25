@@ -21,6 +21,7 @@ use Illuminate\Database\Eloquent\Relations\MorphTo;
  * @property User $user
  * @property Collection<Token> $tokens
  * @property string $user_id
+ * @property int $tenant_id
  * @property string $provider_id
  * @property string $provider
  */

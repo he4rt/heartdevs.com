@@ -12,6 +12,7 @@ final class NewMessageDTO
     public function __construct(
         public int $tenantId,
         public ProviderEnum $provider,
+        public string $providerUsername,
         public string $providerId,
         public string $providerMessageId,
         public string $channelId,
@@ -24,6 +25,7 @@ final class NewMessageDTO
         return new self(
             tenantId: $payload['tenant_id'],
             provider: ProviderEnum::from($payload['provider']),
+            providerUsername: $payload['provider_username'],
             providerId: $payload['provider_id'],
             providerMessageId: $payload['provider_message_id'],
             channelId: $payload['channel_id'],
