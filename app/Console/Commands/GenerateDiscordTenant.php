@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Console\Commands;
 
 use He4rt\Provider\Enums\ProviderEnum;
-use He4rt\Provider\Models\Provider;
 use He4rt\Tenant\Models\Tenant;
 use Illuminate\Console\Command;
 
@@ -32,11 +31,13 @@ class GenerateDiscordTenant extends Command
     {
         Tenant::factory()
             ->afterCreating(function (Tenant $tenant): void {
-                Provider::factory([
-                    'tenant_id' => $tenant->getKey(),
-                    'provider' => ProviderEnum::Discord,
-                    'provider_id' => $this->argument('guildId'),
-                ])->create();
+                $tenant
+                    ->providers()
+                    ->create([
+                        'tenant_id' => $tenant->getKey(),
+                        'provider' => ProviderEnum::Discord,
+                        'provider_id' => $this->argument('guildId'),
+                    ]);
             })
             ->create();
 
