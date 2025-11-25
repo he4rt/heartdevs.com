@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace He4rt\BotDiscord\SlashCommands;
 
-use React\Promise\PromiseInterface;
 use Discord\Builders\Components\TextInput;
 use Discord\Helpers\Collection;
 use Discord\Parts\Guild\Role;
@@ -14,6 +13,7 @@ use He4rt\Tenant\Models\Tenant;
 use He4rt\User\Actions\UpdateProfile;
 use He4rt\User\DTO\UpdateProfileDTO;
 use Laracord\Commands\SlashCommand;
+use React\Promise\PromiseInterface;
 use Throwable;
 
 class IntroductionCommand extends SlashCommand
@@ -116,8 +116,6 @@ class IntroductionCommand extends SlashCommand
     private function persistData(Interaction $interaction, Collection $components): PromiseInterface
     {
         $role = $interaction->guild->roles->find(fn (Role $role) => $role->name === 'He4rt');
-
-        $this->logger()->info($role);
 
         if (! $role) {
             return $interaction->respondWithMessage('Erro ao encontrar o role He4rt');
