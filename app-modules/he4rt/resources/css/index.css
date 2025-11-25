@@ -55,10 +55,6 @@
     will-change: transform;
 }
 
-.animate-infinite-scroll:hover {
-    animation-play-state: paused;
-}
-
 .fi-topbar {
     @apply bg-elevation-surface p-4 px-12 shadow-none ring-0;
 }
