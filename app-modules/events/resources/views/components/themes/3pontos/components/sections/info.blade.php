@@ -30,26 +30,30 @@
                 <x-he4rt::headline>
                     <x-slot:title>Informações sobre o evento</x-slot>
                     <x-slot:subtitle class="gap-8">
-                        <div class="flex items-center gap-2">
+                        <div class="flex flex-col items-center gap-2 sm:flex-row">
                             <x-he4rt::icon
                                 :interactive="false"
                                 icon="heroicon-o-map-pin"
-                                class="text-icon-light bg-transparent p-0!"
+                                class="text-icon-light w-fit bg-transparent p-0!"
                             />
                             <x-he4rt::text class="font-bold">
                                 Endereço: R. Aspicuelta, 422 - Vila Madalena, São Paulo - SP, 05416-011
                             </x-he4rt::text>
                         </div>
-                        <div class="flex items-center gap-2">
+                        <div class="flex flex-col items-center gap-2 sm:flex-row">
                             <x-he4rt::icon
                                 :interactive="false"
                                 icon="heroicon-o-clock"
-                                class="text-icon-light bg-transparent p-0!"
+                                class="text-icon-light w-fit bg-transparent p-0!"
                             />
-                            <x-he4rt::text class="font-bold">Horário: Sábado (3/12) - 14:00 até 19:00</x-he4rt::text>
-                            <x-he4rt::text class="font-bold">(Chegar às 14h30)</x-he4rt::text>
+                            <div>
+                                <x-he4rt::text class="font-bold">
+                                    Horário: Sábado (3/12) - 14:00 até 19:00
+                                </x-he4rt::text>
+                                <x-he4rt::text class="font-bold">(Chegar às 14h30)</x-he4rt::text>
+                            </div>
                         </div>
-                        <div class="flex gap-8">
+                        <div class="flex justify-center gap-8 sm:justify-start">
                             @foreach ($socials as $social)
                                 <x-he4rt::icon
                                     rel="noopener noreferrer"
