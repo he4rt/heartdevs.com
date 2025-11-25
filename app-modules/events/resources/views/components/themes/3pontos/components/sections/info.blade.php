@@ -37,7 +37,7 @@
                                 class="text-icon-light w-fit bg-transparent p-0!"
                             />
                             <x-he4rt::text class="font-bold">
-                                Endereço: R. Aspicuelta, 422 - Vila Madalena, São Paulo - SP, 05416-011
+                                Endereço: Alameda Santos, 1165 – Jardim Paulista, São Paulo
                             </x-he4rt::text>
                         </div>
                         <div class="flex flex-col items-center gap-2 sm:flex-row">
@@ -46,12 +46,9 @@
                                 icon="heroicon-o-clock"
                                 class="text-icon-light w-fit bg-transparent p-0!"
                             />
-                            <div>
-                                <x-he4rt::text class="font-bold">
-                                    Horário: Sábado (3/12) - 14:00 até 19:00
-                                </x-he4rt::text>
-                                <x-he4rt::text class="font-bold">(Chegar às 14h30)</x-he4rt::text>
-                            </div>
+                            <x-he4rt::text class="font-bold">
+                                Horário: Sábado (3/12) - 14:00 até 19:00 (Chegar às 14h30)
+                            </x-he4rt::text>
                         </div>
                         <div class="flex justify-center gap-8 sm:justify-start">
                             @foreach ($socials as $social)
