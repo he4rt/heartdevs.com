@@ -1,0 +1,47 @@
+@import 'tailwindcss' source(none);
+@import '../../../../vendor/livewire/flux/dist/flux.css';
+
+@plugin '@tailwindcss/typography';
+@source '../../../../app-modules/**/resources/views/**/*.blade.php';
+
+:root {
+    --gray-50: oklch(0.989 0.005 286.303) !important;
+    --gray-100: oklch(50.98 0.005 274.967) !important;
+    --gray-200: oklch(0.9673 0.0083 271.33) !important;
+    --gray-300: oklch(0.88 0.01 273.342) !important;
+    --gray-400: oklch(0.805 0.009 271.307) !important;
+    --gray-500: oklch(0.728 0.008 268.525) !important;
+    --gray-600: oklch(0.57 0.006 274.9) !important;
+    --gray-700: oklch(0.486 0.005 271.313) !important;
+    --gray-800: oklch(0.399 0.005 286.172) !important;
+    --gray-900: oklch(0.306 0.004 286.188) !important;
+    --gray-950: oklch(0.205 0.002 286.226) !important;
+}
+
+:root.dark {
+    --gray-50: oklch(0.928 0 89.876) !important;
+    --gray-100: oklch(0.858 0 89.876) !important;
+    --gray-200: oklch(0.783 0.001 286.368) !important;
+    --gray-300: oklch(0.709 0 89.876) !important;
+    --gray-400: oklch(0.633 0 89.876) !important;
+    --gray-500: oklch(0.552 0.002 286.35) !important;
+    --gray-600: oklch(0.471 0 89.876) !important;
+    --gray-700: oklch(0.383 0.002 286.321) !important;
+    --gray-800: oklch(0.187 0.002 286.205) !important;
+    --gray-900: oklch(0.169 0.002 286.177) !important;
+    --gray-950: oklch(0.14 0.002 286.109) !important;
+}
+
+@theme {
+    --color-zinc-50: var(--gray-50);
+    --color-zinc-100: var(--gray-100);
+    --color-zinc-200: var(--gray-200);
+    --color-zinc-300: var(--gray-300);
+    --color-zinc-400: var(--gray-400);
+    --color-zinc-500: var(--gray-500);
+    --color-zinc-600: var(--gray-600);
+    --color-zinc-700: var(--gray-700);
+    --color-zinc-800: var(--gray-800);
+    --color-zinc-900: var(--gray-900);
+    --color-zinc-950: var(--gray-950);
+}

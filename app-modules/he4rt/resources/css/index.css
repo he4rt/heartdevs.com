@@ -20,6 +20,7 @@
 @import './components/partials/footer.css' layer(components);
 
 @source '../../../../resources/views/**/*.blade.php';
+@source '../../../../app-modules/**/resources/views/**/*.blade.php';
 @source '../../../../app/Filament/**/*';
 @source '../../../../vendor/filament/**/*.blade.php';
 @source '../**/*.blade.php';

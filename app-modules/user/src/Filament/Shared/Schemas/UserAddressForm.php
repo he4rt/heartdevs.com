@@ -22,7 +22,6 @@ final class UserAddressForm
                             ->label('ZIP Code')
                             ->placeholder('Enter your ZIP Code (e.g., 13000-000)')
                             ->mask('99999-999')
-                            ->required()
                             ->bindCityField('city')
                             ->bindStateCodeField('state')
                             ->bindCountryCodeField('country')

@@ -25,9 +25,18 @@ class UsersStatsOverview extends BaseWidget
             );
         }
 
-        $totalDonators = (clone $query)->where('is_donator', true)->count();
-        $totalUsersToday = (clone $query)->whereDate('created_at', today())->count();
-        $totalUsersMonth = (clone $query)->whereMonth('created_at', now()->month)->count();
+        $totalDonators = (clone $query)
+            ->where('is_donator', true)
+            ->count();
+
+        $totalUsersToday = (clone $query)
+            ->whereDate('created_at', today())
+            ->count();
+
+        $totalUsersMonth = (clone $query)
+            ->whereYear('created_at', now()->year)
+            ->whereMonth('created_at', now()->month)
+            ->count();
 
         return [
             Stat::make('Usuários criados hoje', $totalUsersToday)

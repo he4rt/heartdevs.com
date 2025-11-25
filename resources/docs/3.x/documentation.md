@@ -1,0 +1,3 @@
+- ## Prologue
+    - [Release Notes](/docs/{{version}}/releases)
+    - [Installation](/docs/{{version}}/installation)
