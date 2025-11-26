@@ -127,7 +127,12 @@ final class User extends Authenticatable implements FilamentUser, HasMedia, HasN
 
     public function canAccessPanel(Panel $panel): bool
     {
-        return true;
+        match ($panel->getId()) {
+            'admin' => app()->isProduction() ? $this->isAdmin() : true,
+            default => true
+        };
+
+        return $this->isAdmin();
     }
 
     public function getFilamentAvatarUrl(): string
