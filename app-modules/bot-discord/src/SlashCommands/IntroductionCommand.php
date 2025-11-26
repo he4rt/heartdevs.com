@@ -175,7 +175,7 @@ class IntroductionCommand extends SlashCommand
         } catch (Throwable $throwable) {
             $this->logger()->error($throwable->getMessage());
 
-            return $interaction->respondWithMessage('Erro ao persistir dados');
+            return $interaction->respondWithMessage('Erro ao persistir dados', true);
         }
     }
 }
