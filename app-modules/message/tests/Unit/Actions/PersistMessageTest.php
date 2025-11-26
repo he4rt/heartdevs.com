@@ -17,10 +17,11 @@ beforeEach(function (): void {
     $this->messageDTO = new NewMessageDTO(
         1,
         ProviderEnum::Discord,
+        'eae',
         $this->messageEntity->providerId,
         $this->messageEntity->providerMessageId,
         $this->messageEntity->channelId,
-        $this->messageEntity->content,
+        content: $this->messageEntity->content,
         sentAt: CarbonImmutable::parse('2023-01-24'),
     );
 });

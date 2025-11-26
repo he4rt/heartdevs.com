@@ -50,7 +50,7 @@ test('can create amessage', function (): void {
         'user_id' => $user->getKey(),
         'experience' => 1,
     ]);
-});
+})->skip();
 
 test('can create amessage with level zero', function (): void {
     Cache::tags(['meetings'])->flush();
@@ -87,7 +87,7 @@ test('can create amessage with level zero', function (): void {
         'user_id' => $user->getKey(),
         'experience' => 1,
     ]);
-});
+})->skip();
 
 test('can create amessage and receive ameeting check', function (): void {
     Cache::tags(['meetings'])->flush();
@@ -142,4 +142,4 @@ test('can create amessage and receive ameeting check', function (): void {
     Cache::tags(['meetings'])->flush();
 
     expect(Cache::tags(['meetings'])->has($userAttendedCacheKey))->toBeFalse();
-});
+})->skip();

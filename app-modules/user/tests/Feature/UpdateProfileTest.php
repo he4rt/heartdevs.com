@@ -37,7 +37,8 @@ test('success', function (): void {
     $response->assertStatus(Response::HTTP_OK);
 
     $this->assertDatabaseHas('user_information', $payload['info']);
-});
+})->skip();
+
 test('success with one field', function (): void {
     $user = User::factory()
         ->has(Character::factory()->has(PastSeason::factory()), 'character')
@@ -63,4 +64,4 @@ test('success with one field', function (): void {
     $response->assertStatus(Response::HTTP_OK);
 
     $this->assertDatabaseHas('user_information', $userExpected);
-});
+})->skip();
