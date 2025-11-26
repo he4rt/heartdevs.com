@@ -9,6 +9,7 @@ use He4rt\Provider\Enums\ProviderEnum;
 use He4rt\Provider\Models\Provider;
 use He4rt\Tenant\Models\Tenant;
 use He4rt\User\Models\User;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Pipeline\Pipeline;
 use Laracord\Commands\Middleware\Context;
 use Laracord\Commands\SlashCommand;
@@ -35,6 +36,14 @@ abstract class AbstractSlashCommand extends SlashCommand
             ->then(fn (Context $context) => $this->resolveHandler([
                 'interaction' => $context->source,
             ]));
+    }
+
+    protected function getMemberProviderQuery(): Builder
+    {
+        return Provider::query()
+            ->where('tenant_id', $this->tenantProvider->tenant_id)
+            ->where('model_type', User::class)
+            ->where('provider', ProviderEnum::Discord);
     }
 
     private function beforePipeline(Interaction $interaction): void
