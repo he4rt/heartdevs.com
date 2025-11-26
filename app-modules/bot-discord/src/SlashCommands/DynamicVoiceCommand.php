@@ -49,7 +49,7 @@ class DynamicVoiceCommand extends SlashCommand
      *
      * @var bool
      */
-    protected $hidden = false;
+    protected $hidden = true;
 
     /**
      * Handle the slash command.

@@ -11,7 +11,7 @@ class DynamicVoiceTask extends Task
     /**
      * The task interval.
      */
-    protected int $interval = 5;
+    protected int $interval = 30;
 
     /**
      * Determine if the task handler should execute during boot.
