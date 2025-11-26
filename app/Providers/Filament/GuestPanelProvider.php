@@ -27,10 +27,9 @@ final class GuestPanelProvider extends PanelProvider
 {
     public function panel(Panel $panel): Panel
     {
-        return $panel
+        $panel = $panel
             ->default()
             ->id('guest')
-            ->path('')
             ->colors([
                 'primary' => Color::Purple,
             ])
@@ -116,5 +115,12 @@ final class GuestPanelProvider extends PanelProvider
                 DisableBladeIconComponents::class,
                 DispatchServingFilamentEvent::class,
             ]);
+
+        if (app()->isProduction()) {
+            $panel->domain(config('app.domain'));
+        }
+
+        return $panel;
+
     }
 }

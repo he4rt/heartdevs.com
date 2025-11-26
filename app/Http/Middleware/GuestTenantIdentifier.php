@@ -6,6 +6,7 @@ namespace App\Http\Middleware;
 
 use Closure;
 use Filament\Facades\Filament;
+use He4rt\Tenant\Models\Tenant;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -28,9 +29,19 @@ class GuestTenantIdentifier
             return $next($request);
         }
 
-        $tenant = $panel->getTenant($request->route()->parameter('tenant'));
+        $q = $request->route()->parameter('tenant');
+        $tenant = Tenant::query()
+            ->where('slug', $q)
+            ->orWhere('domain', $q)
+            ->first();
 
-        Filament::setTenant($tenant, true);
+        if ($tenant) {
+            Filament::setTenant($tenant, true);
+
+            return $next($request);
+        }
+
+        Filament::setCurrentPanel('guest');
 
         return $next($request);
     }

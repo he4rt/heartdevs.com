@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace He4rt\User\Models;
 
+use Filament\Models\Contracts\FilamentUser;
 use Filament\Models\Contracts\HasName;
 use Filament\Models\Contracts\HasTenants;
+use Filament\Panel;
 use He4rt\Character\Models\Character;
 use He4rt\Events\Models\EventModel;
 use He4rt\Events\Models\Pivot\EventAttend;
@@ -32,7 +34,7 @@ use Spatie\MediaLibrary\InteractsWithMedia;
  * @property bool $is_donator
  */
 #[ObservedBy(UserObserver::class)]
-final class User extends Authenticatable implements HasMedia, HasName, HasTenants
+final class User extends Authenticatable implements FilamentUser, HasMedia, HasName, HasTenants
 {
     use HasFactory;
     use HasUuids;
@@ -52,7 +54,7 @@ final class User extends Authenticatable implements HasMedia, HasName, HasTenant
 
     public function isAdmin(): bool
     {
-        return $this->email === 'admin@admin.com';
+        return in_array($this->username, str(config('he4rt.admins'))->explode(',')->toArray(), true);
     }
 
     /**
@@ -121,6 +123,11 @@ final class User extends Authenticatable implements HasMedia, HasName, HasTenant
     {
         $this->addMediaCollection('avatar')
             ->useDisk('public');
+    }
+
+    public function canAccessPanel(Panel $panel): bool
+    {
+        return true;
     }
 
     protected static function newFactory(): UserFactory

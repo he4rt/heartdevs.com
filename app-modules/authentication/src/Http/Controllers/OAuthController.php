@@ -24,6 +24,14 @@ final class OAuthController extends Controller
 
         $action->withOAuth($state, $provider, request()->input('code'));
 
+        if ($state->panel === 'event') {
+            $panel = filament()->getPanel($state->panel);
+
+            return to_route('filament.event.pages.participant-dashboard', [
+                'tenant' => $state->tenant,
+            ]);
+        }
+
         $redirectUri = filament()
             ->getPanel($state->panel)
             ->getUrl(Tenant::query()->where('slug', $state->tenant)->firstOrFail());

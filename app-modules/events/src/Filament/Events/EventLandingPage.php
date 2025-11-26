@@ -29,7 +29,6 @@ class EventLandingPage extends Dashboard
         $tenantSlug = str($tenantSlug)->replace(['.', '-'], '')->toString();
 
         $this->tenant = Tenant::query()->where('slug', $tenantSlug)->firstOrFail();
-
     }
 
     public function getView(): string

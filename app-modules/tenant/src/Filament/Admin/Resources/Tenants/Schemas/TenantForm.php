@@ -24,7 +24,9 @@ class TenantForm
                             ->minLength(3)
                             ->maxLength(255)
                             ->afterStateUpdated(fn ($state, Set $set) => $set('slug', Str::slug($state)))
-                            ->live()
+                            ->live(debounce: 500)
+                            ->required(),
+                        TextInput::make('domain')
                             ->required(),
                         TextInput::make('slug')
                             ->readonly()
