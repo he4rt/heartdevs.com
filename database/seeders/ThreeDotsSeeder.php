@@ -20,7 +20,11 @@ class ThreeDotsSeeder extends Seeder
      */
     public function run(): void
     {
-        $user = User::query()->where('name', '=', 'admin')->first();
+        if (app()->isProduction()) {
+            $user = User::query()->where('username', 'danielhe4rt')->first();
+        } else {
+            $user = User::query()->where('name', 'admin')->first();
+        }
 
         $tenant = Tenant::factory()
             ->for($user, 'owner')
