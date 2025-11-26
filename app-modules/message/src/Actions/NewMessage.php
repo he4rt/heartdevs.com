@@ -4,13 +4,11 @@ declare(strict_types=1);
 
 namespace He4rt\Message\Actions;
 
-use Exception;
+use He4rt\BotDiscord\Actions\UserCharacterResolver;
 use He4rt\Character\Entities\CharacterEntity;
-use He4rt\Character\Models\Character;
 use He4rt\Message\DTO\NewMessageDTO;
-use He4rt\Provider\Models\Provider;
-use He4rt\User\Models\User;
-use Ramsey\Uuid\Uuid;
+use Illuminate\Support\Facades\Log;
+use Throwable;
 
 final readonly class NewMessage
 {
@@ -21,52 +19,36 @@ final readonly class NewMessage
 
     public function persist(NewMessageDTO $messageDTO): void
     {
-
         try {
+            $resolution = app(UserCharacterResolver::class)->resolve(
+                provider: $messageDTO->provider,
+                providerId: $messageDTO->providerId,
+                username: $messageDTO->providerUsername,
+                tenantId: $messageDTO->tenantId,
+            );
 
-            $providerEntity = Provider::query()
-                ->where('model_type', User::class)
-                ->where('provider', $messageDTO->provider)
-                ->where('provider_id', $messageDTO->providerId)
-                ->firstOrFail();
+            $character = $resolution->character;
 
-        } catch (Exception) {
-            $user = User::query()
-                ->create([
-                    'id' => Uuid::uuid4()->toString(),
-                    'username' => $messageDTO->providerUsername,
-                    'name' => $messageDTO->providerUsername,
-                    'is_donator' => false,
-                ]);
+            $characterEntity = CharacterEntity::make($character->toArray());
+            $obtainedExperience = $characterEntity->level->generateExperience($messageDTO->content);
 
-            $user->address()->create();
-            $user->information()->create();
-            $user->character()->create([
-                'tenant_id' => $messageDTO->tenantId,
+            $character->update([
+                'experience' => $characterEntity->level->getExperience(),
             ]);
 
-            $providerEntity = $user->providers()->create([
-                'tenant_id' => $messageDTO->tenantId,
-                'model_type' => User::class,
-                'provider' => $messageDTO->provider,
+            $this->persistMessage->handle(
+                $messageDTO,
+                $obtainedExperience,
+                $resolution->provider->id,
+            );
+
+        } catch (Throwable $throwable) {
+            Log::error('NewMessage failed', [
                 'provider_id' => $messageDTO->providerId,
+                'tenant_id' => $messageDTO->tenantId,
+                'error' => $throwable->getMessage(),
+                'trace' => $throwable->getTraceAsString(),
             ]);
         }
-
-        $character = Character::query()
-            ->where('tenant_id', $messageDTO->tenantId)
-            ->where('user_id', $providerEntity->model_id)
-            ->first();
-
-        $characterEntity = CharacterEntity::make($character->toArray());
-        $obtainedExperience = $characterEntity->level->generateExperience($messageDTO->content);
-
-        $character->update(['experience' => $characterEntity->level->getExperience()]);
-
-        $this->persistMessage->handle(
-            $messageDTO,
-            $obtainedExperience,
-            $providerEntity->id,
-        );
     }
 }
