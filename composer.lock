@@ -3828,12 +3828,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/danielhe4rt/laracord-framework.git",
-                "reference": "a97be41e7a5f5c194ccbdb5a8d6637cf1809a0a9"
+                "reference": "d083c5a836c211f2fca854d9aa47b8cea939a7db"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/danielhe4rt/laracord-framework/zipball/a97be41e7a5f5c194ccbdb5a8d6637cf1809a0a9",
-                "reference": "a97be41e7a5f5c194ccbdb5a8d6637cf1809a0a9",
+                "url": "https://api.github.com/repos/danielhe4rt/laracord-framework/zipball/d083c5a836c211f2fca854d9aa47b8cea939a7db",
+                "reference": "d083c5a836c211f2fca854d9aa47b8cea939a7db",
                 "shasum": ""
             },
             "require": {
@@ -3863,7 +3863,7 @@
                 "react/promise": "^3.0",
                 "sebastian/environment": "*",
                 "symfony/psr-http-message-bridge": "^7.0",
-                "team-reflex/discord-php": "dev-master"
+                "team-reflex/discord-php": "^10.40"
             },
             "require-dev": {
                 "laravel/pint": "^1.15"
@@ -3903,7 +3903,7 @@
                     "url": "https://github.com/Log1x"
                 }
             ],
-            "time": "2025-11-25T19:52:07+00:00"
+            "time": "2025-11-25T20:49:24+00:00"
         },
         {
             "name": "laravel/framework",
@@ -12553,7 +12553,7 @@
         },
         {
             "name": "team-reflex/discord-php",
-            "version": "dev-master",
+            "version": "v10.40.25",
             "source": {
                 "type": "git",
                 "url": "https://github.com/discord-php/DiscordPHP.git",
@@ -12600,7 +12600,6 @@
                 "ext-mbstring": "For accurate calculations of string length when handling non-english characters.",
                 "ext-uv": "For a faster, and more performant loop. Preferred."
             },
-            "default-branch": true,
             "type": "library",
             "autoload": {
                 "files": [
@@ -12625,7 +12624,7 @@
                 "chat": "https://discord.gg/dphp",
                 "docs": "https://discord-php.github.io/DiscordPHP/",
                 "issues": "https://github.com/discord-php/DiscordPHP/issues",
-                "source": "https://github.com/discord-php/DiscordPHP/tree/master",
+                "source": "https://github.com/discord-php/DiscordPHP/tree/v10.40.25",
                 "wiki": "https://github.com/discord-php/DiscordPHP/wiki"
             },
             "funding": [
@@ -17287,5 +17286,5 @@
         "php": "^8.3"
     },
     "platform-dev": {},
-    "plugin-api-version": "2.9.0"
+    "plugin-api-version": "2.6.0"
 }

@@ -5,7 +5,10 @@ declare(strict_types=1);
 namespace He4rt\BotDiscord\SlashCommands;
 
 use Discord\Parts\Interactions\Interaction;
+use He4rt\Provider\Models\Provider;
+use He4rt\User\Models\User;
 use Laracord\Commands\SlashCommand;
+use Throwable;
 
 class ProfileCommand extends SlashCommand
 {
@@ -56,10 +59,49 @@ class ProfileCommand extends SlashCommand
      */
     public function handle(Interaction $interaction): void
     {
-        $this
-            ->message()
-            ->title('Profile Command')
-            ->content('Hello world!')
-            ->reply($interaction);
+        try {
+            $userProvider = Provider::query()
+                ->where('model_type', User::class)
+                ->where('provider_id', (string) $interaction->user->id)
+                ->with(['user.information'])
+                ->firstOrFail();
+
+            if (! $userProvider || ! $userProvider->user->information) {
+                $this
+                    ->message()
+                    ->content('Você ainda não se apresentou! Use o comando `/introduction` primeiro.')
+                    ->reply($interaction, true);
+
+                return;
+            }
+
+            $information = $userProvider->user->information;
+
+            $this
+                ->message()
+                ->content('https://heartdevs.com/')
+                ->color('800080')
+                ->title('Perfil de '.($information->nickname ?? '-'))
+                ->thumbnailUrl($interaction->user->avatar)
+                ->fields([
+                    'Nome/Nickname' => $information->nickname ?? '-',
+                    'Sobre' => $information->about ?? '-',
+                ])
+                ->fields([
+                    'Git/Github' => $information->github_url ?? '-',
+                    'Linkedin' => $information->linkedin_url ?? '-',
+                ], inline: false)
+                ->footerIcon($interaction->guild->icon)
+                ->footerText('HE4RT INC')
+                ->timestamp(now())
+                ->reply($interaction, true);
+        } catch (Throwable $throwable) {
+            $this->logger()->error('Erro ao buscar perfil: '.$throwable->getMessage());
+
+            $this
+                ->message()
+                ->content('Erro ao buscar perfil.')
+                ->reply($interaction, true);
+        }
     }
 }
