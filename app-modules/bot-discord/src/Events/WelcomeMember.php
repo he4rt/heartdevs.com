@@ -41,7 +41,7 @@ class WelcomeMember extends Event
         if ($isNew) {
             $this
                 ->message(sprintf('Seja bem-vindo(a), %s!', $username))
-                ->title('Chegada de ' . $username)
+                ->title('Chegada de '.$username)
                 ->thumbnailUrl($avatarUrl)
                 ->body(sprintf('<@%s> entrou pela primeira vez.', $userId))
                 ->color('#5865F2')
@@ -49,7 +49,7 @@ class WelcomeMember extends Event
         } else {
             $this
                 ->message(sprintf('Bem-vindo de volta, %s!', $username))
-                ->title('Retorno de ' . $username)
+                ->title('Retorno de '.$username)
                 ->thumbnailUrl($avatarUrl)
                 ->body(sprintf('<@%s> voltou ao servidor.', $userId))
                 ->color('#FEE75C')

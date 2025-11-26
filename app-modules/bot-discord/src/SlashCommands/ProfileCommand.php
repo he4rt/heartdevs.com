@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace He4rt\BotDiscord\SlashCommands;
 
-use He4rt\Provider\Models\Provider;
 use Discord\Parts\Interactions\Interaction;
+use He4rt\Provider\Models\Provider;
 use Throwable;
 
 class ProfileCommand extends AbstractSlashCommand
