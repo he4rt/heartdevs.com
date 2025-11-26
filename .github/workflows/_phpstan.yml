@@ -46,10 +46,6 @@ jobs:
           composer-options: ${{ inputs.COMPOSER_FLAGS }}
           custom-cache-key: ${{ inputs.CACHE_KEY }}
 
-      - name: Perform ide-helper
-        run: |
-          composer run ide-helper
-
       - name: Run Phpstan
         run: |
           vendor/bin/phpstan analyse --ansi --error-format=github

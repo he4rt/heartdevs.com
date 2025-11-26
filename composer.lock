@@ -3828,12 +3828,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/danielhe4rt/laracord-framework.git",
-                "reference": "d083c5a836c211f2fca854d9aa47b8cea939a7db"
+                "reference": "1daa1300e1bf0e10c6d8312b04d1601f1e93f47c"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/danielhe4rt/laracord-framework/zipball/d083c5a836c211f2fca854d9aa47b8cea939a7db",
-                "reference": "d083c5a836c211f2fca854d9aa47b8cea939a7db",
+                "url": "https://api.github.com/repos/danielhe4rt/laracord-framework/zipball/1daa1300e1bf0e10c6d8312b04d1601f1e93f47c",
+                "reference": "1daa1300e1bf0e10c6d8312b04d1601f1e93f47c",
                 "shasum": ""
             },
             "require": {
@@ -3903,7 +3903,7 @@
                     "url": "https://github.com/Log1x"
                 }
             ],
-            "time": "2025-11-25T20:49:24+00:00"
+            "time": "2025-11-26T16:24:40+00:00"
         },
         {
             "name": "laravel/framework",
