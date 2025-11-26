@@ -13,7 +13,6 @@ use He4rt\Tenant\Models\Tenant;
 use He4rt\User\Actions\UpdateProfile;
 use He4rt\User\DTO\UpdateProfileDTO;
 use Laracord\Commands\SlashCommand;
-use React\Promise\PromiseInterface;
 use Throwable;
 
 class IntroductionCommand extends SlashCommand
@@ -109,22 +108,27 @@ class IntroductionCommand extends SlashCommand
                     ->setRequired(true),
 
             ])
-            ->submit(fn (Interaction $interaction, Collection $components) => $this->persistData($interaction, $components))
+            ->submit(fn (Interaction $interaction, Collection $components) => $this->persistData($interaction,
+                $components))
             ->show($interaction);
     }
 
-    private function persistData(Interaction $interaction, Collection $components): PromiseInterface
+    private function persistData(Interaction $interaction, Collection $components): void
     {
         $role = $interaction->guild->roles->find(fn (Role $role) => $role->name === 'He4rt');
 
         if (! $role) {
-            return $interaction->respondWithMessage('Erro ao encontrar o role He4rt');
+            $interaction->respondWithMessage('Erro ao encontrar o role He4rt', true);
+
+            return;
         }
 
         $hasRole = $interaction->member->roles->find(fn (Role $item) => $item->id === $role->id);
 
         if ($hasRole) {
-            return $interaction->respondWithMessage('Você já apresentou!!');
+            $interaction->respondWithMessage('Você já apresentou!!', true);
+
+            return;
         }
 
         try {
@@ -167,15 +171,17 @@ class IntroductionCommand extends SlashCommand
                 ->footerIcon($interaction->guild->icon)
                 ->footerText('HE4RT INC')
                 ->timestamp(now())
-                ->send($interaction->channel->id);
+                ->reply($interaction, true);
 
             $interaction->member->addRole($role);
 
-            return $interaction->respondWithMessage('Dados salvos com sucesso!', true);
         } catch (Throwable $throwable) {
             $this->logger()->error($throwable->getMessage());
 
-            return $interaction->respondWithMessage('Erro ao persistir dados', true);
+            $interaction->respondWithMessage(
+                'Ocorreu um erro ao processar sua apresentação. Por favor, tente novamente mais tarde.',
+                true
+            );
         }
     }
 }
