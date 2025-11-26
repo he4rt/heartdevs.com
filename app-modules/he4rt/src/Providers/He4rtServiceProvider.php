@@ -13,6 +13,5 @@ class He4rtServiceProvider extends ServiceProvider
     public function boot(): void
     {
         $this->loadViewsFrom(__DIR__.'/../../resources/views', 'he4rt');
-        $this->loadViewsFrom(__DIR__.'/../../resources/views/3pontos/views', '3pontos');
     }
 }
