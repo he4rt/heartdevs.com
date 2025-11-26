@@ -7,15 +7,11 @@ namespace He4rt\BotDiscord\SlashCommands;
 use Discord\Builders\Components\TextInput;
 use Discord\Helpers\Collection;
 use Discord\Parts\Interactions\Interaction;
-use He4rt\Provider\Enums\ProviderEnum;
-use He4rt\Provider\Models\Provider;
 use He4rt\User\Actions\UpdateProfile;
 use He4rt\User\DTO\UpdateProfileDTO;
-use He4rt\User\Models\User;
-use Laracord\Commands\SlashCommand;
 use Throwable;
 
-class EditProfileCommand extends SlashCommand
+class EditProfileCommand extends AbstractSlashCommand
 {
     /**
      * The command name.
@@ -64,13 +60,7 @@ class EditProfileCommand extends SlashCommand
      */
     public function handle(Interaction $interaction): void
     {
-        $userProvider = Provider::query()
-            ->where('model_type', User::class)
-            ->where('provider', ProviderEnum::Discord)
-            ->where('provider_id', $interaction->user->id)
-            ->first();
-
-        if (! $userProvider?->user?->information) {
+        if (! $this->memberProvider?->user?->information) {
             $interaction->respondWithMessage(
                 'Parece que você ainda não completou sua apresentação. Use o comando `/introduction` para continuar.',
                 true);
@@ -78,7 +68,7 @@ class EditProfileCommand extends SlashCommand
             return;
         }
 
-        $profile = $userProvider->user->information;
+        $profile = $this->memberProvider->user->information;
 
         $this->modal('Editar Perfil')
             ->components([
@@ -124,19 +114,18 @@ class EditProfileCommand extends SlashCommand
 
             ])
             ->submit(fn (Interaction $interaction, Collection $components) => $this->persistData($interaction,
-                $components, $userProvider))
+                $components))
             ->show($interaction);
     }
 
     private function persistData(
         Interaction $interaction,
-        Collection $components,
-        Provider $tenantProvider
+        Collection $components
     ): void {
         try {
             $payload = UpdateProfileDTO::fromPayload([
-                'tenant_id' => $tenantProvider->tenant_id,
-                'provider' => $tenantProvider->provider,
+                'tenant_id' => $this->memberProvider->tenant_id,
+                'provider' => $this->memberProvider->provider,
                 'provider_id' => $interaction->user->id,
                 'name' => $components->get('custom_id', 'name')->value,
                 'nickname' => $components->get('custom_id', 'nickname')->value,
