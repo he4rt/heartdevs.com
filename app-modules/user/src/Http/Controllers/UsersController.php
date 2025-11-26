@@ -46,7 +46,7 @@ final class UsersController extends Controller
         string $value,
         UpdateProfile $action,
     ): JsonResponse {
-        $action->handle($value, $request->validated());
+        $action->handle($value);
 
         return response()->json();
     }
