@@ -35,6 +35,7 @@
         "internachi/modular": "^2.3.0",
         "laracord/framework": "dev-next",
         "laravel/framework": "^12.40.1",
+        "laravel/nightwatch": "^1.19",
         "laravel/sanctum": "^4.2.1",
         "laravel/tinker": "^2.10.2",
         "livewire/flux": "^2.9.0",
