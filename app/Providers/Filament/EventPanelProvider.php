@@ -36,22 +36,22 @@ class EventPanelProvider extends PanelProvider
     {
         return $panel
             ->id('event')
-            ->path('event')
             ->tenant(Tenant::class, 'slug', 'ownedTenants')
             ->login(EventLogin::class)
-            ->loginRouteSlug('{tenantSlug}/login')
-            ->tenantDomain(app()->isLocal() ? null : sprintf('{tenant:slug}.%s', config('app.domain')))
+            ->path(app()->isLocal() ? 'event' : '')
+            ->tenantDomain(app()->isProduction() ? '{tenant:domain}' : null)
+            ->loginRouteSlug('{tenant}/login')
             ->renderHook(PanelsRenderHook::SIDEBAR_NAV_END, fn () => Blade::render(sprintf(<<<'BLADE'
                @guest
                     <x-he4rt::button href="%s" class="mt-auto block sm:hidden text-center">Fazer Login</x-he4rt::button>
                @endguest
-            BLADE, Filament::getLoginUrl(['tenantSlug' => session()->get('tenant')]))
+            BLADE, Filament::getLoginUrl(['tenant' => filament()->getTenant()?->slug]))
             ))
             ->renderHook(PanelsRenderHook::TOPBAR_END, fn () => Blade::render(sprintf(<<<'BLADE'
                @guest
                     <x-he4rt::button href="%s" class="w-fit hidden sm:block">Fazer Login</x-he4rt::button>
                @endguest
-            BLADE, Filament::getLoginUrl(['tenantSlug' => session()->get('tenant')]))
+            BLADE, Filament::getLoginUrl(['tenant' => filament()->getTenant()?->slug]))
             ))
             ->tenantViteTheme()
             ->topbarLivewireComponent(GuestTopbar::class)
@@ -68,7 +68,7 @@ class EventPanelProvider extends PanelProvider
                 'logout' => Action::make('logout')
                     ->label(__('filament-panels::layout.actions.logout.label'))
                     ->icon(FilamentIcon::resolve(PanelsIconAlias::USER_MENU_LOGOUT_BUTTON) ?? Heroicon::ArrowLeftEndOnRectangle)
-                    ->url(fn () => route('tenant.logout', ['tenantSlug' => filament()->getTenant()?->slug]))
+                    ->url(fn () => route('tenant.logout', ['tenant' => filament()->getTenant()?->slug]))
                     ->postToUrl()
                     ->sort(PHP_INT_MAX),
             ])

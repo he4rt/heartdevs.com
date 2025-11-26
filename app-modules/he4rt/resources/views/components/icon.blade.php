@@ -1,11 +1,15 @@
 @props([
-    'icon' => 'heroicon-s-heart',
+    'icon' => 'fas-fire-flame-curved',
     'as' => 'div',
     'interactive' => true,
     'size' => 'lg',
 ])
 
 @php
+    if ($attributes->has('href')) {
+        $as = 'a';
+    }
+
     $iconSizeCls = 'hp-icon-size-' . $size;
 @endphp
 
@@ -17,5 +21,5 @@
         ])
     }}
 >
-    <x-filament::icon :icon="$icon" {{ $attributes->class([$iconSizeCls]) }} />
+    <x-filament::icon :icon="$icon" class="{{ $iconSizeCls }}" />
 </{{ $as }}>

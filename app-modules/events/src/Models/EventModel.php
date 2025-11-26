@@ -16,6 +16,7 @@ use He4rt\User\Models\User;
 use Illuminate\Database\Eloquent\Attributes\Scope;
 use Illuminate\Database\Eloquent\Attributes\UseFactory;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -37,6 +38,7 @@ use Illuminate\Database\Eloquent\Relations\Pivot;
  * @property int $tenant_id
  * @property Date $end_at
  * @property Date $start_at
+ * @property Date $event_at
  */
 #[UseFactory(EventFactory::class)]
 class EventModel extends Model
@@ -153,7 +155,35 @@ class EventModel extends Model
      */
     public function speakers(): HasManyThrough
     {
-        return $this->hasManyThrough(User::class, Talk::class, 'user_id');
+        return $this->hasManyThrough(User::class, Talk::class, 'event_id', 'id', 'id', 'user_id');
+    }
+
+    protected function duration(): Attribute
+    {
+        return Attribute::make(
+            get: fn () => $this->start_at->diffInHours($this->end_at),
+        );
+    }
+
+    protected function start(): Attribute
+    {
+        return Attribute::make(
+            get: fn () => $this->start_at?->format('H:i'),
+        );
+    }
+
+    protected function day(): Attribute
+    {
+        return Attribute::make(
+            get: fn () => $this->event_at?->format('d/m'),
+        );
+    }
+
+    protected function end(): Attribute
+    {
+        return Attribute::make(
+            get: fn () => $this->end_at?->format('H:i'),
+        );
     }
 
     #[Scope]

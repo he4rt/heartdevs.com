@@ -13,7 +13,8 @@ return new class extends Migration
         Schema::create('media', function (Blueprint $table): void {
             $table->id();
 
-            $table->morphs('model');
+            $table->string('model_type');
+            $table->string('model_id');
             $table->uuid()->nullable()->unique();
             $table->string('collection_name');
             $table->string('name');
@@ -28,6 +29,7 @@ return new class extends Migration
             $table->json('responsive_images');
             $table->unsignedInteger('order_column')->nullable()->index();
 
+            $table->index(['model_type', 'model_id'], 'media_model_idx');
             $table->nullableTimestamps();
         });
     }

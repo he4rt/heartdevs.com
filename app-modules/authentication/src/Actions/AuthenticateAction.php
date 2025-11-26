@@ -48,11 +48,9 @@ class AuthenticateAction
             $provider = $this->registerNewUser($user, $tenant);
         }
 
-        if (! auth()->check()) {
-            Auth::logout();
-            Auth::login($provider->user);
-            filament()->auth()->setUser($provider->user);
-        }
+        Auth::logout();
+        Auth::login($provider->user);
+        filament()->auth()->setUser($provider->user);
     }
 
     private function registerNewUser(OAuthUserDTO $userDTO, Tenant $tenant): Provider
@@ -74,6 +72,8 @@ class AuthenticateAction
             'provider_id' => $userDTO->providerId,
         ], [
             'email' => $userDTO->email,
+            'avatar' => $userDTO->avatarUrl,
+            'username' => $userDTO->username,
         ]);
 
         $provider->tokens()->create($userDTO->credentials->toDatabase());

@@ -21,35 +21,46 @@
                     ul.nextSibling.setAttribute('aria-hidden', 'true')
                 })
             "
-            class="inline-flex w-full flex-nowrap overflow-hidden mask-r-from-95% mask-r-to-99% mask-l-from-95% mask-l-to-99%"
+            class="mt-8 inline-flex w-full flex-nowrap overflow-hidden mask-r-from-95% mask-r-to-99% mask-l-from-95% mask-l-to-99%"
         >
             <ul
                 x-ref="partners"
-                class="animate-infinite-scroll flex items-center justify-center md:justify-start [&_li]:mx-8"
+                class="animate-infinite-scroll flex items-center justify-center md:justify-start [&_img]:cursor-pointer [&_img]:grayscale [&_img]:transition-all [&_img]:duration-300 [&_img]:hover:grayscale-0 [&_li]:mx-8"
             >
-                <li class="w-[280px]">
-                    <img src="./facebook.svg" alt="Facebook" />
+                <li class="flex h-24 w-[300px] items-center justify-center">
+                    <img class="h-full w-full object-contain" src="{{ asset('images/logo.svg') }}" alt="He4rt" />
                 </li>
-                <li class="w-[280px]">
-                    <img src="./disney.svg" alt="Disney" />
+
+                <li class="flex h-24 w-[300px] items-center justify-center">
+                    <img
+                        class="h-full w-full object-contain"
+                        src="{{ asset('images/3pontos/partners/firece-logo.svg') }}"
+                        alt="Firece"
+                    />
                 </li>
-                <li class="w-[280px]">
-                    <img src="./airbnb.svg" alt="Airbnb" />
+
+                <li class="flex h-24 w-[300px] items-center justify-center">
+                    <img
+                        class="h-full w-full object-contain"
+                        src="{{ asset('images/3pontos/partners/flamma-logo.svg') }}"
+                        alt="Flamma"
+                    />
                 </li>
-                <li class="w-[280px]">
-                    <img src="./apple.svg" alt="Apple" />
+
+                <li class="flex h-24 w-[300px] items-center justify-center">
+                    <img
+                        class="h-full w-full object-contain"
+                        src="{{ asset('images/3pontos/partners/ipe-logo.svg') }}"
+                        alt="Ipe Crowd"
+                    />
                 </li>
-                <li class="w-[280px]">
-                    <img src="./spark.svg" alt="Spark" />
-                </li>
-                <li class="w-[280px]">
-                    <img src="./samsung.svg" alt="Samsung" />
-                </li>
-                <li class="w-[280px]">
-                    <img src="./quora.svg" alt="Quora" />
-                </li>
-                <li class="w-[280px]">
-                    <img src="./sass.svg" alt="Sass" />
+
+                <li class="flex h-24 w-[300px] items-center justify-center">
+                    <img
+                        class="h-full w-full object-contain"
+                        src="{{ asset('images/3pontos/partners/betel-logo.png') }}"
+                        alt="Betel"
+                    />
                 </li>
             </ul>
         </div>

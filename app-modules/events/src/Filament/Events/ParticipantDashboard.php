@@ -41,4 +41,9 @@ class ParticipantDashboard extends Page
 
         return $view;
     }
+
+    protected function getViewData(): array
+    {
+        return ['event' => filament()->getTenant()->events()->first()];
+    }
 }

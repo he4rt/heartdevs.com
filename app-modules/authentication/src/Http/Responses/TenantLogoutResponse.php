@@ -20,7 +20,7 @@ class TenantLogoutResponse implements LogoutResponse
         Filament::setCurrentPanel($panel);
 
         return redirect()->to(
-            Filament::hasLogin() ? Filament::getLoginUrl(['tenantSlug' => $tenantSlug]) : Filament::getUrl($tenant),
+            Filament::hasLogin() ? Filament::getLoginUrl(['tenant' => $tenantSlug]) : Filament::getUrl($tenant),
         );
     }
 }

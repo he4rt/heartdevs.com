@@ -61,13 +61,13 @@ class EventLogin extends SimplePage
     #[Locked]
     public ?string $userUndertakingMultiFactorAuthentication = null;
 
-    public ?string $tenantSlug = null;
+    public ?string $tenant = null;
 
-    public function mount(?string $tenantSlug = null): void
+    public function mount(?string $tenant = null): void
     {
-        abort_unless(Tenant::query()->where('slug', $tenantSlug)->exists(), 404);
+        abort_unless(Tenant::query()->where('slug', $tenant)->exists(), 404);
 
-        $this->tenantSlug = $tenantSlug;
+        $this->tenant = $tenant;
         if (Filament::auth()->check()) {
             redirect()->intended(Filament::getUrl());
         }
@@ -158,7 +158,7 @@ class EventLogin extends SimplePage
             ->components([
                 View::make('he4rt::components.partials.oauth-connect')->viewData([
                     'providers' => OAuthProviderEnum::cases(),
-                    'tenantSlug' => $this->tenantSlug,
+                    'tenant' => $this->tenant,
                 ]),
                 $this->getEmailFormComponent(),
                 $this->getPasswordFormComponent(),

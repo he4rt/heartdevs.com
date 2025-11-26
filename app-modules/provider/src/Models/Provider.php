@@ -40,6 +40,8 @@ final class Provider extends Model
         'provider',
         'provider_id',
         'email',
+        'avatar',
+        'username',
     ];
 
     protected $appends = [

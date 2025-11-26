@@ -24,10 +24,39 @@ final class OAuthController extends Controller
 
         $action->withOAuth($state, $provider, request()->input('code'));
 
+        if ($state->tenant === null) {
+            return $this->basePanelRedirectResponse($state);
+        }
+
+        if ($state->panel === 'event') {
+            return $this->eventRedirectResponse($state);
+        }
+
         $redirectUri = filament()
             ->getPanel($state->panel)
             ->getUrl(Tenant::query()->where('slug', $state->tenant)->firstOrFail());
 
-        return redirect()->intended($redirectUri);
+        return redirect()->to($redirectUri);
+    }
+
+    private function eventRedirectResponse(OAuthStateDTO $state): RedirectResponse
+    {
+
+        $tenant = Tenant::query()->where('slug', $state->tenant)->firstOrFail();
+        $baseUri = app()->isProduction()
+            ? $tenant->domain
+            : $state->tenant;
+
+        return redirect()->intended(route('filament.event.pages.participant-dashboard', [
+            'tenant' => $baseUri,
+        ]));
+
+    }
+
+    private function basePanelRedirectResponse(OAuthStateDTO $state): RedirectResponse
+    {
+        $panel = filament()->getPanel($state->panel);
+
+        return redirect()->intended($panel->getUrl());
     }
 }
