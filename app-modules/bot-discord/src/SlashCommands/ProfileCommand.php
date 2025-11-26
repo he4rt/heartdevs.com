@@ -4,13 +4,11 @@ declare(strict_types=1);
 
 namespace He4rt\BotDiscord\SlashCommands;
 
-use Discord\Parts\Interactions\Interaction;
 use He4rt\Provider\Models\Provider;
-use He4rt\User\Models\User;
-use Laracord\Commands\SlashCommand;
+use Discord\Parts\Interactions\Interaction;
 use Throwable;
 
-class ProfileCommand extends SlashCommand
+class ProfileCommand extends AbstractSlashCommand
 {
     /**
      * The command name.
@@ -60,13 +58,8 @@ class ProfileCommand extends SlashCommand
     public function handle(Interaction $interaction): void
     {
         try {
-            $userProvider = Provider::query()
-                ->where('model_type', User::class)
-                ->where('provider_id', (string) $interaction->user->id)
-                ->with(['user.information'])
-                ->firstOrFail();
 
-            if (! $userProvider || ! $userProvider->user->information) {
+            if (! $this->memberProvider instanceof Provider || ! $this->memberProvider->user->information) {
                 $this
                     ->message()
                     ->content('Você ainda não se apresentou! Use o comando `/introduction` primeiro.')
@@ -75,7 +68,7 @@ class ProfileCommand extends SlashCommand
                 return;
             }
 
-            $information = $userProvider->user->information;
+            $information = $this->memberProvider->user->information;
 
             $this
                 ->message()
