@@ -15,6 +15,5 @@ final class ResolvedUserCharacter
         public Provider $provider,
         public Character $character,
         public bool $isNewUser,
-        public bool $isNewCharacter,
     ) {}
 }

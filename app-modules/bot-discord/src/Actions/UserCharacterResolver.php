@@ -50,8 +50,7 @@ class UserCharacterResolver
                 user: $user,
                 provider: $providerEntity,
                 character: $character,
-                isNewUser: true,
-                isNewCharacter: true,
+                isNewUser: true
             );
         }
 
@@ -67,7 +66,6 @@ class UserCharacterResolver
             provider: $providerEntity,
             character: $character,
             isNewUser: false,
-            isNewCharacter: false,
         );
     }
 }
