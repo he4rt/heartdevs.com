@@ -24,9 +24,6 @@ class MessageReceivedEvent extends Event
      */
     protected $handler = Events::MESSAGE_CREATE;
 
-    /**
-     * Handle the event.
-     */
     public function handle(Message $message, Discord $discord): void
     {
         if ($message->author->bot) {
