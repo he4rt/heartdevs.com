@@ -20,6 +20,7 @@ it('can create a tenant', function (): void {
         ->fillForm([
             'name' => 'My Tenant',
             'slug' => 'my-tenant',
+            'domain' => 'my-tenant.test',
             'owner_id' => $owner->id,
             'active' => true,
         ])
@@ -30,6 +31,7 @@ it('can create a tenant', function (): void {
     $this->assertDatabaseHas(Tenant::class, [
         'name' => 'My Tenant',
         'slug' => 'my-tenant',
+        'domain' => 'my-tenant.test',
         'owner_id' => $owner->id,
         'active' => true,
     ]);
@@ -42,6 +44,7 @@ test('name field should fill slug after updated ', function (): void {
         ->fillForm([
             'name' => 'My Tenant',
             'owner_id' => $owner->id,
+            'domain' => 'my-tenant.test',
             'active' => true,
         ])
         ->assertSchemaComponentStateSet('slug', 'my-tenant')
@@ -52,6 +55,7 @@ test('name field should fill slug after updated ', function (): void {
     $this->assertDatabaseHas(Tenant::class, [
         'name' => 'My Tenant',
         'slug' => 'my-tenant',
+        'domain' => 'my-tenant.test',
         'owner_id' => $owner->id,
         'active' => true,
     ]);

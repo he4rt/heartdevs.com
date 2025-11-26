@@ -34,6 +34,7 @@ it('can update a tenant', function (): void {
         ->fillForm([
             'name' => $newTenantData->name,
             'slug' => $newTenantData->slug,
+            'domain' => 'my-tenant.test',
             'active' => $newTenantData->active,
         ])
         ->call('save')
