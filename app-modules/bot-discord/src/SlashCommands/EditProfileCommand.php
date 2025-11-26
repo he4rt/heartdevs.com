@@ -13,7 +13,6 @@ use He4rt\User\Actions\UpdateProfile;
 use He4rt\User\DTO\UpdateProfileDTO;
 use He4rt\User\Models\User;
 use Laracord\Commands\SlashCommand;
-use React\Promise\PromiseInterface;
 use Throwable;
 
 class EditProfileCommand extends SlashCommand
@@ -133,7 +132,7 @@ class EditProfileCommand extends SlashCommand
         Interaction $interaction,
         Collection $components,
         Provider $tenantProvider
-    ): PromiseInterface {
+    ): void {
         try {
             $payload = UpdateProfileDTO::fromPayload([
                 'tenant_id' => $tenantProvider->tenant_id,
@@ -169,13 +168,12 @@ class EditProfileCommand extends SlashCommand
                 ->footerIcon($interaction->guild->icon)
                 ->footerText('HE4RT INC')
                 ->timestamp(now())
-                ->send($interaction->guild_id);
+                ->reply($interaction, true);
 
-            return $interaction->respondWithMessage('Dados alterados com sucesso!', true);
         } catch (Throwable $throwable) {
             $this->logger()->error($throwable->getMessage());
 
-            return $interaction->respondWithMessage('Erro ao persistir dados', true);
+            $interaction->respondWithMessage('Erro ao persistir dados', true);
         }
     }
 }
