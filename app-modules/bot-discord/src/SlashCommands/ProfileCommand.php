@@ -77,7 +77,7 @@ class ProfileCommand extends AbstractSlashCommand
             if (! $this->memberProvider instanceof Provider || ! $this->memberProvider->user->information) {
                 $this
                     ->message()
-                    ->content($mentionedUser . ' ainda não se apresentou! Use o comando `/introduction` primeiro.')
+                    ->content($mentionedUser.' ainda não se apresentou! Use o comando `/introduction` primeiro.')
                     ->reply($interaction, true);
 
                 return;
