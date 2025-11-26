@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "9bb59e7701167e3103596701f9f9f6e6",
+    "content-hash": "8f8298451e15e096f385b292c159e765",
     "packages": [
         {
             "name": "anourvalar/eloquent-serialize",
@@ -5110,16 +5110,16 @@
         },
         {
             "name": "livewire/flux",
-            "version": "v2.8.0",
+            "version": "v2.9.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/livewire/flux.git",
-                "reference": "f975c58a53ef1a45246b244438e213050e1e8aab"
+                "reference": "d961ba5512ecfa38f8b759133ceec0fb295c4e16"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/livewire/flux/zipball/f975c58a53ef1a45246b244438e213050e1e8aab",
-                "reference": "f975c58a53ef1a45246b244438e213050e1e8aab",
+                "url": "https://api.github.com/repos/livewire/flux/zipball/d961ba5512ecfa38f8b759133ceec0fb295c4e16",
+                "reference": "d961ba5512ecfa38f8b759133ceec0fb295c4e16",
                 "shasum": ""
             },
             "require": {
@@ -5170,9 +5170,9 @@
             ],
             "support": {
                 "issues": "https://github.com/livewire/flux/issues",
-                "source": "https://github.com/livewire/flux/tree/v2.8.0"
+                "source": "https://github.com/livewire/flux/tree/v2.9.0"
             },
-            "time": "2025-11-25T07:08:06+00:00"
+            "time": "2025-11-26T00:32:54+00:00"
         },
         {
             "name": "livewire/livewire",
@@ -9057,28 +9057,28 @@
         },
         {
             "name": "spatie/image-optimizer",
-            "version": "1.8.0",
+            "version": "1.8.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/spatie/image-optimizer.git",
-                "reference": "4fd22035e81d98fffced65a8c20d9ec4daa9671c"
+                "reference": "2ad9ac7c19501739183359ae64ea6c15869c23d9"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/spatie/image-optimizer/zipball/4fd22035e81d98fffced65a8c20d9ec4daa9671c",
-                "reference": "4fd22035e81d98fffced65a8c20d9ec4daa9671c",
+                "url": "https://api.github.com/repos/spatie/image-optimizer/zipball/2ad9ac7c19501739183359ae64ea6c15869c23d9",
+                "reference": "2ad9ac7c19501739183359ae64ea6c15869c23d9",
                 "shasum": ""
             },
             "require": {
                 "ext-fileinfo": "*",
                 "php": "^7.3|^8.0",
                 "psr/log": "^1.0 | ^2.0 | ^3.0",
-                "symfony/process": "^4.2|^5.0|^6.0|^7.0"
+                "symfony/process": "^4.2|^5.0|^6.0|^7.0|^8.0"
             },
             "require-dev": {
-                "pestphp/pest": "^1.21",
-                "phpunit/phpunit": "^8.5.21|^9.4.4",
-                "symfony/var-dumper": "^4.2|^5.0|^6.0|^7.0"
+                "pestphp/pest": "^1.21|^2.0|^3.0|^4.0",
+                "phpunit/phpunit": "^8.5.21|^9.4.4|^10.0|^11.0|^12.0",
+                "symfony/var-dumper": "^4.2|^5.0|^6.0|^7.0|^8.0"
             },
             "type": "library",
             "autoload": {
@@ -9106,9 +9106,9 @@
             ],
             "support": {
                 "issues": "https://github.com/spatie/image-optimizer/issues",
-                "source": "https://github.com/spatie/image-optimizer/tree/1.8.0"
+                "source": "https://github.com/spatie/image-optimizer/tree/1.8.1"
             },
-            "time": "2024-11-04T08:24:54+00:00"
+            "time": "2025-11-26T10:57:19+00:00"
         },
         {
             "name": "spatie/invade",
@@ -13942,16 +13942,16 @@
         },
         {
             "name": "laravel/boost",
-            "version": "v1.8.2",
+            "version": "v1.8.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/laravel/boost.git",
-                "reference": "cf57ba510df44e0d4ed2c1c91360477e92d7d644"
+                "reference": "26572e858e67334952779c0110ca4c378a44d28d"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/laravel/boost/zipball/cf57ba510df44e0d4ed2c1c91360477e92d7d644",
-                "reference": "cf57ba510df44e0d4ed2c1c91360477e92d7d644",
+                "url": "https://api.github.com/repos/laravel/boost/zipball/26572e858e67334952779c0110ca4c378a44d28d",
+                "reference": "26572e858e67334952779c0110ca4c378a44d28d",
                 "shasum": ""
             },
             "require": {
@@ -14004,7 +14004,7 @@
                 "issues": "https://github.com/laravel/boost/issues",
                 "source": "https://github.com/laravel/boost"
             },
-            "time": "2025-11-20T18:13:17+00:00"
+            "time": "2025-11-26T14:12:52+00:00"
         },
         {
             "name": "laravel/mcp",
@@ -17287,5 +17287,5 @@
         "php": "^8.3"
     },
     "platform-dev": {},
-    "plugin-api-version": "2.6.0"
+    "plugin-api-version": "2.9.0"
 }
