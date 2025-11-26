@@ -36,6 +36,7 @@ class GuestTenantIdentifier
             ->first();
 
         if ($tenant) {
+
             Filament::setTenant($tenant, true);
 
             return $next($request);

@@ -18,7 +18,7 @@
                                 icon="heroicon-o-map-pin"
                                 class="text-icon-light bg-transparent p-0!"
                             />
-                            <x-he4rt::text class="font-bold">Endereço: {{ $event->location }}</x-he4rt::text>
+                            <x-he4rt::text class="font-bold">Endereço: {{ $event->location ?? '' }}</x-he4rt::text>
                         </div>
                         <div class="flex gap-2">
                             <x-he4rt::icon

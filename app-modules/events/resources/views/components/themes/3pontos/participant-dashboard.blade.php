@@ -2,7 +2,7 @@
     <x-events::themes.3pontos.components.sections.event-ticket />
     <x-events::themes.3pontos.components.sections.event-progress />
     <x-events::themes.3pontos.components.sections.partners />
-    <x-events::themes.3pontos.components.sections.info />
+    <x-events::themes.3pontos.components.sections.info :event="$event" />
     <x-he4rt::partials.footer
         logoPath="images/3pontos/logo.svg"
         logoSize="sm"

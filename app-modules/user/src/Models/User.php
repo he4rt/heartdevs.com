@@ -130,6 +130,15 @@ final class User extends Authenticatable implements FilamentUser, HasMedia, HasN
         return true;
     }
 
+    public function getFilamentAvatarUrl(): string
+    {
+        if ($this->providers->firstWhere('provider_name', 'github')) {
+            return sprintf('https://github.com/%s.png', $this->username);
+        }
+
+        return sprintf('https://github.com/%s.png', $this->username);
+    }
+
     protected static function newFactory(): UserFactory
     {
         return UserFactory::new();

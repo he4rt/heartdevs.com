@@ -20,6 +20,8 @@ return new class extends Migration
                 $table->string('provider');
                 $table->string('provider_id');
                 $table->string('email')->nullable();
+                $table->string('avatar')->nullable();
+                $table->string('username')->nullable();
                 $table->timestamps();
             });
         }

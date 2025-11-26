@@ -21,12 +21,10 @@
             <div>
                 <x-he4rt::headline>
                     <x-slot:badge>
-                        <x-he4rt::section-title>Section name</x-he4rt::section-title>
+                        <x-he4rt::section-title>Área do Participante</x-he4rt::section-title>
                     </x-slot>
-                    <x-slot:title>Parabéns. Sua vaga está garantida</x-slot>
-                    <x-slot:description>
-                        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent vestibulum a augue at ornare
-                    </x-slot>
+                    <x-slot:title>Parabéns! Sua vaga está garantida!</x-slot>
+                    <x-slot:description>Acesse o link abaixo para conferir o seu ticket.</x-slot>
                     <x-slot:actions>
                         <x-he4rt::button>Compartilhar no...</x-he4rt::button>
                         <x-he4rt::button variant="outline">Copiar link</x-he4rt::button>
@@ -41,8 +39,8 @@
             >
                 <x-he4rt::animate-block type="blur">
                     <x-he4rt::ticket
-                        user-img="https://avatars.githubusercontent.com/u/85951158?v=4"
-                        username="Kaster"
+                        user-img="auth()->user()->"
+                        username="danielhe4rt"
                         github-username="NexTurHe4rt"
                         ticketNumber="42"
                         githubLink="https://github.com/john-doe"
