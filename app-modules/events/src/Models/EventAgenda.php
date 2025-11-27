@@ -15,6 +15,9 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
+/**
+ * @property string $schedulable_type
+ */
 #[UseFactory(EventAgendaFactory::class)]
 class EventAgenda extends Model
 {
