@@ -48,8 +48,11 @@
                 <x-he4rt::icon size="md" :icon="$icon" class="text-icon-light bg-transparent p-0!" />
                 <div class="flex gap-3">
                     {{ $title }}
+
                     @if ($speakers)
-                        <span class="text-text-medium">// {{ $speakers->name ?? '' }} \\</span>
+                        <span class="text-text-medium">
+                            // {{ $speakers->map(fn ($speaker) => $speaker->name)->implode(',  ') }} \\
+                        </span>
                     @endif
                 </div>
             </x-he4rt::heading>

@@ -15,7 +15,7 @@ use Illuminate\Support\Facades\Date;
 /**
  * @extends Factory<EventSubmission>
  */
-final class TalkFactory extends Factory
+final class EventSubmissionFactory extends Factory
 {
     protected $model = EventSubmission::class;
 

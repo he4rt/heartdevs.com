@@ -19,7 +19,7 @@
             @forelse ($event->agenda as $talk)
                 <x-he4rt::animate-block :observe="true" type="fade-right">
                     <x-he4rt::schedule-card
-                        :speakers="$talk->schedulable?->user"
+                        :speakers="$talk->schedulable?->speakers ?? []"
                         :icon="$talk->scheduleType->getIcon()"
                         :starts-at="$talk->starting_at"
                         :ends-at="$talk->ending_at"

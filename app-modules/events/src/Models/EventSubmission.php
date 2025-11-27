@@ -4,9 +4,11 @@ declare(strict_types=1);
 
 namespace He4rt\Events\Models;
 
+use Illuminate\Database\Eloquent\Relations\Pivot;
 use Carbon\Carbon;
-use He4rt\Events\Database\Factories\TalkFactory;
+use He4rt\Events\Database\Factories\EventSubmissionFactory;
 use He4rt\Events\Enums\Talks\TalkStatusEnum;
+use He4rt\Events\Models\Pivot\EventSubmissionSpeaker;
 use He4rt\Tenant\Models\Tenant;
 use He4rt\User\Models\User;
 use Illuminate\Database\Eloquent\Attributes\UseFactory;
@@ -14,6 +16,7 @@ use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 /**
  * @property int|string $event_id
@@ -25,7 +28,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property Carbon $starts_at
  * @property Carbon $ends_at
  */
-#[UseFactory(TalkFactory::class)]
+#[UseFactory(EventSubmissionFactory::class)]
 class EventSubmission extends Model
 {
     use HasFactory;
@@ -56,6 +59,19 @@ class EventSubmission extends Model
     public function event(): BelongsTo
     {
         return $this->belongsTo(EventModel::class);
+    }
+
+    /**
+     * @return BelongsToMany<User, $this, Pivot>
+     */
+    public function speakers(): BelongsToMany
+    {
+        return $this->belongsToMany(
+            User::class,
+            'event_submission_speakers',
+            'submission_id',
+            'user_id'
+        )->using(EventSubmissionSpeaker::class);
     }
 
     /**
