@@ -15,3 +15,11 @@
 .fi-page-content {
     @apply bg-elevation-surface bg-none;
 }
+
+.fi-topbar-item-btn {
+    @apply bg-transparent hover:bg-transparent;
+}
+
+.fi-sidebar-item-btn {
+    @apply bg-transparent hover:bg-transparent;
+}
