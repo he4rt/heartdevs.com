@@ -35,7 +35,12 @@ class TenantForm
                         Select::make('owner_id')
                             ->native(false)
                             ->searchable()
-                            ->relationship(name: 'owner', titleAttribute: 'name', modifyQueryUsing: fn ($query) => $query->limit(10))
+                            ->preload()
+                            ->relationship(
+                                name: 'owner',
+                                titleAttribute: 'name',
+                                modifyQueryUsing: fn ($query) => $query->limit(10)
+                            )
                             ->required(),
                         Toggle::make('active')
                             ->required(),

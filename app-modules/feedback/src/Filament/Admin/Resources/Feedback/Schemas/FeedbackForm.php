@@ -8,6 +8,7 @@ use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Schemas\Schema;
+use Illuminate\Database\Query\Builder;
 
 class FeedbackForm
 {
@@ -17,19 +18,34 @@ class FeedbackForm
             ->components([
                 Select::make('sender_id')
                     ->label('Sender')
-                    ->relationship('sender', 'username')
+                    ->preload()
+                    ->relationship(
+                        name: 'sender',
+                        titleAttribute: 'username',
+                        modifyQueryUsing: fn (Builder $query) => $query->limit(10)
+                    )
                     ->searchable()
                     ->required(),
 
                 Select::make('target_id')
                     ->label('Target')
-                    ->relationship('target', 'username')
+                    ->preload()
+                    ->relationship(
+                        name: 'target',
+                        titleAttribute: 'username',
+                        modifyQueryUsing: fn (Builder $query) => $query->limit(10)
+                    )
                     ->searchable()
                     ->required(),
 
                 Select::make('tenant_id')
                     ->label('Target')
-                    ->relationship('tenant', 'name')
+                    ->preload()
+                    ->relationship(
+                        name: 'tenant',
+                        titleAttribute: 'name',
+                        modifyQueryUsing: fn (Builder $query) => $query->limit(10)
+                    )
                     ->searchable()
                     ->required(),
 

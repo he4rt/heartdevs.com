@@ -10,6 +10,7 @@ use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Schemas\Schema;
 use He4rt\Provider\Models\Provider;
+use Illuminate\Database\Query\Builder;
 
 class MessageForm
 {
@@ -20,7 +21,12 @@ class MessageForm
                 Select::make('provider_id')
                     ->label('Provider')
                     ->getOptionLabelFromRecordUsing(fn (Provider $record) => $record->provider->getLabel())
-                    ->relationship('provider', 'provider')
+                    ->preload()
+                    ->relationship(
+                        name: 'provider',
+                        titleAttribute: 'provider',
+                        modifyQueryUsing: fn (Builder $query) => $query->limit(10)
+                    )
                     ->required(),
 
                 TextInput::make('channel_id')
@@ -29,7 +35,12 @@ class MessageForm
 
                 Select::make('tenant_id')
                     ->label('Tenant')
-                    ->relationship('tenant', 'name')
+                    ->preload()
+                    ->relationship(
+                        name: 'tenant',
+                        titleAttribute: 'name',
+                        modifyQueryUsing: fn (Builder $query) => $query->limit(10)
+                    )
                     ->nullable(),
 
                 TextInput::make('provider_message_id')

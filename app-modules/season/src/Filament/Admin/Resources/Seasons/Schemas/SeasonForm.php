@@ -9,6 +9,7 @@ use Filament\Forms\Components\RichEditor;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Schemas\Schema;
+use Illuminate\Database\Query\Builder;
 
 class SeasonForm
 {
@@ -17,7 +18,12 @@ class SeasonForm
         return $schema
             ->components([
                 Select::make('tenant_id')
-                    ->relationship('tenant', 'name')
+                    ->preload()
+                    ->relationship(
+                        name: 'tenant',
+                        titleAttribute: 'name',
+                        modifyQueryUsing: fn (Builder $query) => $query->limit(10)
+                    )
                     ->required(),
                 TextInput::make('name')
                     ->required(),

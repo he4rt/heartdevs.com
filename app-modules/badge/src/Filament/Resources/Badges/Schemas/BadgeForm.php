@@ -13,6 +13,7 @@ use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use He4rt\Provider\Enums\ProviderEnum;
+use Illuminate\Database\Query\Builder;
 
 class BadgeForm
 {
@@ -28,7 +29,12 @@ class BadgeForm
                             ->description('Administration Area')
                             ->schema([
                                 Select::make('tenant_id')
-                                    ->relationship('tenant', 'name')
+                                    ->preload()
+                                    ->relationship(
+                                        name: 'tenant',
+                                        titleAttribute: 'name',
+                                        modifyQueryUsing: fn (Builder $query) => $query->limit(10)
+                                    )
                                     ->required(),
                                 Select::make('provider')
                                     ->enum(ProviderEnum::class)
