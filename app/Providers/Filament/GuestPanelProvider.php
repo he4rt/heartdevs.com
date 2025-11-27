@@ -27,12 +27,12 @@ final class GuestPanelProvider extends PanelProvider
 {
     public function panel(Panel $panel): Panel
     {
-        $panel = $panel
-            ->default()
+        return $panel
             ->id('guest')
             ->colors([
                 'primary' => Color::Purple,
             ])
+            ->domain(app()->isProduction() ? config('app.domain') : null)
             ->defaultThemeMode(ThemeMode::Dark)
             ->topNavigation()
             ->brandLogo(fn (): View => view('he4rt::components.logo'))
@@ -62,8 +62,6 @@ final class GuestPanelProvider extends PanelProvider
                         <x-he4rt::button href="https://github.com/he4rt" icon="heroicon-s-arrow-top-right-on-square" variant="outline">
                             Github
                         </x-he4rt::button>
-
-                    <!--                        <x-he4rt::button icon-position="leading" icon="heroicon-o-user">Entrar agora</x-he4rt::button>-->
                     </div>
                @endguest
             BLADE
@@ -74,8 +72,6 @@ final class GuestPanelProvider extends PanelProvider
                         <x-he4rt::button href="https://github.com/he4rt" icon="heroicon-s-arrow-top-right-on-square" variant="outline">
                             Github
                         </x-he4rt::button>
-
-                    <!--                        <x-he4rt::button icon-position="leading" icon="heroicon-o-user">Entrar agora</x-he4rt::button>-->
                     </div>
                @endguest
             BLADE
@@ -115,12 +111,6 @@ final class GuestPanelProvider extends PanelProvider
                 DisableBladeIconComponents::class,
                 DispatchServingFilamentEvent::class,
             ]);
-
-        if (app()->isProduction()) {
-            $panel->domain(config('app.domain'));
-        }
-
-        return $panel;
 
     }
 }

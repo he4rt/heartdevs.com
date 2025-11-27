@@ -11,6 +11,7 @@ use function Pest\Laravel\assertDatabaseHas;
 use function Pest\Livewire\livewire;
 
 it('can create a feedback', function (): void {
+    filament()->setCurrentPanel('admin');
     $sender = User::factory()->create();
     $target = User::factory()->create();
 
