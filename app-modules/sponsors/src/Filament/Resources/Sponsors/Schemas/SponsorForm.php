@@ -9,6 +9,7 @@ use Filament\Forms\Components\SpatieMediaLibraryFileUpload;
 use Filament\Forms\Components\TextInput;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
+use Illuminate\Database\Eloquent\Builder;
 
 class SponsorForm
 {
@@ -23,7 +24,11 @@ class SponsorForm
                             ->label('Tenant')
                             ->preload()
                             ->searchable()
-                            ->relationship('tenant', 'name')
+                            ->relationship(
+                                name: 'tenant',
+                                titleAttribute: 'name',
+                                modifyQueryUsing: fn (Builder $query) => $query->limit(10)
+                            )
                             ->required(),
                         TextInput::make('name')
                             ->minLength(5)
