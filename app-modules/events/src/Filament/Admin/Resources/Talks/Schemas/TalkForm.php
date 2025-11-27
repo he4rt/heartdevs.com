@@ -11,7 +11,6 @@ use Filament\Schemas\Components\Flex;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 use He4rt\Events\Enums\Talks\TalkStatusEnum;
-use He4rt\Events\Filament\Shared\Schemas\StartEndFieldsSchema;
 
 class TalkForm
 {
@@ -62,12 +61,7 @@ class TalkForm
                         ->columnSpan(2),
                 ])
                     ->columnSpanFull(),
-                Section::make('Horários da Palestra')
-                    ->description('Forneça os horários da sua palestra')
-                    ->schema(
-                        StartEndFieldsSchema::make(),
-                    )
-                    ->columnSpanFull(),
+
                 Section::make('Detalhes e Conteúdo')
                     ->description('Forneça a descrição completa da sua palestra e o que o público aprenderá.')
                     ->icon('heroicon-m-document-text')

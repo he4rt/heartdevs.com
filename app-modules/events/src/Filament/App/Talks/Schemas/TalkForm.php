@@ -13,7 +13,6 @@ use Filament\Schemas\Components\Flex;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 use He4rt\Events\Enums\Talks\TalkStatusEnum;
-use He4rt\Events\Filament\Shared\Schemas\StartEndFieldsSchema;
 use Illuminate\Database\Eloquent\Builder;
 
 class TalkForm
@@ -52,11 +51,7 @@ class TalkForm
                                 ->maxlength(255)
                                 ->required()
                                 ->columnSpanFull(),
-                            Section::make('Horários da Palestra')
-                                ->description('Forneça os horários da sua palestra')
-                                ->schema(
-                                    StartEndFieldsSchema::make(),
-                                ),
+
                         ])->columnSpan(3),
 
                 ])
