@@ -55,13 +55,21 @@ class AuthenticateAction
 
     private function registerNewUser(OAuthUserDTO $userDTO, Tenant $tenant): Provider
     {
-        $user = auth()->check() ? auth()->user() : User::query()->firstOrCreate(['email' => $userDTO->email], [
-            'id' => Uuid::uuid4()->toString(),
-            'username' => $userDTO->username,
-            'name' => $userDTO->name,
-            'password' => Hash::make(Date::now()->getTimestamp().'-vai-brasil'),
-            'is_donator' => false,
-        ]);
+        $user = auth()->check() ? auth()->user() : User::query()
+            ->where('username', $userDTO->username)
+            ->orWhere('email', $userDTO->email)
+            ->first();
+
+        if (! $user) {
+            $user = User::query()->create([
+                'id' => Uuid::uuid4()->toString(),
+                'username' => $userDTO->username,
+                'email' => $userDTO->email,
+                'name' => $userDTO->name,
+                'password' => Hash::make(Date::now()->getTimestamp().'-vai-brasil'),
+                'is_donator' => false,
+            ]);
+        }
 
         $user->tenants()->attach($tenant);
 
