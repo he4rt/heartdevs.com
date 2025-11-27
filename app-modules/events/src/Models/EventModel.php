@@ -76,7 +76,7 @@ class EventModel extends Model
                 'user_id'
             )
             ->using(EventAttend::class)
-            ->withPivot('status')
+            ->withPivot(['status', 'attend_order'])
             ->withTimestamps();
     }
 
@@ -86,13 +86,18 @@ class EventModel extends Model
             return;
         }
 
-        $this->attendees()->attach($userId, ['status' => $status]);
-
         match ($status) {
             AttendingStatusEnum::Attending => $this->increment('attendees_count'),
             AttendingStatusEnum::Waitlist => $this->increment('waitlist_count'),
             default => throw new Exception('Unexpected match value'),
         };
+
+        $this->refresh();
+
+        $this->attendees()->attach($userId, [
+            'status' => $status,
+            'attend_order' => $this->attendees_count + $this->waitlist_count,
+        ]);
     }
 
     public function isPast(): bool

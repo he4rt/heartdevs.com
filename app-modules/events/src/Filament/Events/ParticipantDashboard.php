@@ -6,16 +6,21 @@ namespace He4rt\Events\Filament\Events;
 
 use Filament\Pages\Page;
 use Filament\Support\Enums\Width;
+use He4rt\Events\Enums\AttendingStatusEnum;
+use He4rt\Events\Models\EventModel;
 use He4rt\Tenant\Models\Tenant;
 use Illuminate\Contracts\Support\Htmlable;
-use Illuminate\Database\Eloquent\Model;
 
-/** @property Tenant $tenant  */
+/** @property Tenant $tenant */
 class ParticipantDashboard extends Page
 {
-    protected Width|string|null $maxContentWidth = Width::Full;
+    /** @var Tenant|null */
+    public $tenant;
 
-    private ?Model $tenant = null;
+    /** @var EventModel|null */
+    public $event;
+
+    protected Width|string|null $maxContentWidth = Width::Full;
 
     public static function shouldRegisterNavigation(): bool
     {
@@ -30,6 +35,13 @@ class ParticipantDashboard extends Page
     public function mount(): void
     {
         $this->tenant = filament()->getTenant();
+
+        $this->event = $this->tenant
+            ->events()
+            ->where('active', true)
+            ->first();
+
+        abort_unless($this->event, 404);
     }
 
     public function getView(): string
@@ -41,8 +53,17 @@ class ParticipantDashboard extends Page
         return $view;
     }
 
+    public function eventAttend(): void
+    {
+
+        $this->event->attend(auth()->id(), AttendingStatusEnum::Attending);
+    }
+
     protected function getViewData(): array
     {
-        return ['event' => filament()->getTenant()->events()->first()];
+        return [
+            'event' => $this->event,
+            'participant' => $this->event->attendees()->where('user_id', auth()->id())->first(),
+        ];
     }
 }

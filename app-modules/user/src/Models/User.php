@@ -17,6 +17,7 @@ use He4rt\Tenant\Models\Concerns\InteractsWithTenants;
 use He4rt\User\Database\Factories\UserFactory;
 use He4rt\User\Observers\UserObserver;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
@@ -137,6 +138,19 @@ final class User extends Authenticatable implements FilamentUser, HasMedia, HasN
     {
 
         return sprintf('https://github.com/%s.png', $this->username);
+    }
+
+    protected function shortName(): Attribute
+    {
+        return Attribute::get(function (): string {
+            $name = str($this->name)
+                ->explode(' ');
+
+            $firstName = $name->shift();
+            $lastName = $name->pop();
+
+            return sprintf('%s %s', $firstName, $lastName);
+        });
     }
 
     protected static function newFactory(): UserFactory

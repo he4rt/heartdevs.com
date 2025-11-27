@@ -13,6 +13,7 @@ class EventAttend extends Pivot
 
     protected $fillable = [
         'status',
+        'attend_order',
     ];
 
     protected function casts(): array

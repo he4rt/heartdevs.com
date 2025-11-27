@@ -1,5 +1,5 @@
 <x-he4rt::layouts.page class="relative" full-height="true">
-    <x-events::themes.3pontos.components.sections.event-ticket />
+    <x-events::themes.3pontos.components.sections.event-ticket :$participant :$event />
     <x-events::themes.3pontos.components.sections.event-progress />
     <x-events::themes.3pontos.components.sections.partners />
     <x-events::themes.3pontos.components.sections.info :event="$event" />
