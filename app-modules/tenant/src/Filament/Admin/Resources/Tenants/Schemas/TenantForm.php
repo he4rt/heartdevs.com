@@ -10,6 +10,7 @@ use Filament\Forms\Components\Toggle;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Components\Utilities\Set;
 use Filament\Schemas\Schema;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Str;
 
 class TenantForm
@@ -39,7 +40,7 @@ class TenantForm
                             ->relationship(
                                 name: 'owner',
                                 titleAttribute: 'name',
-                                modifyQueryUsing: fn ($query) => $query->limit(10)
+                                modifyQueryUsing: fn (Builder $query) => $query->limit(10)
                             )
                             ->required(),
                         Toggle::make('active')
