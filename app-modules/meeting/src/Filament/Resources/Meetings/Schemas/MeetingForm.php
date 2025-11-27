@@ -23,6 +23,7 @@ class MeetingForm
                     ->schema([
                         Select::make('tenant_id')
                             ->preload()
+                            ->searchable()
                             ->relationship(
                                 name: 'tenant',
                                 titleAttribute: 'name',
@@ -31,6 +32,7 @@ class MeetingForm
                             ->required(),
                         Select::make('admin_id')
                             ->preload()
+                            ->searchable()
                             ->relationship(
                                 name: 'admin',
                                 titleAttribute: 'name',
@@ -56,6 +58,7 @@ class MeetingForm
                             ->columnSpanFull(),
                         Select::make('meeting_type_id')
                             ->preload()
+                            ->searchable()
                             ->relationship(
                                 name: 'meetingType',
                                 titleAttribute: 'name',

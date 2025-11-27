@@ -19,34 +19,34 @@ class FeedbackForm
                 Select::make('sender_id')
                     ->label('Sender')
                     ->preload()
+                    ->searchable()
                     ->relationship(
                         name: 'sender',
                         titleAttribute: 'username',
                         modifyQueryUsing: fn (Builder $query) => $query->limit(10)
                     )
-                    ->searchable()
                     ->required(),
 
                 Select::make('target_id')
                     ->label('Target')
                     ->preload()
+                    ->searchable()
                     ->relationship(
                         name: 'target',
                         titleAttribute: 'username',
                         modifyQueryUsing: fn (Builder $query) => $query->limit(10)
                     )
-                    ->searchable()
                     ->required(),
 
                 Select::make('tenant_id')
                     ->label('Target')
                     ->preload()
+                    ->searchable()
                     ->relationship(
                         name: 'tenant',
                         titleAttribute: 'name',
                         modifyQueryUsing: fn (Builder $query) => $query->limit(10)
                     )
-                    ->searchable()
                     ->required(),
 
                 TextInput::make('type')

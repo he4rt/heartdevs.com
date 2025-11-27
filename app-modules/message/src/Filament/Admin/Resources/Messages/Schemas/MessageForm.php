@@ -22,6 +22,7 @@ class MessageForm
                     ->label('Provider')
                     ->getOptionLabelFromRecordUsing(fn (Provider $record) => $record->provider->getLabel())
                     ->preload()
+                    ->searchable()
                     ->relationship(
                         name: 'provider',
                         titleAttribute: 'provider',
@@ -36,6 +37,7 @@ class MessageForm
                 Select::make('tenant_id')
                     ->label('Tenant')
                     ->preload()
+                    ->searchable()
                     ->relationship(
                         name: 'tenant',
                         titleAttribute: 'name',

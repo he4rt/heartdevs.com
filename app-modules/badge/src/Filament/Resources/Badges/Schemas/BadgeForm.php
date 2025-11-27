@@ -30,6 +30,7 @@ class BadgeForm
                             ->schema([
                                 Select::make('tenant_id')
                                     ->preload()
+                                    ->searchable()
                                     ->relationship(
                                         name: 'tenant',
                                         titleAttribute: 'name',

@@ -19,6 +19,7 @@ class SeasonForm
             ->components([
                 Select::make('tenant_id')
                     ->preload()
+                    ->searchable()
                     ->relationship(
                         name: 'tenant',
                         titleAttribute: 'name',
