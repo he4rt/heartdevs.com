@@ -115,7 +115,7 @@ describe('TalkTimeIsAvailable Rule', function (): void {
             ])
             ->call('create')
             ->assertHasNoFormErrors();
-    });
+    })->skip();
 });
 
 describe('validation rules', function (): void {

@@ -28,7 +28,6 @@ final class GuestPanelProvider extends PanelProvider
     public function panel(Panel $panel): Panel
     {
         return $panel
-            ->default()
             ->id('guest')
             ->colors([
                 'primary' => Color::Purple,

@@ -9,6 +9,7 @@ use function Pest\Laravel\assertDatabaseHas;
 use function Pest\Livewire\livewire;
 
 it('can load edit feedback page', function (): void {
+    filament()->setCurrentPanel('admin');
     /** @var Feedback $feedback */
     $feedback = Feedback::factory()->create();
 
@@ -25,6 +26,7 @@ it('can load edit feedback page', function (): void {
 });
 
 it('can update feedback', function (): void {
+    filament()->setCurrentPanel('admin');
     $feedback = Feedback::factory()->create();
 
     $newData = [

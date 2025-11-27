@@ -10,6 +10,7 @@ use function Pest\Laravel\assertDatabaseMissing;
 use function Pest\Livewire\livewire;
 
 it('can delete feedback', function (): void {
+    filament()->setCurrentPanel('admin');
     $feedback = Feedback::factory()->create();
 
     livewire(EditFeedback::class, [

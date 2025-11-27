@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace He4rt\Events\Filament\Events;
 
-use Illuminate\Database\Eloquent\Model;
 use Filament\Pages\Page;
 use Filament\Support\Enums\Width;
 use He4rt\Tenant\Models\Tenant;
 use Illuminate\Contracts\Support\Htmlable;
+use Illuminate\Database\Eloquent\Model;
 
 /** @property Tenant $tenant  */
 class ParticipantDashboard extends Page
