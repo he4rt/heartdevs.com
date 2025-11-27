@@ -10,6 +10,7 @@ use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\TimePicker;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
+use Illuminate\Database\Eloquent\Builder;
 
 class MeetingForm
 {
@@ -21,10 +22,22 @@ class MeetingForm
                     ->description('Tenant and Administration')
                     ->schema([
                         Select::make('tenant_id')
-                            ->relationship('tenant', 'name')
+                            ->preload()
+                            ->searchable()
+                            ->relationship(
+                                name: 'tenant',
+                                titleAttribute: 'name',
+                                modifyQueryUsing: fn (Builder $query) => $query->limit(10)
+                            )
                             ->required(),
                         Select::make('admin_id')
-                            ->relationship('admin', 'name')
+                            ->preload()
+                            ->searchable()
+                            ->relationship(
+                                name: 'admin',
+                                titleAttribute: 'name',
+                                modifyQueryUsing: fn (Builder $query) => $query->limit(10)
+                            )
                             ->required(),
                     ]),
                 Section::make('Meeting Data')
@@ -44,7 +57,13 @@ class MeetingForm
                         RichEditor::make('content')
                             ->columnSpanFull(),
                         Select::make('meeting_type_id')
-                            ->relationship('meetingType', 'name')
+                            ->preload()
+                            ->searchable()
+                            ->relationship(
+                                name: 'meetingType',
+                                titleAttribute: 'name',
+                                modifyQueryUsing: fn (Builder $query) => $query->limit(10)
+                            )
                             ->createOptionForm([
                                 TextInput::make('name')
                                     ->minLength(3)
