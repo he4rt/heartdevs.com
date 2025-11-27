@@ -4,9 +4,6 @@ declare(strict_types=1);
 
 namespace He4rt\Events\Filament\Resources;
 
-use He4rt\Events\Filament\Resources\EventSubmissionSpeakerResource\Pages\ListEventSubmissionSpeakers;
-use He4rt\Events\Filament\Resources\EventSubmissionSpeakerResource\Pages\CreateEventSubmissionSpeaker;
-use He4rt\Events\Filament\Resources\EventSubmissionSpeakerResource\Pages\EditEventSubmissionSpeaker;
 use BackedEnum;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteAction;
@@ -24,6 +21,9 @@ use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\TrashedFilter;
 use Filament\Tables\Table;
+use He4rt\Events\Filament\Resources\EventSubmissionSpeakerResource\Pages\CreateEventSubmissionSpeaker;
+use He4rt\Events\Filament\Resources\EventSubmissionSpeakerResource\Pages\EditEventSubmissionSpeaker;
+use He4rt\Events\Filament\Resources\EventSubmissionSpeakerResource\Pages\ListEventSubmissionSpeakers;
 use He4rt\Events\Models\Pivot\EventSubmissionSpeaker;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;

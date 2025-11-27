@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace He4rt\Events\Models;
 
-use Illuminate\Database\Eloquent\Relations\Pivot;
 use Carbon\Carbon;
 use He4rt\Events\Database\Factories\EventSubmissionFactory;
 use He4rt\Events\Enums\Talks\TalkStatusEnum;
@@ -17,6 +16,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\Pivot;
 
 /**
  * @property int|string $event_id
