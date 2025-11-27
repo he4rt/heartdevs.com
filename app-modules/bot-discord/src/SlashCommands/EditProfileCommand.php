@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace He4rt\BotDiscord\SlashCommands;
 
-use Illuminate\Support\Facades\Date;
 use Discord\Builders\Components\TextInput;
 use Discord\Helpers\Collection;
 use Discord\Parts\Interactions\Interaction;
 use He4rt\User\Actions\UpdateProfile;
 use He4rt\User\DTO\UpdateProfileDTO;
+use Illuminate\Support\Facades\Date;
 use Throwable;
 
 class EditProfileCommand extends AbstractSlashCommand
@@ -63,7 +63,7 @@ class EditProfileCommand extends AbstractSlashCommand
     {
         if (! $this->memberProvider?->user?->information) {
             $interaction->respondWithMessage(
-                'Parece que você ainda não completou sua apresentação. Use o comando `/introduction` para continuar.',
+                'Parece que você ainda não completou sua apresentação. Use o comando `/apresentar` para continuar.',
                 true
             );
 

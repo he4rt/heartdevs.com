@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace He4rt\BotDiscord\SlashCommands;
 
-use Illuminate\Support\Facades\Date;
 use Discord\Parts\Interactions\Command\Option;
 use Discord\Parts\Interactions\Interaction;
 use He4rt\Provider\Models\Provider;
+use Illuminate\Support\Facades\Date;
 use Throwable;
 
 class ProfileCommand extends AbstractSlashCommand

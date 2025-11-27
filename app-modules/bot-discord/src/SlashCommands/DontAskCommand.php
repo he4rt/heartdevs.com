@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace He4rt\BotDiscord\SlashCommands;
 
-use Illuminate\Support\Facades\Date;
 use Discord\Parts\Interactions\Command\Option;
 use Discord\Parts\Interactions\Interaction;
+use Illuminate\Support\Facades\Date;
 use Laracord\Commands\SlashCommand;
 
 class DontAskCommand extends SlashCommand

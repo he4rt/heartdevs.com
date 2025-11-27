@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace He4rt\BotDiscord\SlashCommands;
 
-use Illuminate\Support\Facades\Date;
 use Discord\Builders\Components\TextInput;
 use Discord\Helpers\Collection;
 use Discord\Parts\Guild\Role;
@@ -13,6 +12,7 @@ use He4rt\Provider\Models\Provider;
 use He4rt\Tenant\Models\Tenant;
 use He4rt\User\Actions\UpdateProfile;
 use He4rt\User\DTO\UpdateProfileDTO;
+use Illuminate\Support\Facades\Date;
 use Laracord\Commands\SlashCommand;
 use Throwable;
 
