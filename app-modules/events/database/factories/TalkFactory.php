@@ -29,8 +29,6 @@ final class TalkFactory extends Factory
             'field_type' => fake()->word(),
             'title' => fake()->word(),
             'description' => fake()->text(),
-            'starts_at' => Date::now(),
-            'ends_at' => Date::now(),
             'created_at' => Date::now(),
             'updated_at' => Date::now(),
         ];

@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace He4rt\Events\Models;
 
+use He4rt\Events\Database\Factories\EventAgendaFactory;
 use He4rt\Events\Enums\SchedulableTypeEnum;
 use He4rt\Tenant\Models\Tenant;
+use Illuminate\Database\Eloquent\Attributes\UseFactory;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -13,6 +15,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
+#[UseFactory(EventAgendaFactory::class)]
 class EventAgenda extends Model
 {
     use HasFactory;
@@ -53,6 +56,7 @@ class EventAgenda extends Model
     {
         return Attribute::get(fn () => SchedulableTypeEnum::from($this->schedulable_type));
     }
+
     protected function casts(): array
     {
         return [

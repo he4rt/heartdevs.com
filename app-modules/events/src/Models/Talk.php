@@ -40,8 +40,6 @@ class Talk extends Model
         'field_type',
         'title',
         'description',
-        'starts_at',
-        'ends_at',
     ];
 
     /**
