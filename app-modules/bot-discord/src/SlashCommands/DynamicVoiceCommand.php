@@ -9,6 +9,8 @@ use Discord\Parts\Interactions\Command\Option;
 use Discord\Parts\Interactions\Interaction;
 use Laracord\Commands\SlashCommand;
 
+use function React\Async\await;
+
 class DynamicVoiceCommand extends SlashCommand
 {
     /**
@@ -57,13 +59,26 @@ class DynamicVoiceCommand extends SlashCommand
             ->title('Dynamic Voice Command')
             ->content($this->value('tipo', $default = null))
             ->reply($interaction);
-
-        $interaction->guild->channels->build(
+        //
+        //        cache()->flush();
+        //        return;
+        $channel = await($interaction->guild->channels->build(
             $interaction->guild,
             ChannelBuilder::new($this->value('tipo'))
                 ->setType(2)
                 ->setUserLimit($this->value('quantidade'))
-        );
+        ));
+
+        $keys[] = [
+            'guildId' => $interaction->guild->id,
+            'channelId' => $channel->id,
+            'ownerId' => $interaction->user->id,
+            'usersCount' => 0,
+            'users' => [],
+            'lastJoinedAt' => now(),
+        ];
+
+        cache()->put('active_voice_channels_keys', $keys);
     }
 
     /**
