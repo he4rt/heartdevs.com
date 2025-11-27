@@ -16,6 +16,7 @@ final readonly class UpdateProfile
 
         $provider = Provider::query()
             ->where('model_type', User::class)
+            ->where('tenant_id', $profileDTO->tenantId)
             ->where('provider', $profileDTO->provider)
             ->where('provider_id', $profileDTO->providerId)
             ->first();
