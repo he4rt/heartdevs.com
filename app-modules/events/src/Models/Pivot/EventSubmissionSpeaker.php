@@ -22,7 +22,7 @@ class EventSubmissionSpeaker extends Pivot
     /**
      * @return BelongsTo<EventSubmission, $this>
      */
-    public function event(): BelongsTo
+    public function submission(): BelongsTo
     {
         return $this->belongsTo(EventSubmission::class, 'submission_id');
     }
