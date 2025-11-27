@@ -1,5 +1,5 @@
 @props([
-    'userImg',
+    'userImg' => '',
     'username',
     'githubUsername',
     'ticketNumber',
