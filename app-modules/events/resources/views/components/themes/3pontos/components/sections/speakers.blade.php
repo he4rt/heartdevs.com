@@ -76,8 +76,7 @@
                         </x-slot>
                         <div class="custom-scrollbar h-full overflow-hidden transition-all duration-500 ease-in-out">
                             <x-he4rt::text class="line-clamp-1 transition-all duration-500 group-hover:line-clamp-none">
-                                Este é um texto simples criado especialmente para ter exatamente cento e trinta
-                                caracteres no total. Texto extra para completar!!!
+                                {{ $speaker->talks->first()->description }}
                             </x-he4rt::text>
                         </div>
 
