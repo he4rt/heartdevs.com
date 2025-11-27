@@ -36,7 +36,11 @@ class EventPanelProvider extends PanelProvider
     {
         return $panel
             ->id('event')
-            ->tenant(Tenant::class, 'slug', 'ownedTenants')
+            ->tenant(
+                model: Tenant::class,
+                slugAttribute: app()->isProduction() ? 'domain' : 'slug',
+                ownershipRelationship: 'ownedTenants'
+            )
             ->login(EventLogin::class)
             ->path(app()->isLocal() ? 'event' : '')
             ->tenantDomain(app()->isProduction() ? '{tenant:domain}' : null)
