@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace He4rt\Events\Models;
 
+use He4rt\Events\Enums\SchedulableTypeEnum;
 use He4rt\Tenant\Models\Tenant;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -45,5 +47,17 @@ class EventAgenda extends Model
     public function schedulable(): MorphTo
     {
         return $this->morphTo();
+    }
+
+    protected function scheduleType(): Attribute
+    {
+        return Attribute::get(fn () => SchedulableTypeEnum::from($this->schedulable_type));
+    }
+    protected function casts(): array
+    {
+        return [
+            'starting_at' => 'datetime',
+            'ending_at' => 'datetime',
+        ];
     }
 }

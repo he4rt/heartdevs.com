@@ -1,22 +1,27 @@
 @props([
-    'startsAt' => '14:00',
-    'title' => 'Networking',
-    'status' => 'finished',
+    'startsAt',
+    'endsAt',
+    'title',
+    'icon',
+    'speakers',
 ])
 
 @php
-    $config = match ($status) {
-        'finished' => [
+    /** @var \Carbon\Carbon $startsAt */
+    /** @var \Carbon\Carbon $endsAt */
+
+    $config = match (true) {
+        $endsAt->isPast() => [
             'color' => 'text-green-300',
             'text' => 'Finalizado',
             'icon' => 'heroicon-s-check-circle',
         ],
-        'in_progress' => [
+        default => [
             'color' => 'text-orange-300',
             'text' => 'Em andamento',
             'icon' => 'heroicon-s-clock',
         ],
-        'upcoming' => [
+        $startsAt->isFuture() => [
             'color' => 'text-blue-300',
             'text' => 'Em breve',
             'icon' => 'heroicon-o-calendar',
@@ -28,7 +33,7 @@
     <div class="grid grid-cols-2 gap-x-4 gap-y-4 lg:grid-cols-[auto_1fr_auto]">
         <div class="flex items-center gap-2 lg:order-1">
             <x-he4rt::icon size="md" class="text-icon-light bg-transparent p-0!" icon="heroicon-o-clock" />
-            <x-he4rt::text size="xs" class="font-semibold">{{ $startsAt }}</x-he4rt::text>
+            <x-he4rt::text size="xs" class="font-semibold">{{ $startsAt->format('H:i') }}</x-he4rt::text>
         </div>
 
         <div class="flex items-center justify-end gap-2 lg:order-3 lg:justify-center">
@@ -39,8 +44,14 @@
         </div>
 
         <div class="col-span-2 flex items-center gap-2 lg:order-2 lg:col-span-1">
-            <x-he4rt::heading size="2xs">
-                {{ $title }}
+            <x-he4rt::heading size="2xs" class="flex gap-2">
+                <x-he4rt::icon size="md" :icon="$icon" class="text-icon-light bg-transparent p-0!" />
+                <div class="flex gap-3">
+                    {{ $title }}
+                    @if ($speakers)
+                        <span class="text-text-medium">// {{ $speakers->name ?? '' }} \\</span>
+                    @endif
+                </div>
             </x-he4rt::heading>
         </div>
     </div>

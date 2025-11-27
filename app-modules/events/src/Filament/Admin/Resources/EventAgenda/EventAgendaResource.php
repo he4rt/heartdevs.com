@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace He4rt\Events\Filament\Admin\Resources\EventAgenda;
 
-use Filament\Forms\Components\MorphToSelect\Type;
 use BackedEnum;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteAction;
@@ -15,6 +14,7 @@ use Filament\Actions\ForceDeleteBulkAction;
 use Filament\Actions\RestoreAction;
 use Filament\Actions\RestoreBulkAction;
 use Filament\Forms\Components\MorphToSelect;
+use Filament\Forms\Components\MorphToSelect\Type;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TimePicker;
 use Filament\Infolists\Components\TextEntry;
@@ -50,7 +50,6 @@ class EventAgendaResource extends Resource
                 Select::make('tenant_id')
                     ->relationship('tenant', 'name')
                     ->required(),
-
                 Select::make('event_id')
                     ->relationship(
                         'event',

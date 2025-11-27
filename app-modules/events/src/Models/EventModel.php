@@ -163,6 +163,15 @@ class EventModel extends Model
         return $this->hasManyThrough(User::class, Talk::class, 'event_id', 'id', 'id', 'user_id');
     }
 
+    /**
+     * @return HasMany<EventAgenda, $this>
+     */
+    public function agenda(): HasMany
+    {
+        return $this->hasMany(EventAgenda::class, 'event_id')
+            ->oldest('starting_at');
+    }
+
     protected function duration(): Attribute
     {
         return Attribute::make(
