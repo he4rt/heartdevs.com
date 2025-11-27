@@ -9,6 +9,7 @@ use Discord\Helpers\Collection;
 use Discord\Parts\Interactions\Interaction;
 use He4rt\User\Actions\UpdateProfile;
 use He4rt\User\DTO\UpdateProfileDTO;
+use Illuminate\Support\Facades\Date;
 use Throwable;
 
 class EditProfileCommand extends AbstractSlashCommand
@@ -18,14 +19,14 @@ class EditProfileCommand extends AbstractSlashCommand
      *
      * @var string
      */
-    protected $name = 'edit-profile';
+    protected $name = 'editar-perfil';
 
     /**
      * The command description.
      *
      * @var string
      */
-    protected $description = 'The Edit Profile Command slash command.';
+    protected $description = 'Comando para editar seu perfil.';
 
     /**
      * The command options.
@@ -62,8 +63,9 @@ class EditProfileCommand extends AbstractSlashCommand
     {
         if (! $this->memberProvider?->user?->information) {
             $interaction->respondWithMessage(
-                'Parece que você ainda não completou sua apresentação. Use o comando `/introduction` para continuar.',
-                true);
+                'Parece que você ainda não completou sua apresentação. Use o comando `/apresentar` para continuar.',
+                true
+            );
 
             return;
         }
@@ -96,7 +98,7 @@ class EditProfileCommand extends AbstractSlashCommand
                     ->setValue($profile->github_url ?? '')
                     ->setRequired(false),
 
-                TextInput::new('Linkedisney (Opcional)', TextInput::STYLE_SHORT)
+                TextInput::new('Linkedin (Opcional)', TextInput::STYLE_SHORT)
                     ->setCustomId('linkedin_url')
                     ->setMinLength(0)
                     ->setMaxLength(60)
@@ -113,8 +115,10 @@ class EditProfileCommand extends AbstractSlashCommand
                     ->setRequired(true),
 
             ])
-            ->submit(fn (Interaction $interaction, Collection $components) => $this->persistData($interaction,
-                $components))
+            ->submit(fn (Interaction $interaction, Collection $components) => $this->persistData(
+                $interaction,
+                $components
+            ))
             ->show($interaction);
     }
 
@@ -155,7 +159,7 @@ class EditProfileCommand extends AbstractSlashCommand
                     inline: false
                 )
                 ->footerIcon($interaction->guild->icon)
-                ->footerText('HE4RT INC')
+                ->footerText(Date::now()->format('Y').' © He4rt Developers')
                 ->timestamp(now())
                 ->reply($interaction, true);
 

@@ -19,6 +19,17 @@
             </x-he4rt::headline>
         </div>
 
-        <div class="bg-elevation-01dp border-outline-dark flex h-full w-full max-w-5xl rounded-xl border"></div>
+        <div
+            class="bg-elevation-01dp border-outline-dark relative mx-auto aspect-video w-full max-w-5xl overflow-hidden rounded-xl border shadow-lg"
+        >
+            <iframe
+                class="absolute inset-0 h-full w-full"
+                loading="lazy"
+                src="http://www.youtube.com/embed/dQw4w9WgXcQ"
+                title="YouTube video player"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                allowfullscreen
+            ></iframe>
+        </div>
     </div>
 </section>
