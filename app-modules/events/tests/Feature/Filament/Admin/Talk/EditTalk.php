@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 use App\Enums\FilamentPanel;
 use Filament\Facades\Filament;
-use He4rt\Events\Models\Talk;
+use He4rt\Events\Models\EventSubmission;
 
 use function Pest\Livewire\livewire;
 
 it('should render', function (): void {
-    $talk = Talk::factory()->create();
+    $talk = EventSubmission::factory()->create();
     Filament::setCurrentPanel(FilamentPanel::Admin->value);
     $this->actingAsAdmin();
 

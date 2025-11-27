@@ -9,7 +9,7 @@ use He4rt\Events\Enums\Talks\TalkStatusEnum;
 use He4rt\Events\Models\EventAgenda;
 use He4rt\Events\Models\EventModel;
 use He4rt\Events\Models\EventSegment;
-use He4rt\Events\Models\Talk;
+use He4rt\Events\Models\EventSubmission;
 use He4rt\Tenant\Models\Tenant;
 use He4rt\User\Models\User;
 use Illuminate\Database\Seeder;
@@ -60,7 +60,7 @@ class ThreeDotsSeeder extends Seeder
     {
         $talks = [
             ['speaker' => 'Juliana Cardoso', 'title' => "'Killing the Vibecoding  //  Juliana Gaioso \'", 'field_type' => 'twitch', 'description' => 'Por mais de quinze anos, solucionando problemas na indústria através de automação, IoT e desenvolvimento de software. Atualmente focada em solucionar problemas de software de segurança.'],
-            ['speaker' => 'Stefano', 'title' => 'FIRE|CE com Stefano', 'field_type' => 'Diretor de Key Acc (Fire|ce)', 'description' => 'Talk da Fire|ce'],
+            ['speaker' => 'Stefano', 'title' => 'FIRE|CE com Stefano', 'field_type' => 'Diretor de Key Acc (Fire|ce)', 'description' => 'EventSubmission da Fire|ce'],
             ['speaker' => 'Dulce', 'title' => 'Hunting de Oportunidades para Comunidade', 'field_type' => 'Bethel', 'description' => 'Hunting de Oportunidades para Comunidade'],
             ['speaker' => 'Daniel Reis', 'title' => "'Comunidade é FODA! // Daniel Reis \'", 'field_type' => 'Tech Lead & Fundador da He4rt Developers', 'description' => 'Linha de frente na criação de softwares e fortalecendo comunidades dev. DevRel focado em conteúdo técnico, live coding e educação, sempre impulsionando novos talentos. Fundador da He4rt Developers e apaixonado por ensinar, programar e construir espaços onde desenvolvedores crescem juntos.'],
         ];
@@ -74,7 +74,7 @@ class ThreeDotsSeeder extends Seeder
             $speaker->addMediaFromUrl('https://github.com/danielhe4rt.png')
                 ->toMediaCollection('avatar');
 
-            Talk::factory()
+            EventSubmission::factory()
                 ->recycle($tenant)
                 ->recycle($event)
                 ->for($speaker, 'user')
@@ -85,7 +85,7 @@ class ThreeDotsSeeder extends Seeder
                     'description' => $item['description'],
                 ]);
 
-            $talks = Talk::all()->toArray();
+            $talks = EventSubmission::all()->toArray();
 
             $segments = EventSegment::all()->toArray();
 

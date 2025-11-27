@@ -5,7 +5,7 @@ declare(strict_types=1);
 use App\Enums\FilamentPanel;
 use Filament\Facades\Filament;
 use He4rt\Events\Filament\App\Talks\Pages\ListTalks;
-use He4rt\Events\Models\Talk;
+use He4rt\Events\Models\EventSubmission;
 use He4rt\Tenant\Models\Tenant;
 use He4rt\User\Models\User;
 
@@ -17,7 +17,7 @@ beforeEach(function (): void {
     actingAs(User::factory()->create());
     $this->tenant = Tenant::factory()->create();
     Filament::setTenant($this->tenant);
-    $this->talks = Talk::factory()
+    $this->talks = EventSubmission::factory()
         ->recycle($this->tenant)
         ->recycle(auth()->user())
         ->count(10)
@@ -36,7 +36,7 @@ it('should see all talks belongs to the user', function (): void {
         ->assertCountTableRecords($this->talks->count());
 });
 it('should see only talks that belongs to the user', function (): void {
-    $anotherTalks = Talk::factory()->for($this->tenant)->count(10)->create();
+    $anotherTalks = EventSubmission::factory()->for($this->tenant)->count(10)->create();
     livewire(ListTalks::class)
         ->assertOk()
         ->assertCanSeeTableRecords($this->talks)
@@ -45,7 +45,7 @@ it('should see only talks that belongs to the user', function (): void {
 });
 it('should see only talks that belongs to the user and current tenant', function (): void {
     $anotherTenant = Tenant::factory()->create();
-    $this->talks->each(function (Talk $talk) use ($anotherTenant): void {
+    $this->talks->each(function (EventSubmission $talk) use ($anotherTenant): void {
         $talk->update(['tenant_id' => $anotherTenant->getKey()]);
     });
     $this->talks->fresh();

@@ -30,7 +30,7 @@ use He4rt\Events\Filament\Admin\Resources\EventAgenda\Pages\EditEventAgenda;
 use He4rt\Events\Filament\Admin\Resources\EventAgenda\Pages\ListEventAgendas;
 use He4rt\Events\Models\EventAgenda;
 use He4rt\Events\Models\EventSegment;
-use He4rt\Events\Models\Talk;
+use He4rt\Events\Models\EventSubmission;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
@@ -59,7 +59,7 @@ class EventAgendaResource extends Resource
 
                 MorphToSelect::make('schedulable')
                     ->types([
-                        Type::make(Talk::class)
+                        Type::make(EventSubmission::class)
                             ->titleAttribute('title'),
                         Type::make(EventSegment::class)
                             ->titleAttribute('title'),

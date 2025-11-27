@@ -22,7 +22,17 @@
 
     <div class="hp-container relative z-10">
         <div class="grid grid-cols-1 gap-8 lg:grid-cols-2">
-            <div>
+            <div
+                x-data="{
+                    copied: false,
+                    link: '{{ url()->current() }}',
+                    copyToClipboard() {
+                        navigator.clipboard.writeText(this.link)
+                        this.copied = true
+                        setTimeout(() => (this.copied = false), 2000)
+                    },
+                }"
+            >
                 @if ($participant)
                     <x-he4rt::headline>
                         <x-slot:badge>
@@ -32,13 +42,16 @@
                         <x-slot:description>
                             Aproveite o evento e não se esqueça de compartilhar nas redes sociais!
                         </x-slot>
-                        {{-- TODO: implement this 'shareable' component later --}}
-                        @if (1 > 2)
-                            <x-slot:actions>
-                                <x-he4rt::button>Compartilhar no...</x-he4rt::button>
-                                <x-he4rt::button variant="outline">Copiar link</x-he4rt::button>
-                            </x-slot>
-                        @endif
+                        <x-slot:actions>
+                            <div x-show="!copied">
+                                <x-he4rt::button icon="far-copy" @click="copyToClipboard()">
+                                    Compartilhe na redes
+                                </x-he4rt::button>
+                            </div>
+                            <div x-show="copied" x-cloak>
+                                <x-he4rt::button icon="fas-check">Compartilhe na redes</x-he4rt::button>
+                            </div>
+                        </x-slot>
                     </x-he4rt::headline>
                 @else
                     <x-he4rt::headline>
@@ -54,35 +67,6 @@
                         </x-slot>
                     </x-he4rt::headline>
                 @endif
-            <div
-                x-data="{
-                    copied: false,
-                    link: '{{ url()->current() }}',
-                    copyToClipboard() {
-                        navigator.clipboard.writeText(this.link)
-                        this.copied = true
-                        setTimeout(() => (this.copied = false), 2000)
-                    },
-                }"
-            >
-                <x-he4rt::headline>
-                    <x-slot:badge>
-                        <x-he4rt::section-title>Área do Participante</x-he4rt::section-title>
-                    </x-slot>
-                    <x-slot:title>Parabéns! Sua vaga está garantida!</x-slot>
-                    <x-slot:description>Acesse o link abaixo para conferir o seu ticket.</x-slot>
-                    <x-slot:actions>
-                        <div x-show="!copied">
-                            <x-he4rt::button icon="far-copy" @click="copyToClipboard()">
-                                Compartilhe na redes
-                            </x-he4rt::button>
-                        </div>
-
-                        <div x-show="copied" x-cloak>
-                            <x-he4rt::button icon="fas-check">Compartilhe na redes</x-he4rt::button>
-                        </div>
-                    </x-slot>
-                </x-he4rt::headline>
             </div>
 
             <div

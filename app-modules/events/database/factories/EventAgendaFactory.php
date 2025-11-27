@@ -7,7 +7,7 @@ namespace He4rt\Events\Database\Factories;
 use He4rt\Events\Models\EventAgenda;
 use He4rt\Events\Models\EventModel;
 use He4rt\Events\Models\EventSegment;
-use He4rt\Events\Models\Talk;
+use He4rt\Events\Models\EventSubmission;
 use He4rt\Tenant\Models\Tenant;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Facades\Date;
@@ -39,11 +39,11 @@ final class EventAgendaFactory extends Factory
         ]);
     }
 
-    public function forTalk(?Talk $talk = null)
+    public function forTalk(?EventSubmission $talk = null)
     {
         return $this->state(fn () => [
-            'schedulable_type' => Talk::class,
-            'schedulable_id' => $talk ?? Talk::factory(),
+            'schedulable_type' => EventSubmission::class,
+            'schedulable_id' => $talk ?? EventSubmission::factory(),
         ]);
     }
 }

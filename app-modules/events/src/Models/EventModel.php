@@ -148,19 +148,19 @@ class EventModel extends Model
     }
 
     /**
-     * @return HasMany<Talk, $this>
+     * @return HasMany<EventSubmission, $this>
      */
     public function talks(): HasMany
     {
-        return $this->hasMany(Talk::class, 'event_id');
+        return $this->hasMany(EventSubmission::class, 'event_id');
     }
 
     /**
-     * @return HasManyThrough<User, Talk>
+     * @return HasManyThrough<User, EventSubmission>
      */
     public function speakers(): HasManyThrough
     {
-        return $this->hasManyThrough(User::class, Talk::class, 'event_id', 'id', 'id', 'user_id');
+        return $this->hasManyThrough(User::class, EventSubmission::class, 'event_id', 'id', 'id', 'user_id');
     }
 
     /**

@@ -26,7 +26,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property Carbon $ends_at
  */
 #[UseFactory(TalkFactory::class)]
-class Talk extends Model
+class EventSubmission extends Model
 {
     use HasFactory;
 

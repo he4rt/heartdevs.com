@@ -10,8 +10,8 @@ use Filament\Models\Contracts\HasTenants;
 use Filament\Panel;
 use He4rt\Character\Models\Character;
 use He4rt\Events\Models\EventModel;
+use He4rt\Events\Models\EventSubmission;
 use He4rt\Events\Models\Pivot\EventAttend;
-use He4rt\Events\Models\Talk;
 use He4rt\Provider\Models\Provider;
 use He4rt\Tenant\Models\Concerns\InteractsWithTenants;
 use He4rt\User\Database\Factories\UserFactory;
@@ -100,11 +100,11 @@ final class User extends Authenticatable implements FilamentUser, HasMedia, HasN
     }
 
     /**
-     * @return HasMany<Talk, $this>
+     * @return HasMany<EventSubmission, $this>
      */
     public function talks(): HasMany
     {
-        return $this->hasMany(Talk::class, 'user_id');
+        return $this->hasMany(EventSubmission::class, 'user_id');
     }
 
     /**
@@ -140,6 +140,11 @@ final class User extends Authenticatable implements FilamentUser, HasMedia, HasN
         return sprintf('https://github.com/%s.png', $this->username);
     }
 
+    protected static function newFactory(): UserFactory
+    {
+        return UserFactory::new();
+    }
+
     protected function shortName(): Attribute
     {
         return Attribute::get(function (): string {
@@ -151,11 +156,6 @@ final class User extends Authenticatable implements FilamentUser, HasMedia, HasN
 
             return sprintf('%s %s', $firstName, $lastName);
         });
-    }
-
-    protected static function newFactory(): UserFactory
-    {
-        return UserFactory::new();
     }
 
     protected function casts(): array

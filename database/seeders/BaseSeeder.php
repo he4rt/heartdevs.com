@@ -6,7 +6,7 @@ namespace Database\Seeders;
 
 use He4rt\Character\Models\Character;
 use He4rt\Events\Models\EventModel;
-use He4rt\Events\Models\Talk;
+use He4rt\Events\Models\EventSubmission;
 use He4rt\Meeting\Models\Meeting;
 use He4rt\Message\Models\Message;
 use He4rt\Provider\Models\Provider;
@@ -61,7 +61,7 @@ class BaseSeeder extends Seeder
         EventModel::factory()->count(5)
             ->withStatus()
             ->afterCreating(function ($event): void {
-                Talk::factory()->count(5)->create([
+                EventSubmission::factory()->count(5)->create([
                     'event_id' => $event->id,
                 ]);
             })
