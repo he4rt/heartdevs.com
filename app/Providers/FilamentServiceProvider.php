@@ -22,15 +22,13 @@ class FilamentServiceProvider extends ServiceProvider
 
         Panel::macro('tenantViteTheme', function (): static {
 
-            if (app()->isLocal()) {
-                $tenantSlug = str(request()->path())->explode('/')
-                    ->get(1);
-            } else {
-                $path = explode('.', request()->header('host'));
-                $tenantSlug = array_shift($path);
-            }
+            $tenantSlug = app()->isLocal() ? request()->path() : request()->header('host');
 
-            $tenantSlug = str($tenantSlug)->replace(['.', '-'], '')->toString();
+            $tenantSlug = match (true) {
+                str_contains($tenantSlug, '3pontos') => '3pontos',
+                default => 'he4rt'
+            };
+
             $themeDirectory = sprintf('app-modules/he4rt/resources/css/themes/%s/theme.css', $tenantSlug);
 
             if (! file_exists(base_path($themeDirectory))) {
@@ -46,8 +44,8 @@ class FilamentServiceProvider extends ServiceProvider
                 'primary' => $color,
             ]);
 
-            session()->put('panel', $this->getId());
             session()->put('tenant', $tenantSlug);
+            session()->put('panel', $this->getId());
 
             $this->viteTheme($themeDirectory);
 

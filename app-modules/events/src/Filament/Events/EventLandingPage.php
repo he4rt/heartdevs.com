@@ -6,7 +6,6 @@ namespace He4rt\Events\Filament\Events;
 
 use Filament\Pages\Dashboard;
 use Filament\Support\Enums\Width;
-use He4rt\Tenant\Models\Tenant;
 
 class EventLandingPage extends Dashboard
 {
@@ -18,17 +17,7 @@ class EventLandingPage extends Dashboard
 
     public function mount(): void
     {
-        if (app()->isLocal()) {
-            $tenantSlug = str(request()->path())->explode('/')
-                ->get(1);
-        } else {
-            $path = explode('.', request()->header('host'));
-            $tenantSlug = array_shift($path);
-        }
-
-        $tenantSlug = str($tenantSlug)->replace(['.', '-'], '')->toString();
-
-        $this->tenant = Tenant::query()->where('slug', $tenantSlug)->firstOrFail();
+        $this->tenant = filament()->getTenant();
     }
 
     public function getView(): string

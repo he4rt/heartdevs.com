@@ -6,11 +6,16 @@ namespace He4rt\Events\Filament\Events;
 
 use Filament\Pages\Page;
 use Filament\Support\Enums\Width;
+use He4rt\Tenant\Models\Tenant;
 use Illuminate\Contracts\Support\Htmlable;
+use Illuminate\Database\Eloquent\Model;
 
+/** @property Tenant $tenant  */
 class ParticipantDashboard extends Page
 {
     protected Width|string|null $maxContentWidth = Width::Full;
+
+    private ?Model $tenant = null;
 
     public static function shouldRegisterNavigation(): bool
     {
@@ -22,20 +27,14 @@ class ParticipantDashboard extends Page
         return '';
     }
 
+    public function mount(): void
+    {
+        $this->tenant = filament()->getTenant();
+    }
+
     public function getView(): string
     {
-
-        if (app()->isLocal()) {
-            $tenantSlug = str(request()->path())->explode('/')
-                ->get(1);
-        } else {
-            $path = explode('.', request()->header('host'));
-            $tenantSlug = array_shift($path);
-        }
-
-        $tenantSlug = str($tenantSlug)->replace(['.', '-'], '');
-
-        $view = sprintf('events::components.themes.%s.participant-dashboard', $tenantSlug);
+        $view = sprintf('events::components.themes.%s.participant-dashboard', $this->tenant->slug);
 
         abort_unless(view()->exists($view), 403, 'Forbidden Tenant');
 

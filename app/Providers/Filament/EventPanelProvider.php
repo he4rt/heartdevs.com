@@ -36,9 +36,13 @@ class EventPanelProvider extends PanelProvider
     {
         return $panel
             ->id('event')
-            ->tenant(Tenant::class, 'slug', 'ownedTenants')
+            ->tenant(
+                model: Tenant::class,
+                slugAttribute: app()->isProduction() ? 'domain' : 'slug',
+                ownershipRelationship: 'ownedTenants'
+            )
             ->login(EventLogin::class)
-            ->path(app()->isLocal() ? 'event' : '')
+            ->path(app()->isProduction() ? '' : 'event')
             ->tenantDomain(app()->isProduction() ? '{tenant:domain}' : null)
             ->loginRouteSlug('{tenant}/login')
             ->renderHook(PanelsRenderHook::SIDEBAR_NAV_END, fn () => Blade::render(sprintf(<<<'BLADE'

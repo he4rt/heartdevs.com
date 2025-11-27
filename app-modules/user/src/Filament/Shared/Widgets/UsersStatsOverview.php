@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace He4rt\User\Filament\Shared\Widgets;
 
-use Filament\Facades\Filament;
 use Filament\Widgets\StatsOverviewWidget as BaseWidget;
 use Filament\Widgets\StatsOverviewWidget\Stat;
 use He4rt\User\Models\User;
-use Illuminate\Contracts\Database\Query\Builder;
+
+use function Illuminate\Support\minutes;
 
 class UsersStatsOverview extends BaseWidget
 {
@@ -16,27 +16,20 @@ class UsersStatsOverview extends BaseWidget
 
     protected function getStats(): array
     {
-        $user = Filament::auth()->user();
-
         $query = User::query();
 
-        if (! $user->isAdmin()) {
-            $query->whereHas('tenants', fn (Builder $q) => $q->where('tenants.id', Filament::getTenant()->getKey())
-            );
-        }
-
-        $totalDonators = (clone $query)
+        $totalDonators = cache()->remember('total_users_donators', minutes(5), fn () => $query
             ->where('is_donator', true)
-            ->count();
+            ->count());
 
-        $totalUsersToday = (clone $query)
+        $totalUsersToday = cache()->remember('total_users_today', minutes(5), fn () => $query
             ->whereDate('created_at', today())
-            ->count();
+            ->count());
 
-        $totalUsersMonth = (clone $query)
+        $totalUsersMonth = cache()->remember('total_users_month', minutes(5), fn () => $query
             ->whereYear('created_at', now()->year)
             ->whereMonth('created_at', now()->month)
-            ->count();
+            ->count());
 
         return [
             Stat::make('Usuários criados hoje', $totalUsersToday)
