@@ -21,6 +21,8 @@ class UserCharacterResolver
     ): ResolvedUserCharacter {
         $providerEntity = Provider::query()
             ->where('provider', $provider)
+            ->where('tenant_id', $tenantId)
+            ->where('model_type', User::class)
             ->where('provider_id', $providerId)
             ->first();
 
@@ -39,30 +41,27 @@ class UserCharacterResolver
                 'tenant_id' => $tenantId,
             ]);
 
+            $character->refresh();
+
             $providerEntity = $user->providers()->create([
                 'tenant_id' => $tenantId,
-                'model_type' => User::class,
                 'provider' => $provider,
                 'provider_id' => $providerId,
             ]);
 
             return new ResolvedUserCharacter(
-                user: $user,
                 provider: $providerEntity,
                 character: $character,
                 isNewUser: true
             );
         }
 
-        $user = $providerEntity->model;
-
         $character = Character::query()
             ->where('tenant_id', $tenantId)
-            ->where('user_id', $user->id)
+            ->where('user_id', $providerEntity->user->id)
             ->firstOrFail();
 
         return new ResolvedUserCharacter(
-            user: $user,
             provider: $providerEntity,
             character: $character,
             isNewUser: false,

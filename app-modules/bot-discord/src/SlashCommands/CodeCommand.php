@@ -14,14 +14,14 @@ class CodeCommand extends SlashCommand
      *
      * @var string
      */
-    protected $name = 'code';
+    protected $name = 'codigo';
 
     /**
      * The command description.
      *
      * @var string
      */
-    protected $description = 'The Code Command command.';
+    protected $description = 'Comando para formatar seu código.';
 
     /**
      * Determines whether the command requires admin permissions.

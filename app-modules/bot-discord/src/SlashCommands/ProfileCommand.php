@@ -7,6 +7,7 @@ namespace He4rt\BotDiscord\SlashCommands;
 use Discord\Parts\Interactions\Command\Option;
 use Discord\Parts\Interactions\Interaction;
 use He4rt\Provider\Models\Provider;
+use Illuminate\Support\Facades\Date;
 use Throwable;
 
 class ProfileCommand extends AbstractSlashCommand
@@ -16,14 +17,14 @@ class ProfileCommand extends AbstractSlashCommand
      *
      * @var string
      */
-    protected $name = 'profile';
+    protected $name = 'perfil';
 
     /**
      * The command description.
      *
      * @var string
      */
-    protected $description = 'The Profile Command slash command.';
+    protected $description = 'Exiba seu perfil ou de outro membro.';
 
     /**
      * The command options.
@@ -33,7 +34,7 @@ class ProfileCommand extends AbstractSlashCommand
     protected $options = [
         [
             'name' => 'user',
-            'description' => 'Mention a user to check their profile.',
+            'description' => 'Mencione um usuário para verificar seu perfil.',
             'type' => Option::USER,
             'required' => false,
         ],
@@ -100,7 +101,7 @@ class ProfileCommand extends AbstractSlashCommand
                     'Linkedin' => $information->linkedin_url ?? '-',
                 ], inline: false)
                 ->footerIcon($interaction->guild->icon)
-                ->footerText('HE4RT INC')
+                ->footerText(Date::now()->format('Y').' © He4rt Developers')
                 ->timestamp(now())
                 ->reply($interaction, true);
         } catch (Throwable $throwable) {
