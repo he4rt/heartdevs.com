@@ -15,7 +15,10 @@ use He4rt\User\Filament\Admin\Resources\Users\Pages\ListUsers;
 use He4rt\User\Filament\Admin\Resources\Users\Schemas\UserForm;
 use He4rt\User\Filament\Admin\Resources\Users\Tables\UsersTable;
 use He4rt\User\Models\User;
+use Illuminate\Support\Number;
 use UnitEnum;
+
+use function Illuminate\Support\minutes;
 
 class UserResource extends Resource
 {
@@ -31,7 +34,7 @@ class UserResource extends Resource
 
     public static function getNavigationBadge(): ?string
     {
-        return (string) self::$model::count();
+        return Number::abbreviate((int) (cache()->remember('total_users', minutes(5), fn () => self::$model::count()) ?? 0));
     }
 
     public static function form(Schema $schema): Schema

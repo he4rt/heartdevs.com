@@ -33,7 +33,9 @@ class TenantForm
                             ->partiallyRenderComponentsAfterStateUpdated(['name'])
                             ->required(),
                         Select::make('owner_id')
-                            ->relationship('owner', 'name')
+                            ->native(false)
+                            ->searchable()
+                            ->relationship(name: 'owner', titleAttribute: 'name', modifyQueryUsing: fn ($query) => $query->limit(10))
                             ->required(),
                         Toggle::make('active')
                             ->required(),

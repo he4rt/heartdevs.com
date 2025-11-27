@@ -37,30 +37,30 @@ final class GuestPanelProvider extends PanelProvider
             ->defaultThemeMode(ThemeMode::Dark)
             ->topNavigation()
             ->brandLogo(fn (): View => view('he4rt::components.logo'))
-            ->renderHook(PanelsRenderHook::FOOTER, fn (): View => view('he4rt::components.partials.footer', [
-                'description' => 'Conheça MeuGuia.app! Lorem ipsum dolor sit amet,
-                    consectetur adipiscing elit. Vivamus sed egestas nisl. Vivamus blandit vehicula eleifend.
-                    Phasellus vulputate elit leo, porta vehicula nunc placerat placerat.',
-                'columns' => [
-                    'Sobre nós' => [
-                        'Home' => '/',
-                        'Quem somos' => '/about',
-                    ],
-                    'Suporte' => [
-                        'Termos e Privacidade' => '/terms',
-                        'Junte-se à nós' => '/jobs',
-                    ],
-                    'Social Media' => [
-                        'Discord' => 'https://discord.gg/he4rt',
-                        'Github' => 'https://github.com/he4rt',
-                        'X' => 'https://x.com/he4rtdevs',
-                    ],
-                ],
-            ]))
+//            ->renderHook(PanelsRenderHook::FOOTER, fn (): View => view('he4rt::components.partials.footer', [
+//                'description' => 'Conheça MeuGuia.app! Lorem ipsum dolor sit amet,
+//                    consectetur adipiscing elit. Vivamus sed egestas nisl. Vivamus blandit vehicula eleifend.
+//                    Phasellus vulputate elit leo, porta vehicula nunc placerat placerat.',
+//                'columns' => [
+//                    'Sobre nós' => [
+//                        'Home' => '/',
+//                        'Quem somos' => '/about',
+//                    ],
+//                    'Suporte' => [
+//                        'Termos e Privacidade' => '/terms',
+//                        'Junte-se à nós' => '/jobs',
+//                    ],
+//                    'Social Media' => [
+//                        'Discord' => 'https://discord.gg/he4rt',
+//                        'Github' => 'https://github.com/he4rt',
+//                        'X' => 'https://x.com/he4rtdevs',
+//                    ],
+//                ],
+//            ]))
             ->renderHook(PanelsRenderHook::SIDEBAR_NAV_END, fn () => Blade::render(<<<'BLADE'
                @guest
                     <div class="flex flex-col md:hidden mt-auto items-center space-y-4">
-                        <x-he4rt::button icon="heroicon-s-arrow-top-right-on-square" variant="outline">
+                        <x-he4rt::button href="https://github.com/he4rt" icon="heroicon-s-arrow-top-right-on-square" variant="outline">
                             Github
                         </x-he4rt::button>
                     </div>
@@ -70,7 +70,7 @@ final class GuestPanelProvider extends PanelProvider
             ->renderHook(PanelsRenderHook::TOPBAR_END, fn () => Blade::render(<<<'BLADE'
                @guest
                     <div class="hidden md:flex items-center space-x-4">
-                        <x-he4rt::button icon="heroicon-s-arrow-top-right-on-square" variant="outline">
+                        <x-he4rt::button href="https://github.com/he4rt" icon="heroicon-s-arrow-top-right-on-square" variant="outline">
                             Github
                         </x-he4rt::button>
                     </div>
