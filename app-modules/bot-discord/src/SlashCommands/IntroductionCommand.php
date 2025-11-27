@@ -12,6 +12,7 @@ use He4rt\Provider\Models\Provider;
 use He4rt\Tenant\Models\Tenant;
 use He4rt\User\Actions\UpdateProfile;
 use He4rt\User\DTO\UpdateProfileDTO;
+use Illuminate\Support\Facades\Date;
 use Laracord\Commands\SlashCommand;
 use Throwable;
 
@@ -22,14 +23,14 @@ class IntroductionCommand extends SlashCommand
      *
      * @var string
      */
-    protected $name = 'introduction';
+    protected $name = 'apresentar';
 
     /**
      * The command description.
      *
      * @var string
      */
-    protected $description = 'The Introduction Command slash command.';
+    protected $description = 'Apresente-se no servidor!';
 
     /**
      * The command options.
@@ -72,7 +73,6 @@ class IntroductionCommand extends SlashCommand
                     ->setMinLength(2)
                     ->setMaxLength(32)
                     ->setPlaceholder('Pride')
-                    ->setValue('Pride')
                     ->setRequired(true),
 
                 TextInput::new('Nickname', TextInput::STYLE_SHORT)
@@ -80,7 +80,6 @@ class IntroductionCommand extends SlashCommand
                     ->setMinLength(2)
                     ->setMaxLength(32)
                     ->setPlaceholder('Pride')
-                    ->setValue('Pride')
                     ->setRequired(true),
 
                 TextInput::new('Git/Github (Opcional)', TextInput::STYLE_SHORT)
@@ -88,15 +87,13 @@ class IntroductionCommand extends SlashCommand
                     ->setMinLength(0)
                     ->setMaxLength(60)
                     ->setPlaceholder('https://github.com/YOUR_USERNAME')
-                    ->setValue('https://github.com/YOUR_USERNAME')
                     ->setRequired(false),
 
-                TextInput::new('Linkedisney (Opcional)', TextInput::STYLE_SHORT)
+                TextInput::new('LinkedIn (Opcional)', TextInput::STYLE_SHORT)
                     ->setCustomId('linkedin_url')
                     ->setMinLength(0)
                     ->setMaxLength(60)
                     ->setPlaceholder('https://linkedin.com/in/YOUR_USERNAME')
-                    ->setValue('https://linkedin.com/in/YOUR_USERNAME')
                     ->setRequired(false),
 
                 TextInput::new('Nos conte um pouco sobre você', TextInput::STYLE_PARAGRAPH)
@@ -104,18 +101,19 @@ class IntroductionCommand extends SlashCommand
                     ->setMinLength(5)
                     ->setMaxLength(1000)
                     ->setPlaceholder('Entrei de curioso e acabei gostando do servidor!')
-                    ->setValue(fake()->paragraph(10))
                     ->setRequired(true),
 
             ])
-            ->submit(fn (Interaction $interaction, Collection $components) => $this->persistData($interaction,
-                $components))
+            ->submit(fn (Interaction $interaction, Collection $components) => $this->persistData(
+                $interaction,
+                $components
+            ))
             ->show($interaction);
     }
 
     private function persistData(Interaction $interaction, Collection $components): void
     {
-        $role = $interaction->guild->roles->find(fn (Role $role) => $role->name === 'He4rt');
+        $role = $interaction->guild->roles->find(fn (Role $role) => $role->name === '💜 He4rt');
 
         if (! $role) {
             $interaction->respondWithMessage('Erro ao encontrar o role He4rt', true);
@@ -157,19 +155,19 @@ class IntroductionCommand extends SlashCommand
                 ->color('800080')
                 ->title('Apresentação '.$payload->nickname)
                 ->thumbnailUrl($interaction->user->avatar)
-                ->fields([ // max 3 fields per row
+                ->fields([
                     'Nome/Nickname' => $payload->nickname,
                     'Sobre' => $payload->about,
                 ])
                 ->fields(
-                    [ // max 3 fields per row
+                    [
                         'Git/Github' => $payload->githubUrl ?? '-',
                         'Linkedin' => $payload->linkedinUrl ?? '-',
                     ],
                     inline: false
                 )
                 ->footerIcon($interaction->guild->icon)
-                ->footerText('HE4RT INC')
+                ->footerText(Date::now()->format('Y').' © He4rt Developers')
                 ->timestamp(now())
                 ->reply($interaction, true);
 
