@@ -46,6 +46,7 @@
         "predis/predis": "^2.4.1",
         "ryangjchandler/commonmark-blade-block": "^1.1",
         "spatie/laravel-medialibrary": "^11.17.5",
+        "stechstudio/filament-impersonate": "^4.0",
         "symfony/browser-kit": "v7.0.8",
         "torchlight/torchlight-commonmark": "^0.6.0",
         "torchlight/torchlight-laravel": "^0.6.1"
