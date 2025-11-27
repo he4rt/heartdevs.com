@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace He4rt\BotDiscord\SlashCommands;
 
+use Discord\Parts\Interactions\Command\Option;
 use Discord\Parts\Interactions\Interaction;
 use He4rt\Provider\Models\Provider;
 use Throwable;
@@ -29,7 +30,14 @@ class ProfileCommand extends AbstractSlashCommand
      *
      * @var array
      */
-    protected $options = [];
+    protected $options = [
+        [
+            'name' => 'user',
+            'description' => 'Mention a user to check their profile.',
+            'type' => Option::USER,
+            'required' => false,
+        ],
+    ];
 
     /**
      * The permissions required to use the command.
@@ -57,12 +65,19 @@ class ProfileCommand extends AbstractSlashCommand
      */
     public function handle(Interaction $interaction): void
     {
+        $mentionedUser = $interaction->user;
+
+        if ($userId = $this->value('user')) {
+            $this->memberProvider = $this->getMemberProviderQuery()->where('provider_id', $userId)->first();
+            $mentionedUser = $interaction->data->resolved->users->get('id', $userId);
+        }
+
         try {
 
             if (! $this->memberProvider instanceof Provider || ! $this->memberProvider->user->information) {
                 $this
                     ->message()
-                    ->content('Você ainda não se apresentou! Use o comando `/introduction` primeiro.')
+                    ->content($mentionedUser.' ainda não se apresentou! Use o comando `/introduction` primeiro.')
                     ->reply($interaction, true);
 
                 return;
@@ -75,7 +90,7 @@ class ProfileCommand extends AbstractSlashCommand
                 ->content('https://heartdevs.com/')
                 ->color('800080')
                 ->title('Perfil de '.($information->nickname ?? '-'))
-                ->thumbnailUrl($interaction->user->avatar)
+                ->thumbnailUrl($mentionedUser->avatar)
                 ->fields([
                     'Nome/Nickname' => $information->nickname ?? '-',
                     'Sobre' => $information->about ?? '-',
