@@ -6,18 +6,18 @@ namespace He4rt\Events\Database\Factories;
 
 use He4rt\Events\Enums\Talks\TalkStatusEnum;
 use He4rt\Events\Models\EventModel;
-use He4rt\Events\Models\Talk;
+use He4rt\Events\Models\EventSubmission;
 use He4rt\Tenant\Models\Tenant;
 use He4rt\User\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Facades\Date;
 
 /**
- * @extends Factory<Talk>
+ * @extends Factory<EventSubmission>
  */
-final class TalkFactory extends Factory
+final class EventSubmissionFactory extends Factory
 {
-    protected $model = Talk::class;
+    protected $model = EventSubmission::class;
 
     public function definition(): array
     {
@@ -29,8 +29,6 @@ final class TalkFactory extends Factory
             'field_type' => fake()->word(),
             'title' => fake()->word(),
             'description' => fake()->text(),
-            'starts_at' => Date::now(),
-            'ends_at' => Date::now(),
             'created_at' => Date::now(),
             'updated_at' => Date::now(),
         ];

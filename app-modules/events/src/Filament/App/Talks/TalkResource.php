@@ -13,11 +13,11 @@ use He4rt\Events\Filament\App\Talks\Pages\CreateTalk;
 use He4rt\Events\Filament\App\Talks\Pages\ListTalks;
 use He4rt\Events\Filament\App\Talks\Schemas\TalkForm;
 use He4rt\Events\Filament\App\Talks\Tables\TalksTable;
-use He4rt\Events\Models\Talk;
+use He4rt\Events\Models\EventSubmission;
 
 class TalkResource extends Resource
 {
-    protected static ?string $model = Talk::class;
+    protected static ?string $model = EventSubmission::class;
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::Microphone;
 

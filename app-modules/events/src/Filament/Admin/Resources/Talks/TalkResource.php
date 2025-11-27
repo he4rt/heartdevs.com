@@ -14,12 +14,12 @@ use He4rt\Events\Filament\Admin\Resources\Talks\Pages\EditTalk;
 use He4rt\Events\Filament\Admin\Resources\Talks\Pages\ListTalks;
 use He4rt\Events\Filament\Admin\Resources\Talks\Schemas\TalkForm;
 use He4rt\Events\Filament\Admin\Resources\Talks\Tables\TalksTable;
-use He4rt\Events\Models\Talk;
+use He4rt\Events\Models\EventSubmission;
 use UnitEnum;
 
 class TalkResource extends Resource
 {
-    protected static ?string $model = Talk::class;
+    protected static ?string $model = EventSubmission::class;
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::Microphone;
 

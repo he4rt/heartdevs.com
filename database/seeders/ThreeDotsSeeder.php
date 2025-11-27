@@ -7,7 +7,8 @@ namespace Database\Seeders;
 use He4rt\Events\Enums\EventTypeEnum;
 use He4rt\Events\Enums\Talks\TalkStatusEnum;
 use He4rt\Events\Models\EventModel;
-use He4rt\Events\Models\Talk;
+use He4rt\Events\Models\EventSegment;
+use He4rt\Events\Models\EventSubmission;
 use He4rt\Tenant\Models\Tenant;
 use He4rt\User\Models\User;
 use Illuminate\Database\Seeder;
@@ -47,7 +48,7 @@ class ThreeDotsSeeder extends Seeder
                 'end_at' => Date::createFromFormat('m-d-Y h:i:s A', '11-29-2025 07:00:00 PM'),
                 'location' => 'Alameda Santos, 1163 — Jardim Paulista, São Paulo — SP, 01419-002',
                 'max_attendees' => 50,
-                'attendees_count' => 30,
+                'attendees_count' => 0,
                 'tenant_id' => $tenant->getKey(),
             ]);
 
@@ -56,49 +57,132 @@ class ThreeDotsSeeder extends Seeder
 
     private function talks(Tenant $tenant, EventModel $event): void
     {
-        $talks = [
-            ['time' => '15:00', 'speaker' => $event->slug, 'title' => 'Abertura e Início da Live (Twitch)', 'field_type' => 'twitch', 'description' => 'twitch'],
-            ['time' => '15:05', 'speaker' => 'Filipe Augusto', 'title' => '3 Pontos com Filipe', 'field_type' => 'CEO 3 Pontos', 'description' => 'A 3 Pontos é uma aceleradora financeira que conecta pessoas e empresas a diagnósticos estratégicos, soluções de investimento e tecnologia de gestão.'],
-            ['time' => '15:05', 'speaker' => 'Joy', 'title' => '3 Pontos com Joy', 'field_type' => 'CMO 3 Pontos', 'description' => 'A 3 Pontos é uma aceleradora financeira que conecta pessoas e empresas a diagnósticos estratégicos, soluções de investimento e tecnologia de gestão.'],
-            ['time' => '15:10', 'speaker' => 'Fernanda Fagundes', 'title' => 'Talk Fernanda Fagundes -  (Ipê)', 'field_type' => 'Ipê', 'description' => 'Talk da Fefa'],
-            ['time' => '15:10', 'speaker' => $event->slug, 'title' => 'Ações social I (Cestas Básicas)', 'field_type' => '3pontos', 'description' => 'Ação Social I'],
-            ['time' => '15:30', 'speaker' => 'Juliana Gaioso', 'title' => 'Talk Juliana Gaioso (DevSec PicPay) - Tema', 'field_type' => 'Devsec', 'description' => 'Por mais de quinze anos, solucionando problemas na indústria através de automação, IoT e desenvolvimento de software. Atualmente focada em solucionar problemas de software de segurança.'],
-            ['time' => '15:50', 'speaker' => 'Oka', 'title' => 'Fire/ce com Oka', 'field_type' => 'Fire/ce', 'description' => 'Talk da Fire/ce'],
-            ['time' => '15:50', 'speaker' => 'Stefano Piucci', 'title' => 'Fire/ce com Stefano', 'field_type' => 'Diretor de Key Acc (Fire/ce)', 'description' => 'Talk da Fire/ce'],
-            ['time' => '16:10', 'speaker' => $event->slug, 'title' => 'Aquecimento da Nova Marca', 'field_type' => '3pontos', 'description' => 'Contexto da comunidade'],
-            ['time' => '16:50', 'speaker' => 'Dulce', 'title' => 'Hunting de Oportunidades para Comunidade', 'field_type' => 'Bethel', 'description' => 'Hunting de Oportunidades para Comunidade'],
-            ['time' => '17:10', 'speaker' => $event->slug, 'title' => 'Sorteio', 'field_type' => 'sorteio', 'description' => 'Sorteio 1.'],
-            ['time' => '17:20', 'speaker' => 'Daniel Reis', 'title' => 'Talk Daniel Reis - Tema', 'field_type' => 'Tech Lead & Fundador da He4rt Developers', 'description' => 'Linha de frente na criação de softwares e fortalecendo comunidades dev. DevRel focado em conteúdo técnico, live coding e educação, sempre impulsionando novos talentos. Fundador da He4rt Developers e apaixonado por ensinar, programar e construir espaços onde desenvolvedores crescem juntos.'],
-            ['time' => '17:40', 'speaker' => $event->slug, 'title' => 'Roda de Conversa - IA como ferramenta do dia a dia', 'field_type' => 'IA', 'description' => 'IA como ferramenta do dia a dia'],
-            ['time' => '17:40', 'speaker' => 'Eduardo Vogel', 'title' => 'Roda de Conversa - Eduardo Vogel', 'field_type' => 'Business Development & Strategic Partnerships/ IT Project Manager', 'description' => 'IA como ferramenta do dia a dia'],
-            ['time' => '17:50', 'speaker' => 'Juliano Kimura', 'title' => 'Roda de Conversa - Juliano Kimura ', 'field_type' => 'Palestrante, Creative Thinker, Transformador Digital', 'description' => 'Foi palestrante e especialista no Facebook Brasil. Eleito duas vezes Melhor profissional de redes sociais pela ABcomm Professor há 5 anos na Comschool. '],
-            ['time' => '18:00', 'speaker' => 'Tatiana Barros', 'title' => 'Roda de Conversa - Tatiana Barros', 'field_type' => 'Technology Evangelist', 'description' => 'Há mais de uma década unindo tecnologia, criatividade e impacto social. Evangelista de Tecnologia focada em fortalecer comunidades dev e ampliar o acesso à educação tecnológica por meio de workshops, mentorias e iniciativas premiadas.'],
-            ['time' => '18:10', 'speaker' => $event->slug, 'title' => 'Intervalo', 'field_type' => '3 pontos', 'description' => 'Intervalo Técnico'],
-            ['time' => '18:30', 'speaker' => $event->slug, 'title' => 'Lançamento da comunidade 3 Pontos', 'field_type' => '3 pontos', 'description' => 'Lançamento 3 pontos'],
-            ['time' => '19:00', 'speaker' => $event->slug, 'title' => 'Encerramento e Agradecimentos', 'field_type' => '3pontos', 'description' => 'Agradecimentos'],
+        $agenda = [
+            [
+                'title' => 'Abertura e Início da Live',
+                'description' => 'twitch',
+                'start' => '2025-11-26 15:00:00',
+                'end' => '2025-11-26 15:00:00',
+                'speakers' => [],
+                'type' => 'segment', // SchedulableTypeEnum::Segment
+            ],
+            [
+                'title' => 'Lançamento da comunidade 3 Pontos',
+                'description' => 'Lançamento 3 pontos',
+                'start' => '2025-11-26 18:10:00',
+                'end' => '2025-11-26 20:00:00',
+                'speakers' => [],
+                'type' => 'segment',
+            ],
+            [
+                'title' => 'Killing the Vibecoding',
+                'description' => 'Por mais de quinze anos, solucionando problemas na indústria através de automação, IoT e desenvolvimento de software. Atualmente focada em solucionar problemas de software de segurança.',
+                'start' => '2025-11-26 15:30:00',
+                'end' => '2025-11-26 15:30:00',
+                'speakers' => ['Juliana Gaioso'],
+                'type' => 'submission', // SchedulableTypeEnum::Submission
+                'field_type' => 'twitch',
+            ],
+            [
+                'title' => 'Encerramento e Agradecimentos',
+                'description' => 'Agradecimentos',
+                'start' => '2025-11-26 20:00:00',
+                'end' => '2025-11-26 20:10:00',
+                'speakers' => [],
+                'type' => 'segment',
+            ],
+            [
+                'title' => 'Fire|ce com Stefano',
+                'description' => 'Talk da Fire/ce',
+                'start' => '2025-11-26 15:50:00',
+                'end' => '2025-11-26 15:50:00',
+                'speakers' => ['Stefano'],
+                'type' => 'submission',
+                'field_type' => 'Diretor de Key Acc (Fire|ce)',
+            ],
+            [
+                'title' => 'Coffee Break',
+                'description' => 'Contexto da comunidade',
+                'start' => '2025-11-26 16:20:00',
+                'end' => '2025-11-26 17:00:00',
+                'speakers' => [],
+                'type' => 'segment',
+            ],
+            [
+                'title' => 'Hunting de Oportunidades para Comunidade',
+                'description' => 'Hunting de Oportunidades para Comunidade',
+                'start' => '2025-11-26 17:00:00',
+                'end' => '2025-11-26 17:20:00',
+                'speakers' => ['Dulce'],
+                'type' => 'submission',
+                'field_type' => 'Bethel',
+            ],
+            [
+                'title' => 'Comunidade é FODA!',
+                'description' => 'Linha de frente na criação de softwares e fortalecendo comunidades dev. DevRel focado em conteúdo técnico, live coding e educação, sempre impulsionando novos talentos. Fundador da He4rt Developers e apaixonado por ensinar, programar e construir espaços onde desenvolvedores crescem juntos.',
+                'start' => '2025-11-26 17:20:00',
+                'end' => '2025-11-26 17:40:00',
+                'speakers' => ['Daniel Reis'],
+                'type' => 'submission',
+                'field_type' => 'Fundador da He4rt Developers',
+            ],
+            [
+                'title' => 'IA como ferramenta do dia a dia',
+                'description' => 'IA como ferramenta do dia a dia',
+                'start' => '2025-11-26 17:40:00',
+                'end' => '2025-11-26 18:10:00',
+                'speakers' => ['Tatiana Barros', 'Eduardo Vogel', 'Kimura'],
+                'type' => 'submission',
+                'field_type' => 'Painel de Discussão',
+            ],
         ];
 
-        foreach ($talks as $item) {
+        foreach ($agenda as $item) {
 
-            $speaker = User::query()->firstOrCreate([
-                'name' => $item['speaker'],
-            ]);
+            if ($item['speakers'] !== []) {
+                $speakers = [];
+                foreach ($item['speakers'] as $speaker) {
+                    $speakers[] = User::query()->firstOrCreate([
+                        'name' => $speaker,
+                    ], [
+                        'username' => str($speaker)->slug()->prepend('speaker-'),
+                    ]);
+                }
 
-            $speaker->addMediaFromUrl('https://github.com/danielhe4rt.png')
-                ->toMediaCollection('avatar');
+                $speakers[0]->addMediaFromUrl('https://github.com/danielhe4rt.png')
+                    ->toMediaCollection('avatar');
 
-            Talk::factory()
-                ->recycle($tenant)
-                ->recycle($event)
-                ->for($speaker, 'user')
-                ->create([
-                    'status' => TalkStatusEnum::Accepted,
-                    'field_type' => $item['field_type'],
-                    'title' => $item['title'],
-                    'description' => $item['description'],
-                    'starts_at' => Date::parse($item['time']),
-                    'ends_at' => Date::parse($item['time']),
+                $eventSubmission = EventSubmission::factory()
+                    ->recycle($tenant)
+                    ->recycle($event)
+                    ->afterCreating(
+                        fn (EventSubmission $submission) => $submission->speakers()->attach($speakers)
+                    )
+                    ->for($speakers[0], 'user')
+                    ->create([
+                        'tenant_id' => $tenant->getKey(),
+                        'status' => TalkStatusEnum::Accepted,
+                        'field_type' => $item['field_type'],
+                        'title' => $item['title'],
+                        'description' => $item['description'],
+                    ]);
+
+                $event->agenda()->create([
+                    'tenant_id' => $tenant->getKey(),
+                    'schedulable_type' => EventSubmission::class,
+                    'schedulable_id' => $eventSubmission->getKey(),
+                    'starting_at' => Date::parse($item['start']),
+                    'ending_at' => Date::parse($item['end']),
                 ]);
+            } else {
+                $event->agenda()->create([
+                    'tenant_id' => $tenant->getKey(),
+                    'schedulable_type' => EventSegment::class,
+                    'schedulable_id' => EventSegment::query()->inRandomOrder()->first()->getKey(),
+                    'starting_at' => Date::parse($item['start']),
+                    'ending_at' => Date::parse($item['end']),
+                ]);
+            }
         }
     }
 }

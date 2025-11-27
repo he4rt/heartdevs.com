@@ -7,7 +7,7 @@ use Filament\Facades\Filament;
 use He4rt\Events\Enums\Talks\TalkStatusEnum;
 use He4rt\Events\Filament\Admin\Resources\Talks\Pages\CreateTalk;
 use He4rt\Events\Models\EventModel;
-use He4rt\Events\Models\Talk;
+use He4rt\Events\Models\EventSubmission;
 use He4rt\User\Models\User;
 
 use function Pest\Laravel\assertDatabaseCount;
@@ -42,8 +42,8 @@ it('should be able to register a talk', function (): void {
         ->call('create')
         ->assertHasNoFormErrors();
 
-    assertDatabaseCount(Talk::class, 1);
-    assertDatabaseHas(Talk::class, [
+    assertDatabaseCount(EventSubmission::class, 1);
+    assertDatabaseHas(EventSubmission::class, [
         'tenant_id' => 1,
         'user_id' => $user->getKey(),
         'event_id' => $event->getKey(),

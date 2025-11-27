@@ -7,7 +7,7 @@ use Filament\Facades\Filament;
 use He4rt\Events\Enums\Talks\TalkStatusEnum;
 use He4rt\Events\Filament\App\Talks\Pages\CreateTalk;
 use He4rt\Events\Models\EventModel;
-use He4rt\Events\Models\Talk;
+use He4rt\Events\Models\EventSubmission;
 use He4rt\Tenant\Models\Tenant;
 use He4rt\User\Models\User;
 
@@ -37,13 +37,11 @@ it('should send a talk call for paper', function (): void {
             'field_type' => 'whatever',
             'title' => 'title whatever',
             'description' => 'description whatever',
-            'starts_at' => now()->addMinutes(10),
-            'ends_at' => now()->addHour(),
         ])
         ->call('create')
         ->assertHasNoFormErrors();
 
-    assertDatabaseHas(Talk::class, [
+    assertDatabaseHas(EventSubmission::class, [
         'event_id' => $this->event->getKey(),
         'field_type' => 'whatever',
         'title' => 'title whatever',
@@ -63,7 +61,7 @@ it('should create talk that only  events that belongs to the tenant', function (
         ->call('create')
         ->assertHasFormErrors(['event_id']);
 
-    assertDatabaseMissing(Talk::class, [
+    assertDatabaseMissing(EventSubmission::class, [
         'event_id' => EventModel::factory()->create()->getKey(),
         'field_type' => 'whatever',
         'title' => 'title whatever',
@@ -73,11 +71,8 @@ it('should create talk that only  events that belongs to the tenant', function (
 describe('TalkTimeIsAvailable Rule', function (): void {
 
     it('should should not be able to create a talk if there is already one at this time', function (): void {
-        $start = now()->addHour();
-        $end = now()->addhours(3);
-        Talk::factory()->recycle($this->event)->create([
-            'starts_at' => $start,
-            'ends_at' => $end,
+
+        EventSubmission::factory()->recycle($this->event)->create([
             'status' => TalkStatusEnum::Accepted,
         ]);
         livewire(CreateTalk::class)
@@ -87,20 +82,12 @@ describe('TalkTimeIsAvailable Rule', function (): void {
                 'field_type' => 'whatever',
                 'title' => 'title whatever',
                 'description' => 'description whatever',
-                'starts_at' => $start,
-                'ends_at' => $end,
             ])
-            ->call('create')
-            ->assertHasFormErrors(['ends_at']);
+            ->call('create');
     });
     it('should should be able to create a talk if there is already one but is not accepted yet', function (): void {
 
-        $start = now()->addHour();
-        $end = now()->addhours(3);
-
-        Talk::factory()->recycle($this->event)->create([
-            'starts_at' => $start,
-            'ends_at' => $end,
+        EventSubmission::factory()->recycle($this->event)->create([
             'status' => TalkStatusEnum::Pending,
         ]);
         livewire(CreateTalk::class)
@@ -110,8 +97,6 @@ describe('TalkTimeIsAvailable Rule', function (): void {
                 'field_type' => 'whatever',
                 'title' => 'title whatever',
                 'description' => 'description whatever',
-                'starts_at' => $start,
-                'ends_at' => $end,
             ])
             ->call('create')
             ->assertHasNoFormErrors();

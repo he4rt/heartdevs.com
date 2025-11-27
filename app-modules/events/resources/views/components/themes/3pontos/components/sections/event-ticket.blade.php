@@ -1,3 +1,7 @@
+@props([
+    'event'/**@var\He4rt\Events\Models\Pivot\EventAttend$participant*/,
+    'participant'/**@var\He4rt\Events\Models\EventModel$event*/,
+])
 <section class="hp-section relative items-start" id="hero">
     <div class="absolute inset-0 -left-[20%] z-0 h-full w-[150%]">
         <img src="{{ asset('images/3pontos/logo-chain.png') }}" alt="" class="h-full w-full object-cover" />
@@ -29,24 +33,40 @@
                     },
                 }"
             >
-                <x-he4rt::headline>
-                    <x-slot:badge>
-                        <x-he4rt::section-title>Área do Participante</x-he4rt::section-title>
-                    </x-slot>
-                    <x-slot:title>Parabéns! Sua vaga está garantida!</x-slot>
-                    <x-slot:description>Acesse o link abaixo para conferir o seu ticket.</x-slot>
-                    <x-slot:actions>
-                        <div x-show="!copied">
-                            <x-he4rt::button icon="far-copy" @click="copyToClipboard()">
-                                Compartilhe na redes
-                            </x-he4rt::button>
-                        </div>
-
-                        <div x-show="copied" x-cloak>
-                            <x-he4rt::button icon="fas-check">Compartilhe na redes</x-he4rt::button>
-                        </div>
-                    </x-slot>
-                </x-he4rt::headline>
+                @if ($participant)
+                    <x-he4rt::headline>
+                        <x-slot:badge>
+                            <x-he4rt::section-title>Área do Participante</x-he4rt::section-title>
+                        </x-slot>
+                        <x-slot:title>Parabéns! Sua vaga está garantida!</x-slot>
+                        <x-slot:description>
+                            Aproveite o evento e não se esqueça de compartilhar nas redes sociais!
+                        </x-slot>
+                        <x-slot:actions>
+                            <div x-show="!copied">
+                                <x-he4rt::button icon="far-copy" @click="copyToClipboard()">
+                                    Compartilhe na redes
+                                </x-he4rt::button>
+                            </div>
+                            <div x-show="copied" x-cloak>
+                                <x-he4rt::button icon="fas-check">Compartilhe na redes</x-he4rt::button>
+                            </div>
+                        </x-slot>
+                    </x-he4rt::headline>
+                @else
+                    <x-he4rt::headline>
+                        <x-slot:badge>
+                            <x-he4rt::section-title>Área do Participante</x-he4rt::section-title>
+                        </x-slot>
+                        <x-slot:title>Garanta seu ingresso!</x-slot>
+                        <x-slot:description>
+                            Clique no botão abaixo para confirmar sua inscrição no evento.
+                        </x-slot>
+                        <x-slot:actions>
+                            <x-he4rt::button wire:click="eventAttend">Inscrever</x-he4rt::button>
+                        </x-slot>
+                    </x-he4rt::headline>
+                @endif
             </div>
 
             <div
@@ -56,15 +76,16 @@
             >
                 <x-he4rt::animate-block type="blur">
                     <x-he4rt::ticket
-                        user-img="auth()->user()->"
-                        username="danielhe4rt"
-                        github-username="NexTurHe4rt"
-                        ticketNumber="42"
-                        githubLink="https://github.com/john-doe"
-                        githubText="nexturhe4rt"
-                        twitchLink="https://twitch.tv/john"
+                        :user-img="auth()->user()->getFilamentAvatarUrl()"
+                        :username="auth()->user()->shortName"
+                        :name="auth()->user()->shortName"
+                        :github-username="auth()->user()->name"
+                        :ticketNumber="$participant?->pivot->attend_order ?? '???????'"
+                        githubLink="https://github.com/{{auth()->user()->username}}"
+                        :githubText="auth()->user()->username"
+                        twitchLink="https://twitch.tv/danielhe4rt"
                         twitchText="danielhe4rt"
-                        eventDate="10/12, 20 horas"
+                        :eventDate="sprintf('%s às %s', $event->day, $event->start)"
                         eventSubtitle="Ao vivo no Twitch"
                     />
                 </x-he4rt::animate-block>

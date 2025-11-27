@@ -1,6 +1,7 @@
 @props([
     'userImg' => '',
     'username',
+    'name',
     'githubUsername',
     'ticketNumber',
     'githubLink' => '#',
@@ -27,7 +28,7 @@
                     </div>
 
                     <div class="ticket-profile-text">
-                        <x-he4rt::heading size="sm">{{ $githubUsername }}</x-he4rt::heading>
+                        <x-he4rt::heading size="sm">{{ $name }}</x-he4rt::heading>
 
                         <div class="ticket-profile-username">
                             <x-he4rt::button

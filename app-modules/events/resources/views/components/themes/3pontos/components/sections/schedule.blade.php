@@ -16,9 +16,15 @@
         </div>
 
         <div class="mt-24 flex w-full max-w-5xl flex-col gap-4">
-            @forelse ($event->talks as $talk)
-                <x-he4rt::animate-block observe type="fade-right">
-                    <x-he4rt::schedule-card starts-at="{{$talk->start}}" title="{{$talk->title}}" />
+            @forelse ($event->agenda as $talk)
+                <x-he4rt::animate-block :observe="true" type="fade-right">
+                    <x-he4rt::schedule-card
+                        :speakers="$talk->schedulable?->speakers ?? []"
+                        :icon="$talk->scheduleType->getIcon()"
+                        :starts-at="$talk->starting_at"
+                        :ends-at="$talk->ending_at"
+                        :title="$talk->schedulable->title"
+                    />
                 </x-he4rt::animate-block>
             @empty
                 <p>There is no talk yet.</p>

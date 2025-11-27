@@ -27,12 +27,6 @@ class TalksTable
                 TextColumn::make('status')
                     ->badge()
                     ->searchable(),
-                TextColumn::make('starts_at')
-                    ->dateTime()
-                    ->sortable(),
-                TextColumn::make('ends_at')
-                    ->dateTime()
-                    ->sortable(),
             ])
             ->recordActions([
                 EditAction::make(),

@@ -9,7 +9,7 @@ use He4rt\Events\Enums\Talks\TalkStatusEnum;
 use He4rt\Events\Filament\Admin\Resources\Events\Pages\EditEvent;
 use He4rt\Events\Filament\Admin\Resources\Events\RelationManagers\TalksRelationManager;
 use He4rt\Events\Models\EventModel;
-use He4rt\Events\Models\Talk;
+use He4rt\Events\Models\EventSubmission;
 use He4rt\Tenant\Models\Tenant;
 use He4rt\User\Models\User;
 
@@ -32,7 +32,7 @@ it('should render', function (): void {
 });
 
 it('should list event talks', function (): void {
-    $talks = Talk::factory()
+    $talks = EventSubmission::factory()
         ->recycle($this->event)
         ->recycle($this->tenant)
         ->count(5)
@@ -104,8 +104,8 @@ it('should associate talk with event automatically', function (): void {
         ->fillForm([
             'user_id' => $speaker->getKey(),
             'tenant_id' => $this->tenant->getKey(),
-            'title' => 'My Talk',
-            'description' => '<p>Talk description</p>',
+            'title' => 'My EventSubmission',
+            'description' => '<p>EventSubmission description</p>',
             'status' => TalkStatusEnum::Pending->value,
             'field_type' => 'talk',
             'starts_at' => $this->event->start_at,
@@ -113,7 +113,7 @@ it('should associate talk with event automatically', function (): void {
         ])
         ->callMountedAction();
 
-    $talk = Talk::query()->first();
+    $talk = EventSubmission::query()->first();
 
     expect($talk->event_id)->toBe($this->event->getKey());
 });
@@ -135,12 +135,12 @@ it('should validate required fields when creating talk', function (): void {
 });
 
 it('should list talks with different statuses', function (): void {
-    $pendingTalk = Talk::factory()
+    $pendingTalk = EventSubmission::factory()
         ->recycle($this->event)
         ->recycle($this->tenant)
         ->create(['status' => TalkStatusEnum::Pending]);
 
-    $acceptedTalk = Talk::factory()
+    $acceptedTalk = EventSubmission::factory()
         ->recycle($this->event)
         ->recycle($this->tenant)
         ->create(['status' => TalkStatusEnum::Accepted]);
@@ -155,14 +155,14 @@ it('should list talks with different statuses', function (): void {
 });
 
 it('should only show talks belonging to the event', function (): void {
-    $eventTalks = Talk::factory()
+    $eventTalks = EventSubmission::factory()
         ->recycle($this->event)
         ->recycle($this->tenant)
         ->count(3)
         ->create();
 
     $otherEvent = EventModel::factory()->recycle($this->tenant)->create();
-    $otherTalks = Talk::factory()
+    $otherTalks = EventSubmission::factory()
         ->recycle($otherEvent)
         ->recycle($this->tenant)
         ->count(2)

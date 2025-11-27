@@ -9,6 +9,7 @@
     "license": "MIT",
     "require": {
         "php": "^8.3",
+        "calebporzio/sushi": "^2.5.3",
         "dedoc/scramble": "^0.13.5",
         "filament/filament": "^4.2.3",
         "filament/spatie-laravel-media-library-plugin": "^4.2.3",

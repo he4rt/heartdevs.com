@@ -6,7 +6,6 @@ namespace Database\Seeders;
 
 use He4rt\Character\Models\Character;
 use He4rt\Events\Models\EventModel;
-use He4rt\Events\Models\Talk;
 use He4rt\Meeting\Models\Meeting;
 use He4rt\Message\Models\Message;
 use He4rt\Provider\Models\Provider;
@@ -58,15 +57,6 @@ class BaseSeeder extends Seeder
                 'end_at' => Date::tomorrow(),
             ]);
 
-        EventModel::factory()->count(5)
-            ->withStatus()
-            ->afterCreating(function ($event): void {
-                Talk::factory()->count(5)->create([
-                    'event_id' => $event->id,
-                ]);
-            })
-            ->create();
-
         Season::factory()
             ->recycle($tenant)
             ->create([
@@ -78,16 +68,16 @@ class BaseSeeder extends Seeder
         Provider::factory()
             ->recycle($user)
             ->recycle($tenant)
-            ->count(4)
+            ->count(2)
             ->create(['email' => $user->email]);
         Meeting::factory()
-            ->count(5)
+            ->count(2)
             ->recycle($tenant)
             ->create();
 
         Message::factory()
             ->recycle($tenant)
-            ->count(5)
+            ->count(2)
             ->create();
     }
 }

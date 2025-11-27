@@ -76,7 +76,7 @@ class EventModel extends Model
                 'user_id'
             )
             ->using(EventAttend::class)
-            ->withPivot('status')
+            ->withPivot(['status', 'attend_order'])
             ->withTimestamps();
     }
 
@@ -86,13 +86,18 @@ class EventModel extends Model
             return;
         }
 
-        $this->attendees()->attach($userId, ['status' => $status]);
-
         match ($status) {
             AttendingStatusEnum::Attending => $this->increment('attendees_count'),
             AttendingStatusEnum::Waitlist => $this->increment('waitlist_count'),
             default => throw new Exception('Unexpected match value'),
         };
+
+        $this->refresh();
+
+        $this->attendees()->attach($userId, [
+            'status' => $status,
+            'attend_order' => $this->attendees_count + $this->waitlist_count,
+        ]);
     }
 
     public function isPast(): bool
@@ -143,19 +148,28 @@ class EventModel extends Model
     }
 
     /**
-     * @return HasMany<Talk, $this>
+     * @return HasMany<EventSubmission, $this>
      */
     public function talks(): HasMany
     {
-        return $this->hasMany(Talk::class, 'event_id');
+        return $this->hasMany(EventSubmission::class, 'event_id');
     }
 
     /**
-     * @return HasManyThrough<User, Talk>
+     * @return HasManyThrough<User, EventSubmission>
      */
     public function speakers(): HasManyThrough
     {
-        return $this->hasManyThrough(User::class, Talk::class, 'event_id', 'id', 'id', 'user_id');
+        return $this->hasManyThrough(User::class, EventSubmission::class, 'event_id', 'id', 'id', 'user_id');
+    }
+
+    /**
+     * @return HasMany<EventAgenda, $this>
+     */
+    public function agenda(): HasMany
+    {
+        return $this->hasMany(EventAgenda::class, 'event_id')
+            ->oldest('starting_at');
     }
 
     protected function duration(): Attribute
