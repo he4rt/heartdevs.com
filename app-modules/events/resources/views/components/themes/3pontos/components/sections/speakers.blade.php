@@ -28,7 +28,7 @@
         <div
             x-data="{ visible: false }"
             x-intersect.once="visible = true"
-            class="grid grid-cols-1 gap-6 sm:grid-cols-2 sm:gap-8 lg:grid-cols-4"
+            class="grid max-w-6xl grid-cols-1 gap-6 sm:grid-cols-2 sm:gap-8 lg:grid-cols-3"
         >
             @forelse ($speakers as $speaker)
                 <x-he4rt::animate-block>

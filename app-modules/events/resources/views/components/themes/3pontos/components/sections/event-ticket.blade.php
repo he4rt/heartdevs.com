@@ -21,7 +21,7 @@
             <div
                 x-data="{
                     copied: false,
-                    link: '{{ url('/event/3pontos') }}',
+                    link: '{{ url()->current() }}',
                     copyToClipboard() {
                         navigator.clipboard.writeText(this.link)
                         this.copied = true
@@ -36,16 +36,14 @@
                     <x-slot:title>Parabéns! Sua vaga está garantida!</x-slot>
                     <x-slot:description>Acesse o link abaixo para conferir o seu ticket.</x-slot>
                     <x-slot:actions>
-                        <x-he4rt::button>Compartilhar no...</x-he4rt::button>
-
                         <div x-show="!copied">
-                            <x-he4rt::button variant="outline" icon="far-copy" @click="copyToClipboard()">
-                                Copiar
+                            <x-he4rt::button icon="far-copy" @click="copyToClipboard()">
+                                Compartilhe na redes
                             </x-he4rt::button>
                         </div>
 
                         <div x-show="copied" x-cloak>
-                            <x-he4rt::button variant="outline" icon="fas-check">Copiado</x-he4rt::button>
+                            <x-he4rt::button icon="fas-check">Compartilhe na redes</x-he4rt::button>
                         </div>
                     </x-slot>
                 </x-he4rt::headline>
