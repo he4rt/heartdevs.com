@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace He4rt\BotDiscord\SlashCommands;
 
+use Illuminate\Support\Facades\Date;
 use Discord\Parts\Interactions\Command\Option;
 use Discord\Parts\Interactions\Interaction;
 use Laracord\Commands\SlashCommand;
@@ -15,14 +16,14 @@ class DontAskCommand extends SlashCommand
      *
      * @var string
      */
-    protected $name = 'dont-ask';
+    protected $name = 'perguntar';
 
     /**
      * The command description.
      *
      * @var string
      */
-    protected $description = 'The Dont Ask Command command.';
+    protected $description = 'Não peça para perguntar. Mande direto!';
 
     /**
      * Determines whether the command requires admin permissions.
@@ -46,7 +47,7 @@ class DontAskCommand extends SlashCommand
     protected $options = [
         [
             'name' => 'user',
-            'description' => 'Mention a user to be quoted.',
+            'description' => 'Mencione um usuário para citar.',
             'type' => Option::USER,
             'required' => true,
         ],
@@ -61,8 +62,8 @@ class DontAskCommand extends SlashCommand
             ->message()
             ->title('Não peça para perguntar.')
             ->footerIcon($interaction->guild->icon)
-            ->thumbnailUrl($interaction->user->avatar)
-            ->footerText('HE4RT INC')
+            ->thumbnailUrl($interaction->data->resolved->users->get('id', $this->value('user'))->avatar)
+            ->footerText(Date::now()->format('Y').' © He4rt Developers')
             ->imageUrl('https://media.discordapp.net/attachments/546151895010508827/1046092564513701909/Frame_1282_1.png')
             ->timestamp(now())
             ->content("Ei <@{$this->value('user')}>
