@@ -10,6 +10,7 @@ use Filament\Actions\EditAction;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
+use He4rt\User\Models\User;
 use STS\FilamentImpersonate\Actions\Impersonate;
 
 class UsersTable
@@ -32,7 +33,13 @@ class UsersTable
             ])
             ->recordActions([
                 EditAction::make(),
-                Impersonate::make(),
+                Impersonate::make()
+                    ->visible(fn (User $record) => (bool) $record->character?->tenant?->slug)
+                    ->redirectTo(function (User $record): string {
+                        $tenantName = $record->character?->tenant?->slug;
+
+                        return '/app/'.$tenantName;
+                    }),
             ])
             ->toolbarActions([
                 BulkActionGroup::make([
