@@ -7,7 +7,7 @@ use He4rt\Character\Models\Character;
 use He4rt\Events\Models\EventModel;
 use He4rt\Season\Models\Season;
 use He4rt\Tenant\Models\Tenant;
-use He4rt\User\Filament\User\Pages\Dashboard;
+use He4rt\User\Filament\User\Pages\UserDashboard;
 use He4rt\User\Models\User;
 use Illuminate\Support\Facades\Date;
 
@@ -43,14 +43,14 @@ beforeEach(function (): void {
 });
 
 it('should render', function (): void {
-    livewire(Dashboard::class)
+    livewire(UserDashboard::class)
         ->assertOk();
 });
 
 it('should be able to see user experience/stats', function (): void {
     $nextLevelXp = $this->character->percentageExperience + $this->character->experience;
 
-    livewire(Dashboard::class)
+    livewire(UserDashboard::class)
         ->assertOk()
         ->assertSeeTextInOrder(['Level', $this->character->level])
         ->assertSeeTextInOrder(['Reputation', $this->character->reputation])
@@ -60,7 +60,7 @@ it('should be able to see user experience/stats', function (): void {
 
 it('should be able to see events details', function (): void {
     $this->events->each(function (EventModel $event): void {
-        livewire(Dashboard::class)
+        livewire(UserDashboard::class)
             ->assertOk()
             ->assertSeeText($event->title)
             ->assertSeeText(Date::parse($event->starts_at)->format('d/m/Y H:i'))

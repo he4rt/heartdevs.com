@@ -9,7 +9,7 @@ use Filament\Pages\Dashboard as FilamentDashboard;
 use He4rt\Tenant\Models\Tenant;
 use Livewire\Attributes\Computed;
 
-class Dashboard extends FilamentDashboard
+class UserDashboard extends FilamentDashboard
 {
     protected string $view = 'users::filament.app-dashboard';
 
@@ -25,6 +25,6 @@ class Dashboard extends FilamentDashboard
     #[Computed]
     public function stats()
     {
-        return auth()->user()->character()->where('tenant_id', '=', $this->tenant->getKey())->first();
+        return auth()->user()->character()->where('tenant_id', '=', $this->tenant?->getKey())->first();
     }
 }

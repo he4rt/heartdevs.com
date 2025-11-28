@@ -8,7 +8,7 @@ use App\Enums\FilamentPanel;
 use Filament\Contracts\Plugin;
 use Filament\Panel;
 use He4rt\Events\Filament\App\EventModels\Widgets\LatestEvents;
-use He4rt\User\Filament\User\Pages\Dashboard;
+use He4rt\User\Filament\User\Pages\UserDashboard;
 use He4rt\User\Filament\User\Pages\UserProfile;
 
 class AppUserPanelPlugin implements Plugin
@@ -22,7 +22,7 @@ class AppUserPanelPlugin implements Plugin
     {
         $panel->pages([
             UserProfile::class,
-            Dashboard::class,
+            UserDashboard::class,
         ]);
         $panel->widgets([
             LatestEvents::class,
