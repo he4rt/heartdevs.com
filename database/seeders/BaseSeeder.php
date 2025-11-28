@@ -50,6 +50,21 @@ class BaseSeeder extends Seeder
             ->recycle($tenant)
             ->createOne();
 
+        User::factory()
+            ->count(5)
+            ->create()
+            ->each(function (User $user, $index) use ($tenant): void {
+                $idx = $index + 1;
+                $user->update([
+                    'username' => 'fake_user_'.$idx,
+                    'name' => 'Fake User '.$idx,
+                ]);
+                Character::factory()->recycle($user)->recycle($tenant)->create();
+                Information::factory()->recycle($user)->create();
+                Address::factory()->recycle($user)->create();
+                Provider::factory()->recycle($user)->recycle($tenant)->create();
+            });
+
         EventModel::factory()
             ->withStatus()
             ->recycle($tenant)
