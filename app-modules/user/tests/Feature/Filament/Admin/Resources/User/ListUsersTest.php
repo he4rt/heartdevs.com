@@ -7,7 +7,8 @@ use He4rt\User\Models\User;
 
 it('renders the list of users', function (): void {
     $users = User::factory()->count(5)->create();
-
+    $admin = User::factory()->create();
+    $this->actingAs($admin);
     $this->livewire(ListUsers::class)
         ->assertOk()
         ->assertCanSeeTableRecords($users);
