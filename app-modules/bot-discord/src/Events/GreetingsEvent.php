@@ -27,10 +27,7 @@ class GreetingsEvent extends Event
             return;
         }
 
-        $allowedChannel = env('DISCORD_GENEREAL_CHAT_ID');
-        if ($message->channel_id != $allowedChannel) {
-            return;
-        }
+        $allowedChannel = config('services.discord.general_chat_id');
 
         $this->logger()->notice(sprintf('%s: %s', $message->author->username, $message->content));
 

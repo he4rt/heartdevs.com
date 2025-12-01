@@ -39,6 +39,7 @@ return [
         'redirect_uri' => env('DISCORD_OAUTH_REDIRECT_URI', 'https://localhost:8000/auth/oauth/discord'),
         'scopes' => env('DISCORD_OAUTH_SCOPES', 'identify email'),
         'enabled' => env('DISCORD_OAUTH_ENABLED', true),
+        'general_chat_id' => env('DISCORD_GENERAL_CHAT_ID'),
     ],
     'twitch' => [
         'client_id' => env('TWITCH_OAUTH_CLIENT_ID'),
