@@ -28,9 +28,16 @@ class DynamicVoiceTask extends Task
         $channels = cache()->get('active_voice_channels_keys', []);
         foreach ($channels as $channel) {
             if ($channel['usersCount'] === 0 && abs($channel['lastJoinedAt']->diffInSeconds(now())) >= 20) {
-                //                $this->discord()->getChannel($channel['channelId'])->delete();
-                //                DeleteVoiceDiscord::dispatch( $channel['channelId']);
+                $this->delete($channel['guildId'], $channel['channelId']);
             }
+        }
+    }
+
+    public function delete(string $guildId, string $channelId): void
+    {
+        $guild = $this->discord()->guilds->get('id', $guildId);
+        if ($guild && $guild->channels->has($channelId)) {
+            $guild->channels->delete($channelId);
         }
     }
 }
