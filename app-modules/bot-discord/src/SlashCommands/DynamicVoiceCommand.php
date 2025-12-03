@@ -4,8 +4,12 @@ declare(strict_types=1);
 
 namespace He4rt\BotDiscord\SlashCommands;
 
+use Discord\Builders\ChannelBuilder;
+use Discord\Parts\Interactions\Command\Option;
 use Discord\Parts\Interactions\Interaction;
 use Laracord\Commands\SlashCommand;
+
+use function React\Async\await;
 
 class DynamicVoiceCommand extends SlashCommand
 {
@@ -59,9 +63,26 @@ class DynamicVoiceCommand extends SlashCommand
         $this
             ->message()
             ->title('Dynamic Voice Command')
-            ->content('Hello world!')
-            ->button('👋', route: 'wave')
+            ->content($this->value('tipo', $default = null))
             ->reply($interaction);
+
+        $channel = await($interaction->guild->channels->build(
+            $interaction->guild,
+            ChannelBuilder::new($this->value('tipo'))
+                ->setType(2)
+                ->setUserLimit($this->value('quantidade'))
+        ));
+
+        $keys[] = [
+            'guildId' => $interaction->guild->id,
+            'channelId' => $channel->id,
+            'ownerId' => $interaction->user->id,
+            'usersCount' => 0,
+            'users' => [],
+            'lastJoinedAt' => now(),
+        ];
+
+        cache()->put('active_voice_channels_keys', $keys);
     }
 
     /**
@@ -72,5 +93,42 @@ class DynamicVoiceCommand extends SlashCommand
         return [
             'wave' => fn (Interaction $interaction) => $this->message('👋')->reply($interaction),
         ];
+    }
+
+    public function options(): array
+    {
+        return [
+            [
+                'name' => 'tipo',
+                'description' => 'Manage the ticket system.',
+                'type' => Option::STRING,
+                'required' => true,
+                'choices' => $this->getVoiceChoices(),
+            ],
+            [
+                'name' => 'quantidade',
+                'description' => 'Manage how many people can use the voice channel.',
+                'type' => Option::INTEGER,
+                'required' => true,
+            ],
+        ];
+    }
+
+    private function getVoiceChoices(): array
+    {
+        $items = [
+            ['name' => '🗣 Only English'],
+            ['name' => '👥 Novas Amizades'],
+            ['name' => '👋 Novato'],
+            ['name' => '🎓 Mentoria'],
+            ['name' => '🏢 Trabalho'],
+            ['name' => '📖 Estudando'],
+            ['name' => '🔴 Live'],
+            ['name' => '🎮 Joguinhos'],
+            ['name' => '🗣 Conversando'],
+            ['name' => '🆘 ME AJUDAAA!!!!'],
+        ];
+
+        return array_map(fn (array $item) => ['name' => $item['name'], 'value' => str($item['name'])->toString()], $items);
     }
 }
