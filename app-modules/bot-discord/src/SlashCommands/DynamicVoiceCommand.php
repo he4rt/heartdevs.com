@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace He4rt\BotDiscord\SlashCommands;
 
 use Discord\Builders\ChannelBuilder;
+use Discord\Parts\Channel\Invite;
 use Discord\Parts\Interactions\Command\Option;
 use Discord\Parts\Interactions\Interaction;
 use Laracord\Commands\SlashCommand;
@@ -60,19 +61,12 @@ class DynamicVoiceCommand extends SlashCommand
      */
     public function handle(Interaction $interaction): void
     {
-        $this
-            ->message()
-            ->title('Dynamic Voice Command')
-            ->content($this->value('tipo', $default = null))
-            ->reply($interaction);
-
         $channel = await($interaction->guild->channels->build(
             $interaction->guild,
             ChannelBuilder::new($this->value('tipo'))
                 ->setType(2)
                 ->setUserLimit($this->value('quantidade'))
         ));
-
         $keys[] = [
             'guildId' => $interaction->guild->id,
             'channelId' => $channel->id,
@@ -83,16 +77,13 @@ class DynamicVoiceCommand extends SlashCommand
         ];
 
         cache()->put('active_voice_channels_keys', $keys);
-    }
 
-    /**
-     * The command interaction routes.
-     */
-    public function interactions(): array
-    {
-        return [
-            'wave' => fn (Interaction $interaction) => $this->message('👋')->reply($interaction),
-        ];
+        /** @var Invite $invite */
+        $invite = await($channel->createInvite([
+            'max_age' => 300,
+        ]));
+
+        $this->interactionWithUser($interaction, $channel, $invite);
     }
 
     public function options(): array
@@ -130,5 +121,13 @@ class DynamicVoiceCommand extends SlashCommand
         ];
 
         return array_map(fn (array $item) => ['name' => $item['name'], 'value' => str($item['name'])->toString()], $items);
+    }
+
+    private function interactionWithUser(Interaction $interaction, $channel, $invite): void
+    {
+        $channel->sendMessage(sprintf('<@%s>: %s', $interaction->user->id, $invite->invite_url));
+        $this->message()
+            ->content('Aqui está o link para o seu canal de voz: ' . $invite->invite_url)
+            ->reply($interaction);
     }
 }
