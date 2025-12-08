@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace He4rt\BotDiscord\Tasks;
 
+use He4rt\BotDiscord\DTO\VoiceChannelDTO;
 use Laracord\Tasks\Task;
 
 class DynamicVoiceTask extends Task
@@ -11,7 +12,7 @@ class DynamicVoiceTask extends Task
     /**
      * The task interval.
      */
-    protected int $interval = 5;
+    protected int $interval = 30;
 
     /**
      * Determine if the task handler should execute during boot.
@@ -25,8 +26,9 @@ class DynamicVoiceTask extends Task
     {
         $channels = cache()->tags(['voice_channels'])->get('active_voice_channels_keys', []);
         foreach ($channels as $index => $channel) {
-            if ($channel['usersCount'] === 0 && abs($channel['lastJoinedAt']->diffInSeconds(now())) >= 20) {
-                $this->delete($channel['guildId'], $channel['channelId'], $index);
+            /** @var VoiceChannelDTO $channel */
+            if ($channel->isEmpty() && $channel->isLongTermEmpty()) {
+                $this->delete($channel->guildId, $channel->channelId, $index);
             }
         }
     }
@@ -45,10 +47,9 @@ class DynamicVoiceTask extends Task
 
             unset($channels[$arrayIndex]);
 
-            $channels = array_filter($channels, fn (array $channel) => $channel['channelId'] !== $channelId);
+            $channels = array_filter($channels, fn (VoiceChannelDTO $channel) => $channel->channelId !== $channelId);
             $channels = array_values($channels);
 
-            dump($channels);
             cache()->tags(['voice_channels'])->put('active_voice_channels_keys', $channels);
         }
 

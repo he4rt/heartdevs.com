@@ -10,6 +10,7 @@ use Discord\Parts\Channel\Channel;
 use Discord\Parts\Embed\Embed;
 use Discord\Parts\Interactions\Command\Option;
 use Discord\Parts\Interactions\Interaction;
+use He4rt\BotDiscord\DTO\VoiceChannelDTO;
 use Laracord\Commands\SlashCommand;
 
 use function React\Async\await;
@@ -72,14 +73,15 @@ class DynamicVoiceCommand extends SlashCommand
         ));
         $channels = cache()->tags(['voice_channels'])->get('active_voice_channels_keys', []);
 
-        $channels[] = [
+        $channelDto = VoiceChannelDTO::make([
             'guildId' => $interaction->guild->id,
             'channelId' => $channel->id,
             'ownerId' => $interaction->user->id,
             'usersCount' => 0,
             'users' => [],
             'lastJoinedAt' => now(),
-        ];
+        ]);
+        $channels[] = $channelDto;
 
         cache()->tags(['voice_channels'])->put('active_voice_channels_keys', $channels);
 
