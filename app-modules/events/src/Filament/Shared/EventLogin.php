@@ -143,7 +143,7 @@ class EventLogin extends SimplePage
 
         session()->regenerate();
 
-        return app(LoginResponse::class);
+        return resolve(LoginResponse::class);
     }
 
     public function defaultForm(Schema $schema): Schema
@@ -300,7 +300,7 @@ class EventLogin extends SimplePage
      */
     protected function fireFailedEvent(Guard $guard, ?Authenticatable $user, #[SensitiveParameter] array $credentials): void
     {
-        event(app(Failed::class, ['guard' => property_exists($guard, 'name') ? $guard->name : '', 'user' => $user, 'credentials' => $credentials]));
+        event(resolve(Failed::class, ['guard' => property_exists($guard, 'name') ? $guard->name : '', 'user' => $user, 'credentials' => $credentials]));
     }
 
     protected function throwFailureValidationException(): never

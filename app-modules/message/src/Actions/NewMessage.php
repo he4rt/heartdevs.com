@@ -20,7 +20,7 @@ final readonly class NewMessage
     public function persist(NewMessageDTO $messageDTO): void
     {
         try {
-            $resolution = app(UserCharacterResolver::class)->resolve(
+            $resolution = resolve(UserCharacterResolver::class)->resolve(
                 provider: $messageDTO->provider,
                 providerId: $messageDTO->providerId,
                 username: $messageDTO->providerUsername,

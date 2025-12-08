@@ -20,6 +20,7 @@ final class Token extends Model
 {
     use HasFactory;
     use HasUuids;
+
     protected $table = 'provider_tokens';
 
     protected $fillable = [

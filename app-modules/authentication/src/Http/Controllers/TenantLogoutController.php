@@ -20,6 +20,6 @@ class TenantLogoutController
         session()->put('tenant', $tenantSlug);
         session()->put('panel', $panel);
 
-        return app(TenantLogoutResponse::class);
+        return resolve(TenantLogoutResponse::class);
     }
 }

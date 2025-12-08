@@ -68,7 +68,7 @@ class DynamicVoiceCommand extends SlashCommand
             ChannelBuilder::new($this->value('tipo'))
                 ->setType(2)
                 ->setUserLimit($this->value('quantidade'))
-                ->setParentId('1447692330235859104') // TODO: change to "use/sala" category id
+                ->setParentId(config('he4rt-bot-discord.category_id', '1447692330235859104')) // TODO: change to "use/sala" category id
         ));
         $channels = cache()->tags(['voice_channels'])->get('active_voice_channels_keys', []);
 

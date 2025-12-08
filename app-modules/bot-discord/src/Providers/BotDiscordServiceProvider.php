@@ -9,6 +9,14 @@ use Laracord\LaracordServiceProvider;
 
 class BotDiscordServiceProvider extends LaracordServiceProvider
 {
+    public function register(): void
+    {
+        parent::register();
+
+        $this->mergeConfigFrom(
+            __DIR__.'/../../config/he4rt-bot-discord.php', 'he4rt-bot-discord');
+    }
+
     public function bot(Laracord $bot): Laracord
     {
         return $bot

@@ -488,14 +488,14 @@ class UserProfile extends Page
             return;
         }
 
-        $notification = app(VerifyEmailChange::class);
+        $notification = resolve(VerifyEmailChange::class);
         $notification->url = Filament::getVerifyEmailChangeUrl($record, $newEmail);
 
         $verificationSignature = Query::new($notification->url)->get('signature');
 
         cache()->put($verificationSignature, true, ttl: now()->addHour());
 
-        $record->notify(app(NoticeOfEmailChangeRequest::class, [
+        $record->notify(resolve(NoticeOfEmailChangeRequest::class, [
             /** @phpstan-ignore-line */
             'blockVerificationUrl' => Filament::getBlockEmailChangeVerificationUrl($record, $newEmail,
                 $verificationSignature),

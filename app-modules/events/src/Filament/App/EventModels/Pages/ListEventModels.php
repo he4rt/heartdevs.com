@@ -21,7 +21,7 @@ class ListEventModels extends ListRecords
     public function attend(string|int $eventModelId): void
     {
         $eventModel = EventModel::query()->find($eventModelId);
-        app(AttendEventAction::class)->execute($eventModel);
+        resolve(AttendEventAction::class)->execute($eventModel);
 
         Notification::make()
             ->success()
@@ -33,7 +33,7 @@ class ListEventModels extends ListRecords
     {
         $eventModel = EventModel::query()->find($eventModelId);
 
-        app(LeaveEventAction::class)->execute($eventModel);
+        resolve(LeaveEventAction::class)->execute($eventModel);
         Notification::make()
             ->success()
             ->body('Leaved Event Successfully')
