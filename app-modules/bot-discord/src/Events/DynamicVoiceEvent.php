@@ -25,8 +25,7 @@ class DynamicVoiceEvent extends Event
     {
         $channelId = $state->channel_id;
         $user = $state->user_id;
-        $activeChannels = cache()->get('active_voice_channels_keys', []);
-
+        $activeChannels = cache()->tags(['voice_channels'])->get('active_voice_channels_keys', []);
         $this->logger()->info('Channel Members:'.($state->channel?->members?->count() ?? 0));
 
         if (! is_null($channelId)) {
@@ -53,7 +52,7 @@ class DynamicVoiceEvent extends Event
                 $activeChannels[$index]['usersCount']++;
 
                 $activeChannels[$index]['lastJoinedAt'] = now();
-                cache()->put('active_voice_channels_keys', $activeChannels);
+                cache()->tags(['voice_channels'])->put('active_voice_channels_keys', $activeChannels);
                 break;
             }
         }
@@ -67,7 +66,7 @@ class DynamicVoiceEvent extends Event
                 $activeChannels[$index]['users'] = array_values(array_filter($channel['users'], fn ($userId) => $userId !== $user));
                 $activeChannels[$index]['usersCount']--;
 
-                cache()->put('active_voice_channels_keys', $activeChannels);
+                cache()->tags(['voice_channels'])->put('active_voice_channels_keys', $activeChannels);
                 break;
             }
         }

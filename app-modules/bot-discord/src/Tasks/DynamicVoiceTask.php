@@ -23,20 +23,35 @@ class DynamicVoiceTask extends Task
      */
     public function handle(): void
     {
-        $channels = cache()->get('active_voice_channels_keys', []);
-        dump($channels);
-        foreach ($channels as $channel) {
+        $channels = cache()->tags(['voice_channels'])->get('active_voice_channels_keys', []);
+        foreach ($channels as $index => $channel) {
             if ($channel['usersCount'] === 0 && abs($channel['lastJoinedAt']->diffInSeconds(now())) >= 20) {
-                $this->delete($channel['guildId'], $channel['channelId']);
+                $this->delete($channel['guildId'], $channel['channelId'], $index);
             }
         }
     }
 
-    public function delete(string $guildId, string $channelId): void
+    public function delete(string $guildId, string $channelId, int $arrayIndex): void
     {
         $guild = $this->discord()->guilds->get('id', $guildId);
+
         if ($guild && $guild->channels->has($channelId)) {
             $guild->channels->delete($channelId);
         }
+
+        $channels = cache()->tags(['voice_channels'])->get('active_voice_channels_keys', []);
+
+        if (isset($channels[$arrayIndex])) {
+
+            unset($channels[$arrayIndex]);
+
+            $channels = array_filter($channels, fn(array $channel) => $channel['channelId'] !== $channelId);
+            $channels = array_values($channels);
+
+            dump($channels);
+            cache()->tags(['voice_channels'])->put('active_voice_channels_keys', $channels);
+        }
+
+        $this->logger()->info('Canal '.$channelId.' removido do cache.');
     }
 }

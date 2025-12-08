@@ -5,7 +5,10 @@ declare(strict_types=1);
 namespace He4rt\BotDiscord\SlashCommands;
 
 use Discord\Builders\ChannelBuilder;
+use Discord\Builders\MessageBuilder;
+use Discord\Parts\Channel\Channel;
 use Discord\Parts\Channel\Invite;
+use Discord\Parts\Embed\Embed;
 use Discord\Parts\Interactions\Command\Option;
 use Discord\Parts\Interactions\Interaction;
 use Laracord\Commands\SlashCommand;
@@ -67,7 +70,9 @@ class DynamicVoiceCommand extends SlashCommand
                 ->setType(2)
                 ->setUserLimit($this->value('quantidade'))
         ));
-        $keys[] = [
+        $channels = cache()->tags(['voice_channels'])->get('active_voice_channels_keys', []);
+
+        $channels[] = [
             'guildId' => $interaction->guild->id,
             'channelId' => $channel->id,
             'ownerId' => $interaction->user->id,
@@ -76,7 +81,7 @@ class DynamicVoiceCommand extends SlashCommand
             'lastJoinedAt' => now(),
         ];
 
-        cache()->put('active_voice_channels_keys', $keys);
+        cache()->tags(['voice_channels'])->put('active_voice_channels_keys', $channels);
 
         /** @var Invite $invite */
         $invite = await($channel->createInvite([
@@ -125,11 +130,20 @@ class DynamicVoiceCommand extends SlashCommand
         return array_map(fn (array $item) => ['name' => $item['name'], 'value' => str($item['name'])->toString()], $items);
     }
 
-    private function interactionWithUser(Interaction $interaction, $channel, $invite): void
+    private function interactionWithUser(Interaction $interaction, Channel $channel, $invite): void
     {
-        $channel->sendMessage(sprintf('<@%s>: %s', $interaction->user->id, $invite->invite_url));
+
+        $embed = new Embed($this->discord());
+        $embed->setTitle('Canal de Voz')
+            ->setDescription('Link do canal de voz')
+            ->setURL($invite->invite_url);
+
+        $channel->sendMessage(message: MessageBuilder::new()
+            ->setContent(sprintf('<@%s>', $interaction->user->id))
+            ->addEmbed($embed));
+
         $this->message()
-            ->content('Aqui está o link para o seu canal de voz: '.$invite->invite_url)
-            ->reply($interaction);
+            ->content('Sala Criada com sucesso !!')
+            ->reply($interaction, true);
     }
 }
