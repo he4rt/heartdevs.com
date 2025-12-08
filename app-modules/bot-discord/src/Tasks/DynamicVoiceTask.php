@@ -45,7 +45,7 @@ class DynamicVoiceTask extends Task
 
             unset($channels[$arrayIndex]);
 
-            $channels = array_filter($channels, fn(array $channel) => $channel['channelId'] !== $channelId);
+            $channels = array_filter($channels, fn (array $channel) => $channel['channelId'] !== $channelId);
             $channels = array_values($channels);
 
             dump($channels);
