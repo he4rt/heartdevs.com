@@ -7,7 +7,6 @@ namespace He4rt\BotDiscord\SlashCommands;
 use Discord\Builders\ChannelBuilder;
 use Discord\Builders\MessageBuilder;
 use Discord\Parts\Channel\Channel;
-use Discord\Parts\Channel\Invite;
 use Discord\Parts\Embed\Embed;
 use Discord\Parts\Interactions\Command\Option;
 use Discord\Parts\Interactions\Interaction;
@@ -22,7 +21,7 @@ class DynamicVoiceCommand extends SlashCommand
      *
      * @var string
      */
-    protected $name = 'voice';
+    protected $name = 'sala';
 
     /**
      * The command description.
@@ -69,6 +68,7 @@ class DynamicVoiceCommand extends SlashCommand
             ChannelBuilder::new($this->value('tipo'))
                 ->setType(2)
                 ->setUserLimit($this->value('quantidade'))
+                ->setParentId('1447692330235859104') // TODO: change to "use/sala" category id
         ));
         $channels = cache()->tags(['voice_channels'])->get('active_voice_channels_keys', []);
 
@@ -83,14 +83,9 @@ class DynamicVoiceCommand extends SlashCommand
 
         cache()->tags(['voice_channels'])->put('active_voice_channels_keys', $channels);
 
-        /** @var Invite $invite */
-        $invite = await($channel->createInvite([
-            'max_age' => 300,
-        ]));
-
         await($interaction->guild->channels->freshen());
 
-        $this->interactionWithUser($interaction, $channel, $invite);
+        $this->interactionWithUser($interaction, $channel);
     }
 
     public function options(): array
@@ -130,20 +125,19 @@ class DynamicVoiceCommand extends SlashCommand
         return array_map(fn (array $item) => ['name' => $item['name'], 'value' => str($item['name'])->toString()], $items);
     }
 
-    private function interactionWithUser(Interaction $interaction, Channel $channel, $invite): void
+    private function interactionWithUser(Interaction $interaction, Channel $channel): void
     {
 
         $embed = new Embed($this->discord());
         $embed->setTitle('Canal de Voz')
-            ->setDescription('Link do canal de voz')
-            ->setURL($invite->invite_url);
+            ->setDescription(sprintf('Link do canal de voz: <#%s>', $channel->id));
 
         $channel->sendMessage(message: MessageBuilder::new()
             ->setContent(sprintf('<@%s>', $interaction->user->id))
             ->addEmbed($embed));
 
         $this->message()
-            ->content('Sala Criada com sucesso !!')
+            ->content(sprintf('Sala Criada com sucesso !! <#%s>', $channel->id))
             ->reply($interaction, true);
     }
 }
