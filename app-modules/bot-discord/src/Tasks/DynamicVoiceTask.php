@@ -11,7 +11,7 @@ class DynamicVoiceTask extends Task
     /**
      * The task interval.
      */
-    protected int $interval = 30;
+    protected int $interval = 5;
 
     /**
      * Determine if the task handler should execute during boot.
@@ -24,6 +24,7 @@ class DynamicVoiceTask extends Task
     public function handle(): void
     {
         $channels = cache()->get('active_voice_channels_keys', []);
+        dump($channels);
         foreach ($channels as $channel) {
             if ($channel['usersCount'] === 0 && abs($channel['lastJoinedAt']->diffInSeconds(now())) >= 20) {
                 $this->delete($channel['guildId'], $channel['channelId']);

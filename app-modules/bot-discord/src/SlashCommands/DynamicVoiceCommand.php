@@ -83,6 +83,8 @@ class DynamicVoiceCommand extends SlashCommand
             'max_age' => 300,
         ]));
 
+        await($interaction->guild->channels->freshen());
+
         $this->interactionWithUser($interaction, $channel, $invite);
     }
 
@@ -127,7 +129,7 @@ class DynamicVoiceCommand extends SlashCommand
     {
         $channel->sendMessage(sprintf('<@%s>: %s', $interaction->user->id, $invite->invite_url));
         $this->message()
-            ->content('Aqui está o link para o seu canal de voz: ' . $invite->invite_url)
+            ->content('Aqui está o link para o seu canal de voz: '.$invite->invite_url)
             ->reply($interaction);
     }
 }

@@ -27,6 +27,8 @@ class DynamicVoiceEvent extends Event
         $user = $state->user_id;
         $activeChannels = cache()->get('active_voice_channels_keys', []);
 
+        $this->logger()->info('Channel Members:'.($state->channel?->members?->count() ?? 0));
+
         if (! is_null($channelId)) {
             $this->joinedChannel(
                 channelId: $channelId,
