@@ -26,7 +26,7 @@ class WelcomeMember extends Event
             ->where('provider_id', (string) $member->guild_id)
             ->firstOrFail();
 
-        $resolution = app(UserCharacterResolver::class)->resolve(
+        $resolution = resolve(UserCharacterResolver::class)->resolve(
             provider: ProviderEnum::Discord,
             providerId: $member->user->id,
             username: $member->user->username,

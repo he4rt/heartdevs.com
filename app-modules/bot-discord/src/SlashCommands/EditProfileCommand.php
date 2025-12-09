@@ -139,7 +139,7 @@ class EditProfileCommand extends AbstractSlashCommand
                 'about' => $components->get('custom_id', 'about')->value,
             ]);
 
-            app(UpdateProfile::class)->handle($payload);
+            resolve(UpdateProfile::class)->handle($payload);
 
             $this
                 ->message('Perfil atualizado!')

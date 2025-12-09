@@ -23,6 +23,7 @@ class EventAgenda extends Model
 {
     use HasFactory;
     use SoftDeletes;
+
     protected $table = 'events_agenda';
 
     protected $fillable = [

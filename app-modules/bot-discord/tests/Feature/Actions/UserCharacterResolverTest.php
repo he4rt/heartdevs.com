@@ -10,7 +10,7 @@ use He4rt\Tenant\Models\Tenant;
 use He4rt\User\Models\User;
 
 it('creates a new user, provider and character when no provider entry exists for the given providerId', function (): void {
-    $resolver = app(UserCharacterResolver::class);
+    $resolver = resolve(UserCharacterResolver::class);
 
     $provider = ProviderEnum::Discord;
     $providerId = '123456789';
@@ -60,7 +60,7 @@ it('returns the existing user, provider and character when the provider entry al
         'provider_id' => $providerId,
     ]);
 
-    $resolver = app(UserCharacterResolver::class);
+    $resolver = resolve(UserCharacterResolver::class);
 
     $resolved = $resolver->resolve(
         provider: $provider,

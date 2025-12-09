@@ -36,7 +36,7 @@ class MessageReceivedEvent extends Event
                 ->where('provider_id', (string) $message->guild_id)
                 ->firstOrFail();
 
-            app(NewMessage::class)->persist(new NewMessageDTO(
+            resolve(NewMessage::class)->persist(new NewMessageDTO(
                 tenantId: $tenantProvider->tenant_id,
                 provider: ProviderEnum::Discord,
                 providerUsername: $message->author->username.'#'.$message->author->discriminator,

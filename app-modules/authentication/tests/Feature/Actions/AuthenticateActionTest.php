@@ -55,7 +55,7 @@ it('authenticates a new user via Discord and persists provider + token', functio
         'slug' => 'he4rt',
     ]);
 
-    $action = app(AuthenticateAction::class);
+    $action = resolve(AuthenticateAction::class);
 
     $action->withOAuth(state: new OAuthStateDTO('admin', 'he4rt'), oauthProvider: OAuthProviderEnum::Discord, code: 'dummy_code');
 
@@ -98,7 +98,7 @@ it('authenticates an existing provider without duplicating records', function ()
 
     $initialProviders = Provider::query()->count();
 
-    $action = app(AuthenticateAction::class);
+    $action = resolve(AuthenticateAction::class);
     $action->withOAuth(state: new OAuthStateDTO('123', 'he4rt'), oauthProvider: OAuthProviderEnum::Discord, code: 'dummy_code');
 
     // Should log in the same existing user

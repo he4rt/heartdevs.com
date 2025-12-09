@@ -22,8 +22,8 @@ enum OAuthProviderEnum: string implements HasDescription, HasIcon, HasLabel
     public function getClient(): OAuthClientContract
     {
         return match ($this) {
-            self::Twitch => app(TwitchOAuthService::class),
-            self::Discord => app(DiscordOAuthClient::class),
+            self::Twitch => resolve(TwitchOAuthService::class),
+            self::Discord => resolve(DiscordOAuthClient::class),
         };
     }
 

@@ -8,7 +8,7 @@ use He4rt\Authentication\DTO\OAuthAccessDTO;
 
 final class DiscordOAuthAccessDTO extends OAuthAccessDTO
 {
-    public static function make(array $payload): OAuthAccessDTO
+    public static function make(array $payload): self
     {
         return new self(
             accessToken: $payload['access_token'],
