@@ -18,6 +18,7 @@ return [
     ],
     'channels' => [
         'commands' => '542840741588762637',
+        'dynamic_voice_category' => env('HE4RT_DYNAMIC_VOICE_CATEGORY'),
     ],
     'seasons' => [
         [

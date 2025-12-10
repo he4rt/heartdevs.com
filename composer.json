@@ -11,8 +11,8 @@
         "php": "^8.3",
         "calebporzio/sushi": "^2.5.3",
         "dedoc/scramble": "^0.13.8",
-        "filament/filament": "^4.3.0",
-        "filament/spatie-laravel-media-library-plugin": "^4.3.0",
+        "filament/filament": "^4.3.1",
+        "filament/spatie-laravel-media-library-plugin": "^4.3.1",
         "guzzlehttp/guzzle": "^7.10.0",
         "he4rt/authentication": ">=1",
         "he4rt/badge": ">=1",
@@ -35,7 +35,7 @@
         "he4rt/user": ">=1",
         "internachi/modular": "^2.3.0",
         "laracord/framework": "dev-next",
-        "laravel/framework": "^12.41.1",
+        "laravel/framework": "^12.42.0",
         "laravel/nightwatch": "^1.19",
         "laravel/sanctum": "^4.2.1",
         "laravel/tinker": "^2.10.2",
@@ -45,21 +45,21 @@
         "owenvoke/blade-fontawesome": "^3.0",
         "predis/predis": "^2.4.1",
         "ryangjchandler/commonmark-blade-block": "^1.1",
-        "spatie/laravel-medialibrary": "^11.17.5",
+        "spatie/laravel-medialibrary": "^11.17.6",
         "symfony/browser-kit": "v7.0.8",
         "torchlight/torchlight-commonmark": "^0.6.0",
         "torchlight/torchlight-laravel": "^0.6.1"
     },
     "require-dev": {
         "barryvdh/laravel-debugbar": "^3.16.1",
-        "barryvdh/laravel-ide-helper": "^3.6.0",
+        "barryvdh/laravel-ide-helper": "^3.6.1",
         "driftingly/rector-laravel": "^2.1.6",
         "fakerphp/faker": "^1.24.1",
         "larastan/larastan": "^3.8.0",
-        "laravel/boost": "^1.8.4",
+        "laravel/boost": "^1.8.5",
         "laravel/pail": "^1.2.4",
         "laravel/pint": "^1.26.0",
-        "laravel/sail": "^1.50.0",
+        "laravel/sail": "^1.51.0",
         "mockery/mockery": "^1.6.12",
         "nunomaduro/collision": "^8.8.3",
         "pestphp/pest": "^4.1.6",
@@ -68,7 +68,7 @@
         "pestphp/pest-plugin-laravel": "^4.0.0",
         "pestphp/pest-plugin-livewire": "^4.0.1",
         "phpstan/extension-installer": "^1.4.3",
-        "rector/rector": "^2.2.11"
+        "rector/rector": "^2.2.14"
     },
     "autoload": {
         "psr-4": {
@@ -116,6 +116,7 @@
             "@php artisan storage:link --ansi",
             "composer run-script ide-helper"
         ],
+        "bot": "@php artisan bot:boot",
         "dev": [
             "Composer\\Config::disableProcessTimeout",
             "npx concurrently -c \"#93c5fd,#c4b5fd,#fb7185,#fdba74\" \"php artisan serve\" \"php artisan queue:listen --tries=1\" \"php artisan pail --timeout=0\" \"npm run dev\" --names=server,queue,logs,vite"

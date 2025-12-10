@@ -67,9 +67,9 @@ class DynamicVoiceCommand extends SlashCommand
         $channel = await($interaction->guild->channels->build(
             $interaction->guild,
             ChannelBuilder::new($this->value('tipo'))
-                ->setType(2)
+                ->setType(Channel::TYPE_GUILD_VOICE)
                 ->setUserLimit($this->value('quantidade'))
-                ->setParentId(config('he4rt-bot-discord.category_id', '1447692330235859104')) // TODO: change to "use/sala" category id
+                ->setParentId(config('he4rt.channels.dynamic_voice_category')),
         ));
         $channels = cache()->tags(['voice_channels'])->get('active_voice_channels_keys', []);
 
@@ -105,6 +105,7 @@ class DynamicVoiceCommand extends SlashCommand
                 'description' => 'Manage how many people can use the voice channel.',
                 'type' => Option::INTEGER,
                 'required' => true,
+                'max_value' => 99,
             ],
         ];
     }
