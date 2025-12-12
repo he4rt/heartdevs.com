@@ -7,7 +7,8 @@ namespace He4rt\BotDiscord\Events;
 use Discord\Discord;
 use Discord\Parts\WebSockets\VoiceStateUpdate;
 use Discord\WebSockets\Event as Events;
-use He4rt\BotDiscord\DTO\VoiceChannelDTO;
+use He4rt\BotDiscord\Actions\JoiningChannelAction;
+use He4rt\BotDiscord\Actions\LeftChannelAction;
 use Laracord\Events\Event;
 
 class DynamicVoiceEvent extends Event
@@ -25,52 +26,93 @@ class DynamicVoiceEvent extends Event
     public function handle(VoiceStateUpdate $state, Discord $discord, ?VoiceStateUpdate $oldState): void
     {
         $channelId = $state->channel_id;
-        $user = $state->user_id;
+        $userId = $state->user_id;
+
         $activeChannels = cache()->tags(['voice_channels'])->get('active_voice_channels_keys', []);
         $this->logger()->info('Channel Members:'.($state->channel?->members?->count() ?? 0));
 
-        if (! is_null($channelId)) {
-            $this->joinedChannel(
-                channelId: $channelId,
+        $oldChannelId = $this->getUserLastChannel($userId);
+
+        if ($this->isLeavingVoice($channelId, $oldChannelId)) {
+            resolve(LeftChannelAction::class)->execute(
                 activeChannels: $activeChannels,
-                user: $user
+                user: $userId
             );
+
+            $this->clearUserLastChannel($userId);
 
             return;
         }
 
-        $this->leavedChannel(
-            activeChannels: $activeChannels,
-            user: $user
-        );
-    }
+        if ($this->isMovingBetweenChannels($channelId, $oldChannelId)) {
+            resolve(LeftChannelAction::class)->execute(
+                activeChannels: $activeChannels,
+                user: $userId
+            );
 
-    private function joinedChannel(string $channelId, array $activeChannels, $user): void
-    {
-        foreach ($activeChannels as $index => $channel) {
-            /** @var VoiceChannelDTO $channel */
-            if (isset($channel->channelId) && $channel->channelId === $channelId) {
-                $activeChannels[$index]->users[] = $user;
-                $activeChannels[$index]->usersCount++;
+            resolve(JoiningChannelAction::class)->execute(
+                channelId: $channelId,
+                activeChannels: $activeChannels,
+                user: $userId
+            );
 
-                $activeChannels[$index]->lastJoinedAt = now();
-                cache()->tags(['voice_channels'])->put('active_voice_channels_keys', $activeChannels);
-                break;
-            }
+            $this->setUserLastChannel($userId, $channelId);
+
+            return;
+        }
+
+        if ($this->isJoiningChannel($channelId, $oldChannelId)) {
+            resolve(JoiningChannelAction::class)->execute(
+                channelId: $channelId,
+                activeChannels: $activeChannels,
+                user: $userId
+            );
+            $this->setUserLastChannel($userId, $channelId);
+
+            return;
+        }
+
+        if ($this->isUpdatingInSameChannel($channelId, $oldChannelId)) {
+            $this->setUserLastChannel($userId, $channelId);
+
+            return;
         }
     }
 
-    private function leavedChannel(array $activeChannels, $user): void
+    private function isMovingBetweenChannels(?string $newChannelId, ?string $oldChannelId): bool
     {
-        foreach ($activeChannels as $index => $channel) {
-            /** @var VoiceChannelDTO $channel */
-            if (in_array($user, $channel->users)) {
-                $activeChannels[$index]->users = array_values(array_filter($channel->users, fn ($userId) => $userId !== $user));
-                $activeChannels[$index]->usersCount--;
+        return ! is_null($newChannelId)
+            && ! is_null($oldChannelId)
+            && $oldChannelId !== $newChannelId;
+    }
 
-                cache()->tags(['voice_channels'])->put('active_voice_channels_keys', $activeChannels);
-                break;
-            }
-        }
+    private function isLeavingVoice(?string $newChannelId, ?string $oldChannelId): bool
+    {
+        return is_null($newChannelId) && ! is_null($oldChannelId);
+    }
+
+    private function isJoiningChannel(?string $channelId, ?string $oldChannelId): bool
+    {
+        return ! is_null($channelId) && is_null($oldChannelId);
+    }
+
+    private function getUserLastChannel(string $userId): ?string
+    {
+        return cache()->tags(['voice_tracking'])->get('user_last_channel_'.$userId);
+    }
+
+    private function setUserLastChannel(string $userId, string $channelId): void
+    {
+        cache()->tags(['voice_tracking'])->put('user_last_channel_'.$userId, $channelId, 86400);
+    }
+
+    private function clearUserLastChannel(string $userId): void
+    {
+        cache()->tags(['voice_tracking'])->forget('user_last_channel_'.$userId);
+    }
+
+    private function isUpdatingInSameChannel($newChannelId, ?string $oldChannelId): bool
+    {
+        return ! is_null($newChannelId) && $oldChannelId === $newChannelId;
     }
 }
