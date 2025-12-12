@@ -79,7 +79,6 @@ class DynamicVoiceCommand extends SlashCommand
             'ownerId' => $interaction->user->id,
             'usersCount' => 0,
             'users' => [],
-            'lastJoinedAt' => now(),
         ]);
         $channels[] = $channelDto;
 

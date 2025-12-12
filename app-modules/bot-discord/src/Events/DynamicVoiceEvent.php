@@ -103,7 +103,8 @@ class DynamicVoiceEvent extends Event
 
     private function setUserLastChannel(string $userId, string $channelId): void
     {
-        cache()->tags(['voice_tracking'])->put('user_last_channel_'.$userId, $channelId, 86400);
+        $ttl = 60 * 60 * 24;
+        cache()->tags(['voice_tracking'])->put('user_last_channel_'.$userId, $channelId, $ttl);
     }
 
     private function clearUserLastChannel(string $userId): void

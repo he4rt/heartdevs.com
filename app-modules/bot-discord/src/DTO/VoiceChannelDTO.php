@@ -14,7 +14,7 @@ final class VoiceChannelDTO
         public readonly string $ownerId,
         public int $usersCount,
         public array $users,
-        public CarbonInterface $lastJoinedAt,
+        public ?CarbonInterface $lastJoinedAt = null,
     ) {}
 
     public static function make(array $data): self
@@ -25,7 +25,7 @@ final class VoiceChannelDTO
             ownerId: $data['ownerId'],
             usersCount: $data['usersCount'],
             users: $data['users'],
-            lastJoinedAt: $data['lastJoinedAt'],
+            lastJoinedAt: $data['lastJoinedAt'] ?? null,
         );
     }
 
