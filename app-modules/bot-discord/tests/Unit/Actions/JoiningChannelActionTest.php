@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-use Ramsey\Uuid\Uuid;
 use He4rt\BotDiscord\Actions\JoiningChannelAction;
 use He4rt\BotDiscord\DTO\VoiceChannelDTO;
+use Ramsey\Uuid\Uuid;
 
 it('should insert user into channel cache', function (): void {
     $channelId = 'channel-123-id';

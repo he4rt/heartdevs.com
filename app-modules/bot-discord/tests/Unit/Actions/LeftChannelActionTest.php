@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-use Ramsey\Uuid\Uuid;
 use He4rt\BotDiscord\Actions\LeftChannelAction;
 use He4rt\BotDiscord\DTO\VoiceChannelDTO;
+use Ramsey\Uuid\Uuid;
 
 it('should remove user from channel when he lefts the channel', function (): void {
     $channelId = 'channel-123-id';
