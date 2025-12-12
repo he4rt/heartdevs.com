@@ -53,7 +53,7 @@
     "require-dev": {
         "barryvdh/laravel-debugbar": "^3.16.1",
         "barryvdh/laravel-ide-helper": "^3.6.1",
-        "driftingly/rector-laravel": "^2.1.6",
+        "driftingly/rector-laravel": "^2.1.7",
         "fakerphp/faker": "^1.24.1",
         "larastan/larastan": "^3.8.0",
         "laravel/boost": "^1.8.5",
