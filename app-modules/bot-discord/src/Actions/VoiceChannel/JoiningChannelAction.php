@@ -2,20 +2,21 @@
 
 declare(strict_types=1);
 
-namespace He4rt\BotDiscord\Actions;
+namespace He4rt\BotDiscord\Actions\VoiceChannel;
 
 use He4rt\BotDiscord\DTO\VoiceChannelDTO;
 
-final class LeftChannelAction
+final class JoiningChannelAction
 {
-    public function execute(array $activeChannels, $user): void
+    public function execute(string $channelId, array $activeChannels, $user): void
     {
         foreach ($activeChannels as $index => $channel) {
             /** @var VoiceChannelDTO $channel */
-            if (in_array($user, $channel->users)) {
-                $activeChannels[$index]->users = array_values(array_filter($channel->users, fn ($userId) => $userId !== $user));
-                $activeChannels[$index]->usersCount--;
+            if (isset($channel->channelId) && $channel->channelId === $channelId) {
+                $activeChannels[$index]->users[] = $user;
+                $activeChannels[$index]->usersCount++;
 
+                $activeChannels[$index]->lastJoinedAt = now();
                 $this->saveActiveChannels($activeChannels);
                 break;
             }

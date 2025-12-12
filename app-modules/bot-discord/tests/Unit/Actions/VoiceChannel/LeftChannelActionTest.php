@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-use He4rt\BotDiscord\Actions\LeftChannelAction;
+use He4rt\BotDiscord\Actions\VoiceChannel\LeftChannelAction;
 use He4rt\BotDiscord\DTO\VoiceChannelDTO;
 use Ramsey\Uuid\Uuid;
 
