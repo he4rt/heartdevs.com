@@ -3158,7 +3158,7 @@
             "dist": {
                 "type": "path",
                 "url": "app-modules/bot-discord",
-                "reference": "84d2dac97e123b15e8c593a1c565770f4db7f576"
+                "reference": "0829cfa428eca9360a79a2d047405197b98c0c18"
             },
             "type": "library",
             "extra": {
@@ -3171,7 +3171,8 @@
             "autoload": {
                 "psr-4": {
                     "He4rt\\BotDiscord\\": "src/",
-                    "He4rt\\BotDiscord\\Tests\\": "tests/"
+                    "He4rt\\BotDiscord\\Tests\\": "tests/",
+                    "Fixtures\\": "tests/Fixtures/"
                 }
             },
             "license": [

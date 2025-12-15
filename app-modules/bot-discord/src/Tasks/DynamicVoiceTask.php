@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace He4rt\BotDiscord\Tasks;
 
-use He4rt\BotDiscord\DTO\VoiceChannelDTO;
+use He4rt\BotDiscord\Actions\VoiceChannel\DeleteVoiceChannelAction;
 use Laracord\Tasks\Task;
 
 class DynamicVoiceTask extends Task
@@ -24,35 +24,6 @@ class DynamicVoiceTask extends Task
      */
     public function handle(): void
     {
-        $channels = cache()->tags(['voice_channels'])->get('active_voice_channels_keys', []);
-        foreach ($channels as $index => $channel) {
-            /** @var VoiceChannelDTO $channel */
-            if ($channel->isEmpty() && $channel->isLongTermEmpty()) {
-                $this->delete($channel->guildId, $channel->channelId, $index);
-            }
-        }
-    }
-
-    public function delete(string $guildId, string $channelId, int $arrayIndex): void
-    {
-        $guild = $this->discord()->guilds->get('id', $guildId);
-
-        if ($guild && $guild->channels->has($channelId)) {
-            $guild->channels->delete($channelId);
-        }
-
-        $channels = cache()->tags(['voice_channels'])->get('active_voice_channels_keys', []);
-
-        if (isset($channels[$arrayIndex])) {
-
-            unset($channels[$arrayIndex]);
-
-            $channels = array_filter($channels, fn (VoiceChannelDTO $channel) => $channel->channelId !== $channelId);
-            $channels = array_values($channels);
-
-            cache()->tags(['voice_channels'])->put('active_voice_channels_keys', $channels);
-        }
-
-        $this->logger()->info('Canal '.$channelId.' removido do cache.');
+        resolve(DeleteVoiceChannelAction::class)->execute($this->discord());
     }
 }
