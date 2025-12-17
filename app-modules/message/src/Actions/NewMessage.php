@@ -4,9 +4,11 @@ declare(strict_types=1);
 
 namespace He4rt\Message\Actions;
 
-use He4rt\BotDiscord\Actions\UserCharacterResolver;
 use He4rt\Character\Entities\CharacterEntity;
 use He4rt\Message\DTO\NewMessageDTO;
+use He4rt\Provider\DTO\ResolveUserProviderDTO;
+use He4rt\User\Actions\ResolveUserContextAction;
+use He4rt\User\Models\User;
 use Illuminate\Support\Facades\Log;
 use Throwable;
 
@@ -14,32 +16,32 @@ final readonly class NewMessage
 {
     public function __construct(
         private PersistMessage $persistMessage,
-
     ) {}
 
     public function persist(NewMessageDTO $messageDTO): void
     {
         try {
-            $resolution = resolve(UserCharacterResolver::class)->resolve(
-                provider: $messageDTO->provider,
-                providerId: $messageDTO->providerId,
-                username: $messageDTO->providerUsername,
-                tenantId: $messageDTO->tenantId,
-            );
+            $userDto = ResolveUserProviderDTO::make([
+                'tenantId' => $messageDTO->tenantId,
+                'provider' => $messageDTO->provider,
+                'providerId' => $messageDTO->providerId,
+                'modelType' => User::class,
+                'username' => $messageDTO->providerUsername,
+            ]);
 
-            $character = $resolution->character;
+            $userContext = resolve(ResolveUserContextAction::class)->handle($userDto);
 
-            $characterEntity = CharacterEntity::make($character->toArray());
+            $characterEntity = CharacterEntity::make($userContext->character->toArray());
             $obtainedExperience = $characterEntity->level->generateExperience($messageDTO->content);
 
-            $character->update([
+            $userContext->character->update([
                 'experience' => $characterEntity->level->getExperience(),
             ]);
 
             $this->persistMessage->handle(
                 $messageDTO,
                 $obtainedExperience,
-                $resolution->provider->id,
+                $userContext->provider->id,
             );
 
         } catch (Throwable $throwable) {
