@@ -34,7 +34,7 @@ class TelescopeServiceProvider extends TelescopeApplicationServiceProvider
 
     public function canBoot(): bool
     {
-        return config('telescope.enabled');
+        return config()->boolean('telescope.enabled');
     }
 
     /**
