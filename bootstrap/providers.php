@@ -11,7 +11,6 @@ use App\Providers\Filament\PartnerPanelProvider;
 use App\Providers\Filament\UserPanelProvider;
 use App\Providers\FilamentServiceProvider;
 use App\Providers\RouteServiceProvider;
-use App\Providers\Tools\TelescopeServiceProvider;
 
 return [
     AppServiceProvider::class,
@@ -23,5 +22,4 @@ return [
     PartnerPanelProvider::class,
     UserPanelProvider::class,
     RouteServiceProvider::class,
-    TelescopeServiceProvider::class,
 ];
