@@ -9,7 +9,7 @@ use He4rt\Provider\Enums\ProviderEnum;
 class ResolveUserProviderDTO
 {
     public function __construct(
-        public string $tenantId,
+        public int $tenantId,
         public ProviderEnum $provider,
         public string $providerId,
         public string $modelType,

@@ -31,7 +31,7 @@ class WelcomeMember extends Event
 
         try {
             $userDto = ResolveUserProviderDTO::make([
-                'tenantId' => $tenantProvider->tenant_id,
+                'tenant_id' => $tenantProvider->tenant_id,
                 'provider' => $tenantProvider->provider,
                 'provider_id' => $member->user->id,
                 'model_type' => User::class,

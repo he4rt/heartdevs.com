@@ -22,14 +22,16 @@ final readonly class NewMessage
     {
         try {
             $userDto = ResolveUserProviderDTO::make([
-                'tenantId' => $messageDTO->tenantId,
+                'tenant_id' => $messageDTO->tenantId,
                 'provider' => $messageDTO->provider,
-                'providerId' => $messageDTO->providerId,
-                'modelType' => User::class,
+                'provider_id' => $messageDTO->providerId,
+                'model_type' => User::class,
                 'username' => $messageDTO->providerUsername,
             ]);
 
             $userContext = resolve(ResolveUserContextAction::class)->handle($userDto);
+
+            $userContext->character->refresh();
 
             $characterEntity = CharacterEntity::make($userContext->character->toArray());
             $obtainedExperience = $characterEntity->level->generateExperience($messageDTO->content);
