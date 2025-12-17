@@ -4,29 +4,40 @@ declare(strict_types=1);
 
 namespace He4rt\User\Actions;
 
-use He4rt\Provider\Models\Provider;
+use He4rt\Provider\Actions\ProviderResolver;
+use He4rt\Provider\DTO\ResolveUserProviderDTO;
 use He4rt\User\DTO\UpdateProfileDTO;
+use He4rt\User\DTO\UpsertInformationDTO;
 use He4rt\User\Models\User;
-use Illuminate\Support\Facades\Log;
 
 final readonly class UpdateProfile
 {
+    public function __construct(
+        private ProviderResolver $providerResolver,
+        private InformationUserAction $informationUserAction,
+    ) {}
+
     public function handle(UpdateProfileDTO $profileDTO): void
     {
+        $providerDto = ResolveUserProviderDTO::make([
+            'provider_id' => $profileDTO->providerId,
+            'provider' => $profileDTO->provider,
+            'tenant_id' => $profileDTO->tenantId,
+            'model_type' => User::class,
+        ]);
+        $provider = $this->providerResolver->handle($providerDto);
 
-        $provider = Provider::query()
-            ->where('model_type', User::class)
-            ->where('tenant_id', $profileDTO->tenantId)
-            ->where('provider', $profileDTO->provider)
-            ->where('provider_id', $profileDTO->providerId)
-            ->first();
+        $informationDto = UpsertInformationDTO::make([
+            'user' => $provider->user,
+            'name' => $profileDTO->name,
+            'nickname' => $profileDTO->nickname,
+            'linkedin_url' => $profileDTO->linkedinUrl,
+            'github_url' => $profileDTO->githubUrl,
+            'birthdate' => $profileDTO->birthdate,
+            'about' => $profileDTO->about,
+        ]);
 
-        if (! $provider) {
-            Log::error('Provider not found');
+        $this->informationUserAction->handle($informationDto);
 
-            return;
-        }
-
-        $provider->user->information()->update($profileDTO->toProfile());
     }
 }
