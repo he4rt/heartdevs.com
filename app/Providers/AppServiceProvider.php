@@ -5,11 +5,11 @@ declare(strict_types=1);
 namespace App\Providers;
 
 use App\Providers\Tools\DebugbarServiceProvider;
+use App\Providers\Tools\TelescopeServiceProvider;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Facades\Vite;
 use Illuminate\Support\ServiceProvider;
-use Laravel\Telescope\TelescopeServiceProvider;
 
 final class AppServiceProvider extends ServiceProvider
 {
@@ -74,7 +74,7 @@ final class AppServiceProvider extends ServiceProvider
 
     private function registerTelescope(): void
     {
-        if (app()->isLocal() && class_exists(TelescopeServiceProvider::class)) {
+        if (class_exists(TelescopeServiceProvider::class)) {
             $this->app->register(TelescopeServiceProvider::class);
         }
     }
