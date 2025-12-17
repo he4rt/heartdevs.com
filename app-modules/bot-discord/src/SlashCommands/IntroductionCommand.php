@@ -8,10 +8,13 @@ use Discord\Builders\Components\TextInput;
 use Discord\Helpers\Collection;
 use Discord\Parts\Guild\Role;
 use Discord\Parts\Interactions\Interaction;
+use He4rt\Provider\DTO\ResolveUserProviderDTO;
 use He4rt\Provider\Models\Provider;
 use He4rt\Tenant\Models\Tenant;
-use He4rt\User\Actions\UpdateProfile;
-use He4rt\User\DTO\UpdateProfileDTO;
+use He4rt\User\Actions\InformationUserAction;
+use He4rt\User\Actions\ResolveUserContextAction;
+use He4rt\User\DTO\UpsertInformationDTO;
+use He4rt\User\Models\User;
 use Illuminate\Support\Facades\Date;
 use Laracord\Commands\SlashCommand;
 use Throwable;
@@ -72,14 +75,14 @@ class IntroductionCommand extends SlashCommand
                     ->setCustomId('name')
                     ->setMinLength(2)
                     ->setMaxLength(32)
-                    ->setPlaceholder('Pride')
+                    ->setPlaceholder('Fulano de Tal')
                     ->setRequired(true),
 
                 TextInput::new('Nickname', TextInput::STYLE_SHORT)
                     ->setCustomId('nickname')
                     ->setMinLength(2)
                     ->setMaxLength(32)
-                    ->setPlaceholder('Pride')
+                    ->setPlaceholder('Fulano123')
                     ->setRequired(true),
 
                 TextInput::new('Git/Github (Opcional)', TextInput::STYLE_SHORT)
@@ -135,34 +138,43 @@ class IntroductionCommand extends SlashCommand
                 ->where('provider_id', (string) $interaction->guild_id)
                 ->firstOrFail();
 
-            $payload = UpdateProfileDTO::fromPayload([
+            $userDto = ResolveUserProviderDTO::make([
                 'tenant_id' => $tenantProvider->tenant_id,
                 'provider' => $tenantProvider->provider,
                 'provider_id' => $interaction->user->id,
-                'name' => $components->get('custom_id', 'name')->value,
-                'nickname' => $components->get('custom_id', 'nickname')->value,
-                'linkedin_url' => $components->get('custom_id', 'linkedin_url')->value,
-                'github_url' => $components->get('custom_id', 'github_url')->value,
-                'birthdate' => $components->get('custom_id', 'birthdate')?->value ?? null,
-                'about' => $components->get('custom_id', 'about')->value,
+                'model_type' => User::class,
+                'username' => $interaction->user->username,
+                'avatar' => $interaction->user->avatar,
             ]);
 
-            resolve(UpdateProfile::class)->handle($payload);
+            $userContext = resolve(ResolveUserContextAction::class)->handle($userDto);
+
+            $informationDto = UpsertInformationDTO::make([
+                'user' => $userContext->user,
+                'name' => $components->get('custom_id', 'name')->value,
+                'nickname' => $components->get('custom_id', 'nickname')->value,
+                'about' => $components->get('custom_id', 'about')->value,
+                'linkedin_url' => $components->get('custom_id', 'linkedin_url')->value ?? null,
+                'github_url' => $components->get('custom_id', 'github_url')->value ?? null,
+                'birthdate' => $components->get('custom_id', 'birthdate')?->value ?? null,
+            ]);
+
+            $userInformation = resolve(InformationUserAction::class)->handle($informationDto);
 
             $this
                 ->message('apresentou')
                 ->content('https://heartdevs.com/')
                 ->color('800080')
-                ->title('Apresentação '.$payload->nickname)
+                ->title('Apresentação '.$userInformation->nickname)
                 ->thumbnailUrl($interaction->user->avatar)
                 ->fields([
-                    'Nome/Nickname' => $payload->nickname,
-                    'Sobre' => $payload->about,
+                    'Nome/Nickname' => $userInformation->nickname,
+                    'Sobre' => $userInformation->about,
                 ])
                 ->fields(
                     [
-                        'Git/Github' => $payload->githubUrl ?? '-',
-                        'Linkedin' => $payload->linkedinUrl ?? '-',
+                        'Git/Github' => $userInformation->github_url ?? '-',
+                        'Linkedin' => $userInformation->linkedin_url ?? '-',
                     ],
                     inline: false
                 )
@@ -174,7 +186,7 @@ class IntroductionCommand extends SlashCommand
             $interaction->member->addRole($role);
 
         } catch (Throwable $throwable) {
-            $this->logger()->error($throwable->getMessage());
+            $this->logger()->error('Error IntroductionCommand', [$throwable->getMessage()]);
 
             $interaction->respondWithMessage(
                 'Ocorreu um erro ao processar sua apresentação. Por favor, tente novamente mais tarde.',
