@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace He4rt\BotDiscord\Events;
 
-use Illuminate\Support\Facades\Log;
 use Discord\Discord;
 use Discord\Parts\User\Member;
 use Discord\WebSockets\Event as Events;
@@ -13,6 +12,7 @@ use He4rt\Provider\Models\Provider;
 use He4rt\Tenant\Models\Tenant;
 use He4rt\User\Actions\ResolveUserContextAction;
 use He4rt\User\Models\User;
+use Illuminate\Support\Facades\Log;
 use Laracord\Events\Event;
 use Throwable;
 
