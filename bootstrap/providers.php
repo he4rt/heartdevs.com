@@ -11,15 +11,17 @@ use App\Providers\Filament\PartnerPanelProvider;
 use App\Providers\Filament\UserPanelProvider;
 use App\Providers\FilamentServiceProvider;
 use App\Providers\RouteServiceProvider;
+use App\Providers\Tools\TelescopeServiceProvider;
 
 return [
     AppServiceProvider::class,
     EventServiceProvider::class,
     FilamentServiceProvider::class,
-    GuestPanelProvider::class,
     AdminPanelProvider::class,
     EventPanelProvider::class,
+    GuestPanelProvider::class,
     PartnerPanelProvider::class,
     UserPanelProvider::class,
     RouteServiceProvider::class,
+    TelescopeServiceProvider::class,
 ];
