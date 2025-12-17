@@ -164,7 +164,7 @@ class EditProfileCommand extends AbstractSlashCommand
                 ->reply($interaction, true);
 
         } catch (Throwable $throwable) {
-            $this->logger()->error($throwable->getMessage());
+            $this->logger()->error('Error EditProfileCommand:', [$throwable->getMessage()]);
 
             $interaction->respondWithMessage('Erro ao persistir dados', true);
         }
