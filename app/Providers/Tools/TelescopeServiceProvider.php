@@ -6,7 +6,6 @@ namespace App\Providers\Tools;
 
 use He4rt\User\Models\User;
 use Illuminate\Support\Facades\Gate;
-use Laravel\Telescope\IncomingEntry;
 use Laravel\Telescope\Telescope;
 use Laravel\Telescope\TelescopeApplicationServiceProvider;
 
@@ -17,10 +16,10 @@ class TelescopeServiceProvider extends TelescopeApplicationServiceProvider
      */
     public function register(): void
     {
-        // Telescope::night();
+        $this->registerTelescopeServiceProvider();
+        $this->setNightMode();
         $this->hideSensitiveRequestDetails();
-
-        Telescope::filter(fn (IncomingEntry $entry) => true);
+        $this->setFilter();
     }
 
     public function boot(): void
@@ -34,25 +33,7 @@ class TelescopeServiceProvider extends TelescopeApplicationServiceProvider
 
     public function canBoot(): bool
     {
-        return config()->boolean('telescope.enabled');
-    }
-
-    /**
-     * Prevent sensitive request details from being logged by Telescope.
-     */
-    protected function hideSensitiveRequestDetails(): void
-    {
-        if ($this->app->environment('local')) {
-            return;
-        }
-
-        Telescope::hideRequestParameters(['_token']);
-
-        Telescope::hideRequestHeaders([
-            'cookie',
-            'x-csrf-token',
-            'x-xsrf-token',
-        ]);
+        return config('telescope.enabled');
     }
 
     /**
@@ -63,5 +44,34 @@ class TelescopeServiceProvider extends TelescopeApplicationServiceProvider
     protected function gate(): void
     {
         Gate::define('viewTelescope', fn (User $user) => $user->isAdmin());
+    }
+
+    /**
+     * Prevent sensitive request details from being logged by Telescope.
+     */
+    protected function hideSensitiveRequestDetails(): void
+    {
+        Telescope::hideRequestParameters(['_token']);
+        Telescope::hideRequestHeaders([
+            'cookie',
+            'x-csrf-token',
+            'x-xsrf-token',
+        ]);
+    }
+
+    private function registerTelescopeServiceProvider(): void
+    {
+        $this->app->register(provider: \Laravel\Telescope\TelescopeServiceProvider::class);
+    }
+
+    private function setNightMode(): void
+    {
+        Telescope::night();
+    }
+
+    private function setFilter(): void
+    {
+        Telescope::filter(fn (): bool => true);
+        Telescope::filterBatch(fn (): bool => true);
     }
 }

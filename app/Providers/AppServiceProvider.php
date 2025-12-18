@@ -74,8 +74,6 @@ final class AppServiceProvider extends ServiceProvider
 
     private function registerTelescope(): void
     {
-        if (class_exists(TelescopeServiceProvider::class)) {
-            $this->app->register(TelescopeServiceProvider::class);
-        }
+        $this->app->register(TelescopeServiceProvider::class);
     }
 }
