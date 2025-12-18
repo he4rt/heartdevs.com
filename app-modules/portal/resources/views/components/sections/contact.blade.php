@@ -35,7 +35,9 @@
                                 comunidade.
                             </x-slot>
                             <x-slot:actions>
-                                <x-he4rt::button>Entrar no Discord</x-he4rt::button>
+                                <x-he4rt::button href="https://discord.com/invite/he4rt">
+                                    Entrar no Discord
+                                </x-he4rt::button>
                             </x-slot>
                         </x-he4rt::headline>
                     </div>
@@ -43,28 +45,41 @@
                     <div class="border-outline-low flex flex-col gap-4 rounded-lg border p-8">
                         <x-he4rt::headline class="mx-0" size="sm">
                             <x-slot:title>Redes sociais</x-slot>
-                            <x-slot:description>Lorem ipsum dolor sit amet, consectetur</x-slot>
+                            <x-slot:description>
+                                Siga-nos nas redes sociais para ficar por dentro das últimas novidades e conteúdos.
+                            </x-slot>
                             <x-slot:actions>
-                                <x-filament::icon
-                                    icon="fab-discord"
-                                    class="h-6 w-6 transition-all duration-500 hover:scale-105"
-                                />
-                                <x-filament::icon
-                                    icon="fab-linkedin"
-                                    class="h-6 w-6 transition-all duration-500 hover:scale-105"
-                                />
-                                <x-filament::icon
-                                    icon="fab-x-twitter"
-                                    class="h-6 w-6 transition-all duration-500 hover:scale-105"
-                                />
-                                <x-filament::icon
-                                    icon="fab-instagram"
-                                    class="h-6 w-6 transition-all duration-500 hover:scale-105"
-                                />
-                                <x-filament::icon
-                                    icon="fab-github"
-                                    class="h-6 w-6 transition-all duration-500 hover:scale-105"
-                                />
+                                <a href="https://discord.com/invite/he4rt">
+                                    <x-filament::icon
+                                        href="google.com"
+                                        icon="fab-discord"
+                                        class="h-6 w-6 transition-all duration-500 hover:scale-105"
+                                    />
+                                </a>
+                                <a href="https://www.linkedin.com/company/he4rt/">
+                                    <x-filament::icon
+                                        icon="fab-linkedin"
+                                        class="h-6 w-6 transition-all duration-500 hover:scale-105"
+                                    />
+                                </a>
+                                <a href="https://x.com/He4rtDevs">
+                                    <x-filament::icon
+                                        icon="fab-x-twitter"
+                                        class="h-6 w-6 transition-all duration-500 hover:scale-105"
+                                    />
+                                </a>
+                                <a href="https://instagram.com/heartdevs">
+                                    <x-filament::icon
+                                        icon="fab-instagram"
+                                        class="h-6 w-6 transition-all duration-500 hover:scale-105"
+                                    />
+                                </a>
+                                <a href="https://github.com/he4rt/">
+                                    <x-filament::icon
+                                        icon="fab-github"
+                                        class="h-6 w-6 transition-all duration-500 hover:scale-105"
+                                    />
+                                </a>
                             </x-slot>
                         </x-he4rt::headline>
                     </div>

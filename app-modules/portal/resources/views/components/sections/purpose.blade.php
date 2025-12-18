@@ -7,7 +7,7 @@
                         <div
                             class="bg-primary/8 border-primary/16 flex w-fit items-center justify-center rounded-lg border p-2"
                         >
-                            <x-filament::icon icon="heroicon-o-code-bracket" class="text-primary h-4 w-4" />
+                            <x-filament::icon icon="heroicon-o-hashtag" class="text-primary h-4 w-4" />
                         </div>
                     </x-slot>
                     <x-slot:title>Comunidade</x-slot>
@@ -20,10 +20,10 @@
                         <div
                             class="bg-primary/8 border-primary/16 flex w-fit items-center justify-center rounded-lg border p-2"
                         >
-                            <x-filament::icon icon="heroicon-o-code-bracket" class="text-primary h-4 w-4" />
+                            <x-filament::icon icon="heroicon-o-chat-bubble-left-right" class="text-primary h-4 w-4" />
                         </div>
                     </x-slot>
-                    <x-slot:title>Comunidade</x-slot>
+                    <x-slot:title>Interação</x-slot>
                     <x-slot:description>
                         Workshops, lives e encontros virtuais com especialistas.
                     </x-slot>
@@ -36,7 +36,7 @@
                             <x-filament::icon icon="heroicon-o-code-bracket" class="text-primary h-4 w-4" />
                         </div>
                     </x-slot>
-                    <x-slot:title>Comunidade</x-slot>
+                    <x-slot:title>Aprendizado</x-slot>
                     <x-slot:description>
                         Dezenas de projetos open source para contribuir e aprender.
                     </x-slot>
@@ -46,10 +46,10 @@
                         <div
                             class="bg-primary/8 border-primary/16 flex w-fit items-center justify-center rounded-lg border p-2"
                         >
-                            <x-filament::icon icon="heroicon-o-code-bracket" class="text-primary h-4 w-4" />
+                            <x-filament::icon icon="heroicon-o-user-group" class="text-primary h-4 w-4" />
                         </div>
                     </x-slot>
-                    <x-slot:title>Comunidade</x-slot>
+                    <x-slot:title>Colaboração</x-slot>
                     <x-slot:description>
                         Orientação personalizada para acelerar seu desenvolvimento.
                     </x-slot>
@@ -79,8 +79,12 @@
                         criam oportunidades.
                     </x-slot>
                     <x-slot:actions>
-                        <x-he4rt::button icon="heroicon-s-chevron-right" variant="outline">
-                            Conheça nossa história
+                        <x-he4rt::button
+                            href="https://discord.com/invite/he4rt"
+                            icon="heroicon-s-chevron-right"
+                            variant="outline"
+                        >
+                            Participe nossa comunidade
                         </x-he4rt::button>
                     </x-slot>
                 </x-he4rt::headline>
