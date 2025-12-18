@@ -84,7 +84,7 @@
                             icon="heroicon-s-chevron-right"
                             variant="outline"
                         >
-                            Participe nossa comunidade
+                            Participe da nossa comunidade
                         </x-he4rt::button>
                     </x-slot>
                 </x-he4rt::headline>

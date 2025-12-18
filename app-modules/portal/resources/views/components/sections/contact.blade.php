@@ -51,7 +51,6 @@
                             <x-slot:actions>
                                 <a href="https://discord.com/invite/he4rt">
                                     <x-filament::icon
-                                        href="google.com"
                                         icon="fab-discord"
                                         class="h-6 w-6 transition-all duration-500 hover:scale-105"
                                     />
