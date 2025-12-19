@@ -33,10 +33,20 @@ class IntroductionCommand extends SlashCommand
 
     protected $hidden = false;
 
+    private readonly string $roleId;
+
+    private readonly string $welcomeChanelId;
+
+    public function __construct()
+    {
+        $this->roleId = config('he4rt.channels.presentation_role_id');
+        $this->welcomeChanelId = config('he4rt.channels.welcome_channel_id');
+    }
+
     public function handle(Interaction $interaction): void
     {
         $hasRole = $interaction->member->roles
-            ->find(fn (Role $role) => $role->id === config('he4rt.channels.guild_rule_id'));
+            ->find(fn (Role $role) => $role->id === $this->roleId);
 
         if ($hasRole) {
             $interaction->respondWithMessage(
@@ -147,20 +157,21 @@ class IntroductionCommand extends SlashCommand
                 ->fields([
                     'Nome' => $userInformation->name,
                     'Nickname' => $userInformation->nickname,
-                    'Sobre' => $userInformation->about,
                 ])
-                ->fields(
-                    [
-                        'GitHub' => $userInformation->github_url ?? '-',
-                        'LinkedIn' => $userInformation->linkedin_url ?? '-',
-                    ],
+                ->fields([
+                    'Sobre' => $userInformation->about,
+                ],
                     inline: false
                 )
+                ->fields([
+                    'GitHub' => $userInformation->github_url ?? '-',
+                    'LinkedIn' => $userInformation->linkedin_url ?? '-',
+                ])
                 ->footerIcon($interaction->guild->icon)
                 ->footerText(Date::now()->format('Y').' © He4rt Developers')
                 ->timestamp(now())
                 ->color((string) hexdec('4b0080'))
-                ->send(config('he4rt.channels.welcome_channel'));
+                ->send($this->welcomeChanelId);
 
             $actualRoles = [];
 
@@ -168,7 +179,7 @@ class IntroductionCommand extends SlashCommand
                 $actualRoles[] = $role->id;
             }
 
-            $actualRoles[] = config('he4rt.channels.guild_rule_id');
+            $actualRoles[] = $this->roleId;
 
             $interaction->member->setRoles($actualRoles);
 
