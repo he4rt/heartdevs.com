@@ -127,8 +127,8 @@ class IntroductionCommand extends SlashCommand
                 'name' => $components->get('custom_id', 'name')->value,
                 'nickname' => $components->get('custom_id', 'nickname')->value,
                 'about' => $components->get('custom_id', 'about')->value,
-                'linkedin_url' => $components->get('custom_id', 'linkedin_url')->value ?? null,
-                'github_url' => $components->get('custom_id', 'github_url')->value ?? null,
+                'linkedin_url' => $components->get('custom_id', 'linkedin_url')?->value,
+                'github_url' => $components->get('custom_id', 'github_url')?->value,
                 'birthdate' => null,
             ]);
 
