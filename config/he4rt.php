@@ -19,6 +19,8 @@ return [
     'channels' => [
         'commands' => '542840741588762637',
         'dynamic_voice_category' => env('HE4RT_DYNAMIC_VOICE_CATEGORY'),
+        'welcome_channel' => env('WELCOME_CHANNEL_ID', '540993663468306433'),
+        'guild_rule_id' => env('GUILD_RULE_ID', '546150872397119491'),
     ],
     'seasons' => [
         [
