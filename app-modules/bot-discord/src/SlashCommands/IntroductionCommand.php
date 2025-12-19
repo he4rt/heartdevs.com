@@ -12,62 +12,40 @@ use He4rt\Provider\DTO\ResolveUserProviderDTO;
 use He4rt\Provider\Models\Provider;
 use He4rt\Tenant\Models\Tenant;
 use He4rt\User\Actions\InformationUserAction;
-use He4rt\User\Actions\ResolveUserContextAction;
 use He4rt\User\DTO\UpsertInformationDTO;
 use He4rt\User\Models\User;
+use He4rt\User\Services\ResolveUserContextService;
 use Illuminate\Support\Facades\Date;
 use Laracord\Commands\SlashCommand;
 use Throwable;
 
 class IntroductionCommand extends SlashCommand
 {
-    /**
-     * The command name.
-     *
-     * @var string
-     */
     protected $name = 'apresentar';
 
-    /**
-     * The command description.
-     *
-     * @var string
-     */
     protected $description = 'Apresente-se no servidor!';
 
-    /**
-     * The command options.
-     *
-     * @var array
-     */
     protected $options = [];
 
-    /**
-     * The permissions required to use the command.
-     *
-     * @var array
-     */
     protected $permissions = [];
 
-    /**
-     * Indicates whether the command requires admin permissions.
-     *
-     * @var bool
-     */
     protected $admin = false;
 
-    /**
-     * Indicates whether the command should be displayed in the commands list.
-     *
-     * @var bool
-     */
     protected $hidden = false;
 
-    /**
-     * Handle the slash command.
-     */
     public function handle(Interaction $interaction): void
     {
+        $hasRole = $interaction->member->roles
+            ->find(fn (Role $role) => $role->id === config('he4rt.channels.guild_rule_id'));
+
+        if ($hasRole) {
+            $interaction->respondWithMessage(
+                'Você já se apresentou. Esse comando só pode ser usado uma vez.',
+                true
+            );
+
+            return;
+        }
 
         $this->modal('Apresentar')
             ->components([
@@ -116,21 +94,6 @@ class IntroductionCommand extends SlashCommand
 
     private function persistData(Interaction $interaction, Collection $components): void
     {
-        $role = $interaction->guild->roles->find(fn (Role $role) => $role->name === '💜 He4rt');
-
-        if (! $role) {
-            $interaction->respondWithMessage('Erro ao encontrar o role He4rt', true);
-
-            return;
-        }
-
-        $hasRole = $interaction->member->roles->find(fn (Role $item) => $item->id === $role->id);
-
-        if ($hasRole) {
-            $interaction->respondWithMessage('Você já apresentou!!', true);
-
-            return;
-        }
 
         try {
             $tenantProvider = Provider::query()
@@ -147,7 +110,7 @@ class IntroductionCommand extends SlashCommand
                 'avatar' => $interaction->user->avatar,
             ]);
 
-            $userContext = resolve(ResolveUserContextAction::class)->handle($userDto);
+            $userContext = resolve(ResolveUserContextService::class)->handle($userDto);
 
             $informationDto = UpsertInformationDTO::make([
                 'user' => $userContext->user,
@@ -156,34 +119,58 @@ class IntroductionCommand extends SlashCommand
                 'about' => $components->get('custom_id', 'about')->value,
                 'linkedin_url' => $components->get('custom_id', 'linkedin_url')->value ?? null,
                 'github_url' => $components->get('custom_id', 'github_url')->value ?? null,
-                'birthdate' => $components->get('custom_id', 'birthdate')?->value ?? null,
+                'birthdate' => null,
             ]);
 
             $userInformation = resolve(InformationUserAction::class)->handle($informationDto);
 
             $this
-                ->message('apresentou')
-                ->content('https://heartdevs.com/')
-                ->color('800080')
-                ->title('Apresentação '.$userInformation->nickname)
+                ->message('Apresentação enviada com sucesso')
+                ->content(
+                    "Agora a comunidade já pode conhecer um pouco mais sobre você!\n"
+                    .'https://heartdevs.com/'
+                )
+                ->color((string) hexdec('4b0080'))
+                ->footerIcon($interaction->guild->icon)
+                ->footerText(Date::now()->format('Y').' © He4rt Developers')
+                ->timestamp(now())
+                ->reply($interaction, true);
+
+            $this
+                ->message('Nova apresentação')
+                ->title('Apresentação de '.$userInformation->nickname)
                 ->thumbnailUrl($interaction->user->avatar)
+                ->content(sprintf(
+                    '<@%s> acabou de se apresentar na comunidade. Sejam bem-vindo(a) e fique à vontade para interagir.',
+                    $interaction->user->id
+                ))
                 ->fields([
-                    'Nome/Nickname' => $userInformation->nickname,
+                    'Nome' => $userInformation->name,
+                    'Nickname' => $userInformation->nickname,
                     'Sobre' => $userInformation->about,
                 ])
                 ->fields(
                     [
-                        'Git/Github' => $userInformation->github_url ?? '-',
-                        'Linkedin' => $userInformation->linkedin_url ?? '-',
+                        'GitHub' => $userInformation->github_url ?? '-',
+                        'LinkedIn' => $userInformation->linkedin_url ?? '-',
                     ],
                     inline: false
                 )
                 ->footerIcon($interaction->guild->icon)
                 ->footerText(Date::now()->format('Y').' © He4rt Developers')
                 ->timestamp(now())
-                ->reply($interaction, true);
+                ->color((string) hexdec('4b0080'))
+                ->send(config('he4rt.channels.welcome_channel'));
 
-            $interaction->member->addRole($role);
+            $actualRoles = [];
+
+            foreach ($interaction->member->roles as $role) {
+                $actualRoles[] = $role->id;
+            }
+
+            $actualRoles[] = config('he4rt.channels.guild_rule_id');
+
+            $interaction->member->setRoles($actualRoles);
 
         } catch (Throwable $throwable) {
             $this->logger()->error('Error IntroductionCommand', [$throwable->getMessage()]);
