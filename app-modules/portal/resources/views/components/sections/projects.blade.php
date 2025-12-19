@@ -21,10 +21,9 @@
                 <x-slot:description>Repositórios de conteúdos sobre diversas tecnologias.</x-slot>
                 <x-slot:tags>
                     <x-he4rt::tag>Documentação</x-he4rt::tag>
-                    <x-he4rt::tag>Documentação</x-he4rt::tag>
                 </x-slot>
                 <x-slot:actions>
-                    <x-he4rt::button block>Ver projeto</x-he4rt::button>
+                    <x-he4rt::button href="https://github.com/he4rt/4noobs" block>Ver projeto</x-he4rt::button>
                 </x-slot>
             </x-he4rt::card>
 
@@ -34,25 +33,27 @@
                     Projetos práticos desenvolvidos pela comunidade para aprendizado.
                 </x-slot>
                 <x-slot:tags>
-                    <x-he4rt::tag>Documentação</x-he4rt::tag>
+                    <x-he4rt::tag>Projetos</x-he4rt::tag>
                     <x-he4rt::tag>Documentação</x-he4rt::tag>
                 </x-slot>
                 <x-slot:actions>
-                    <x-he4rt::button block>Ver projeto</x-he4rt::button>
+                    <x-he4rt::button href="https://github.com/he4rt/heartlabs-challenges" block>
+                        Ver projeto
+                    </x-he4rt::button>
                 </x-slot>
             </x-he4rt::card>
 
             <x-he4rt::card>
-                <x-slot:title>Desafios de Código</x-slot>
+                <x-slot:title>100DiasDeCodigo</x-slot>
                 <x-slot:description>
-                    Desafios semanais para praticar suas habilidades de programação.
+                    Plataforma para acompanhar o desafio dos 100 dias de código.
                 </x-slot>
                 <x-slot:tags>
                     <x-he4rt::tag>Documentação</x-he4rt::tag>
-                    <x-he4rt::tag>Documentação</x-he4rt::tag>
+                    <x-he4rt::tag>Comunidade</x-he4rt::tag>
                 </x-slot>
                 <x-slot:actions>
-                    <x-he4rt::button block>Ver projeto</x-he4rt::button>
+                    <x-he4rt::button href="https://github.com/he4rt/100diasdecodigo" block>Ver projeto</x-he4rt::button>
                 </x-slot>
             </x-he4rt::card>
         </div>
