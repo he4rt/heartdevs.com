@@ -8,10 +8,10 @@ use App\Http\Controllers\Controller;
 use He4rt\User\Actions\FindProfile;
 use He4rt\User\Actions\GetUser;
 use He4rt\User\Actions\GetUsersPaginated;
-use He4rt\User\Actions\UpdateProfile;
 use He4rt\User\Exceptions\ProfileException;
 use He4rt\User\Exceptions\UserEntityException;
 use He4rt\User\Http\Requests\UpdateProfileRequest;
+use He4rt\User\Services\UpdateProfileService;
 use Illuminate\Http\JsonResponse;
 
 final class UsersController extends Controller
@@ -44,9 +44,9 @@ final class UsersController extends Controller
     public function putProfile(
         UpdateProfileRequest $request,
         string $value,
-        UpdateProfile $action,
+        UpdateProfileService $action,
     ): JsonResponse {
-        $action->handle($value);
+        $action->handle($value); // TODO: handle need UpdateProfileDTO
 
         return response()->json();
     }
