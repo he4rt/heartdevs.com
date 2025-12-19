@@ -35,12 +35,12 @@ class IntroductionCommand extends SlashCommand
 
     private readonly string $roleId;
 
-    private readonly string $welcomeChanelId;
+    private readonly string $welcomeChannelId;
 
     public function __construct()
     {
         $this->roleId = config('he4rt.channels.presentation_role_id');
-        $this->welcomeChanelId = config('he4rt.channels.welcome_channel_id');
+        $this->welcomeChannelId = config('he4rt.channels.welcome_channel_id');
     }
 
     public function handle(Interaction $interaction): void
@@ -171,7 +171,7 @@ class IntroductionCommand extends SlashCommand
                 ->footerText(Date::now()->format('Y').' © He4rt Developers')
                 ->timestamp(now())
                 ->color((string) hexdec('4b0080'))
-                ->send($this->welcomeChanelId);
+                ->send($this->welcomeChannelId);
 
             $actualRoles = [];
 
