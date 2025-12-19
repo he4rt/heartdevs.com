@@ -131,12 +131,12 @@ class EditProfileCommand extends AbstractSlashCommand
                 'tenant_id' => $this->memberProvider->tenant_id,
                 'provider' => $this->memberProvider->provider,
                 'provider_id' => $interaction->user->id,
-                'name' => $components->get('custom_id', 'name')->value,
-                'nickname' => $components->get('custom_id', 'nickname')->value,
-                'linkedin_url' => $components->get('custom_id', 'linkedin_url')->value,
-                'github_url' => $components->get('custom_id', 'github_url')->value,
-                'birthdate' => $components->get('custom_id', 'birthdate')?->value ?? null,
-                'about' => $components->get('custom_id', 'about')->value,
+                'name' => $components->get('custom_id', 'name')?->value,
+                'nickname' => $components->get('custom_id', 'nickname')?->value,
+                'linkedin_url' => $components->get('custom_id', 'linkedin_url')?->value,
+                'github_url' => $components->get('custom_id', 'github_url')?->value,
+                'birthdate' => $components->get('custom_id', 'birthdate')?->value,
+                'about' => $components->get('custom_id', 'about')?->value,
             ]);
 
             resolve(UpdateProfileService::class)->handle($payload);
