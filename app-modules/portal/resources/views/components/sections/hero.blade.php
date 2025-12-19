@@ -30,9 +30,11 @@
                         através de projetos, mentorias e networking.
                     </x-slot>
                     <x-slot:actions>
-                        <x-he4rt::button icon="heroicon-s-chevron-right">Começar agora</x-he4rt::button>
+                        <x-he4rt::button href="https://discord.com/invite/he4rt" icon="heroicon-s-chevron-right">
+                            Começar agora
+                        </x-he4rt::button>
 
-                        <x-he4rt::button icon="heroicon-s-chevron-right" variant="outline">
+                        <x-he4rt::button href="#projects" icon="heroicon-s-chevron-right" variant="outline">
                             Explorar projetos
                         </x-he4rt::button>
                     </x-slot>

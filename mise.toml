@@ -1,2 +1,3 @@
 [tools]
 node = "24"
+"ubi:adwinying/php" = "8.4"
