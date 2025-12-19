@@ -2,14 +2,15 @@
 
 declare(strict_types=1);
 
-namespace He4rt\User\Actions;
+namespace He4rt\User\Services;
 
 use He4rt\Character\Actions\CharacterInitializerAction;
 use He4rt\Provider\Actions\ProviderResolver;
 use He4rt\Provider\DTO\ResolveUserProviderDTO;
+use He4rt\User\Actions\LinkUserToProviderAction;
 use He4rt\User\ValueObjects\UserContext;
 
-readonly class ResolveUserContextAction
+readonly class ResolveUserContextService
 {
     public function __construct(
         private ProviderResolver $providerResolver,

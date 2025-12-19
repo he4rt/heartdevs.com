@@ -2,15 +2,16 @@
 
 declare(strict_types=1);
 
-namespace He4rt\User\Actions;
+namespace He4rt\User\Services;
 
 use He4rt\Provider\Actions\ProviderResolver;
 use He4rt\Provider\DTO\ResolveUserProviderDTO;
+use He4rt\User\Actions\InformationUserAction;
 use He4rt\User\DTO\UpdateProfileDTO;
 use He4rt\User\DTO\UpsertInformationDTO;
 use He4rt\User\Models\User;
 
-final readonly class UpdateProfile
+final readonly class UpdateProfileService
 {
     public function __construct(
         private ProviderResolver $providerResolver,
