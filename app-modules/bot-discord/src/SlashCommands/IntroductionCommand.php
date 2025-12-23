@@ -39,8 +39,8 @@ class IntroductionCommand extends SlashCommand
 
     public function __construct()
     {
-        $this->roleId = config('he4rt.channels.presentation_role_id');
-        $this->welcomeChannelId = config('he4rt.channels.welcome_channel_id');
+        $this->roleId = config('bot-discord.roles.presentation');
+        $this->welcomeChannelId = config('bot-discord.channels.presentations');
     }
 
     public function handle(Interaction $interaction): void
