@@ -19,7 +19,7 @@ class WelcomeMember extends Event
 
     public function handle(Member $member, Discord $discord): void
     {
-        $channelId = '756664919709057046'; // TODO: Definir o ID do canal de boas-vindas
+        $channelId = config('bot-discord.channels.presentations');
 
         $tenantProvider = Provider::query()
             ->where('model_type', Tenant::class)
