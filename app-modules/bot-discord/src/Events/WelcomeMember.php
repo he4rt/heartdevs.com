@@ -22,7 +22,7 @@ class WelcomeMember extends Event
 
     public function handle(Member $member, Discord $discord): void
     {
-        $channelId = config('he4rt.channels.welcome_channel');
+        $channelId = config('bot-discord.channels.auto-report');
 
         $tenantProvider = Provider::query()
             ->where('model_type', Tenant::class)

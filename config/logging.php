@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use MarvinLabs\DiscordLogger\Logger;
 use Monolog\Handler\NullHandler;
 use Monolog\Handler\StreamHandler;
 use Monolog\Handler\SyslogUdpHandler;
@@ -127,6 +128,14 @@ return [
 
         'emergency' => [
             'path' => storage_path('logs/laravel.log'),
+        ],
+
+        'discord' => [
+            'driver' => 'custom',
+            'via' => Logger::class,
+            'level' => 'debug',
+            'url' => env('LOG_DISCORD_WEBHOOK_URL'),
+            'ignore_exceptions' => env('LOG_DISCORD_IGNORE_EXCEPTIONS', false),
         ],
 
     ],

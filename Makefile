@@ -88,3 +88,7 @@ setup: ## Setup the project
 	@php artisan key:generate --ansi
 	@php artisan storage:link --ansi
 	@composer run-script ide-helper
+
+.PHONY: bot
+bot: ## Run the Discord bot
+	@php artisan bot:boot

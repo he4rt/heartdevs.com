@@ -40,6 +40,7 @@ return [
         'scopes' => env('DISCORD_OAUTH_SCOPES', 'identify email'),
         'enabled' => env('DISCORD_OAUTH_ENABLED', true),
     ],
+
     'twitch' => [
         'client_id' => env('TWITCH_OAUTH_CLIENT_ID'),
         'client_secret' => env('TWITCH_OAUTH_CLIENT_SECRET'),
