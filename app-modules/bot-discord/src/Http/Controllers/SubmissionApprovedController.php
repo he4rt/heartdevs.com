@@ -18,24 +18,22 @@ class SubmissionApprovedController extends Controller
 
     public function __invoke(Request $request)
     {
+        $validated = $request->validate([
+            'day' => ['required', 'integer', 'between:1,100'],
+            'text' => ['required', 'string'],
+            'tweet_url' => ['required', 'string', 'url'],
+            'user_name' => ['required', 'string'],
+        ]);
         try {
-            $validated = $request->validate([
-                'day' => ['required', 'integer'],
-                'text' => ['required', 'string'],
-                'tweetUrl' => ['required', 'string'],
-                'userName' => ['required', 'string'],
-            ]);
-
             $dto = SubmissionApprovedWebhookDTO::make($validated);
 
             $this->postSubmissionToDiscordAction->execute($dto);
 
             return response()->json(['ok' => true]);
-        } catch (Throwable $throwable) {
+        } catch (Throwable) {
             return response()->json([
                 'ok' => false,
-                'error' => $throwable->getMessage(),
-            ], 400);
+            ], 500);
         }
     }
 }
