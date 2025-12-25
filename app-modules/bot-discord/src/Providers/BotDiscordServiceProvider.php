@@ -38,7 +38,7 @@ class BotDiscordServiceProvider extends LaracordServiceProvider
                 $middleware->append([BotAuthentication::class]);
             })
             ->withRoutes(function (Router $router): void {
-                $router->post('/submission-approved', SubmissionApprovedController::class);
+                $router->post('/webhooks/submission-approved', SubmissionApprovedController::class);
             })
             ->discoverEvents(__DIR__.'/../Events', 'He4rt\BotDiscord\Events')
             ->discoverCommands(__DIR__.'/../Commands', 'He4rt\BotDiscord\Commands')
