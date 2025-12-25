@@ -8,6 +8,7 @@ use App\Http\Controllers\Controller;
 use He4rt\BotDiscord\Actions\PostSubmissionToDiscordAction;
 use He4rt\BotDiscord\DTO\SubmissionApprovedWebhookDTO;
 use Illuminate\Http\Request;
+use Throwable;
 
 class SubmissionApprovedController extends Controller
 {
@@ -17,10 +18,24 @@ class SubmissionApprovedController extends Controller
 
     public function __invoke(Request $request)
     {
-        $dto = SubmissionApprovedWebhookDTO::make($request->toArray());
+        try {
+            $validated = $request->validate([
+                'day' => ['required', 'integer'],
+                'text' => ['required', 'string'],
+                'tweetUrl' => ['required', 'string'],
+                'userName' => ['required', 'string'],
+            ]);
 
-        $this->postSubmissionToDiscordAction->execute($dto);
+            $dto = SubmissionApprovedWebhookDTO::make($validated);
 
-        return response()->json(['ok' => true]);
+            $this->postSubmissionToDiscordAction->execute($dto);
+
+            return response()->json(['ok' => true]);
+        } catch (Throwable $throwable) {
+            return response()->json([
+                'ok' => false,
+                'error' => $throwable->getMessage(),
+            ], 400);
+        }
     }
 }
