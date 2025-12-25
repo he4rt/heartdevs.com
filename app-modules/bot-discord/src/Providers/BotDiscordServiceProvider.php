@@ -4,6 +4,10 @@ declare(strict_types=1);
 
 namespace He4rt\BotDiscord\Providers;
 
+use App\Http\Middleware\BotAuthentication;
+use He4rt\BotDiscord\Http\Controllers\SubmissionApprovedController;
+use Illuminate\Foundation\Configuration\Middleware;
+use Illuminate\Routing\Router;
 use Laracord\Laracord;
 use Laracord\LaracordServiceProvider;
 
@@ -30,7 +34,12 @@ class BotDiscordServiceProvider extends LaracordServiceProvider
     public function bot(Laracord $bot): Laracord
     {
         return $bot
-            ->disableHttpServer()
+            ->withMiddleware(function (Middleware $middleware): void {
+                $middleware->append([BotAuthentication::class]);
+            })
+            ->withRoutes(function (Router $router): void {
+                $router->post('/submission-approved', SubmissionApprovedController::class);
+            })
             ->discoverEvents(__DIR__.'/../Events', 'He4rt\BotDiscord\Events')
             ->discoverCommands(__DIR__.'/../Commands', 'He4rt\BotDiscord\Commands')
             ->discoverSlashCommands(__DIR__.'/../SlashCommands', 'He4rt\BotDiscord\SlashCommands')
