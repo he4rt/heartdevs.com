@@ -135,18 +135,6 @@ class IntroductionCommand extends SlashCommand
             $userInformation = resolve(InformationUserAction::class)->handle($informationDto);
 
             $this
-                ->message('Apresentação enviada com sucesso')
-                ->content(
-                    "Agora a comunidade já pode conhecer um pouco mais sobre você!\n"
-                    .'https://heartdevs.com/'
-                )
-                ->color((string) hexdec('4b0080'))
-                ->footerIcon($interaction->guild->icon)
-                ->footerText(Date::now()->format('Y').' © He4rt Developers')
-                ->timestamp(now())
-                ->reply($interaction, true);
-
-            $this
                 ->message('Nova apresentação')
                 ->title('Apresentação de '.$userInformation->nickname)
                 ->thumbnailUrl($interaction->user->avatar)
