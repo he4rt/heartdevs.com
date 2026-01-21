@@ -104,6 +104,7 @@ class IntroductionCommand extends SlashCommand
 
     private function persistData(Interaction $interaction, Collection $components): void
     {
+        $interaction->acknowledgeWithResponse(true);
 
         try {
             $tenantProvider = Provider::query()
@@ -171,12 +172,27 @@ class IntroductionCommand extends SlashCommand
 
             $interaction->member->setRoles($actualRoles);
 
-        } catch (Throwable $throwable) {
-            $this->logger()->error('Error IntroductionCommand', [$throwable->getMessage()]);
+            $interaction->updateOriginalResponse(
+                $this
+                    ->message('Apresentação enviada com sucesso')
+                    ->content(
+                        "Agora a comunidade já pode conhecer um pouco mais sobre você!\n"
+                        .'https://heartdevs.com/'
+                    )
+                    ->color((string) hexdec('4b0080'))
+                    ->footerIcon($interaction->guild->icon)
+                    ->footerText(Date::now()->format('Y').' © He4rt Developers')
+                    ->timestamp(now())
+                    ->build()
+            );
 
-            $interaction->respondWithMessage(
-                'Ocorreu um erro ao processar sua apresentação. Por favor, tente novamente mais tarde.',
-                true
+        } catch (Throwable) {
+            $interaction->updateOriginalResponse(
+                $this
+                    ->message('Erro ao processar apresentacao')
+                    ->content('Ocorreu um erro ao processar sua apresentacao. Por favor, tente novamente mais tarde.')
+                    ->error()
+                    ->build()
             );
         }
     }
