@@ -49,15 +49,15 @@ class IntroductionCommand extends SlashCommand
             ->find(fn (Role $role) => $role->id === $this->roleId);
 
         if ($hasRole) {
-            $interaction->respondWithMessage(
-                'Você já se apresentou. Esse comando só pode ser usado uma vez.',
-                true
-            );
+            $interaction->respondWithMessage('Você já se apresentou. Esse comando só pode ser usado uma vez.', true);
 
             return;
         }
 
+        $modalId = 'presentation_'.uniqid();
+
         $this->modal('Apresentar')
+            ->id($modalId)
             ->components([
                 TextInput::new('Nome', TextInput::STYLE_SHORT)
                     ->setCustomId('name')
@@ -95,105 +95,84 @@ class IntroductionCommand extends SlashCommand
                     ->setRequired(true),
 
             ])
-            ->submit(fn (Interaction $interaction, Collection $components) => $this->persistData(
-                $interaction,
-                $components
-            ))
+            ->submit(function (Interaction $interaction, Collection $components) use ($modalId): void {
+                if ($interaction->data->custom_id !== $modalId) {
+                    return;
+                }
+
+                try {
+                    $this->persistData($interaction, $components);
+
+                    $interaction->respondWithMessage("Apresentação enviada com sucesso.\nhttps://heartdevs.com/", true);
+
+                } catch (Throwable) {
+                    $interaction->respondWithMessage('Ocorreu um erro ao processar sua apresentação.', true);
+                }
+            })
             ->show($interaction);
     }
 
     private function persistData(Interaction $interaction, Collection $components): void
     {
-        $interaction->acknowledgeWithResponse(true);
+        $tenantProvider = Provider::query()
+            ->where('model_type', Tenant::class)
+            ->where('provider_id', (string) $interaction->guild_id)
+            ->firstOrFail();
 
-        try {
-            $tenantProvider = Provider::query()
-                ->where('model_type', Tenant::class)
-                ->where('provider_id', (string) $interaction->guild_id)
-                ->firstOrFail();
+        $userDto = ResolveUserProviderDTO::make([
+            'tenant_id' => $tenantProvider->tenant_id,
+            'provider' => $tenantProvider->provider,
+            'provider_id' => $interaction->user->id,
+            'model_type' => User::class,
+            'username' => $interaction->user->username,
+            'avatar' => $interaction->user->avatar,
+        ]);
 
-            $userDto = ResolveUserProviderDTO::make([
-                'tenant_id' => $tenantProvider->tenant_id,
-                'provider' => $tenantProvider->provider,
-                'provider_id' => $interaction->user->id,
-                'model_type' => User::class,
-                'username' => $interaction->user->username,
-                'avatar' => $interaction->user->avatar,
-            ]);
+        $userContext = resolve(ResolveUserContextService::class)->handle($userDto);
 
-            $userContext = resolve(ResolveUserContextService::class)->handle($userDto);
+        $informationDto = UpsertInformationDTO::make([
+            'user' => $userContext->user,
+            'name' => $components->get('custom_id', 'name')->value,
+            'nickname' => $components->get('custom_id', 'nickname')->value,
+            'about' => $components->get('custom_id', 'about')->value,
+            'linkedin_url' => $components->get('custom_id', 'linkedin_url')?->value,
+            'github_url' => $components->get('custom_id', 'github_url')?->value,
+            'birthdate' => null,
+        ]);
 
-            $informationDto = UpsertInformationDTO::make([
-                'user' => $userContext->user,
-                'name' => $components->get('custom_id', 'name')->value,
-                'nickname' => $components->get('custom_id', 'nickname')->value,
-                'about' => $components->get('custom_id', 'about')->value,
-                'linkedin_url' => $components->get('custom_id', 'linkedin_url')?->value,
-                'github_url' => $components->get('custom_id', 'github_url')?->value,
-                'birthdate' => null,
-            ]);
+        $userInformation = resolve(InformationUserAction::class)->handle($informationDto);
 
-            $userInformation = resolve(InformationUserAction::class)->handle($informationDto);
+        $this
+            ->message('Nova apresentação')
+            ->title('Apresentação de '.$userInformation->nickname)
+            ->thumbnailUrl($interaction->user->avatar)
+            ->content(sprintf(
+                '<@%s> acabou de se apresentar na comunidade.',
+                $interaction->user->id
+            ))
+            ->fields([
+                'Nome' => $userInformation->name,
+                'Nickname' => $userInformation->nickname,
+            ])
+            ->fields(['Sobre' => $userInformation->about], inline: false)
+            ->fields([
+                'GitHub' => $userInformation->github_url ?? '-',
+                'LinkedIn' => $userInformation->linkedin_url ?? '-',
+            ])
+            ->footerIcon($interaction->guild->icon)
+            ->footerText(Date::now()->format('Y').' © He4rt Developers')
+            ->timestamp(now())
+            ->color((string) hexdec('4b0080'))
+            ->send($this->welcomeChannelId);
 
-            $this
-                ->message('Nova apresentação')
-                ->title('Apresentação de '.$userInformation->nickname)
-                ->thumbnailUrl($interaction->user->avatar)
-                ->content(sprintf(
-                    '<@%s> acabou de se apresentar na comunidade. Sejam bem-vindo(a) e fique à vontade para interagir.',
-                    $interaction->user->id
-                ))
-                ->fields([
-                    'Nome' => $userInformation->name,
-                    'Nickname' => $userInformation->nickname,
-                ])
-                ->fields([
-                    'Sobre' => $userInformation->about,
-                ],
-                    inline: false
-                )
-                ->fields([
-                    'GitHub' => $userInformation->github_url ?? '-',
-                    'LinkedIn' => $userInformation->linkedin_url ?? '-',
-                ])
-                ->footerIcon($interaction->guild->icon)
-                ->footerText(Date::now()->format('Y').' © He4rt Developers')
-                ->timestamp(now())
-                ->color((string) hexdec('4b0080'))
-                ->send($this->welcomeChannelId);
+        $roles = [];
 
-            $actualRoles = [];
-
-            foreach ($interaction->member->roles as $role) {
-                $actualRoles[] = $role->id;
-            }
-
-            $actualRoles[] = $this->roleId;
-
-            $interaction->member->setRoles($actualRoles);
-
-            $interaction->updateOriginalResponse(
-                $this
-                    ->message('Apresentação enviada com sucesso')
-                    ->content(
-                        "Agora a comunidade já pode conhecer um pouco mais sobre você!\n"
-                        .'https://heartdevs.com/'
-                    )
-                    ->color((string) hexdec('4b0080'))
-                    ->footerIcon($interaction->guild->icon)
-                    ->footerText(Date::now()->format('Y').' © He4rt Developers')
-                    ->timestamp(now())
-                    ->build()
-            );
-
-        } catch (Throwable) {
-            $interaction->updateOriginalResponse(
-                $this
-                    ->message('Erro ao processar apresentacao')
-                    ->content('Ocorreu um erro ao processar sua apresentacao. Por favor, tente novamente mais tarde.')
-                    ->error()
-                    ->build()
-            );
+        foreach ($interaction->member->roles as $role) {
+            $roles[] = $role->id;
         }
+
+        $roles[] = $this->roleId;
+
+        $interaction->member->setRoles($roles);
     }
 }
