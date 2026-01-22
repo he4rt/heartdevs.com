@@ -27,8 +27,6 @@ class DynamicVoiceEvent extends Event
         $channelId = $state->channel_id;
         $userId = $state->user_id;
 
-        $this->logger()->info('Channel Members:'.($state->channel?->members?->count() ?? 0));
-
         resolve(HandleStateChannelAction::class)->execute(
             userId: $userId,
             channelId: $channelId,

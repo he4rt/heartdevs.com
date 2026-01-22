@@ -27,8 +27,6 @@ class GreetingsEvent extends Event
             return;
         }
 
-        $this->logger()->notice(sprintf('%s: %s', $message->author->username, $message->content));
-
         $hour = now()->hour;
         $payload = mb_strtolower($message->content);
 
