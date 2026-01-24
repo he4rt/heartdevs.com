@@ -10,7 +10,6 @@ return [
     'roles' => [
         'presentation' => env('HE4RT_PRESENTATION_ROLE_ID', '546150872397119491'),
 
-        // Tecnologias e especialidades disponíveis para seleção
         'technologies' => [
             'basic_english' => '546148708077666315',
             'intermediate_english' => '546148711416332298',
