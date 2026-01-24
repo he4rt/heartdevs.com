@@ -7,7 +7,6 @@ namespace He4rt\BotDiscord\SlashCommands;
 use Discord\Parts\Guild\Role;
 use Discord\Parts\Interactions\Command\Option;
 use Discord\Parts\Interactions\Interaction;
-use Illuminate\Support\Facades\Log;
 use Laracord\Commands\SlashCommand;
 use Throwable;
 
@@ -62,7 +61,6 @@ class DelasCommand extends SlashCommand
                 return;
             }
 
-            // Verificar se não é ele mesmo
             if ($interaction->user->id === $targetUserId) {
                 $interaction->respondWithMessage('❌ Você não pode usar este comando em você mesmo.', true);
 
@@ -71,14 +69,7 @@ class DelasCommand extends SlashCommand
 
             $this->addHe4rtDelasRole($interaction, $targetMember, $targetUserId);
 
-        } catch (Throwable $throwable) {
-            Log::error('Error in MulherCommand', [
-                'executor_id' => $interaction->user->id,
-                'target_id' => $targetUserId ?? 'unknown',
-                'error' => $throwable->getMessage(),
-                'trace' => $throwable->getTraceAsString(),
-            ]);
-
+        } catch (Throwable) {
             $interaction->respondWithMessage('❌ Erro ao processar comando. Tente novamente.', true);
         }
     }
