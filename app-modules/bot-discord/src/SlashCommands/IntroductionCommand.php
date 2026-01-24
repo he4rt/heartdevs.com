@@ -187,7 +187,7 @@ class IntroductionCommand extends SlashCommand
 
     private function savePersonalInfoAndShowTechSelection(Interaction $interaction, Collection $components): void
     {
-        $sessionKey = 'presentation_data_' . $interaction->user->id;
+        $sessionKey = 'presentation_data_'.$interaction->user->id;
         $personalData = [
             'name' => $components->get('custom_id', 'name')->value,
             'nickname' => $components->get('custom_id', 'nickname')->value,
@@ -226,7 +226,7 @@ class IntroductionCommand extends SlashCommand
 
     private function finalizePresentation(Interaction $interaction, array $selectedTechnologies): void
     {
-        $sessionKey = 'presentation_data_' . $interaction->user->id;
+        $sessionKey = 'presentation_data_'.$interaction->user->id;
         $personalData = Cache::get($sessionKey);
 
         if (! $personalData) {
