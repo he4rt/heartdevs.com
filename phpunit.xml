@@ -25,6 +25,7 @@
         <env name="PULSE_ENABLED" value="false"/>
         <env name="QUEUE_CONNECTION" value="sync"/>
         <env name="SESSION_DRIVER" value="array"/>
+        <env name="LARAVEL_CLOUDFLARE_ENABLED" value="false"/>
     </php>
     <source>
         <include>

@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "f8bcfb2769ac0c96340871a4b083aab2",
+    "content-hash": "61685dd9c70c62f7d18584f56e849545",
     "packages": [
         {
             "name": "anourvalar/eloquent-serialize",
@@ -5884,6 +5884,93 @@
                 "source": "https://github.com/Masterminds/html5-php/tree/2.10.0"
             },
             "time": "2025-07-25T09:04:22+00:00"
+        },
+        {
+            "name": "monicahq/laravel-cloudflare",
+            "version": "4.0.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/monicahq/laravel-cloudflare.git",
+                "reference": "4bf313fbfdf3a9a4beb071cba3aa1351bc1703c5"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/monicahq/laravel-cloudflare/zipball/4bf313fbfdf3a9a4beb071cba3aa1351bc1703c5",
+                "reference": "4bf313fbfdf3a9a4beb071cba3aa1351bc1703c5",
+                "shasum": ""
+            },
+            "require": {
+                "illuminate/support": "^11.0 || ^12.0",
+                "php": "^8.2"
+            },
+            "require-dev": {
+                "brainmaestro/composer-git-hooks": "^3.0",
+                "guzzlehttp/guzzle": "^6.3 || ^7.0",
+                "larastan/larastan": "^2.4 || ^3.0",
+                "laravel/pint": "^1.15",
+                "mockery/mockery": "^1.4",
+                "ocramius/package-versions": "^1.5 || ^2.1",
+                "orchestra/testbench": "^9.0 || ^10.0",
+                "phpstan/phpstan-deprecation-rules": "^1.0 || ^2.0",
+                "phpstan/phpstan-phpunit": "^1.0 || ^2.0",
+                "phpstan/phpstan-strict-rules": "^1.0 || ^2.0",
+                "phpunit/phpunit": "^10.0 || ^11.0",
+                "vimeo/psalm": "^6.0"
+            },
+            "suggest": {
+                "guzzlehttp/guzzle": "Required to get cloudflares ip addresses (^6.5.5|^7.0)."
+            },
+            "type": "library",
+            "extra": {
+                "hooks": {
+                    "config": {
+                        "stop-on-failure": [
+                            "pre-commit"
+                        ]
+                    },
+                    "pre-commit": [
+                        "files=$(git diff --staged --name-only);\"$(dirname \"$0\")/../../vendor/bin/pint\" $files; git add $files"
+                    ]
+                },
+                "laravel": {
+                    "providers": [
+                        "Monicahq\\Cloudflare\\TrustedProxyServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Monicahq\\Cloudflare\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Alexis Saettler",
+                    "email": "alexis@saettler.org"
+                }
+            ],
+            "description": "Add Cloudflare ip addresses to trusted proxies for Laravel.",
+            "keywords": [
+                "cloudflare",
+                "laravel",
+                "php",
+                "proxies"
+            ],
+            "support": {
+                "issues": "https://github.com/monicahq/laravel-cloudflare/issues",
+                "source": "https://github.com/monicahq/laravel-cloudflare"
+            },
+            "funding": [
+                {
+                    "url": "https://github.com/asbiin",
+                    "type": "github"
+                }
+            ],
+            "time": "2025-07-26T22:39:13+00:00"
         },
         {
             "name": "monolog/monolog",

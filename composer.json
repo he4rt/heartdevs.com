@@ -42,6 +42,7 @@
         "laravel/tinker": "^2.11.0",
         "livewire/flux": "^2.11.1",
         "marvinlabs/laravel-discord-logger": "^1.4.3",
+        "monicahq/laravel-cloudflare": "^4.0",
         "otavio-araujo/filament-smart-cep": "^4.0.1",
         "owenvoke/blade-fontawesome": "^3.0",
         "predis/predis": "^2.4.1",
