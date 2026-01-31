@@ -40,7 +40,7 @@ class ListEventModels extends ListRecords
             ->send();
     }
 
-    protected function modifyQueryWithActiveTab(Builder $query): Builder
+    protected function modifyQueryWithActiveTab(Builder $query, bool $isResolvingRecord = false): Builder
     {
         return $query->where('active', true)->with('attendees')->latest('end_at');
     }
