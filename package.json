@@ -18,7 +18,7 @@
     "devDependencies": {
         "@tailwindcss/typography": "0.5.19",
         "@tailwindcss/vite": "4.1.18",
-        "axios": "1.13.4",
+        "axios": "1.13.5",
         "concurrently": "9.2.1",
         "husky": "9.1.7",
         "laravel-vite-plugin": "2.1.0",
