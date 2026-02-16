@@ -20,7 +20,5 @@ return Application::configure(basePath: dirname(__DIR__))
             Monicahq\Cloudflare\Http\Middleware\TrustProxies::class
         );
     })
-    ->withExceptions(function (Exceptions $exceptions): void {
-        //
-    })
+    ->withExceptions(function (Exceptions $exceptions): void {})
     ->create();

@@ -34,7 +34,7 @@ class MeetingTypesTable
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
-                //
+
             ])
             ->recordActions([
                 EditAction::make(),

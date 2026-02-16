@@ -1,7 +1,6 @@
 {
     "preset": "laravel",
     "cache-file": ".pint.result.cache",
-    "notPath": ["tests/TestCase.php"],
     "rules": {
         "operator_linebreak": true,
         "no_unused_imports": true,
@@ -63,6 +62,10 @@
             "elements": {
                 "method": "one"
             }
-        }
+        },
+        "no_empty_comment": true,
+        "declare_parentheses": true,
+        "assign_null_coalescing_to_coalesce_equal": true,
+        "align_multiline_comment": true
     }
 }

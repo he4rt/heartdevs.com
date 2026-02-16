@@ -25,7 +25,7 @@ yarn-error.log
 /.phpunit.cache
 /.kiro
 /.junie
-/.rector.cache
+/.rector.result.cache
 *.log
 .DS_Store
 .phpactor.json

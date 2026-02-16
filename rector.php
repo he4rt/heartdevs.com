@@ -34,8 +34,8 @@ return RectorConfig::configure()
         __DIR__.'/app-modules/*/tests',
     ])
     ->withSkip([__DIR__.'/bootstrap/cache'])
-    ->withCache(cacheDirectory: sys_get_temp_dir().'/rector_cache', cacheClass: FileCacheStorage::class)
-    ->withImportNames(importShortClasses: false, removeUnusedImports: true)
+    ->withCache(cacheDirectory: __DIR__.'/.rector.result.cache', cacheClass: FileCacheStorage::class)
+    ->withImportNames(removeUnusedImports: true)
     ->withRootFiles()
     ->withPhpSets()
     ->withComposerBased(laravel: true)
@@ -50,7 +50,8 @@ return RectorConfig::configure()
         instanceOf: true,
         earlyReturn: true,
         carbon: true,
-        rectorPreset: true
+        rectorPreset: true,
+        phpunitCodeQuality: true,
     )
     ->withRules([
         ApplyDefaultInsteadOfNullCoalesceRector::class,

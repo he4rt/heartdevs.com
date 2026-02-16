@@ -22,7 +22,7 @@ class SponsorsTable
                     ->searchable(),
             ])
             ->filters([
-                //
+
             ])
             ->recordActions([
                 EditAction::make(),

@@ -14,6 +14,8 @@ class EventSubmissionSpeaker extends Pivot
 {
     use HasFactory;
 
+    protected $table = 'event_submission_speakers';
+
     protected $fillable = [
         'submission_id',
         'user_id',
