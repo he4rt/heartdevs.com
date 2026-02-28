@@ -80,7 +80,7 @@ class CargoDelasCommand extends SlashCommand
         $targetUserId = $this->value('user');
         $targetMember = $this->validateTarget($interaction, $targetUserId);
 
-        if (!$targetMember instanceof Member) {
+        if (! $targetMember instanceof Member) {
             return;
         }
 
