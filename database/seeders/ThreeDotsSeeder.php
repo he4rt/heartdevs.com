@@ -9,8 +9,8 @@ use He4rt\Events\Enums\Talks\TalkStatusEnum;
 use He4rt\Events\Models\EventModel;
 use He4rt\Events\Models\EventSegment;
 use He4rt\Events\Models\EventSubmission;
-use He4rt\Tenant\Models\Tenant;
-use He4rt\User\Models\User;
+use He4rt\Identity\Tenant\Models\Tenant;
+use He4rt\Identity\User\Models\User;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Date;
 

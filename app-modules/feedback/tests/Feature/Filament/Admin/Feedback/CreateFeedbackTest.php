@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 use He4rt\Feedback\Filament\Admin\Resources\Feedback\Pages\CreateFeedback;
 use He4rt\Feedback\Models\Feedback;
-use He4rt\Tenant\Models\Tenant;
-use He4rt\User\Models\User;
+use He4rt\Identity\Tenant\Models\Tenant;
+use He4rt\Identity\User\Models\User;
 
 use function Pest\Laravel\assertDatabaseHas;
 use function Pest\Livewire\livewire;

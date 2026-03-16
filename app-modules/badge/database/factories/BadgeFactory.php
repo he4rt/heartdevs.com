@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace He4rt\Badge\Database\Factories;
 
 use He4rt\Badge\Models\Badge;
-use He4rt\Provider\Enums\ProviderEnum;
-use He4rt\Tenant\Models\Tenant;
+use He4rt\Identity\ExternalIdentity\Enums\IdentityProvider;
+use He4rt\Identity\Tenant\Models\Tenant;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -19,7 +19,7 @@ final class BadgeFactory extends Factory
     public function definition(): array
     {
         return [
-            'provider' => fake()->randomElement(ProviderEnum::cases()),
+            'provider' => fake()->randomElement(IdentityProvider::cases()),
             'tenant_id' => Tenant::factory(),
             'name' => fake()->name(),
             'description' => fake()->sentence(),

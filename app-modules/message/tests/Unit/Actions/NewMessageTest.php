@@ -4,13 +4,12 @@ declare(strict_types=1);
 
 use He4rt\Character\Actions\FindCharacterIdByUserId;
 use He4rt\Character\Actions\IncrementExperience;
+use He4rt\Identity\ExternalIdentity\Actions\FindExternalIdentity;
+use He4rt\Identity\ExternalIdentity\Actions\LinkExternalIdentity as NewAccountByProvider;
 use He4rt\Meeting\Actions\AttendMeeting;
 use He4rt\Message\Actions\NewMessage;
 use He4rt\Message\Actions\PersistMessage;
 use He4rt\Message\DTO\NewMessageDTO;
-use He4rt\Provider\Actions\FindProvider;
-use He4rt\Provider\Actions\NewAccountByProvider;
-use He4rt\Provider\Entities\ProviderEntity;
 use Illuminate\Support\Facades\Cache;
 
 test('new message', function (string $provider, array $payload): void {
@@ -24,7 +23,7 @@ test('new message', function (string $provider, array $payload): void {
         ->with('meeting-id-user-foda-attended')
         ->andReturn(false);
 
-    $findProviderStub = Mockery::mock(FindProvider::class);
+    $findProviderStub = Mockery::mock(FindExternalIdentity::class);
     $findCharacterStub = Mockery::mock(FindCharacterIdByUserId::class);
     $characterExperienceStub = Mockery::mock(IncrementExperience::class);
     $persistMessageStub = Mockery::mock(PersistMessage::class);
@@ -32,14 +31,12 @@ test('new message', function (string $provider, array $payload): void {
     $newUserStub = Mockery::mock(NewAccountByProvider::class);
 
     $obtainedExperience = 1;
-    $providerEntityMock = new ProviderEntity(
-        '1',
-        '1',
-        'id-user-foda',
-        'twitch',
-        '12312312',
-        'email@foda.com'
-    );
+    $providerEntityMock = (object) [
+        'id' => '1',
+        'model_id' => 'id-user-foda',
+        'provider' => 'twitch',
+        'provider_id' => '12312312',
+    ];
 
     $findProviderStub
         ->shouldReceive('handle')
@@ -49,7 +46,7 @@ test('new message', function (string $provider, array $payload): void {
     $findCharacterStub
         ->shouldReceive('handle')
         ->once()
-        ->with($providerEntityMock->modelId)
+        ->with($providerEntityMock->model_id)
         ->andReturn('id-character-foda');
 
     $characterExperienceStub
@@ -66,7 +63,7 @@ test('new message', function (string $provider, array $payload): void {
     $attendMeetingStub
         ->shouldReceive('handle')
         ->once()
-        ->with($providerEntityMock->modelId);
+        ->with($providerEntityMock->model_id);
 
     $action = new NewMessage(
         $persistMessageStub,

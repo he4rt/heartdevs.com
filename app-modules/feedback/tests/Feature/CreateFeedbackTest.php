@@ -2,15 +2,15 @@
 
 declare(strict_types=1);
 
-use He4rt\Provider\Models\Provider;
-use He4rt\Tenant\Models\Tenant;
+use He4rt\Identity\ExternalIdentity\Models\ExternalIdentity;
+use He4rt\Identity\Tenant\Models\Tenant;
 use Symfony\Component\HttpFoundation\Response;
 
 test('can create', function (): void {
 
     $tenant = Tenant::factory()
         ->afterCreating(function (Tenant $tenant): void {
-            Provider::factory([
+            ExternalIdentity::factory([
                 'tenant_id' => $tenant->getKey(),
                 'provider' => 'discord',
                 'provider_id' => '123',
@@ -18,8 +18,8 @@ test('can create', function (): void {
         })
         ->create();
 
-    $providerSender = Provider::factory()->create(['tenant_id' => $tenant->getKey(), 'provider' => 'discord']);
-    $providerTarget = Provider::factory()->create(['tenant_id' => $tenant->getKey(), 'provider' => 'discord']);
+    $providerSender = ExternalIdentity::factory()->create(['tenant_id' => $tenant->getKey(), 'provider' => 'discord']);
+    $providerTarget = ExternalIdentity::factory()->create(['tenant_id' => $tenant->getKey(), 'provider' => 'discord']);
 
     $payload = [
         'sender_id' => $providerSender->provider_id,

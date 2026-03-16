@@ -12,7 +12,7 @@ use Filament\Forms\Components\Toggle;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
-use He4rt\Provider\Enums\ProviderEnum;
+use He4rt\Identity\ExternalIdentity\Enums\IdentityProvider;
 use Illuminate\Database\Eloquent\Builder;
 
 class BadgeForm
@@ -38,8 +38,8 @@ class BadgeForm
                                     )
                                     ->required(),
                                 Select::make('provider')
-                                    ->enum(ProviderEnum::class)
-                                    ->options(ProviderEnum::class)
+                                    ->enum(IdentityProvider::class)
+                                    ->options(IdentityProvider::class)
                                     ->required(),
                                 Toggle::make('active')
                                     ->required(),

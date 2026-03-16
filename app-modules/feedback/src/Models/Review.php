@@ -6,7 +6,7 @@ namespace He4rt\Feedback\Models;
 
 use He4rt\Feedback\Database\Factories\ReviewFactory;
 use He4rt\Feedback\Enum\ReviewTypeEnum;
-use He4rt\User\Models\User;
+use He4rt\Identity\User\Models\User;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;

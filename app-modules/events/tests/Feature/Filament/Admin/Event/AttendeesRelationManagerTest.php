@@ -9,8 +9,8 @@ use He4rt\Events\Enums\AttendingStatusEnum;
 use He4rt\Events\Filament\Admin\Resources\Events\Pages\EditEvent;
 use He4rt\Events\Filament\Admin\Resources\Events\RelationManagers\AttendeesRelationManager;
 use He4rt\Events\Models\EventModel;
-use He4rt\Tenant\Models\Tenant;
-use He4rt\User\Models\User;
+use He4rt\Identity\Tenant\Models\Tenant;
+use He4rt\Identity\User\Models\User;
 
 use function Pest\Laravel\actingAs;
 use function Pest\Livewire\livewire;

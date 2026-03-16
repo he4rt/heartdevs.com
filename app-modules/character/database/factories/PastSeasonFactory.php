@@ -6,8 +6,8 @@ namespace He4rt\Character\Database\Factories;
 
 use He4rt\Character\Models\Character;
 use He4rt\Character\Models\PastSeason;
+use He4rt\Identity\Tenant\Models\Tenant;
 use He4rt\Season\Models\Season;
-use He4rt\Tenant\Models\Tenant;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**

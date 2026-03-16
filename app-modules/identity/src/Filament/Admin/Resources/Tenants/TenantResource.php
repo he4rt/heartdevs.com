@@ -1,0 +1,65 @@
+<?php
+
+declare(strict_types=1);
+
+namespace He4rt\Identity\Filament\Admin\Resources\Tenants;
+
+use App\Filament\Shared\RelationManagers\EventsRelationManager;
+use App\Filament\Shared\RelationManagers\MembersRelationManager;
+use BackedEnum;
+use Filament\Resources\Resource;
+use Filament\Schemas\Schema;
+use Filament\Support\Icons\Heroicon;
+use Filament\Tables\Table;
+use He4rt\Identity\Filament\Admin\Resources\Tenants\Pages\CreateTenant;
+use He4rt\Identity\Filament\Admin\Resources\Tenants\Pages\EditTenant;
+use He4rt\Identity\Filament\Admin\Resources\Tenants\Pages\ListTenants;
+use He4rt\Identity\Filament\Admin\Resources\Tenants\Schemas\TenantForm;
+use He4rt\Identity\Filament\Admin\Resources\Tenants\Tables\TenantsTable;
+use He4rt\Identity\Tenant\Models\Tenant;
+use UnitEnum;
+
+class TenantResource extends Resource
+{
+    protected static ?string $model = Tenant::class;
+
+    protected static string|UnitEnum|null $navigationGroup = 'Administration';
+
+    protected static ?int $navigationSort = 2;
+
+    protected static string|BackedEnum|null $navigationIcon = Heroicon::Cube;
+
+    protected static ?string $recordTitleAttribute = 'name';
+
+    public static function getNavigationBadge(): ?string
+    {
+        return (string) self::$model::count();
+    }
+
+    public static function form(Schema $schema): Schema
+    {
+        return TenantForm::configure($schema);
+    }
+
+    public static function table(Table $table): Table
+    {
+        return TenantsTable::configure($table);
+    }
+
+    public static function getRelations(): array
+    {
+        return [
+            EventsRelationManager::class,
+            MembersRelationManager::class,
+        ];
+    }
+
+    public static function getPages(): array
+    {
+        return [
+            'index' => ListTenants::route('/'),
+            'create' => CreateTenant::route('/create'),
+            'edit' => EditTenant::route('/{record}/edit'),
+        ];
+    }
+}

@@ -1,0 +1,26 @@
+<?php
+
+declare(strict_types=1);
+
+namespace He4rt\Identity\ExternalIdentity\DTOs;
+
+use He4rt\Identity\ExternalIdentity\Enums\IdentityProvider;
+use JsonSerializable;
+
+final readonly class NewProviderDTO implements JsonSerializable
+{
+    public function __construct(
+        private int $tenantId,
+        private IdentityProvider $provider,
+        private string $providerId
+    ) {}
+
+    public function jsonSerialize(): array
+    {
+        return [
+            'tenant_id' => $this->tenantId,
+            'provider' => $this->provider->value,
+            'provider_id' => $this->providerId,
+        ];
+    }
+}

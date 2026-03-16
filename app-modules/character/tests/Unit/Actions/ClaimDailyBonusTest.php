@@ -8,14 +8,14 @@ use He4rt\Character\Actions\PersistDailyBonus;
 use He4rt\Character\Contracts\CharacterRepository;
 use He4rt\Character\Tests\Unit\CharacterProviderTrait;
 use He4rt\Character\Tests\Unit\ProviderProviderTrait;
-use He4rt\Provider\Actions\FindProvider;
+use He4rt\Identity\ExternalIdentity\Actions\FindExternalIdentity;
 
 uses(ProviderProviderTrait::class, CharacterProviderTrait::class);
 
 beforeEach(function (): void {
     $this->characterRepositoryStub = Mockery::mock(CharacterRepository::class);
     $this->persistDailyBonus = new PersistDailyBonus($this->characterRepositoryStub);
-    $this->findProviderStub = Mockery::mock(FindProvider::class);
+    $this->findExternalIdentityStub = Mockery::mock(FindExternalIdentity::class);
     $this->findCharacterIdByUserIdStub = Mockery::mock(FindCharacterIdByUserId::class);
     $this->providerEntity = $this->validProviderEntity();
     $this->characterEntity = $this->validCharacterEntity([
@@ -28,7 +28,7 @@ afterEach(function (): void {
 });
 
 test('claim daily bonus success', function (): void {
-    $this->findProviderStub
+    $this->findExternalIdentityStub
         ->shouldReceive('handle')
         ->with('canhassi-provider', 'canhassi-id')
         ->once()
@@ -36,7 +36,7 @@ test('claim daily bonus success', function (): void {
 
     $this->findCharacterIdByUserIdStub
         ->shouldReceive('handle')
-        ->with($this->providerEntity->modelId)
+        ->with($this->providerEntity->model_id)
         ->once()
         ->andReturn('character-id');
 
@@ -52,7 +52,7 @@ test('claim daily bonus success', function (): void {
 
     $test = new ClaimDailyBonus(
         $this->persistDailyBonus,
-        $this->findProviderStub,
+        $this->findExternalIdentityStub,
         $this->findCharacterIdByUserIdStub
     );
 

@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace He4rt\Feedback\DTO;
 
 use He4rt\Feedback\Enum\ReviewTypeEnum;
-use He4rt\Provider\Entities\ProviderEntity;
+use He4rt\Identity\ExternalIdentity\Models\ExternalIdentity;
 use JsonSerializable;
 
 final readonly class FeedbackReviewDTO implements JsonSerializable
@@ -13,20 +13,20 @@ final readonly class FeedbackReviewDTO implements JsonSerializable
     public function __construct(
         public string $feedbackId,
         public ReviewTypeEnum $reviewTypeEnum,
-        public ProviderEntity $adminProviderEntity,
+        public ExternalIdentity $adminProvider,
         public ?string $reason,
     ) {}
 
     public static function make(
         string $feedbackId,
         string $reviewType,
-        ProviderEntity $providerEntity,
+        ExternalIdentity $provider,
         ?string $reason
     ): self {
         return new self(
             feedbackId: $feedbackId,
             reviewTypeEnum: ReviewTypeEnum::from($reviewType),
-            adminProviderEntity: $providerEntity,
+            adminProvider: $provider,
             reason: $reason
         );
     }
@@ -35,7 +35,7 @@ final readonly class FeedbackReviewDTO implements JsonSerializable
     {
         return [
             'feedback_id' => $this->feedbackId,
-            'staff_id' => $this->adminProviderEntity->modelId,
+            'staff_id' => $this->adminProvider->model_id,
             'status' => $this->reviewTypeEnum->value,
             'reason' => $this->reason,
             'received_at' => $this->reason,

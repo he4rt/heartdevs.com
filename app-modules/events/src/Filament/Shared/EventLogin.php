@@ -30,8 +30,8 @@ use Filament\Schemas\Components\View;
 use Filament\Schemas\Schema;
 use Filament\Support\Enums\Alignment;
 use Filament\View\PanelsRenderHook;
-use He4rt\Authentication\Enums\OAuthProviderEnum;
-use He4rt\Tenant\Models\Tenant;
+use He4rt\Identity\ExternalIdentity\Enums\IdentityProvider;
+use He4rt\Identity\Tenant\Models\Tenant;
 use Illuminate\Auth\Events\Failed;
 use Illuminate\Auth\SessionGuard;
 use Illuminate\Contracts\Auth\Authenticatable;
@@ -157,7 +157,7 @@ class EventLogin extends SimplePage
         return $schema
             ->components([
                 View::make('he4rt::components.partials.oauth-connect')->viewData([
-                    'providers' => OAuthProviderEnum::cases(),
+                    'providers' => IdentityProvider::cases(),
                     'tenant' => $this->tenant,
                 ]),
                 $this->getEmailFormComponent(),

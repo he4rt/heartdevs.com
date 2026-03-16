@@ -3,8 +3,8 @@
 declare(strict_types=1);
 
 use He4rt\Feedback\Models\Feedback;
-use He4rt\Provider\Models\Provider;
-use He4rt\Tenant\Models\Tenant;
+use He4rt\Identity\ExternalIdentity\Models\ExternalIdentity;
+use He4rt\Identity\Tenant\Models\Tenant;
 use Symfony\Component\HttpFoundation\Response;
 
 dataset('data provider', fn () => [
@@ -31,7 +31,7 @@ test('can handle feedback', function (string $action, array $payload, array $exp
 
     $tenant = Tenant::factory()
         ->afterCreating(function (Tenant $tenant): void {
-            Provider::factory([
+            ExternalIdentity::factory([
                 'tenant_id' => $tenant->getKey(),
                 'provider' => 'discord',
                 'provider_id' => '123',
@@ -40,7 +40,7 @@ test('can handle feedback', function (string $action, array $payload, array $exp
         ->create();
 
     $feedback = Feedback::factory()->create(['tenant_id' => $tenant->getKey()]);
-    $staffProvider = Provider::factory()->create(['tenant_id' => $tenant->getKey(), 'provider' => 'discord']);
+    $staffProvider = ExternalIdentity::factory()->create(['tenant_id' => $tenant->getKey(), 'provider' => 'discord']);
 
     $payload['staff_id'] = $staffProvider->provider_id;
     $response = $this

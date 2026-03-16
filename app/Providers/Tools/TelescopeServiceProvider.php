@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Providers\Tools;
 
-use He4rt\User\Models\User;
+use He4rt\Identity\User\Models\User;
 use Illuminate\Support\Facades\Gate;
 use Laravel\Telescope\Telescope;
 use Laravel\Telescope\TelescopeApplicationServiceProvider;

@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace He4rt\Sponsors\Database\Factories;
 
+use He4rt\Identity\Tenant\Models\Tenant;
 use He4rt\Sponsors\Models\Sponsor;
-use He4rt\Tenant\Models\Tenant;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Facades\Date;
 

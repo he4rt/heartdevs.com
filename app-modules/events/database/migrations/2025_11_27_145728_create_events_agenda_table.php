@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 use He4rt\Events\Models\EventModel;
-use He4rt\Tenant\Models\Tenant;
+use He4rt\Identity\Tenant\Models\Tenant;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;

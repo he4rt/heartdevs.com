@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace He4rt\Message\Models;
 
-use He4rt\Provider\Models\Provider;
+use He4rt\Identity\ExternalIdentity\Models\ExternalIdentity;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
@@ -21,10 +21,10 @@ final class Voice extends Model
     ];
 
     /**
-     * @return BelongsTo<Provider, $this>
+     * @return BelongsTo<ExternalIdentity, $this>
      */
     public function provider(): BelongsTo
     {
-        return $this->belongsTo(Provider::class);
+        return $this->belongsTo(ExternalIdentity::class);
     }
 }

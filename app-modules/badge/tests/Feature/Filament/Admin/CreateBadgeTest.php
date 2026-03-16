@@ -5,9 +5,9 @@ declare(strict_types=1);
 use Filament\Facades\Filament;
 use He4rt\Badge\Filament\Resources\Badges\Pages\CreateBadge;
 use He4rt\Badge\Models\Badge;
-use He4rt\Provider\Enums\ProviderEnum;
-use He4rt\Tenant\Models\Tenant;
-use He4rt\User\Models\User;
+use He4rt\Identity\ExternalIdentity\Enums\IdentityProvider;
+use He4rt\Identity\Tenant\Models\Tenant;
+use He4rt\Identity\User\Models\User;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
 
@@ -35,7 +35,7 @@ it('should be able to create a badge', function (): void {
         ->assertOk()
         ->fillForm([
             'tenant_id' => $tenant->getKey(),
-            'provider' => ProviderEnum::Discord,
+            'provider' => IdentityProvider::Discord,
             'name' => 'name',
             'description' => 'description',
             'badge' => $image,
@@ -48,7 +48,7 @@ it('should be able to create a badge', function (): void {
     assertDatabaseCount(Badge::class, 1);
     assertDatabaseHas(Badge::class, [
         'tenant_id' => $tenant->getKey(),
-        'provider' => ProviderEnum::Discord->value,
+        'provider' => IdentityProvider::Discord->value,
         'name' => 'name',
         'redeem_code' => 'redeem_code',
         'active' => 1,

@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Tests;
 
-use He4rt\Provider\Models\Provider;
-use He4rt\Tenant\Models\Tenant;
+use He4rt\Identity\ExternalIdentity\Models\ExternalIdentity;
+use He4rt\Identity\Tenant\Models\Tenant;
 use Illuminate\Foundation\Testing\TestCase as BaseTestCase;
 
 abstract class TestCase extends BaseTestCase
@@ -16,7 +16,7 @@ abstract class TestCase extends BaseTestCase
     {
         Tenant::factory()
             ->afterCreating(function (Tenant $tenant): void {
-                Provider::factory([
+                ExternalIdentity::factory([
                     'tenant_id' => $tenant->getKey(),
                     'provider' => 'discord',
                     'provider_id' => '123',

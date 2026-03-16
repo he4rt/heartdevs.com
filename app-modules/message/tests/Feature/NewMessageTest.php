@@ -3,11 +3,11 @@
 declare(strict_types=1);
 
 use He4rt\Character\Models\Character;
+use He4rt\Identity\ExternalIdentity\Enums\IdentityProvider;
+use He4rt\Identity\ExternalIdentity\Models\ExternalIdentity;
+use He4rt\Identity\Tenant\Models\Tenant;
+use He4rt\Identity\User\Models\User;
 use He4rt\Meeting\Models\Meeting;
-use He4rt\Provider\Enums\ProviderEnum;
-use He4rt\Provider\Models\Provider;
-use He4rt\Tenant\Models\Tenant;
-use He4rt\User\Models\User;
 use Illuminate\Support\Facades\Cache;
 
 test('can create amessage', function (): void {
@@ -15,9 +15,9 @@ test('can create amessage', function (): void {
 
     $tenant = Tenant::factory()
         ->afterCreating(function (Tenant $tenant): void {
-            Provider::factory([
+            ExternalIdentity::factory([
                 'tenant_id' => $tenant->getKey(),
-                'provider' => ProviderEnum::Discord,
+                'provider' => IdentityProvider::Discord,
                 'provider_id' => '123',
             ])->create();
         })
@@ -25,7 +25,7 @@ test('can create amessage', function (): void {
 
     $user = User::factory()
         ->has(Character::factory(['tenant_id' => $tenant->getKey(), 'experience' => 1]), 'character')
-        ->has(Provider::factory(['tenant_id' => $tenant->getKey()]), 'providers')
+        ->has(ExternalIdentity::factory(['tenant_id' => $tenant->getKey()]), 'providers')
         ->create();
 
     $provider = $user->providers[0];
@@ -56,9 +56,9 @@ test('can create amessage with level zero', function (): void {
     Cache::tags(['meetings'])->flush();
     $tenant = Tenant::factory()
         ->afterCreating(function (Tenant $tenant): void {
-            Provider::factory([
+            ExternalIdentity::factory([
                 'tenant_id' => $tenant->getKey(),
-                'provider' => ProviderEnum::Discord,
+                'provider' => IdentityProvider::Discord,
                 'provider_id' => '123',
             ])->create();
         })
@@ -66,7 +66,7 @@ test('can create amessage with level zero', function (): void {
 
     $user = User::factory()
         ->has(Character::factory(['tenant_id' => $tenant->getKey(), 'experience' => 0]), 'character')
-        ->has(Provider::factory(['tenant_id' => $tenant->getKey()]), 'providers')
+        ->has(ExternalIdentity::factory(['tenant_id' => $tenant->getKey()]), 'providers')
         ->create();
     $provider = $user->providers[0];
     $payload = [
@@ -94,9 +94,9 @@ test('can create amessage and receive ameeting check', function (): void {
 
     $tenant = Tenant::factory()
         ->afterCreating(function (Tenant $tenant): void {
-            Provider::factory([
+            ExternalIdentity::factory([
                 'tenant_id' => $tenant->getKey(),
-                'provider' => ProviderEnum::Discord,
+                'provider' => IdentityProvider::Discord,
                 'provider_id' => '123',
             ])->create();
         })
@@ -104,7 +104,7 @@ test('can create amessage and receive ameeting check', function (): void {
 
     $user = User::factory()
         ->has(Character::factory(['tenant_id' => $tenant->getKey(), 'experience' => 1]), 'character')
-        ->has(Provider::factory(['tenant_id' => $tenant->getKey()]), 'providers')
+        ->has(ExternalIdentity::factory(['tenant_id' => $tenant->getKey()]), 'providers')
         ->create();
 
     $meeting = Meeting::factory()

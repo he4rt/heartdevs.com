@@ -6,8 +6,8 @@ use App\Enums\FilamentPanel;
 use Filament\Facades\Filament;
 use He4rt\Events\Filament\App\Talks\Pages\ListTalks;
 use He4rt\Events\Models\EventSubmission;
-use He4rt\Tenant\Models\Tenant;
-use He4rt\User\Models\User;
+use He4rt\Identity\Tenant\Models\Tenant;
+use He4rt\Identity\User\Models\User;
 
 use function Pest\Laravel\actingAs;
 use function Pest\Livewire\livewire;

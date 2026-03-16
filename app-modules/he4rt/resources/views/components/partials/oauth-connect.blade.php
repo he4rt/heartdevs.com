@@ -1,6 +1,6 @@
 @php
-    use He4rt\Authentication\Enums\OAuthProviderEnum;
-    /** @var OAuthProviderEnum[] $providers */
+    use He4rt\Identity\ExternalIdentity\Enums\IdentityProvider;
+    /** @var IdentityProvider[] $providers */
 @endphp
 
 @props([

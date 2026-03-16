@@ -20,7 +20,7 @@ use Filament\View\PanelsRenderHook;
 use He4rt\Events\Filament\Shared\EventLogin;
 use He4rt\Events\Filament\Shared\GuestSidebar;
 use He4rt\Events\Filament\Shared\GuestTopbar;
-use He4rt\Tenant\Models\Tenant;
+use He4rt\Identity\Tenant\Models\Tenant;
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
 use Illuminate\Cookie\Middleware\EncryptCookies;
 use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;

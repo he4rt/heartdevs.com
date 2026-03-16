@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-use He4rt\User\Models\User;
+use He4rt\Identity\User\Models\User;
 
 return [
 

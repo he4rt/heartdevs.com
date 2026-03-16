@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "0bd560c5150382e04b0e30c56ffdb3ab",
+    "content-hash": "92cb2318f3be199348274f10b8281841",
     "packages": [
         {
             "name": "anourvalar/eloquent-serialize",
@@ -3138,35 +3138,6 @@
             "time": "2025-08-22T14:27:06+00:00"
         },
         {
-            "name": "he4rt/authentication",
-            "version": "1.0",
-            "dist": {
-                "type": "path",
-                "url": "app-modules/authentication",
-                "reference": "03784359502b30f8add6e88cf85f8aa2cbc07965"
-            },
-            "type": "library",
-            "extra": {
-                "laravel": {
-                    "providers": [
-                        "He4rt\\Authentication\\Providers\\AuthenticationServiceProvider"
-                    ]
-                }
-            },
-            "autoload": {
-                "psr-4": {
-                    "He4rt\\Authentication\\": "src/"
-                }
-            },
-            "license": [
-                "proprietary"
-            ],
-            "transport-options": {
-                "symlink": true,
-                "relative": true
-            }
-        },
-        {
             "name": "he4rt/badge",
             "version": "1.0.0",
             "dist": {
@@ -3381,6 +3352,38 @@
             }
         },
         {
+            "name": "he4rt/identity",
+            "version": "1.0",
+            "dist": {
+                "type": "path",
+                "url": "app-modules/identity",
+                "reference": "8c53ac8360b892238de87e7134bc056d9274c856"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "He4rt\\Identity\\Providers\\IdentityServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "He4rt\\Identity\\": "src/",
+                    "He4rt\\Identity\\Tests\\": "tests/",
+                    "He4rt\\Identity\\Database\\Factories\\": "database/factories/",
+                    "He4rt\\Identity\\Database\\Seeders\\": "database/seeders/"
+                }
+            },
+            "license": [
+                "proprietary"
+            ],
+            "transport-options": {
+                "symlink": true,
+                "relative": true
+            }
+        },
+        {
             "name": "he4rt/integrations",
             "version": "1.0",
             "dist": {
@@ -3505,37 +3508,6 @@
             }
         },
         {
-            "name": "he4rt/provider",
-            "version": "1.0",
-            "dist": {
-                "type": "path",
-                "url": "app-modules/provider",
-                "reference": "2aa7bca9ad117070524f06bde1d5a6662eda6760"
-            },
-            "type": "library",
-            "extra": {
-                "laravel": {
-                    "providers": [
-                        "He4rt\\Provider\\Providers\\ProviderServiceProvider"
-                    ]
-                }
-            },
-            "autoload": {
-                "psr-4": {
-                    "He4rt\\Provider\\": "src/",
-                    "He4rt\\Provider\\Tests\\": "tests/",
-                    "He4rt\\Provider\\Database\\Factories\\": "database/factories/"
-                }
-            },
-            "license": [
-                "proprietary"
-            ],
-            "transport-options": {
-                "symlink": true,
-                "relative": true
-            }
-        },
-        {
             "name": "he4rt/ranking",
             "version": "1.0",
             "dist": {
@@ -3619,73 +3591,6 @@
                     "He4rt\\Sponsors\\Tests\\": "tests/",
                     "He4rt\\Sponsors\\Database\\Factories\\": "database/factories/",
                     "He4rt\\Sponsors\\Database\\Seeders\\": "database/seeders/"
-                }
-            },
-            "license": [
-                "proprietary"
-            ],
-            "transport-options": {
-                "symlink": true,
-                "relative": true
-            }
-        },
-        {
-            "name": "he4rt/tenant",
-            "version": "1.0",
-            "dist": {
-                "type": "path",
-                "url": "app-modules/tenant",
-                "reference": "206c0b9ce6e30e7ed0ec3bb38cf3734fe93db7e8"
-            },
-            "type": "library",
-            "extra": {
-                "laravel": {
-                    "providers": [
-                        "He4rt\\Tenant\\Providers\\TenantServiceProvider"
-                    ]
-                }
-            },
-            "autoload": {
-                "psr-4": {
-                    "He4rt\\Tenant\\": "src/",
-                    "He4rt\\Tenant\\Database\\Factories\\": "database/factories/",
-                    "He4rt\\Tenant\\Database\\Seeders\\": "database/seeders/"
-                }
-            },
-            "autoload-dev": {
-                "psr-4": {
-                    "He4rt\\Tenant\\Tests\\": "tests/"
-                }
-            },
-            "license": [
-                "proprietary"
-            ],
-            "transport-options": {
-                "symlink": true,
-                "relative": true
-            }
-        },
-        {
-            "name": "he4rt/user",
-            "version": "1.0",
-            "dist": {
-                "type": "path",
-                "url": "app-modules/user",
-                "reference": "04e0fdf2859651ef4803521124202f2ed18faf0b"
-            },
-            "type": "library",
-            "extra": {
-                "laravel": {
-                    "providers": [
-                        "He4rt\\User\\Providers\\UserServiceProvider"
-                    ]
-                }
-            },
-            "autoload": {
-                "psr-4": {
-                    "He4rt\\User\\": "src/",
-                    "He4rt\\User\\Tests\\": "tests/",
-                    "He4rt\\User\\Database\\Factories\\": "database/factories/"
                 }
             },
             "license": [

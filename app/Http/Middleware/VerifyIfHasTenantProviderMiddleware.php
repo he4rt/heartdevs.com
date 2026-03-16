@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace App\Http\Middleware;
 
 use Closure;
-use He4rt\Provider\Enums\ProviderEnum;
-use He4rt\Provider\Models\Provider;
+use He4rt\Identity\ExternalIdentity\Enums\IdentityProvider;
+use He4rt\Identity\ExternalIdentity\Models\ExternalIdentity;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use Symfony\Component\HttpFoundation\Response;
@@ -19,7 +19,7 @@ final class VerifyIfHasTenantProviderMiddleware
             return response()->json(['error' => 'Provider not registered for any tenant.'], Response::HTTP_UNAUTHORIZED);
         }
 
-        $provider = ProviderEnum::tryFrom($request->header('X-He4rt-Provider') ?? 'not-found');
+        $provider = IdentityProvider::tryFrom($request->header('X-He4rt-Provider') ?? 'not-found');
 
         if (! $provider) {
             return response()->json(['error' => 'Provider not registered for any tenant.'], Response::HTTP_UNAUTHORIZED);
@@ -28,7 +28,7 @@ final class VerifyIfHasTenantProviderMiddleware
         $providerId = $request->header('X-He4rt-Provider-Id');
 
         $str = sprintf('tenant_provider_%s', $providerId);
-        $providerModel = Cache::flexible($str, [1, 2], fn () => Provider::query()
+        $providerModel = Cache::flexible($str, [1, 2], fn () => ExternalIdentity::query()
             ->where('provider_id', $providerId)
             ->where('provider', $provider)
             ->first()

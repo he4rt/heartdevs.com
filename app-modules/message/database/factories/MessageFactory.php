@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace He4rt\Message\Database\Factories;
 
+use He4rt\Identity\ExternalIdentity\Models\ExternalIdentity;
+use He4rt\Identity\Tenant\Models\Tenant;
 use He4rt\Message\Models\Message;
-use He4rt\Provider\Models\Provider;
-use He4rt\Tenant\Models\Tenant;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -21,7 +21,7 @@ final class MessageFactory extends Factory
         return [
             'id' => fake()->uuid(),
             'tenant_id' => Tenant::factory(),
-            'provider_id' => Provider::factory(),
+            'provider_id' => ExternalIdentity::factory(),
             'provider_message_id' => fake()->randomNumber(4),
             'channel_id' => fake()->randomNumber(4),
             'content' => fake()->sentence(),

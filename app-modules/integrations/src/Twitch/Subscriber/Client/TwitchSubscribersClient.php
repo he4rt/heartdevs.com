@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace He4rt\Integrations\Twitch\Subscriber\Client;
 
 use GuzzleHttp\Client;
-use He4rt\Authentication\DTO\OAuthAccessDTO;
+use He4rt\Identity\Auth\DTOs\OAuthAccessDTO;
 use He4rt\Integrations\Twitch\Subscriber\Contracts\TwitchSubscribersService;
 use He4rt\Integrations\Twitch\Subscriber\DTO\TwitchSubscriberDTO;
 

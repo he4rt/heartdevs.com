@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace He4rt\Meeting\Models;
 
+use He4rt\Identity\Tenant\Models\Tenant;
+use He4rt\Identity\User\Models\User;
 use He4rt\Meeting\Database\Factories\MeetingFactory;
-use He4rt\Tenant\Models\Tenant;
-use He4rt\User\Models\User;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;

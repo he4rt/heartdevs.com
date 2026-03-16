@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace He4rt\Meeting\Actions;
 
 use App\Contracts\Paginator;
-use He4rt\Provider\Enums\ProviderEnum;
+use He4rt\Identity\ExternalIdentity\Enums\IdentityProvider;
 
 final readonly class PaginateMeetings
 {
@@ -13,7 +13,7 @@ final readonly class PaginateMeetings
 
     public function handle(string $provider): Paginator
     {
-        ProviderEnum::from($provider);
+        IdentityProvider::from($provider);
 
         return $this->paginateMeetingsAction->handle();
     }

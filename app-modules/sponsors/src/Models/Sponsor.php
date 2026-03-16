@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace He4rt\Sponsors\Models;
 
 use He4rt\Events\Models\EventModel;
+use He4rt\Identity\Tenant\Models\Tenant;
 use He4rt\Sponsors\Database\Factories\SponsorFactory;
 use He4rt\Sponsors\Models\Pivot\SponsorAttend;
-use He4rt\Tenant\Models\Tenant;
 use Illuminate\Database\Eloquent\Attributes\UseFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;

@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
+use He4rt\Identity\ExternalIdentity\Models\ExternalIdentity;
+use He4rt\Identity\Tenant\Models\Tenant;
 use He4rt\Meeting\Models\MeetingType;
-use He4rt\Provider\Models\Provider;
-use He4rt\Tenant\Models\Tenant;
 use Illuminate\Support\Facades\Cache;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -16,8 +16,8 @@ test('bot can start new meeting', function (): void {
         ->withDiscordProvider()
         ->create();
 
-    /** @var Provider $provider */
-    $provider = Provider::factory()->create(['tenant_id' => $tenant->getKey(), 'provider' => $providerName]);
+    /** @var ExternalIdentity $provider */
+    $provider = ExternalIdentity::factory()->create(['tenant_id' => $tenant->getKey(), 'provider' => $providerName]);
 
     $meetingType = MeetingType::factory()->create();
     $payload = [
@@ -47,8 +47,8 @@ test('meeting type not found', function (): void {
     // Arrange
     $providerName = 'discord';
 
-    /** @var Provider $provider */
-    $provider = Provider::factory()->create(['provider' => $providerName]);
+    /** @var ExternalIdentity $provider */
+    $provider = ExternalIdentity::factory()->create(['provider' => $providerName]);
 
     $payload = [
         'meeting_type_id' => 12,

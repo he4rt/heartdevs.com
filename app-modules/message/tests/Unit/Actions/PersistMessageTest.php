@@ -3,11 +3,11 @@
 declare(strict_types=1);
 
 use Carbon\CarbonImmutable;
+use He4rt\Identity\ExternalIdentity\Enums\IdentityProvider;
 use He4rt\Message\Actions\PersistMessage;
 use He4rt\Message\Contracts\MessageRepository;
 use He4rt\Message\DTO\NewMessageDTO;
 use He4rt\Message\Tests\Unit\MessageProviderTrait;
-use He4rt\Provider\Enums\ProviderEnum;
 
 uses(MessageProviderTrait::class);
 
@@ -16,7 +16,7 @@ beforeEach(function (): void {
     $this->messageEntity = $this->validMessageEntity();
     $this->messageDTO = new NewMessageDTO(
         1,
-        ProviderEnum::Discord,
+        IdentityProvider::Discord,
         'eae',
         $this->messageEntity->providerId,
         $this->messageEntity->providerMessageId,

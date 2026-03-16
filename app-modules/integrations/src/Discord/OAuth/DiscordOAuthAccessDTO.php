@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace He4rt\Integrations\Discord\OAuth;
 
-use He4rt\Authentication\DTO\OAuthAccessDTO;
+use He4rt\Identity\Auth\DTOs\OAuthAccessDTO;
 
 final class DiscordOAuthAccessDTO extends OAuthAccessDTO
 {

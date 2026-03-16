@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace He4rt\Badge\Models;
 
 use He4rt\Badge\Database\Factories\BadgeFactory;
-use He4rt\Provider\Enums\ProviderEnum;
-use He4rt\Tenant\Models\Tenant;
+use He4rt\Identity\ExternalIdentity\Enums\IdentityProvider;
+use He4rt\Identity\Tenant\Models\Tenant;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -52,7 +52,7 @@ final class Badge extends Model implements HasMedia
     {
         return [
             'active' => 'boolean',
-            'provider' => ProviderEnum::class,
+            'provider' => IdentityProvider::class,
         ];
     }
 }

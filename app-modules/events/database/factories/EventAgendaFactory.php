@@ -8,7 +8,7 @@ use He4rt\Events\Models\EventAgenda;
 use He4rt\Events\Models\EventModel;
 use He4rt\Events\Models\EventSegment;
 use He4rt\Events\Models\EventSubmission;
-use He4rt\Tenant\Models\Tenant;
+use He4rt\Identity\Tenant\Models\Tenant;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Facades\Date;
 

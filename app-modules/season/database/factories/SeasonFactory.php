@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace He4rt\Season\Database\Factories;
 
+use He4rt\Identity\Tenant\Models\Tenant;
 use He4rt\Season\Models\Season;
-use He4rt\Tenant\Models\Tenant;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**

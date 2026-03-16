@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Livewire;
 
-use He4rt\Authentication\Enums\OAuthProviderEnum;
-use He4rt\Tenant\Models\Tenant;
+use He4rt\Identity\ExternalIdentity\Enums\IdentityProvider;
+use He4rt\Identity\Tenant\Models\Tenant;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Livewire\Attributes\Computed;
@@ -23,11 +23,11 @@ class ConnectionHub extends Component
     {
         return view('livewire.connection-hub', [
             'userProviders' => $this->userProviders(),
-            'supportedProviders' => OAuthProviderEnum::cases(),
+            'supportedProviders' => IdentityProvider::cases(),
         ]);
     }
 
-    public function connect(OAuthProviderEnum $provider): RedirectResponse
+    public function connect(IdentityProvider $provider): RedirectResponse
     {
         /** @var Tenant $tenant */
         $tenant = filament()->getTenant();

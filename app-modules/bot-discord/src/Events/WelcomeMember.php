@@ -7,11 +7,11 @@ namespace He4rt\BotDiscord\Events;
 use Discord\Discord;
 use Discord\Parts\User\Member;
 use Discord\WebSockets\Event as Events;
-use He4rt\Provider\DTO\ResolveUserProviderDTO;
-use He4rt\Provider\Models\Provider;
-use He4rt\Tenant\Models\Tenant;
-use He4rt\User\Models\User;
-use He4rt\User\Services\ResolveUserContextService;
+use He4rt\Identity\ExternalIdentity\DTOs\ResolveUserProviderDTO;
+use He4rt\Identity\ExternalIdentity\Models\ExternalIdentity;
+use He4rt\Identity\Tenant\Models\Tenant;
+use He4rt\Identity\User\Actions\ResolveUserContext;
+use He4rt\Identity\User\Models\User;
 use Illuminate\Support\Facades\Log;
 use Laracord\Events\Event;
 use Throwable;
@@ -24,7 +24,7 @@ class WelcomeMember extends Event
     {
         $channelId = config('bot-discord.channels.auto-report');
 
-        $tenantProvider = Provider::query()
+        $tenantProvider = ExternalIdentity::query()
             ->where('model_type', Tenant::class)
             ->where('provider_id', (string) $member->guild_id)
             ->firstOrFail();
@@ -39,7 +39,7 @@ class WelcomeMember extends Event
                 'avatar' => $member->user->avatar,
             ]);
 
-            resolve(ResolveUserContextService::class)->handle($userDto);
+            resolve(ResolveUserContext::class)->handle($userDto);
         } catch (Throwable $throwable) {
             Log::error('Falha ao resolver usuário no evento WelcomeMember', [
                 'tenant_id' => $tenantProvider->tenant_id ?? null,

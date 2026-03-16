@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace He4rt\Integrations\Discord\OAuth;
 
-use He4rt\Authentication\DTO\OAuthAccessDTO;
-use He4rt\Authentication\DTO\OAuthUserDTO;
-use He4rt\Authentication\Enums\OAuthProviderEnum;
+use He4rt\Identity\Auth\DTOs\OAuthAccessDTO;
+use He4rt\Identity\Auth\DTOs\OAuthUserDTO;
+use He4rt\Identity\ExternalIdentity\Enums\IdentityProvider;
 
 class DiscordOAuthUser extends OAuthUserDTO
 {
@@ -15,7 +15,7 @@ class DiscordOAuthUser extends OAuthUserDTO
         return new self(
             credentials: $credentials,
             providerId: $payload['id'],
-            provider: OAuthProviderEnum::Discord,
+            provider: IdentityProvider::Discord,
             username: $payload['username'],
             name: $payload['global_name'] ?? $payload['username'],
             email: $payload['email'],

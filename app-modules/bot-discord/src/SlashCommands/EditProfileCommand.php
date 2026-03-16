@@ -7,8 +7,8 @@ namespace He4rt\BotDiscord\SlashCommands;
 use Discord\Builders\Components\TextInput;
 use Discord\Helpers\Collection;
 use Discord\Parts\Interactions\Interaction;
-use He4rt\User\DTO\UpdateProfileDTO;
-use He4rt\User\Services\UpdateProfileService;
+use He4rt\Identity\User\Actions\UpdateProfile;
+use He4rt\Identity\User\DTOs\UpdateProfileDTO;
 use Illuminate\Support\Facades\Date;
 use Throwable;
 
@@ -139,7 +139,7 @@ class EditProfileCommand extends AbstractSlashCommand
                 'about' => $components->get('custom_id', 'about')?->value,
             ]);
 
-            resolve(UpdateProfileService::class)->handle($payload);
+            resolve(UpdateProfile::class)->handle($payload);
 
             $this
                 ->message('Perfil atualizado!')

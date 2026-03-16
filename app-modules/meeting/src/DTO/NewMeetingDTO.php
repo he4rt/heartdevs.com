@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace He4rt\Meeting\DTO;
 
-use He4rt\Provider\Enums\ProviderEnum;
+use He4rt\Identity\ExternalIdentity\Enums\IdentityProvider;
 
 final readonly class NewMeetingDTO
 {
     public function __construct(
-        public ProviderEnum $provider,
+        public IdentityProvider $provider,
         public string $providerId,
         public int $meetingTypeId,
     ) {}
@@ -17,7 +17,7 @@ final readonly class NewMeetingDTO
     public static function make(string $provider, string $providerId, int $meetingTypeId): self
     {
         return new self(
-            provider: ProviderEnum::from($provider),
+            provider: IdentityProvider::from($provider),
             providerId: $providerId,
             meetingTypeId: $meetingTypeId
         );

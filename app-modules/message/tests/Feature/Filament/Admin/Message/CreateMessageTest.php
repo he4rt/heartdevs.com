@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
+use He4rt\Identity\ExternalIdentity\Enums\IdentityProvider;
+use He4rt\Identity\ExternalIdentity\Models\ExternalIdentity;
+use He4rt\Identity\Tenant\Models\Tenant;
 use He4rt\Message\Filament\Admin\Resources\Messages\Pages\CreateMessage;
 use He4rt\Message\Models\Message;
-use He4rt\Provider\Enums\ProviderEnum;
-use He4rt\Provider\Models\Provider;
 use He4rt\Season\Models\Season;
-use He4rt\Tenant\Models\Tenant;
 
 use function Pest\Laravel\assertDatabaseHas;
 use function Pest\Livewire\livewire;
@@ -15,9 +15,9 @@ use function Pest\Livewire\livewire;
 it('can create a message', function (): void {
     $tenant = Tenant::factory()
         ->create();
-    $provider = Provider::factory()
+    $provider = ExternalIdentity::factory()
         ->recycle($tenant)
-        ->create(['provider' => ProviderEnum::Discord]);
+        ->create(['provider' => IdentityProvider::Discord]);
     $season = Season::factory()
         ->recycle($tenant)
         ->create();

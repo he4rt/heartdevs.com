@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace He4rt\Integrations\Twitch\OAuth\DTO;
 
-use He4rt\Authentication\DTO\OAuthAccessDTO;
-use He4rt\Authentication\DTO\OAuthUserDTO;
-use He4rt\Authentication\Enums\OAuthProviderEnum;
+use He4rt\Identity\Auth\DTOs\OAuthAccessDTO;
+use He4rt\Identity\Auth\DTOs\OAuthUserDTO;
+use He4rt\Identity\ExternalIdentity\Enums\IdentityProvider;
 
 final class TwitchOAuthDTO extends OAuthUserDTO
 {
@@ -17,7 +17,7 @@ final class TwitchOAuthDTO extends OAuthUserDTO
         return new self(
             credentials: $credentials,
             providerId: $user['id'],
-            provider: OAuthProviderEnum::Twitch,
+            provider: IdentityProvider::Twitch,
             username: $user['login'],
             name: $user['display_name'],
             email: $user['email'],

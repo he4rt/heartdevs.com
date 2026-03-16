@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 use App\Enums\FilamentPanel;
 use Filament\Facades\Filament;
+use He4rt\Identity\Tenant\Models\Tenant;
 use He4rt\Season\Filament\Admin\Resources\Seasons\Pages\CreateSeason;
 use He4rt\Season\Models\Season;
-use He4rt\Tenant\Models\Tenant;
 use Illuminate\Support\Facades\Date;
 
 use function Pest\Laravel\assertDatabaseCount;

@@ -6,7 +6,7 @@ namespace He4rt\BotDiscord\SlashCommands;
 
 use Discord\Parts\Interactions\Command\Option;
 use Discord\Parts\Interactions\Interaction;
-use He4rt\Provider\Models\Provider;
+use He4rt\Identity\ExternalIdentity\Models\ExternalIdentity;
 use Illuminate\Support\Facades\Date;
 use Throwable;
 
@@ -75,7 +75,7 @@ class ProfileCommand extends AbstractSlashCommand
 
         try {
 
-            if (! $this->memberProvider instanceof Provider || ! $this->memberProvider->user->information) {
+            if (! $this->memberProvider instanceof ExternalIdentity || ! $this->memberProvider->user->information) {
                 $this
                     ->message()
                     ->content($mentionedUser.' ainda não se apresentou! Use o comando `/introduction` primeiro.')

@@ -6,7 +6,7 @@ namespace He4rt\Events\Models;
 
 use He4rt\Events\Database\Factories\EventAgendaFactory;
 use He4rt\Events\Enums\SchedulableTypeEnum;
-use He4rt\Tenant\Models\Tenant;
+use He4rt\Identity\Tenant\Models\Tenant;
 use Illuminate\Database\Eloquent\Attributes\UseFactory;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;

@@ -6,14 +6,14 @@ namespace Database\Seeders;
 
 use He4rt\Character\Models\Character;
 use He4rt\Events\Models\EventModel;
+use He4rt\Identity\ExternalIdentity\Models\ExternalIdentity;
+use He4rt\Identity\Tenant\Models\Tenant;
+use He4rt\Identity\User\Models\Address;
+use He4rt\Identity\User\Models\Information;
+use He4rt\Identity\User\Models\User;
 use He4rt\Meeting\Models\Meeting;
 use He4rt\Message\Models\Message;
-use He4rt\Provider\Models\Provider;
 use He4rt\Season\Models\Season;
-use He4rt\Tenant\Models\Tenant;
-use He4rt\User\Models\Address;
-use He4rt\User\Models\Information;
-use He4rt\User\Models\User;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\Hash;
@@ -65,7 +65,7 @@ class BaseSeeder extends Seeder
                 'ended_at' => now()->addMonth(),
             ]);
 
-        Provider::factory()
+        ExternalIdentity::factory()
             ->recycle($user)
             ->recycle($tenant)
             ->count(2)

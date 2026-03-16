@@ -6,7 +6,7 @@ namespace He4rt\Events\Database\Factories;
 
 use He4rt\Events\Models\EventModel;
 use He4rt\Events\Models\Pivot\EventSubmissionSpeaker;
-use He4rt\User\Models\User;
+use He4rt\Identity\User\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /** @extends Factory<EventSubmissionSpeaker> */

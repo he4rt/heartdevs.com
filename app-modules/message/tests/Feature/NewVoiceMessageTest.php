@@ -4,19 +4,19 @@ declare(strict_types=1);
 
 use He4rt\Character\Enums\VoiceStatesEnum;
 use He4rt\Character\Models\Character;
-use He4rt\Provider\Enums\ProviderEnum;
-use He4rt\Provider\Models\Provider;
-use He4rt\Tenant\Models\Tenant;
-use He4rt\User\Models\User;
+use He4rt\Identity\ExternalIdentity\Enums\IdentityProvider;
+use He4rt\Identity\ExternalIdentity\Models\ExternalIdentity;
+use He4rt\Identity\Tenant\Models\Tenant;
+use He4rt\Identity\User\Models\User;
 
 test('can create voice message', function (): void {
     config(['he4rt.season.id' => 2]);
 
     $tenant = Tenant::factory()
         ->afterCreating(function (Tenant $tenant): void {
-            Provider::factory([
+            ExternalIdentity::factory([
                 'tenant_id' => $tenant->getKey(),
-                'provider' => ProviderEnum::Discord,
+                'provider' => IdentityProvider::Discord,
                 'provider_id' => '123',
             ])->create();
         })
@@ -24,7 +24,7 @@ test('can create voice message', function (): void {
 
     $user = User::factory()
         ->has(Character::factory(['tenant_id' => $tenant->getKey(), 'experience' => 1]), 'character')
-        ->has(Provider::factory(['tenant_id' => $tenant->getKey()]), 'providers')
+        ->has(ExternalIdentity::factory(['tenant_id' => $tenant->getKey()]), 'providers')
         ->create();
 
     $provider = $user->providers[0];

@@ -6,14 +6,14 @@ namespace He4rt\Message\Actions;
 
 use He4rt\Character\Actions\FindCharacterIdByUserId;
 use He4rt\Character\Actions\IncrementExperience;
+use He4rt\Identity\ExternalIdentity\Actions\FindExternalIdentity;
 use He4rt\Message\Contracts\VoiceRepository;
 use He4rt\Message\DTO\NewVoiceMessageDTO;
-use He4rt\Provider\Actions\FindProvider;
 
 final readonly class NewVoiceMessage
 {
     public function __construct(
-        private FindProvider $findProvider,
+        private FindExternalIdentity $findExternalIdentity,
         private FindCharacterIdByUserId $findCharacterId,
         private IncrementExperience $characterExperience,
         private VoiceRepository $voiceRepository
@@ -22,17 +22,17 @@ final readonly class NewVoiceMessage
     public function persist(array $payload): void
     {
         $voiceDTO = NewVoiceMessageDTO::make($payload);
-        $provider = $this->findProvider->handle(
+        $externalIdentity = $this->findExternalIdentity->handle(
             $voiceDTO->provider->value,
             $voiceDTO->providerId
         );
 
-        $characterId = $this->findCharacterId->handle($provider->modelId);
+        $characterId = $this->findCharacterId->handle($externalIdentity->model_id);
         $obtainedExperience = $this->characterExperience->incrementByVoiceMessage(
             $characterId,
             $voiceDTO->voiceState
         );
 
-        $this->voiceRepository->create($voiceDTO, $provider->id, $obtainedExperience);
+        $this->voiceRepository->create($voiceDTO, $externalIdentity->id, $obtainedExperience);
     }
 }

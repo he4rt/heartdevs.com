@@ -11,8 +11,8 @@ use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
-use He4rt\User\Filament\Admin\Resources\Users\UserResource;
-use He4rt\User\Models\User;
+use He4rt\Identity\Filament\Admin\Resources\Users\UserResource;
+use He4rt\Identity\User\Models\User;
 use Illuminate\Database\Eloquent\Model;
 
 class AttendeesRelationManager extends RelationManager

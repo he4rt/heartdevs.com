@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Console\Commands;
 
-use He4rt\Provider\Enums\ProviderEnum;
-use He4rt\Tenant\Models\Tenant;
+use He4rt\Identity\ExternalIdentity\Enums\IdentityProvider;
+use He4rt\Identity\Tenant\Models\Tenant;
 use Illuminate\Console\Command;
 
 class GenerateDiscordTenant extends Command
@@ -35,7 +35,7 @@ class GenerateDiscordTenant extends Command
                     ->providers()
                     ->create([
                         'tenant_id' => $tenant->getKey(),
-                        'provider' => ProviderEnum::Discord,
+                        'provider' => IdentityProvider::Discord,
                         'provider_id' => $this->argument('guildId'),
                     ]);
             })

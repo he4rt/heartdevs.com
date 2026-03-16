@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-use He4rt\Tenant\Models\Tenant;
+use He4rt\Identity\Tenant\Models\Tenant;
 use Symfony\Component\HttpFoundation\Response;
 
 test('can create badge', function (): void {

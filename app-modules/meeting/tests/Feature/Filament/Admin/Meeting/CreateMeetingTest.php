@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 use App\Enums\FilamentPanel;
 use Filament\Facades\Filament;
+use He4rt\Identity\Tenant\Models\Tenant;
+use He4rt\Identity\User\Models\User;
 use He4rt\Meeting\Filament\Resources\Meetings\Pages\CreateMeeting;
 use He4rt\Meeting\Models\Meeting;
 use He4rt\Meeting\Models\MeetingType;
-use He4rt\Tenant\Models\Tenant;
-use He4rt\User\Models\User;
 use Illuminate\Support\Facades\Date;
 
 use function Pest\Laravel\assertDatabaseCount;

@@ -1,5 +1,5 @@
 @php
-    use He4rt\Provider\Models\Provider;
+    use He4rt\Identity\ExternalIdentity\Models\ExternalIdentity;
 @endphp
 
 @props([
@@ -8,14 +8,14 @@
 ])
 
 @php
-    /** @var \He4rt\Authentication\Enums\OAuthProviderEnum[] $supportedProviders */
-    /** @var \Illuminate\Support\Collection<int, Provider> $userProviders */
+    /** @var \He4rt\Identity\ExternalIdentity\Enums\IdentityProvider[] $supportedProviders */
+    /** @var \Illuminate\Support\Collection<int, ExternalIdentity> $userProviders */
 @endphp
 
 <div data-slot="card-content" class="space-y-3 px-6">
     @foreach ($supportedProviders as $provider)
         @php
-            $connectedProvider = $userProviders->filter(fn (Provider $connection) => $connection->provider == $provider->value)->first();
+            $connectedProvider = $userProviders->filter(fn (ExternalIdentity $connection) => $connection->provider == $provider->value)->first();
         @endphp
 
         <x-filament::section :secondary="$connectedProvider">

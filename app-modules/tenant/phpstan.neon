@@ -1,6 +1,0 @@
-includes:
-    - phpstan.ignore.neon
-
-parameters:
-    paths:
-        - src/

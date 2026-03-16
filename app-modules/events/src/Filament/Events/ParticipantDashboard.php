@@ -8,7 +8,7 @@ use Filament\Pages\Page;
 use Filament\Support\Enums\Width;
 use He4rt\Events\Enums\AttendingStatusEnum;
 use He4rt\Events\Models\EventModel;
-use He4rt\Tenant\Models\Tenant;
+use He4rt\Identity\Tenant\Models\Tenant;
 use Illuminate\Contracts\Support\Htmlable;
 
 /** @property Tenant $tenant */

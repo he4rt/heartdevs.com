@@ -10,9 +10,7 @@ use He4rt\Character\Actions\FindCharacterIdByUserId;
 use He4rt\Character\Actions\PersistClaimedBadge;
 use He4rt\Character\Contracts\CharacterRepository;
 use He4rt\Character\Tests\Unit\ProviderProviderTrait;
-use He4rt\Provider\Actions\FindProvider;
-use He4rt\Provider\Contracts\ProviderRepository;
-use He4rt\User\Contracts\UserRepository;
+use He4rt\Identity\ExternalIdentity\Actions\FindExternalIdentity;
 
 uses(BadgeProviderTrait::class, ProviderProviderTrait::class);
 
@@ -20,15 +18,13 @@ beforeEach(function (): void {
     // Repository stubs
     $this->characterRepositoryStub = Mockery::mock(CharacterRepository::class);
     $this->badgeRepositoryStub = Mockery::mock(BadgeRepository::class);
-    $this->providerRepositoryStub = Mockery::mock(ProviderRepository::class);
-    $this->userRepositoryStub = Mockery::mock(UserRepository::class);
 
     // Action instances
     $this->persistClaimedBadge = new PersistClaimedBadge($this->characterRepositoryStub);
     $this->findBadgeBySlug = new FindBadgeBySlug($this->badgeRepositoryStub);
 
     // Action stubs
-    $this->findProviderStub = Mockery::mock(FindProvider::class);
+    $this->findExternalIdentityStub = Mockery::mock(FindExternalIdentity::class);
     $this->findCharacterIdByUserId = Mockery::mock(FindCharacterIdByUserId::class);
 
     // Sample entities
@@ -41,7 +37,7 @@ afterEach(function (): void {
 });
 
 test('claim character badge success', function (): void {
-    $this->findProviderStub
+    $this->findExternalIdentityStub
         ->shouldReceive('handle')
         ->with('canhassi-provider', 'canhassi-id')
         ->once()
@@ -49,7 +45,7 @@ test('claim character badge success', function (): void {
 
     $this->findCharacterIdByUserId
         ->shouldReceive('handle')
-        ->with($this->providerEntity->modelId)
+        ->with($this->providerEntity->model_id)
         ->once()
         ->andReturn('character-id');
 
@@ -66,7 +62,7 @@ test('claim character badge success', function (): void {
 
     $test = new ClaimCharacterBadge(
         $this->persistClaimedBadge,
-        $this->findProviderStub,
+        $this->findExternalIdentityStub,
         $this->findCharacterIdByUserId,
         $this->findBadgeBySlug
     );

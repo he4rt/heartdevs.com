@@ -5,10 +5,10 @@ declare(strict_types=1);
 namespace He4rt\Message\Actions;
 
 use He4rt\Character\Entities\CharacterEntity;
+use He4rt\Identity\ExternalIdentity\DTOs\ResolveUserProviderDTO;
+use He4rt\Identity\User\Actions\ResolveUserContext;
+use He4rt\Identity\User\Models\User;
 use He4rt\Message\DTO\NewMessageDTO;
-use He4rt\Provider\DTO\ResolveUserProviderDTO;
-use He4rt\User\Models\User;
-use He4rt\User\Services\ResolveUserContextService;
 use Illuminate\Support\Facades\Log;
 use Throwable;
 
@@ -29,7 +29,7 @@ final readonly class NewMessage
                 'username' => $messageDTO->providerUsername,
             ]);
 
-            $userContext = resolve(ResolveUserContextService::class)->handle($userDto);
+            $userContext = resolve(ResolveUserContext::class)->handle($userDto);
 
             $userContext->character->refresh();
 

@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace He4rt\Message\Models;
 
+use He4rt\Identity\ExternalIdentity\Models\ExternalIdentity;
+use He4rt\Identity\Tenant\Models\Tenant;
 use He4rt\Message\Database\Factories\MessageFactory;
-use He4rt\Provider\Models\Provider;
-use He4rt\Tenant\Models\Tenant;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -31,11 +31,11 @@ final class Message extends Model
     ];
 
     /**
-     * @return BelongsTo<Provider, $this>
+     * @return BelongsTo<ExternalIdentity, $this>
      */
     public function provider(): BelongsTo
     {
-        return $this->belongsTo(Provider::class, 'provider_id');
+        return $this->belongsTo(ExternalIdentity::class, 'provider_id');
     }
 
     /**

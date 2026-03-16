@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace He4rt\Character\Database\Factories;
 
 use He4rt\Character\Models\Character;
-use He4rt\Tenant\Models\Tenant;
-use He4rt\User\Models\User;
+use He4rt\Identity\Tenant\Models\Tenant;
+use He4rt\Identity\User\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Database\Eloquent\Model;
 

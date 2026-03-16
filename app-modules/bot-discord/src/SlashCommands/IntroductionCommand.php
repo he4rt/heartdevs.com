@@ -8,13 +8,13 @@ use Discord\Builders\Components\TextInput;
 use Discord\Helpers\Collection;
 use Discord\Parts\Guild\Role;
 use Discord\Parts\Interactions\Interaction;
-use He4rt\Provider\DTO\ResolveUserProviderDTO;
-use He4rt\Provider\Models\Provider;
-use He4rt\Tenant\Models\Tenant;
-use He4rt\User\Actions\InformationUserAction;
-use He4rt\User\DTO\UpsertInformationDTO;
-use He4rt\User\Models\User;
-use He4rt\User\Services\ResolveUserContextService;
+use He4rt\Identity\ExternalIdentity\DTOs\ResolveUserProviderDTO;
+use He4rt\Identity\ExternalIdentity\Models\ExternalIdentity;
+use He4rt\Identity\Tenant\Models\Tenant;
+use He4rt\Identity\User\Actions\InformationUserAction;
+use He4rt\Identity\User\Actions\ResolveUserContext;
+use He4rt\Identity\User\DTOs\UpsertInformationDTO;
+use He4rt\Identity\User\Models\User;
 use Illuminate\Support\Facades\Date;
 use Laracord\Commands\SlashCommand;
 use Throwable;
@@ -114,7 +114,7 @@ class IntroductionCommand extends SlashCommand
 
     private function persistData(Interaction $interaction, Collection $components): void
     {
-        $tenantProvider = Provider::query()
+        $tenantProvider = ExternalIdentity::query()
             ->where('model_type', Tenant::class)
             ->where('provider_id', (string) $interaction->guild_id)
             ->firstOrFail();
@@ -128,7 +128,7 @@ class IntroductionCommand extends SlashCommand
             'avatar' => $interaction->user->avatar,
         ]);
 
-        $userContext = resolve(ResolveUserContextService::class)->handle($userDto);
+        $userContext = resolve(ResolveUserContext::class)->handle($userDto);
 
         $informationDto = UpsertInformationDTO::make([
             'user' => $userContext->user,

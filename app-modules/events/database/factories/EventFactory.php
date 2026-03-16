@@ -8,8 +8,8 @@ use Exception;
 use He4rt\Events\Enums\AttendingStatusEnum;
 use He4rt\Events\Enums\EventTypeEnum;
 use He4rt\Events\Models\EventModel;
-use He4rt\Tenant\Models\Tenant;
-use He4rt\User\Models\User;
+use He4rt\Identity\Tenant\Models\Tenant;
+use He4rt\Identity\User\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Facades\Date;
 
