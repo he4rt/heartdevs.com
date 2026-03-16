@@ -6,7 +6,6 @@ use He4rt\Provider\Actions\FindProvider;
 use He4rt\Provider\Actions\GetProviderById;
 use He4rt\Provider\Contracts\ProviderRepository;
 use He4rt\Provider\Entities\ProviderEntity;
-use He4rt\Shared\TTL;
 use Illuminate\Support\Facades\Cache;
 
 test('cached provider', function (): void {
@@ -18,7 +17,7 @@ test('cached provider', function (): void {
 
     Cache::shouldReceive('remember')
         ->once()
-        ->with($cacheKey, TTL::fromDays(2), Mockery::type('closure'))
+        ->with($cacheKey, 2 * 86400, Mockery::type('closure'))
         ->andReturn($providerEntity);
 
     $action = new FindProvider($getProvider);

@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace He4rt\Meeting\Contracts;
 
+use App\Contracts\Paginator;
 use He4rt\Meeting\DTO\NewMeetingDTO;
 use He4rt\Meeting\Entities\MeetingEntity;
-use He4rt\Shared\Contract\Paginator;
 
 interface MeetingRepository
 {

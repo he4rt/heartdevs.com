@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace He4rt\Authentication\Enums;
 
+use App\Contracts\OAuthClientContract;
 use Filament\Support\Contracts\HasDescription;
 use Filament\Support\Contracts\HasIcon;
 use Filament\Support\Contracts\HasLabel;
-use He4rt\Authentication\Contracts\OAuthClientContract;
 use He4rt\Authentication\DTO\OAuthStateDTO;
 use He4rt\Integrations\Discord\OAuth\DiscordOAuthClient;
 use He4rt\Integrations\Twitch\OAuth\Contracts\TwitchOAuthService;

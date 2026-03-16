@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace He4rt\Ranking\Actions;
 
+use App\Contracts\Paginator;
 use He4rt\Ranking\Contracts\RankingRepository;
-use He4rt\Shared\Contract\Paginator;
 
 final readonly class RankingByLevel
 {

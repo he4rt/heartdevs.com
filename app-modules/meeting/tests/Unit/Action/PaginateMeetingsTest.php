@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
+use App\Contracts\Paginator;
 use He4rt\Meeting\Actions\PaginateMeetingsAction;
 use He4rt\Meeting\Contracts\MeetingRepository;
 use He4rt\Meeting\Tests\Unit\MeetingProviderTrait;
-use He4rt\Shared\Contract\Paginator;
 
 uses(MeetingProviderTrait::class);
 

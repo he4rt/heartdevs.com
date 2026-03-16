@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace App\Providers;
 
+use App\Contracts\Paginator as PaginatorInterface;
 use App\Providers\Tools\DebugbarServiceProvider;
 use App\Providers\Tools\TelescopeServiceProvider;
+use App\Support\Paginator;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Facades\Vite;
@@ -18,6 +20,8 @@ final class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
+        $this->app->bind(PaginatorInterface::class, Paginator::class);
+
         $this->registerDebugbar();
         $this->registerTelescope();
     }

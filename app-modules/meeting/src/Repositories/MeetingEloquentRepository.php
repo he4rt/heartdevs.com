@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace He4rt\Meeting\Repositories;
 
+use App\Contracts\Paginator;
+use App\Support\Paginator as PaginatorConcrete;
 use He4rt\Meeting\Contracts\MeetingRepository;
 use He4rt\Meeting\DTO\NewMeetingDTO;
 use He4rt\Meeting\Entities\MeetingEntity;
 use He4rt\Meeting\Models\Meeting;
-use He4rt\Shared\Contract\Paginator;
-use He4rt\Shared\Paginator as PaginatorConcrete;
 
 final readonly class MeetingEloquentRepository implements MeetingRepository
 {

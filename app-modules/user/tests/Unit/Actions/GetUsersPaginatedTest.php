@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-use He4rt\Shared\Contract\Paginator;
+use App\Contracts\Paginator;
 use He4rt\User\Actions\GetUsersPaginated;
 use He4rt\User\Contracts\UserRepository;
 use Mockery as m;

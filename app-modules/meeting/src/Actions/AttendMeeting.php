@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace He4rt\Meeting\Actions;
 
 use He4rt\Meeting\Exceptions\MeetingException;
-use He4rt\Shared\TTL;
 use Illuminate\Support\Facades\Cache;
 
 class AttendMeeting
@@ -20,7 +19,7 @@ class AttendMeeting
 
         $this->persistAttendMeeting->handle($meetingId, $userId);
         $userAttendedCacheKey = sprintf('meeting-%s-attended', $userId);
-        Cache::tags(['meetings'])->put($userAttendedCacheKey, true, TTL::fromHours(2));
+        Cache::tags(['meetings'])->put($userAttendedCacheKey, true, 2 * 3600);
     }
 
     public function getMeetingId(): string

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace He4rt\Integrations\Discord\OAuth;
 
-use He4rt\Authentication\Contracts\OAuthClientContract;
+use App\Contracts\OAuthClientContract;
 use He4rt\Authentication\DTO\OAuthAccessDTO;
 use He4rt\Authentication\DTO\OAuthStateDTO;
 use He4rt\Authentication\DTO\OAuthUserDTO;

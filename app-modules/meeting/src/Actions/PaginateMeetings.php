@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace He4rt\Meeting\Actions;
 
+use App\Contracts\Paginator;
 use He4rt\Provider\Enums\ProviderEnum;
-use He4rt\Shared\Contract\Paginator;
 
 final readonly class PaginateMeetings
 {

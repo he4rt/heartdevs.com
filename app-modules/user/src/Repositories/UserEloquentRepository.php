@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace He4rt\User\Repositories;
 
-use He4rt\Shared\Contract\Paginator;
-use He4rt\Shared\Paginator as PaginatorConcrete;
+use App\Contracts\Paginator;
+use App\Support\Paginator as PaginatorConcrete;
 use He4rt\User\Contracts\UserRepository;
 use He4rt\User\Entities\ProfileEntity;
 use He4rt\User\Entities\UserEntity;

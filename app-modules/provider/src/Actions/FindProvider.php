@@ -7,7 +7,6 @@ namespace He4rt\Provider\Actions;
 use He4rt\Provider\Entities\ProviderEntity;
 use He4rt\Provider\Exceptions\ProviderException;
 use He4rt\Provider\Models\Provider;
-use He4rt\Shared\TTL;
 use Illuminate\Support\Facades\Cache;
 
 class FindProvider
@@ -18,7 +17,7 @@ class FindProvider
 
         return Cache::remember(
             $providerCacheKey,
-            TTL::fromDays(2),
+            2 * 86400,
             fn () => $this->findProvider($provider, $providerId)
         );
     }
