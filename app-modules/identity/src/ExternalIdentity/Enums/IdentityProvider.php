@@ -11,8 +11,8 @@ use Filament\Support\Contracts\HasDescription;
 use Filament\Support\Contracts\HasIcon;
 use Filament\Support\Contracts\HasLabel;
 use He4rt\Identity\Auth\DTOs\OAuthStateDTO;
-use He4rt\Integrations\Discord\OAuth\DiscordOAuthClient;
-use He4rt\Integrations\Twitch\OAuth\Contracts\TwitchOAuthService;
+use He4rt\IntegrationDiscord\OAuth\DiscordOAuthClient;
+use He4rt\IntegrationTwitch\OAuth\Contracts\TwitchOAuthService;
 use Illuminate\Contracts\Support\Htmlable;
 
 enum IdentityProvider: string implements HasColor, HasDescription, HasIcon, HasLabel

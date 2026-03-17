@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "62e67e3fcbb60dc326434bf74059537c",
+    "content-hash": "893ab6700d05edca0bec02d67ae26caa",
     "packages": [
         {
             "name": "anourvalar/eloquent-serialize",
@@ -3143,7 +3143,7 @@
             "dist": {
                 "type": "path",
                 "url": "app-modules/activity",
-                "reference": "7cb64e982fb1bac500e57db4b939d23e847ac451"
+                "reference": "b0b0cae498e28402e4c71cd8ad1853cf9617b2fc"
             },
             "type": "library",
             "extra": {
@@ -3205,7 +3205,7 @@
             "dist": {
                 "type": "path",
                 "url": "app-modules/community",
-                "reference": "29411c73508e4a3dbdc313314c77c57f617acd19"
+                "reference": "5ddc8f888750cb339474bf9c0e46b1543a463702"
             },
             "type": "library",
             "extra": {
@@ -3419,24 +3419,59 @@
             }
         },
         {
-            "name": "he4rt/integrations",
+            "name": "he4rt/integration-discord",
             "version": "1.0",
             "dist": {
                 "type": "path",
-                "url": "app-modules/integrations",
-                "reference": "1eb5590d8f46351b3c1c7dec68ab49d94aafbd3c"
+                "url": "app-modules/integration-discord",
+                "reference": "ee7c1e65c18e4dda2ef2ab88dcfbef93c31d74e7"
             },
             "type": "library",
             "extra": {
                 "laravel": {
                     "providers": [
-                        "He4rt\\Integrations\\Providers\\IntegrationsServiceProvider"
+                        "He4rt\\IntegrationDiscord\\Providers\\IntegrationDiscordServiceProvider"
                     ]
                 }
             },
             "autoload": {
                 "psr-4": {
-                    "He4rt\\Integrations\\": "src/"
+                    "He4rt\\IntegrationDiscord\\": "src/",
+                    "He4rt\\IntegrationDiscord\\Tests\\": "tests/",
+                    "He4rt\\IntegrationDiscord\\Database\\Factories\\": "database/factories/",
+                    "He4rt\\IntegrationDiscord\\Database\\Seeders\\": "database/seeders/"
+                }
+            },
+            "license": [
+                "proprietary"
+            ],
+            "transport-options": {
+                "symlink": true,
+                "relative": true
+            }
+        },
+        {
+            "name": "he4rt/integration-twitch",
+            "version": "1.0",
+            "dist": {
+                "type": "path",
+                "url": "app-modules/integration-twitch",
+                "reference": "c050010ef14e60040a47b18c0e0afe3f989cc0f0"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "He4rt\\IntegrationTwitch\\Providers\\IntegrationTwitchServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "He4rt\\IntegrationTwitch\\": "src/",
+                    "He4rt\\IntegrationTwitch\\Tests\\": "tests/",
+                    "He4rt\\IntegrationTwitch\\Database\\Factories\\": "database/factories/",
+                    "He4rt\\IntegrationTwitch\\Database\\Seeders\\": "database/seeders/"
                 }
             },
             "license": [
