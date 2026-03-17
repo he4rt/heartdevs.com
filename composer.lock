@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "568becd2666eabbcea2936c6ec090763",
+    "content-hash": "191d7df4df310f86c978fe8016bca4bf",
     "packages": [
         {
             "name": "anourvalar/eloquent-serialize",
@@ -3198,6 +3198,38 @@
             }
         },
         {
+            "name": "he4rt/economy",
+            "version": "1.0",
+            "dist": {
+                "type": "path",
+                "url": "app-modules/economy",
+                "reference": "b304b57d1127567d6a97fe7b4bd89d6ca149326e"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "He4rt\\Economy\\Providers\\EconomyServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "He4rt\\Economy\\": "src/",
+                    "He4rt\\Economy\\Tests\\": "tests/",
+                    "He4rt\\Economy\\Database\\Factories\\": "database/factories/",
+                    "He4rt\\Economy\\Database\\Seeders\\": "database/seeders/"
+                }
+            },
+            "license": [
+                "proprietary"
+            ],
+            "transport-options": {
+                "symlink": true,
+                "relative": true
+            }
+        },
+        {
             "name": "he4rt/events",
             "version": "1.0",
             "dist": {
@@ -3266,7 +3298,7 @@
             "dist": {
                 "type": "path",
                 "url": "app-modules/gamification",
-                "reference": "d93451a07c03d74160c8a7e0eda07dfe91a869bb"
+                "reference": "664adb676e8342cfa1870d79605efc0bd50c72f2"
             },
             "type": "library",
             "extra": {

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace He4rt\Gamification\Character\Models;
 
 use Carbon\Carbon;
+use He4rt\Economy\Concerns\HasWallet;
 use He4rt\Gamification\Badge\Models\Badge;
 use He4rt\Gamification\Database\Factories\CharacterFactory;
 use He4rt\Identity\Tenant\Models\Tenant;
@@ -30,6 +31,7 @@ final class Character extends Model
 {
     use HasFactory;
     use HasUuids;
+    use HasWallet;
 
     public const array LEVEL_THRESHOLDS = [
         1 => 0, 2 => 120, 3 => 250, 4 => 510, 5 => 1000,

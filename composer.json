@@ -17,6 +17,7 @@
         "guzzlehttp/guzzle": "^7.10.0",
         "he4rt/bot-discord": ">=1",
         "he4rt/docs": ">=1",
+        "he4rt/economy": ">=1",
         "he4rt/events": ">=1",
         "he4rt/feedback": ">=1",
         "he4rt/gamification": ">=1",
