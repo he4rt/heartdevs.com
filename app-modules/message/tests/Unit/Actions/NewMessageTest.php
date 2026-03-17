@@ -2,8 +2,6 @@
 
 declare(strict_types=1);
 
-use He4rt\Character\Actions\FindCharacterIdByUserId;
-use He4rt\Character\Actions\IncrementExperience;
 use He4rt\Identity\ExternalIdentity\Actions\FindExternalIdentity;
 use He4rt\Identity\ExternalIdentity\Actions\LinkExternalIdentity as NewAccountByProvider;
 use He4rt\Meeting\Actions\AttendMeeting;

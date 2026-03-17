@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
+use He4rt\Gamification\Season\Models\Season;
 use He4rt\Identity\ExternalIdentity\Enums\IdentityProvider;
 use He4rt\Identity\ExternalIdentity\Models\ExternalIdentity;
 use He4rt\Identity\Tenant\Models\Tenant;
 use He4rt\Message\Filament\Admin\Resources\Messages\Pages\CreateMessage;
 use He4rt\Message\Models\Message;
-use He4rt\Season\Models\Season;
 
 use function Pest\Laravel\assertDatabaseHas;
 use function Pest\Livewire\livewire;

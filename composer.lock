@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "92cb2318f3be199348274f10b8281841",
+    "content-hash": "568becd2666eabbcea2936c6ec090763",
     "packages": [
         {
             "name": "anourvalar/eloquent-serialize",
@@ -3138,37 +3138,6 @@
             "time": "2025-08-22T14:27:06+00:00"
         },
         {
-            "name": "he4rt/badge",
-            "version": "1.0.0",
-            "dist": {
-                "type": "path",
-                "url": "app-modules/badge",
-                "reference": "fc7b84faef6bdb1fae0bb8c1ee93182a665bbdfc"
-            },
-            "type": "library",
-            "extra": {
-                "laravel": {
-                    "providers": [
-                        "He4rt\\Badge\\Providers\\BadgeServiceProvider"
-                    ]
-                }
-            },
-            "autoload": {
-                "psr-4": {
-                    "He4rt\\Badge\\": "src/",
-                    "He4rt\\Badge\\Tests\\": "tests/",
-                    "He4rt\\Badge\\Database\\Factories\\": "database/factories/"
-                }
-            },
-            "license": [
-                "proprietary"
-            ],
-            "transport-options": {
-                "symlink": true,
-                "relative": true
-            }
-        },
-        {
             "name": "he4rt/bot-discord",
             "version": "1.0",
             "dist": {
@@ -3188,37 +3157,6 @@
                 "psr-4": {
                     "He4rt\\BotDiscord\\": "src/",
                     "He4rt\\BotDiscord\\Tests\\": "tests/"
-                }
-            },
-            "license": [
-                "proprietary"
-            ],
-            "transport-options": {
-                "symlink": true,
-                "relative": true
-            }
-        },
-        {
-            "name": "he4rt/character",
-            "version": "1.0",
-            "dist": {
-                "type": "path",
-                "url": "app-modules/character",
-                "reference": "f7db0fec55103a51ec96da838731bb6e9554f53b"
-            },
-            "type": "library",
-            "extra": {
-                "laravel": {
-                    "providers": [
-                        "He4rt\\Character\\Providers\\CharacterServiceProvider"
-                    ]
-                }
-            },
-            "autoload": {
-                "psr-4": {
-                    "He4rt\\Character\\": "src/",
-                    "He4rt\\Character\\Tests\\": "tests/",
-                    "He4rt\\Character\\Database\\Factories\\": "database/factories/"
                 }
             },
             "license": [
@@ -3323,6 +3261,38 @@
             }
         },
         {
+            "name": "he4rt/gamification",
+            "version": "1.0",
+            "dist": {
+                "type": "path",
+                "url": "app-modules/gamification",
+                "reference": "d93451a07c03d74160c8a7e0eda07dfe91a869bb"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "He4rt\\Gamification\\Providers\\GamificationServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "He4rt\\Gamification\\": "src/",
+                    "He4rt\\Gamification\\Tests\\": "tests/",
+                    "He4rt\\Gamification\\Database\\Factories\\": "database/factories/",
+                    "He4rt\\Gamification\\Database\\Seeders\\": "database/seeders/"
+                }
+            },
+            "license": [
+                "proprietary"
+            ],
+            "transport-options": {
+                "symlink": true,
+                "relative": true
+            }
+        },
+        {
             "name": "he4rt/he4rt-core",
             "version": "1.0",
             "dist": {
@@ -3357,7 +3327,7 @@
             "dist": {
                 "type": "path",
                 "url": "app-modules/identity",
-                "reference": "8c53ac8360b892238de87e7134bc056d9274c856"
+                "reference": "2d3b67c7222d76c33c1815690f280665bf65a821"
             },
             "type": "library",
             "extra": {
@@ -3497,68 +3467,6 @@
                     "He4rt\\Portal\\Tests\\": "tests/",
                     "He4rt\\Portal\\Database\\Factories\\": "database/factories/",
                     "He4rt\\Portal\\Database\\Seeders\\": "database/seeders/"
-                }
-            },
-            "license": [
-                "proprietary"
-            ],
-            "transport-options": {
-                "symlink": true,
-                "relative": true
-            }
-        },
-        {
-            "name": "he4rt/ranking",
-            "version": "1.0",
-            "dist": {
-                "type": "path",
-                "url": "app-modules/ranking",
-                "reference": "01b45cfc17673281aaa2438573d1b4cff456a7a3"
-            },
-            "type": "library",
-            "extra": {
-                "laravel": {
-                    "providers": [
-                        "He4rt\\Ranking\\Providers\\RankingServiceProvider"
-                    ]
-                }
-            },
-            "autoload": {
-                "psr-4": {
-                    "He4rt\\Ranking\\": "src/",
-                    "He4rt\\Ranking\\Tests\\": "tests/"
-                }
-            },
-            "license": [
-                "proprietary"
-            ],
-            "transport-options": {
-                "symlink": true,
-                "relative": true
-            }
-        },
-        {
-            "name": "he4rt/season",
-            "version": "1.0.0",
-            "dist": {
-                "type": "path",
-                "url": "app-modules/season",
-                "reference": "4c4c4d1cceb5ac1679aed12380f89d4be22dd168"
-            },
-            "type": "library",
-            "extra": {
-                "laravel": {
-                    "providers": [
-                        "He4rt\\Season\\Providers\\SeasonServiceProvider"
-                    ]
-                }
-            },
-            "autoload": {
-                "psr-4": {
-                    "He4rt\\Season\\": "src/",
-                    "He4rt\\Season\\Tests\\": "tests/",
-                    "He4rt\\Season\\Database\\Factories\\": "database/factories/",
-                    "He4rt\\Season\\Database\\Seeders\\": "database/seeders/"
                 }
             },
             "license": [

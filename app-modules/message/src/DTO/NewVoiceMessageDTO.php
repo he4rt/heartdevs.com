@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace He4rt\Message\DTO;
 
-use He4rt\Character\Enums\VoiceStatesEnum;
+use He4rt\Gamification\Character\Enums\VoiceStatesEnum;
 use He4rt\Identity\ExternalIdentity\Enums\IdentityProvider;
 
 final readonly class NewVoiceMessageDTO

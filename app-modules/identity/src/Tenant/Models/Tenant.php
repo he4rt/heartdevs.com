@@ -4,13 +4,13 @@ declare(strict_types=1);
 
 namespace He4rt\Identity\Tenant\Models;
 
-use He4rt\Character\Models\PastSeason;
 use He4rt\Events\Models\EventModel;
+use He4rt\Gamification\Character\Models\PastSeason;
+use He4rt\Gamification\Season\Models\Season;
 use He4rt\Identity\Database\Factories\TenantFactory;
 use He4rt\Identity\ExternalIdentity\Models\ExternalIdentity;
 use He4rt\Identity\User\Models\User;
 use He4rt\Message\Models\Message;
-use He4rt\Season\Models\Season;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;

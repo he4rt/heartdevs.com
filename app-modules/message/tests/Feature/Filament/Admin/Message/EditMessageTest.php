@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
+use He4rt\Gamification\Season\Models\Season;
 use He4rt\Message\Filament\Admin\Resources\Messages\Pages\EditMessage;
 use He4rt\Message\Models\Message;
-use He4rt\Season\Models\Season;
 
 use function Pest\Laravel\assertDatabaseHas;
 use function Pest\Livewire\livewire;

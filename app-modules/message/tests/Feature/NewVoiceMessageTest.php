@@ -2,8 +2,8 @@
 
 declare(strict_types=1);
 
-use He4rt\Character\Enums\VoiceStatesEnum;
-use He4rt\Character\Models\Character;
+use He4rt\Gamification\Character\Enums\VoiceStatesEnum;
+use He4rt\Gamification\Character\Models\Character;
 use He4rt\Identity\ExternalIdentity\Enums\IdentityProvider;
 use He4rt\Identity\ExternalIdentity\Models\ExternalIdentity;
 use He4rt\Identity\Tenant\Models\Tenant;

@@ -3,12 +3,12 @@
 declare(strict_types=1);
 
 use Filament\Facades\Filament;
-use He4rt\Character\Models\Character;
 use He4rt\Events\Models\EventModel;
+use He4rt\Gamification\Character\Models\Character;
+use He4rt\Gamification\Season\Models\Season;
 use He4rt\Identity\Filament\User\Pages\Dashboard;
 use He4rt\Identity\Tenant\Models\Tenant;
 use He4rt\Identity\User\Models\User;
-use He4rt\Season\Models\Season;
 use Illuminate\Support\Facades\Date;
 
 use function Pest\Laravel\actingAs;

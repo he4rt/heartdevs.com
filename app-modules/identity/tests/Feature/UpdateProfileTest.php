@@ -2,8 +2,8 @@
 
 declare(strict_types=1);
 
-use He4rt\Character\Models\Character;
-use He4rt\Character\Models\PastSeason;
+use He4rt\Gamification\Character\Models\Character;
+use He4rt\Gamification\Character\Models\PastSeason;
 use He4rt\Identity\ExternalIdentity\Models\ExternalIdentity;
 use He4rt\Identity\User\Models\Address;
 use He4rt\Identity\User\Models\Information;

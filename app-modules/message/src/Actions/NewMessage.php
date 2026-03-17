@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace He4rt\Message\Actions;
 
-use He4rt\Character\Entities\CharacterEntity;
+use He4rt\Gamification\Character\Models\Character;
 use He4rt\Identity\ExternalIdentity\DTOs\ResolveUserProviderDTO;
 use He4rt\Identity\User\Actions\ResolveUserContext;
 use He4rt\Identity\User\Models\User;
@@ -33,12 +33,13 @@ final readonly class NewMessage
 
             $userContext->character->refresh();
 
-            $characterEntity = CharacterEntity::make($userContext->character->toArray());
-            $obtainedExperience = $characterEntity->level->generateExperience($messageDTO->content);
+            $obtainedExperience = Character::generateTextExperience(
+                $messageDTO->content,
+                $userContext->character->level,
+                $userContext->user->is_donator,
+            );
 
-            $userContext->character->update([
-                'experience' => $characterEntity->level->getExperience(),
-            ]);
+            $userContext->character->increment('experience', $obtainedExperience);
 
             $this->persistMessage->handle(
                 $messageDTO,
