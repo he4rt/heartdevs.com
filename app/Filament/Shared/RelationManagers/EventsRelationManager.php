@@ -10,7 +10,7 @@ use Filament\Schemas\Schema;
 use Filament\Tables\Table;
 use He4rt\Events\Filament\Admin\Resources\Events\Schemas\EventForm;
 use He4rt\Events\Filament\Admin\Resources\Events\Tables\EventsTable;
-use He4rt\Sponsors\Filament\Resources\Sponsors\Pages\EditSponsor;
+use He4rt\Events\Filament\Resources\Sponsors\Pages\EditSponsor;
 use Illuminate\Database\Eloquent\Model;
 
 class EventsRelationManager extends RelationManager

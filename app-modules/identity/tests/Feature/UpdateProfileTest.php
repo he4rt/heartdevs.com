@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
+use He4rt\Activity\Models\Message;
 use He4rt\Gamification\Character\Models\Character;
 use He4rt\Gamification\Character\Models\PastSeason;
 use He4rt\Identity\ExternalIdentity\Models\ExternalIdentity;
 use He4rt\Identity\User\Models\Address;
 use He4rt\Identity\User\Models\Information;
 use He4rt\Identity\User\Models\User;
-use He4rt\Message\Models\Message;
 use Symfony\Component\HttpFoundation\Response;
 
 test('success', function (): void {

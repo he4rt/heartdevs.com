@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "191d7df4df310f86c978fe8016bca4bf",
+    "content-hash": "62e67e3fcbb60dc326434bf74059537c",
     "packages": [
         {
             "name": "anourvalar/eloquent-serialize",
@@ -3138,6 +3138,38 @@
             "time": "2025-08-22T14:27:06+00:00"
         },
         {
+            "name": "he4rt/activity",
+            "version": "1.0",
+            "dist": {
+                "type": "path",
+                "url": "app-modules/activity",
+                "reference": "7cb64e982fb1bac500e57db4b939d23e847ac451"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "He4rt\\Activity\\Providers\\ActivityServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "He4rt\\Activity\\": "src/",
+                    "He4rt\\Activity\\Tests\\": "tests/",
+                    "He4rt\\Activity\\Database\\Factories\\": "database/factories/",
+                    "He4rt\\Activity\\Database\\Seeders\\": "database/seeders/"
+                }
+            },
+            "license": [
+                "proprietary"
+            ],
+            "transport-options": {
+                "symlink": true,
+                "relative": true
+            }
+        },
+        {
             "name": "he4rt/bot-discord",
             "version": "1.0",
             "dist": {
@@ -3157,6 +3189,38 @@
                 "psr-4": {
                     "He4rt\\BotDiscord\\": "src/",
                     "He4rt\\BotDiscord\\Tests\\": "tests/"
+                }
+            },
+            "license": [
+                "proprietary"
+            ],
+            "transport-options": {
+                "symlink": true,
+                "relative": true
+            }
+        },
+        {
+            "name": "he4rt/community",
+            "version": "1.0",
+            "dist": {
+                "type": "path",
+                "url": "app-modules/community",
+                "reference": "29411c73508e4a3dbdc313314c77c57f617acd19"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "He4rt\\Community\\Providers\\CommunityServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "He4rt\\Community\\": "src/",
+                    "He4rt\\Community\\Tests\\": "tests/",
+                    "He4rt\\Community\\Database\\Factories\\": "database/factories/",
+                    "He4rt\\Community\\Database\\Seeders\\": "database/seeders/"
                 }
             },
             "license": [
@@ -3203,7 +3267,7 @@
             "dist": {
                 "type": "path",
                 "url": "app-modules/economy",
-                "reference": "b304b57d1127567d6a97fe7b4bd89d6ca149326e"
+                "reference": "aeda1d019bfebcfaebdd97627ed34efa9f45844a"
             },
             "type": "library",
             "extra": {
@@ -3251,37 +3315,6 @@
                     "He4rt\\Events\\Tests\\": "tests/",
                     "He4rt\\Events\\Database\\Factories\\": "database/factories/",
                     "He4rt\\Events\\Database\\Seeders\\": "database/seeders/"
-                }
-            },
-            "license": [
-                "proprietary"
-            ],
-            "transport-options": {
-                "symlink": true,
-                "relative": true
-            }
-        },
-        {
-            "name": "he4rt/feedback",
-            "version": "1.0",
-            "dist": {
-                "type": "path",
-                "url": "app-modules/feedback",
-                "reference": "b8aa7ad4c4a19f366621cd7bdd533d34f2991558"
-            },
-            "type": "library",
-            "extra": {
-                "laravel": {
-                    "providers": [
-                        "He4rt\\Feedback\\Providers\\FeedbackServiceProvider"
-                    ]
-                }
-            },
-            "autoload": {
-                "psr-4": {
-                    "He4rt\\Feedback\\": "src/",
-                    "He4rt\\Feedback\\Tests\\": "tests/",
-                    "He4rt\\Feedback\\Database\\Factories\\": "database/factories/"
                 }
             },
             "license": [
@@ -3415,69 +3448,6 @@
             }
         },
         {
-            "name": "he4rt/meeting",
-            "version": "1.0",
-            "dist": {
-                "type": "path",
-                "url": "app-modules/meeting",
-                "reference": "bb355f10487e267277247012a775b9e92a5ca6ba"
-            },
-            "type": "library",
-            "extra": {
-                "laravel": {
-                    "providers": [
-                        "He4rt\\Meeting\\Providers\\MeetingServiceProvider"
-                    ]
-                }
-            },
-            "autoload": {
-                "psr-4": {
-                    "He4rt\\Meeting\\": "src/",
-                    "He4rt\\Meeting\\Tests\\": "tests/",
-                    "He4rt\\Meeting\\Database\\Factories\\": "database/factories/"
-                }
-            },
-            "license": [
-                "proprietary"
-            ],
-            "transport-options": {
-                "symlink": true,
-                "relative": true
-            }
-        },
-        {
-            "name": "he4rt/message",
-            "version": "1.0.0",
-            "dist": {
-                "type": "path",
-                "url": "app-modules/message",
-                "reference": "fb9f533635f14cf1cb18698b42aac4b50d6b9590"
-            },
-            "type": "library",
-            "extra": {
-                "laravel": {
-                    "providers": [
-                        "He4rt\\Message\\Providers\\MessageServiceProvider"
-                    ]
-                }
-            },
-            "autoload": {
-                "psr-4": {
-                    "He4rt\\Message\\": "src/",
-                    "He4rt\\Message\\Tests\\": "tests/",
-                    "He4rt\\Message\\Database\\Factories\\": "database/factories/"
-                }
-            },
-            "license": [
-                "proprietary"
-            ],
-            "description": "Message module for He4rt community bot",
-            "transport-options": {
-                "symlink": true,
-                "relative": true
-            }
-        },
-        {
             "name": "he4rt/portal",
             "version": "1.0",
             "dist": {
@@ -3499,38 +3469,6 @@
                     "He4rt\\Portal\\Tests\\": "tests/",
                     "He4rt\\Portal\\Database\\Factories\\": "database/factories/",
                     "He4rt\\Portal\\Database\\Seeders\\": "database/seeders/"
-                }
-            },
-            "license": [
-                "proprietary"
-            ],
-            "transport-options": {
-                "symlink": true,
-                "relative": true
-            }
-        },
-        {
-            "name": "he4rt/sponsors",
-            "version": "1.0",
-            "dist": {
-                "type": "path",
-                "url": "app-modules/sponsors",
-                "reference": "371fbe84b0ca098b282824f6f5147ab00e872413"
-            },
-            "type": "library",
-            "extra": {
-                "laravel": {
-                    "providers": [
-                        "He4rt\\Sponsors\\Providers\\SponsorsServiceProvider"
-                    ]
-                }
-            },
-            "autoload": {
-                "psr-4": {
-                    "He4rt\\Sponsors\\": "src/",
-                    "He4rt\\Sponsors\\Tests\\": "tests/",
-                    "He4rt\\Sponsors\\Database\\Factories\\": "database/factories/",
-                    "He4rt\\Sponsors\\Database\\Seeders\\": "database/seeders/"
                 }
             },
             "license": [

@@ -10,6 +10,7 @@ use Filament\Panel;
 use He4rt\Events\Filament\Admin\Resources\EventAgenda\EventAgendaResource;
 use He4rt\Events\Filament\Admin\Resources\Events\EventResource;
 use He4rt\Events\Filament\Admin\Resources\Talks\TalkResource;
+use He4rt\Events\Filament\Resources\Sponsors\SponsorResource;
 
 class AdminEventPanelPlugin implements Plugin
 {
@@ -24,6 +25,7 @@ class AdminEventPanelPlugin implements Plugin
             EventResource::class,
             TalkResource::class,
             EventAgendaResource::class,
+            SponsorResource::class,
         ]);
 
     }

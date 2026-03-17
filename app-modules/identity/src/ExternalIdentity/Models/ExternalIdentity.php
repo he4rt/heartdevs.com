@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace He4rt\Identity\ExternalIdentity\Models;
 
+use He4rt\Activity\Models\Message;
 use He4rt\Identity\Database\Factories\ExternalIdentityFactory;
 use He4rt\Identity\ExternalIdentity\Enums\IdentityProvider;
 use He4rt\Identity\User\Models\User;
-use He4rt\Message\Models\Message;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;

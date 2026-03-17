@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace He4rt\Gamification\Season\Models;
 
+use He4rt\Community\Meeting\Models\Meeting;
 use He4rt\Gamification\Badge\Models\Badge;
 use He4rt\Gamification\Database\Factories\SeasonFactory;
 use He4rt\Identity\Tenant\Models\Tenant;
-use He4rt\Meeting\Models\Meeting;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;

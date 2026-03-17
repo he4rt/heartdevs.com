@@ -7,11 +7,11 @@ namespace He4rt\BotDiscord\Events;
 use Discord\Discord;
 use Discord\Parts\Channel\Message;
 use Discord\WebSockets\Event as Events;
+use He4rt\Activity\Actions\NewMessage;
+use He4rt\Activity\DTOs\NewMessageDTO;
 use He4rt\Identity\ExternalIdentity\Enums\IdentityProvider;
 use He4rt\Identity\ExternalIdentity\Models\ExternalIdentity;
 use He4rt\Identity\Tenant\Models\Tenant;
-use He4rt\Message\Actions\NewMessage;
-use He4rt\Message\DTO\NewMessageDTO;
 use Laracord\Events\Event;
 use Throwable;
 
