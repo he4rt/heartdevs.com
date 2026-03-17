@@ -4,8 +4,9 @@ declare(strict_types=1);
 
 namespace Database\Seeders;
 
-use He4rt\Character\Models\Character;
 use He4rt\Events\Models\EventModel;
+use He4rt\Gamification\Character\Models\Character;
+use He4rt\Gamification\Season\Models\Season;
 use He4rt\Identity\ExternalIdentity\Models\ExternalIdentity;
 use He4rt\Identity\Tenant\Models\Tenant;
 use He4rt\Identity\User\Models\Address;
@@ -13,7 +14,6 @@ use He4rt\Identity\User\Models\Information;
 use He4rt\Identity\User\Models\User;
 use He4rt\Meeting\Models\Meeting;
 use He4rt\Message\Models\Message;
-use He4rt\Season\Models\Season;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\Hash;
