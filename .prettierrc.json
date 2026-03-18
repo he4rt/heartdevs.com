@@ -1,0 +1,9 @@
+{
+    "singleQuote": true,
+    "trailingComma": "all",
+    "endOfLine": "lf",
+    "printWidth": 120,
+    "semi": true,
+    "plugins": ["prettier-plugin-blade", "@prettier/plugin-php", "prettier-plugin-tailwindcss"],
+    "overrides": [{ "files": ["*.blade.php"], "options": { "parser": "blade", "bladePhpFormatting": "safe" } }]
+}
