@@ -17,6 +17,7 @@
     },
     "devDependencies": {
         "@prettier/plugin-php": "0.24.0",
+        "@tailwindcss/typography": "0.5.19",
         "@tailwindcss/vite": "4.2.1",
         "autoprefixer": "10.4.27",
         "axios": "1.13.6",
