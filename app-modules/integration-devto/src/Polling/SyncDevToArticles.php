@@ -36,7 +36,7 @@ class SyncDevToArticles extends Command
         $totalUpdated = 0;
         $totalSkipped = 0;
 
-        $this->info("Syncing articles from DevTo org: {$orgSlug}");
+        $this->info('Syncing articles from DevTo org: '.$orgSlug);
 
         do {
             $articles = $this->apiClient->getArticlesByOrg($orgSlug, $page);
@@ -54,7 +54,7 @@ class SyncDevToArticles extends Command
             $page++;
         } while (count($articles) === 30);
 
-        $this->info("Sync complete: {$totalCreated} created, {$totalUpdated} updated, {$totalSkipped} skipped");
+        $this->info(sprintf('Sync complete: %d created, %d updated, %d skipped', $totalCreated, $totalUpdated, $totalSkipped));
 
         return self::SUCCESS;
     }
@@ -83,7 +83,7 @@ class SyncDevToArticles extends Command
             return 'skipped';
         }
 
-        $externalRef = "devto:article:{$article['id']}";
+        $externalRef = 'devto:article:'.$article['id'];
 
         $existingInteraction = Interaction::query()
             ->where('external_ref', $externalRef)

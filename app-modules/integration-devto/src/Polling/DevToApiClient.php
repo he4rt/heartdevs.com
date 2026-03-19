@@ -12,7 +12,7 @@ final class DevToApiClient
     {
         $baseUrl = config('integration-devto.api_base_url');
 
-        $response = Http::get("{$baseUrl}/articles", [
+        $response = Http::get($baseUrl.'/articles', [
             'username' => $orgSlug,
             'per_page' => $perPage,
             'page' => $page,
@@ -25,7 +25,7 @@ final class DevToApiClient
     {
         $baseUrl = config('integration-devto.api_base_url');
 
-        $response = Http::get("{$baseUrl}/articles/{$articleId}");
+        $response = Http::get(sprintf('%s/articles/%d', $baseUrl, $articleId));
 
         return $response->json() ?? [];
     }
