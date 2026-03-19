@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace He4rt\Activity\Http\Requests;
+namespace He4rt\Activity\Voice\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 
@@ -19,7 +19,7 @@ final class CreateVoiceMessageRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'provider' => ['required', 'in:twitch,discord'],
+            'provider' => ['required', 'in:twitch,discord,devto'],
             'external_account_id' => ['required'],
             'state' => ['required', 'in:muted,unmuted,disabled'],
             'channel_name' => ['required', 'string'],

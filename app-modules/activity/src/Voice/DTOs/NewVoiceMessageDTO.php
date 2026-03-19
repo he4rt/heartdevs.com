@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace He4rt\Activity\DTOs;
+namespace He4rt\Activity\Voice\DTOs;
 
 use He4rt\Gamification\Character\Enums\VoiceStatesEnum;
 use He4rt\Identity\ExternalIdentity\Enums\IdentityProvider;

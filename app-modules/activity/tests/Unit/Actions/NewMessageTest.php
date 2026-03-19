@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-use He4rt\Activity\Actions\NewMessage;
-use He4rt\Activity\Actions\PersistMessage;
-use He4rt\Activity\DTOs\NewMessageDTO;
+use He4rt\Activity\Message\Actions\NewMessage;
+use He4rt\Activity\Message\Actions\PersistMessage;
+use He4rt\Activity\Message\DTOs\NewMessageDTO;
 use He4rt\Community\Meeting\Actions\AttendMeeting;
 use He4rt\Identity\ExternalIdentity\Actions\FindExternalIdentity;
 use He4rt\Identity\ExternalIdentity\Actions\LinkExternalIdentity as NewAccountByProvider;

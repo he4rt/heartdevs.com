@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace He4rt\Activity\Actions;
+namespace He4rt\Activity\Message\Actions;
 
-use He4rt\Activity\DTOs\NewMessageDTO;
+use He4rt\Activity\Message\DTOs\NewMessageDTO;
 use He4rt\Gamification\Character\Models\Character;
 use He4rt\Identity\ExternalIdentity\DTOs\ResolveUserProviderDTO;
 use He4rt\Identity\User\Actions\ResolveUserContext;

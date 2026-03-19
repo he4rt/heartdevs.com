@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace He4rt\Activity\Http\Requests;
+namespace He4rt\Activity\Message\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 
@@ -20,7 +20,7 @@ final class CreateMessageRequest extends FormRequest
     {
         return [
             'tenant_id' => ['required'],
-            'provider' => ['required', 'in:twitch,discord'],
+            'provider' => ['required', 'in:twitch,discord,devto'],
             'external_account_id' => ['required'],
             'provider_message_id' => ['required'],
             'channel_id' => ['required'],

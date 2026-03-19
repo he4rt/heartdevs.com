@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace He4rt\Activity\Models;
+namespace He4rt\Activity\Message\Models;
 
 use He4rt\Activity\Database\Factories\MessageFactory;
 use He4rt\Identity\ExternalIdentity\Models\ExternalIdentity;

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace He4rt\Activity\DTOs;
+namespace He4rt\Activity\Message\DTOs;
 
 use DateTimeImmutable;
 use He4rt\Identity\ExternalIdentity\Enums\IdentityProvider;

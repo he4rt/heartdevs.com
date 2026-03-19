@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace He4rt\Activity\Database\Factories;
 
-use He4rt\Activity\Models\Message;
+use He4rt\Activity\Message\Models\Message;
 use He4rt\Identity\ExternalIdentity\Models\ExternalIdentity;
 use He4rt\Identity\Tenant\Models\Tenant;
 use Illuminate\Database\Eloquent\Factories\Factory;

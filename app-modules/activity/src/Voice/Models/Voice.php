@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace He4rt\Activity\Models;
+namespace He4rt\Activity\Voice\Models;
 
 use He4rt\Identity\ExternalIdentity\Models\ExternalIdentity;
 use Illuminate\Database\Eloquent\Model;

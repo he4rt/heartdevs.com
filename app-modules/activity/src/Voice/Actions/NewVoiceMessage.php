@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace He4rt\Activity\Actions;
+namespace He4rt\Activity\Voice\Actions;
 
-use He4rt\Activity\DTOs\NewVoiceMessageDTO;
-use He4rt\Activity\Models\Voice;
+use He4rt\Activity\Voice\DTOs\NewVoiceMessageDTO;
+use He4rt\Activity\Voice\Models\Voice;
 use He4rt\Gamification\Character\Actions\IncrementExperience;
 use He4rt\Gamification\Character\Models\Character;
 use He4rt\Identity\ExternalIdentity\Actions\FindExternalIdentity;
