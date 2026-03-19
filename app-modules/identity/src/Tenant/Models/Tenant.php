@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace He4rt\Identity\Tenant\Models;
 
 use Carbon\Carbon;
-use He4rt\Activity\Models\Message;
+use He4rt\Activity\Message\Models\Message;
 use He4rt\Events\Models\EventModel;
 use He4rt\Gamification\Character\Models\PastSeason;
 use He4rt\Gamification\Season\Models\Season;

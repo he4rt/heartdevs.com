@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-use He4rt\Activity\Models\Message;
+use He4rt\Activity\Message\Models\Message;
 use He4rt\Gamification\Character\Models\Character;
 use He4rt\Gamification\Character\Models\PastSeason;
 use He4rt\Identity\ExternalIdentity\Models\ExternalIdentity;

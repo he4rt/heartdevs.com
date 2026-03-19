@@ -11,6 +11,7 @@ use Filament\Support\Contracts\HasDescription;
 use Filament\Support\Contracts\HasIcon;
 use Filament\Support\Contracts\HasLabel;
 use He4rt\Identity\Auth\DTOs\OAuthStateDTO;
+use He4rt\IntegrationDevTo\OAuth\DevToOAuthClient;
 use He4rt\IntegrationDiscord\OAuth\DiscordOAuthClient;
 use He4rt\IntegrationTwitch\OAuth\Contracts\TwitchOAuthService;
 
@@ -18,12 +19,14 @@ enum IdentityProvider: string implements HasColor, HasDescription, HasIcon, HasL
 {
     case Discord = 'discord';
     case Twitch = 'twitch';
+    case DevTo = 'devto';
 
     public function getClient(): OAuthClientContract
     {
         return match ($this) {
             self::Twitch => resolve(TwitchOAuthService::class),
             self::Discord => resolve(DiscordOAuthClient::class),
+            self::DevTo => resolve(DevToOAuthClient::class),
         };
     }
 
@@ -32,6 +35,7 @@ enum IdentityProvider: string implements HasColor, HasDescription, HasIcon, HasL
         return match ($this) {
             self::Discord => Color::Blue,
             self::Twitch => Color::Purple,
+            self::DevTo => Color::Gray,
         };
     }
 
@@ -40,6 +44,7 @@ enum IdentityProvider: string implements HasColor, HasDescription, HasIcon, HasL
         return match ($this) {
             self::Discord => 'fab-discord',
             self::Twitch => 'fab-twitch',
+            self::DevTo => 'fab-dev',
         };
     }
 
@@ -53,6 +58,7 @@ enum IdentityProvider: string implements HasColor, HasDescription, HasIcon, HasL
         return match ($this) {
             self::Discord => 'Conecte sua conta do Discord para gameficações e eventos.',
             self::Twitch => 'Conecte sua conta do Twitch para gameficações e eventos.',
+            self::DevTo => 'Conecte sua conta do Dev.to para rastrear artigos e contribuições.',
         };
     }
 
@@ -64,6 +70,7 @@ enum IdentityProvider: string implements HasColor, HasDescription, HasIcon, HasL
         $scopes = match ($this) {
             self::Discord => config('services.discord.scopes'),
             self::Twitch => config('services.twitch.scopes'),
+            self::DevTo => config('services.devto.scopes'),
         };
 
         return explode(' ', $scopes);
@@ -87,7 +94,7 @@ enum IdentityProvider: string implements HasColor, HasDescription, HasIcon, HasL
     public function getType(): IdentityType
     {
         return match ($this) {
-            self::Discord, self::Twitch => IdentityType::External,
+            self::Discord, self::Twitch, self::DevTo => IdentityType::External,
         };
     }
 }

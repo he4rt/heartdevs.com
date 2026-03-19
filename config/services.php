@@ -49,4 +49,12 @@ return [
         'enabled' => env('TWITCH_OAUTH_ENABLED', true),
     ],
 
+    'devto' => [
+        'client_id' => env('DEVTO_OAUTH_CLIENT_ID'),
+        'client_secret' => env('DEVTO_OAUTH_CLIENT_SECRET'),
+        'redirect_uri' => env('DEVTO_OAUTH_REDIRECT_URI', 'https://localhost:8000/auth/oauth/devto'),
+        'scopes' => env('DEVTO_OAUTH_SCOPES', 'public'),
+        'enabled' => env('DEVTO_OAUTH_ENABLED', false),
+    ],
+
 ];

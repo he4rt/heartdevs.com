@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Database\Seeders;
 
-use He4rt\Activity\Models\Message;
+use He4rt\Activity\Message\Models\Message;
 use He4rt\Community\Meeting\Models\Meeting;
 use He4rt\Events\Models\EventModel;
 use He4rt\Gamification\Character\Models\Character;

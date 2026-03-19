@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace He4rt\Identity\ExternalIdentity\Models;
 
-use He4rt\Activity\Models\Message;
+use He4rt\Activity\Message\Models\Message;
 use He4rt\Identity\Database\Factories\ExternalIdentityFactory;
 use He4rt\Identity\ExternalIdentity\Casts\AsCredentials;
 use He4rt\Identity\ExternalIdentity\Data\ClientAccessManager;
