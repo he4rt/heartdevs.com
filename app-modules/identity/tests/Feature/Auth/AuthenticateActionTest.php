@@ -89,7 +89,7 @@ it('authenticates an existing provider without duplicating records', function ()
     $existingUser = User::factory()->create();
     $existingProvider = ExternalIdentity::factory()->create([
         'tenant_id' => $tenant->getKey(),
-        'model_type' => User::class,
+        'model_type' => (new User)->getMorphClass(),
         'model_id' => $existingUser->getKey(),
         'provider' => 'discord',
         'external_account_id' => '777777',

@@ -23,7 +23,7 @@ final readonly class UpdateProfile
             'external_account_id' => $profileDTO->externalAccountId,
             'provider' => $profileDTO->provider,
             'tenant_id' => $profileDTO->tenantId,
-            'model_type' => User::class,
+            'model_type' => (new User)->getMorphClass(),
         ]);
         $provider = $this->providerResolver->handle($providerDto);
 

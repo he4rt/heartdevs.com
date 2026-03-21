@@ -9,6 +9,7 @@ use App\Providers\Tools\DebugbarServiceProvider;
 use App\Providers\Tools\TelescopeServiceProvider;
 use App\Support\Paginator;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Facades\Vite;
 use Illuminate\Support\ServiceProvider;
@@ -43,6 +44,7 @@ final class AppServiceProvider extends ServiceProvider
     private function configureDatabase(): void
     {
         Model::automaticallyEagerLoadRelationships();
+        Relation::requireMorphMap();
     }
 
     /**

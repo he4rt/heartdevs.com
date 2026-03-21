@@ -26,7 +26,7 @@ final class ExternalIdentityFactory extends Factory
         return [
             'id' => fake()->uuid(),
             'tenant_id' => Tenant::factory(),
-            'model_type' => User::class,
+            'model_type' => (new User)->getMorphClass(),
             'model_id' => User::factory(),
             'type' => IdentityType::External,
             'provider' => fake()->randomElement(IdentityProvider::cases()),
@@ -49,7 +49,7 @@ final class ExternalIdentityFactory extends Factory
     public function morphFor(?string $model = User::class): static
     {
         return $this->state(fn () => [
-            'model_type' => $model,
+            'model_type' => (new $model)->getMorphClass(),
             'model_id' => $model::factory(),
         ]);
     }

@@ -39,7 +39,7 @@ class CreateAccountByExternalIdentity
 
         return ExternalIdentity::query()->create([
             'tenant_id' => $tenantId,
-            'model_type' => User::class,
+            'model_type' => (new User)->getMorphClass(),
             'model_id' => $user->id,
             'type' => $provider->getType(),
             'provider' => $provider->value,
