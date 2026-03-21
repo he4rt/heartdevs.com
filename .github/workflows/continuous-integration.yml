@@ -31,7 +31,7 @@ jobs:
         id: setup
         run: |
           echo "PHP_VERSION=8.4" >> "$GITHUB_OUTPUT"
-          echo "PHP_EXTENSIONS=mbstring,pdo,xml,ctype,fileinfo,json,curl,openssl,dom,zip" >> "$GITHUB_OUTPUT"
+          echo "PHP_EXTENSIONS=mbstring,pdo,pdo_pgsql,xml,ctype,fileinfo,json,curl,openssl,dom,zip" >> "$GITHUB_OUTPUT"
           echo "PHP_INI_PROPERTIES=post_max_size=256M,upload_max_filesize=256M" >> "$GITHUB_OUTPUT"
           echo "COMPOSER_FLAGS=--prefer-dist --optimize-autoloader" >> "$GITHUB_OUTPUT"
 
