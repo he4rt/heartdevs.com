@@ -1,4 +1,4 @@
-# He4rtBot Discord API
+# he4rtdevs.com
 
 <p align="center">
   <a href="https://discord.gg/he4rt">
