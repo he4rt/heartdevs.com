@@ -42,21 +42,21 @@ abstract class AbstractSlashCommand extends SlashCommand
     {
         return ExternalIdentity::query()
             ->where('tenant_id', $this->tenantProvider->tenant_id)
-            ->where('model_type', User::class)
+            ->where('model_type', (new User)->getMorphClass())
             ->where('provider', IdentityProvider::Discord);
     }
 
     private function beforePipeline(Interaction $interaction): void
     {
         $this->tenantProvider = ExternalIdentity::query()
-            ->where('model_type', Tenant::class)
+            ->where('model_type', (new Tenant)->getMorphClass())
             ->where('provider', IdentityProvider::Discord)
             ->where('external_account_id', $interaction->guild_id)
             ->first();
 
         $this->memberProvider = ExternalIdentity::query()
             ->where('tenant_id', $this->tenantProvider->tenant_id)
-            ->where('model_type', User::class)
+            ->where('model_type', (new User)->getMorphClass())
             ->where('provider', IdentityProvider::Discord)
             ->where('external_account_id', $interaction->user->id)
             ->first();

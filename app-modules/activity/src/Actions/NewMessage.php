@@ -25,7 +25,7 @@ final readonly class NewMessage
                 'tenant_id' => $messageDTO->tenantId,
                 'provider' => $messageDTO->provider,
                 'external_account_id' => $messageDTO->externalAccountId,
-                'model_type' => User::class,
+                'model_type' => (new User)->getMorphClass(),
                 'username' => $messageDTO->providerUsername,
             ]);
 

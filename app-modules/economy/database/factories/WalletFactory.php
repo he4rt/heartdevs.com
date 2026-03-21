@@ -17,7 +17,7 @@ final class WalletFactory extends Factory
     public function definition(): array
     {
         return [
-            'owner_type' => Character::class,
+            'owner_type' => (new Character)->getMorphClass(),
             'owner_id' => Character::factory(),
             'currency' => Currency::Coin,
             'balance' => 0,

@@ -169,7 +169,7 @@ class ThreeDotsSeeder extends Seeder
 
                 $event->agenda()->create([
                     'tenant_id' => $tenant->getKey(),
-                    'schedulable_type' => EventSubmission::class,
+                    'schedulable_type' => (new EventSubmission)->getMorphClass(),
                     'schedulable_id' => $eventSubmission->getKey(),
                     'starting_at' => Date::parse($item['start']),
                     'ending_at' => Date::parse($item['end']),
@@ -177,7 +177,7 @@ class ThreeDotsSeeder extends Seeder
             } else {
                 $event->agenda()->create([
                     'tenant_id' => $tenant->getKey(),
-                    'schedulable_type' => EventSegment::class,
+                    'schedulable_type' => (new EventSegment)->getMorphClass(),
                     'schedulable_id' => EventSegment::query()->inRandomOrder()->first()->getKey(),
                     'starting_at' => Date::parse($item['start']),
                     'ending_at' => Date::parse($item['end']),

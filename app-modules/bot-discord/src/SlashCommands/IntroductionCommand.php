@@ -115,7 +115,7 @@ class IntroductionCommand extends SlashCommand
     private function persistData(Interaction $interaction, Collection $components): void
     {
         $tenantProvider = ExternalIdentity::query()
-            ->where('model_type', Tenant::class)
+            ->where('model_type', (new Tenant)->getMorphClass())
             ->where('external_account_id', (string) $interaction->guild_id)
             ->firstOrFail();
 
@@ -123,7 +123,7 @@ class IntroductionCommand extends SlashCommand
             'tenant_id' => $tenantProvider->tenant_id,
             'provider' => $tenantProvider->provider,
             'external_account_id' => $interaction->user->id,
-            'model_type' => User::class,
+            'model_type' => (new User)->getMorphClass(),
             'username' => $interaction->user->username,
             'avatar' => $interaction->user->avatar,
         ]);

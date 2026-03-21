@@ -32,7 +32,7 @@ class MessageReceivedEvent extends Event
 
         try {
             $tenantProvider = ExternalIdentity::query()
-                ->where('model_type', Tenant::class)
+                ->where('model_type', (new Tenant)->getMorphClass())
                 ->where('external_account_id', (string) $message->guild_id)
                 ->firstOrFail();
 

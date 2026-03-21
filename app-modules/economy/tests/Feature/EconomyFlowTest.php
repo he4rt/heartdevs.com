@@ -17,7 +17,7 @@ test('full economy flow: create wallet, credit, debit', function (): void {
 
     expect($wallet->balance)->toBe(0)
         ->and($wallet->currency)->toBe(Currency::Coin)
-        ->and($wallet->owner_type)->toBe(Character::class)
+        ->and($wallet->owner_type)->toBe('character')
         ->and($wallet->owner_id)->toBe($character->id);
 
     resolve(Credit::class)->handle(new CreditDTO(
