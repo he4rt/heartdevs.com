@@ -89,6 +89,10 @@ setup: ## Setup the project
 	@php artisan storage:link --ansi
 	@composer run-script ide-helper
 
+.PHONY: import-db
+import-db: ## Import a PostgreSQL dump file (usage: make import-db file=path/to/dump)
+	@PGHOST=localhost PGUSER=postgres PGPASSWORD=postgres pg_restore -x -O -cC -j 8 -d postgres $(file)
+
 .PHONY: bot
 bot: ## Run the Discord bot
 	@php artisan bot:boot
