@@ -13,7 +13,7 @@ test('can create', function (): void {
             ExternalIdentity::factory([
                 'tenant_id' => $tenant->getKey(),
                 'provider' => 'discord',
-                'provider_id' => '123',
+                'external_account_id' => '123',
             ])->create();
         })
         ->create();
@@ -22,8 +22,8 @@ test('can create', function (): void {
     $providerTarget = ExternalIdentity::factory()->create(['tenant_id' => $tenant->getKey(), 'provider' => 'discord']);
 
     $payload = [
-        'sender_id' => $providerSender->provider_id,
-        'target_id' => $providerTarget->provider_id,
+        'sender_id' => $providerSender->external_account_id,
+        'target_id' => $providerTarget->external_account_id,
         'message' => 'mt legal vc',
         'type' => 'elogio',
     ];

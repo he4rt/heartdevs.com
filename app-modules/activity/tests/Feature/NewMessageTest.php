@@ -18,7 +18,7 @@ test('can create amessage', function (): void {
             ExternalIdentity::factory([
                 'tenant_id' => $tenant->getKey(),
                 'provider' => IdentityProvider::Discord,
-                'provider_id' => '123',
+                'external_account_id' => '123',
             ])->create();
         })
         ->create();
@@ -31,7 +31,7 @@ test('can create amessage', function (): void {
     $provider = $user->providers[0];
     $payload = [
         'provider' => $provider->provider->value,
-        'provider_id' => $provider->provider_id,
+        'external_account_id' => $provider->external_account_id,
         'provider_message_id' => '12312312',
         'channel_id' => '312321',
         'content' => '321312',
@@ -59,7 +59,7 @@ test('can create amessage with level zero', function (): void {
             ExternalIdentity::factory([
                 'tenant_id' => $tenant->getKey(),
                 'provider' => IdentityProvider::Discord,
-                'provider_id' => '123',
+                'external_account_id' => '123',
             ])->create();
         })
         ->create();
@@ -71,7 +71,7 @@ test('can create amessage with level zero', function (): void {
     $provider = $user->providers[0];
     $payload = [
         'provider' => $provider->provider->value,
-        'provider_id' => $provider->provider_id,
+        'external_account_id' => $provider->external_account_id,
         'provider_message_id' => '12312312',
         'channel_id' => '312321',
         'content' => '321312',
@@ -97,7 +97,7 @@ test('can create amessage and receive ameeting check', function (): void {
             ExternalIdentity::factory([
                 'tenant_id' => $tenant->getKey(),
                 'provider' => IdentityProvider::Discord,
-                'provider_id' => '123',
+                'external_account_id' => '123',
             ])->create();
         })
         ->create();
@@ -116,7 +116,7 @@ test('can create amessage and receive ameeting check', function (): void {
     $provider = $user->providers[0];
     $payload = [
         'provider' => $provider->provider->value,
-        'provider_id' => $provider->provider_id,
+        'external_account_id' => $provider->external_account_id,
         'provider_message_id' => '12312312',
         'channel_id' => '312321',
         'content' => '321312',

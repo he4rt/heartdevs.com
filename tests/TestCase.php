@@ -19,7 +19,7 @@ abstract class TestCase extends BaseTestCase
                 ExternalIdentity::factory([
                     'tenant_id' => $tenant->getKey(),
                     'provider' => 'discord',
-                    'provider_id' => '123',
+                    'external_account_id' => '123',
                 ])->create();
             })
             ->create();

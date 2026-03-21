@@ -116,13 +116,13 @@ class IntroductionCommand extends SlashCommand
     {
         $tenantProvider = ExternalIdentity::query()
             ->where('model_type', Tenant::class)
-            ->where('provider_id', (string) $interaction->guild_id)
+            ->where('external_account_id', (string) $interaction->guild_id)
             ->firstOrFail();
 
         $userDto = ResolveUserProviderDTO::make([
             'tenant_id' => $tenantProvider->tenant_id,
             'provider' => $tenantProvider->provider,
-            'provider_id' => $interaction->user->id,
+            'external_account_id' => $interaction->user->id,
             'model_type' => User::class,
             'username' => $interaction->user->username,
             'avatar' => $interaction->user->avatar,

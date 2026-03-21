@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace He4rt\Identity\ExternalIdentity\Actions;
 
+use He4rt\Identity\ExternalIdentity\Data\ClientAccessManager;
+use He4rt\Identity\ExternalIdentity\Enums\CredentialsType;
 use He4rt\Identity\ExternalIdentity\Enums\IdentityProvider;
 use He4rt\Identity\ExternalIdentity\Models\ExternalIdentity;
 use He4rt\Identity\User\Models\User;
@@ -15,7 +17,7 @@ class CreateAccountByExternalIdentity
     {
         $existing = ExternalIdentity::query()
             ->where('provider', $provider->value)
-            ->where('provider_id', $providerId)
+            ->where('external_account_id', $providerId)
             ->first();
 
         if ($existing) {
@@ -39,8 +41,12 @@ class CreateAccountByExternalIdentity
             'tenant_id' => $tenantId,
             'model_type' => User::class,
             'model_id' => $user->id,
+            'type' => $provider->getType(),
             'provider' => $provider->value,
-            'provider_id' => $providerId,
+            'credentials_type' => CredentialsType::OAuth2,
+            'credentials' => ClientAccessManager::make(),
+            'external_account_id' => $providerId,
+            'connected_at' => now(),
         ]);
     }
 }

@@ -69,7 +69,7 @@ class ProfileCommand extends AbstractSlashCommand
         $mentionedUser = $interaction->user;
 
         if ($userId = $this->value('user')) {
-            $this->memberProvider = $this->getMemberProviderQuery()->where('provider_id', $userId)->first();
+            $this->memberProvider = $this->getMemberProviderQuery()->where('external_account_id', $userId)->first();
             $mentionedUser = $interaction->data->resolved->users->get('id', $userId);
         }
 

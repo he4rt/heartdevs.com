@@ -41,7 +41,7 @@ it('can load the edit page', function (): void {
     ])
         ->assertOk()
         ->assertSchemaStateSet([
-            'provider_id' => $message->provider_id,
+            'external_identity_id' => $message->external_identity_id,
             'channel_id' => $message->channel_id,
             'content' => $message->content,
             'provider_message_id' => $message->provider_message_id,

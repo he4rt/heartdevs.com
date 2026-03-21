@@ -20,7 +20,7 @@ final readonly class UpdateProfile
     public function handle(UpdateProfileDTO $profileDTO): void
     {
         $providerDto = ResolveUserProviderDTO::make([
-            'provider_id' => $profileDTO->providerId,
+            'external_account_id' => $profileDTO->externalAccountId,
             'provider' => $profileDTO->provider,
             'tenant_id' => $profileDTO->tenantId,
             'model_type' => User::class,

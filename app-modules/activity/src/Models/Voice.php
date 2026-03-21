@@ -14,7 +14,7 @@ final class Voice extends Model
 
     protected $fillable = [
         'tenant_id',
-        'provider_id',
+        'external_identity_id',
         'channel_name',
         'state',
         'obtained_experience',
@@ -25,6 +25,6 @@ final class Voice extends Model
      */
     public function provider(): BelongsTo
     {
-        return $this->belongsTo(ExternalIdentity::class);
+        return $this->belongsTo(ExternalIdentity::class, 'external_identity_id');
     }
 }

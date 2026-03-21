@@ -22,7 +22,7 @@ test('bot can start new meeting', function (): void {
     $meetingType = MeetingType::factory()->create();
     $payload = [
         'meeting_type_id' => $meetingType->getKey(),
-        'provider_id' => $provider->provider_id,
+        'external_account_id' => $provider->external_account_id,
     ];
 
     $expectedResponse = [
@@ -52,7 +52,7 @@ test('meeting type not found', function (): void {
 
     $payload = [
         'meeting_type_id' => 12,
-        'provider_id' => $provider->provider_id,
+        'external_account_id' => $provider->external_account_id,
     ];
 
     // Act

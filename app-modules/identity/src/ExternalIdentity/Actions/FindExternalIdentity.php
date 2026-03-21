@@ -26,7 +26,7 @@ class FindExternalIdentity
         $model = ExternalIdentity::query()
             ->where('tenant_id', request()->input('tenant_id'))
             ->where('provider', $provider)
-            ->where('provider_id', $providerId)
+            ->where('external_account_id', $providerId)
             ->first();
 
         throw_unless($model, ExternalIdentityException::notFound($provider, $providerId));

@@ -21,7 +21,7 @@ final class MessageFactory extends Factory
         return [
             'id' => fake()->uuid(),
             'tenant_id' => Tenant::factory(),
-            'provider_id' => ExternalIdentity::factory(),
+            'external_identity_id' => ExternalIdentity::factory(),
             'provider_message_id' => fake()->randomNumber(4),
             'channel_id' => fake()->randomNumber(4),
             'content' => fake()->sentence(),

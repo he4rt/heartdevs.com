@@ -45,7 +45,7 @@ final class TenantFactory extends Factory
             ExternalIdentity::factory()->create([
                 'tenant_id' => $tenant->getKey(),
                 'provider' => $provider,
-                'provider_id' => $providerId,
+                'external_account_id' => $providerId,
             ]);
         });
     }

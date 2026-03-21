@@ -33,14 +33,14 @@ class MessageReceivedEvent extends Event
         try {
             $tenantProvider = ExternalIdentity::query()
                 ->where('model_type', Tenant::class)
-                ->where('provider_id', (string) $message->guild_id)
+                ->where('external_account_id', (string) $message->guild_id)
                 ->firstOrFail();
 
             resolve(NewMessage::class)->persist(new NewMessageDTO(
                 tenantId: $tenantProvider->tenant_id,
                 provider: IdentityProvider::Discord,
                 providerUsername: $message->author->username.'#'.$message->author->discriminator,
-                providerId: $message->user_id,
+                externalAccountId: $message->user_id,
                 providerMessageId: $message->id,
                 channelId: $message->channel_id,
                 content: $message->content,

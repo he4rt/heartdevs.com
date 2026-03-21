@@ -67,7 +67,7 @@ test('can find profile with provider id', function (): void {
 
     $this
         ->actingAsAdmin()
-        ->getJson(route('users.profile', ['value' => $user->providers[0]->provider_id]))
+        ->getJson(route('users.profile', ['value' => $user->providers[0]->external_account_id]))
         ->assertStatus(Response::HTTP_OK)
         ->assertJsonStructure([
             'id',

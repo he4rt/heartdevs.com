@@ -18,7 +18,7 @@ final class CreateMessageRequest extends FormRequest
         return [
             'tenant_id' => ['required'],
             'provider' => ['required', 'in:twitch,discord'],
-            'provider_id' => ['required'],
+            'external_account_id' => ['required'],
             'provider_message_id' => ['required'],
             'channel_id' => ['required'],
             'content' => ['required', 'string'],

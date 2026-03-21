@@ -17,7 +17,7 @@ final class MeetingRequest extends FormRequest
     {
         return [
             'meeting_type_id' => ['required', 'integer'],
-            'provider_id' => ['required'],
+            'external_account_id' => ['required'],
             'provider' => ['required'],
         ];
     }

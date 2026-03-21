@@ -33,12 +33,12 @@ test('new message', function (string $provider, array $payload): void {
         'id' => '1',
         'model_id' => 'id-user-foda',
         'provider' => 'twitch',
-        'provider_id' => '12312312',
+        'external_account_id' => '12312312',
     ];
 
     $findProviderStub
         ->shouldReceive('handle')
-        ->with($provider, $payload['provider_id'])
+        ->with($provider, $payload['external_account_id'])
         ->andReturn($providerEntityMock);
 
     $findCharacterStub
@@ -81,7 +81,7 @@ dataset('data provider', fn () => [
         'payload' => [
             'provider' => 'twitch',
             'tenant_id' => 1,
-            'provider_id' => '1234',
+            'external_account_id' => '1234',
             'provider_message_id' => '78781237',
             'channel_id' => '31231267312',
             'content' => 'deixa o sub',

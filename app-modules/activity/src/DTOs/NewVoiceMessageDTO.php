@@ -11,7 +11,7 @@ final readonly class NewVoiceMessageDTO
 {
     public function __construct(
         public IdentityProvider $provider,
-        public string $providerId,
+        public string $externalAccountId,
         public VoiceStatesEnum $voiceState,
         public string $channelName,
     ) {}
@@ -20,7 +20,7 @@ final readonly class NewVoiceMessageDTO
     {
         return new self(
             provider: IdentityProvider::from($payload['provider']),
-            providerId: $payload['provider_id'],
+            externalAccountId: $payload['external_account_id'],
             voiceState: VoiceStatesEnum::from($payload['state']),
             channelName: $payload['channel_name']
         );

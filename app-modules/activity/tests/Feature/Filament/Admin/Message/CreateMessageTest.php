@@ -24,7 +24,7 @@ it('can create a message', function (): void {
 
     $data = [
         'tenant_id' => $tenant->getKey(),
-        'provider_id' => $provider->getKey(),
+        'external_identity_id' => $provider->getKey(),
         'channel_id' => 1,
         'provider_message_id' => 'prov-msg-123',
         'content' => 'Mensagem de teste enviada',
@@ -40,7 +40,7 @@ it('can create a message', function (): void {
 
     assertDatabaseHas(Message::class, [
         'tenant_id' => $tenant->getKey(),
-        'provider_id' => $provider->getKey(),
+        'external_identity_id' => $provider->getKey(),
         'content' => 'Mensagem de teste enviada',
     ]);
 });

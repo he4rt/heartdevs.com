@@ -6,42 +6,62 @@ namespace He4rt\Identity\ExternalIdentity\Models;
 
 use He4rt\Activity\Models\Message;
 use He4rt\Identity\Database\Factories\ExternalIdentityFactory;
+use He4rt\Identity\ExternalIdentity\Casts\AsCredentials;
+use He4rt\Identity\ExternalIdentity\Data\ClientAccessManager;
+use He4rt\Identity\ExternalIdentity\Enums\CredentialsType;
 use He4rt\Identity\ExternalIdentity\Enums\IdentityProvider;
+use He4rt\Identity\ExternalIdentity\Enums\IdentityType;
 use He4rt\Identity\User\Models\User;
-use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
+use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Carbon;
 
 /**
  * @property string $id
- * @property User $user
- * @property Collection<AccessToken> $tokens
- * @property string $user_id
  * @property int $tenant_id
- * @property string $provider_id
- * @property string $provider
+ * @property string $model_type
+ * @property string $model_id
+ * @property IdentityType $type
+ * @property IdentityProvider $provider
+ * @property CredentialsType $credentials_type
+ * @property ClientAccessManager $credentials
+ * @property string|null $external_account_id
+ * @property string|null $connected_by
+ * @property Carbon|null $connected_at
+ * @property Carbon|null $disconnected_at
+ * @property array<string, mixed>|null $metadata
+ * @property Carbon $created_at
+ * @property Carbon $updated_at
+ * @property Carbon|null $deleted_at
+ * @property-read User|null $connectedByUser
  */
 final class ExternalIdentity extends Model
 {
     use HasFactory;
     use HasUuids;
+    use SoftDeletes;
 
-    protected $table = 'providers';
+    protected $table = 'external_identities';
 
     protected $fillable = [
         'id',
         'tenant_id',
         'model_type',
         'model_id',
+        'type',
         'provider',
-        'provider_id',
-        'email',
-        'avatar',
-        'username',
+        'credentials_type',
+        'credentials',
+        'external_account_id',
+        'connected_by',
+        'connected_at',
+        'disconnected_at',
+        'metadata',
     ];
 
     protected $appends = [
@@ -62,11 +82,11 @@ final class ExternalIdentity extends Model
     }
 
     /**
-     * @return HasMany<AccessToken, $this>
+     * @return BelongsTo<User, $this>
      */
-    public function tokens(): HasMany
+    public function connectedByUser(): BelongsTo
     {
-        return $this->hasMany(AccessToken::class, 'provider_id');
+        return $this->belongsTo(User::class, 'connected_by');
     }
 
     /**
@@ -74,7 +94,12 @@ final class ExternalIdentity extends Model
      */
     public function messages(): HasMany
     {
-        return $this->hasMany(Message::class, 'provider_id');
+        return $this->hasMany(Message::class, 'external_identity_id');
+    }
+
+    public function isConnected(): bool
+    {
+        return $this->connected_at !== null && $this->disconnected_at === null;
     }
 
     protected static function newFactory(): ExternalIdentityFactory
@@ -82,15 +107,21 @@ final class ExternalIdentity extends Model
         return ExternalIdentityFactory::new();
     }
 
-    protected function casts(): array
-    {
-        return [
-            'provider' => IdentityProvider::class,
-        ];
-    }
-
     protected function getMessagesCountAttribute(): int
     {
         return $this->messages()->count();
+    }
+
+    protected function casts(): array
+    {
+        return [
+            'type' => IdentityType::class,
+            'provider' => IdentityProvider::class,
+            'credentials_type' => CredentialsType::class,
+            'credentials' => AsCredentials::class,
+            'connected_at' => 'datetime',
+            'disconnected_at' => 'datetime',
+            'metadata' => 'array',
+        ];
     }
 }

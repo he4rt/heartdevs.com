@@ -17,7 +17,7 @@ final class CreateVoiceMessageRequest extends FormRequest
     {
         return [
             'provider' => ['required', 'in:twitch,discord'],
-            'provider_id' => ['required'],
+            'external_account_id' => ['required'],
             'state' => ['required', 'in:muted,unmuted,disabled'],
             'channel_name' => ['required', 'string'],
         ];

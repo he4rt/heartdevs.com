@@ -17,7 +17,7 @@ final class CreateProviderRequest extends FormRequest
     {
         return [
             'provider' => ['required', 'in:discord,twitch'],
-            'provider_id' => ['required'],
+            'external_account_id' => ['required'],
             'username' => ['required'],
         ];
     }

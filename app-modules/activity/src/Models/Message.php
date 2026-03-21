@@ -22,7 +22,7 @@ final class Message extends Model
     protected $fillable = [
         'id',
         'tenant_id',
-        'provider_id',
+        'external_identity_id',
         'provider_message_id',
         'channel_id',
         'content',
@@ -35,7 +35,7 @@ final class Message extends Model
      */
     public function provider(): BelongsTo
     {
-        return $this->belongsTo(ExternalIdentity::class, 'provider_id');
+        return $this->belongsTo(ExternalIdentity::class, 'external_identity_id');
     }
 
     /**

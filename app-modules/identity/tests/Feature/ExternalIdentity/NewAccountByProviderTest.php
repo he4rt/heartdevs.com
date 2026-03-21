@@ -9,7 +9,7 @@ use Symfony\Component\HttpFoundation\Response;
 test('can create account by provider', function (): void {
     $provider = 'discord';
     $payload = [
-        'provider_id' => '184789120940244992',
+        'external_account_id' => '184789120940244992',
         'username' => 'danielhe4rt',
     ];
 
@@ -28,9 +28,9 @@ test('can create account by provider', function (): void {
         'username' => $payload['username'],
     ]);
 
-    $this->assertDatabaseHas('providers', [
+    $this->assertDatabaseHas('external_identities', [
         'provider' => $provider,
-        'provider_id' => $payload['provider_id'],
+        'external_account_id' => $payload['external_account_id'],
     ]);
 
     $this->assertDatabaseHas('characters', [
@@ -41,11 +41,11 @@ test('can create account by provider', function (): void {
 test('should not create account with a registered provider', function (): void {
     $provider = ExternalIdentity::factory()->create([
         'provider' => 'discord',
-        'provider_id' => '123',
+        'external_account_id' => '123',
     ]);
 
     $payload = [
-        'provider_id' => $provider->provider_id,
+        'external_account_id' => $provider->external_account_id,
         'username' => 'danielhe4rt',
     ];
 

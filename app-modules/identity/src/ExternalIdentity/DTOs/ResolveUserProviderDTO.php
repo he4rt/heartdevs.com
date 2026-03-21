@@ -11,7 +11,7 @@ class ResolveUserProviderDTO
     public function __construct(
         public int $tenantId,
         public IdentityProvider $provider,
-        public string $providerId,
+        public string $externalAccountId,
         public string $modelType,
         public ?string $username = null,
         public ?string $email = null,
@@ -23,7 +23,7 @@ class ResolveUserProviderDTO
         return new self(
             tenantId: $data['tenant_id'],
             provider: $data['provider'],
-            providerId: $data['provider_id'],
+            externalAccountId: $data['external_account_id'],
             modelType: $data['model_type'],
             username: $data['username'] ?? null,
             email: $data['email'] ?? null,

@@ -17,7 +17,7 @@ test('can create voice message', function (): void {
             ExternalIdentity::factory([
                 'tenant_id' => $tenant->getKey(),
                 'provider' => IdentityProvider::Discord,
-                'provider_id' => '123',
+                'external_account_id' => '123',
             ])->create();
         })
         ->create();
@@ -30,7 +30,7 @@ test('can create voice message', function (): void {
     $provider = $user->providers[0];
     $payload = [
         'provider' => $provider->provider->value,
-        'provider_id' => $provider->provider_id,
+        'external_account_id' => $provider->external_account_id,
         'state' => VoiceStatesEnum::Muted->value,
         'channel_name' => 'Estudando',
     ];

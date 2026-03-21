@@ -29,7 +29,7 @@ final class VerifyIfHasTenantProviderMiddleware
 
         $str = sprintf('tenant_provider_%s', $providerId);
         $providerModel = Cache::flexible($str, [1, 2], fn () => ExternalIdentity::query()
-            ->where('provider_id', $providerId)
+            ->where('external_account_id', $providerId)
             ->where('provider', $provider)
             ->first()
         );

@@ -12,7 +12,7 @@ final readonly class NewProviderDTO implements JsonSerializable
     public function __construct(
         private int $tenantId,
         private IdentityProvider $provider,
-        private string $providerId
+        private string $externalAccountId
     ) {}
 
     public function jsonSerialize(): array
@@ -20,7 +20,7 @@ final readonly class NewProviderDTO implements JsonSerializable
         return [
             'tenant_id' => $this->tenantId,
             'provider' => $this->provider->value,
-            'provider_id' => $this->providerId,
+            'external_account_id' => $this->externalAccountId,
         ];
     }
 }

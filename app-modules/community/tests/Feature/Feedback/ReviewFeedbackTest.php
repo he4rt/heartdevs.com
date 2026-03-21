@@ -34,7 +34,7 @@ test('can handle feedback', function (string $action, array $payload, array $exp
             ExternalIdentity::factory([
                 'tenant_id' => $tenant->getKey(),
                 'provider' => 'discord',
-                'provider_id' => '123',
+                'external_account_id' => '123',
             ])->create();
         })
         ->create();
@@ -42,7 +42,7 @@ test('can handle feedback', function (string $action, array $payload, array $exp
     $feedback = Feedback::factory()->create(['tenant_id' => $tenant->getKey()]);
     $staffProvider = ExternalIdentity::factory()->create(['tenant_id' => $tenant->getKey(), 'provider' => 'discord']);
 
-    $payload['staff_id'] = $staffProvider->provider_id;
+    $payload['staff_id'] = $staffProvider->external_account_id;
     $response = $this
         ->actingAsAdmin()
         ->postJson(route('feedbacks.review', [

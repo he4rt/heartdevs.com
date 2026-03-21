@@ -76,11 +76,18 @@ class EditUser extends EditRecord
                                             TextEntry::make('provider')
                                                 ->label('Provider'),
 
-                                            TextEntry::make('provider_id')
-                                                ->label('Provider ID'),
+                                            TextEntry::make('external_account_id')
+                                                ->label('External Account ID'),
 
-                                            TextEntry::make('email')
+                                            TextEntry::make('metadata.email')
                                                 ->label('Email'),
+
+                                            TextEntry::make('metadata.username')
+                                                ->label('Username'),
+
+                                            TextEntry::make('connected_at')
+                                                ->label('Connected At')
+                                                ->dateTime(),
                                         ])
                                         ->columns(3)
                                         ->addable(false)

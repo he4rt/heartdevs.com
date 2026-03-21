@@ -81,4 +81,11 @@ enum IdentityProvider: string implements HasColor, HasDescription, HasIcon, HasL
             )
         );
     }
+
+    public function getType(): IdentityType
+    {
+        return match ($this) {
+            self::Discord, self::Twitch => IdentityType::External,
+        };
+    }
 }

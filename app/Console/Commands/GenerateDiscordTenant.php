@@ -4,7 +4,10 @@ declare(strict_types=1);
 
 namespace App\Console\Commands;
 
+use He4rt\Identity\ExternalIdentity\Data\ClientAccessManager;
+use He4rt\Identity\ExternalIdentity\Enums\CredentialsType;
 use He4rt\Identity\ExternalIdentity\Enums\IdentityProvider;
+use He4rt\Identity\ExternalIdentity\Enums\IdentityType;
 use He4rt\Identity\Tenant\Models\Tenant;
 use Illuminate\Console\Command;
 
@@ -35,8 +38,12 @@ class GenerateDiscordTenant extends Command
                     ->providers()
                     ->create([
                         'tenant_id' => $tenant->getKey(),
+                        'type' => IdentityType::External,
                         'provider' => IdentityProvider::Discord,
-                        'provider_id' => $this->argument('guildId'),
+                        'credentials_type' => CredentialsType::OAuth2,
+                        'credentials' => ClientAccessManager::make(),
+                        'external_account_id' => $this->argument('guildId'),
+                        'connected_at' => now(),
                     ]);
             })
             ->create();

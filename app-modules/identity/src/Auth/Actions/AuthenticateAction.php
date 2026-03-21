@@ -6,6 +6,7 @@ namespace He4rt\Identity\Auth\Actions;
 
 use He4rt\Identity\Auth\DTOs\OAuthStateDTO;
 use He4rt\Identity\Auth\DTOs\OAuthUserDTO;
+use He4rt\Identity\ExternalIdentity\Enums\CredentialsType;
 use He4rt\Identity\ExternalIdentity\Enums\IdentityProvider;
 use He4rt\Identity\ExternalIdentity\Models\ExternalIdentity;
 use He4rt\Identity\Tenant\Models\Tenant;
@@ -40,7 +41,7 @@ class AuthenticateAction
         $provider = ExternalIdentity::query()
             ->where('tenant_id', $tenant->getKey())
             ->where('provider', $user->provider)
-            ->where('provider_id', $user->providerId)
+            ->where('external_account_id', $user->providerId)
             ->first();
 
         if (! $provider) {
@@ -76,14 +77,19 @@ class AuthenticateAction
         $provider = $user->providers()->updateOrCreate([
             'tenant_id' => $tenant->getKey(),
             'provider' => IdentityProvider::from($userDTO->provider->value),
-            'provider_id' => $userDTO->providerId,
+            'external_account_id' => $userDTO->providerId,
         ], [
-            'email' => $userDTO->email,
-            'avatar' => $userDTO->avatarUrl,
-            'username' => $userDTO->username,
+            'type' => $userDTO->provider->getType(),
+            'credentials_type' => CredentialsType::OAuth2,
+            'credentials' => $userDTO->credentials->toClientAccessManager(),
+            'metadata' => [
+                'email' => $userDTO->email,
+                'avatar' => $userDTO->avatarUrl,
+                'username' => $userDTO->username,
+            ],
+            'connected_at' => now(),
+            'connected_by' => $user->id,
         ]);
-
-        $provider->tokens()->create($userDTO->credentials->toDatabase());
 
         return $provider;
     }

@@ -19,7 +19,7 @@ test('can claim badge', function (): void {
             ExternalIdentity::factory([
                 'tenant_id' => $tenant->getKey(),
                 'provider' => IdentityProvider::Discord,
-                'provider_id' => '123',
+                'external_account_id' => '123',
             ])->create();
         })
         ->create();
@@ -35,10 +35,10 @@ test('can claim badge', function (): void {
         ->actingAsAdmin()
         ->postJson(route('characters.claimBadge', [
             'provider' => $provider->provider->value,
-            'providerId' => $provider->provider_id,
+            'providerId' => $provider->external_account_id,
         ]), ['redeem_code' => $badge->redeem_code], [
             'X-He4rt-Provider' => $provider->provider->value,
-            'X-He4rt-Provider-Id' => $provider->provider_id,
+            'X-He4rt-Provider-Id' => $provider->external_account_id,
         ]);
 
     $response->assertStatus(Response::HTTP_NO_CONTENT);

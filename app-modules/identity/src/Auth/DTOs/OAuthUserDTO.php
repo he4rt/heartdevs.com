@@ -24,7 +24,7 @@ abstract class OAuthUserDTO
     {
         return [
             'provider' => $this->provider,
-            'provider_id' => $this->providerId,
+            'external_account_id' => $this->providerId,
             'email' => $this->email,
         ];
     }

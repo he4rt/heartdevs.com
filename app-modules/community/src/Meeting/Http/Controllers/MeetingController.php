@@ -29,7 +29,7 @@ final class MeetingController extends Controller
     ): JsonResponse {
         try {
             return response()->json(
-                $startMeeting->handle($provider, $request->input('provider_id'), $request->input('meeting_type_id')),
+                $startMeeting->handle($provider, $request->input('external_account_id'), $request->input('meeting_type_id')),
                 Response::HTTP_CREATED
             );
         } catch (MeetingException $meetingException) {

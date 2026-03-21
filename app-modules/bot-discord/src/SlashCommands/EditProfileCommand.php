@@ -130,7 +130,7 @@ class EditProfileCommand extends AbstractSlashCommand
             $payload = UpdateProfileDTO::fromPayload([
                 'tenant_id' => $this->memberProvider->tenant_id,
                 'provider' => $this->memberProvider->provider,
-                'provider_id' => $interaction->user->id,
+                'external_account_id' => $interaction->user->id,
                 'name' => $components->get('custom_id', 'name')?->value,
                 'nickname' => $components->get('custom_id', 'nickname')?->value,
                 'linkedin_url' => $components->get('custom_id', 'linkedin_url')?->value,

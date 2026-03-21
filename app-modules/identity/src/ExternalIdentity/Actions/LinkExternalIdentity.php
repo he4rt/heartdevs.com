@@ -16,10 +16,12 @@ final class LinkExternalIdentity
             return $provider->model;
         }
 
+        $username = $provider->metadata['username'] ?? 'unknown';
+
         $user = User::query()->create([
             'id' => Uuid::uuid4()->toString(),
-            'username' => $provider->username,
-            'name' => $provider->username,
+            'username' => $username,
+            'name' => $username,
             'is_donator' => false,
         ]);
 

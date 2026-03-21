@@ -18,7 +18,7 @@ class MessageForm
     {
         return $schema
             ->components([
-                Select::make('provider_id')
+                Select::make('external_identity_id')
                     ->label('Provider')
                     ->getOptionLabelFromRecordUsing(fn (ExternalIdentity $record) => $record->provider->getLabel())
                     ->preload()

@@ -26,14 +26,14 @@ class WelcomeMember extends Event
 
         $tenantProvider = ExternalIdentity::query()
             ->where('model_type', Tenant::class)
-            ->where('provider_id', (string) $member->guild_id)
+            ->where('external_account_id', (string) $member->guild_id)
             ->firstOrFail();
 
         try {
             $userDto = ResolveUserProviderDTO::make([
                 'tenant_id' => $tenantProvider->tenant_id,
                 'provider' => $tenantProvider->provider,
-                'provider_id' => $member->user->id,
+                'external_account_id' => $member->user->id,
                 'model_type' => User::class,
                 'username' => $member->user->username,
                 'avatar' => $member->user->avatar,
@@ -44,7 +44,7 @@ class WelcomeMember extends Event
             Log::error('Falha ao resolver usuário no evento WelcomeMember', [
                 'tenant_id' => $tenantProvider->tenant_id ?? null,
                 'provider' => $tenantProvider->provider ?? null,
-                'provider_id' => $member->user->id ?? null,
+                'external_account_id' => $member->user->id ?? null,
                 'exception' => $throwable,
             ]);
 

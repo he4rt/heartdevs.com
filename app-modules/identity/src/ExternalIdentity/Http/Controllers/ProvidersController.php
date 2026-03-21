@@ -21,7 +21,7 @@ final class ProvidersController extends Controller
         $response = $action->handle(
             $request->input('tenant_id'),
             IdentityProvider::from($provider),
-            $request->input('provider_id'),
+            $request->input('external_account_id'),
             $request->input('username')
         );
 

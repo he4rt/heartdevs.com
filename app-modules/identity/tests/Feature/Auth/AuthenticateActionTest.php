@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use He4rt\Identity\Auth\Actions\AuthenticateAction;
 use He4rt\Identity\Auth\DTOs\OAuthStateDTO;
+use He4rt\Identity\ExternalIdentity\Data\ClientAccessManager;
 use He4rt\Identity\ExternalIdentity\Enums\IdentityProvider;
 use He4rt\Identity\ExternalIdentity\Models\ExternalIdentity;
 use He4rt\Identity\Tenant\Models\Tenant;
@@ -67,15 +68,14 @@ it('authenticates a new user via Discord and persists provider + token', functio
     $provider = ExternalIdentity::query()->first();
     expect($provider)->not->toBeNull();
     expect($provider->provider->value)->toBe('discord');
-    expect($provider->provider_id)->toBe('1234567890');
+    expect($provider->external_account_id)->toBe('1234567890');
     expect($provider->user->is($user))->toBeTrue();
 
-    // Token created for new provider
+    // Credentials stored inline (no more separate tokens table)
     $provider->refresh();
-    expect($provider->tokens()->count())->toBe(1);
-    $token = $provider->tokens()->first();
-    expect($token->access_token)->toBe('discord_access_token_123');
-    expect($token->refresh_token)->toBe('discord_refresh_token_456');
+    expect($provider->credentials)->toBeInstanceOf(ClientAccessManager::class);
+    expect($provider->credentials->getAccessToken())->toBe('discord_access_token_123');
+    expect($provider->credentials->getRefreshToken())->toBe('discord_refresh_token_456');
 });
 
 it('authenticates an existing provider without duplicating records', function (): void {
@@ -92,8 +92,8 @@ it('authenticates an existing provider without duplicating records', function ()
         'model_type' => User::class,
         'model_id' => $existingUser->getKey(),
         'provider' => 'discord',
-        'provider_id' => '777777',
-        'email' => 'existing@example.test',
+        'external_account_id' => '777777',
+        'metadata' => ['email' => 'existing@example.test'],
     ]);
 
     $initialProviders = ExternalIdentity::query()->count();
@@ -109,8 +109,7 @@ it('authenticates an existing provider without duplicating records', function ()
     // No duplicate providers
     expect(ExternalIdentity::query()->count())->toBe($initialProviders);
 
-    // By current implementation, tokens are only created on new registrations
-    // Ensure no new tokens were created for the existing provider
+    // Credentials should be updated for existing provider (updateOrCreate)
     $existingProvider->refresh();
-    expect($existingProvider->tokens()->count())->toBe(0);
+    expect($existingProvider->credentials)->toBeInstanceOf(ClientAccessManager::class);
 });

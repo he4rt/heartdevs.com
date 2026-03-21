@@ -22,7 +22,7 @@ final readonly class NewVoiceMessage
         $voiceDTO = NewVoiceMessageDTO::make($payload);
         $externalIdentity = $this->findExternalIdentity->handle(
             $voiceDTO->provider->value,
-            $voiceDTO->providerId
+            $voiceDTO->externalAccountId
         );
 
         $characterId = Character::query()
@@ -37,7 +37,7 @@ final readonly class NewVoiceMessage
 
         Voice::query()->create([
             'tenant_id' => request()->tenant_id,
-            'provider_id' => $externalIdentity->id,
+            'external_identity_id' => $externalIdentity->id,
             'channel_name' => $voiceDTO->channelName,
             'state' => $voiceDTO->voiceState->value,
             'obtained_experience' => $obtainedExperience,

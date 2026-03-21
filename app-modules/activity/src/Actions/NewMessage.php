@@ -24,7 +24,7 @@ final readonly class NewMessage
             $userDto = ResolveUserProviderDTO::make([
                 'tenant_id' => $messageDTO->tenantId,
                 'provider' => $messageDTO->provider,
-                'provider_id' => $messageDTO->providerId,
+                'external_account_id' => $messageDTO->externalAccountId,
                 'model_type' => User::class,
                 'username' => $messageDTO->providerUsername,
             ]);
@@ -49,7 +49,7 @@ final readonly class NewMessage
 
         } catch (Throwable $throwable) {
             Log::error('NewMessage failed', [
-                'provider_id' => $messageDTO->providerId,
+                'external_account_id' => $messageDTO->externalAccountId,
                 'tenant_id' => $messageDTO->tenantId,
                 'error' => $throwable->getMessage(),
                 'trace' => $throwable->getTraceAsString(),

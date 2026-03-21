@@ -51,14 +51,14 @@ abstract class AbstractSlashCommand extends SlashCommand
         $this->tenantProvider = ExternalIdentity::query()
             ->where('model_type', Tenant::class)
             ->where('provider', IdentityProvider::Discord)
-            ->where('provider_id', $interaction->guild_id)
+            ->where('external_account_id', $interaction->guild_id)
             ->first();
 
         $this->memberProvider = ExternalIdentity::query()
             ->where('tenant_id', $this->tenantProvider->tenant_id)
             ->where('model_type', User::class)
             ->where('provider', IdentityProvider::Discord)
-            ->where('provider_id', $interaction->user->id)
+            ->where('external_account_id', $interaction->user->id)
             ->first();
     }
 }

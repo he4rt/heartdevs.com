@@ -9,7 +9,7 @@ use He4rt\Identity\ExternalIdentity\Enums\IdentityProvider;
 readonly class UpdateProfileDTO
 {
     public function __construct(
-        public string $providerId,
+        public string $externalAccountId,
         public IdentityProvider $provider,
         public int $tenantId,
         public ?string $name = null,
@@ -23,7 +23,7 @@ readonly class UpdateProfileDTO
     public static function fromPayload(array $payload): self
     {
         return new self(
-            providerId: $payload['provider_id'],
+            externalAccountId: $payload['external_account_id'],
             provider: $payload['provider'],
             tenantId: $payload['tenant_id'],
             name: $payload['name'],
