@@ -122,9 +122,9 @@
         "test:rector": "vendor/bin/rector --dry-run",
         "phpstan": "vendor/bin/phpstan analyse --ansi",
         "test:phpstan": "vendor/bin/phpstan analyse --ansi",
-        "test:unit": "vendor/bin/pest --parallel --compact --group=unit",
-        "test:feature": "vendor/bin/pest --parallel --compact --group=feature",
-        "test:cov": "vendor/bin/pest --parallel --compact --coverage",
+        "test:unit": "vendor/bin/pest --compact --group=unit",
+        "test:feature": "vendor/bin/pest --compact --group=feature",
+        "test:cov": "vendor/bin/pest --compact --coverage",
         "check": [
             "@test:rector",
             "@test:pint",
@@ -132,7 +132,7 @@
         ],
         "test": [
             "@php artisan config:clear --ansi",
-            "vendor/bin/pest --parallel --compact"
+            "vendor/bin/pest --compact"
         ]
     },
     "extra": {
