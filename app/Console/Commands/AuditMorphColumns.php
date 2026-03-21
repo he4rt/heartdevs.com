@@ -25,6 +25,7 @@ class AuditMorphColumns extends Command
         'notifications' => 'notifiable_type',
         'personal_access_tokens' => 'tokenable_type',
     ];
+
     protected $signature = 'morph:audit';
 
     protected $description = 'Audit all polymorphic *_type columns and report distinct values';
