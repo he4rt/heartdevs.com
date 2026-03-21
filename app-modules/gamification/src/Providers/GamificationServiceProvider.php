@@ -7,8 +7,11 @@ namespace He4rt\Gamification\Providers;
 use App\Enums\FilamentPanel;
 use Filament\Panel;
 use He4rt\Gamification\Badge\Filament\Resources\Badges\BadgeResource;
+use He4rt\Gamification\Badge\Models\Badge;
+use He4rt\Gamification\Character\Models\Character;
 use He4rt\Gamification\Season\Filament\Admin\Resources\Seasons\SeasonResource;
 use He4rt\Gamification\Season\Filament\Shared\Widgets\SeasonStatsOverview;
+use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\ServiceProvider;
 
 class GamificationServiceProvider extends ServiceProvider
@@ -33,5 +36,10 @@ class GamificationServiceProvider extends ServiceProvider
     public function boot(): void
     {
         $this->loadMigrationsFrom(__DIR__.'/../../database/migrations');
+
+        Relation::morphMap([
+            'character' => Character::class,
+            'badge' => Badge::class,
+        ]);
     }
 }

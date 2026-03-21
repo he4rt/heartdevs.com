@@ -34,7 +34,7 @@ final class EventAgendaFactory extends Factory
     public function forSegment(?EventSegment $segment = null)
     {
         return $this->state(fn () => [
-            'schedulable_type' => EventSegment::class,
+            'schedulable_type' => (new EventSegment)->getMorphClass(),
             'schedulable_id' => $segment ?? EventSegment::query()->inRandomOrder()->first()->getKey(),
         ]);
     }
@@ -42,7 +42,7 @@ final class EventAgendaFactory extends Factory
     public function forTalk(?EventSubmission $talk = null)
     {
         return $this->state(fn () => [
-            'schedulable_type' => EventSubmission::class,
+            'schedulable_type' => (new EventSubmission)->getMorphClass(),
             'schedulable_id' => $talk ?? EventSubmission::factory(),
         ]);
     }
