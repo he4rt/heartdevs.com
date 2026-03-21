@@ -8,7 +8,7 @@ use He4rt\Gamification\Character\Models\Character;
 
 final readonly class PersistClaimedBadge
 {
-    public function handle(string $characterId, int $badgeId): void
+    public function handle(string $characterId, int|string $badgeId): void
     {
         $character = Character::query()->findOrFail($characterId);
         $character->badges()

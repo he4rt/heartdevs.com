@@ -7,6 +7,7 @@ use Filament\Facades\Filament;
 use He4rt\Events\Enums\EventTypeEnum;
 use He4rt\Events\Filament\Admin\Resources\Events\Pages\CreateEvent;
 use He4rt\Events\Models\EventModel;
+use He4rt\Identity\Tenant\Models\Tenant;
 use Illuminate\Support\Facades\Date;
 
 use function Pest\Laravel\assertDatabaseCount;
@@ -16,6 +17,7 @@ use function Pest\Livewire\livewire;
 beforeEach(function (): void {
     Filament::setCurrentPanel(FilamentPanel::Admin->value);
     $this->actingAsAdmin();
+    $this->tenant = Tenant::query()->first();
 });
 
 it('should render', function (): void {
@@ -27,7 +29,7 @@ it('should be able to create an event', function (): void {
     livewire(CreateEvent::class)
         ->assertOk()
         ->fillForm([
-            'tenant_id' => 1,
+            'tenant_id' => $this->tenant->getKey(),
             'title' => 'event title',
             'slug' => 'event-slug',
             'description' => 'event description',
@@ -44,7 +46,7 @@ it('should be able to create an event', function (): void {
 
     assertDatabaseCount(EventModel::class, 1);
     assertDatabaseHas(EventModel::class, [
-        'tenant_id' => 1,
+        'tenant_id' => $this->tenant->getKey(),
         'title' => 'event title',
         'slug' => 'event-slug',
         'location' => 'event location',

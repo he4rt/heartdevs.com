@@ -20,6 +20,8 @@ final class Badge extends Model implements HasMedia
 
     protected $table = 'badges';
 
+    protected $keyType = 'string';
+
     protected $fillable = [
         'provider',
         'name',

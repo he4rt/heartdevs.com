@@ -19,7 +19,7 @@ final class UserFactory extends Factory
     {
         return [
             'id' => fake()->uuid(),
-            'username' => fake()->userName(),
+            'username' => fake()->unique()->userName(),
             'name' => fake()->name(),
             'email' => fake()->email(),
             'password' => Hash::make('password'),

@@ -29,6 +29,8 @@ class Sponsor extends Model implements HasMedia
 
     protected $table = 'sponsors';
 
+    protected $keyType = 'string';
+
     protected $fillable = [
         'name',
         'logo_path',

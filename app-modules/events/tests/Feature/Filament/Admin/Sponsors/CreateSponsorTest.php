@@ -6,6 +6,7 @@ use App\Enums\FilamentPanel;
 use Filament\Facades\Filament;
 use He4rt\Events\Filament\Resources\Sponsors\Pages\CreateSponsor;
 use He4rt\Events\Models\Sponsor;
+use He4rt\Identity\Tenant\Models\Tenant;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
 
@@ -27,10 +28,12 @@ it('should be able to register a sponsor', function (): void {
     Filament::setCurrentPanel(FilamentPanel::Admin->value);
     $this->actingAsAdmin();
 
+    $tenant = Tenant::query()->first();
+
     livewire(CreateSponsor::class)
         ->assertOk()
         ->fillForm([
-            'tenant_id' => 1,
+            'tenant_id' => $tenant->getKey(),
             'name' => 'sponsor name',
             'receipt' => $image,
             'homepage_url' => 'https://www.google.com',
@@ -41,7 +44,7 @@ it('should be able to register a sponsor', function (): void {
     assertDatabaseCount(Sponsor::class, 1);
 
     assertDatabaseHas(Sponsor::class, [
-        'tenant_id' => 1,
+        'tenant_id' => $tenant->getKey(),
         'name' => 'sponsor name',
         'homepage_url' => 'https://www.google.com',
     ]);

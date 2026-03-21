@@ -57,14 +57,15 @@ it('should render events', function (): void {
 
 it('should see Register or Join Waitlist based on status', function ($status, $text, $dontSeeText): void {
     $this->events->each(function (EventModel $event) use ($status): void {
-        $attendeeIds = $event->attendees->pluck('id');
-        $event->attendees()->updateExistingPivot(
-            $attendeeIds,
-            ['status' => $status]
-        );
+        foreach ($event->attendees as $attendee) {
+            $event->attendees()->updateExistingPivot(
+                $attendee->getKey(),
+                ['status' => $status]
+            );
+        }
     });
 
-    $this->events->fresh();
+    $this->events = $this->events->fresh();
     livewire(ListEventModels::class, ['tenant' => $this->tenant->slug])
         ->assertOk()
         ->assertSeeText($text)
@@ -76,12 +77,14 @@ it('should see Register or Join Waitlist based on status', function ($status, $t
 
 it('should be able to participate to an event', function (): void {
     $event = $this->events->first();
-    $attendeeIds = $event->attendees->pluck('id');
 
-    $event->attendees()->updateExistingPivot(
-        $attendeeIds,
-        ['status' => AttendingStatusEnum::Waitlist],
-    );
+    foreach ($event->attendees as $attendee) {
+        $event->attendees()->updateExistingPivot(
+            $attendee->getKey(),
+            ['status' => AttendingStatusEnum::Waitlist],
+        );
+    }
+
     livewire(ListEventModels::class, ['tenant' => $this->tenant->slug])
         ->assertOk()
         ->call('attend', $event->getKey())
@@ -92,17 +95,18 @@ it('should be able to participate to an event', function (): void {
         );
 
     expect($event->attendees()->count())->toBe(5)
-        ->and($event->attendees()->get()->last()->getKey())->toBe(auth()->user()->getKey());
+        ->and($event->isParticipating(auth()->user()->getKey()))->toBeTrue();
 });
 
 it('should go to waitlist', function (): void {
     $event = $this->events->first();
-    $attendeeIds = $event->attendees->pluck('id');
 
-    $event->attendees()->updateExistingPivot(
-        $attendeeIds,
-        ['status' => AttendingStatusEnum::Waitlist],
-    );
+    foreach ($event->attendees as $attendee) {
+        $event->attendees()->updateExistingPivot(
+            $attendee->getKey(),
+            ['status' => AttendingStatusEnum::Waitlist],
+        );
+    }
 
     livewire(ListEventModels::class, ['tenant' => $this->tenant->slug])
         ->assertOk()

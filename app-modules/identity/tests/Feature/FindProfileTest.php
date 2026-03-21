@@ -7,6 +7,7 @@ use He4rt\Gamification\Badge\Models\Badge;
 use He4rt\Gamification\Character\Models\Character;
 use He4rt\Gamification\Character\Models\PastSeason;
 use He4rt\Identity\ExternalIdentity\Models\ExternalIdentity;
+use He4rt\Identity\Tenant\Models\Tenant;
 use He4rt\Identity\User\Models\Address;
 use He4rt\Identity\User\Models\Information;
 use He4rt\Identity\User\Models\User;
@@ -63,7 +64,8 @@ test('can find profile with provider id', function (): void {
     $badge = Badge::factory()->create();
 
     $character = $user->character;
-    $character->badges()->attach($badge->id, ['claimed_at' => now(), 'tenant_id' => 1]);
+    $tenant = Tenant::factory()->create();
+    $character->badges()->attach($badge->id, ['claimed_at' => now(), 'tenant_id' => $tenant->getKey()]);
 
     $this
         ->actingAsAdmin()
