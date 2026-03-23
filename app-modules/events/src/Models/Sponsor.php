@@ -12,7 +12,6 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
-use Illuminate\Database\Eloquent\Relations\Pivot;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
 
@@ -24,6 +23,7 @@ use Spatie\MediaLibrary\InteractsWithMedia;
 #[UseFactory(SponsorFactory::class)]
 class Sponsor extends Model implements HasMedia
 {
+    /** @use HasFactory<SponsorFactory> */
     use HasFactory;
     use InteractsWithMedia;
 
@@ -47,7 +47,7 @@ class Sponsor extends Model implements HasMedia
     }
 
     /**
-     * @return BelongsToMany<EventModel, $this, Pivot>
+     * @return BelongsToMany<EventModel, $this, SponsorAttend>
      */
     public function events(): BelongsToMany
     {

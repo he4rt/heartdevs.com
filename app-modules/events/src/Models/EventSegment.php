@@ -11,6 +11,7 @@ class EventSegment extends Model
 {
     use Sushi;
 
+    /** @var array<int, array{title: string}> */
     protected $rows = [
         [
             'title' => 'Abertura do Evento',

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace He4rt\Events\Models;
 
+use Carbon\Carbon;
 use He4rt\Events\Database\Factories\EventAgendaFactory;
 use He4rt\Events\Enums\SchedulableTypeEnum;
 use He4rt\Identity\Tenant\Models\Tenant;
@@ -17,10 +18,14 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
  * @property string $schedulable_type
+ * @property Carbon|null $created_at
+ * @property Carbon|null $updated_at
+ * @property Carbon|null $deleted_at
  */
 #[UseFactory(EventAgendaFactory::class)]
 class EventAgenda extends Model
 {
+    /** @use HasFactory<EventAgendaFactory> */
     use HasFactory;
     use SoftDeletes;
 
@@ -51,11 +56,17 @@ class EventAgenda extends Model
         return $this->belongsTo(EventModel::class, 'event_id');
     }
 
+    /**
+     * @return MorphTo<Model, $this>
+     */
     public function schedulable(): MorphTo
     {
         return $this->morphTo();
     }
 
+    /**
+     * @return Attribute<SchedulableTypeEnum, never>
+     */
     protected function scheduleType(): Attribute
     {
         return Attribute::get(fn () => SchedulableTypeEnum::from($this->schedulable_type));

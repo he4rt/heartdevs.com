@@ -16,7 +16,6 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
-use Illuminate\Database\Eloquent\Relations\Pivot;
 
 /**
  * @property int|string $event_id
@@ -31,6 +30,7 @@ use Illuminate\Database\Eloquent\Relations\Pivot;
 #[UseFactory(EventSubmissionFactory::class)]
 class EventSubmission extends Model
 {
+    /** @use HasFactory<EventSubmissionFactory> */
     use HasFactory;
 
     protected $table = 'events_talks';
@@ -62,7 +62,7 @@ class EventSubmission extends Model
     }
 
     /**
-     * @return BelongsToMany<User, $this, Pivot>
+     * @return BelongsToMany<User, $this, EventSubmissionSpeaker>
      */
     public function speakers(): BelongsToMany
     {
@@ -82,17 +82,23 @@ class EventSubmission extends Model
         return $this->belongsTo(Tenant::class);
     }
 
+    /**
+     * @return Attribute<string|null, never>
+     */
     protected function start(): Attribute
     {
         return Attribute::make(
-            get: fn () => $this->starts_at?->format('H:i'),
+            get: fn () => $this->starts_at->format('H:i'),
         );
     }
 
+    /**
+     * @return Attribute<string|null, never>
+     */
     protected function end(): Attribute
     {
         return Attribute::make(
-            get: fn () => $this->ends_at?->format('H:i'),
+            get: fn () => $this->ends_at->format('H:i'),
         );
     }
 

@@ -7,6 +7,10 @@ namespace He4rt\Events\Models\Pivot;
 use He4rt\Events\Enums\AttendingStatusEnum;
 use Illuminate\Database\Eloquent\Relations\Pivot;
 
+/**
+ * @property AttendingStatusEnum $status
+ * @property int $attend_order
+ */
 class EventAttend extends Pivot
 {
     protected $table = 'events_attendees';

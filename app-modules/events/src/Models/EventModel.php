@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace He4rt\Events\Models;
 
-use Carbon\Traits\Date;
+use Carbon\Carbon;
 use Exception;
 use He4rt\Events\Database\Factories\EventFactory;
 use He4rt\Events\Enums\AttendingStatusEnum;
@@ -23,7 +23,6 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasManyThrough;
-use Illuminate\Database\Eloquent\Relations\Pivot;
 
 /**
  * @property bool $active
@@ -36,13 +35,14 @@ use Illuminate\Database\Eloquent\Relations\Pivot;
  * @property int $attendees_count
  * @property int $waitlist_count
  * @property int $tenant_id
- * @property Date $end_at
- * @property Date $start_at
- * @property Date $event_at
+ * @property Carbon $end_at
+ * @property Carbon $start_at
+ * @property Carbon $event_at
  */
 #[UseFactory(EventFactory::class)]
 class EventModel extends Model
 {
+    /** @use HasFactory<EventFactory> */
     use HasFactory;
 
     protected $table = 'events';
@@ -64,7 +64,7 @@ class EventModel extends Model
     ];
 
     /**
-     * @return BelongsToMany<User, $this, Pivot>
+     * @return BelongsToMany<User, $this, EventAttend>
      */
     public function attendees(): BelongsToMany
     {
@@ -113,7 +113,9 @@ class EventModel extends Model
             return false;
         }
 
-        match ($eventAttend->pivot->status) {
+        /** @var EventAttend $pivot */
+        $pivot = $eventAttend->pivot;
+        match ($pivot->status) {
             AttendingStatusEnum::Attending => $this->decrement('attendees_count'),
             AttendingStatusEnum::Waitlist => $this->decrement('waitlist_count'),
             default => null,
@@ -124,19 +126,23 @@ class EventModel extends Model
         return true;
     }
 
-    public function isParticipating($userId): bool
+    public function isParticipating(mixed $userId): bool
     {
         return $this->attendees()->where('user_id', $userId)->exists();
     }
 
     public function isAttending(): bool
     {
-        return $this->attendees->first()->pivot->status === AttendingStatusEnum::Attending;
+        return $this->attendees()
+            ->wherePivot('status', AttendingStatusEnum::Attending)
+            ->exists();
     }
 
     public function onWaitlist(): bool
     {
-        return $this->attendees->first()->pivot->status === AttendingStatusEnum::Waitlist;
+        return $this->attendees()
+            ->wherePivot('status', AttendingStatusEnum::Waitlist)
+            ->exists();
     }
 
     /**
@@ -156,7 +162,7 @@ class EventModel extends Model
     }
 
     /**
-     * @return HasManyThrough<User, EventSubmission>
+     * @return HasManyThrough<User, EventSubmission, $this>
      */
     public function speakers(): HasManyThrough
     {
@@ -172,6 +178,7 @@ class EventModel extends Model
             ->oldest('starting_at');
     }
 
+    /** @return Attribute<int, never> */
     protected function duration(): Attribute
     {
         return Attribute::make(
@@ -179,27 +186,34 @@ class EventModel extends Model
         );
     }
 
+    /** @return Attribute<string|null, never> */
     protected function start(): Attribute
     {
         return Attribute::make(
-            get: fn () => $this->start_at?->format('H:i'),
+            get: fn () => $this->start_at->format('H:i'),
         );
     }
 
+    /** @return Attribute<string|null, never> */
     protected function day(): Attribute
     {
         return Attribute::make(
-            get: fn () => $this->event_at?->format('d/m'),
+            get: fn () => $this->event_at->format('d/m'),
         );
     }
 
+    /** @return Attribute<string|null, never> */
     protected function end(): Attribute
     {
         return Attribute::make(
-            get: fn () => $this->end_at?->format('H:i'),
+            get: fn () => $this->end_at->format('H:i'),
         );
     }
 
+    /**
+     * @param  Builder<self>  $query
+     * @return Builder<self>
+     */
     #[Scope]
     protected function availableHours(Builder $query, string $start, string $end): Builder
     {
@@ -215,8 +229,12 @@ class EventModel extends Model
         });
     }
 
+    /**
+     * @param  Builder<self>  $query
+     * @return Builder<self>
+     */
     #[Scope]
-    protected function active($query)
+    protected function active(Builder $query): Builder
     {
         return $query->where('active', true);
     }
