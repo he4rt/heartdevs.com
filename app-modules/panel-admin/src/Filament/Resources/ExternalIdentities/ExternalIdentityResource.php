@@ -12,8 +12,10 @@ use Filament\Tables\Table;
 use He4rt\Identity\ExternalIdentity\Models\ExternalIdentity;
 use He4rt\PanelAdmin\Filament\Resources\ExternalIdentities\Pages\ListExternalIdentities;
 use He4rt\PanelAdmin\Filament\Resources\ExternalIdentities\Pages\ViewExternalIdentity;
+use He4rt\PanelAdmin\Filament\Resources\ExternalIdentities\RelationManagers\MessagesRelationManager;
 use He4rt\PanelAdmin\Filament\Resources\ExternalIdentities\Schemas\ExternalIdentityForm;
 use He4rt\PanelAdmin\Filament\Resources\ExternalIdentities\Tables\ExternalIdentitiesTable;
+use He4rt\PanelAdmin\Filament\Resources\ExternalIdentities\Widgets\ExternalIdentityStatsOverview;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use UnitEnum;
@@ -43,9 +45,21 @@ class ExternalIdentityResource extends Resource
     /**
      * @return array<class-string>
      */
+    public static function getWidgets(): array
+    {
+        return [
+            ExternalIdentityStatsOverview::class,
+        ];
+    }
+
+    /**
+     * @return array<class-string>
+     */
     public static function getRelations(): array
     {
-        return [];
+        return [
+            MessagesRelationManager::class,
+        ];
     }
 
     /**
