@@ -14,6 +14,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 final class Message extends Model
 {
+    /** @use HasFactory<MessageFactory> */
     use HasFactory;
     use HasUuids;
 

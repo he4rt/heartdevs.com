@@ -34,14 +34,14 @@ class DynamicVoiceCommand extends SlashCommand
     /**
      * The command options.
      *
-     * @var array
+     * @var array<mixed>
      */
     protected $options = [];
 
     /**
      * The permissions required to use the command.
      *
-     * @var array
+     * @var array<mixed>
      */
     protected $permissions = [];
 
@@ -90,6 +90,9 @@ class DynamicVoiceCommand extends SlashCommand
         $this->interactionWithUser($interaction, $channel);
     }
 
+    /**
+     * @return array<mixed>
+     */
     public function options(): array
     {
         return [
@@ -110,6 +113,9 @@ class DynamicVoiceCommand extends SlashCommand
         ];
     }
 
+    /**
+     * @return array<mixed>
+     */
     private function getVoiceChoices(): array
     {
         $items = [

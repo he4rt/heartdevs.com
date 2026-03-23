@@ -6,6 +6,7 @@ namespace He4rt\Community\Feedback\Exceptions;
 
 use Exception;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 final class FeedbackException extends Exception
@@ -15,7 +16,7 @@ final class FeedbackException extends Exception
         return new self(sprintf(trans('feedbacks.exceptions.id_not_found'), $id), Response::HTTP_NOT_FOUND);
     }
 
-    public function render($request): JsonResponse
+    public function render(Request $request): JsonResponse
     {
         return response()->json($this->getMessage(), $this->code);
     }

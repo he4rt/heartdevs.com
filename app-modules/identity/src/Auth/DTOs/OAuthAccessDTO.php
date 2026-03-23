@@ -15,8 +15,14 @@ abstract class OAuthAccessDTO
         public ?int $expiresIn
     ) {}
 
+    /**
+     * @param  array<string, mixed>  $payload
+     */
     abstract public static function make(array $payload): self;
 
+    /**
+     * @return array<string, mixed>
+     */
     final public function toDatabase(): array
     {
         return [

@@ -29,7 +29,7 @@ class ProfileCommand extends AbstractSlashCommand
     /**
      * The command options.
      *
-     * @var array
+     * @var array<mixed>
      */
     protected $options = [
         [
@@ -43,7 +43,7 @@ class ProfileCommand extends AbstractSlashCommand
     /**
      * The permissions required to use the command.
      *
-     * @var array
+     * @var array<mixed>
      */
     protected $permissions = [];
 

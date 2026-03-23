@@ -14,6 +14,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 final class Review extends Model
 {
+    /** @use HasFactory<ReviewFactory> */
     use HasFactory;
     use HasUuids;
 

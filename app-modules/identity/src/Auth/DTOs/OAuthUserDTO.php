@@ -18,8 +18,14 @@ abstract class OAuthUserDTO
         public ?string $avatarUrl,
     ) {}
 
+    /**
+     * @param  array<string, mixed>  $payload
+     */
     abstract public static function make(OAuthAccessDTO $credentials, array $payload): self;
 
+    /**
+     * @return array<string, mixed>
+     */
     final public function toDatabase(): array
     {
         return [

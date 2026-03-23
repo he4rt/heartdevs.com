@@ -42,6 +42,7 @@ use Illuminate\Support\Carbon;
  */
 final class ExternalIdentity extends Model
 {
+    /** @use HasFactory<ExternalIdentityFactory> */
     use HasFactory;
     use HasUuids;
     use SoftDeletes;
@@ -68,6 +69,7 @@ final class ExternalIdentity extends Model
         'messages_count',
     ];
 
+    /** @return MorphTo<Model, $this> */
     public function model(): MorphTo
     {
         return $this->morphTo();

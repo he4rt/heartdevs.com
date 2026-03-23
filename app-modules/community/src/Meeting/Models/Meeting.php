@@ -16,6 +16,7 @@ use Illuminate\Database\Eloquent\Relations\Pivot;
 
 final class Meeting extends Model
 {
+    /** @use HasFactory<MeetingFactory> */
     use HasFactory;
     use HasUuids;
 

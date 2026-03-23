@@ -15,6 +15,9 @@ final readonly class NewProviderDTO implements JsonSerializable
         private string $externalAccountId
     ) {}
 
+    /**
+     * @return array<string, mixed>
+     */
     public function jsonSerialize(): array
     {
         return [

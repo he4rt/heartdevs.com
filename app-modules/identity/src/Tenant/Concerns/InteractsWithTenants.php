@@ -28,7 +28,7 @@ trait InteractsWithTenants
     }
 
     /**
-     * @return array<Tenant> | Collection
+     * @return array<int, Tenant>|Collection<int, Tenant>
      */
     public function getTenants(Panel $panel): array|Collection
     {

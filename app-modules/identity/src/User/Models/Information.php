@@ -10,8 +10,18 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
+/**
+ * @property string $name
+ * @property string $nickname
+ * @property string|null $about
+ * @property string|null $linkedin_url
+ * @property string|null $github_url
+ * @property string|null $birthdate
+ * @property int $user_id
+ */
 final class Information extends Model
 {
+    /** @use HasFactory<InformationFactory> */
     use HasFactory;
     use HasUuids;
 

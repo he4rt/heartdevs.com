@@ -25,8 +25,10 @@ class IntroductionCommand extends SlashCommand
 
     protected $description = 'Apresente-se no servidor!';
 
+    /** @var array<mixed> */
     protected $options = [];
 
+    /** @var array<mixed> */
     protected $permissions = [];
 
     protected $admin = false;
@@ -112,6 +114,9 @@ class IntroductionCommand extends SlashCommand
             ->show($interaction);
     }
 
+    /**
+     * @param  Collection<mixed, mixed>  $components
+     */
     private function persistData(Interaction $interaction, Collection $components): void
     {
         $tenantProvider = ExternalIdentity::query()

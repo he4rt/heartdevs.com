@@ -20,6 +20,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  */
 final class Address extends Model
 {
+    /** @use HasFactory<AddressFactory> */
     use HasFactory;
     use HasUuids;
 

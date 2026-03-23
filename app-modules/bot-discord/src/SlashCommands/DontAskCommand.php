@@ -42,7 +42,7 @@ class DontAskCommand extends SlashCommand
     /**
      * The slash command options.
      *
-     * @var array
+     * @var array<mixed>
      */
     protected $options = [
         [

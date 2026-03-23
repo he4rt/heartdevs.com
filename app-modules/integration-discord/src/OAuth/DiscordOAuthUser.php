@@ -10,6 +10,9 @@ use He4rt\Identity\ExternalIdentity\Enums\IdentityProvider;
 
 class DiscordOAuthUser extends OAuthUserDTO
 {
+    /**
+     * @param  array<string, mixed>  $payload
+     */
     public static function make(OAuthAccessDTO $credentials, array $payload): OAuthUserDTO
     {
         return new self(

@@ -79,6 +79,9 @@ class EditVoiceChannelLimitCommand extends SlashCommand
         }
     }
 
+    /**
+     * @return array<mixed>
+     */
     public function options(): array
     {
         return [

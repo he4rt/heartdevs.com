@@ -18,6 +18,9 @@ final class UpsertInformationDTO
         public ?string $birthdate,
     ) {}
 
+    /**
+     * @param  array<string, mixed>  $data
+     */
     public static function make(array $data): self
     {
         return new self(

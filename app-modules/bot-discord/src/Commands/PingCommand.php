@@ -40,6 +40,8 @@ class PingCommand extends Command
 
     /**
      * Handle the command.
+     *
+     * @param  array<mixed>  $args
      */
     public function handle(Message $message, array $args): void
     {
@@ -53,6 +55,8 @@ class PingCommand extends Command
 
     /**
      * The command interaction routes.
+     *
+     * @return array<mixed>
      */
     public function interactions(): array
     {

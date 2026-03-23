@@ -38,6 +38,7 @@ use Spatie\MediaLibrary\InteractsWithMedia;
 #[ObservedBy(UserObserver::class)]
 final class User extends Authenticatable implements FilamentUser, HasMedia, HasName, HasTenants
 {
+    /** @use HasFactory<UserFactory> */
     use HasFactory;
     use HasUuids;
     use InteractsWithMedia;
@@ -68,7 +69,7 @@ final class User extends Authenticatable implements FilamentUser, HasMedia, HasN
     }
 
     /**
-     * @return BelongsToMany<EventModel, $this>
+     * @return BelongsToMany<EventModel, $this, EventAttend, 'pivot'>
      */
     public function events(): BelongsToMany
     {
@@ -146,6 +147,9 @@ final class User extends Authenticatable implements FilamentUser, HasMedia, HasN
         return UserFactory::new();
     }
 
+    /**
+     * @return Attribute<string, never>
+     */
     protected function shortName(): Attribute
     {
         return Attribute::get(function (): string {
@@ -155,7 +159,10 @@ final class User extends Authenticatable implements FilamentUser, HasMedia, HasN
             $firstName = $name->shift();
             $lastName = $name->pop();
 
-            return sprintf('%s %s', $firstName, $lastName);
+            /** @var string $result */
+            $result = sprintf('%s %s', $firstName, $lastName);
+
+            return $result;
         });
     }
 

@@ -13,7 +13,6 @@ use Filament\Support\Contracts\HasLabel;
 use He4rt\Identity\Auth\DTOs\OAuthStateDTO;
 use He4rt\IntegrationDiscord\OAuth\DiscordOAuthClient;
 use He4rt\IntegrationTwitch\OAuth\Contracts\TwitchOAuthService;
-use Illuminate\Contracts\Support\Htmlable;
 
 enum IdentityProvider: string implements HasColor, HasDescription, HasIcon, HasLabel
 {
@@ -49,7 +48,7 @@ enum IdentityProvider: string implements HasColor, HasDescription, HasIcon, HasL
         return $this->name;
     }
 
-    public function getDescription(): string|Htmlable|null
+    public function getDescription(): string
     {
         return match ($this) {
             self::Discord => 'Conecte sua conta do Discord para gameficações e eventos.',
@@ -57,6 +56,9 @@ enum IdentityProvider: string implements HasColor, HasDescription, HasIcon, HasL
         };
     }
 
+    /**
+     * @return array<int, string>
+     */
     public function getScopes(): array
     {
         $scopes = match ($this) {

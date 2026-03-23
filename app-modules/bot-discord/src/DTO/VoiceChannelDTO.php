@@ -13,10 +13,14 @@ final class VoiceChannelDTO
         public readonly string $channelId,
         public readonly string $ownerId,
         public int $usersCount,
+        /** @var array<string, mixed> */
         public array $users,
         public ?CarbonInterface $lastJoinedAt = null,
     ) {}
 
+    /**
+     * @param  array<string, mixed>  $data
+     */
     public static function make(array $data): self
     {
         return new self(

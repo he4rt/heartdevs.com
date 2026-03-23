@@ -9,6 +9,9 @@ enum ReviewTypeEnum: string
     case APPROVED = 'approved';
     case DECLINED = 'declined';
 
+    /**
+     * @return array<int, string>
+     */
     public static function getTypes(): array
     {
         return [

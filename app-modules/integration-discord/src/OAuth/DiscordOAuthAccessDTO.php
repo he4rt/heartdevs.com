@@ -8,6 +8,9 @@ use He4rt\Identity\Auth\DTOs\OAuthAccessDTO;
 
 final class DiscordOAuthAccessDTO extends OAuthAccessDTO
 {
+    /**
+     * @param  array<string, mixed>  $payload
+     */
     public static function make(array $payload): self
     {
         return new self(

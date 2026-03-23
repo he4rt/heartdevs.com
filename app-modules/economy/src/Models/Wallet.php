@@ -21,6 +21,7 @@ use Illuminate\Database\Eloquent\Relations\MorphTo;
  */
 final class Wallet extends Model
 {
+    /** @use HasFactory<WalletFactory> */
     use HasFactory;
     use HasUuids;
 

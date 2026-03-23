@@ -38,6 +38,7 @@ abstract class AbstractSlashCommand extends SlashCommand
             ]));
     }
 
+    /** @return Builder<ExternalIdentity> */
     protected function getMemberProviderQuery(): Builder
     {
         return ExternalIdentity::query()

@@ -18,6 +18,9 @@ final readonly class TwitchSubscriberDTO
         public ?string $gifterName = null,
     ) {}
 
+    /**
+     * @param  array<string, mixed>  $payload
+     */
     public static function make(array $payload): self
     {
         return new self(

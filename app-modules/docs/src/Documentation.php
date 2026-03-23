@@ -67,6 +67,8 @@ class Documentation
 
     /**
      * Get the given documentation page.
+     *
+     * @return array<string, mixed>|null
      */
     public function get(string $version, string $page): ?array
     {
@@ -90,6 +92,8 @@ class Documentation
 
     /**
      * Get the array based index representation of the documentation.
+     *
+     * @return array<string, mixed>
      */
     public function indexArray(string $version): array
     {
@@ -136,6 +140,8 @@ class Documentation
 
     /**
      * Determine which versions a page exists in.
+     *
+     * @return Collection<string, string>
      */
     public function versionsContainingPage(string $page): Collection
     {
@@ -145,6 +151,8 @@ class Documentation
 
     /**
      * Get the sidebar documentation index.
+     *
+     * @return array<string, mixed>
      */
     public function getPages(string $version): array
     {
@@ -199,6 +207,9 @@ class Documentation
         });
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     public function getToc(string $markdown): array
     {
         $headings = [];

@@ -8,6 +8,9 @@ use He4rt\Identity\Auth\DTOs\OAuthAccessDTO;
 
 class TwitchOAuthAccessDTO extends OAuthAccessDTO
 {
+    /**
+     * @param  array<string, mixed>  $payload
+     */
     public static function make(array $payload): self
     {
         return new self(

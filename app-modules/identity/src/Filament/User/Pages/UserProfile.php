@@ -60,8 +60,14 @@ class UserProfile extends Page
      */
     public ?array $data = [];
 
+    /**
+     * @var array<string, mixed> | null
+     */
     public ?array $informationData = [];
 
+    /**
+     * @var array<string, mixed> | null
+     */
     public ?array $addressData = [];
 
     protected static bool $isDiscovered = false;
@@ -529,7 +535,7 @@ class UserProfile extends Page
                 ['email' => $newEmail]));
     }
 
-    private function getSavedNotificationTitle(): ?string
+    private function getSavedNotificationTitle(): string
     {
         return __('filament-panels::auth/pages/edit-profile.notifications.saved.title');
     }

@@ -16,6 +16,9 @@ final readonly class NewVoiceMessageDTO
         public string $channelName,
     ) {}
 
+    /**
+     * @param  array<string, mixed>  $payload
+     */
     public static function make(array $payload): self
     {
         return new self(

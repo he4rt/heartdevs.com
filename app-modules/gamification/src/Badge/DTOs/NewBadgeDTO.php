@@ -17,6 +17,9 @@ final readonly class NewBadgeDTO implements JsonSerializable
         private int $tenant_id
     ) {}
 
+    /**
+     * @param  array<string, mixed>  $payload
+     */
     public static function make(array $payload): self
     {
         return new self(
@@ -29,6 +32,9 @@ final readonly class NewBadgeDTO implements JsonSerializable
         );
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     public function jsonSerialize(): array
     {
         return [

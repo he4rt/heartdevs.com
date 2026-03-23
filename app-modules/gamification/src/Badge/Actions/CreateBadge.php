@@ -10,6 +10,9 @@ final readonly class CreateBadge
 {
     public function __construct(private PersistBadge $persistBadge) {}
 
+    /**
+     * @param  array<string, mixed>  $payload
+     */
     public function handle(array $payload): mixed
     {
         $newBadgeDTO = NewBadgeDTO::make($payload);

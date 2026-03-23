@@ -24,6 +24,7 @@ use Illuminate\Database\Eloquent\Relations\MorphTo;
  */
 final class Transaction extends Model
 {
+    /** @use HasFactory<TransactionFactory> */
     use HasFactory;
     use HasUuids;
 

@@ -25,6 +25,9 @@ class OAuthStateDTO implements JsonSerializable, Stringable
         return new self(...json_decode(Crypt::decryptString($state), true));
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     public function jsonSerialize(): array
     {
 

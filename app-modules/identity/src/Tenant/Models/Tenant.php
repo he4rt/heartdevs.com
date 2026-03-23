@@ -34,6 +34,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  */
 class Tenant extends Model
 {
+    /** @use HasFactory<TenantFactory> */
     use HasFactory;
 
     use SoftDeletes;

@@ -8,7 +8,10 @@ use He4rt\BotDiscord\DTO\VoiceChannelDTO;
 
 final class LeftChannelAction
 {
-    public function execute(array $activeChannels, $user): void
+    /**
+     * @param  array<string, mixed>  $activeChannels
+     */
+    public function execute(array $activeChannels, string $user): void
     {
         foreach ($activeChannels as $index => $channel) {
             /** @var VoiceChannelDTO $channel */
@@ -22,6 +25,9 @@ final class LeftChannelAction
         }
     }
 
+    /**
+     * @param  array<string, mixed>  $activeChannels
+     */
     private function saveActiveChannels(array $activeChannels): void
     {
         cache()->tags(['voice_channels'])->put('active_voice_channels_keys', $activeChannels);

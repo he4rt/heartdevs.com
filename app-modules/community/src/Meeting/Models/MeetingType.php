@@ -18,6 +18,7 @@ use Illuminate\Database\Eloquent\Model;
  */
 final class MeetingType extends Model
 {
+    /** @use HasFactory<MeetingTypeFactory> */
     use HasFactory;
 
     protected $table = 'meeting_types';
@@ -33,6 +34,9 @@ final class MeetingType extends Model
         return MeetingTypeFactory::new();
     }
 
+    /**
+     * @return Attribute<string, never>
+     */
     protected function startAt(): Attribute
     {
         return Attribute::make(
@@ -40,6 +44,9 @@ final class MeetingType extends Model
         );
     }
 
+    /**
+     * @return Attribute<string, never>
+     */
     protected function meetingDayForHumans(): Attribute
     {
         return Attribute::get(fn () => match ($this->week_day) {
@@ -50,6 +57,7 @@ final class MeetingType extends Model
             4 => 'Quinta Feira',
             5 => 'Sexta Feira',
             6 => 'Sábado',
+            default => '',
         });
     }
 

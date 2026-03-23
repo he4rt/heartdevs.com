@@ -23,7 +23,7 @@ class Dashboard extends FilamentDashboard
     }
 
     #[Computed]
-    public function stats()
+    public function stats(): mixed
     {
         return auth()->user()->character()->where('tenant_id', '=', $this->tenant->getKey())->first();
     }

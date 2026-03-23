@@ -17,6 +17,9 @@ final readonly class NewVoiceMessage
         private IncrementExperience $characterExperience,
     ) {}
 
+    /**
+     * @param  array<string, mixed>  $payload
+     */
     public function persist(array $payload): void
     {
         $voiceDTO = NewVoiceMessageDTO::make($payload);

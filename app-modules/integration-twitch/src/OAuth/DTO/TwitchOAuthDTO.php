@@ -10,6 +10,9 @@ use He4rt\Identity\ExternalIdentity\Enums\IdentityProvider;
 
 final class TwitchOAuthDTO extends OAuthUserDTO
 {
+    /**
+     * @param  array<string, mixed>  $payload
+     */
     public static function make(OAuthAccessDTO $credentials, array $payload): self
     {
         $user = $payload['data'][0];

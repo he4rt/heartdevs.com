@@ -7,6 +7,7 @@ namespace He4rt\Activity\Http\Controllers;
 use App\Http\Controllers\Controller;
 use He4rt\Activity\Actions\NewMessage;
 use He4rt\Activity\Actions\NewVoiceMessage;
+use He4rt\Activity\DTOs\NewMessageDTO;
 use He4rt\Activity\Http\Requests\CreateMessageRequest;
 use He4rt\Activity\Http\Requests\CreateVoiceMessageRequest;
 use Illuminate\Http\Response;
@@ -18,7 +19,7 @@ final class MessagesController extends Controller
         string $provider,
         NewMessage $newMessage,
     ): Response {
-        $newMessage->persist($request->validated());
+        $newMessage->persist(NewMessageDTO::make($request->validated()));
 
         return response()->noContent();
     }

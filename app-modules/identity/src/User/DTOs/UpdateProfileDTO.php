@@ -20,6 +20,9 @@ readonly class UpdateProfileDTO
         public ?string $about = null,
     ) {}
 
+    /**
+     * @param  array<string, mixed>  $payload
+     */
     public static function fromPayload(array $payload): self
     {
         return new self(
@@ -35,6 +38,9 @@ readonly class UpdateProfileDTO
         );
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     public function toProfile(): array
     {
         return [

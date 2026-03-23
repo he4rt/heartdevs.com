@@ -1,2 +1,22 @@
 parameters:
     ignoreErrors:
+        - message: '#^Call\ to\ function\ assert\(\)\ with\ true\ will\ always\ evaluate\ to\ true\.$#'
+          identifier: function.alreadyNarrowedType
+          count: 1
+          path: src/CommonMark/Markdown/GithubFlavoredMarkdownConverter.php
+        - message: '#^Instanceof\ between\ League\\CommonMark\\Environment\\EnvironmentInterface\ and\ League\\CommonMark\\Environment\\EnvironmentInterface\ will\ always\ evaluate\ to\ true\.$#'
+          identifier: instanceof.alwaysTrue
+          count: 1
+          path: src/CommonMark/Markdown/GithubFlavoredMarkdownConverter.php
+        - message: '#^Method\ He4rt\\Docs\\Documentation::getToc\(\)\ should\ return\ array<string,\ mixed>\ but\ returns\ list<array<string,\ int<1,\ max>\|string\|null>>\.$#'
+          identifier: return.type
+          count: 1
+          path: src/Documentation.php
+        - message: '#^Parameter\ \#1\ \$path\ of\ function\ resource_path\ expects\ string,\ Illuminate\\Support\\Stringable\ given\.$#'
+          identifier: argument.type
+          count: 1
+          path: src/Documentation.php
+        - message: '#^Parameter\ \#2\ \$content\ of\ static\ method\ He4rt\\Docs\\Documentation::replaceLinks\(\)\ expects\ League\\CommonMark\\Output\\RenderedContent\|string,\ League\\CommonMark\\Output\\RenderedContentInterface\ given\.$#'
+          identifier: argument.type
+          count: 2
+          path: src/Documentation.php

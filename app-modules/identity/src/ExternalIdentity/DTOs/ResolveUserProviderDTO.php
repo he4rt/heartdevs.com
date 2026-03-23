@@ -18,6 +18,9 @@ class ResolveUserProviderDTO
         public ?string $avatar = null,
     ) {}
 
+    /**
+     * @param  array<string, mixed>  $data
+     */
     public static function make(array $data): self
     {
         return new self(

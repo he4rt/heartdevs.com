@@ -29,6 +29,7 @@ use Illuminate\Support\Facades\Date;
  */
 final class Season extends Model
 {
+    /** @use HasFactory<SeasonFactory> */
     use HasFactory;
     use HasUuids;
 

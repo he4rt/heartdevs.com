@@ -14,6 +14,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 final class PastSeason extends Model
 {
+    /** @use HasFactory<PastSeasonFactory> */
     use HasFactory;
     use HasUuids;
 

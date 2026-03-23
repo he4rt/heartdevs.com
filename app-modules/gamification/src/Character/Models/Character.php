@@ -17,18 +17,22 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\Pivot;
 use Illuminate\Support\Facades\Date;
 
 /**
  * @property int $user_id
- * @property int reputation
+ * @property int $reputation
  * @property int $experience
- * @property Carbon $daily_bonus_claimed_at
+ * @property Carbon|null $daily_bonus_claimed_at
+ * @property int $level
+ * @property float $percentage_experience
+ * @property bool $can_claim_daily_bonus
+ * @property int|null $tenant_id
  */
 final class Character extends Model
 {
+    /** @use HasFactory<CharacterFactory> */
     use HasFactory;
     use HasUuids;
     use HasWallet;
@@ -86,14 +90,6 @@ final class Character extends Model
     }
 
     /**
-     * @return HasOne<Wallet, $this>
-     */
-    public function wallet(): HasOne
-    {
-        return $this->hasOne(Wallet::class);
-    }
-
-    /**
      * @return BelongsToMany<Badge, $this, Pivot>
      */
     public function badges(): BelongsToMany
@@ -129,6 +125,9 @@ final class Character extends Model
             ->first() + 1;
     }
 
+    /**
+     * @return Attribute<int, never>
+     */
     protected function level(): Attribute
     {
         return Attribute::get(function (): int {
@@ -144,6 +143,9 @@ final class Character extends Model
         });
     }
 
+    /**
+     * @return Attribute<int, never>
+     */
     protected function experienceProgress(): Attribute
     {
         return Attribute::get(function (): int {
@@ -155,6 +157,9 @@ final class Character extends Model
         });
     }
 
+    /**
+     * @return Attribute<float, never>
+     */
     protected function percentageExperience(): Attribute
     {
         return Attribute::get(function (): float {
@@ -171,11 +176,17 @@ final class Character extends Model
         });
     }
 
+    /**
+     * @return Attribute<float, never>
+     */
     protected function experiencePercentageRemaining(): Attribute
     {
         return Attribute::get(fn (): float => round(100.0 - $this->percentage_experience, 2));
     }
 
+    /**
+     * @return Attribute<bool, never>
+     */
     protected function canClaimDailyBonus(): Attribute
     {
         return Attribute::get(function (): bool {

@@ -15,6 +15,9 @@ final readonly class CreateFeedback
         private FindExternalIdentity $findExternalIdentity
     ) {}
 
+    /**
+     * @param  array<string, mixed>  $payload
+     */
     public function handle(array $payload): Feedback
     {
         $payload = $this->transformPeopleInvolvedIds($payload);
@@ -26,6 +29,10 @@ final readonly class CreateFeedback
         ]);
     }
 
+    /**
+     * @param  array<string, mixed>  $payload
+     * @return array<string, mixed>
+     */
     private function transformPeopleInvolvedIds(array $payload): array
     {
         $senderIdentity = $this->findExternalIdentity->handle(IdentityProvider::Discord->value, $payload['sender_id']);

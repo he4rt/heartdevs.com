@@ -20,6 +20,9 @@ final class NewMessageDTO
         public DateTimeImmutable $sentAt,
     ) {}
 
+    /**
+     * @param  array<string, mixed>  $payload
+     */
     public static function make(array $payload): self
     {
         return new self(

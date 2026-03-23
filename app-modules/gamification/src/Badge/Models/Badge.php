@@ -18,6 +18,7 @@ use Spatie\MediaLibrary\InteractsWithMedia;
 
 final class Badge extends Model implements HasMedia
 {
+    /** @use HasFactory<BadgeFactory> */
     use HasFactory;
     use InteractsWithMedia;
 

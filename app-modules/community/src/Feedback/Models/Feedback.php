@@ -15,6 +15,7 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
 
 final class Feedback extends Model
 {
+    /** @use HasFactory<FeedbackFactory> */
     use HasFactory;
     use HasUuids;
 
