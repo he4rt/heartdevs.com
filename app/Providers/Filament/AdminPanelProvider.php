@@ -41,22 +41,6 @@ final class AdminPanelProvider extends PanelProvider
                 Dashboard::class,
             ])
             ->discoverWidgets(in: app_path('Filament/Widgets'), for: 'App\Filament\Widgets')
-            ->navigationGroups([
-                NavigationGroup::make()
-                    ->label('Administration'),
-
-                NavigationGroup::make()
-                    ->label('Events'),
-
-                NavigationGroup::make()
-                    ->label('Gamefication'),
-
-                NavigationGroup::make()
-                    ->label('Meetings'),
-
-                NavigationGroup::make()
-                    ->label('General'),
-            ])
             ->middleware([
                 EncryptCookies::class,
                 AddQueuedCookiesToResponse::class,

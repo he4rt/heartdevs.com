@@ -13,14 +13,6 @@ class ActivityServiceProvider extends ServiceProvider
 {
     public function register(): void
     {
-        Panel::configureUsing(function (Panel $panel): void {
-            match ($panel->currentPanel()) {
-                FilamentPanel::Admin => $panel->resources([
-                    MessageResource::class,
-                ]),
-                default => null,
-            };
-        });
     }
 
     public function boot(): void

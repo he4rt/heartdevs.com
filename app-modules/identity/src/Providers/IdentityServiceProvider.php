@@ -22,14 +22,6 @@ class IdentityServiceProvider extends ServiceProvider
     {
         Panel::configureUsing(function (Panel $panel): void {
             match ($panel->currentPanel()) {
-                FilamentPanel::Admin => $panel
-                    ->resources([
-                        UserResource::class,
-                        TenantResource::class,
-                    ])
-                    ->widgets([
-                        UsersStatsOverview::class,
-                    ]),
                 FilamentPanel::User => $panel
                     ->pages([
                         UserProfile::class,
@@ -42,8 +34,8 @@ class IdentityServiceProvider extends ServiceProvider
 
     public function boot(): void
     {
-        $this->loadMigrationsFrom(__DIR__.'/../../database/migrations');
-        $this->loadViewsFrom(__DIR__.'/../../resources/views', 'identity');
+        $this->loadMigrationsFrom(__DIR__ . '/../../database/migrations');
+        $this->loadViewsFrom(__DIR__ . '/../../resources/views', 'identity');
 
         Relation::morphMap([
             'user' => User::class,
