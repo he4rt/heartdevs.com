@@ -10,7 +10,7 @@ use Symfony\Component\HttpFoundation\Response;
 
 final class BotAuthentication
 {
-    public function handle(Request $request, Closure $next)
+    public function handle(Request $request, Closure $next): Response
     {
         $apiKey = $request->header('X-He4rt-Authorization');
 

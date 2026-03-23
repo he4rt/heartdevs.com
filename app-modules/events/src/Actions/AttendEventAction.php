@@ -6,6 +6,7 @@ namespace He4rt\Events\Actions;
 
 use Exception;
 use He4rt\Events\Models\EventModel;
+use He4rt\Events\Models\Pivot\EventAttend;
 
 final class AttendEventAction
 {
@@ -14,7 +15,9 @@ final class AttendEventAction
      */
     public function execute(EventModel $eventModel): void
     {
-        $attendingStatus = $eventModel->attendees()->first()->pivot->status;
+        /** @var EventAttend|null $pivot */
+        $pivot = $eventModel->attendees()->first()?->pivot;
+        $attendingStatus = $pivot->status;
         $eventModel->attend(auth()->user()->id, $attendingStatus);
     }
 }

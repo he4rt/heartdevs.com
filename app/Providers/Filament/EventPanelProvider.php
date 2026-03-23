@@ -45,19 +45,27 @@ class EventPanelProvider extends PanelProvider
             ->path(app()->isProduction() ? '' : 'event')
             ->tenantDomain(app()->isProduction() ? '{tenant:domain}' : null)
             ->loginRouteSlug('{tenant}/login')
-            ->renderHook(PanelsRenderHook::SIDEBAR_NAV_END, fn () => Blade::render(sprintf(<<<'BLADE'
-               @guest
-                    <x-he4rt::button href="%s" class="mt-auto block sm:hidden text-center">Fazer Login</x-he4rt::button>
-               @endguest
-            BLADE, Filament::getLoginUrl(['tenant' => filament()->getTenant()?->slug]))
-            ))
-            ->renderHook(PanelsRenderHook::TOPBAR_END, fn () => Blade::render(sprintf(<<<'BLADE'
-               @guest
-                    <x-he4rt::button href="%s" class="w-fit hidden sm:block">Fazer Login</x-he4rt::button>
-               @endguest
-            BLADE, Filament::getLoginUrl(['tenant' => filament()->getTenant()?->slug]))
-            ))
-            ->tenantViteTheme()
+            ->renderHook(PanelsRenderHook::SIDEBAR_NAV_END, function (): string {
+                /** @var Tenant|null $tenant */
+                $tenant = filament()->getTenant();
+
+                return Blade::render(sprintf(<<<'BLADE'
+                   @guest
+                        <x-he4rt::button href="%s" class="mt-auto block sm:hidden text-center">Fazer Login</x-he4rt::button>
+                   @endguest
+                BLADE, Filament::getLoginUrl(['tenant' => $tenant?->slug])));
+            })
+            ->renderHook(PanelsRenderHook::TOPBAR_END, function (): string {
+                /** @var Tenant|null $tenant */
+                $tenant = filament()->getTenant();
+
+                return Blade::render(sprintf(<<<'BLADE'
+                   @guest
+                        <x-he4rt::button href="%s" class="w-fit hidden sm:block">Fazer Login</x-he4rt::button>
+                   @endguest
+                BLADE, Filament::getLoginUrl(['tenant' => $tenant?->slug])));
+            })
+            ->tenantViteTheme() /** @phpstan-ignore method.notFound */
             ->topbarLivewireComponent(GuestTopbar::class)
             ->sidebarLivewireComponent(GuestSidebar::class)
             ->discoverResources(in: app_path('Filament/Event/Resources'), for: 'App\Filament\Event\Resources')
@@ -72,7 +80,12 @@ class EventPanelProvider extends PanelProvider
                 'logout' => Action::make('logout')
                     ->label(__('filament-panels::layout.actions.logout.label'))
                     ->icon(FilamentIcon::resolve(PanelsIconAlias::USER_MENU_LOGOUT_BUTTON) ?? Heroicon::ArrowLeftEndOnRectangle)
-                    ->url(fn () => route('tenant.logout', ['tenant' => filament()->getTenant()?->slug]))
+                    ->url(function (): string {
+                        /** @var Tenant|null $tenant */
+                        $tenant = filament()->getTenant();
+
+                        return route('tenant.logout', ['tenant' => $tenant?->slug]);
+                    })
                     ->postToUrl()
                     ->sort(PHP_INT_MAX),
             ])

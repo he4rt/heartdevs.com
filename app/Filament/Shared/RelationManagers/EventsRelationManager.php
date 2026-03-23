@@ -11,6 +11,8 @@ use Filament\Tables\Table;
 use He4rt\Events\Filament\Admin\Resources\Events\Schemas\EventForm;
 use He4rt\Events\Filament\Admin\Resources\Events\Tables\EventsTable;
 use He4rt\Events\Filament\Resources\Sponsors\Pages\EditSponsor;
+use He4rt\Events\Models\Sponsor;
+use He4rt\Identity\Tenant\Models\Tenant;
 use Illuminate\Database\Eloquent\Model;
 
 class EventsRelationManager extends RelationManager
@@ -19,6 +21,7 @@ class EventsRelationManager extends RelationManager
 
     public static function getBadge(Model $ownerRecord, string $pageClass): ?string
     {
+        /** @var Tenant|Sponsor $ownerRecord */
         return (string) ($ownerRecord->events->where('active', true)->count());
     }
 

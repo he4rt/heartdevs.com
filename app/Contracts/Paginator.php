@@ -11,7 +11,7 @@ interface Paginator
      *
      * @param  int  $start
      * @param  int  $end
-     * @return array
+     * @return array<int, string>
      */
     public function getUrlRange($start, $end);
 
@@ -40,7 +40,7 @@ interface Paginator
     /**
      * Add a set of query string values to the paginator.
      *
-     * @param  array|string|null  $key
+     * @param  array<string, mixed>|string|null  $key
      * @param  string|null  $value
      * @return $this
      */
@@ -71,7 +71,7 @@ interface Paginator
     /**
      * Get all of the items being paginated.
      *
-     * @return array
+     * @return array<int, mixed>
      */
     public function items();
 
@@ -142,7 +142,7 @@ interface Paginator
      * Render the paginator using a given view.
      *
      * @param  string|null  $view
-     * @param  array  $data
+     * @param  array<string, mixed>  $data
      * @return string
      */
     public function render($view = null, $data = []);

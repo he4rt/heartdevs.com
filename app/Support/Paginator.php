@@ -8,8 +8,14 @@ use App\Contracts\Paginator as PaginatorInterface;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator as LengthAwarePaginatorContract;
 use Illuminate\Pagination\LengthAwarePaginator;
 
+/**
+ * @extends LengthAwarePaginator<int, mixed>
+ */
 final class Paginator extends LengthAwarePaginator implements PaginatorInterface
 {
+    /**
+     * @param  LengthAwarePaginatorContract<int, mixed>  $lengthAwarePaginator
+     */
     public static function paginate(LengthAwarePaginatorContract $lengthAwarePaginator): self
     {
         return new self(
