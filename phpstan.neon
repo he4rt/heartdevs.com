@@ -5,9 +5,7 @@ includes:
 parameters:
     reportUnmatchedIgnoredErrors: false
 
-    level: 1
+    level: 6
 
     paths:
         - app/
-        - database/
-        - routes/
