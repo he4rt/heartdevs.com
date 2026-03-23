@@ -6,7 +6,7 @@ namespace He4rt\PanelAdmin\Tests\Feature\Providers;
 
 use Tests\TestCase;
 
-class PanelAdminServiceProviderTest extends TestCase
+final class PanelAdminServiceProviderTest extends TestCase
 {
     public function test_it_boots(): void
     {

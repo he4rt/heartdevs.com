@@ -43,7 +43,7 @@ class EditSeason extends EditRecord
 
                     $position = 1;
                     foreach ($characters as $character) {
-                        PastSeason::create([
+                        PastSeason::query()->create([
                             'tenant_id' => $this->record->tenant_id,
                             'season_id' => $this->record->id,
                             'character_id' => $character->id,

@@ -28,7 +28,7 @@ class FeedbackResource extends Resource
 
     public static function getNavigationBadge(): ?string
     {
-        return (string) Feedback::whereDoesntHave('review')->count();
+        return (string) Feedback::query()->whereDoesntHave('review')->count();
     }
 
     public static function form(Schema $schema): Schema

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-if (!function_exists('modules_path')) {
+if (! function_exists('modules_path')) {
     /**
      * Get the path to the modules' folder.
      *

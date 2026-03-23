@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 // use He4rt\PanelAdmin\Http\Controllers\PanelAdminController;
 
 // Route::get('/panel-admins', [PanelAdminController::class, 'index'])->name('panel-admins.index');

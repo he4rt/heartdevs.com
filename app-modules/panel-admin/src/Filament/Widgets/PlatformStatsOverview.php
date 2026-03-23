@@ -19,13 +19,13 @@ class PlatformStatsOverview extends StatsOverviewWidget
     protected function getStats(): array
     {
         return [
-            Stat::make('Total Users', User::count())
+            Stat::make('Total Users', User::query()->count())
                 ->icon(Heroicon::Users),
-            Stat::make('Active Tenants', Tenant::where('active', true)->count())
+            Stat::make('Active Tenants', Tenant::query()->where('active', true)->count())
                 ->icon(Heroicon::BuildingOffice),
-            Stat::make('Total Characters', Character::count())
+            Stat::make('Total Characters', Character::query()->count())
                 ->icon(Heroicon::UserCircle),
-            Stat::make('Active Events', EventModel::where('active', true)->count())
+            Stat::make('Active Events', EventModel::query()->where('active', true)->count())
                 ->icon(Heroicon::Ticket),
         ];
     }

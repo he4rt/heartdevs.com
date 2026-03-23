@@ -18,12 +18,12 @@ class SeasonStatsOverview extends StatsOverviewWidget
 
     protected function getStats(): array
     {
-        $currentSeason = Season::whereNull('ended_at')->first();
+        $currentSeason = Season::query()->whereNull('ended_at')->first();
 
         return [
             Stat::make('Current Season', $currentSeason?->name ?? 'None')
                 ->icon(Heroicon::Flag),
-            Stat::make('Total XP Distributed', Number::abbreviate(Character::sum('experience')))
+            Stat::make('Total XP Distributed', Number::abbreviate(Character::query()->sum('experience')))
                 ->icon(Heroicon::ArrowTrendingUp),
             Stat::make('Badges Claimed', DB::table('characters_badges')->count())
                 ->icon(Heroicon::Star),

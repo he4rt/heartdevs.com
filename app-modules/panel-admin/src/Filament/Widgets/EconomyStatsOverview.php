@@ -18,9 +18,9 @@ class EconomyStatsOverview extends StatsOverviewWidget
     protected function getStats(): array
     {
         return [
-            Stat::make('Total Coin Balance', Wallet::where('currency', Currency::Coin)->sum('balance'))
+            Stat::make('Total Coin Balance', Wallet::query()->where('currency', Currency::Coin)->sum('balance'))
                 ->icon(Heroicon::CurrencyDollar),
-            Stat::make('Transactions Today', Transaction::whereDate('created_at', today())->count())
+            Stat::make('Transactions Today', Transaction::query()->whereDate('created_at', today())->count())
                 ->icon(Heroicon::ReceiptPercent),
         ];
     }

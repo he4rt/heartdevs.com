@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace He4rt\Events\Models;
 
+use He4rt\Events\Models\Pivot\SponsorAttend;
 use Carbon\Carbon;
 use Exception;
 use He4rt\Events\Database\Factories\EventFactory;
@@ -184,7 +185,7 @@ class EventModel extends Model
     public function sponsors(): BelongsToMany
     {
         return $this->belongsToMany(Sponsor::class, 'events_sponsors', 'event_id', 'sponsor_id')
-            ->using(Pivot\SponsorAttend::class)
+            ->using(SponsorAttend::class)
             ->withPivot(['level'])
             ->withTimestamps();
     }

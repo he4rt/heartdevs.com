@@ -19,3 +19,8 @@ parameters:
           identifier: method.notFound
           count: 1
           path: app/Providers/FilamentServiceProvider.php
+
+        - message: '#^Function module_path not found\.$#'
+          identifier: function.notFound
+          count: 1
+          path: app/Providers/FilamentServiceProvider.php
