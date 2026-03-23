@@ -6,9 +6,6 @@ namespace He4rt\Identity\Providers;
 
 use App\Enums\FilamentPanel;
 use Filament\Panel;
-use He4rt\Identity\Filament\Admin\Resources\Tenants\TenantResource;
-use He4rt\Identity\Filament\Admin\Resources\Users\UserResource;
-use He4rt\Identity\Filament\Shared\Widgets\UsersStatsOverview;
 use He4rt\Identity\Filament\User\Pages\Dashboard;
 use He4rt\Identity\Filament\User\Pages\UserProfile;
 use He4rt\Identity\Tenant\Models\Tenant;
