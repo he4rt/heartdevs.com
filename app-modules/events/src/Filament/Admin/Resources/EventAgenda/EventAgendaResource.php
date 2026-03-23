@@ -153,6 +153,7 @@ class EventAgendaResource extends Resource
 
     public static function getGlobalSearchResultDetails(Model $record): array
     {
+        /** @var EventAgenda $record */
         $details = [];
 
         if ($record->tenant) {

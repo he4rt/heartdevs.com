@@ -11,11 +11,9 @@ use He4rt\Events\Models\EventModel;
 use He4rt\Identity\Tenant\Models\Tenant;
 use Illuminate\Contracts\Support\Htmlable;
 
-/** @property Tenant $tenant */
 class ParticipantDashboard extends Page
 {
-    /** @var Tenant|null */
-    public $tenant;
+    public ?Tenant $tenant = null;
 
     /** @var EventModel|null */
     public $event;
@@ -34,14 +32,16 @@ class ParticipantDashboard extends Page
 
     public function mount(): void
     {
-        $this->tenant = filament()->getTenant();
+        /** @var Tenant $tenant */
+        $tenant = filament()->getTenant();
+        $this->tenant = $tenant;
 
         $this->event = $this->tenant
             ->events()
             ->where('active', true)
             ->first();
 
-        abort_unless($this->event, 404);
+        abort_unless($this->event !== null, 404);
     }
 
     public function getView(): string

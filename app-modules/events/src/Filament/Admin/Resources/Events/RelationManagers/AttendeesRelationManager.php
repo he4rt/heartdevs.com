@@ -11,6 +11,7 @@ use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
+use He4rt\Events\Models\EventModel;
 use He4rt\Identity\Filament\Admin\Resources\Users\UserResource;
 use He4rt\Identity\User\Models\User;
 use Illuminate\Database\Eloquent\Model;
@@ -27,6 +28,7 @@ class AttendeesRelationManager extends RelationManager
 
     public static function getBadge(Model $ownerRecord, string $pageClass): ?string
     {
+        /** @var EventModel $ownerRecord */
         return (string) $ownerRecord->attendees()->count();
     }
 
@@ -48,7 +50,11 @@ class AttendeesRelationManager extends RelationManager
             ])
             ->recordActions([
                 DetachAction::make()
-                    ->using(fn (User $record) => $this->getOwnerRecord()->leave($record->getKey())),
+                    ->using(function (User $record): void {
+                        /** @var EventModel $ownerRecord */
+                        $ownerRecord = $this->getOwnerRecord();
+                        $ownerRecord->leave($record->getKey());
+                    }),
             ]);
     }
 }

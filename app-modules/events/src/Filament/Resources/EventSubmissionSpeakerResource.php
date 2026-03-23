@@ -110,20 +110,21 @@ class EventSubmissionSpeakerResource extends Resource
 
     public static function getGlobalSearchEloquentQuery(): Builder
     {
-        return parent::getGlobalSearchEloquentQuery()->with(['event', 'user']);
+        return parent::getGlobalSearchEloquentQuery()->with(['submission.event', 'user']);
     }
 
     public static function getGloballySearchableAttributes(): array
     {
-        return ['event.title', 'user.name'];
+        return ['submission.event.title', 'user.name'];
     }
 
     public static function getGlobalSearchResultDetails(Model $record): array
     {
+        /** @var EventSubmissionSpeaker $record */
         $details = [];
 
-        if ($record->event) {
-            $details['Event'] = $record->event->title;
+        if ($record->submission?->event) {
+            $details['Event'] = $record->submission->event->title;
         }
 
         if ($record->user) {

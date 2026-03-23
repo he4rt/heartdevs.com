@@ -6,10 +6,11 @@ namespace He4rt\Events\Filament\Events;
 
 use Filament\Pages\Dashboard;
 use Filament\Support\Enums\Width;
+use He4rt\Identity\Tenant\Models\Tenant;
 
 class EventLandingPage extends Dashboard
 {
-    public $tenant;
+    public ?Tenant $tenant = null;
 
     protected static bool $shouldRegisterNavigation = false;
 
@@ -17,7 +18,9 @@ class EventLandingPage extends Dashboard
 
     public function mount(): void
     {
-        $this->tenant = filament()->getTenant();
+        /** @var Tenant|null $tenant */
+        $tenant = filament()->getTenant();
+        $this->tenant = $tenant;
     }
 
     public function getView(): string

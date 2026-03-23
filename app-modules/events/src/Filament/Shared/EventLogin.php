@@ -174,8 +174,9 @@ class EventLogin extends SimplePage
                     return [];
                 }
 
-                $authProvider = Filament::auth()->getProvider();
-                /** @phpstan-ignore-line */
+                /** @var SessionGuard $guard */
+                $guard = Filament::auth();
+                $authProvider = $guard->getProvider();
                 $user = $authProvider->retrieveById(decrypt($this->userUndertakingMultiFactorAuthentication));
 
                 $enabledMultiFactorAuthenticationProviders = array_filter(
@@ -341,8 +342,9 @@ class EventLogin extends SimplePage
 
     protected function getMultiFactorProviderFormComponent(): ?Component
     {
-        $authProvider = Filament::auth()->getProvider();
-        /** @phpstan-ignore-line */
+        /** @var SessionGuard $guard */
+        $guard = Filament::auth();
+        $authProvider = $guard->getProvider();
         $user = $authProvider->retrieveById(decrypt($this->userUndertakingMultiFactorAuthentication));
 
         $enabledMultiFactorAuthenticationProviders = array_filter(
