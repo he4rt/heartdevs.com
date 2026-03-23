@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace He4rt\Identity\User\Actions;
 
 use He4rt\Gamification\Character\Actions\CharacterInitializerAction;
+use He4rt\Identity\ExternalIdentity\Actions\LinkExternalIdentity;
 use He4rt\Identity\ExternalIdentity\Actions\ResolveExternalIdentity;
 use He4rt\Identity\ExternalIdentity\DTOs\ResolveUserProviderDTO;
 use He4rt\Identity\User\ValueObjects\UserContext;
