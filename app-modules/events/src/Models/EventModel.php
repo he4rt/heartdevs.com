@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace He4rt\Events\Models;
 
-use He4rt\Events\Models\Pivot\SponsorAttend;
 use Carbon\Carbon;
 use Exception;
 use He4rt\Events\Database\Factories\EventFactory;
@@ -12,6 +11,7 @@ use He4rt\Events\Enums\AttendingStatusEnum;
 use He4rt\Events\Enums\EventTypeEnum;
 use He4rt\Events\Enums\Talks\TalkStatusEnum;
 use He4rt\Events\Models\Pivot\EventAttend;
+use He4rt\Events\Models\Pivot\SponsorAttend;
 use He4rt\Identity\Tenant\Models\Tenant;
 use He4rt\Identity\User\Models\User;
 use Illuminate\Database\Eloquent\Attributes\Scope;
@@ -180,7 +180,7 @@ class EventModel extends Model
     }
 
     /**
-     * @return BelongsToMany<Sponsor, $this, Pivot\SponsorAttend>
+     * @return BelongsToMany<Sponsor, $this, SponsorAttend>
      */
     public function sponsors(): BelongsToMany
     {

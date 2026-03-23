@@ -6,10 +6,13 @@ namespace He4rt\PanelAdmin\Filament\Resources\ExternalIdentities;
 
 use BackedEnum;
 use Filament\Resources\Resource;
+use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
 use He4rt\Identity\ExternalIdentity\Models\ExternalIdentity;
 use He4rt\PanelAdmin\Filament\Resources\ExternalIdentities\Pages\ListExternalIdentities;
+use He4rt\PanelAdmin\Filament\Resources\ExternalIdentities\Pages\ViewExternalIdentity;
+use He4rt\PanelAdmin\Filament\Resources\ExternalIdentities\Schemas\ExternalIdentityForm;
 use He4rt\PanelAdmin\Filament\Resources\ExternalIdentities\Tables\ExternalIdentitiesTable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
@@ -24,6 +27,13 @@ class ExternalIdentityResource extends Resource
     protected static string|UnitEnum|null $navigationGroup = 'Community';
 
     protected static ?int $navigationSort = 3;
+
+    protected static ?string $recordTitleAttribute = 'external_account_id';
+
+    public static function form(Schema $schema): Schema
+    {
+        return ExternalIdentityForm::configure($schema);
+    }
 
     public static function table(Table $table): Table
     {
@@ -45,6 +55,7 @@ class ExternalIdentityResource extends Resource
     {
         return [
             'index' => ListExternalIdentities::route('/'),
+            'edit' => ViewExternalIdentity::route('/{record}/edit'),
         ];
     }
 
