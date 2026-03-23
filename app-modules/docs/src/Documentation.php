@@ -100,7 +100,7 @@ class Documentation
         return $this->cache->remember('docs.{'.$version.'}.index', CarbonInterval::second(1), function () use ($version): array {
             $path = base_path('resources/docs/'.$version.'/documentation.md');
 
-            if (! $this->files->exists($path)) {
+            if (!$this->files->exists($path)) {
                 return [];
             }
 
@@ -159,7 +159,7 @@ class Documentation
         return $this->cache->remember('docs.'.$version.'.sidebar', 5, function () use ($version): array {
             $path = base_path('resources/docs/'.$version.'/documentation.md');
 
-            if (! $this->files->exists($path)) {
+            if (!$this->files->exists($path)) {
                 return [];
             }
 

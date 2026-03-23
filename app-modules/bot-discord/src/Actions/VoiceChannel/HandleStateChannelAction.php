@@ -59,19 +59,19 @@ final class HandleStateChannelAction
 
     private function isMovingBetweenChannels(?string $newChannelId, ?string $oldChannelId): bool
     {
-        return ! is_null($newChannelId)
-            && ! is_null($oldChannelId)
+        return !is_null($newChannelId)
+            && !is_null($oldChannelId)
             && $oldChannelId !== $newChannelId;
     }
 
     private function isLeavingVoice(?string $newChannelId, ?string $oldChannelId): bool
     {
-        return is_null($newChannelId) && ! is_null($oldChannelId);
+        return is_null($newChannelId) && !is_null($oldChannelId);
     }
 
     private function isJoiningChannel(?string $channelId, ?string $oldChannelId): bool
     {
-        return ! is_null($channelId) && is_null($oldChannelId);
+        return !is_null($channelId) && is_null($oldChannelId);
     }
 
     private function getUserLastChannel(string $userId): ?string
@@ -92,6 +92,6 @@ final class HandleStateChannelAction
 
     private function isUpdatingInSameChannel(?string $newChannelId, ?string $oldChannelId): bool
     {
-        return ! is_null($newChannelId) && $oldChannelId === $newChannelId;
+        return !is_null($newChannelId) && $oldChannelId === $newChannelId;
     }
 }

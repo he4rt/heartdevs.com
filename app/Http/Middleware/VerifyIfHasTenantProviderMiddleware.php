@@ -15,13 +15,13 @@ final class VerifyIfHasTenantProviderMiddleware
 {
     public function handle(Request $request, Closure $next): mixed
     {
-        if (! $request->hasHeader('X-He4rt-Provider') || ! $request->hasHeader('X-He4rt-Provider-Id')) {
+        if (!$request->hasHeader('X-He4rt-Provider') || !$request->hasHeader('X-He4rt-Provider-Id')) {
             return response()->json(['error' => 'Provider not registered for any tenant.'], Response::HTTP_UNAUTHORIZED);
         }
 
         $provider = IdentityProvider::tryFrom($request->header('X-He4rt-Provider') ?? 'not-found');
 
-        if (! $provider) {
+        if (!$provider) {
             return response()->json(['error' => 'Provider not registered for any tenant.'], Response::HTTP_UNAUTHORIZED);
         }
 
@@ -34,7 +34,7 @@ final class VerifyIfHasTenantProviderMiddleware
             ->first()
         );
 
-        if (! $providerModel) {
+        if (!$providerModel) {
             return response()->json(['error' => 'Provider not registered for any tenant.'], Response::HTTP_UNAUTHORIZED);
         }
 

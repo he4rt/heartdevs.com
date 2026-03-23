@@ -26,7 +26,7 @@ class EditVoiceChannelLimitCommand extends SlashCommand
         $userId = $interaction->member->id;
         $channelId = cache()->tags(['voice_tracking'])->get('user_last_channel_'.$userId);
 
-        if (! $channelId) {
+        if (!$channelId) {
             $this->message()
                 ->content('❌ Você precisa estar em uma sala de voz para usar este comando!')
                 ->reply($interaction, true);
@@ -37,7 +37,7 @@ class EditVoiceChannelLimitCommand extends SlashCommand
         $activeChannels = cache()->tags(['voice_channels'])->get('active_voice_channels_keys', []);
         $channelDto = collect($activeChannels)->firstWhere('channelId', $channelId);
 
-        if (! $channelDto) {
+        if (!$channelDto) {
             $this->message()
                 ->content('❌ Este comando só funciona em salas criadas com /sala!')
                 ->reply($interaction, true);
@@ -55,7 +55,7 @@ class EditVoiceChannelLimitCommand extends SlashCommand
 
         $voiceChannel = $interaction->guild->channels->get('id', $channelId);
 
-        if (! $voiceChannel) {
+        if (!$voiceChannel) {
             $this->message()
                 ->content('❌ Canal de voz não encontrado!')
                 ->reply($interaction, true);

@@ -32,7 +32,7 @@ class AvailableTalkSchedule implements ValidationRule
             ->availableHours(start: $start, end: $end)
             ->exists();
 
-        if (! $isAvailable) {
+        if (!$isAvailable) {
             $fail(sprintf('O Horário %s até %s não está disponível.', $end, $start));
         }
     }

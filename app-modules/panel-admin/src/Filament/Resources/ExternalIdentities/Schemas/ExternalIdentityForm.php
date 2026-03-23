@@ -36,7 +36,7 @@ class ExternalIdentityForm
                                 Placeholder::make('status')
                                     ->label('Connection Status')
                                     ->content(function (?ExternalIdentity $record): string {
-                                        if (! $record instanceof ExternalIdentity) {
+                                        if (!$record instanceof ExternalIdentity) {
                                             return '-';
                                         }
 

@@ -71,7 +71,7 @@ class CargoDelasCommand extends SlashCommand
         $hasComiteRole = $interaction->member->roles
             ->find(fn (Role $role) => $role->id === $comiteRoleId);
 
-        if (! $hasComiteRole) {
+        if (!$hasComiteRole) {
             $interaction->respondWithMessage('❌ Você não tem permissão para usar este comando.', true);
 
             return;
@@ -80,7 +80,7 @@ class CargoDelasCommand extends SlashCommand
         $targetUserId = $this->value('user');
         $targetMember = $this->validateTarget($interaction, $targetUserId);
 
-        if (! $targetMember instanceof Member) {
+        if (!$targetMember instanceof Member) {
             return;
         }
 
@@ -111,7 +111,7 @@ class CargoDelasCommand extends SlashCommand
     {
         $targetMember = $interaction->guild->members->get('id', $targetUserId);
 
-        if (! $targetMember) {
+        if (!$targetMember) {
             $interaction->respondWithMessage('❌ Usuário mencionado não foi encontrado no servidor.', true);
 
             return null;
@@ -127,7 +127,7 @@ class CargoDelasCommand extends SlashCommand
         $targetHasPresentation = $targetMember->roles
             ->find(fn (Role $role) => $role->id === $presentationRoleId);
 
-        if (! $targetHasPresentation) {
+        if (!$targetHasPresentation) {
             $username = $targetMember->user->username ?? 'usuário';
             $interaction->respondWithMessage(sprintf('❌ @%s precisa se apresentar primeiro (/apresentar).', $username), true);
 

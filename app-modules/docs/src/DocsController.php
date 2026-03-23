@@ -35,7 +35,7 @@ class DocsController extends Controller
     public function index($version, Documentation $docs)
     {
 
-        if (! $this->isVersion($version)) {
+        if (!$this->isVersion($version)) {
             return redirect('docs/'.DEFAULT_VERSION.'/index.json', 301);
         }
 
@@ -50,7 +50,7 @@ class DocsController extends Controller
      */
     public function sidebar($version, Documentation $docs)
     {
-        if (! $this->isVersion($version)) {
+        if (!$this->isVersion($version)) {
             return redirect('docs/'.DEFAULT_VERSION.'/sidebar.json', 301);
         }
 
@@ -62,11 +62,11 @@ class DocsController extends Controller
      */
     public function show(string $version, ?string $page = null): RedirectResponse|View|Response
     {
-        if (! $this->isVersion($version)) {
+        if (!$this->isVersion($version)) {
             return redirect('docs/'.DEFAULT_VERSION.'/'.$version, 301);
         }
 
-        if (! defined('CURRENT_VERSION')) {
+        if (!defined('CURRENT_VERSION')) {
             define('CURRENT_VERSION', $version);
         }
 
@@ -85,7 +85,7 @@ class DocsController extends Controller
 
         if ($this->docs->sectionExists($version, $page)) {
             $section .= '/'.$page;
-        } elseif (! is_null($page)) {
+        } elseif (!is_null($page)) {
             return redirect('/docs/'.$version);
         }
 

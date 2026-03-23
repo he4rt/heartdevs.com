@@ -13,7 +13,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        if (! Schema::hasTable('seasons')) {
+        if (!Schema::hasTable('seasons')) {
             Schema::create('seasons', function (Blueprint $table): void {
                 $table->uuid('id');
                 $table->string('name');

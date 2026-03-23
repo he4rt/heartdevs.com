@@ -44,7 +44,7 @@ class AuthenticateAction
             ->where('external_account_id', $user->providerId)
             ->first();
 
-        if (! $provider) {
+        if (!$provider) {
             $provider = $this->registerNewUser($user, $tenant);
         }
 
@@ -60,7 +60,7 @@ class AuthenticateAction
             ->orWhere('email', $userDTO->email)
             ->first();
 
-        if (! $user) {
+        if (!$user) {
             $user = User::query()->create([
                 'id' => Uuid::uuid4()->toString(),
                 'username' => $userDTO->username,

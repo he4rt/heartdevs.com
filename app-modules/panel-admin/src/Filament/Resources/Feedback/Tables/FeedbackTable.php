@@ -56,7 +56,7 @@ class FeedbackTable
                         'declined' => 'Declined',
                     ])
                     ->query(function ($query, array $data) {
-                        if (! $data['value']) {
+                        if (!$data['value']) {
                             return $query;
                         }
 

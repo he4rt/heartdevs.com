@@ -31,7 +31,7 @@ class FilamentServiceProvider extends ServiceProvider
 
             $themeDirectory = sprintf('app-modules/he4rt/resources/css/themes/%s/theme.css', $tenantSlug);
 
-            if (! file_exists(base_path($themeDirectory))) {
+            if (!file_exists(base_path($themeDirectory))) {
                 $themeDirectory = 'app-modules/he4rt/resources/css/theme.css';
             }
 

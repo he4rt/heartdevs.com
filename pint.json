@@ -15,11 +15,7 @@
         "final_internal_class": false,
         "final_public_method_for_abstract_class": false,
         "fully_qualified_strict_types": true,
-        "global_namespace_import": {
-            "import_classes": true,
-            "import_constants": true,
-            "import_functions": true
-        },
+        "global_namespace_import": { "import_classes": true, "import_constants": true, "import_functions": true },
         "mb_str_functions": true,
         "modernize_types_casting": true,
         "new_with_parentheses": false,
@@ -58,14 +54,12 @@
         "self_static_accessor": true,
         "strict_comparison": true,
         "visibility_required": true,
-        "class_attributes_separation": {
-            "elements": {
-                "method": "one"
-            }
-        },
+        "class_attributes_separation": { "elements": { "method": "one" } },
         "no_empty_comment": true,
         "declare_parentheses": true,
         "assign_null_coalescing_to_coalesce_equal": true,
-        "align_multiline_comment": true
+        "align_multiline_comment": true,
+        "not_operator_with_successor_space": false,
+        "unary_operator_spaces": true
     }
 }

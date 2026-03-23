@@ -19,13 +19,13 @@ class ActiveEventsStats extends BaseWidget
 
         $query = EventModel::query()->where('active', true);
 
-        if (! $user->isAdmin()) {
+        if (!$user->isAdmin()) {
             $query->where('tenant_id', Filament::getTenant()->getKey());
         }
 
         $event = $query->first();
 
-        if (! $event) {
+        if (!$event) {
             return [
                 Stat::make('Evento ativo', 'Nenhum')
                     ->description('Sem evento em andamento')

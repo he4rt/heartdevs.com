@@ -96,7 +96,7 @@ class EventLogin extends SimplePage
 
         $user = $authProvider->retrieveByCredentials($credentials);
 
-        if ((! $user) || (! $authProvider->validateCredentials($user, $credentials))) {
+        if ((!$user) || (!$authProvider->validateCredentials($user, $credentials))) {
             $this->userUndertakingMultiFactorAuthentication = null;
 
             $this->fireFailedEvent($authGuard, $user, $credentials);
@@ -110,7 +110,7 @@ class EventLogin extends SimplePage
             $this->multiFactorChallengeForm->validate();
         } else {
             foreach (Filament::getMultiFactorAuthenticationProviders() as $multiFactorAuthenticationProvider) {
-                if (! $multiFactorAuthenticationProvider->isEnabled($user)) {
+                if (!$multiFactorAuthenticationProvider->isEnabled($user)) {
                     continue;
                 }
 
@@ -130,8 +130,8 @@ class EventLogin extends SimplePage
             }
         }
 
-        if (! $authGuard->attemptWhen($credentials, function (Authenticatable $user): bool {
-            if (! ($user instanceof FilamentUser)) {
+        if (!$authGuard->attemptWhen($credentials, function (Authenticatable $user): bool {
+            if (!($user instanceof FilamentUser)) {
                 return true;
             }
 
@@ -232,7 +232,7 @@ class EventLogin extends SimplePage
             return __('filament-panels::auth/pages/login.multi_factor.subheading');
         }
 
-        if (! filament()->hasRegistration()) {
+        if (!filament()->hasRegistration()) {
             return null;
         }
 
@@ -370,7 +370,7 @@ class EventLogin extends SimplePage
                     ->afterStateUpdated(function (?string $state) use ($enabledMultiFactorAuthenticationProviders, $section, $user): void {
                         $provider = $enabledMultiFactorAuthenticationProviders[$state] ?? null;
 
-                        if (! $provider) {
+                        if (!$provider) {
                             return;
                         }
 
@@ -380,7 +380,7 @@ class EventLogin extends SimplePage
                             ->getChildSchema()
                             ->fill();
 
-                        if (! ($provider instanceof HasBeforeChallengeHook)) {
+                        if (!($provider instanceof HasBeforeChallengeHook)) {
                             return;
                         }
 

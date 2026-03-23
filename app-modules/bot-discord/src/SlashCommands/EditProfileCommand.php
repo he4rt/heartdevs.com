@@ -61,7 +61,7 @@ class EditProfileCommand extends AbstractSlashCommand
      */
     public function handle(Interaction $interaction): void
     {
-        if (! $this->memberProvider?->user?->information) {
+        if (!$this->memberProvider?->user?->information) {
             $interaction->respondWithMessage(
                 'Parece que você ainda não completou sua apresentação. Use o comando `/apresentar` para continuar.',
                 true

@@ -33,7 +33,7 @@ final class UsersController extends Controller
     {
         $user = User::query()->where('username', $value)->first();
 
-        if (! $user) {
+        if (!$user) {
             $provider = ExternalIdentity::query()->where('external_account_id', $value)->first();
 
             throw_unless($provider, ProfileException::notFound());

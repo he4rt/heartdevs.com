@@ -62,7 +62,7 @@ return new class extends Migration
     public function up(): void
     {
         foreach (self::TABLES as $table => $column) {
-            if (! Schema::hasTable($table)) {
+            if (!Schema::hasTable($table)) {
                 continue;
             }
 
@@ -89,7 +89,7 @@ return new class extends Migration
         ];
 
         foreach (self::TABLES as $table => $column) {
-            if (! Schema::hasTable($table)) {
+            if (!Schema::hasTable($table)) {
                 continue;
             }
 

@@ -110,7 +110,7 @@ class EventModel extends Model
     {
         $eventAttend = $this->attendees()->where('user_id', $userId)->first();
 
-        if (! $eventAttend) {
+        if (!$eventAttend) {
             return false;
         }
 

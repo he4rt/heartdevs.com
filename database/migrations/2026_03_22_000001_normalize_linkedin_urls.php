@@ -126,7 +126,7 @@ return new class extends Migration
 
         if (preg_match('#^https?://(?:www\.)?linkedin\.com/([\w\-]{3,})$#', $lower, $m)) {
             $path = $m[1];
-            if (! in_array($path, ['feed', 'jobs', 'company', 'me', 'messaging', 'notifications', 'search'], true)) {
+            if (!in_array($path, ['feed', 'jobs', 'company', 'me', 'messaging', 'notifications', 'search'], true)) {
                 return 'https://linkedin.com/in/'.$path;
             }
         }

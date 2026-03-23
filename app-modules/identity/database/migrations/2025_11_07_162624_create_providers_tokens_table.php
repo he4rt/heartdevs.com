@@ -13,7 +13,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        if (! Schema::hasTable('provider_tokens')) {
+        if (!Schema::hasTable('provider_tokens')) {
             Schema::create('provider_tokens', function (Blueprint $table): void {
                 $table->uuid('id')->primary();
                 $table->foreignUuid('provider_id')->constrained('providers')->cascadeOnDelete();

@@ -75,7 +75,7 @@ class ProfileCommand extends AbstractSlashCommand
 
         try {
 
-            if (! $this->memberProvider instanceof ExternalIdentity || ! $this->memberProvider->user->information) {
+            if (!$this->memberProvider instanceof ExternalIdentity || !$this->memberProvider->user->information) {
                 $this
                     ->message()
                     ->content($mentionedUser.' ainda não se apresentou! Use o comando `/introduction` primeiro.')

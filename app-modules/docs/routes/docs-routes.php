@@ -5,7 +5,7 @@ declare(strict_types=1);
 use He4rt\Docs\DocsController;
 use Illuminate\Support\Facades\Route;
 
-if (! defined('DEFAULT_VERSION')) {
+if (!defined('DEFAULT_VERSION')) {
     define('DEFAULT_VERSION', '3.x');
 }
 

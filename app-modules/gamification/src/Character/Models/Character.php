@@ -190,7 +190,7 @@ final class Character extends Model
     protected function canClaimDailyBonus(): Attribute
     {
         return Attribute::get(function (): bool {
-            if (! $this->daily_bonus_claimed_at) {
+            if (!$this->daily_bonus_claimed_at) {
                 return true;
             }
 

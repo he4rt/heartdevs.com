@@ -49,7 +49,7 @@ return new class extends Migration
             $orphanInfo = DB::table('user_information')->where('user_id', $orphanId)->first();
             $keptInfo = DB::table('user_information')->where('user_id', $keptId)->first();
 
-            if (! $orphanInfo || ! $keptInfo) {
+            if (!$orphanInfo || !$keptInfo) {
                 continue;
             }
 

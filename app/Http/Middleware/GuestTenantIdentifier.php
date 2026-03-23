@@ -20,11 +20,11 @@ class GuestTenantIdentifier
     {
         $panel = Filament::getCurrentOrDefaultPanel();
 
-        if (! $panel->hasTenancy()) {
+        if (!$panel->hasTenancy()) {
             return $next($request);
         }
 
-        if (! $request->route()->hasParameter('tenant')) {
+        if (!$request->route()->hasParameter('tenant')) {
             return $next($request);
         }
 

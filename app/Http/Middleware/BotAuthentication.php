@@ -14,7 +14,7 @@ final class BotAuthentication
     {
         $apiKey = $request->header('X-He4rt-Authorization');
 
-        if (! $apiKey) {
+        if (!$apiKey) {
             return response()->json(['error' => 'Chave não encontrada'], Response::HTTP_UNAUTHORIZED);
         }
 

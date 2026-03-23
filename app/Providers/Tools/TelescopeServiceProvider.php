@@ -24,7 +24,7 @@ class TelescopeServiceProvider extends TelescopeApplicationServiceProvider
 
     public function boot(): void
     {
-        if (! $this->canBoot()) {
+        if (!$this->canBoot()) {
             return;
         }
 

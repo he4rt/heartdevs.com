@@ -230,7 +230,7 @@ class UserProfile extends Page
     public function defaultForm(Schema $schema): Schema
     {
         return $schema
-            ->inlineLabel(! self::isSimple())
+            ->inlineLabel(!self::isSimple())
             ->model($this->getUser())
             ->operation('edit')
             ->statePath('data');
@@ -401,14 +401,14 @@ class UserProfile extends Page
                 Actions::make($this->getFormActions())
                     ->alignment($this->getFormActionsAlignment())
                     ->fullWidth($this->hasFullWidthFormActions())
-                    ->sticky((! self::isSimple()) && $this->areFormActionsSticky())
+                    ->sticky((!self::isSimple()) && $this->areFormActionsSticky())
                     ->key('form-actions'),
             ]);
     }
 
     public function getMultiFactorAuthenticationContentComponent(): ?Component
     {
-        if (! Filament::hasMultiFactorAuthentication()) {
+        if (!Filament::hasMultiFactorAuthentication()) {
             return null;
         }
 

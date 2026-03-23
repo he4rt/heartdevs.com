@@ -13,7 +13,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        if (! Schema::hasTable('characters')) {
+        if (!Schema::hasTable('characters')) {
             Schema::create('characters', function (Blueprint $table): void {
                 $table->uuid('id')->primary();
                 $table->foreignUuid('user_id')->constrained('users')->cascadeOnDelete();

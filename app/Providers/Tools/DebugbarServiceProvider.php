@@ -11,7 +11,7 @@ class DebugbarServiceProvider extends ServiceProvider
 {
     public function boot(Dispatcher $events): void
     {
-        if (! $this->canBoot()) {
+        if (!$this->canBoot()) {
             return;
         }
 
