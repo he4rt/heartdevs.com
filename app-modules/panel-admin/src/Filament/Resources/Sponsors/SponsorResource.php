@@ -1,0 +1,55 @@
+<?php
+
+declare(strict_types=1);
+
+namespace He4rt\PanelAdmin\Filament\Resources\Sponsors;
+
+use BackedEnum;
+use Filament\Resources\Resource;
+use Filament\Schemas\Schema;
+use Filament\Support\Icons\Heroicon;
+use Filament\Tables\Table;
+use He4rt\Events\Models\Sponsor;
+use He4rt\PanelAdmin\Filament\Resources\Sponsors\Pages\CreateSponsor;
+use He4rt\PanelAdmin\Filament\Resources\Sponsors\Pages\EditSponsor;
+use He4rt\PanelAdmin\Filament\Resources\Sponsors\Pages\ListSponsors;
+use He4rt\PanelAdmin\Filament\Resources\Sponsors\Schemas\SponsorForm;
+use He4rt\PanelAdmin\Filament\Resources\Sponsors\Tables\SponsorsTable;
+use UnitEnum;
+
+class SponsorResource extends Resource
+{
+    protected static ?string $model = Sponsor::class;
+
+    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedGift;
+
+    protected static string|UnitEnum|null $navigationGroup = 'Events';
+
+    protected static ?int $navigationSort = 3;
+
+    protected static ?string $recordTitleAttribute = 'name';
+
+    public static function form(Schema $schema): Schema
+    {
+        return SponsorForm::configure($schema);
+    }
+
+    public static function table(Table $table): Table
+    {
+        return SponsorsTable::configure($table);
+    }
+
+    public static function getRelations(): array
+    {
+        return [];
+    }
+
+    public static function getPages(): array
+    {
+        return [
+            'index' => ListSponsors::route('/'),
+            'create' => CreateSponsor::route('/create'),
+            'edit' => EditSponsor::route('/{record}/edit'),
+        ];
+    }
+}

@@ -6,6 +6,7 @@ namespace He4rt\Gamification\Season\Models;
 
 use He4rt\Community\Meeting\Models\Meeting;
 use He4rt\Gamification\Badge\Models\Badge;
+use He4rt\Gamification\Character\Models\PastSeason;
 use He4rt\Gamification\Database\Factories\SeasonFactory;
 use He4rt\Identity\Tenant\Models\Tenant;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
@@ -60,6 +61,14 @@ final class Season extends Model
     public function meetings(): HasMany
     {
         return $this->hasMany(Meeting::class);
+    }
+
+    /**
+     * @return HasMany<PastSeason, $this>
+     */
+    public function rankings(): HasMany
+    {
+        return $this->hasMany(PastSeason::class, 'season_id');
     }
 
     /**

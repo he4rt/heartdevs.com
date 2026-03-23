@@ -178,6 +178,17 @@ class EventModel extends Model
             ->oldest('starting_at');
     }
 
+    /**
+     * @return BelongsToMany<Sponsor, $this, Pivot\SponsorAttend>
+     */
+    public function sponsors(): BelongsToMany
+    {
+        return $this->belongsToMany(Sponsor::class, 'events_sponsors', 'event_id', 'sponsor_id')
+            ->using(Pivot\SponsorAttend::class)
+            ->withPivot(['level'])
+            ->withTimestamps();
+    }
+
     /** @return Attribute<int, never> */
     protected function duration(): Attribute
     {

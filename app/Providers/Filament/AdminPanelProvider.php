@@ -35,12 +35,21 @@ final class AdminPanelProvider extends PanelProvider
                 ...Color::all(),
             ])
             ->viteTheme('resources/css/filament/admin/theme.css')
-            ->discoverResources(in: modules_path('panel-admin/src/Filament/Resources'), for: 'He4rt\\Admin\\Filament\\Resources')
-            ->discoverPages(in: modules_path('panel-admin/src/Filament/Pages'), for: 'He4rt\\Admin\\Filament\\Pages')
-            ->discoverWidgets(in: modules_path('panel-admin/src/Filament/Widgets'), for: 'He4rt\\Admin\\Filament\\Widgets')
-            ->discoverClusters(in: modules_path('panel-admin/src/Filament/Clusters'), for: 'He4rt\\Admin\\Filament\\Clusters')
+            ->discoverResources(in: modules_path('panel-admin/src/Filament/Resources'), for: 'He4rt\\PanelAdmin\\Filament\\Resources')
+            ->discoverPages(in: modules_path('panel-admin/src/Filament/Pages'), for: 'He4rt\\PanelAdmin\\Filament\\Pages')
+            ->discoverWidgets(in: modules_path('panel-admin/src/Filament/Widgets'), for: 'He4rt\\PanelAdmin\\Filament\\Widgets')
+            ->discoverClusters(in: modules_path('panel-admin/src/Filament/Clusters'), for: 'He4rt\\PanelAdmin\\Filament\\Clusters')
             ->pages([
                 Dashboard::class,
+            ])
+            ->navigationGroups([
+                NavigationGroup::make('Community'),
+                NavigationGroup::make('Gamification'),
+                NavigationGroup::make('Economy'),
+                NavigationGroup::make('Events'),
+                NavigationGroup::make('Activity'),
+                NavigationGroup::make('Meetings'),
+                NavigationGroup::make('Moderation'),
             ])
             ->discoverWidgets(in: app_path('Filament/Widgets'), for: 'App\Filament\Widgets')
             ->middleware([

@@ -23,6 +23,7 @@ final class PastSeason extends Model
         'season_id',
         'character_id',
         'ranking_position',
+        'level',
         'experience',
         'messages_count',
         'badges_count',
