@@ -24,7 +24,7 @@ test('can create voice message', function (): void {
 
     $user = User::factory()
         ->has(Character::factory(['tenant_id' => $tenant->getKey(), 'experience' => 1]), 'character')
-        ->has(ExternalIdentity::factory(['tenant_id' => $tenant->getKey()]), 'providers')
+        ->has(ExternalIdentity::factory(['tenant_id' => $tenant->getKey(), 'provider' => IdentityProvider::Discord]), 'providers')
         ->create();
 
     $provider = $user->providers[0];

@@ -26,8 +26,8 @@ enum ValueTier: string implements HasColor, HasLabel
     public function getColor(): array
     {
         return match ($this) {
-            self::High => Color::Purple,
-            self::Medium => Color::Blue,
+            self::High => Color::Red,
+            self::Medium => Color::Yellow,
             self::Low => Color::Gray,
         };
     }

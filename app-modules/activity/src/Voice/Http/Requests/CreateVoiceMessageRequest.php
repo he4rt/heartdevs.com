@@ -19,7 +19,7 @@ final class CreateVoiceMessageRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'provider' => ['required', 'in:twitch,discord,devto'],
+            'provider' => ['required', 'in:twitch,discord'],
             'external_account_id' => ['required'],
             'state' => ['required', 'in:muted,unmuted,disabled'],
             'channel_name' => ['required', 'string'],

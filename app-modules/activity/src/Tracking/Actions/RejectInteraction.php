@@ -11,6 +11,10 @@ final class RejectInteraction
 {
     public function handle(Interaction $interaction): Interaction
     {
+        if ($interaction->status !== ActivityStatus::Pending) {
+            return $interaction;
+        }
+
         $interaction->update([
             'status' => ActivityStatus::Rejected,
             'reviewed_at' => now(),

@@ -23,7 +23,7 @@ return new class extends Migration
             $table->integer('xp_awarded')->nullable();
             $table->string('status')->default('pending');
             $table->nullableUuidMorphs('source');
-            $table->string('external_ref')->unique()->nullable();
+            $table->string('external_ref')->nullable();
             $table->jsonb('metadata')->nullable();
             $table->timestamp('occurred_at');
             $table->timestamp('reviewed_at')->nullable();
@@ -32,6 +32,7 @@ return new class extends Migration
             $table->index(['character_id', 'type', 'created_at'], 'idx_interactions_character_type');
             $table->index(['status', 'value_tier'], 'idx_interactions_status_tier');
             $table->index(['tenant_id', 'occurred_at'], 'idx_interactions_tenant');
+            $table->unique(['tenant_id', 'provider', 'external_ref'], 'uniq_interactions_tenant_provider_ref');
         });
     }
 

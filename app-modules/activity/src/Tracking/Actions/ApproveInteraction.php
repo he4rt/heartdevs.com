@@ -10,6 +10,7 @@ use He4rt\Activity\Tracking\Models\Interaction;
 use He4rt\Economy\Actions\Credit;
 use He4rt\Economy\DTOs\CreditDTO;
 use He4rt\Gamification\Character\Models\Character;
+use Illuminate\Support\Facades\DB;
 
 final readonly class ApproveInteraction
 {
@@ -19,28 +20,44 @@ final readonly class ApproveInteraction
 
     public function handle(Interaction $interaction, ?int $peerReviewBase = null): Interaction
     {
-        $reward = $this->calculateReward->handle($interaction, $peerReviewBase);
+        if ($interaction->status !== ActivityStatus::Pending) {
+            return $interaction;
+        }
 
-        $character = Character::query()->findOrFail($interaction->character_id);
-        $wallet = $character->getOrCreateWallet();
+        return DB::transaction(function () use ($interaction, $peerReviewBase): Interaction {
+            $locked = Interaction::query()
+                ->where('id', $interaction->id)
+                ->where('status', ActivityStatus::Pending)
+                ->lockForUpdate()
+                ->first();
 
-        resolve(Credit::class)->handle(new CreditDTO(
-            walletId: $wallet->id,
-            amount: $reward['coins_awarded'],
-            referenceType: Interaction::class,
-            referenceId: $interaction->id,
-            description: 'Reward: '.$interaction->type->value,
-        ));
+            if ($locked === null) {
+                return $interaction->fresh();
+            }
 
-        $character->increment('experience', $reward['xp_awarded']);
+            $reward = $this->calculateReward->handle($locked, $peerReviewBase);
 
-        $interaction->update([
-            'status' => ActivityStatus::Approved,
-            'reviewed_at' => now(),
-        ]);
+            $character = Character::query()->findOrFail($locked->character_id);
+            $wallet = $character->getOrCreateWallet();
 
-        event(new InteractionApproved($interaction->fresh()));
+            resolve(Credit::class)->handle(new CreditDTO(
+                walletId: $wallet->id,
+                amount: $reward['coins_awarded'],
+                referenceType: Interaction::class,
+                referenceId: $locked->id,
+                description: 'Reward: '.$locked->type->value,
+            ));
 
-        return $interaction->fresh();
+            $character->increment('experience', $reward['xp_awarded']);
+
+            $locked->update([
+                'status' => ActivityStatus::Approved,
+                'reviewed_at' => now(),
+            ]);
+
+            event(new InteractionApproved($locked->fresh()));
+
+            return $locked->fresh();
+        });
     }
 }
