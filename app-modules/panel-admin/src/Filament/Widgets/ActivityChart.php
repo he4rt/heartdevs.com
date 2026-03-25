@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace He4rt\PanelAdmin\Filament\Widgets;
 
 use Filament\Widgets\ChartWidget;
-use He4rt\Activity\Models\Message;
+use He4rt\Activity\Message\Models\Message;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Date;
 

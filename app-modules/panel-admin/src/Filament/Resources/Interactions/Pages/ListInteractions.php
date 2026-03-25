@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace He4rt\Activity\Tracking\Filament\Admin\Resources\Interactions\Pages;
+namespace He4rt\PanelAdmin\Filament\Resources\Interactions\Pages;
 
 use Filament\Resources\Pages\ListRecords;
-use He4rt\Activity\Tracking\Filament\Admin\Resources\Interactions\InteractionResource;
+use He4rt\PanelAdmin\Filament\Resources\Interactions\InteractionResource;
 
 class ListInteractions extends ListRecords
 {

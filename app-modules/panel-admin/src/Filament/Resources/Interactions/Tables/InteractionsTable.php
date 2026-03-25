@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace He4rt\Activity\Tracking\Filament\Admin\Resources\Interactions\Tables;
+namespace He4rt\PanelAdmin\Filament\Resources\Interactions\Tables;
 
 use Filament\Actions\Action;
 use Filament\Actions\BulkAction;

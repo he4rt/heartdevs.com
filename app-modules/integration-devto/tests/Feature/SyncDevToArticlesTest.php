@@ -58,7 +58,7 @@ test('syncs articles and creates interactions for linked authors', function (): 
         'model_type' => User::class,
         'model_id' => $user->id,
         'provider' => IdentityProvider::DevTo,
-        'username' => 'linked_user',
+        'metadata' => ['email' => 'linked@example.com', 'username' => 'linked_user'],
     ]);
 
     $this->artisan('devto:sync-articles')
@@ -106,7 +106,7 @@ test('updates engagement for existing interactions without creating duplicates',
         'model_type' => User::class,
         'model_id' => $user->id,
         'provider' => IdentityProvider::DevTo,
-        'username' => 'author',
+        'metadata' => ['email' => 'author@example.com', 'username' => 'author'],
     ]);
 
     Interaction::factory()->recycle($character)->recycle($tenant)->create([

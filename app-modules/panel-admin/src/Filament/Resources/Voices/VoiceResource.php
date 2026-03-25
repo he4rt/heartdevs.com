@@ -9,7 +9,7 @@ use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
-use He4rt\Activity\Models\Voice;
+use He4rt\Activity\Voice\Models\Voice;
 use He4rt\PanelAdmin\Filament\Resources\Voices\Pages\ListVoices;
 use He4rt\PanelAdmin\Filament\Resources\Voices\Tables\VoicesTable;
 use UnitEnum;

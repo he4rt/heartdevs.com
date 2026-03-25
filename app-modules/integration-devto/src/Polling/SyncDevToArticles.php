@@ -69,7 +69,7 @@ class SyncDevToArticles extends Command
 
         $externalIdentity = ExternalIdentity::query()
             ->where('provider', IdentityProvider::DevTo)
-            ->where('username', $devToUsername)
+            ->where('metadata->username', $devToUsername)
             ->where('model_type', User::class)
             ->first();
 

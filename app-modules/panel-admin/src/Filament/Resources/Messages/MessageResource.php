@@ -9,7 +9,7 @@ use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
-use He4rt\Activity\Models\Message;
+use He4rt\Activity\Message\Models\Message;
 use He4rt\PanelAdmin\Filament\Resources\Messages\Pages\ListMessages;
 use He4rt\PanelAdmin\Filament\Resources\Messages\Tables\MessagesTable;
 use UnitEnum;

@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace He4rt\Activity\Tracking\Filament\Admin\Resources\Interactions\Pages;
+namespace He4rt\PanelAdmin\Filament\Resources\Interactions\Pages;
 
 use Filament\Infolists\Components\Section;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Resources\Pages\ViewRecord;
 use Filament\Schemas\Schema;
-use He4rt\Activity\Tracking\Filament\Admin\Resources\Interactions\InteractionResource;
+use He4rt\PanelAdmin\Filament\Resources\Interactions\InteractionResource;
 
 class ViewInteraction extends ViewRecord
 {

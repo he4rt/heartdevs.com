@@ -8,7 +8,10 @@ use Illuminate\Support\ServiceProvider;
 
 class ActivityServiceProvider extends ServiceProvider
 {
-    public function register(): void {}
+    public function register(): void
+    {
+        $this->mergeConfigFrom(__DIR__.'/../../config/activity-tracking.php', 'activity-tracking');
+    }
 
     public function boot(): void
     {
