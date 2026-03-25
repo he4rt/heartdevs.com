@@ -19,6 +19,7 @@ final readonly class TrackActivityDTO
         public ?string $externalRef = null,
         public ?string $sourceType = null,
         public ?string $sourceId = null,
+        /** @var array<string, mixed>|null */
         public ?array $metadata = null,
     ) {}
 }

@@ -7,7 +7,6 @@ namespace He4rt\Gamification\Character\Models;
 use Carbon\Carbon;
 use He4rt\Activity\Tracking\Concerns\HasInteractions;
 use He4rt\Economy\Concerns\HasWallet;
-use He4rt\Economy\Models\Wallet;
 use He4rt\Gamification\Badge\Models\Badge;
 use He4rt\Gamification\Database\Factories\CharacterFactory;
 use He4rt\Identity\Tenant\Models\Tenant;

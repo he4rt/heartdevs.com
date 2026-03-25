@@ -33,12 +33,13 @@ use Illuminate\Database\Eloquent\Relations\MorphTo;
  * @property string|null $source_type
  * @property string|null $source_id
  * @property string|null $external_ref
- * @property array|null $metadata
+ * @property array<string, mixed>|null $metadata
  * @property Carbon $occurred_at
  * @property Carbon|null $reviewed_at
  */
 final class Interaction extends Model
 {
+    /** @use HasFactory<InteractionFactory> */
     use HasFactory;
     use HasUuids;
 
