@@ -10,7 +10,7 @@ uses(RefreshDatabase::class);
 
 test('calculates reward with engagement snapshot', function (): void {
     $interaction = Interaction::factory()
-        ->withEngagement(reactions: 42, bookmarks: 8, comments: 12)
+        ->withEngagement(reactions: 42, comments: 12, bookmarks: 8)
         ->create([
             'coins_min' => 100,
             'coins_max' => 300,
@@ -29,7 +29,7 @@ test('calculates reward with engagement snapshot', function (): void {
 
 test('caps engagement bonus at coins max', function (): void {
     $interaction = Interaction::factory()
-        ->withEngagement(reactions: 100, bookmarks: 100, comments: 100)
+        ->withEngagement(reactions: 100, comments: 100, bookmarks: 100)
         ->create([
             'coins_min' => 100,
             'coins_max' => 200,

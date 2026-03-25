@@ -22,7 +22,7 @@ test('approves interaction and credits economy', function (): void {
     $character = Character::factory()->recycle($user)->recycle($tenant)->create(['experience' => 500]);
 
     $interaction = Interaction::factory()
-        ->withEngagement(reactions: 42, bookmarks: 8, comments: 12)
+        ->withEngagement(reactions: 42, comments: 12, bookmarks: 8)
         ->recycle($character)
         ->recycle($tenant)
         ->create([
