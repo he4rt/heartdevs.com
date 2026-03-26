@@ -7,6 +7,8 @@ namespace He4rt\Gamification\Character\Models;
 use Carbon\Carbon;
 use He4rt\Economy\Concerns\HasWallet;
 use He4rt\Gamification\Badge\Models\Badge;
+use He4rt\Gamification\Character\Equipment\Models\CharacterEquipment;
+use He4rt\Gamification\Character\Inventory\Models\CharacterItem;
 use He4rt\Gamification\Database\Factories\CharacterFactory;
 use He4rt\Identity\Tenant\Models\Tenant;
 use He4rt\Identity\User\Models\User;
@@ -108,6 +110,22 @@ final class Character extends Model
     public function pastSeasons(): HasMany
     {
         return $this->hasMany(PastSeason::class);
+    }
+
+    /**
+     * @return HasMany<CharacterItem, $this>
+     */
+    public function inventory(): HasMany
+    {
+        return $this->hasMany(CharacterItem::class);
+    }
+
+    /**
+     * @return HasMany<CharacterEquipment, $this>
+     */
+    public function equipment(): HasMany
+    {
+        return $this->hasMany(CharacterEquipment::class);
     }
 
     protected static function newFactory(): CharacterFactory
