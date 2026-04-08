@@ -74,6 +74,16 @@ return [
             'throw' => false,
         ],
 
+        'sftp' => [
+            'driver' => 'sftp',
+            'host' => env('BACKUP_VPS_HOST'),
+            'username' => env('BACKUP_VPS_USER'),
+            'password' => env('BACKUP_VPS_PASSWORD'),
+            'privateKey' => env('BACKUP_VPS_KEY_PATH'),
+            'port' => (int) env('BACKUP_VPS_PORT', 22),
+            'root' => env('BACKUP_VPS_ROOT', '/backups'),
+        ],
+
     ],
 
     /*
