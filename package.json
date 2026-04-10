@@ -19,7 +19,7 @@
         "@prettier/plugin-php": "0.24.0",
         "@tailwindcss/typography": "0.5.19",
         "@tailwindcss/vite": "4.2.2",
-        "axios": "1.13.6",
+        "axios": "1.15.0",
         "concurrently": "9.2.1",
         "husky": "9.1.7",
         "laravel-vite-plugin": "2.1.0",
@@ -42,7 +42,7 @@
         ]
     },
     "optionalDependencies": {
-        "@rollup/rollup-linux-x64-gnu": "4.59.1",
+        "@rollup/rollup-linux-x64-gnu": "4.60.1",
         "@tailwindcss/oxide-linux-x64-gnu": "4.2.2",
         "lightningcss-linux-x64-gnu": "1.32.0"
     }
