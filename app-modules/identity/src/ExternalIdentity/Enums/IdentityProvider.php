@@ -14,19 +14,45 @@ use He4rt\Identity\Auth\DTOs\OAuthStateDTO;
 use He4rt\IntegrationDevTo\OAuth\DevToOAuthClient;
 use He4rt\IntegrationDiscord\OAuth\DiscordOAuthClient;
 use He4rt\IntegrationTwitch\OAuth\Contracts\TwitchOAuthService;
+use LogicException;
 
 enum IdentityProvider: string implements HasColor, HasDescription, HasIcon, HasLabel
 {
     case Discord = 'discord';
     case Twitch = 'twitch';
     case DevTo = 'devto';
+    case Spotify = 'spotify';
+    case Steam = 'steam';
+    case GitHub = 'github';
+    case Xbox = 'xbox';
+    case YouTube = 'youtube';
+    case Twitter = 'twitter';
+    case LeagueOfLegends = 'leagueoflegends';
+    case RiotGames = 'riotgames';
+    case BattleNet = 'battlenet';
+    case EpicGames = 'epicgames';
+    case PlayStation = 'playstation';
+    case Facebook = 'facebook';
+    case Instagram = 'instagram';
+    case Crunchyroll = 'crunchyroll';
+    case Reddit = 'reddit';
+    case Roblox = 'roblox';
+    case TikTok = 'tiktok';
+    case Skype = 'skype';
+    case Domain = 'domain';
+    case Bluesky = 'bluesky';
+    case PayPal = 'paypal';
+    case AmazonMusic = 'amazon-music';
+    case Bungie = 'bungie';
+    case Ebay = 'ebay';
 
-    public function getClient(): OAuthClientContract
+    public function getClient(): ?OAuthClientContract
     {
         return match ($this) {
             self::Twitch => resolve(TwitchOAuthService::class),
             self::Discord => resolve(DiscordOAuthClient::class),
             self::DevTo => resolve(DevToOAuthClient::class),
+            default => null,
         };
     }
 
@@ -36,6 +62,31 @@ enum IdentityProvider: string implements HasColor, HasDescription, HasIcon, HasL
             self::Discord => Color::Blue,
             self::Twitch => Color::Purple,
             self::DevTo => Color::Gray,
+            self::Spotify => ['#1DB954'],
+            self::Steam => Color::Slate,
+            self::GitHub => Color::Neutral,
+            self::Xbox => Color::Green,
+            self::YouTube => Color::Red,
+            self::Twitter => Color::Sky,
+            self::LeagueOfLegends => Color::Amber,
+            self::RiotGames => Color::Red,
+            self::BattleNet => Color::Blue,
+            self::EpicGames => Color::Dark,
+            self::PlayStation => Color::Blue,
+            self::Facebook => Color::Indigo,
+            self::Instagram => Color::Pink,
+            self::Crunchyroll => Color::Orange,
+            self::Reddit => Color::Orange,
+            self::Roblox => Color::Red,
+            self::TikTok => Color::Zinc,
+            self::Skype => Color::Blue,
+            self::Domain => Color::Teal,
+            self::Bluesky => Color::Sky,
+            self::PayPal => Color::Blue,
+            self::AmazonMusic => Color::Orange,
+            self::Bungie => Color::Yellow,
+            self::Ebay => Color::Blue,
+            default => Color::Gray,
         };
     }
 
@@ -45,6 +96,31 @@ enum IdentityProvider: string implements HasColor, HasDescription, HasIcon, HasL
             self::Discord => 'fab-discord',
             self::Twitch => 'fab-twitch',
             self::DevTo => 'fab-dev',
+            self::Spotify => 'fab-spotify',
+            self::Steam => 'fab-steam',
+            self::GitHub => 'fab-github',
+            self::Xbox => 'fab-xbox',
+            self::YouTube => 'fab-youtube',
+            self::Twitter => 'fab-twitter',
+            self::LeagueOfLegends => 'heroicon-o-sparkles',
+            self::RiotGames => 'heroicon-o-shield-check',
+            self::BattleNet => 'fab-battle-net',
+            self::EpicGames => 'heroicon-o-sparkles',
+            self::PlayStation => 'heroicon-o-sparkles',
+            self::Facebook => 'fab-facebook',
+            self::Instagram => 'fab-instagram',
+            self::Crunchyroll => 'heroicon-o-sparkles',
+            self::Reddit => 'fab-reddit',
+            self::Roblox => 'heroicon-o-sparkles',
+            self::TikTok => 'fab-tiktok',
+            self::Skype => 'fab-skype',
+            self::Domain => 'heroicon-o-globe-alt',
+            self::Bluesky => 'heroicon-o-cloud',
+            self::PayPal => 'fab-paypal',
+            self::AmazonMusic => 'fab-amazon',
+            self::Bungie => 'heroicon-o-sparkles',
+            self::Ebay => 'heroicon-o-sparkles',
+            default => 'heroicon-o-link',
         };
     }
 
@@ -59,6 +135,31 @@ enum IdentityProvider: string implements HasColor, HasDescription, HasIcon, HasL
             self::Discord => 'Conecte sua conta do Discord para gameficações e eventos.',
             self::Twitch => 'Conecte sua conta do Twitch para gameficações e eventos.',
             self::DevTo => 'Conecte sua conta do Dev.to para rastrear artigos e contribuições.',
+            self::Spotify => 'Conecte sua conta do Spotify para rastrear músicas ouvidas.',
+            self::Steam => 'Conecte sua conta da Steam para rastrear jogos.',
+            self::GitHub => 'Conecte sua conta do GitHub para rastrear contribuições.',
+            self::Xbox => 'Conecte sua conta do Xbox para gameficações.',
+            self::YouTube => 'Conecte sua conta do YouTube para rastrear vídeos.',
+            self::Twitter => 'Conecte sua conta do Twitter/X para interações sociais.',
+            self::LeagueOfLegends => 'Conecte sua conta do League of Legends.',
+            self::RiotGames => 'Conecte sua conta da Riot Games.',
+            self::BattleNet => 'Conecte sua conta do Battle.net.',
+            self::EpicGames => 'Conecte sua conta da Epic Games.',
+            self::PlayStation => 'Conecte sua conta do PlayStation.',
+            self::Facebook => 'Conecte sua conta do Facebook.',
+            self::Instagram => 'Conecte sua conta do Instagram.',
+            self::Crunchyroll => 'Conecte sua conta do Crunchyroll.',
+            self::Reddit => 'Conecte sua conta do Reddit.',
+            self::Roblox => 'Conecte sua conta do Roblox.',
+            self::TikTok => 'Conecte sua conta do TikTok.',
+            self::Skype => 'Conecte sua conta do Skype.',
+            self::Domain => 'Conecte um domínio personalizado.',
+            self::Bluesky => 'Conecte sua conta do Bluesky.',
+            self::PayPal => 'Conecte sua conta do PayPal.',
+            self::AmazonMusic => 'Conecte sua conta do Amazon Music.',
+            self::Bungie => 'Conecte sua conta da Bungie.',
+            self::Ebay => 'Conecte sua conta do eBay.',
+            default => sprintf('Conta conectada via %s.', $this->label()),
         };
     }
 
@@ -71,9 +172,10 @@ enum IdentityProvider: string implements HasColor, HasDescription, HasIcon, HasL
             self::Discord => config('services.discord.scopes'),
             self::Twitch => config('services.twitch.scopes'),
             self::DevTo => config('services.devto.scopes'),
+            default => '',
         };
 
-        return explode(' ', $scopes);
+        return $scopes ? explode(' ', $scopes) : [];
     }
 
     public function isEnabled(): bool
@@ -83,7 +185,13 @@ enum IdentityProvider: string implements HasColor, HasDescription, HasIcon, HasL
 
     public function getRedirectUri(?string $tenant = null): string
     {
-        return $this->getClient()->redirectUrl(
+        $client = $this->getClient();
+
+        if (!$client instanceof OAuthClientContract) {
+            throw new LogicException(sprintf('Provider %s does not support OAuth authentication.', $this->name));
+        }
+
+        return $client->redirectUrl(
             new OAuthStateDTO(
                 filament()->getCurrentPanel()->getId(),
                 $tenant
@@ -94,7 +202,7 @@ enum IdentityProvider: string implements HasColor, HasDescription, HasIcon, HasL
     public function getType(): IdentityType
     {
         return match ($this) {
-            self::Discord, self::Twitch, self::DevTo => IdentityType::External,
+            default => IdentityType::External,
         };
     }
 }

@@ -1,0 +1,18 @@
+{
+    "agents": ["claude_code", "opencode"],
+    "guidelines": true,
+    "mcp": true,
+    "nightwatch_mcp": false,
+    "packages": ["filament/filament", "internachi/modular", "spatie/laravel-medialibrary", "spatie/laravel-backup"],
+    "sail": false,
+    "skills": [
+        "laravel-best-practices",
+        "configure-nightwatch",
+        "fluxui-development",
+        "pest-testing",
+        "tailwindcss-development",
+        "modular",
+        "laravel-backup",
+        "medialibrary-development"
+    ]
+}

@@ -69,7 +69,7 @@ class BaseSeeder extends Seeder
             ->recycle($user)
             ->recycle($tenant)
             ->count(2)
-            ->create(['email' => $user->email]);
+            ->create(['metadata' => ['email' => $user->email, 'username' => $user->username]]);
         Meeting::factory()
             ->count(2)
             ->recycle($tenant)
