@@ -16,6 +16,7 @@
         "filament/spatie-laravel-media-library-plugin": "^5.5.0",
         "guzzlehttp/guzzle": "^7.10.0",
         "he4rt/activity": ">=1",
+        "he4rt/bot-discord": ">=1",
         "he4rt/community": ">=1",
         "he4rt/docs": ">=1",
         "he4rt/economy": ">=1",
@@ -29,6 +30,7 @@
         "he4rt/panel-admin": "^1.0",
         "he4rt/portal": ">=1",
         "internachi/modular": "^3.0.2",
+        "laracord/framework": "dev-next",
         "laravel/framework": "^13.4",
         "laravel/nightwatch": "^1.26.1",
         "laravel/sanctum": "^4.3.1",
@@ -165,6 +167,14 @@
             "options": {
                 "symlink": true
             }
+        },
+        {
+            "type": "vcs",
+            "url": "https://github.com/danielhe4rt/laracord-framework"
+        },
+        {
+            "type": "vcs",
+            "url": "https://github.com/danielhe4rt/tinker-zero"
         }
     ]
 }
