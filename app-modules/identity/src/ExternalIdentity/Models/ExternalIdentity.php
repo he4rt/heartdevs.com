@@ -12,6 +12,9 @@ use He4rt\Identity\ExternalIdentity\Enums\CredentialsType;
 use He4rt\Identity\ExternalIdentity\Enums\IdentityProvider;
 use He4rt\Identity\ExternalIdentity\Enums\IdentityType;
 use He4rt\Identity\User\Models\User;
+use Illuminate\Database\Eloquent\Attributes\Appends;
+use Illuminate\Database\Eloquent\Attributes\Fillable;
+use Illuminate\Database\Eloquent\Attributes\Table;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -40,34 +43,31 @@ use Illuminate\Support\Carbon;
  * @property Carbon|null $deleted_at
  * @property-read User|null $connectedByUser
  */
+#[Appends([
+    'messages_count',
+])]
+#[Fillable([
+    'id',
+    'tenant_id',
+    'model_type',
+    'model_id',
+    'type',
+    'provider',
+    'credentials_type',
+    'credentials',
+    'external_account_id',
+    'connected_by',
+    'connected_at',
+    'disconnected_at',
+    'metadata',
+])]
+#[Table(name: 'external_identities')]
 final class ExternalIdentity extends Model
 {
     /** @use HasFactory<ExternalIdentityFactory> */
     use HasFactory;
     use HasUuids;
     use SoftDeletes;
-
-    protected $table = 'external_identities';
-
-    protected $fillable = [
-        'id',
-        'tenant_id',
-        'model_type',
-        'model_id',
-        'type',
-        'provider',
-        'credentials_type',
-        'credentials',
-        'external_account_id',
-        'connected_by',
-        'connected_at',
-        'disconnected_at',
-        'metadata',
-    ];
-
-    protected $appends = [
-        'messages_count',
-    ];
 
     /** @return MorphTo<Model, $this> */
     public function model(): MorphTo

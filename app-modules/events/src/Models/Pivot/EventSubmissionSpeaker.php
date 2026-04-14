@@ -8,6 +8,8 @@ use Carbon\Carbon;
 use He4rt\Events\Database\Factories\EventSubmissionSpeakerFactory;
 use He4rt\Events\Models\EventSubmission;
 use He4rt\Identity\User\Models\User;
+use Illuminate\Database\Eloquent\Attributes\Fillable;
+use Illuminate\Database\Eloquent\Attributes\Table;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\Pivot;
@@ -16,17 +18,15 @@ use Illuminate\Database\Eloquent\Relations\Pivot;
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
  */
+#[Fillable([
+    'submission_id',
+    'user_id',
+])]
+#[Table(name: 'event_submission_speakers')]
 class EventSubmissionSpeaker extends Pivot
 {
     /** @use HasFactory<EventSubmissionSpeakerFactory> */
     use HasFactory;
-
-    protected $table = 'event_submission_speakers';
-
-    protected $fillable = [
-        'submission_id',
-        'user_id',
-    ];
 
     /**
      * @return BelongsTo<EventSubmission, $this>

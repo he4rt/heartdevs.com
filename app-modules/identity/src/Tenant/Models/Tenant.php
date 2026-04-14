@@ -12,6 +12,7 @@ use He4rt\Gamification\Season\Models\Season;
 use He4rt\Identity\Database\Factories\TenantFactory;
 use He4rt\Identity\ExternalIdentity\Models\ExternalIdentity;
 use He4rt\Identity\User\Models\User;
+use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -32,20 +33,19 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property Carbon|null $updated_at
  * @property Carbon|null $deleted_at
  */
+#[Fillable([
+    'name',
+    'slug',
+    'domain',
+    'owner_id',
+    'active',
+])]
 class Tenant extends Model
 {
     /** @use HasFactory<TenantFactory> */
     use HasFactory;
 
     use SoftDeletes;
-
-    protected $fillable = [
-        'name',
-        'slug',
-        'domain',
-        'owner_id',
-        'active',
-    ];
 
     /**
      * @return BelongsTo<User, $this>

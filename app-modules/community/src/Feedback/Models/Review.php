@@ -7,28 +7,28 @@ namespace He4rt\Community\Feedback\Models;
 use He4rt\Community\Database\Factories\ReviewFactory;
 use He4rt\Community\Feedback\Enums\ReviewTypeEnum;
 use He4rt\Identity\User\Models\User;
+use Illuminate\Database\Eloquent\Attributes\Fillable;
+use Illuminate\Database\Eloquent\Attributes\Table;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
+#[Fillable([
+    'id',
+    'tenant_id',
+    'feedback_id',
+    'staff_id',
+    'status',
+    'reason',
+    'received_at',
+])]
+#[Table(name: 'feedback_reviews')]
 final class Review extends Model
 {
     /** @use HasFactory<ReviewFactory> */
     use HasFactory;
     use HasUuids;
-
-    protected $table = 'feedback_reviews';
-
-    protected $fillable = [
-        'id',
-        'tenant_id',
-        'feedback_id',
-        'staff_id',
-        'status',
-        'reason',
-        'received_at',
-    ];
 
     /**
      * @return BelongsTo<Feedback, $this>
