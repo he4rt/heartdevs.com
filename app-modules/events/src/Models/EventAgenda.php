@@ -8,6 +8,8 @@ use Carbon\Carbon;
 use He4rt\Events\Database\Factories\EventAgendaFactory;
 use He4rt\Events\Enums\SchedulableTypeEnum;
 use He4rt\Identity\Tenant\Models\Tenant;
+use Illuminate\Database\Eloquent\Attributes\Fillable;
+use Illuminate\Database\Eloquent\Attributes\Table;
 use Illuminate\Database\Eloquent\Attributes\UseFactory;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -23,22 +25,20 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property Carbon|null $deleted_at
  */
 #[UseFactory(EventAgendaFactory::class)]
+#[Fillable([
+    'tenant_id',
+    'event_id',
+    'schedulable_type',
+    'schedulable_id',
+    'starting_at',
+    'ending_at',
+])]
+#[Table(name: 'events_agenda')]
 class EventAgenda extends Model
 {
     /** @use HasFactory<EventAgendaFactory> */
     use HasFactory;
     use SoftDeletes;
-
-    protected $table = 'events_agenda';
-
-    protected $fillable = [
-        'tenant_id',
-        'event_id',
-        'schedulable_type',
-        'schedulable_id',
-        'starting_at',
-        'ending_at',
-    ];
 
     /**
      * @return BelongsTo<Tenant, $this>

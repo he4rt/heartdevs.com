@@ -8,6 +8,8 @@ use He4rt\Gamification\Character\Models\Character;
 use He4rt\Gamification\Database\Factories\BadgeFactory;
 use He4rt\Identity\ExternalIdentity\Enums\IdentityProvider;
 use He4rt\Identity\Tenant\Models\Tenant;
+use Illuminate\Database\Eloquent\Attributes\Fillable;
+use Illuminate\Database\Eloquent\Attributes\Table;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -16,24 +18,20 @@ use Illuminate\Database\Eloquent\Relations\Pivot;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
 
+#[Fillable([
+    'provider',
+    'name',
+    'description',
+    'redeem_code',
+    'active',
+    'tenant_id',
+])]
+#[Table(name: 'badges', keyType: 'string')]
 final class Badge extends Model implements HasMedia
 {
     /** @use HasFactory<BadgeFactory> */
     use HasFactory;
     use InteractsWithMedia;
-
-    protected $table = 'badges';
-
-    protected $keyType = 'string';
-
-    protected $fillable = [
-        'provider',
-        'name',
-        'description',
-        'redeem_code',
-        'active',
-        'tenant_id',
-    ];
 
     /**
      * @return BelongsTo<Tenant, $this>

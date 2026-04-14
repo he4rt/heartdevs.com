@@ -14,7 +14,9 @@ use He4rt\Events\Models\Pivot\EventAttend;
 use He4rt\Events\Models\Pivot\SponsorAttend;
 use He4rt\Identity\Tenant\Models\Tenant;
 use He4rt\Identity\User\Models\User;
+use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Scope;
+use Illuminate\Database\Eloquent\Attributes\Table;
 use Illuminate\Database\Eloquent\Attributes\UseFactory;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\Attribute;
@@ -41,28 +43,26 @@ use Illuminate\Database\Eloquent\Relations\HasManyThrough;
  * @property Carbon $event_at
  */
 #[UseFactory(EventFactory::class)]
+#[Fillable([
+    'active',
+    'slug',
+    'event_type',
+    'title',
+    'description',
+    'event_at',
+    'start_at',
+    'end_at',
+    'location',
+    'max_attendees',
+    'attendees_count',
+    'waitlist_count',
+    'tenant_id',
+])]
+#[Table(name: 'events')]
 class EventModel extends Model
 {
     /** @use HasFactory<EventFactory> */
     use HasFactory;
-
-    protected $table = 'events';
-
-    protected $fillable = [
-        'active',
-        'slug',
-        'event_type',
-        'title',
-        'description',
-        'event_at',
-        'start_at',
-        'end_at',
-        'location',
-        'max_attendees',
-        'attendees_count',
-        'waitlist_count',
-        'tenant_id',
-    ];
 
     /**
      * @return BelongsToMany<User, $this, EventAttend>

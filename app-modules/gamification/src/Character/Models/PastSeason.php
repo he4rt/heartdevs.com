@@ -7,30 +7,30 @@ namespace He4rt\Gamification\Character\Models;
 use He4rt\Gamification\Database\Factories\PastSeasonFactory;
 use He4rt\Gamification\Season\Models\Season;
 use He4rt\Identity\Tenant\Models\Tenant;
+use Illuminate\Database\Eloquent\Attributes\Fillable;
+use Illuminate\Database\Eloquent\Attributes\Table;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
+#[Fillable([
+    'season_id',
+    'character_id',
+    'ranking_position',
+    'level',
+    'experience',
+    'messages_count',
+    'badges_count',
+    'meetings_count',
+    'tenant_id',
+])]
+#[Table(name: 'seasons_rankings')]
 final class PastSeason extends Model
 {
     /** @use HasFactory<PastSeasonFactory> */
     use HasFactory;
     use HasUuids;
-
-    protected $table = 'seasons_rankings';
-
-    protected $fillable = [
-        'season_id',
-        'character_id',
-        'ranking_position',
-        'level',
-        'experience',
-        'messages_count',
-        'badges_count',
-        'meetings_count',
-        'tenant_id',
-    ];
 
     /**
      * @return BelongsTo<Tenant, $this>

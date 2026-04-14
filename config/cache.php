@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use He4rt\Identity\ExternalIdentity\Models\ExternalIdentity;
 use Illuminate\Support\Str;
 
 return [
@@ -115,5 +116,20 @@ return [
     */
 
     'prefix' => env('CACHE_PREFIX', Str::slug((string) env('APP_NAME', 'laravel')).'-cache-'),
+
+    /*
+    |--------------------------------------------------------------------------
+    | Serializable Classes
+    |--------------------------------------------------------------------------
+    |
+    | Classes that may be unserialized from cache. Laravel 13 defaults to
+    | blocking all class unserialization for security. List classes that
+    | your application intentionally stores as objects in cache.
+    |
+    */
+
+    'serializable_classes' => [
+        ExternalIdentity::class,
+    ],
 
 ];

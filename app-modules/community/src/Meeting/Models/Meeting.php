@@ -7,6 +7,8 @@ namespace He4rt\Community\Meeting\Models;
 use He4rt\Community\Database\Factories\MeetingFactory;
 use He4rt\Identity\Tenant\Models\Tenant;
 use He4rt\Identity\User\Models\User;
+use Illuminate\Database\Eloquent\Attributes\Fillable;
+use Illuminate\Database\Eloquent\Attributes\Table;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -14,23 +16,21 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\Pivot;
 
+#[Fillable([
+    'id',
+    'tenant_id',
+    'meeting_type_id',
+    'content',
+    'admin_id',
+    'starts_at',
+    'ends_at',
+])]
+#[Table(name: 'meetings')]
 final class Meeting extends Model
 {
     /** @use HasFactory<MeetingFactory> */
     use HasFactory;
     use HasUuids;
-
-    protected $table = 'meetings';
-
-    protected $fillable = [
-        'id',
-        'tenant_id',
-        'meeting_type_id',
-        'content',
-        'admin_id',
-        'starts_at',
-        'ends_at',
-    ];
 
     public function isEnded(): bool
     {

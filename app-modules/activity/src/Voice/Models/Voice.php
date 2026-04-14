@@ -5,21 +5,21 @@ declare(strict_types=1);
 namespace He4rt\Activity\Voice\Models;
 
 use He4rt\Identity\ExternalIdentity\Models\ExternalIdentity;
+use Illuminate\Database\Eloquent\Attributes\Fillable;
+use Illuminate\Database\Eloquent\Attributes\Table;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
+#[Fillable([
+    'tenant_id',
+    'external_identity_id',
+    'channel_name',
+    'state',
+    'obtained_experience',
+])]
+#[Table(name: 'voice_messages')]
 final class Voice extends Model
 {
-    protected $table = 'voice_messages';
-
-    protected $fillable = [
-        'tenant_id',
-        'external_identity_id',
-        'channel_name',
-        'state',
-        'obtained_experience',
-    ];
-
     /**
      * @return BelongsTo<ExternalIdentity, $this>
      */

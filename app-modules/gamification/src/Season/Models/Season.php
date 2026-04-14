@@ -9,6 +9,8 @@ use He4rt\Gamification\Badge\Models\Badge;
 use He4rt\Gamification\Character\Models\PastSeason;
 use He4rt\Gamification\Database\Factories\SeasonFactory;
 use He4rt\Identity\Tenant\Models\Tenant;
+use Illuminate\Database\Eloquent\Attributes\Fillable;
+use Illuminate\Database\Eloquent\Attributes\Table;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -27,26 +29,24 @@ use Illuminate\Support\Facades\Date;
  * @property Date $started_at
  * @property Date $ended_at
  */
+#[Fillable([
+    'id',
+    'tenant_id',
+    'name',
+    'description',
+    'messages_count',
+    'participants_count',
+    'meeting_count',
+    'badges_count',
+    'started_at',
+    'ended_at',
+])]
+#[Table(name: 'seasons')]
 final class Season extends Model
 {
     /** @use HasFactory<SeasonFactory> */
     use HasFactory;
     use HasUuids;
-
-    protected $table = 'seasons';
-
-    protected $fillable = [
-        'id',
-        'tenant_id',
-        'name',
-        'description',
-        'messages_count',
-        'participants_count',
-        'meeting_count',
-        'badges_count',
-        'started_at',
-        'ended_at',
-    ];
 
     /**
      * @return HasMany<Badge, $this>

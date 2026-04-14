@@ -10,6 +10,8 @@ use He4rt\Events\Enums\Talks\TalkStatusEnum;
 use He4rt\Events\Models\Pivot\EventSubmissionSpeaker;
 use He4rt\Identity\Tenant\Models\Tenant;
 use He4rt\Identity\User\Models\User;
+use Illuminate\Database\Eloquent\Attributes\Fillable;
+use Illuminate\Database\Eloquent\Attributes\Table;
 use Illuminate\Database\Eloquent\Attributes\UseFactory;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -28,22 +30,20 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
  * @property Carbon $ends_at
  */
 #[UseFactory(EventSubmissionFactory::class)]
+#[Fillable([
+    'event_id',
+    'user_id',
+    'tenant_id',
+    'status',
+    'field_type',
+    'title',
+    'description',
+])]
+#[Table(name: 'events_talks')]
 class EventSubmission extends Model
 {
     /** @use HasFactory<EventSubmissionFactory> */
     use HasFactory;
-
-    protected $table = 'events_talks';
-
-    protected $fillable = [
-        'event_id',
-        'user_id',
-        'tenant_id',
-        'status',
-        'field_type',
-        'title',
-        'description',
-    ];
 
     /**
      * @return BelongsTo<User, $this>
