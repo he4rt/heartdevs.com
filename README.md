@@ -243,7 +243,7 @@ Thanks go to these wonderful people:
   </tr>
 </table>
 
-Contributions of any kind welcome!
+Contributions of any kind are welcome!
 
 ## 🌐 Our Ecosystem & Socials
 
