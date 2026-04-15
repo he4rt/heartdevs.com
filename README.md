@@ -97,7 +97,7 @@ To contribute to this project, follow these steps:
 4. Push your branch: `git push -u origin <branch_name>`.
 5. Create the pull request.
 
-Alternatively, see the GitHub documentation on [how to create a pull request](https://help.github.com/en/github/collaborating-with-issues-and-pull-requests/creating-a-pull-request).
+Alternatively, see the GitHub documentation on [how to create a pull request](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests/creating-a-pull-request).
 
 ## Contributors
 
