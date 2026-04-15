@@ -102,7 +102,7 @@ Alternatively, see the GitHub documentation on [how to create a pull request](ht
 
 ## 🤝 Contributors
 
-Thanks goes to these wonderful people:
+Thanks go to these wonderful people:
 
 <table>
   <tr>
