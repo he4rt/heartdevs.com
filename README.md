@@ -11,13 +11,13 @@ He4rt Developers Platform
 </h1>
 
 <p align="center">
-  <a href="https://discord.gg/he4rt"><img src="https://img.shields.io/github/repo-size/he4rt/heartdevs.com?style=for-the-badge"></a>
-  <a href="https://discord.gg/he4rt"><img src="https://img.shields.io/github/languages/count/he4rt/heartdevs.com?style=for-the-badge"></a>
-  <a href="https://discord.gg/he4rt"><img src="https://img.shields.io/github/forks/he4rt/heartdevs.com?style=for-the-badge"></a>
-  <a href="https://github.com/he4rt/heartdevs.com/stargazers"><img src="https://img.shields.io/github/stars/he4rt/heartdevs.com?style=for-the-badge"></a>
-  <a href="https://discord.gg/he4rt"><img src="https://img.shields.io/github/issues/he4rt/heartdevs.com?style=for-the-badge"></a>
-  <a href="https://discord.gg/he4rt"><img src="https://img.shields.io/github/issues-pr/he4rt/heartdevs.com?style=for-the-badge"></a>
-  <a href="https://discord.gg/he4rt"><img src="https://img.shields.io/github/license/he4rt/heartdevs.com?color=6342ED&style=for-the-badge"></a>
+  <img src="https://img.shields.io/github/repo-size/he4rt/heartdevs.com?style=for-the-badge" alt="Repo size">
+  <img src="https://img.shields.io/github/languages/count/he4rt/heartdevs.com?style=for-the-badge" alt="Languages count">
+  <a href="https://github.com/he4rt/heartdevs.com/network/members"><img src="https://img.shields.io/github/forks/he4rt/heartdevs.com?style=for-the-badge" alt="Forks"></a>
+  <a href="https://github.com/he4rt/heartdevs.com/stargazers"><img src="https://img.shields.io/github/stars/he4rt/heartdevs.com?style=for-the-badge" alt="Stars"></a>
+  <a href="https://github.com/he4rt/heartdevs.com/issues"><img src="https://img.shields.io/github/issues/he4rt/heartdevs.com?style=for-the-badge" alt="Open issues"></a>
+  <a href="https://github.com/he4rt/heartdevs.com/pulls"><img src="https://img.shields.io/github/issues-pr/he4rt/heartdevs.com?style=for-the-badge" alt="Open pull requests"></a>
+  <a href="https://github.com/he4rt/heartdevs.com/blob/4.x/LICENSE"><img src="https://img.shields.io/github/license/he4rt/heartdevs.com?color=6342ED&style=for-the-badge" alt="License"></a>
 </p>
 
 > This is the central monorepo application and Discord Bot for the **He4rt Developers** community, built on top of a modular Laravel architecture.
