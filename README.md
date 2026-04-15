@@ -22,7 +22,7 @@ He4rt Developers Platform
 
 > This is the central monorepo application and Discord Bot for the **He4rt Developers** community, built on top of a modular Laravel architecture.
 
-## 🧩 Modules Overview
+## Modules Overview
 
 This project is divided into several interconnected modules:
 - **Activity**: Tracks user actions and engagement.
@@ -36,7 +36,7 @@ This project is divided into several interconnected modules:
 - **Portal**: The main web interface for users.
 - **Integrations**: Integrations with external platforms like DevTo, Discord, and Twitch.
 
-## 💻 Requirements
+## Requirements
 
 Before starting, ensure you have the following installed:
 - PHP 8.3 or higher
@@ -44,7 +44,7 @@ Before starting, ensure you have the following installed:
 - Node.js & NPM
 - Docker (for PostgreSQL & Redis)
 
-## 🚀 Getting Started
+## Getting Started
 
 1. **Start Infrastructure**:
    Spin up the required database and cache containers.
@@ -70,7 +70,7 @@ Before starting, ensure you have the following installed:
    make bot
    ```
 
-## 🧪 Code Quality & Testing
+## Code Quality & Testing
 
 We use multiple tools to ensure code quality:
 
@@ -87,7 +87,7 @@ We use multiple tools to ensure code quality:
   make phpstan
   ```
 
-## 📫 Contributing to He4rt Developers Platform
+## Contributing to He4rt Developers Platform
 
 To contribute to this project, follow these steps:
 
@@ -99,7 +99,7 @@ To contribute to this project, follow these steps:
 
 Alternatively, see the GitHub documentation on [how to create a pull request](https://help.github.com/en/github/collaborating-with-issues-and-pull-requests/creating-a-pull-request).
 
-## 🤝 Contributors
+## Contributors
 
 Thanks go to these wonderful people:
 
@@ -244,22 +244,22 @@ Thanks go to these wonderful people:
 
 Contributions of any kind are welcome!
 
-## 🌐 Our Ecosystem & Socials
+## Our Ecosystem & Socials
 
 **Projects & Initiatives:**
-- 🌐 [Website (heartdevs.com)](https://heartdevs.com/)
-- 💻 [He4rt Developers Platform (This Repo)](https://github.com/he4rt/heartdevs.com)
-- 🎓 [4noobs](https://github.com/he4rt/4noobs)
-- 🧪 [He4rtLabs Challenges](https://github.com/he4rt/heartlabs-challenges)
-- 💯 [100DiasDeCodigo](https://github.com/he4rt/100diasdecodigo)
+- [Website (heartdevs.com)](https://heartdevs.com/)
+- [He4rt Developers Platform (This Repo)](https://github.com/he4rt/heartdevs.com)
+- [4noobs](https://github.com/he4rt/4noobs)
+- [He4rtLabs Challenges](https://github.com/he4rt/heartlabs-challenges)
+- [100DiasDeCodigo](https://github.com/he4rt/100diasdecodigo)
 
 **Social Media:**
-- 💼 [LinkedIn](https://www.linkedin.com/company/he4rt/)
-- 🐦 [X / Twitter](https://x.com/He4rtDevs)
-- 📸 [Instagram](https://instagram.com/heartdevs)
-- 👩‍💻 [Dev.to](https://dev.to/he4rt)
+- [LinkedIn](https://www.linkedin.com/company/he4rt/)
+- [X / Twitter](https://x.com/He4rtDevs)
+- [Instagram](https://instagram.com/heartdevs)
+- [Dev.to](https://dev.to/he4rt)
 
-## 📝 License
+## License
 
 This project is under the MIT license. See the [LICENSE](LICENSE) file for more details.
 
