@@ -14,8 +14,7 @@ He4rt Developers Platform
   <a href="https://discord.gg/he4rt"><img src="https://img.shields.io/github/repo-size/he4rt/heartdevs.com?style=for-the-badge"></a>
   <a href="https://discord.gg/he4rt"><img src="https://img.shields.io/github/languages/count/he4rt/heartdevs.com?style=for-the-badge"></a>
   <a href="https://discord.gg/he4rt"><img src="https://img.shields.io/github/forks/he4rt/heartdevs.com?style=for-the-badge"></a>
-    <a href="https://discord.gg/he4rt"><img src="https://img.shields.io/github/stars/he4rt/heartdevs.com?style=for-the-badge&link=https%3A%2F%2Fgithub.com%2Fhe4rt%2Fheartdevs.com%2Fstargazers
-    "></a>
+  <a href="https://github.com/he4rt/heartdevs.com/stargazers"><img src="https://img.shields.io/github/stars/he4rt/heartdevs.com?style=for-the-badge"></a>
   <a href="https://discord.gg/he4rt"><img src="https://img.shields.io/github/issues/he4rt/heartdevs.com?style=for-the-badge"></a>
   <a href="https://discord.gg/he4rt"><img src="https://img.shields.io/github/issues-pr/he4rt/heartdevs.com?style=for-the-badge"></a>
   <a href="https://discord.gg/he4rt"><img src="https://img.shields.io/github/license/he4rt/heartdevs.com?color=6342ED&style=for-the-badge"></a>
