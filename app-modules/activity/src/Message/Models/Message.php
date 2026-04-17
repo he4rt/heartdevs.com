@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace He4rt\Activity\Message\Models;
 
 use He4rt\Activity\Database\Factories\MessageFactory;
+use He4rt\Activity\Reaction\Concerns\HasReactions;
 use He4rt\Identity\ExternalIdentity\Models\ExternalIdentity;
 use He4rt\Identity\Tenant\Models\Tenant;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
@@ -23,12 +24,16 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
     'content',
     'sent_at',
     'obtained_experience',
+    'metadata',
+    'reactions_count',
+    'reactions_total',
 ])]
 #[Table(name: 'messages')]
 final class Message extends Model
 {
     /** @use HasFactory<MessageFactory> */
     use HasFactory;
+    use HasReactions;
     use HasUuids;
 
     /**
@@ -50,5 +55,14 @@ final class Message extends Model
     protected static function newFactory(): MessageFactory
     {
         return MessageFactory::new();
+    }
+
+    /** @return array<string, mixed> */
+    protected function casts(): array
+    {
+        return [
+            'metadata' => 'array',
+            'sent_at' => 'datetime',
+        ];
     }
 }

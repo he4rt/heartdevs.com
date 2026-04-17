@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace He4rt\IntegrationDiscord\Providers;
 
+use He4rt\IntegrationDiscord\ETL\Console\ImportDiscordMessagesCommand;
 use He4rt\IntegrationDiscord\ETL\Console\ImportDiscordProfilesCommand;
 use Illuminate\Support\ServiceProvider;
 
@@ -16,6 +17,7 @@ class IntegrationDiscordServiceProvider extends ServiceProvider
         if ($this->app->runningInConsole()) {
             $this->commands([
                 ImportDiscordProfilesCommand::class,
+                ImportDiscordMessagesCommand::class,
             ]);
         }
     }

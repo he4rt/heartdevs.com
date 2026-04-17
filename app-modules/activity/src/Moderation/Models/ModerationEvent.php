@@ -1,0 +1,67 @@
+<?php
+
+declare(strict_types=1);
+
+namespace He4rt\Activity\Moderation\Models;
+
+use He4rt\Activity\Message\Models\Message;
+use He4rt\Activity\Moderation\Enums\ModerationType;
+use He4rt\Identity\ExternalIdentity\Models\ExternalIdentity;
+use He4rt\Identity\Tenant\Models\Tenant;
+use Illuminate\Database\Eloquent\Attributes\Fillable;
+use Illuminate\Database\Eloquent\Attributes\Table;
+use Illuminate\Database\Eloquent\Concerns\HasUuids;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+
+#[Fillable([
+    'id',
+    'tenant_id',
+    'external_identity_id',
+    'moderator_identity_id',
+    'type',
+    'reason',
+    'source_bot',
+    'source_message_id',
+    'metadata',
+    'occurred_at',
+])]
+#[Table(name: 'moderation_events')]
+final class ModerationEvent extends Model
+{
+    use HasUuids;
+
+    /** @return BelongsTo<ExternalIdentity, $this> */
+    public function subject(): BelongsTo
+    {
+        return $this->belongsTo(ExternalIdentity::class, 'external_identity_id');
+    }
+
+    /** @return BelongsTo<ExternalIdentity, $this> */
+    public function moderator(): BelongsTo
+    {
+        return $this->belongsTo(ExternalIdentity::class, 'moderator_identity_id');
+    }
+
+    /** @return BelongsTo<Message, $this> */
+    public function sourceMessage(): BelongsTo
+    {
+        return $this->belongsTo(Message::class, 'source_message_id');
+    }
+
+    /** @return BelongsTo<Tenant, $this> */
+    public function tenant(): BelongsTo
+    {
+        return $this->belongsTo(Tenant::class);
+    }
+
+    /** @return array<string, mixed> */
+    protected function casts(): array
+    {
+        return [
+            'type' => ModerationType::class,
+            'metadata' => 'array',
+            'occurred_at' => 'datetime',
+        ];
+    }
+}
