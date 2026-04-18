@@ -17,7 +17,7 @@ return new class extends Migration
             $table->foreignUuid('moderator_identity_id')->nullable()->constrained('external_identities');
             $table->string('type');
             $table->text('reason')->nullable();
-            $table->string('source_bot');
+            $table->foreignUuid('source_identity_id')->nullable()->constrained('external_identities');
             $table->uuid('source_message_id')->nullable();
             $table->jsonb('metadata')->nullable();
             $table->timestamp('occurred_at');

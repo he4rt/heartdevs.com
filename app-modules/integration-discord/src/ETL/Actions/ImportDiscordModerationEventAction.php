@@ -19,14 +19,33 @@ final class ImportDiscordModerationEventAction
     ): ModerationEvent {
         $subjectIdentity = $this->resolveSubject($dto, $tenantId);
         $moderatorIdentity = $this->resolveModerator($dto, $tenantId);
+        $botIdentity = $this->resolveBot($dto, $tenantId);
 
-        return ModerationEvent::query()->create($dto->toDatabase([
-            'id' => Uuid::uuid4()->toString(),
+        $attributes = $dto->toDatabase([
             'tenant_id' => $tenantId,
             'external_identity_id' => $subjectIdentity?->id,
             'moderator_identity_id' => $moderatorIdentity?->id,
+            'source_identity_id' => $botIdentity?->id,
             'source_message_id' => $sourceMessageId,
-        ]));
+        ]);
+
+        if ($sourceMessageId !== null) {
+            return ModerationEvent::query()->updateOrCreate(
+                ['source_message_id' => $sourceMessageId],
+                $attributes,
+            );
+        }
+
+        return ModerationEvent::query()->create($attributes + ['id' => Uuid::uuid4()->toString()]);
+    }
+
+    private function resolveBot(DiscordModerationEventDTO $dto, int $tenantId): ?ExternalIdentity
+    {
+        return ExternalIdentity::query()
+            ->where('provider', IdentityProvider::Discord)
+            ->where('external_account_id', $dto->botDiscordId)
+            ->where('tenant_id', $tenantId)
+            ->first();
     }
 
     private function resolveSubject(DiscordModerationEventDTO $dto, int $tenantId): ?ExternalIdentity

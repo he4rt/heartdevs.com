@@ -16,6 +16,7 @@ use He4rt\IntegrationDiscord\ETL\DTOs\DiscordModerationEventDTO;
 use He4rt\IntegrationDiscord\ETL\DTOs\DiscordVoiceLogDTO;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Throwable;
 
 use function Laravel\Prompts\error;
@@ -26,7 +27,10 @@ use function Laravel\Prompts\table;
 class ImportDiscordMessagesCommand extends Command
 {
     protected $signature = 'discord:import-messages
-                            {path : Caminho da pasta discord-dump}';
+                            {path : Caminho da pasta discord-dump}
+                            {--limit= : Para apos importar N mensagens (total)}
+                            {--channels= : Lista de nomes (ou substrings) de canais separados por virgula}
+                            {--chunks= : Maximo de chunks por canal}';
 
     protected $description = 'Importa mensagens Discord de um dump completo (messages, reactions, voice, moderation)';
 
@@ -56,6 +60,7 @@ class ImportDiscordMessagesCommand extends Command
         $tenantId = $tenant->getKey();
 
         $channelDirs = $this->getChannelDirectories($basePath);
+        $channelDirs = $this->filterChannels($channelDirs, $this->option('channels'));
 
         if ($channelDirs === []) {
             error('Nenhum diretorio de canal encontrado.');
@@ -63,24 +68,48 @@ class ImportDiscordMessagesCommand extends Command
             return self::FAILURE;
         }
 
+        $limit = $this->option('limit') !== null ? (int) $this->option('limit') : null;
+        $chunksPerChannel = $this->option('chunks') !== null ? (int) $this->option('chunks') : null;
+
         info(sprintf('Importando mensagens de %d canais para tenant "%s"...', count($channelDirs), $tenant->name));
+        if ($limit !== null) {
+            info(sprintf('Limite total: %s mensagens.', number_format($limit)));
+        }
+
+        if ($chunksPerChannel !== null) {
+            info(sprintf('Limite por canal: %d chunks.', $chunksPerChannel));
+        }
 
         $stats = ['messages' => 0, 'reactions' => 0, 'voice' => 0, 'moderation' => 0, 'errors' => 0];
+        /** @var list<array{channel:string,message_id:?string,class:string,message:string}> */
+        $errorSamples = [];
 
         progress(
             label: 'Importando canais',
             steps: $channelDirs,
             callback: function (string $channelDir, $progress) use (
                 $messageAction, $reactionsAction, $voiceAction, $moderationAction,
-                $tenantId, $channelMap, &$stats,
+                $tenantId, $channelMap, $limit, $chunksPerChannel, &$stats, &$errorSamples,
             ): void {
+                if ($limit !== null && $stats['messages'] >= $limit) {
+                    return;
+                }
+
                 $channelName = basename($channelDir);
                 $progress->label('Canal: '.$channelName);
 
                 $chunks = glob($channelDir.'/chunk_*.json');
                 sort($chunks);
 
+                if ($chunksPerChannel !== null) {
+                    $chunks = array_slice($chunks, 0, $chunksPerChannel);
+                }
+
                 foreach ($chunks as $chunkFile) {
+                    if ($limit !== null && $stats['messages'] >= $limit) {
+                        return;
+                    }
+
                     $messages = json_decode(file_get_contents($chunkFile), true);
                     if (!is_array($messages)) {
                         continue;
@@ -88,16 +117,30 @@ class ImportDiscordMessagesCommand extends Command
 
                     DB::transaction(function () use (
                         $messages, $messageAction, $reactionsAction, $voiceAction, $moderationAction,
-                        $tenantId, $channelMap, &$stats,
+                        $tenantId, $channelMap, $channelName, $limit, &$stats, &$errorSamples,
                     ): void {
                         foreach ($messages as $raw) {
+                            if ($limit !== null && $stats['messages'] >= $limit) {
+                                return;
+                            }
+
                             try {
                                 $this->processMessage(
                                     $raw, $messageAction, $reactionsAction, $voiceAction, $moderationAction,
                                     $tenantId, $channelMap, $stats,
                                 );
-                            } catch (Throwable) {
+                            } catch (Throwable $e) {
                                 $stats['errors']++;
+                                $context = [
+                                    'channel' => $channelName,
+                                    'message_id' => $raw['id'] ?? null,
+                                    'class' => $e::class,
+                                    'message' => $e->getMessage(),
+                                ];
+                                Log::error('discord-import failed', $context + ['trace' => $e->getTraceAsString()]);
+                                if (count($errorSamples) < 10) {
+                                    $errorSamples[] = $context;
+                                }
                             }
                         }
                     });
@@ -126,6 +169,23 @@ class ImportDiscordMessagesCommand extends Command
                 ['Erros', number_format($stats['errors'])],
             ],
         );
+
+        if ($errorSamples !== []) {
+            $this->newLine();
+            error(sprintf('Primeiros %d erros (detalhes em storage/logs):', count($errorSamples)));
+            table(
+                headers: ['Canal', 'Message ID', 'Exception', 'Mensagem'],
+                rows: array_map(
+                    static fn (array $e): array => [
+                        $e['channel'],
+                        $e['message_id'] ?? '-',
+                        class_basename($e['class']),
+                        mb_substr($e['message'], 0, 120),
+                    ],
+                    $errorSamples,
+                ),
+            );
+        }
 
         info('Importacao finalizada.');
 
@@ -182,14 +242,50 @@ class ImportDiscordMessagesCommand extends Command
             return [];
         }
 
-        $channels = json_decode(file_get_contents($channelsFile), true);
+        $payload = json_decode(file_get_contents($channelsFile), true);
+        $channels = is_array($payload) ? ($payload['channels'] ?? $payload) : [];
         $map = [];
 
         foreach ($channels as $channel) {
-            $map[$channel['id']] = $channel['name'] ?? $channel['id'];
+            if (!is_array($channel) || !isset($channel['id'])) {
+                continue;
+            }
+
+            $map[(string) $channel['id']] = $channel['name'] ?? (string) $channel['id'];
         }
 
         return $map;
+    }
+
+    /**
+     * @param  list<string>  $channelDirs
+     * @return list<string>
+     */
+    private function filterChannels(array $channelDirs, ?string $filter): array
+    {
+        if ($filter === null || mb_trim($filter) === '') {
+            return $channelDirs;
+        }
+
+        $needles = array_values(array_filter(array_map(trim(...), explode(',', $filter))));
+
+        if ($needles === []) {
+            return $channelDirs;
+        }
+
+        return array_values(array_filter(
+            $channelDirs,
+            static function (string $dir) use ($needles): bool {
+                $name = basename($dir);
+                foreach ($needles as $needle) {
+                    if (str_contains($name, $needle)) {
+                        return true;
+                    }
+                }
+
+                return false;
+            },
+        ));
     }
 
     /**

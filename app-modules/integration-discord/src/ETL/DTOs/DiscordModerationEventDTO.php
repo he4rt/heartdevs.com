@@ -5,14 +5,13 @@ declare(strict_types=1);
 namespace He4rt\IntegrationDiscord\ETL\DTOs;
 
 use He4rt\Activity\Moderation\Enums\ModerationType;
-use He4rt\IntegrationDiscord\ETL\Enums\SourceBot;
 use Illuminate\Support\Facades\Date;
 
 final readonly class DiscordModerationEventDTO
 {
     public function __construct(
         public ModerationType $type,
-        public SourceBot $sourceBot,
+        public string $botDiscordId,
         public ?string $subjectDiscordId,
         public ?string $subjectUsername,
         public ?string $subjectDiscriminator,
@@ -54,7 +53,6 @@ final readonly class DiscordModerationEventDTO
         return [
             'type' => $this->type,
             'reason' => $this->reason,
-            'source_bot' => $this->sourceBot->value,
             'occurred_at' => Date::parse($this->timestamp),
             'metadata' => $this->metadata,
             ...$extra,
@@ -90,7 +88,7 @@ final readonly class DiscordModerationEventDTO
 
         return new self(
             type: $type,
-            sourceBot: SourceBot::Dyno,
+            botDiscordId: (string) $message['author']['id'],
             subjectDiscordId: null,
             subjectUsername: mb_trim($m[1]),
             subjectDiscriminator: $m[2],
@@ -140,7 +138,7 @@ final readonly class DiscordModerationEventDTO
 
         return new self(
             type: $type,
-            sourceBot: SourceBot::Heartdevs,
+            botDiscordId: (string) $message['author']['id'],
             subjectDiscordId: $subjectId,
             subjectUsername: null,
             subjectDiscriminator: null,

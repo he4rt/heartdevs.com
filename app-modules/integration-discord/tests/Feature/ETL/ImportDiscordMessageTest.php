@@ -21,7 +21,6 @@ use He4rt\IntegrationDiscord\ETL\DTOs\DiscordMessageDTO;
 use He4rt\IntegrationDiscord\ETL\DTOs\DiscordMessageReactionDTO;
 use He4rt\IntegrationDiscord\ETL\DTOs\DiscordModerationEventDTO;
 use He4rt\IntegrationDiscord\ETL\DTOs\DiscordVoiceLogDTO;
-use He4rt\IntegrationDiscord\ETL\Enums\SourceBot;
 use Illuminate\Support\Carbon;
 use Ramsey\Uuid\Uuid;
 
@@ -309,7 +308,7 @@ test('DiscordModerationEventDTO extracts ban from dyno embed', function (): void
 
     expect($dto)->not->toBeNull()
         ->and($dto->type)->toBe(ModerationType::Ban)
-        ->and($dto->sourceBot)->toBe(SourceBot::Dyno)
+        ->and($dto->botDiscordId)->toBe('155149108183695360')
         ->and($dto->subjectUsername)->toBe('someuser')
         ->and($dto->subjectDiscriminator)->toBe('1234')
         ->and($dto->subjectDiscordId)->toBeNull();
@@ -329,7 +328,7 @@ test('DiscordModerationEventDTO extracts ban from heartdevs embed with reason', 
 
     expect($dto)->not->toBeNull()
         ->and($dto->type)->toBe(ModerationType::Ban)
-        ->and($dto->sourceBot)->toBe(SourceBot::Heartdevs)
+        ->and($dto->botDiscordId)->toBe('123456789')
         ->and($dto->subjectDiscordId)->toBe('367487241171501076')
         ->and($dto->moderatorDiscordId)->toBe('237242679283548160')
         ->and($dto->reason)->toBe('descumpriu regras');
@@ -349,15 +348,15 @@ test('DiscordModerationEventDTO returns null for non-bot messages', function ():
     expect($dto)->toBeNull();
 });
 
-test('DiscordModerationEventDTO::toDatabase converts SourceBot enum to string value', function (): void {
+test('DiscordModerationEventDTO::toDatabase exposes type and occurred_at without bot identifier', function (): void {
     $raw = heartdevsModerationLog('111', '222', 'Banimento', 'motivo');
     $dto = DiscordModerationEventDTO::fromDump($raw);
 
     $result = $dto->toDatabase();
 
-    expect($result['source_bot'])->toBe('heartdevs')
-        ->and($result['type'])->toBe(ModerationType::Ban)
-        ->and($result['occurred_at'])->toBeInstanceOf(Carbon::class);
+    expect($result['type'])->toBe(ModerationType::Ban)
+        ->and($result['occurred_at'])->toBeInstanceOf(Carbon::class)
+        ->and($result)->not->toHaveKey('source_bot');
 });
 
 // ── ImportDiscordMessageAction Tests ─────────────────────────────
@@ -589,6 +588,7 @@ test('it resolves channel name from channel map', function (): void {
 test('it creates moderation event linked to subject identity (heartdevs)', function (): void {
     $tenant = Tenant::factory()->create(['slug' => 'he4rt']);
     $identity = createTestIdentity($tenant, '367487241171501076', 'punished_user');
+    $bot = createTestIdentity($tenant, '123456789', 'heartdevs_bot');
 
     $raw = heartdevsModerationLog('367487241171501076', '237242679283548160', 'Banimento', 'motivo');
     $dto = DiscordModerationEventDTO::fromDump($raw);
@@ -599,7 +599,7 @@ test('it creates moderation event linked to subject identity (heartdevs)', funct
     expect($event)->toBeInstanceOf(ModerationEvent::class)
         ->and($event->type)->toBe(ModerationType::Ban)
         ->and($event->external_identity_id)->toBe($identity->id)
-        ->and($event->source_bot)->toBe('heartdevs');
+        ->and($event->source_identity_id)->toBe($bot->id);
 });
 
 test('it creates moderation event with null subject when dyno username does not match', function (): void {
@@ -656,4 +656,42 @@ test('it links source_message_id when provided', function (): void {
     $event = $action->handle($dto, $tenant->getKey(), $message->id);
 
     expect($event->source_message_id)->toBe($message->id);
+});
+
+test('it is idempotent when re-importing the same source message', function (): void {
+    $tenant = Tenant::factory()->create(['slug' => 'he4rt']);
+    createTestIdentity($tenant, '253642464697516033', 'letsch1');
+
+    $msgAction = resolve(ImportDiscordMessageAction::class);
+    $message = $msgAction->handle(DiscordMessageDTO::fromDump(discordMessage()), $tenant->getKey());
+
+    $raw = heartdevsModerationLog('111', '222', 'Banimento', 'motivo');
+    $dto = DiscordModerationEventDTO::fromDump($raw);
+
+    $action = resolve(ImportDiscordModerationEventAction::class);
+    $first = $action->handle($dto, $tenant->getKey(), $message->id);
+    $second = $action->handle($dto, $tenant->getKey(), $message->id);
+
+    expect($first->id)->toBe($second->id)
+        ->and(ModerationEvent::query()->where('source_message_id', $message->id)->count())->toBe(1);
+});
+
+test('it disambiguates user name when author global_name collides', function (): void {
+    $tenant = Tenant::factory()->create(['slug' => 'he4rt']);
+
+    $action = resolve(ImportDiscordMessageAction::class);
+
+    $action->handle(DiscordMessageDTO::fromDump(discordMessage([
+        'id' => '900000000000000001',
+        'author' => ['id' => '111', 'username' => 'user_a', 'global_name' => 'Joao', 'bot' => false],
+    ])), $tenant->getKey());
+
+    $action->handle(DiscordMessageDTO::fromDump(discordMessage([
+        'id' => '900000000000000002',
+        'author' => ['id' => '222', 'username' => 'user_b', 'global_name' => 'Joao', 'bot' => false],
+    ])), $tenant->getKey());
+
+    expect(User::query()->where('name', 'Joao')->count())->toBe(1)
+        ->and(User::query()->where('username', 'user_a')->value('name'))->toBe('Joao')
+        ->and(User::query()->where('username', 'user_b')->value('name'))->toBe('user_b');
 });

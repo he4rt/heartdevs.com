@@ -45,7 +45,7 @@ final class ImportDiscordMessageAction
             ['username' => $dto->authorUsername],
             [
                 'id' => Uuid::uuid4()->toString(),
-                'name' => $dto->authorName,
+                'name' => $this->uniqueName($dto),
                 'is_donator' => false,
             ]
         );
@@ -68,5 +68,16 @@ final class ImportDiscordMessageAction
                 'bot' => $dto->isBot,
             ]],
         ]);
+    }
+
+    private function uniqueName(DiscordMessageDTO $dto): string
+    {
+        foreach ([$dto->authorName, $dto->authorUsername, $dto->authorUsername.'-'.$dto->authorDiscordId] as $candidate) {
+            if (!User::query()->where('name', $candidate)->exists()) {
+                return $candidate;
+            }
+        }
+
+        return $dto->authorDiscordId;
     }
 }
