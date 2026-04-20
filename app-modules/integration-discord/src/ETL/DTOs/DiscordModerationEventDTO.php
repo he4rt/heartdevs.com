@@ -50,11 +50,21 @@ final readonly class DiscordModerationEventDTO
      */
     public function toDatabase(array $extra = []): array
     {
+        $metadata = $this->metadata;
+
+        if ($this->subjectUsername !== null) {
+            $metadata['subject_username'] = $this->subjectUsername;
+        }
+
+        if ($this->subjectDiscriminator !== null) {
+            $metadata['subject_discriminator'] = $this->subjectDiscriminator;
+        }
+
         return [
             'type' => $this->type,
             'reason' => $this->reason,
             'occurred_at' => Date::parse($this->timestamp),
-            'metadata' => $this->metadata,
+            'metadata' => $metadata,
             ...$extra,
         ];
     }

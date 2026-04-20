@@ -10,8 +10,10 @@ use Filament\Support\Contracts\HasColor;
 use Filament\Support\Contracts\HasDescription;
 use Filament\Support\Contracts\HasIcon;
 use Filament\Support\Contracts\HasLabel;
+use He4rt\Activity\Message\Contracts\MessageActivityAdapter;
 use He4rt\Identity\Auth\DTOs\OAuthStateDTO;
 use He4rt\IntegrationDevTo\OAuth\DevToOAuthClient;
+use He4rt\IntegrationDiscord\ETL\Adapters\DiscordMessageAdapter;
 use He4rt\IntegrationDiscord\OAuth\DiscordOAuthClient;
 use He4rt\IntegrationTwitch\OAuth\Contracts\TwitchOAuthService;
 use LogicException;
@@ -203,6 +205,14 @@ enum IdentityProvider: string implements HasColor, HasDescription, HasIcon, HasL
     {
         return match ($this) {
             default => IdentityType::External,
+        };
+    }
+
+    public function getMessageAdapter(): ?MessageActivityAdapter
+    {
+        return match ($this) {
+            self::Discord => resolve(DiscordMessageAdapter::class),
+            default => null,
         };
     }
 }

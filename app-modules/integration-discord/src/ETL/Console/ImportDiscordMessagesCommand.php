@@ -83,13 +83,15 @@ class ImportDiscordMessagesCommand extends Command
         $stats = ['messages' => 0, 'reactions' => 0, 'voice' => 0, 'moderation' => 0, 'errors' => 0];
         /** @var list<array{channel:string,message_id:?string,class:string,message:string}> */
         $errorSamples = [];
+        /** @var array<string, string> */
+        $identityCache = [];
 
         progress(
             label: 'Importando canais',
             steps: $channelDirs,
             callback: function (string $channelDir, $progress) use (
                 $messageAction, $reactionsAction, $voiceAction, $moderationAction,
-                $tenantId, $channelMap, $limit, $chunksPerChannel, &$stats, &$errorSamples,
+                $tenantId, $channelMap, $limit, $chunksPerChannel, &$stats, &$errorSamples, &$identityCache,
             ): void {
                 if ($limit !== null && $stats['messages'] >= $limit) {
                     return;
@@ -115,9 +117,15 @@ class ImportDiscordMessagesCommand extends Command
                         continue;
                     }
 
+                    $dtos = array_map(
+                        DiscordMessageDTO::fromDump(...),
+                        array_values(array_filter($messages, is_array(...))),
+                    );
+                    $identityCache = $messageAction->prewarm($dtos, $tenantId, $identityCache);
+
                     DB::transaction(function () use (
                         $messages, $messageAction, $reactionsAction, $voiceAction, $moderationAction,
-                        $tenantId, $channelMap, $channelName, $limit, &$stats, &$errorSamples,
+                        $tenantId, $channelMap, $channelName, $limit, &$stats, &$errorSamples, $identityCache,
                     ): void {
                         foreach ($messages as $raw) {
                             if ($limit !== null && $stats['messages'] >= $limit) {
@@ -127,7 +135,7 @@ class ImportDiscordMessagesCommand extends Command
                             try {
                                 $this->processMessage(
                                     $raw, $messageAction, $reactionsAction, $voiceAction, $moderationAction,
-                                    $tenantId, $channelMap, $stats,
+                                    $tenantId, $channelMap, $stats, $identityCache,
                                 );
                             } catch (Throwable $e) {
                                 $stats['errors']++;
@@ -146,11 +154,12 @@ class ImportDiscordMessagesCommand extends Command
                     });
 
                     $progress->hint(sprintf(
-                        'Msgs: %s | React: %s | Voice: %s | Mod: %s',
+                        'Msgs: %s | React: %s | Voice: %s | Mod: %s | Authors: %s',
                         number_format($stats['messages']),
                         number_format($stats['reactions']),
                         number_format($stats['voice']),
                         number_format($stats['moderation']),
+                        number_format(count($identityCache)),
                     ));
                 }
             },
@@ -196,6 +205,7 @@ class ImportDiscordMessagesCommand extends Command
      * @param  array<string, mixed>  $raw
      * @param  array<string, string>  $channelMap
      * @param  array<string, int>  $stats
+     * @param  array<string, string>  $identityCache
      */
     private function processMessage(
         array $raw,
@@ -206,9 +216,10 @@ class ImportDiscordMessagesCommand extends Command
         int $tenantId,
         array $channelMap,
         array &$stats,
+        array $identityCache = [],
     ): void {
         $dto = DiscordMessageDTO::fromDump($raw);
-        $message = $messageAction->handle($dto, $tenantId);
+        $message = $messageAction->handle($dto, $tenantId, $identityCache[$dto->authorDiscordId] ?? null);
         $stats['messages']++;
 
         $reactions = DiscordMessageReactionDTO::fromDumpMessage($raw);

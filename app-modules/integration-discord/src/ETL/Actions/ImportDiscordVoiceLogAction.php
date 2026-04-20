@@ -26,10 +26,24 @@ final class ImportDiscordVoiceLogAction
             return null;
         }
 
-        return Voice::query()->create($dto->toDatabase([
+        $attributes = $dto->toDatabase([
             'tenant_id' => $tenantId,
             'external_identity_id' => $identity->id,
             'channel_name' => $channelMap[$dto->voiceChannelId] ?? $dto->voiceChannelId,
-        ]));
+        ]);
+
+        $providerMessageId = $attributes['provider_message_id'] ?? null;
+
+        if ($providerMessageId === null) {
+            return Voice::query()->create($attributes);
+        }
+
+        return Voice::query()->updateOrCreate(
+            [
+                'tenant_id' => $tenantId,
+                'provider_message_id' => $providerMessageId,
+            ],
+            $attributes,
+        );
     }
 }

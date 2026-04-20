@@ -8,7 +8,6 @@ use He4rt\Activity\Moderation\Models\ModerationEvent;
 use He4rt\Identity\ExternalIdentity\Enums\IdentityProvider;
 use He4rt\Identity\ExternalIdentity\Models\ExternalIdentity;
 use He4rt\IntegrationDiscord\ETL\DTOs\DiscordModerationEventDTO;
-use Ramsey\Uuid\Uuid;
 
 final class ImportDiscordModerationEventAction
 {
@@ -21,13 +20,26 @@ final class ImportDiscordModerationEventAction
         $moderatorIdentity = $this->resolveModerator($dto, $tenantId);
         $botIdentity = $this->resolveBot($dto, $tenantId);
 
+        $providerMessageId = isset($dto->metadata['id']) ? (string) $dto->metadata['id'] : null;
+
         $attributes = $dto->toDatabase([
             'tenant_id' => $tenantId,
             'external_identity_id' => $subjectIdentity?->id,
             'moderator_identity_id' => $moderatorIdentity?->id,
             'source_identity_id' => $botIdentity?->id,
             'source_message_id' => $sourceMessageId,
+            'provider_message_id' => $providerMessageId,
         ]);
+
+        if ($providerMessageId !== null) {
+            return ModerationEvent::query()->updateOrCreate(
+                [
+                    'tenant_id' => $tenantId,
+                    'provider_message_id' => $providerMessageId,
+                ],
+                $attributes,
+            );
+        }
 
         if ($sourceMessageId !== null) {
             return ModerationEvent::query()->updateOrCreate(
@@ -36,7 +48,7 @@ final class ImportDiscordModerationEventAction
             );
         }
 
-        return ModerationEvent::query()->create($attributes + ['id' => Uuid::uuid4()->toString()]);
+        return ModerationEvent::query()->create($attributes);
     }
 
     private function resolveBot(DiscordModerationEventDTO $dto, int $tenantId): ?ExternalIdentity

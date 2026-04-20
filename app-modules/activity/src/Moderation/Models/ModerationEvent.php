@@ -24,6 +24,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property string|null $reason
  * @property string|null $source_identity_id
  * @property string|null $source_message_id
+ * @property string|null $provider_message_id
  * @property array<string, mixed>|null $metadata
  * @property Carbon $occurred_at
  * @property Carbon|null $created_at
@@ -38,6 +39,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
     'reason',
     'source_identity_id',
     'source_message_id',
+    'provider_message_id',
     'metadata',
     'occurred_at',
 ])]

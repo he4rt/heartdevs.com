@@ -48,7 +48,9 @@ final readonly class DiscordVoiceLogDTO
     public function toDatabase(array $extra = []): array
     {
         return [
-            'state' => $this->action === 'joined' ? 'unmuted' : 'disabled',
+            'provider_message_id' => isset($this->metadata['id']) ? (string) $this->metadata['id'] : null,
+            'state' => $this->action === 'joined' ? 'joined' : 'left',
+            'occurred_at' => $this->timestamp,
             'obtained_experience' => 0,
             ...$extra,
         ];

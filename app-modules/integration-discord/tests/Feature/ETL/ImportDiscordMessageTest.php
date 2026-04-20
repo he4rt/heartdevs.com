@@ -2,7 +2,14 @@
 
 declare(strict_types=1);
 
+use He4rt\Activity\Message\Enums\MessageKind;
+use He4rt\Activity\Message\Enums\MessageSourceKind;
+use He4rt\Activity\Message\Models\MembershipEvent;
 use He4rt\Activity\Message\Models\Message;
+use He4rt\Activity\Message\Models\MessageAttachment;
+use He4rt\Activity\Message\Models\MessageEmbed;
+use He4rt\Activity\Message\Models\MessageMention;
+use He4rt\Activity\Message\Models\MessageThread;
 use He4rt\Activity\Moderation\Enums\ModerationType;
 use He4rt\Activity\Moderation\Models\ModerationEvent;
 use He4rt\Activity\Reaction\Models\Reaction;
@@ -281,23 +288,25 @@ test('DiscordVoiceLogDTO returns null for messages without embeds', function ():
     expect($dto)->toBeNull();
 });
 
-test('DiscordVoiceLogDTO::toDatabase maps joined to unmuted state', function (): void {
+test('DiscordVoiceLogDTO::toDatabase maps joined action to joined state', function (): void {
     $raw = dynoVoiceLog('123', '456', 'joined');
     $dto = DiscordVoiceLogDTO::fromDump($raw);
 
     $result = $dto->toDatabase();
 
-    expect($result['state'])->toBe('unmuted')
-        ->and($result['obtained_experience'])->toBe(0);
+    expect($result['state'])->toBe('joined')
+        ->and($result['obtained_experience'])->toBe(0)
+        ->and($result['provider_message_id'])->toBe($raw['id'])
+        ->and($result['occurred_at'])->toBe($raw['timestamp']);
 });
 
-test('DiscordVoiceLogDTO::toDatabase maps left to disabled state', function (): void {
+test('DiscordVoiceLogDTO::toDatabase maps left action to left state', function (): void {
     $raw = dynoVoiceLog('123', '456', 'left');
     $dto = DiscordVoiceLogDTO::fromDump($raw);
 
     $result = $dto->toDatabase();
 
-    expect($result['state'])->toBe('disabled');
+    expect($result['state'])->toBe('left');
 });
 
 // ── DiscordModerationEventDTO Tests ──────────────────────────────
@@ -407,14 +416,75 @@ test('it sets obtained_experience to zero', function (): void {
     expect($message->obtained_experience)->toBe(0);
 });
 
-test('it stores complete message metadata', function (): void {
+test('it stores projected message metadata without redundant fields', function (): void {
     $tenant = Tenant::factory()->create(['slug' => 'he4rt']);
 
     $action = resolve(ImportDiscordMessageAction::class);
     $message = $action->handle(DiscordMessageDTO::fromDump(discordMessage()), $tenant->getKey());
 
     expect($message->metadata)->toBeArray()
-        ->and($message->metadata)->toHaveKeys(['type', 'content', 'author', 'channel_id']);
+        ->toHaveKey('type')
+        ->not->toHaveKey('author')
+        ->not->toHaveKey('id')
+        ->not->toHaveKey('channel_id')
+        ->not->toHaveKey('timestamp')
+        ->not->toHaveKey('content')
+        ->not->toHaveKey('reactions');
+});
+
+test('it preserves empty arrays and null fields in metadata', function (): void {
+    $tenant = Tenant::factory()->create(['slug' => 'he4rt']);
+
+    $action = resolve(ImportDiscordMessageAction::class);
+    $message = $action->handle(DiscordMessageDTO::fromDump(discordMessage()), $tenant->getKey());
+
+    expect($message->metadata)
+        ->toHaveKey('mentions', [])
+        ->toHaveKey('mention_roles', [])
+        ->toHaveKey('attachments', [])
+        ->toHaveKey('embeds', [])
+        ->toHaveKey('edited_timestamp', null);
+});
+
+test('it returns null metadata when projection leaves empty object', function (): void {
+    $tenant = Tenant::factory()->create(['slug' => 'he4rt']);
+
+    $action = resolve(ImportDiscordMessageAction::class);
+    $message = $action->handle(DiscordMessageDTO::fromDump([
+        'id' => '999999999999',
+        'channel_id' => '111111111111',
+        'timestamp' => '2019-02-03T04:03:46.777000+00:00',
+        'content' => '',
+        'author' => ['id' => '253642464697516033', 'username' => 'letsch1'],
+        'reactions' => [],
+    ]), $tenant->getKey());
+
+    expect($message->metadata)->toBeNull();
+});
+
+test('it persists full author raw payload into external_identity metadata', function (): void {
+    $tenant = Tenant::factory()->create(['slug' => 'he4rt']);
+
+    $action = resolve(ImportDiscordMessageAction::class);
+    $action->handle(DiscordMessageDTO::fromDump(discordMessage([
+        'author' => [
+            'id' => '253642464697516033',
+            'username' => 'letsch1',
+            'global_name' => 'letsch',
+            'avatar' => 'abc123',
+            'discriminator' => '0001',
+            'public_flags' => 64,
+        ],
+    ])), $tenant->getKey());
+
+    $identity = ExternalIdentity::query()
+        ->where('external_account_id', '253642464697516033')
+        ->firstOrFail();
+
+    expect($identity->metadata['author']['avatar'] ?? null)->toBe('abc123')
+        ->and($identity->metadata['author']['discriminator'] ?? null)->toBe('0001')
+        ->and($identity->metadata['author']['public_flags'] ?? null)->toBe(64)
+        ->and($identity->metadata['author']['username'] ?? null)->toBe('letsch1');
 });
 
 test('it parses sent_at from discord timestamp', function (): void {
@@ -543,12 +613,12 @@ test('it creates voice record from dyno join log', function (): void {
     $voice = $action->handle($dto, $tenant->getKey(), $channelMap);
 
     expect($voice)->toBeInstanceOf(Voice::class)
-        ->and($voice->state)->toBe('unmuted')
+        ->and($voice->state)->toBe('joined')
         ->and($voice->channel_name)->toBe('general-voice')
         ->and($voice->obtained_experience)->toBe(0);
 });
 
-test('it creates voice record from dyno leave log with disabled state', function (): void {
+test('it creates voice record from dyno leave log with left state', function (): void {
     $tenant = Tenant::factory()->create(['slug' => 'he4rt']);
     createTestIdentity($tenant, '529963308577456128', 'voiceuser');
 
@@ -557,7 +627,7 @@ test('it creates voice record from dyno leave log with disabled state', function
     $action = resolve(ImportDiscordVoiceLogAction::class);
     $voice = $action->handle($dto, $tenant->getKey(), []);
 
-    expect($voice->state)->toBe('disabled');
+    expect($voice->state)->toBe('left');
 });
 
 test('it skips when user has no external identity', function (): void {
@@ -694,4 +764,397 @@ test('it disambiguates user name when author global_name collides', function ():
     expect(User::query()->where('name', 'Joao')->count())->toBe(1)
         ->and(User::query()->where('username', 'user_a')->value('name'))->toBe('Joao')
         ->and(User::query()->where('username', 'user_b')->value('name'))->toBe('user_b');
+});
+
+// ── Fase 1: canonical columns populated by adapter ───────────────
+
+test('it populates canonical kind + raw_message_type from adapter', function (): void {
+    $tenant = Tenant::factory()->create(['slug' => 'he4rt']);
+    createTestIdentity($tenant, '253642464697516033', 'letsch1');
+
+    $raw = discordMessage(['type' => 19, 'message_reference' => ['message_id' => 'parent-msg-1']]);
+
+    $action = resolve(ImportDiscordMessageAction::class);
+    $message = $action->handle(DiscordMessageDTO::fromDump($raw), $tenant->getKey());
+
+    expect($message->kind)->toBe(MessageKind::Reply)
+        ->and($message->raw_message_type)->toBe(19)
+        ->and($message->reply_to_provider_message_id)->toBe('parent-msg-1');
+});
+
+test('it populates source_kind based on author flags', function (): void {
+    $tenant = Tenant::factory()->create(['slug' => 'he4rt']);
+    createTestIdentity($tenant, '253642464697516033', 'letsch1');
+
+    $action = resolve(ImportDiscordMessageAction::class);
+    $message = $action->handle(
+        DiscordMessageDTO::fromDump(discordMessage(['author' => ['bot' => true]])),
+        $tenant->getKey(),
+    );
+
+    expect($message->source_kind)->toBe(MessageSourceKind::Bot);
+});
+
+test('it populates is_pinned, mentions_everyone and mention_role_count', function (): void {
+    $tenant = Tenant::factory()->create(['slug' => 'he4rt']);
+    createTestIdentity($tenant, '253642464697516033', 'letsch1');
+
+    $raw = discordMessage([
+        'pinned' => true,
+        'mention_everyone' => true,
+        'mention_roles' => ['r1', 'r2'],
+    ]);
+
+    $action = resolve(ImportDiscordMessageAction::class);
+    $message = $action->handle(DiscordMessageDTO::fromDump($raw), $tenant->getKey());
+
+    expect($message->is_pinned)->toBeTrue()
+        ->and($message->mentions_everyone)->toBeTrue()
+        ->and($message->mention_role_count)->toBe(2);
+});
+
+test('it parses edited_at into a Carbon instance', function (): void {
+    $tenant = Tenant::factory()->create(['slug' => 'he4rt']);
+    createTestIdentity($tenant, '253642464697516033', 'letsch1');
+
+    $raw = discordMessage(['edited_timestamp' => '2024-05-01T10:00:00+00:00']);
+
+    $action = resolve(ImportDiscordMessageAction::class);
+    $message = $action->handle(DiscordMessageDTO::fromDump($raw), $tenant->getKey());
+
+    expect($message->edited_at)->toBeInstanceOf(Carbon::class)
+        ->and($message->edited_at->year)->toBe(2024);
+});
+
+// ── Fase 1: Deleted User coalescence ─────────────────────────────
+
+test('Deleted User DTO namespaces authorUsername by Discord ID', function (): void {
+    $raw = discordMessage(['author' => ['id' => '500', 'username' => 'Deleted User']]);
+    $dto = DiscordMessageDTO::fromDump($raw);
+
+    expect($dto->authorUsername)->toBe('deleted_user_500');
+});
+
+test('it keeps deleted Discord users as separate rows', function (): void {
+    $tenant = Tenant::factory()->create(['slug' => 'he4rt']);
+
+    $action = resolve(ImportDiscordMessageAction::class);
+
+    $action->handle(DiscordMessageDTO::fromDump(discordMessage([
+        'id' => '800000000000000001',
+        'author' => ['id' => '111', 'username' => 'Deleted User', 'global_name' => null, 'bot' => false],
+    ])), $tenant->getKey());
+
+    $action->handle(DiscordMessageDTO::fromDump(discordMessage([
+        'id' => '800000000000000002',
+        'author' => ['id' => '222', 'username' => 'Deleted User', 'global_name' => null, 'bot' => false],
+    ])), $tenant->getKey());
+
+    expect(User::query()->where('username', 'deleted_user_111')->count())->toBe(1)
+        ->and(User::query()->where('username', 'deleted_user_222')->count())->toBe(1)
+        ->and(ExternalIdentity::query()->where('external_account_id', '111')->count())->toBe(1)
+        ->and(ExternalIdentity::query()->where('external_account_id', '222')->count())->toBe(1);
+});
+
+// ── Fase 1: Voice upsert idempotency ─────────────────────────────
+
+test('it upserts voice events by (tenant_id, provider_message_id)', function (): void {
+    $tenant = Tenant::factory()->create(['slug' => 'he4rt']);
+    createTestIdentity($tenant, '529963308577456128', 'voiceuser');
+
+    $raw = dynoVoiceLog('529963308577456128', '452928009964355604', 'joined');
+    $dto = DiscordVoiceLogDTO::fromDump($raw);
+
+    $action = resolve(ImportDiscordVoiceLogAction::class);
+    $action->handle($dto, $tenant->getKey(), []);
+    $action->handle($dto, $tenant->getKey(), []);
+
+    expect(Voice::query()->count())->toBe(1)
+        ->and(Voice::query()->first()->provider_message_id)->toBe($raw['id']);
+});
+
+test('it preserves the Dyno log timestamp in occurred_at', function (): void {
+    $tenant = Tenant::factory()->create(['slug' => 'he4rt']);
+    createTestIdentity($tenant, '529963308577456128', 'voiceuser');
+
+    $raw = dynoVoiceLog('529963308577456128', '452928009964355604', 'joined');
+    $dto = DiscordVoiceLogDTO::fromDump($raw);
+
+    $action = resolve(ImportDiscordVoiceLogAction::class);
+    $voice = $action->handle($dto, $tenant->getKey(), []);
+
+    expect($voice->occurred_at)->toBeInstanceOf(Carbon::class)
+        ->and($voice->occurred_at->toISOString())->toStartWith('2019-02-03');
+});
+
+// ── Fase 1: Moderation idempotency + subject metadata ────────────
+
+test('moderation DTO stores parsed subject_username/discriminator in metadata', function (): void {
+    $raw = dynoModerationLog('someuser', '1234', 'was banned');
+    $dto = DiscordModerationEventDTO::fromDump($raw);
+
+    $result = $dto->toDatabase();
+
+    expect($result['metadata']['subject_username'])->toBe('someuser')
+        ->and($result['metadata']['subject_discriminator'])->toBe('1234');
+});
+
+test('it upserts moderation events by (tenant_id, provider_message_id)', function (): void {
+    $tenant = Tenant::factory()->create(['slug' => 'he4rt']);
+
+    $raw = dynoModerationLog('someuser', '1234', 'was banned');
+    $dto = DiscordModerationEventDTO::fromDump($raw);
+
+    $action = resolve(ImportDiscordModerationEventAction::class);
+    $first = $action->handle($dto, $tenant->getKey());
+    $second = $action->handle($dto, $tenant->getKey());
+
+    expect($first->id)->toBe($second->id)
+        ->and(ModerationEvent::query()->count())->toBe(1);
+});
+
+// ── Fase 2: mentions / threads / resolved replies ────────────────
+
+test('it populates message_mentions with provider id, position and linked identity when known', function (): void {
+    $tenant = Tenant::factory()->create(['slug' => 'he4rt']);
+    createTestIdentity($tenant, '253642464697516033', 'letsch1');
+    $bob = createTestIdentity($tenant, '999', 'bob');
+
+    $raw = discordMessage([
+        'id' => 'msg-with-mentions',
+        'mentions' => [
+            ['id' => '999', 'username' => 'bob'],
+            ['id' => '888', 'username' => 'ghost'],
+        ],
+    ]);
+
+    $action = resolve(ImportDiscordMessageAction::class);
+    $message = $action->handle(DiscordMessageDTO::fromDump($raw), $tenant->getKey());
+
+    $mentions = MessageMention::query()
+        ->where('message_id', $message->id)
+        ->orderBy('position')
+        ->get();
+
+    expect($mentions)->toHaveCount(2)
+        ->and($mentions[0]->mentioned_provider_account_id)->toBe('999')
+        ->and($mentions[0]->mentioned_identity_id)->toBe($bob->id)
+        ->and($mentions[0]->mentioned_username)->toBe('bob')
+        ->and($mentions[0]->position)->toBe(0)
+        ->and($mentions[1]->mentioned_provider_account_id)->toBe('888')
+        ->and($mentions[1]->mentioned_identity_id)->toBeNull()
+        ->and($mentions[1]->position)->toBe(1);
+});
+
+test('it upserts mentions idempotently on re-import', function (): void {
+    $tenant = Tenant::factory()->create(['slug' => 'he4rt']);
+    createTestIdentity($tenant, '253642464697516033', 'letsch1');
+
+    $raw = discordMessage([
+        'id' => 'msg-dup-mentions',
+        'mentions' => [['id' => '1', 'username' => 'alice']],
+    ]);
+
+    $action = resolve(ImportDiscordMessageAction::class);
+    $action->handle(DiscordMessageDTO::fromDump($raw), $tenant->getKey());
+    $action->handle(DiscordMessageDTO::fromDump($raw), $tenant->getKey());
+
+    expect(MessageMention::query()->count())->toBe(1);
+});
+
+test('it creates a message_thread when payload has a thread block', function (): void {
+    $tenant = Tenant::factory()->create(['slug' => 'he4rt']);
+    createTestIdentity($tenant, '253642464697516033', 'letsch1');
+
+    $raw = discordMessage([
+        'id' => 'msg-with-thread',
+        'thread' => [
+            'id' => 'thread-xyz',
+            'name' => 'Conversa',
+            'thread_metadata' => ['archived' => false, 'auto_archive_duration' => 1440],
+        ],
+    ]);
+
+    $action = resolve(ImportDiscordMessageAction::class);
+    $message = $action->handle(DiscordMessageDTO::fromDump($raw), $tenant->getKey());
+
+    $thread = MessageThread::query()->where('message_id', $message->id)->first();
+
+    expect($thread)->not->toBeNull()
+        ->and($thread->provider_thread_id)->toBe('thread-xyz')
+        ->and($thread->name)->toBe('Conversa')
+        ->and($thread->archived)->toBeFalse()
+        ->and($thread->auto_archive_duration)->toBe(1440);
+});
+
+test('it resolves reply_to_message_id when parent message already exists', function (): void {
+    $tenant = Tenant::factory()->create(['slug' => 'he4rt']);
+    createTestIdentity($tenant, '253642464697516033', 'letsch1');
+
+    $action = resolve(ImportDiscordMessageAction::class);
+    $parent = $action->handle(
+        DiscordMessageDTO::fromDump(discordMessage(['id' => 'parent-1'])),
+        $tenant->getKey(),
+    );
+
+    $child = $action->handle(
+        DiscordMessageDTO::fromDump(discordMessage([
+            'id' => 'child-1',
+            'type' => 19,
+            'message_reference' => ['message_id' => 'parent-1'],
+        ])),
+        $tenant->getKey(),
+    );
+
+    expect($child->reply_to_provider_message_id)->toBe('parent-1')
+        ->and($child->reply_to_message_id)->toBe($parent->id);
+});
+
+test('it leaves reply_to_message_id null when parent is out of order', function (): void {
+    $tenant = Tenant::factory()->create(['slug' => 'he4rt']);
+    createTestIdentity($tenant, '253642464697516033', 'letsch1');
+
+    $action = resolve(ImportDiscordMessageAction::class);
+    $child = $action->handle(
+        DiscordMessageDTO::fromDump(discordMessage([
+            'id' => 'child-2',
+            'type' => 19,
+            'message_reference' => ['message_id' => 'unseen-parent'],
+        ])),
+        $tenant->getKey(),
+    );
+
+    expect($child->reply_to_provider_message_id)->toBe('unseen-parent')
+        ->and($child->reply_to_message_id)->toBeNull();
+});
+
+// ── Fase 3: attachments / embeds / membership events ─────────────
+
+test('it persists attachments with content type, size and dimensions', function (): void {
+    $tenant = Tenant::factory()->create(['slug' => 'he4rt']);
+    createTestIdentity($tenant, '253642464697516033', 'letsch1');
+
+    $raw = discordMessage([
+        'id' => 'msg-atts',
+        'attachments' => [[
+            'id' => 'att-1',
+            'url' => 'https://cdn.discordapp.com/attachments/foo.png',
+            'filename' => 'foo.png',
+            'content_type' => 'image/png',
+            'size' => 4096,
+            'width' => 800,
+            'height' => 600,
+        ]],
+    ]);
+
+    $action = resolve(ImportDiscordMessageAction::class);
+    $message = $action->handle(DiscordMessageDTO::fromDump($raw), $tenant->getKey());
+
+    $attachment = MessageAttachment::query()->where('message_id', $message->id)->first();
+
+    expect($attachment)->not->toBeNull()
+        ->and($attachment->filename)->toBe('foo.png')
+        ->and($attachment->content_type)->toBe('image/png')
+        ->and($attachment->size)->toBe(4096)
+        ->and($attachment->width)->toBe(800);
+});
+
+test('attachments are replaced on re-import (no duplicates)', function (): void {
+    $tenant = Tenant::factory()->create(['slug' => 'he4rt']);
+    createTestIdentity($tenant, '253642464697516033', 'letsch1');
+
+    $raw = discordMessage([
+        'id' => 'msg-atts-dup',
+        'attachments' => [
+            ['id' => 'a', 'url' => 'https://x/a.png', 'filename' => 'a.png'],
+            ['id' => 'b', 'url' => 'https://x/b.png', 'filename' => 'b.png'],
+        ],
+    ]);
+
+    $action = resolve(ImportDiscordMessageAction::class);
+    $action->handle(DiscordMessageDTO::fromDump($raw), $tenant->getKey());
+    $action->handle(DiscordMessageDTO::fromDump($raw), $tenant->getKey());
+
+    expect(MessageAttachment::query()->count())->toBe(2);
+});
+
+test('it persists embeds with derived source_domain and raw payload', function (): void {
+    $tenant = Tenant::factory()->create(['slug' => 'he4rt']);
+    createTestIdentity($tenant, '253642464697516033', 'letsch1');
+
+    $raw = discordMessage([
+        'id' => 'msg-embed',
+        'embeds' => [[
+            'url' => 'https://github.com/laravel/laravel',
+            'title' => 'laravel/laravel',
+            'description' => 'The Laravel framework',
+            'type' => 'link',
+            'thumbnail' => ['url' => 'https://avatars.githubusercontent.com/u/1.png'],
+        ]],
+    ]);
+
+    $action = resolve(ImportDiscordMessageAction::class);
+    $message = $action->handle(DiscordMessageDTO::fromDump($raw), $tenant->getKey());
+
+    $embed = MessageEmbed::query()->where('message_id', $message->id)->first();
+
+    expect($embed)->not->toBeNull()
+        ->and($embed->source_domain)->toBe('github.com')
+        ->and($embed->kind)->toBe('link')
+        ->and($embed->raw['title'])->toBe('laravel/laravel');
+});
+
+test('it derives a membership_event for type=7 user joins', function (): void {
+    $tenant = Tenant::factory()->create(['slug' => 'he4rt']);
+    createTestIdentity($tenant, '253642464697516033', 'letsch1');
+
+    $raw = discordMessage([
+        'id' => 'join-1',
+        'type' => 7,
+        'timestamp' => '2024-03-01T12:00:00+00:00',
+    ]);
+
+    $action = resolve(ImportDiscordMessageAction::class);
+    $message = $action->handle(DiscordMessageDTO::fromDump($raw), $tenant->getKey());
+
+    $event = MembershipEvent::query()
+        ->where('provider_message_id', $message->provider_message_id)
+        ->first();
+
+    expect($event)->not->toBeNull()
+        ->and($event->kind)->toBe('user_join')
+        ->and($event->external_identity_id)->toBe($message->external_identity_id);
+});
+
+test('it derives a boost_tier_2 membership_event for type=10', function (): void {
+    $tenant = Tenant::factory()->create(['slug' => 'he4rt']);
+    createTestIdentity($tenant, '253642464697516033', 'letsch1');
+
+    $raw = discordMessage([
+        'id' => 'boost-t2',
+        'type' => 10,
+        'timestamp' => '2024-03-01T12:00:00+00:00',
+    ]);
+
+    $action = resolve(ImportDiscordMessageAction::class);
+    $action->handle(DiscordMessageDTO::fromDump($raw), $tenant->getKey());
+
+    expect(MembershipEvent::query()->where('kind', 'boost_tier_2')->count())->toBe(1);
+});
+
+test('membership_events are idempotent on re-import', function (): void {
+    $tenant = Tenant::factory()->create(['slug' => 'he4rt']);
+    createTestIdentity($tenant, '253642464697516033', 'letsch1');
+
+    $raw = discordMessage([
+        'id' => 'join-dup',
+        'type' => 7,
+        'timestamp' => '2024-03-01T12:00:00+00:00',
+    ]);
+
+    $action = resolve(ImportDiscordMessageAction::class);
+    $action->handle(DiscordMessageDTO::fromDump($raw), $tenant->getKey());
+    $action->handle(DiscordMessageDTO::fromDump($raw), $tenant->getKey());
+
+    expect(MembershipEvent::query()->count())->toBe(1);
 });
