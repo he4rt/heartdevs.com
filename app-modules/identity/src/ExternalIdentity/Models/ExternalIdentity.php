@@ -63,6 +63,7 @@ final class ExternalIdentity extends Model
         'connected_at',
         'disconnected_at',
         'metadata',
+        'email',
     ];
 
     protected $appends = [
