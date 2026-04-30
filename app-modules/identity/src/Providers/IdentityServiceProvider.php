@@ -4,10 +4,6 @@ declare(strict_types=1);
 
 namespace He4rt\Identity\Providers;
 
-use App\Enums\FilamentPanel;
-use Filament\Panel;
-use He4rt\Identity\Filament\User\Pages\Dashboard;
-use He4rt\Identity\Filament\User\Pages\UserProfile;
 use He4rt\Identity\Tenant\Models\Tenant;
 use He4rt\Identity\User\Models\User;
 use Illuminate\Database\Eloquent\Relations\Relation;
@@ -15,20 +11,6 @@ use Illuminate\Support\ServiceProvider;
 
 class IdentityServiceProvider extends ServiceProvider
 {
-    public function register(): void
-    {
-        Panel::configureUsing(function (Panel $panel): void {
-            match ($panel->currentPanel()) {
-                FilamentPanel::User => $panel
-                    ->pages([
-                        UserProfile::class,
-                        Dashboard::class,
-                    ]),
-                default => null,
-            };
-        });
-    }
-
     public function boot(): void
     {
         $this->loadMigrationsFrom(__DIR__.'/../../database/migrations');
