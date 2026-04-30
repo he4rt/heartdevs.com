@@ -68,8 +68,6 @@ class EventPanelProvider extends PanelProvider
             ->tenantViteTheme() /** @phpstan-ignore method.notFound */
             ->topbarLivewireComponent(GuestTopbar::class)
             ->sidebarLivewireComponent(GuestSidebar::class)
-            ->discoverResources(in: app_path('Filament/Event/Resources'), for: 'App\Filament\Event\Resources')
-            ->discoverPages(in: app_path('Filament/Event/Pages'), for: 'App\Filament\Event\Pages')
             ->brandLogo(fn (): View => view('he4rt::components.logo',
                 [
                     'href' => '/event',
@@ -90,7 +88,6 @@ class EventPanelProvider extends PanelProvider
                     ->sort(PHP_INT_MAX),
             ])
             ->topNavigation()
-            ->discoverWidgets(in: app_path('Filament/Event/Widgets'), for: 'App\Filament\Event\Widgets')
             ->middleware([
                 EncryptCookies::class,
                 AddQueuedCookiesToResponse::class,
