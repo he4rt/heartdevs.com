@@ -15,7 +15,7 @@ final class JoiningChannelAction
     {
         foreach ($activeChannels as $index => $channel) {
             /** @var VoiceChannelDTO $channel */
-            if (isset($channel->channelId) && $channel->channelId === $channelId) {
+            if ($channel->channelId === $channelId) {
                 $activeChannels[$index]->users[] = $user;
                 $activeChannels[$index]->usersCount++;
 
