@@ -8,9 +8,13 @@
     "autoload": {
         "psr-4": {
             "He4rt\\Community\\": "src/",
-            "He4rt\\Community\\Tests\\": "tests/",
             "He4rt\\Community\\Database\\Factories\\": "database/factories/",
             "He4rt\\Community\\Database\\Seeders\\": "database/seeders/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "He4rt\\Community\\Tests\\": "tests/"
         }
     },
     "minimum-stability": "stable",

@@ -8,9 +8,13 @@
     "autoload": {
         "psr-4": {
             "He4rt\\IntegrationTwitch\\": "src/",
-            "He4rt\\IntegrationTwitch\\Tests\\": "tests/",
             "He4rt\\IntegrationTwitch\\Database\\Factories\\": "database/factories/",
             "He4rt\\IntegrationTwitch\\Database\\Seeders\\": "database/seeders/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "He4rt\\IntegrationTwitch\\Tests\\": "tests/"
         }
     },
     "minimum-stability": "stable",

@@ -7,7 +7,11 @@
     "require": {},
     "autoload": {
         "psr-4": {
-            "He4rt\\Docs\\": "src/",
+            "He4rt\\Docs\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
             "He4rt\\Docs\\Tests\\": "tests/"
         }
     },

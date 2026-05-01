@@ -8,9 +8,13 @@
     "autoload": {
         "psr-4": {
             "He4rt\\Economy\\": "src/",
-            "He4rt\\Economy\\Tests\\": "tests/",
             "He4rt\\Economy\\Database\\Factories\\": "database/factories/",
             "He4rt\\Economy\\Database\\Seeders\\": "database/seeders/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "He4rt\\Economy\\Tests\\": "tests/"
         }
     },
     "minimum-stability": "stable",

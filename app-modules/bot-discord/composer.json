@@ -7,7 +7,11 @@
     "require": {},
     "autoload": {
         "psr-4": {
-            "He4rt\\BotDiscord\\": "src/",
+            "He4rt\\BotDiscord\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
             "He4rt\\BotDiscord\\Tests\\": "tests/"
         }
     },

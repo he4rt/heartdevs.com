@@ -8,9 +8,13 @@
     "autoload": {
         "psr-4": {
             "He4rt\\IntegrationDiscord\\": "src/",
-            "He4rt\\IntegrationDiscord\\Tests\\": "tests/",
             "He4rt\\IntegrationDiscord\\Database\\Factories\\": "database/factories/",
             "He4rt\\IntegrationDiscord\\Database\\Seeders\\": "database/seeders/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "He4rt\\IntegrationDiscord\\Tests\\": "tests/"
         }
     },
     "minimum-stability": "stable",

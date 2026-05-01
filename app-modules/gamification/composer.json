@@ -8,9 +8,13 @@
     "autoload": {
         "psr-4": {
             "He4rt\\Gamification\\": "src/",
-            "He4rt\\Gamification\\Tests\\": "tests/",
             "He4rt\\Gamification\\Database\\Factories\\": "database/factories/",
             "He4rt\\Gamification\\Database\\Seeders\\": "database/seeders/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "He4rt\\Gamification\\Tests\\": "tests/"
         }
     },
     "minimum-stability": "stable",
