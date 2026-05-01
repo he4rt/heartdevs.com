@@ -12,6 +12,6 @@ return [
     AppServiceProvider::class,
     EventServiceProvider::class,
     FilamentServiceProvider::class,
-    RouteServiceProvider::class,
     AdminPanelProvider::class,
+    RouteServiceProvider::class,
 ];
