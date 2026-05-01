@@ -76,7 +76,7 @@ return RectorConfig::configure()
         LaravelSetList::LARAVEL_FACTORIES,
         LaravelSetList::LARAVEL_IF_HELPERS,
         LaravelSetList::LARAVEL_TESTING,
-        LaravelSetList::LARAVEL_130,
+        LaravelSetList::LARAVEL_TYPE_DECLARATIONS,
     ])
     ->withSkip([
         AddOverrideAttributeToOverriddenMethodsRector::class,

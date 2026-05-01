@@ -11,7 +11,6 @@
         </testsuite>
         <testsuite name="Modules">
             <directory>./app-modules/*/tests</directory>
-            <exclude>./app-modules/bot-discord/tests</exclude>
         </testsuite>
     </testsuites>
     <php>

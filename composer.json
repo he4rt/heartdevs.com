@@ -16,6 +16,7 @@
         "filament/spatie-laravel-media-library-plugin": "^5.6.1",
         "guzzlehttp/guzzle": "^7.10.0",
         "he4rt/activity": ">=1",
+        "he4rt/bot-discord": ">=1",
         "he4rt/community": ">=1",
         "he4rt/docs": ">=1",
         "he4rt/economy": ">=1",
@@ -28,7 +29,8 @@
         "he4rt/integration-twitch": ">=1",
         "he4rt/portal": ">=1",
         "internachi/modular": "^3.0.2",
-        "laravel/framework": "^13.7",
+        "laracord/framework": "dev-next",
+        "laravel/framework": "^13.7.0",
         "laravel/nightwatch": "^1.26.1",
         "laravel/sanctum": "^4.3.1",
         "laravel/telescope": "^5.20.0",
@@ -112,6 +114,7 @@
             "@php artisan storage:link --ansi",
             "composer run-script ide-helper"
         ],
+        "bot": "@php artisan bot:boot",
         "dev": [
             "Composer\\Config::disableProcessTimeout",
             "npx concurrently -c \"#93c5fd,#c4b5fd,#fb7185,#fdba74\" \"php artisan serve\" \"php artisan queue:listen --tries=1\" \"php artisan pail --timeout=0\" \"npm run dev\" --names=server,queue,logs,vite"
@@ -162,6 +165,14 @@
             "options": {
                 "symlink": true
             }
+        },
+        {
+            "type": "vcs",
+            "url": "https://github.com/danielhe4rt/laracord-framework"
+        },
+        {
+            "type": "vcs",
+            "url": "https://github.com/danielhe4rt/tinker-zero"
         }
     ]
 }
