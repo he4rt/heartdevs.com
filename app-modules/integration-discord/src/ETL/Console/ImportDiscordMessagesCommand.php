@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace He4rt\IntegrationDiscord\ETL\Console;
 
+use He4rt\Activity\Message\Models\Message;
 use He4rt\Activity\Voice\Models\Voice;
 use He4rt\Identity\Tenant\Models\Tenant;
 use He4rt\IntegrationDiscord\ETL\Actions\ImportDiscordMessageAction;
@@ -80,7 +81,7 @@ class ImportDiscordMessagesCommand extends Command
             info(sprintf('Limite por canal: %d chunks.', $chunksPerChannel));
         }
 
-        $stats = ['messages' => 0, 'reactions' => 0, 'voice' => 0, 'moderation' => 0, 'errors' => 0];
+        $stats = ['messages' => 0, 'skipped' => 0, 'reactions' => 0, 'voice' => 0, 'moderation' => 0, 'errors' => 0];
         /** @var list<array{channel:string,message_id:?string,class:string,message:string}> */
         $errorSamples = [];
         /** @var array<string, string> */
@@ -112,8 +113,15 @@ class ImportDiscordMessagesCommand extends Command
                         return;
                     }
 
-                    $messages = json_decode(file_get_contents($chunkFile), true);
-                    if (!is_array($messages)) {
+                    $allMessages = json_decode(file_get_contents($chunkFile), true);
+                    if (!is_array($allMessages)) {
+                        continue;
+                    }
+
+                    $messages = $this->filterNewMessages($allMessages, $tenantId);
+                    $stats['skipped'] += count($allMessages) - count($messages);
+
+                    if ($messages === []) {
                         continue;
                     }
 
@@ -122,10 +130,11 @@ class ImportDiscordMessagesCommand extends Command
                         array_values(array_filter($messages, is_array(...))),
                     );
                     $identityCache = $messageAction->prewarm($dtos, $tenantId, $identityCache);
+                    $replyCache = $messageAction->prewarmReplyTargets($dtos, $tenantId);
 
                     DB::transaction(function () use (
                         $messages, $messageAction, $reactionsAction, $voiceAction, $moderationAction,
-                        $tenantId, $channelMap, $channelName, $limit, &$stats, &$errorSamples, $identityCache,
+                        $tenantId, $channelMap, $channelName, $limit, &$stats, &$errorSamples, $identityCache, $replyCache,
                     ): void {
                         foreach ($messages as $raw) {
                             if ($limit !== null && $stats['messages'] >= $limit) {
@@ -135,7 +144,7 @@ class ImportDiscordMessagesCommand extends Command
                             try {
                                 $this->processMessage(
                                     $raw, $messageAction, $reactionsAction, $voiceAction, $moderationAction,
-                                    $tenantId, $channelMap, $stats, $identityCache,
+                                    $tenantId, $channelMap, $stats, $identityCache, $replyCache,
                                 );
                             } catch (Throwable $e) {
                                 $stats['errors']++;
@@ -154,12 +163,12 @@ class ImportDiscordMessagesCommand extends Command
                     });
 
                     $progress->hint(sprintf(
-                        'Msgs: %s | React: %s | Voice: %s | Mod: %s | Authors: %s',
+                        'Msgs: %s | Skip: %s | React: %s | Voice: %s | Mod: %s',
                         number_format($stats['messages']),
+                        number_format($stats['skipped']),
                         number_format($stats['reactions']),
                         number_format($stats['voice']),
                         number_format($stats['moderation']),
-                        number_format(count($identityCache)),
                     ));
                 }
             },
@@ -171,7 +180,8 @@ class ImportDiscordMessagesCommand extends Command
         table(
             headers: ['Metrica', 'Quantidade'],
             rows: [
-                ['Mensagens', number_format($stats['messages'])],
+                ['Mensagens importadas', number_format($stats['messages'])],
+                ['Mensagens puladas', number_format($stats['skipped'])],
                 ['Reactions', number_format($stats['reactions'])],
                 ['Voice events', number_format($stats['voice'])],
                 ['Moderation events', number_format($stats['moderation'])],
@@ -206,6 +216,7 @@ class ImportDiscordMessagesCommand extends Command
      * @param  array<string, string>  $channelMap
      * @param  array<string, int>  $stats
      * @param  array<string, string>  $identityCache
+     * @param  array<string, string>  $replyCache
      */
     private function processMessage(
         array $raw,
@@ -217,9 +228,10 @@ class ImportDiscordMessagesCommand extends Command
         array $channelMap,
         array &$stats,
         array $identityCache = [],
+        array $replyCache = [],
     ): void {
         $dto = DiscordMessageDTO::fromDump($raw);
-        $message = $messageAction->handle($dto, $tenantId, $identityCache[$dto->authorDiscordId] ?? null);
+        $message = $messageAction->handle($dto, $tenantId, $identityCache[$dto->authorDiscordId] ?? null, $replyCache);
         $stats['messages']++;
 
         $reactions = DiscordMessageReactionDTO::fromDumpMessage($raw);
@@ -241,6 +253,36 @@ class ImportDiscordMessagesCommand extends Command
             $moderationAction->handle($moderationDto, $tenantId, $message->id);
             $stats['moderation']++;
         }
+    }
+
+    /**
+     * @param  list<array<string, mixed>>  $messages
+     * @return list<array<string, mixed>>
+     */
+    private function filterNewMessages(array $messages, int $tenantId): array
+    {
+        $unique = [];
+        foreach ($messages as $m) {
+            if (is_array($m) && isset($m['id'])) {
+                $unique[(string) $m['id']] = $m;
+            }
+        }
+
+        if ($unique === []) {
+            return [];
+        }
+
+        $existing = Message::query()
+            ->where('tenant_id', $tenantId)
+            ->whereIn('provider_message_id', array_keys($unique))
+            ->pluck('provider_message_id')
+            ->flip()
+            ->all();
+
+        return array_values(array_filter(
+            $unique,
+            static fn (array $m): bool => !isset($existing[$m['id']]),
+        ));
     }
 
     /**

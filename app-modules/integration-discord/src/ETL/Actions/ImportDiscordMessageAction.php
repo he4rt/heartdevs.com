@@ -28,19 +28,21 @@ use RuntimeException;
 
 final class ImportDiscordMessageAction
 {
-    public function handle(DiscordMessageDTO $dto, int $tenantId, ?string $cachedIdentityId = null): Message
+    /**
+     * @param  array<string, string>  $replyCache  provider_message_id => message uuid
+     */
+    public function handle(DiscordMessageDTO $dto, int $tenantId, ?string $cachedIdentityId = null, array $replyCache = []): Message
     {
         $identityId = $cachedIdentityId ?? $this->resolveAuthorIdentity($dto, $tenantId)->id;
         $adapter = IdentityProvider::Discord->getMessageAdapter();
 
-        $message = Message::query()->updateOrCreate(
-            ['tenant_id' => $tenantId, 'provider_message_id' => $dto->discordMessageId],
+        $message = Message::query()->create(
             $dto->toDatabase([
                 'tenant_id' => $tenantId,
                 'external_identity_id' => $identityId,
                 'obtained_experience' => 0,
                 ...$this->extractProviderSignals($dto, $adapter),
-                'reply_to_message_id' => $this->resolveReplyTargetId($dto, $tenantId, $adapter),
+                'reply_to_message_id' => $this->resolveReplyTargetId($dto, $adapter, $replyCache),
             ]),
         );
 
@@ -99,6 +101,36 @@ final class ImportDiscordMessageAction
     }
 
     /**
+     * @param  iterable<DiscordMessageDTO>  $dtos
+     * @return array<string, string> reply_to_provider_message_id => message uuid
+     */
+    public function prewarmReplyTargets(iterable $dtos, int $tenantId): array
+    {
+        $adapter = IdentityProvider::Discord->getMessageAdapter();
+        if (!$adapter instanceof MessageActivityAdapter) {
+            return [];
+        }
+
+        $replyProviderIds = [];
+        foreach ($dtos as $dto) {
+            $reply = $adapter->extractReply($dto->metadata);
+            if ($reply instanceof ReplyData && !isset($replyProviderIds[$reply->replyToProviderMessageId])) {
+                $replyProviderIds[$reply->replyToProviderMessageId] = true;
+            }
+        }
+
+        if ($replyProviderIds === []) {
+            return [];
+        }
+
+        return Message::query()
+            ->where('tenant_id', $tenantId)
+            ->whereIn('provider_message_id', array_keys($replyProviderIds))
+            ->pluck('id', 'provider_message_id')
+            ->all();
+    }
+
+    /**
      * @return array<string, mixed>
      */
     private function extractProviderSignals(DiscordMessageDTO $dto, ?MessageActivityAdapter $adapter): array
@@ -123,10 +155,13 @@ final class ImportDiscordMessageAction
         ];
     }
 
+    /**
+     * @param  array<string, string>  $replyCache
+     */
     private function resolveReplyTargetId(
         DiscordMessageDTO $dto,
-        int $tenantId,
         ?MessageActivityAdapter $adapter,
+        array $replyCache = [],
     ): ?string {
         if (!$adapter instanceof MessageActivityAdapter) {
             return null;
@@ -137,10 +172,7 @@ final class ImportDiscordMessageAction
             return null;
         }
 
-        return Message::query()
-            ->where('tenant_id', $tenantId)
-            ->where('provider_message_id', $reply->replyToProviderMessageId)
-            ->value('id');
+        return $replyCache[$reply->replyToProviderMessageId] ?? null;
     }
 
     private function syncMentions(
