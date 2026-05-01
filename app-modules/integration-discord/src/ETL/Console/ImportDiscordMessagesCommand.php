@@ -18,11 +18,14 @@ use He4rt\IntegrationDiscord\ETL\DTOs\DiscordVoiceLogDTO;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Schema;
+use Symfony\Component\Console\Output\ConsoleOutputInterface;
+use Symfony\Component\Console\Output\ConsoleSectionOutput;
+use Symfony\Component\Console\Terminal;
 use Throwable;
 
 use function Laravel\Prompts\error;
 use function Laravel\Prompts\info;
-use function Laravel\Prompts\progress;
 use function Laravel\Prompts\table;
 
 class ImportDiscordMessagesCommand extends Command
@@ -42,6 +45,14 @@ class ImportDiscordMessagesCommand extends Command
         ImportDiscordModerationEventAction $moderationAction,
     ): int {
         DB::disableQueryLog();
+
+        $missingColumns = $this->assertSchema();
+        if ($missingColumns !== []) {
+            error('Schema desatualizado. Colunas ausentes em "messages": '.implode(', ', $missingColumns));
+            error('Rode: php artisan migrate');
+
+            return self::FAILURE;
+        }
 
         $tenant = Tenant::query()->where('slug', 'he4rt')->first();
 
@@ -89,44 +100,65 @@ class ImportDiscordMessagesCommand extends Command
         /** @var array<string, string> */
         $identityCache = [];
 
-        progress(
-            label: 'Importando canais',
-            steps: $channelDirs,
-            callback: function (string $channelDir, $progress) use (
-                $messageAction, $reactionsAction, $voiceAction, $moderationAction,
-                $tenantId, $channelMap, $limit, $chunksPerChannel, &$stats, &$errorSamples, &$identityCache,
-            ): void {
+        $output = $this->output->getOutput();
+
+        if (!$output instanceof ConsoleOutputInterface) {
+            error('Saida nao suporta sections (ConsoleOutputInterface). Rode em terminal interativo.');
+
+            return self::FAILURE;
+        }
+
+        $canalSection = $output->section();
+        $chunkSection = $output->section();
+        $statsSection = $output->section();
+
+        $totalChannels = count($channelDirs);
+        $canalCurrent = 0;
+        $lastStatsRender = 0.0;
+        $this->renderBox($canalSection, 'Canais', $canalCurrent, $totalChannels);
+
+        foreach ($channelDirs as $channelDir) {
+            if ($limit !== null && $stats['messages'] >= $limit) {
+                break;
+            }
+
+            $channelName = basename($channelDir);
+            $chunks = glob($channelDir.'/chunk_*.json');
+            sort($chunks);
+
+            if ($chunksPerChannel !== null) {
+                $chunks = array_slice($chunks, 0, $chunksPerChannel);
+            }
+
+            if ($chunks === []) {
+                $canalCurrent++;
+                $this->renderBox($canalSection, 'Canais', $canalCurrent, $totalChannels);
+
+                continue;
+            }
+
+            $totalChunks = count($chunks);
+            $chunkCurrent = 0;
+            $chunkTitle = 'Chunks: '.$channelName;
+            $this->renderBox($chunkSection, $chunkTitle, $chunkCurrent, $totalChunks);
+
+            foreach ($chunks as $chunkFile) {
                 if ($limit !== null && $stats['messages'] >= $limit) {
-                    return;
+                    break;
                 }
 
-                $channelName = basename($channelDir);
-                $progress->label('Canal: '.$channelName);
+                $allMessages = json_decode(file_get_contents($chunkFile), true);
+                if (!is_array($allMessages)) {
+                    $chunkCurrent++;
+                    $this->renderBox($chunkSection, $chunkTitle, $chunkCurrent, $totalChunks);
 
-                $chunks = glob($channelDir.'/chunk_*.json');
-                sort($chunks);
-
-                if ($chunksPerChannel !== null) {
-                    $chunks = array_slice($chunks, 0, $chunksPerChannel);
+                    continue;
                 }
 
-                foreach ($chunks as $chunkFile) {
-                    if ($limit !== null && $stats['messages'] >= $limit) {
-                        return;
-                    }
+                $messages = $this->filterNewMessages($allMessages, $tenantId);
+                $stats['skipped'] += count($allMessages) - count($messages);
 
-                    $allMessages = json_decode(file_get_contents($chunkFile), true);
-                    if (!is_array($allMessages)) {
-                        continue;
-                    }
-
-                    $messages = $this->filterNewMessages($allMessages, $tenantId);
-                    $stats['skipped'] += count($allMessages) - count($messages);
-
-                    if ($messages === []) {
-                        continue;
-                    }
-
+                if ($messages !== []) {
                     $dtos = array_map(
                         DiscordMessageDTO::fromDump(...),
                         array_values(array_filter($messages, is_array(...))),
@@ -140,55 +172,74 @@ class ImportDiscordMessagesCommand extends Command
                     $identityCache = $messageAction->prewarm($dtos, $tenantId, $identityCache);
                     $replyCache = $messageAction->prewarmReplyTargets($dtos, $tenantId);
 
-                    DB::transaction(function () use (
-                        $messages, $dtos, $messageAction, $reactionsAction, $voiceAction, $moderationAction,
-                        $tenantId, $channelMap, $channelName, &$stats, &$errorSamples, $identityCache, $replyCache,
-                    ): void {
-                        DB::statement('SET LOCAL synchronous_commit = off');
+                    $rawById = [];
+                    foreach ($messages as $raw) {
+                        if (is_array($raw) && isset($raw['id'])) {
+                            $rawById[(string) $raw['id']] = $raw;
+                        }
+                    }
 
-                        $stubs = $messageAction->handleBatch($dtos, $tenantId, $identityCache, $replyCache);
-                        $stats['messages'] += count($stubs);
+                    foreach (array_chunk($dtos, 100) as $dtoBatch) {
+                        if ($limit !== null && $stats['messages'] >= $limit) {
+                            break;
+                        }
 
-                        foreach ($messages as $raw) {
-                            if (!is_array($raw) || !isset($raw['id'], $stubs[$raw['id']])) {
-                                continue;
-                            }
+                        DB::transaction(function () use (
+                            $dtoBatch, $rawById, $messageAction, $reactionsAction, $voiceAction, $moderationAction,
+                            $tenantId, $channelMap, $channelName, &$stats, &$errorSamples,
+                            $identityCache, $replyCache, $statsSection, &$lastStatsRender,
+                        ): void {
+                            DB::statement('SET LOCAL synchronous_commit = off');
 
-                            try {
-                                $this->processSubEntities(
-                                    $raw, $stubs[$raw['id']], $reactionsAction, $voiceAction, $moderationAction,
-                                    $tenantId, $channelMap, $stats,
-                                );
-                            } catch (Throwable $e) {
-                                $stats['errors']++;
-                                $context = [
-                                    'channel' => $channelName,
-                                    'message_id' => $raw['id'],
-                                    'class' => $e::class,
-                                    'message' => $e->getMessage(),
-                                ];
-                                Log::error('discord-import failed', $context + ['trace' => $e->getTraceAsString()]);
-                                if (count($errorSamples) < 10) {
-                                    $errorSamples[] = $context;
+                            $stubs = $messageAction->handleBatch($dtoBatch, $tenantId, $identityCache, $replyCache);
+                            $stats['messages'] += count($stubs);
+
+                            foreach ($stubs as $providerId => $stub) {
+                                $raw = $rawById[(string) $providerId] ?? null;
+                                if ($raw === null) {
+                                    continue;
+                                }
+
+                                try {
+                                    $this->processSubEntities(
+                                        $raw, $stub, $reactionsAction, $voiceAction, $moderationAction,
+                                        $tenantId, $channelMap, $stats,
+                                    );
+                                } catch (Throwable $e) {
+                                    $stats['errors']++;
+                                    $context = [
+                                        'channel' => $channelName,
+                                        'message_id' => (string) $providerId,
+                                        'class' => $e::class,
+                                        'message' => $e->getMessage(),
+                                    ];
+                                    Log::error('discord-import failed', $context + ['trace' => $e->getTraceAsString()]);
+                                    if (count($errorSamples) < 10) {
+                                        $errorSamples[] = $context;
+                                    }
+                                }
+
+                                $now = microtime(true);
+                                if ($now - $lastStatsRender > 0.1) {
+                                    $this->renderStats($statsSection, $stats);
+                                    $lastStatsRender = $now;
                                 }
                             }
-                        }
-                    });
-
-                    $progress->hint(sprintf(
-                        'Msgs: %s | Skip: %s | React: %s | Voice: %s | Mod: %s',
-                        number_format($stats['messages']),
-                        number_format($stats['skipped']),
-                        number_format($stats['reactions']),
-                        number_format($stats['voice']),
-                        number_format($stats['moderation']),
-                    ));
+                        });
+                    }
                 }
-            },
-            hint: 'Isso pode levar bastante tempo...',
-        );
 
-        $this->newLine();
+                $chunkCurrent++;
+                $this->renderBox($chunkSection, $chunkTitle, $chunkCurrent, $totalChunks);
+                $this->renderStats($statsSection, $stats);
+                $lastStatsRender = microtime(true);
+            }
+
+            $canalCurrent++;
+            $this->renderBox($canalSection, 'Canais', $canalCurrent, $totalChannels);
+        }
+
+        $this->newLine(2);
 
         table(
             headers: ['Metrica', 'Quantidade'],
@@ -258,6 +309,68 @@ class ImportDiscordMessagesCommand extends Command
             $moderationAction->handle($moderationDto, $tenantId, $message->id);
             $stats['moderation']++;
         }
+    }
+
+    /**
+     * @return list<string>
+     */
+    private function assertSchema(): array
+    {
+        $required = [
+            'id', 'tenant_id', 'external_identity_id', 'provider_message_id',
+            'channel_id', 'content', 'metadata', 'sent_at', 'edited_at',
+            'kind', 'raw_message_type', 'source_kind', 'is_pinned',
+            'mentions_everyone', 'mention_role_count', 'obtained_experience',
+            'reply_to_provider_message_id', 'reply_to_message_id',
+            'created_at', 'updated_at',
+        ];
+
+        $existing = array_flip(Schema::getColumnListing('messages'));
+
+        return array_values(array_filter(
+            $required,
+            static fn (string $col): bool => !isset($existing[$col]),
+        ));
+    }
+
+    /**
+     * @param  array<string, int>  $stats
+     */
+    private function renderStats(ConsoleSectionOutput $section, array $stats): void
+    {
+        $section->overwrite(sprintf(
+            '   Msgs: %s | Skip: %s | React: %s | Voice: %s | Mod: %s',
+            number_format($stats['messages']),
+            number_format($stats['skipped']),
+            number_format($stats['reactions']),
+            number_format($stats['voice']),
+            number_format($stats['moderation']),
+        ));
+    }
+
+    private function renderBox(ConsoleSectionOutput $section, string $title, int $current, int $max): void
+    {
+        $cols = (new Terminal())->getWidth();
+        $width = max(20, min(60, $cols - 6));
+
+        $title = mb_strimwidth($title, 0, $width - 2, '...');
+        $titleLen = mb_strwidth($title);
+        $topDashes = str_repeat('─', max(0, $width - $titleLen));
+
+        $pct = $max > 0 ? min(1.0, $current / $max) : 0.0;
+        $filled = (int) ceil($pct * $width);
+        $bar = str_repeat('█', $filled);
+        $body = $bar.str_repeat(' ', max(0, $width - mb_strwidth($bar)));
+
+        $info = number_format($current).' / '.number_format($max);
+        $infoLen = mb_strwidth($info);
+        $bottomDashes = str_repeat('─', max(0, $width - $infoLen));
+
+        $section->overwrite(implode("\n", [
+            ' ┌ '.$title.' '.$topDashes.'┐',
+            ' │ '.$body.' │',
+            ' └'.$bottomDashes.' '.$info.' ┘',
+        ]));
     }
 
     /**
