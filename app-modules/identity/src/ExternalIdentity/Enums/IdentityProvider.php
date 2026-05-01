@@ -14,12 +14,14 @@ use He4rt\Identity\Auth\DTOs\OAuthStateDTO;
 use He4rt\IntegrationDevTo\OAuth\DevToOAuthClient;
 use He4rt\IntegrationDiscord\OAuth\DiscordOAuthClient;
 use He4rt\IntegrationTwitch\OAuth\Contracts\TwitchOAuthService;
+use RuntimeException;
 
 enum IdentityProvider: string implements HasColor, HasDescription, HasIcon, HasLabel
 {
     case Discord = 'discord';
     case Twitch = 'twitch';
     case DevTo = 'devto';
+    case GitHub = 'github';
 
     public function getClient(): OAuthClientContract
     {
@@ -27,6 +29,7 @@ enum IdentityProvider: string implements HasColor, HasDescription, HasIcon, HasL
             self::Twitch => resolve(TwitchOAuthService::class),
             self::Discord => resolve(DiscordOAuthClient::class),
             self::DevTo => resolve(DevToOAuthClient::class),
+            self::GitHub => throw new RuntimeException('GitHub OAuth client not implemented yet.'),
         };
     }
 
@@ -36,6 +39,7 @@ enum IdentityProvider: string implements HasColor, HasDescription, HasIcon, HasL
             self::Discord => Color::Blue,
             self::Twitch => Color::Purple,
             self::DevTo => Color::Gray,
+            self::GitHub => Color::Gray,
         };
     }
 
@@ -45,6 +49,7 @@ enum IdentityProvider: string implements HasColor, HasDescription, HasIcon, HasL
             self::Discord => 'fab-discord',
             self::Twitch => 'fab-twitch',
             self::DevTo => 'fab-dev',
+            self::GitHub => 'fab-github',
         };
     }
 
@@ -59,6 +64,7 @@ enum IdentityProvider: string implements HasColor, HasDescription, HasIcon, HasL
             self::Discord => 'Conecte sua conta do Discord para gameficações e eventos.',
             self::Twitch => 'Conecte sua conta do Twitch para gameficações e eventos.',
             self::DevTo => 'Conecte sua conta do Dev.to para rastrear artigos e contribuições.',
+            self::GitHub => 'Conecte sua conta do GitHub para exibir seu perfil e contribuições.',
         };
     }
 
@@ -71,6 +77,7 @@ enum IdentityProvider: string implements HasColor, HasDescription, HasIcon, HasL
             self::Discord => config('services.discord.scopes'),
             self::Twitch => config('services.twitch.scopes'),
             self::DevTo => config('services.devto.scopes'),
+            self::GitHub => config('services.github.scopes'),
         };
 
         return explode(' ', $scopes);
@@ -94,7 +101,7 @@ enum IdentityProvider: string implements HasColor, HasDescription, HasIcon, HasL
     public function getType(): IdentityType
     {
         return match ($this) {
-            self::Discord, self::Twitch, self::DevTo => IdentityType::External,
+            self::Discord, self::Twitch, self::DevTo, self::GitHub => IdentityType::External,
         };
     }
 }
