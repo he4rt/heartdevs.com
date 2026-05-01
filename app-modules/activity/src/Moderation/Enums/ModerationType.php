@@ -1,0 +1,42 @@
+<?php
+
+declare(strict_types=1);
+
+namespace He4rt\Activity\Moderation\Enums;
+
+use Filament\Support\Contracts\HasColor;
+use Filament\Support\Contracts\HasLabel;
+
+enum ModerationType: string implements HasColor, HasLabel
+{
+    case Ban = 'ban';
+    case Unban = 'unban';
+    case Mute = 'mute';
+    case Unmute = 'unmute';
+    case Warn = 'warn';
+    case Kick = 'kick';
+    case Suspension = 'suspension';
+
+    public function getLabel(): string
+    {
+        return match ($this) {
+            self::Ban => 'Ban',
+            self::Unban => 'Unban',
+            self::Mute => 'Mute',
+            self::Unmute => 'Unmute',
+            self::Warn => 'Warning',
+            self::Kick => 'Kick',
+            self::Suspension => 'Suspension',
+        };
+    }
+
+    public function getColor(): string|array
+    {
+        return match ($this) {
+            self::Ban, self::Kick => 'danger',
+            self::Unban, self::Unmute => 'success',
+            self::Mute, self::Suspension => 'warning',
+            self::Warn => 'info',
+        };
+    }
+}

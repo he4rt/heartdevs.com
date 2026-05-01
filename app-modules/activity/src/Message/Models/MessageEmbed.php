@@ -1,0 +1,71 @@
+<?php
+
+declare(strict_types=1);
+
+namespace He4rt\Activity\Message\Models;
+
+use Carbon\Carbon;
+use He4rt\Identity\Tenant\Models\Tenant;
+use Illuminate\Database\Eloquent\Concerns\HasUuids;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+
+/**
+ * @property string $id
+ * @property int $tenant_id
+ * @property string $message_id
+ * @property string|null $url
+ * @property string|null $title
+ * @property string|null $description
+ * @property string|null $source_domain
+ * @property string|null $kind
+ * @property string|null $thumbnail_url
+ * @property array<string, mixed>|null $raw
+ * @property int $position
+ * @property Carbon|null $created_at
+ * @property Carbon|null $updated_at
+ */
+final class MessageEmbed extends Model
+{
+    use HasUuids;
+
+    protected $table = 'message_embeds';
+
+    protected $fillable = [
+        'id',
+        'tenant_id',
+        'message_id',
+        'url',
+        'title',
+        'description',
+        'source_domain',
+        'kind',
+        'thumbnail_url',
+        'raw',
+        'position',
+    ];
+
+    /**
+     * @return BelongsTo<Message, $this>
+     */
+    public function message(): BelongsTo
+    {
+        return $this->belongsTo(Message::class, 'message_id');
+    }
+
+    /**
+     * @return BelongsTo<Tenant, $this>
+     */
+    public function tenant(): BelongsTo
+    {
+        return $this->belongsTo(Tenant::class, 'tenant_id');
+    }
+
+    /** @return array<string, mixed> */
+    protected function casts(): array
+    {
+        return [
+            'raw' => 'array',
+        ];
+    }
+}
