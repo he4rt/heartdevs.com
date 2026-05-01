@@ -9,6 +9,10 @@ return new class extends Migration
 {
     public function up(): void
     {
+        if (!app()->isProduction()) {
+            return;
+        }
+
         $tenantId = 2;
 
         $tables = [

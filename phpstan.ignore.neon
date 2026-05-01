@@ -24,3 +24,8 @@ parameters:
           identifier: function.notFound
           count: 1
           path: app/Providers/FilamentServiceProvider.php
+
+        - message: '#^Call to an undefined method Filament\\Panel::discoverResourcesForPanel\(\)\.$#'
+          identifier: method.notFound
+          count: 1
+          path: app/Providers/Filament/AdminPanelProvider.php
