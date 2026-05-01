@@ -10,8 +10,11 @@ use Rector\Php70\Rector\StaticCall\StaticCallOnNonStaticToInstanceCallRector;
 use Rector\Php83\Rector\ClassMethod\AddOverrideAttributeToOverriddenMethodsRector;
 use Rector\TypeDeclaration\Rector\ArrowFunction\AddArrowFunctionReturnTypeRector;
 use RectorLaravel\Rector\Class_\AddHasFactoryToModelsRector;
+use RectorLaravel\Rector\Class_\AppendsPropertyToAppendsAttributeRector;
+use RectorLaravel\Rector\Class_\FillablePropertyToFillableAttributeRector;
 use RectorLaravel\Rector\Class_\ModelCastsPropertyToCastsMethodRector;
 use RectorLaravel\Rector\Class_\ReplaceExpectsMethodsInTestsRector;
+use RectorLaravel\Rector\Class_\TablePropertyToTableAttributeRector;
 use RectorLaravel\Rector\Coalesce\ApplyDefaultInsteadOfNullCoalesceRector;
 use RectorLaravel\Rector\Empty_\EmptyToBlankAndFilledFuncRector;
 use RectorLaravel\Rector\FuncCall\ConfigToTypedConfigMethodCallRector;
@@ -73,7 +76,7 @@ return RectorConfig::configure()
         LaravelSetList::LARAVEL_FACTORIES,
         LaravelSetList::LARAVEL_IF_HELPERS,
         LaravelSetList::LARAVEL_TESTING,
-        LaravelSetList::LARAVEL_TYPE_DECLARATIONS,
+        LaravelSetList::LARAVEL_130,
     ])
     ->withSkip([
         AddOverrideAttributeToOverriddenMethodsRector::class,
@@ -82,4 +85,7 @@ return RectorConfig::configure()
         AddArrowFunctionReturnTypeRector::class,
         StaticCallOnNonStaticToInstanceCallRector::class,
         AddHasFactoryToModelsRector::class,
+        FillablePropertyToFillableAttributeRector::class,
+        TablePropertyToTableAttributeRector::class,
+        AppendsPropertyToAppendsAttributeRector::class,
     ]);
