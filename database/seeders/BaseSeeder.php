@@ -20,45 +20,50 @@ use Illuminate\Support\Facades\Hash;
 
 class BaseSeeder extends Seeder
 {
-    /**
-     * Run the database seeds.
-     */
     public function run(): void
     {
-        $user = User::factory()
+        $admin = User::factory()
             ->create([
-                'username' => 'admin',
-                'name' => 'admin',
+                'username' => 'danielhe4rt',
+                'name' => 'Daniel Reis',
                 'email' => 'admin@admin.com',
                 'password' => Hash::make('admin'),
             ]);
 
-        Information::factory()->recycle($user)->create();
-        Address::factory()->recycle($user)->create();
+        Information::factory()->recycle($admin)->create();
+        Address::factory()->recycle($admin)->create();
 
-        $tenant = Tenant::factory()
-            ->for($user, 'owner')
-            ->afterCreating(fn (Tenant $tenant) => $tenant->members()->attach($user))
+        $he4rt = Tenant::factory()
+            ->for($admin, 'owner')
+            ->afterCreating(fn (Tenant $tenant) => $tenant->members()->attach($admin))
             ->withDiscordProvider('1442327864052547656')
             ->create([
                 'name' => 'He4rt Developers',
                 'slug' => 'he4rt',
             ]);
 
+        Tenant::factory()
+            ->for($admin, 'owner')
+            ->afterCreating(fn (Tenant $tenant) => $tenant->members()->attach($admin))
+            ->create([
+                'name' => '3 Pontos',
+                'slug' => '3pontos',
+            ]);
+
         Character::factory()
-            ->recycle($user)
-            ->recycle($tenant)
+            ->recycle($admin)
+            ->recycle($he4rt)
             ->createOne();
 
         EventModel::factory()
             ->withStatus()
-            ->recycle($tenant)
+            ->recycle($he4rt)
             ->create([
                 'end_at' => Date::tomorrow(),
             ]);
 
         Season::factory()
-            ->recycle($tenant)
+            ->recycle($he4rt)
             ->create([
                 'name' => 'Season 1',
                 'started_at' => now()->subMonth(),
@@ -66,17 +71,18 @@ class BaseSeeder extends Seeder
             ]);
 
         ExternalIdentity::factory()
-            ->recycle($user)
-            ->recycle($tenant)
+            ->recycle($admin)
+            ->recycle($he4rt)
             ->count(2)
-            ->create(['metadata' => ['email' => $user->email, 'username' => $user->username]]);
+            ->create(['email' => $admin->email]);
+
         Meeting::factory()
             ->count(2)
-            ->recycle($tenant)
+            ->recycle($he4rt)
             ->create();
 
         Message::factory()
-            ->recycle($tenant)
+            ->recycle($he4rt)
             ->count(2)
             ->create();
     }

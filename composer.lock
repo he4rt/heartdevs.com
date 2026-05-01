@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "dfe7cfd7cec720c22f478d583b3e6d8d",
+    "content-hash": "a1507696cd7672fc8615477b71dd341e",
     "packages": [
         {
             "name": "blade-ui-kit/blade-heroicons",
@@ -3480,6 +3480,42 @@
             "autoload-dev": {
                 "psr-4": {
                     "He4rt\\IntegrationTwitch\\Tests\\": "tests/"
+                }
+            },
+            "license": [
+                "proprietary"
+            ],
+            "transport-options": {
+                "symlink": true,
+                "relative": true
+            }
+        },
+        {
+            "name": "he4rt/panel-admin",
+            "version": "1.0",
+            "dist": {
+                "type": "path",
+                "url": "app-modules/panel-admin",
+                "reference": "24bad248d7ef6e839a58fbc1cb4d64dee2200f9f"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "He4rt\\PanelAdmin\\PanelAdminServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "He4rt\\PanelAdmin\\": "src/",
+                    "He4rt\\PanelAdmin\\Database\\Factories\\": "database/factories/",
+                    "He4rt\\PanelAdmin\\Database\\Seeders\\": "database/seeders/"
+                }
+            },
+            "autoload-dev": {
+                "psr-4": {
+                    "He4rt\\PanelAdmin\\Tests\\": "tests/"
                 }
             },
             "license": [
