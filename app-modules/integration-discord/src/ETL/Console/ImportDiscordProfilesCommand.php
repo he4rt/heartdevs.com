@@ -240,7 +240,7 @@ class ImportDiscordProfilesCommand extends Command
 
     private function renderBox(ConsoleSectionOutput $section, string $title, int $current, int $max): void
     {
-        $cols = (new Terminal())->getWidth();
+        $cols = new Terminal()->getWidth();
         $width = max(20, min(60, $cols - 6));
 
         $title = mb_strimwidth($title, 0, $width - 2, '...');

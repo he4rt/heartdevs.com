@@ -298,7 +298,7 @@ class FetchDiscordProfiles extends Command
                 continue;
             }
 
-            [$id, $status, $updatedAt] = str_getcsv($line);
+            [$id, $status, $updatedAt] = str_getcsv($line, escape: '\\');
             $map[$id] = ['status' => $status, 'updated_at' => $updatedAt];
         }
 

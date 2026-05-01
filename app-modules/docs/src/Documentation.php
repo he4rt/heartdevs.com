@@ -57,7 +57,7 @@ class Documentation
             if ($this->files->exists($path)) {
                 return static::replaceLinks(
                     $version,
-                    (new GithubFlavoredMarkdownConverter())->convert($this->files->get($path))
+                    new GithubFlavoredMarkdownConverter()->convert($this->files->get($path))
                 );
             }
 
@@ -78,7 +78,7 @@ class Documentation
             if ($this->files->exists($path)) {
                 $content = $this->files->get($path);
 
-                $htmlContent = (new GithubFlavoredMarkdownConverter())->convert($content);
+                $htmlContent = new GithubFlavoredMarkdownConverter()->convert($content);
 
                 return [
                     'content' => static::replaceLinks($version, $htmlContent),

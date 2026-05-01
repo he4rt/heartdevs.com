@@ -79,7 +79,7 @@ class DocsController extends Controller
             abort(404, 'Page not found. Tried versions: '.$otherVersions->implode(', '));
         }
 
-        $title = (new Crawler($payload['content']))->filterXPath('//h1');
+        $title = new Crawler($payload['content'])->filterXPath('//h1');
 
         $section = '';
 

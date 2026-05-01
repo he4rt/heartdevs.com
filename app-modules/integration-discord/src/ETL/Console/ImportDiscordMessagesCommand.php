@@ -350,7 +350,7 @@ class ImportDiscordMessagesCommand extends Command
 
     private function renderBox(ConsoleSectionOutput $section, string $title, int $current, int $max): void
     {
-        $cols = (new Terminal())->getWidth();
+        $cols = new Terminal()->getWidth();
         $width = max(20, min(60, $cols - 6));
 
         $title = mb_strimwidth($title, 0, $width - 2, '...');
@@ -448,13 +448,8 @@ class ImportDiscordMessagesCommand extends Command
             $channelDirs,
             static function (string $dir) use ($needles): bool {
                 $name = basename($dir);
-                foreach ($needles as $needle) {
-                    if (str_contains($name, $needle)) {
-                        return true;
-                    }
-                }
 
-                return false;
+                return array_any($needles, fn ($needle) => str_contains($name, $needle));
             },
         ));
     }

@@ -30,7 +30,7 @@ abstract class AbstractSlashCommand extends SlashCommand
 
         $this->beforePipeline($interaction);
 
-        return (new Pipeline($this->bot()->app))
+        return new Pipeline($this->bot()->app)
             ->send($context)
             ->through($this->getMiddleware())
             ->then(fn (Context $context) => $this->resolveHandler([
