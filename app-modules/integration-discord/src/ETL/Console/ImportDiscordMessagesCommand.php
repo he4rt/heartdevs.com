@@ -41,6 +41,8 @@ class ImportDiscordMessagesCommand extends Command
         ImportDiscordVoiceLogAction $voiceAction,
         ImportDiscordModerationEventAction $moderationAction,
     ): int {
+        DB::disableQueryLog();
+
         $tenant = Tenant::query()->where('slug', 'he4rt')->first();
 
         if (!$tenant) {
@@ -129,28 +131,39 @@ class ImportDiscordMessagesCommand extends Command
                         DiscordMessageDTO::fromDump(...),
                         array_values(array_filter($messages, is_array(...))),
                     );
+
+                    if ($limit !== null) {
+                        $remaining = $limit - $stats['messages'];
+                        $dtos = array_slice($dtos, 0, $remaining);
+                    }
+
                     $identityCache = $messageAction->prewarm($dtos, $tenantId, $identityCache);
                     $replyCache = $messageAction->prewarmReplyTargets($dtos, $tenantId);
 
                     DB::transaction(function () use (
-                        $messages, $messageAction, $reactionsAction, $voiceAction, $moderationAction,
-                        $tenantId, $channelMap, $channelName, $limit, &$stats, &$errorSamples, $identityCache, $replyCache,
+                        $messages, $dtos, $messageAction, $reactionsAction, $voiceAction, $moderationAction,
+                        $tenantId, $channelMap, $channelName, &$stats, &$errorSamples, $identityCache, $replyCache,
                     ): void {
+                        DB::statement('SET LOCAL synchronous_commit = off');
+
+                        $stubs = $messageAction->handleBatch($dtos, $tenantId, $identityCache, $replyCache);
+                        $stats['messages'] += count($stubs);
+
                         foreach ($messages as $raw) {
-                            if ($limit !== null && $stats['messages'] >= $limit) {
-                                return;
+                            if (!is_array($raw) || !isset($raw['id'], $stubs[$raw['id']])) {
+                                continue;
                             }
 
                             try {
-                                $this->processMessage(
-                                    $raw, $messageAction, $reactionsAction, $voiceAction, $moderationAction,
-                                    $tenantId, $channelMap, $stats, $identityCache, $replyCache,
+                                $this->processSubEntities(
+                                    $raw, $stubs[$raw['id']], $reactionsAction, $voiceAction, $moderationAction,
+                                    $tenantId, $channelMap, $stats,
                                 );
                             } catch (Throwable $e) {
                                 $stats['errors']++;
                                 $context = [
                                     'channel' => $channelName,
-                                    'message_id' => $raw['id'] ?? null,
+                                    'message_id' => $raw['id'],
                                     'class' => $e::class,
                                     'message' => $e->getMessage(),
                                 ];
@@ -215,25 +228,17 @@ class ImportDiscordMessagesCommand extends Command
      * @param  array<string, mixed>  $raw
      * @param  array<string, string>  $channelMap
      * @param  array<string, int>  $stats
-     * @param  array<string, string>  $identityCache
-     * @param  array<string, string>  $replyCache
      */
-    private function processMessage(
+    private function processSubEntities(
         array $raw,
-        ImportDiscordMessageAction $messageAction,
+        Message $message,
         ImportDiscordReactionsAction $reactionsAction,
         ImportDiscordVoiceLogAction $voiceAction,
         ImportDiscordModerationEventAction $moderationAction,
         int $tenantId,
         array $channelMap,
         array &$stats,
-        array $identityCache = [],
-        array $replyCache = [],
     ): void {
-        $dto = DiscordMessageDTO::fromDump($raw);
-        $message = $messageAction->handle($dto, $tenantId, $identityCache[$dto->authorDiscordId] ?? null, $replyCache);
-        $stats['messages']++;
-
         $reactions = DiscordMessageReactionDTO::fromDumpMessage($raw);
         if ($reactions !== []) {
             $reactionsAction->handle($message, $reactions, $tenantId);

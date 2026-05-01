@@ -58,6 +58,68 @@ final class ImportDiscordMessageAction
     }
 
     /**
+     * @param  list<DiscordMessageDTO>  $dtos
+     * @param  array<string, string>  $identityCache
+     * @param  array<string, string>  $replyCache
+     * @return array<string, Message> discordMessageId => Message stub
+     */
+    public function handleBatch(array $dtos, int $tenantId, array $identityCache, array $replyCache): array
+    {
+        $adapter = IdentityProvider::Discord->getMessageAdapter();
+        $now = now();
+        $rows = [];
+        /** @var array<string, Message> */
+        $stubs = [];
+
+        foreach ($dtos as $dto) {
+            $id = (string) Uuid::uuid4();
+            $identityId = $identityCache[$dto->authorDiscordId] ?? $this->resolveAuthorIdentity($dto, $tenantId)->id;
+
+            $row = $dto->toDatabase([
+                'id' => $id,
+                'tenant_id' => $tenantId,
+                'external_identity_id' => $identityId,
+                'obtained_experience' => 0,
+                ...$this->extractProviderSignals($dto, $adapter),
+                'reply_to_message_id' => $this->resolveReplyTargetId($dto, $adapter, $replyCache),
+                'created_at' => $now,
+                'updated_at' => $now,
+            ]);
+
+            if (is_array($row['metadata'])) {
+                $row['metadata'] = json_encode($row['metadata'], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+            }
+
+            $rows[] = $row;
+
+            $stub = (new Message)->forceFill([
+                'id' => $id,
+                'provider_message_id' => $dto->discordMessageId,
+                'external_identity_id' => $identityId,
+            ]);
+            $stub->exists = true;
+            $stubs[$dto->discordMessageId] = $stub;
+        }
+
+        if ($rows !== []) {
+            Message::query()->insert($rows);
+        }
+
+        if ($adapter instanceof MessageActivityAdapter) {
+            foreach ($dtos as $dto) {
+                $stub = $stubs[$dto->discordMessageId];
+                $this->syncMentions($stub, $dto, $tenantId, $adapter);
+                $this->syncThread($stub, $dto, $tenantId, $adapter);
+                $this->syncAttachments($stub, $dto, $tenantId, $adapter);
+                $this->syncEmbeds($stub, $dto, $tenantId, $adapter);
+                $this->syncMembershipEvent($stub, $dto, $tenantId, $adapter);
+            }
+        }
+
+        return $stubs;
+    }
+
+    /**
      * Pre-resolve Discord author identities in bulk. Returns a cache map
      * `discord_id => external_identity_id` ready to be passed to handle().
      *
@@ -390,11 +452,18 @@ final class ImportDiscordMessageAction
             $dto->authorDiscordId,
         ];
 
+        $takenNames = User::query()
+            ->whereIn('name', $candidates)
+            ->pluck('name')
+            ->flip()
+            ->all();
+
         foreach ($candidates as $name) {
+            if (isset($takenNames[$name])) {
+                continue;
+            }
+
             try {
-                // Wrap each attempt in its own (possibly nested) transaction so that a
-                // UNIQUE violation on `name` rolls back a SAVEPOINT instead of poisoning
-                // the caller's transaction — lets us try the next candidate safely.
                 return DB::transaction(fn (): User => User::query()->create([
                     'id' => Uuid::uuid4()->toString(),
                     'username' => $dto->authorUsername,
@@ -406,8 +475,6 @@ final class ImportDiscordMessageAction
                 if ($raced instanceof User) {
                     return $raced;
                 }
-
-                // name collided — try next candidate
             }
         }
 
