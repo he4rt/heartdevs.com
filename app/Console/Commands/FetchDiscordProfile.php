@@ -18,10 +18,10 @@ class FetchDiscordProfile extends Command
     public function handle(): void
     {
         $userId = $this->argument('user_id');
-        $token = $this->option('token') ?: 'xxx';
+        $token = $this->option('token');
 
-        if (!$token) {
-            $this->error('Provide a token via --token or set DISCORD_USER_TOKEN in .env');
+        if (!is_string($token) || $token === '') {
+            $this->error('Provide a token via --token');
 
             return;
         }

@@ -174,7 +174,7 @@ class ImportDiscordMessagesCommand extends Command
 
                     $rawById = [];
                     foreach ($messages as $raw) {
-                        if (is_array($raw) && isset($raw['id'])) {
+                        if (isset($raw['id'])) {
                             $rawById[(string) $raw['id']] = $raw;
                         }
                     }
@@ -381,7 +381,7 @@ class ImportDiscordMessagesCommand extends Command
     {
         $unique = [];
         foreach ($messages as $m) {
-            if (is_array($m) && isset($m['id'])) {
+            if (isset($m['id'])) {
                 $unique[(string) $m['id']] = $m;
             }
         }

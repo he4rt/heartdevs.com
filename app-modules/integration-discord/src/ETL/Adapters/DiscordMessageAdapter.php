@@ -36,11 +36,11 @@ final class DiscordMessageAdapter implements MessageActivityAdapter
 
     public function sourceKind(array $raw): MessageSourceKind
     {
-        if (isset($raw['webhook_id']) && $raw['webhook_id'] !== null && $raw['webhook_id'] !== '') {
+        if (isset($raw['webhook_id']) && $raw['webhook_id'] !== '') {
             return MessageSourceKind::Webhook;
         }
 
-        if (isset($raw['application_id']) && $raw['application_id'] !== null && $raw['application_id'] !== '') {
+        if (isset($raw['application_id']) && $raw['application_id'] !== '') {
             return MessageSourceKind::App;
         }
 

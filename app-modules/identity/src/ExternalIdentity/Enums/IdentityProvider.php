@@ -88,7 +88,6 @@ enum IdentityProvider: string implements HasColor, HasDescription, HasIcon, HasL
             self::AmazonMusic => Color::Orange,
             self::Bungie => Color::Yellow,
             self::Ebay => Color::Blue,
-            default => Color::Gray,
         };
     }
 
@@ -122,7 +121,6 @@ enum IdentityProvider: string implements HasColor, HasDescription, HasIcon, HasL
             self::AmazonMusic => 'fab-amazon',
             self::Bungie => 'heroicon-o-sparkles',
             self::Ebay => 'heroicon-o-sparkles',
-            default => 'heroicon-o-link',
         };
     }
 
@@ -161,7 +159,6 @@ enum IdentityProvider: string implements HasColor, HasDescription, HasIcon, HasL
             self::AmazonMusic => 'Conecte sua conta do Amazon Music.',
             self::Bungie => 'Conecte sua conta da Bungie.',
             self::Ebay => 'Conecte sua conta do eBay.',
-            default => sprintf('Conta conectada via %s.', $this->label()),
         };
     }
 

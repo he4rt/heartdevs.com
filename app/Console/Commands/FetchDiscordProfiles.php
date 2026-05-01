@@ -44,10 +44,10 @@ class FetchDiscordProfiles extends Command
 
     public function handle(): void
     {
-        $token = $this->option('token') ?: env('DISCORD_USER_TOKEN');
+        $token = $this->option('token') ?: config('he4rt.discord.user_token');
 
-        if (!$token) {
-            error('Discord user token not provided. Use --token or set DISCORD_USER_TOKEN in .env');
+        if (!is_string($token) || $token === '') {
+            error('Discord user token not provided. Use --token or set he4rt.discord.user_token in config.');
 
             return;
         }
@@ -64,8 +64,11 @@ class FetchDiscordProfiles extends Command
         intro('Discord Profile Scraper');
 
         // Load members
-        $membersData = json_decode((string) Storage::disk('local')->get($membersFile), true);
-        $allIds = array_map(fn (array $m) => (string) $m['user']['id'], $membersData['members'] ?? []);
+        /** @var array<string, mixed> $membersData */
+        $membersData = (array) json_decode((string) Storage::disk('local')->get($membersFile), true);
+        /** @var list<array<string, mixed>> $members */
+        $members = is_array($membersData['members'] ?? null) ? $membersData['members'] : [];
+        $allIds = array_map(static fn (array $m): string => (string) ($m['user']['id'] ?? ''), $members);
 
         info('Loaded '.count($allIds).' member IDs from '.$membersFile);
 
@@ -109,7 +112,13 @@ class FetchDiscordProfiles extends Command
         // Show current state
         table(
             headers: ['Total Tracked', 'Success', 'Failed', 'Waiting', 'This Run'],
-            rows: [[count($statusMap), $totalSuccess, $totalFailed, $totalWaiting, count($pending)]],
+            rows: [[
+                (string) count($statusMap),
+                (string) $totalSuccess,
+                (string) $totalFailed,
+                (string) $totalWaiting,
+                (string) count($pending),
+            ]],
         );
 
         if ($pending === []) {
@@ -149,7 +158,8 @@ class FetchDiscordProfiles extends Command
 
                         $username = $profile['user']['username'] ?? '?';
                         $globalName = $profile['user']['global_name'] ?? $username;
-                        $accounts = $profile['connected_accounts'] ?? [];
+                        /** @var list<array<string, mixed>> $accounts */
+                        $accounts = is_array($profile['connected_accounts'] ?? null) ? $profile['connected_accounts'] : [];
                         $github = collect($accounts)->firstWhere('type', 'github');
                         $connTypes = collect($accounts)->pluck('type')->implode(', ') ?: 'none';
 
@@ -193,11 +203,11 @@ class FetchDiscordProfiles extends Command
         table(
             headers: ['Metric', 'This Run', 'Overall'],
             rows: [
-                ['Profiles fetched', $this->successCount, $totalSuccess],
-                ['Failed', $this->failCount, $totalFailed],
-                ['Remaining', '', $totalWaiting],
-                ['GitHub found', $this->githubCount, ''],
-                ['Rate limits hit', $this->rateLimitHits, ''],
+                ['Profiles fetched', (string) $this->successCount, (string) $totalSuccess],
+                ['Failed', (string) $this->failCount, (string) $totalFailed],
+                ['Remaining', '', (string) $totalWaiting],
+                ['GitHub found', (string) $this->githubCount, ''],
+                ['Rate limits hit', (string) $this->rateLimitHits, ''],
             ],
         );
 
@@ -208,6 +218,9 @@ class FetchDiscordProfiles extends Command
         outro('Done! Profiles saved to storage/app/private/discord/profiles_chunk_*.json');
     }
 
+    /**
+     * @return array<string, mixed>|null
+     */
     private function fetchProfile(string $token, string|int $userId, string $guildId): ?array
     {
         $maxRetries = 3;
@@ -241,6 +254,9 @@ class FetchDiscordProfiles extends Command
         return null;
     }
 
+    /**
+     * @param  array<string, mixed>  $profile
+     */
     private function appendToChunk(string|int $discordId, array $profile, int $currentSuccessTotal): void
     {
         $chunkIndex = (int) floor($currentSuccessTotal / self::CHUNK_SIZE);
@@ -260,6 +276,9 @@ class FetchDiscordProfiles extends Command
         );
     }
 
+    /**
+     * @return array<string, array{status: string, updated_at: string}>
+     */
     private function loadStatusCsv(): array
     {
         $map = [];
@@ -286,6 +305,9 @@ class FetchDiscordProfiles extends Command
         return $map;
     }
 
+    /**
+     * @param  array<string, array{status: string, updated_at: string}>  $statusMap
+     */
     private function saveStatusCsv(array $statusMap): void
     {
         $csv = "discord_id,status,updated_at\n";

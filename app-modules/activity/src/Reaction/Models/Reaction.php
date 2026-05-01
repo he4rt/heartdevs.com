@@ -10,6 +10,18 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 
+/**
+ * @property string $id
+ * @property int $tenant_id
+ * @property string $reactable_type
+ * @property string $reactable_id
+ * @property string $emoji_key
+ * @property string|null $emoji_id
+ * @property string|null $emoji_name
+ * @property int $count
+ * @property int $count_burst
+ * @property int $count_normal
+ */
 final class Reaction extends Model
 {
     use HasUuids;

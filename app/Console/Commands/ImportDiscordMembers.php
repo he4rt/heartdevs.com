@@ -125,7 +125,7 @@ class ImportDiscordMembers extends Command
             $githubUsername = $githubMap[$discordId] ?? null;
 
             if ($githubUsername && $user) {
-                $info = $user?->information;
+                $info = $user->information;
                 $currentGithub = $info?->github_url;
 
                 if (!$currentGithub || $force) {

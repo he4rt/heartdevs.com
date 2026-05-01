@@ -64,7 +64,7 @@ final readonly class DiscordMessageReactionDTO
         }
 
         return new self(
-            emojiId: isset($emoji['id']) && $emoji['id'] !== null ? (string) $emoji['id'] : null,
+            emojiId: isset($emoji['id']) ? (string) $emoji['id'] : null,
             emojiName: $name,
             count: (int) ($raw['count'] ?? 0),
             countBurst: (int) ($raw['count_details']['burst'] ?? 0),

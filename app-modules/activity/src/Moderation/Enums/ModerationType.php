@@ -30,7 +30,7 @@ enum ModerationType: string implements HasColor, HasLabel
         };
     }
 
-    public function getColor(): string|array
+    public function getColor(): string
     {
         return match ($this) {
             self::Ban, self::Kick => 'danger',

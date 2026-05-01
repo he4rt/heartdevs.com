@@ -95,9 +95,9 @@ class AnalyzeDiscordProfiles extends Command
         table(
             headers: ['Metric', 'Count', '%'],
             rows: [
-                ['Total profiles', $totalProfiles, '100%'],
-                ['With connections', $withConnections, $pctWith.'%'],
-                ['No connections', $noConnections, round(100 - $pctWith, 1).'%'],
+                ['Total profiles', (string) $totalProfiles, '100%'],
+                ['With connections', (string) $withConnections, $pctWith.'%'],
+                ['No connections', (string) $noConnections, round(100 - $pctWith, 1).'%'],
             ],
         );
 
@@ -105,7 +105,7 @@ class AnalyzeDiscordProfiles extends Command
         $socialRows = [];
         foreach ($socialCounts as $type => $count) {
             $pct = round($count / $totalProfiles * 100, 1);
-            $socialRows[] = [$type, $count, $pct.'%'];
+            $socialRows[] = [(string) $type, (string) $count, $pct.'%'];
         }
 
         info('Connected accounts by platform');
@@ -128,7 +128,10 @@ class AnalyzeDiscordProfiles extends Command
 
             table(
                 headers: ['Name', 'Username', '#', 'Platforms'],
-                rows: array_map(fn (array $c) => [$c['name'], $c['username'], $c['count'], $c['types']], $topConnectors),
+                rows: array_map(
+                    static fn (array $c): array => [(string) $c['name'], (string) $c['username'], (string) $c['count'], $c['types']],
+                    $topConnectors,
+                ),
             );
         }
 

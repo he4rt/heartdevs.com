@@ -24,6 +24,7 @@ class CommunityReport extends Command
 
     protected $description = 'Generate a comprehensive community analytics report';
 
+    /** @var array<string, mixed> */
     private array $report = [];
 
     public function handle(): void
@@ -783,11 +784,11 @@ class CommunityReport extends Command
                 info('Live Top 10 by XP (from characters table)');
                 table(
                     headers: ['#', 'Username', 'XP', 'Reputation'],
-                    rows: $liveTop->values()->map(fn ($r, $i) => [
-                        $i + 1,
-                        $r->username,
-                        number_format($r->experience),
-                        number_format($r->reputation),
+                    rows: $liveTop->values()->map(static fn ($r, int $i): array => [
+                        (string) ($i + 1),
+                        (string) $r->username,
+                        number_format((int) $r->experience),
+                        number_format((int) $r->reputation),
                     ])->all(),
                 );
             }
@@ -811,9 +812,13 @@ class CommunityReport extends Command
             return;
         }
 
-        $membersData = json_decode((string) Storage::disk('local')->get('discord/members.json'), true);
-        $scrapedDiscordIds = collect($membersData['members'] ?? [])
-            ->map(fn ($m) => $m['user']['id'])
+        /** @var array<string, mixed> $membersData */
+        $membersData = (array) json_decode((string) Storage::disk('local')->get('discord/members.json'), true);
+        /** @var list<array<string, mixed>> $members */
+        $members = is_array($membersData['members'] ?? null) ? $membersData['members'] : [];
+        $scrapedDiscordIds = collect($members)
+            ->map(static fn (array $m): string => (string) ($m['user']['id'] ?? ''))
+            ->filter(static fn (string $id): bool => $id !== '')
             ->unique()
             ->values();
 
@@ -850,8 +855,11 @@ class CommunityReport extends Command
         $githubReport = ['skipped' => true];
 
         if (Storage::disk('local')->exists('discord/github_connections.json')) {
-            $githubData = json_decode((string) Storage::disk('local')->get('discord/github_connections.json'), true);
-            $githubConnections = collect($githubData['connections'] ?? []);
+            /** @var array<string, mixed> $githubData */
+            $githubData = (array) json_decode((string) Storage::disk('local')->get('discord/github_connections.json'), true);
+            /** @var list<array<string, mixed>> $connections */
+            $connections = is_array($githubData['connections'] ?? null) ? $githubData['connections'] : [];
+            $githubConnections = collect($connections);
 
             info('GitHub connections from scrape: '.$githubConnections->count());
 

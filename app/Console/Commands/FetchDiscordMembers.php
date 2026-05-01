@@ -105,6 +105,10 @@ class FetchDiscordMembers extends Command
         $this->info('Done! Saved '.count($members).sprintf(' members to storage/app/private/discord/members.json (skipped %d bots)', $botCount));
     }
 
+    /**
+     * @param  array<string, mixed>  $query
+     * @return array<int|string, mixed>
+     */
     private function discordGet(string $token, string $endpoint, array $query = []): array
     {
         retry:
