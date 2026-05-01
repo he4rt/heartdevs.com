@@ -3075,13 +3075,13 @@
             "dist": {
                 "type": "path",
                 "url": "app-modules/activity",
-                "reference": "18c4a84e1631474556628b904dc71234b75ee7a0"
+                "reference": "6f47fbd1735df0c7a357fcbbaeb62f75d4f87359"
             },
             "type": "library",
             "extra": {
                 "laravel": {
                     "providers": [
-                        "He4rt\\Activity\\Providers\\ActivityServiceProvider"
+                        "He4rt\\Activity\\ActivityServiceProvider"
                     ]
                 }
             },
@@ -3111,13 +3111,13 @@
             "dist": {
                 "type": "path",
                 "url": "app-modules/bot-discord",
-                "reference": "05f832aad48ed907ab7ee56985c2dc4e59ca512e"
+                "reference": "f0b37c36ff96f09d11efda00562148765c9e0844"
             },
             "type": "library",
             "extra": {
                 "laravel": {
                     "providers": [
-                        "He4rt\\BotDiscord\\Providers\\BotDiscordServiceProvider"
+                        "He4rt\\BotDiscord\\BotDiscordServiceProvider"
                     ]
                 }
             },
@@ -3145,13 +3145,13 @@
             "dist": {
                 "type": "path",
                 "url": "app-modules/community",
-                "reference": "4d901edbf2e0e01eb495a57afb95d9de706f5459"
+                "reference": "fbfe830d8ba4cabdad48a59ab2c15770d097cdac"
             },
             "type": "library",
             "extra": {
                 "laravel": {
                     "providers": [
-                        "He4rt\\Community\\Providers\\CommunityServiceProvider"
+                        "He4rt\\Community\\CommunityServiceProvider"
                     ]
                 }
             },
@@ -3215,13 +3215,13 @@
             "dist": {
                 "type": "path",
                 "url": "app-modules/economy",
-                "reference": "da9eea2ac6924c075cc06f72f40ff0939e901519"
+                "reference": "42527108c63f20a2f26123e0159763d0be5df87b"
             },
             "type": "library",
             "extra": {
                 "laravel": {
                     "providers": [
-                        "He4rt\\Economy\\Providers\\EconomyServiceProvider"
+                        "He4rt\\Economy\\EconomyServiceProvider"
                     ]
                 }
             },
@@ -3251,22 +3251,26 @@
             "dist": {
                 "type": "path",
                 "url": "app-modules/events",
-                "reference": "c54f6839f91b5c8e03521a824b652bcbddd25caa"
+                "reference": "781fb24cba4bff8eed15b26d2964adf4f625a0a8"
             },
             "type": "library",
             "extra": {
                 "laravel": {
                     "providers": [
-                        "He4rt\\Events\\Providers\\EventsServiceProvider"
+                        "He4rt\\Events\\EventsServiceProvider"
                     ]
                 }
             },
             "autoload": {
                 "psr-4": {
                     "He4rt\\Events\\": "src/",
-                    "He4rt\\Events\\Tests\\": "tests/",
                     "He4rt\\Events\\Database\\Factories\\": "database/factories/",
                     "He4rt\\Events\\Database\\Seeders\\": "database/seeders/"
+                }
+            },
+            "autoload-dev": {
+                "psr-4": {
+                    "He4rt\\Events\\Tests\\": "tests/"
                 }
             },
             "license": [
@@ -3283,13 +3287,13 @@
             "dist": {
                 "type": "path",
                 "url": "app-modules/gamification",
-                "reference": "a67b863bbe513c73010b022d5eba8c86c01c0309"
+                "reference": "7ad03c485e9ebc39779174a027498bbff456f6ec"
             },
             "type": "library",
             "extra": {
                 "laravel": {
                     "providers": [
-                        "He4rt\\Gamification\\Providers\\GamificationServiceProvider"
+                        "He4rt\\Gamification\\GamificationServiceProvider"
                     ]
                 }
             },
@@ -3319,13 +3323,13 @@
             "dist": {
                 "type": "path",
                 "url": "app-modules/he4rt",
-                "reference": "c2dae2577742891fc5268261792efc1cb0e4d14a"
+                "reference": "57b337ad69c6f649e1bb3b353e3037fd4459f617"
             },
             "type": "library",
             "extra": {
                 "laravel": {
                     "providers": [
-                        "He4rt\\Core\\Providers\\He4rtServiceProvider"
+                        "He4rt\\Core\\He4rtServiceProvider"
                     ]
                 }
             },
@@ -3348,13 +3352,13 @@
             "dist": {
                 "type": "path",
                 "url": "app-modules/identity",
-                "reference": "13853266b526b6551d32bd3715be4f96abdf2ca9"
+                "reference": "649c67dbdd559cc5ab1a462ffe36cf25b8f0de9b"
             },
             "type": "library",
             "extra": {
                 "laravel": {
                     "providers": [
-                        "He4rt\\Identity\\Providers\\IdentityServiceProvider"
+                        "He4rt\\Identity\\IdentityServiceProvider"
                     ]
                 }
             },
@@ -3384,13 +3388,13 @@
             "dist": {
                 "type": "path",
                 "url": "app-modules/integration-devto",
-                "reference": "a9cf00d0b0777707ad38d67337be8b7265bbdd68"
+                "reference": "b8c3771cfd5bd698ff7030a92090fa005403fda8"
             },
             "type": "library",
             "extra": {
                 "laravel": {
                     "providers": [
-                        "He4rt\\IntegrationDevTo\\Providers\\IntegrationDevToServiceProvider"
+                        "He4rt\\IntegrationDevTo\\IntegrationDevToServiceProvider"
                     ]
                 }
             },
@@ -3420,13 +3424,13 @@
             "dist": {
                 "type": "path",
                 "url": "app-modules/integration-discord",
-                "reference": "c85e828a1a0db08fad2eaf70bba86f917cdb5a65"
+                "reference": "fa4e0c456d4ecfcd298bc70cdc7b98cd6fbaaa67"
             },
             "type": "library",
             "extra": {
                 "laravel": {
                     "providers": [
-                        "He4rt\\IntegrationDiscord\\Providers\\IntegrationDiscordServiceProvider"
+                        "He4rt\\IntegrationDiscord\\IntegrationDiscordServiceProvider"
                     ]
                 }
             },
@@ -3456,13 +3460,13 @@
             "dist": {
                 "type": "path",
                 "url": "app-modules/integration-twitch",
-                "reference": "32fc9645cffd54c6e401c12c6f1cae12064b50a1"
+                "reference": "d84675d9e5ef87842e819789e9b8a3b9780bc651"
             },
             "type": "library",
             "extra": {
                 "laravel": {
                     "providers": [
-                        "He4rt\\IntegrationTwitch\\Providers\\IntegrationTwitchServiceProvider"
+                        "He4rt\\IntegrationTwitch\\IntegrationTwitchServiceProvider"
                     ]
                 }
             },
@@ -3492,13 +3496,13 @@
             "dist": {
                 "type": "path",
                 "url": "app-modules/portal",
-                "reference": "813d926f6b0d5555890959f51b4c37af6d2c6675"
+                "reference": "289230f39053d3339ee643d7b32cf3be89f6d94e"
             },
             "type": "library",
             "extra": {
                 "laravel": {
                     "providers": [
-                        "He4rt\\Portal\\Providers\\PortalServiceProvider"
+                        "He4rt\\Portal\\PortalServiceProvider"
                     ]
                 }
             },

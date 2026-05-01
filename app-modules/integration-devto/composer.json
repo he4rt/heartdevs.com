@@ -21,7 +21,7 @@
     "extra": {
         "laravel": {
             "providers": [
-                "He4rt\\IntegrationDevTo\\Providers\\IntegrationDevToServiceProvider"
+                "He4rt\\IntegrationDevTo\\IntegrationDevToServiceProvider"
             ]
         }
     }

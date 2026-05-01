@@ -21,7 +21,7 @@
     "extra": {
         "laravel": {
             "providers": [
-                "He4rt\\Gamification\\Providers\\GamificationServiceProvider"
+                "He4rt\\Gamification\\GamificationServiceProvider"
             ]
         }
     }

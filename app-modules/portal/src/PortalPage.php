@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace He4rt\Portal\Providers;
+namespace He4rt\Portal;
 
 use Filament\Pages\Dashboard;
 use Filament\Support\Enums\Width;

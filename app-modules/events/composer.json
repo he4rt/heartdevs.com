@@ -21,7 +21,7 @@
     "extra": {
         "laravel": {
             "providers": [
-                "He4rt\\Events\\Providers\\EventsServiceProvider"
+                "He4rt\\Events\\EventsServiceProvider"
             ]
         }
     }

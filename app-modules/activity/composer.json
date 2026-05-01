@@ -21,7 +21,7 @@
     "extra": {
         "laravel": {
             "providers": [
-                "He4rt\\Activity\\Providers\\ActivityServiceProvider"
+                "He4rt\\Activity\\ActivityServiceProvider"
             ]
         }
     }

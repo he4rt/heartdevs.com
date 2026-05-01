@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace He4rt\IntegrationTwitch\Providers;
+namespace He4rt\IntegrationTwitch;
 
 use He4rt\IntegrationTwitch\Client\TwitchBaseClient;
 use He4rt\IntegrationTwitch\Contracts\TwitchService;

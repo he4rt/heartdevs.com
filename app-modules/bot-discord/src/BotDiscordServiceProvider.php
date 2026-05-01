@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace He4rt\BotDiscord\Providers;
+namespace He4rt\BotDiscord;
 
 use Laracord\Laracord;
 use Laracord\LaracordServiceProvider;
@@ -13,7 +13,7 @@ class BotDiscordServiceProvider extends LaracordServiceProvider
     {
         parent::register();
 
-        $this->mergeConfigFrom(__DIR__.'/../../config/bot-discord.php', 'bot-discord');
+        $this->mergeConfigFrom(__DIR__.'/../config/bot-discord.php', 'bot-discord');
     }
 
     public function boot(): void
@@ -22,7 +22,7 @@ class BotDiscordServiceProvider extends LaracordServiceProvider
 
         if ($this->app->runningInConsole()) {
             $this->publishes([
-                __DIR__.'/../../config/bot-discord.php' => config_path('bot-discord.php'),
+                __DIR__.'/../config/bot-discord.php' => config_path('bot-discord.php'),
             ], 'bot-discord-config');
         }
     }

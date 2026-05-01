@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace He4rt\Events\Providers;
+namespace He4rt\Events;
 
 use He4rt\Events\Models\EventSegment;
 use He4rt\Events\Models\EventSubmission;
@@ -14,8 +14,8 @@ class EventsServiceProvider extends ServiceProvider
 {
     public function boot(): void
     {
-        $this->loadMigrationsFrom(__DIR__.'/../../database/migrations');
-        $this->loadViewsFrom(__DIR__.'/../../resources/views', 'events');
+        $this->loadMigrationsFrom(__DIR__.'/../database/migrations');
+        $this->loadViewsFrom(__DIR__.'/../resources/views', 'events');
 
         Relation::morphMap([
             'event_submission' => EventSubmission::class,

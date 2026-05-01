@@ -19,7 +19,7 @@
     "extra": {
         "laravel": {
             "providers": [
-                "He4rt\\BotDiscord\\Providers\\BotDiscordServiceProvider"
+                "He4rt\\BotDiscord\\BotDiscordServiceProvider"
             ]
         }
     }

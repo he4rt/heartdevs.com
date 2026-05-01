@@ -21,7 +21,7 @@
     "extra": {
         "laravel": {
             "providers": [
-                "He4rt\\Community\\Providers\\CommunityServiceProvider"
+                "He4rt\\Community\\CommunityServiceProvider"
             ]
         }
     }

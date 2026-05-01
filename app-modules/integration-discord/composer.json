@@ -21,7 +21,7 @@
     "extra": {
         "laravel": {
             "providers": [
-                "He4rt\\IntegrationDiscord\\Providers\\IntegrationDiscordServiceProvider"
+                "He4rt\\IntegrationDiscord\\IntegrationDiscordServiceProvider"
             ]
         }
     }

@@ -21,7 +21,7 @@
     "extra": {
         "laravel": {
             "providers": [
-                "He4rt\\Identity\\Providers\\IdentityServiceProvider"
+                "He4rt\\Identity\\IdentityServiceProvider"
             ]
         }
     }

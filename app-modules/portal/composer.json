@@ -21,7 +21,7 @@
     "extra": {
         "laravel": {
             "providers": [
-                "He4rt\\Portal\\Providers\\PortalServiceProvider"
+                "He4rt\\Portal\\PortalServiceProvider"
             ]
         }
     }

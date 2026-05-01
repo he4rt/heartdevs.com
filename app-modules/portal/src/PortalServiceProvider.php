@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace He4rt\IntegrationDiscord\Providers;
+namespace He4rt\Portal;
 
 use Illuminate\Support\ServiceProvider;
 
-class IntegrationDiscordServiceProvider extends ServiceProvider
+class PortalServiceProvider extends ServiceProvider
 {
     public function register(): void {}
 

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace He4rt\Community\Providers;
+namespace He4rt\Community;
 
 use Illuminate\Support\ServiceProvider;
 
@@ -12,6 +12,6 @@ class CommunityServiceProvider extends ServiceProvider
 
     public function boot(): void
     {
-        $this->loadMigrationsFrom(__DIR__.'/../../database/migrations');
+        $this->loadMigrationsFrom(__DIR__.'/../database/migrations');
     }
 }

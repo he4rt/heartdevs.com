@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace He4rt\IntegrationDevTo\Providers;
+namespace He4rt\IntegrationDevTo;
 
 use He4rt\IntegrationDevTo\Polling\SyncDevToArticles;
 use Illuminate\Console\Scheduling\Schedule;
@@ -12,7 +12,7 @@ class IntegrationDevToServiceProvider extends ServiceProvider
 {
     public function register(): void
     {
-        $this->mergeConfigFrom(__DIR__.'/../../config/integration-devto.php', 'integration-devto');
+        $this->mergeConfigFrom(__DIR__.'/../config/integration-devto.php', 'integration-devto');
     }
 
     public function boot(): void
