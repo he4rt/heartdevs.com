@@ -79,7 +79,7 @@ final class HeroSection extends Component
         $totalXp = Character::query()->sum('experience');
 
         return [
-            'members' => number_format($this->usersCount, thousands_separator: '.'),
+            'members' => number_format(User::query()->count(), thousands_separator: '.'),
             'messages' => number_format($totalMessages, thousands_separator: '.'),
             'xp' => number_format((int) $totalXp, thousands_separator: '.'),
         ];
