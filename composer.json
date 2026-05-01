@@ -27,7 +27,6 @@
         "he4rt/integration-devto": ">=1",
         "he4rt/integration-discord": ">=1",
         "he4rt/integration-twitch": ">=1",
-        "he4rt/panel-admin": "^1.0",
         "he4rt/portal": ">=1",
         "internachi/modular": "^3.0.2",
         "laracord/framework": "dev-next",

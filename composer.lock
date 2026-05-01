@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "1dca890f185709ee1d8a44a398347cae",
+    "content-hash": "e227b6009bbf2cbda96081dd6dd80a91",
     "packages": [
         {
             "name": "blade-ui-kit/blade-heroicons",
@@ -3075,7 +3075,7 @@
             "dist": {
                 "type": "path",
                 "url": "app-modules/activity",
-                "reference": "b0b0cae498e28402e4c71cd8ad1853cf9617b2fc"
+                "reference": "18c4a84e1631474556628b904dc71234b75ee7a0"
             },
             "type": "library",
             "extra": {
@@ -3088,9 +3088,13 @@
             "autoload": {
                 "psr-4": {
                     "He4rt\\Activity\\": "src/",
-                    "He4rt\\Activity\\Tests\\": "tests/",
                     "He4rt\\Activity\\Database\\Factories\\": "database/factories/",
                     "He4rt\\Activity\\Database\\Seeders\\": "database/seeders/"
+                }
+            },
+            "autoload-dev": {
+                "psr-4": {
+                    "He4rt\\Activity\\Tests\\": "tests/"
                 }
             },
             "license": [
@@ -3107,7 +3111,7 @@
             "dist": {
                 "type": "path",
                 "url": "app-modules/bot-discord",
-                "reference": "84d2dac97e123b15e8c593a1c565770f4db7f576"
+                "reference": "05f832aad48ed907ab7ee56985c2dc4e59ca512e"
             },
             "type": "library",
             "extra": {
@@ -3119,7 +3123,11 @@
             },
             "autoload": {
                 "psr-4": {
-                    "He4rt\\BotDiscord\\": "src/",
+                    "He4rt\\BotDiscord\\": "src/"
+                }
+            },
+            "autoload-dev": {
+                "psr-4": {
                     "He4rt\\BotDiscord\\Tests\\": "tests/"
                 }
             },
@@ -3137,7 +3145,7 @@
             "dist": {
                 "type": "path",
                 "url": "app-modules/community",
-                "reference": "5ddc8f888750cb339474bf9c0e46b1543a463702"
+                "reference": "4d901edbf2e0e01eb495a57afb95d9de706f5459"
             },
             "type": "library",
             "extra": {
@@ -3150,9 +3158,13 @@
             "autoload": {
                 "psr-4": {
                     "He4rt\\Community\\": "src/",
-                    "He4rt\\Community\\Tests\\": "tests/",
                     "He4rt\\Community\\Database\\Factories\\": "database/factories/",
                     "He4rt\\Community\\Database\\Seeders\\": "database/seeders/"
+                }
+            },
+            "autoload-dev": {
+                "psr-4": {
+                    "He4rt\\Community\\Tests\\": "tests/"
                 }
             },
             "license": [
@@ -3169,7 +3181,7 @@
             "dist": {
                 "type": "path",
                 "url": "app-modules/docs",
-                "reference": "0eb6b693c3220f60d5c7e2f64c3dd4c0b264952f"
+                "reference": "65edac1e1f224a7e36a0f50104dbaa01dd55c909"
             },
             "type": "library",
             "extra": {
@@ -3181,7 +3193,11 @@
             },
             "autoload": {
                 "psr-4": {
-                    "He4rt\\Docs\\": "src/",
+                    "He4rt\\Docs\\": "src/"
+                }
+            },
+            "autoload-dev": {
+                "psr-4": {
                     "He4rt\\Docs\\Tests\\": "tests/"
                 }
             },
@@ -3199,7 +3215,7 @@
             "dist": {
                 "type": "path",
                 "url": "app-modules/economy",
-                "reference": "aeda1d019bfebcfaebdd97627ed34efa9f45844a"
+                "reference": "da9eea2ac6924c075cc06f72f40ff0939e901519"
             },
             "type": "library",
             "extra": {
@@ -3212,9 +3228,13 @@
             "autoload": {
                 "psr-4": {
                     "He4rt\\Economy\\": "src/",
-                    "He4rt\\Economy\\Tests\\": "tests/",
                     "He4rt\\Economy\\Database\\Factories\\": "database/factories/",
                     "He4rt\\Economy\\Database\\Seeders\\": "database/seeders/"
+                }
+            },
+            "autoload-dev": {
+                "psr-4": {
+                    "He4rt\\Economy\\Tests\\": "tests/"
                 }
             },
             "license": [
@@ -3263,7 +3283,7 @@
             "dist": {
                 "type": "path",
                 "url": "app-modules/gamification",
-                "reference": "664adb676e8342cfa1870d79605efc0bd50c72f2"
+                "reference": "a67b863bbe513c73010b022d5eba8c86c01c0309"
             },
             "type": "library",
             "extra": {
@@ -3276,9 +3296,13 @@
             "autoload": {
                 "psr-4": {
                     "He4rt\\Gamification\\": "src/",
-                    "He4rt\\Gamification\\Tests\\": "tests/",
                     "He4rt\\Gamification\\Database\\Factories\\": "database/factories/",
                     "He4rt\\Gamification\\Database\\Seeders\\": "database/seeders/"
+                }
+            },
+            "autoload-dev": {
+                "psr-4": {
+                    "He4rt\\Gamification\\Tests\\": "tests/"
                 }
             },
             "license": [
@@ -3324,7 +3348,7 @@
             "dist": {
                 "type": "path",
                 "url": "app-modules/identity",
-                "reference": "2d3b67c7222d76c33c1815690f280665bf65a821"
+                "reference": "13853266b526b6551d32bd3715be4f96abdf2ca9"
             },
             "type": "library",
             "extra": {
@@ -3337,9 +3361,13 @@
             "autoload": {
                 "psr-4": {
                     "He4rt\\Identity\\": "src/",
-                    "He4rt\\Identity\\Tests\\": "tests/",
                     "He4rt\\Identity\\Database\\Factories\\": "database/factories/",
                     "He4rt\\Identity\\Database\\Seeders\\": "database/seeders/"
+                }
+            },
+            "autoload-dev": {
+                "psr-4": {
+                    "He4rt\\Identity\\Tests\\": "tests/"
                 }
             },
             "license": [
@@ -3356,7 +3384,7 @@
             "dist": {
                 "type": "path",
                 "url": "app-modules/integration-devto",
-                "reference": "a4c27199e7e14ef5a965447d3cd3427cb8fbbe86"
+                "reference": "a9cf00d0b0777707ad38d67337be8b7265bbdd68"
             },
             "type": "library",
             "extra": {
@@ -3369,9 +3397,13 @@
             "autoload": {
                 "psr-4": {
                     "He4rt\\IntegrationDevTo\\": "src/",
-                    "He4rt\\IntegrationDevTo\\Tests\\": "tests/",
                     "He4rt\\IntegrationDevTo\\Database\\Factories\\": "database/factories/",
                     "He4rt\\IntegrationDevTo\\Database\\Seeders\\": "database/seeders/"
+                }
+            },
+            "autoload-dev": {
+                "psr-4": {
+                    "He4rt\\IntegrationDevTo\\Tests\\": "tests/"
                 }
             },
             "license": [
@@ -3388,7 +3420,7 @@
             "dist": {
                 "type": "path",
                 "url": "app-modules/integration-discord",
-                "reference": "de26f91326df7921d95b773835799c4423373e1f"
+                "reference": "c85e828a1a0db08fad2eaf70bba86f917cdb5a65"
             },
             "type": "library",
             "extra": {
@@ -3401,9 +3433,13 @@
             "autoload": {
                 "psr-4": {
                     "He4rt\\IntegrationDiscord\\": "src/",
-                    "He4rt\\IntegrationDiscord\\Tests\\": "tests/",
                     "He4rt\\IntegrationDiscord\\Database\\Factories\\": "database/factories/",
                     "He4rt\\IntegrationDiscord\\Database\\Seeders\\": "database/seeders/"
+                }
+            },
+            "autoload-dev": {
+                "psr-4": {
+                    "He4rt\\IntegrationDiscord\\Tests\\": "tests/"
                 }
             },
             "license": [
@@ -3420,7 +3456,7 @@
             "dist": {
                 "type": "path",
                 "url": "app-modules/integration-twitch",
-                "reference": "61e4378da459bce046249d116695ebb0738d8c12"
+                "reference": "32fc9645cffd54c6e401c12c6f1cae12064b50a1"
             },
             "type": "library",
             "extra": {
@@ -3433,41 +3469,13 @@
             "autoload": {
                 "psr-4": {
                     "He4rt\\IntegrationTwitch\\": "src/",
-                    "He4rt\\IntegrationTwitch\\Tests\\": "tests/",
                     "He4rt\\IntegrationTwitch\\Database\\Factories\\": "database/factories/",
                     "He4rt\\IntegrationTwitch\\Database\\Seeders\\": "database/seeders/"
                 }
             },
-            "license": [
-                "proprietary"
-            ],
-            "transport-options": {
-                "symlink": true,
-                "relative": true
-            }
-        },
-        {
-            "name": "he4rt/panel-admin",
-            "version": "1.0",
-            "dist": {
-                "type": "path",
-                "url": "app-modules/panel-admin",
-                "reference": "cbdee07c016511ad846726a0d2d08cb06e3f6513"
-            },
-            "type": "library",
-            "extra": {
-                "laravel": {
-                    "providers": [
-                        "He4rt\\PanelAdmin\\PanelAdminServiceProvider"
-                    ]
-                }
-            },
-            "autoload": {
+            "autoload-dev": {
                 "psr-4": {
-                    "He4rt\\PanelAdmin\\": "src/",
-                    "He4rt\\PanelAdmin\\Tests\\": "tests/",
-                    "He4rt\\PanelAdmin\\Database\\Factories\\": "database/factories/",
-                    "He4rt\\PanelAdmin\\Database\\Seeders\\": "database/seeders/"
+                    "He4rt\\IntegrationTwitch\\Tests\\": "tests/"
                 }
             },
             "license": [
@@ -3484,7 +3492,7 @@
             "dist": {
                 "type": "path",
                 "url": "app-modules/portal",
-                "reference": "bb226cd3c59034215ff7036aa1582589eff04e16"
+                "reference": "813d926f6b0d5555890959f51b4c37af6d2c6675"
             },
             "type": "library",
             "extra": {
@@ -3497,9 +3505,13 @@
             "autoload": {
                 "psr-4": {
                     "He4rt\\Portal\\": "src/",
-                    "He4rt\\Portal\\Tests\\": "tests/",
                     "He4rt\\Portal\\Database\\Factories\\": "database/factories/",
                     "He4rt\\Portal\\Database\\Seeders\\": "database/seeders/"
+                }
+            },
+            "autoload-dev": {
+                "psr-4": {
+                    "He4rt\\Portal\\Tests\\": "tests/"
                 }
             },
             "license": [
@@ -5456,16 +5468,16 @@
         },
         {
             "name": "livewire/livewire",
-            "version": "v4.2.4",
+            "version": "v4.3.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/livewire/livewire.git",
-                "reference": "7d0bfa46269b1ec186b8cdd38baffee5cc647d10"
+                "reference": "19ebb1ee4d057debceccf70ff01950e6a6114edc"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/livewire/livewire/zipball/7d0bfa46269b1ec186b8cdd38baffee5cc647d10",
-                "reference": "7d0bfa46269b1ec186b8cdd38baffee5cc647d10",
+                "url": "https://api.github.com/repos/livewire/livewire/zipball/19ebb1ee4d057debceccf70ff01950e6a6114edc",
+                "reference": "19ebb1ee4d057debceccf70ff01950e6a6114edc",
                 "shasum": ""
             },
             "require": {
@@ -5520,7 +5532,7 @@
             "description": "A front-end framework for Laravel.",
             "support": {
                 "issues": "https://github.com/livewire/livewire/issues",
-                "source": "https://github.com/livewire/livewire/tree/v4.2.4"
+                "source": "https://github.com/livewire/livewire/tree/v4.3.0"
             },
             "funding": [
                 {
@@ -5528,7 +5540,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2026-04-02T20:48:35+00:00"
+            "time": "2026-05-01T00:46:07+00:00"
         },
         {
             "name": "maennchen/zipstream-php",
@@ -10307,16 +10319,16 @@
         },
         {
             "name": "symfony/console",
-            "version": "v7.4.8",
+            "version": "v7.4.9",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/console.git",
-                "reference": "1e92e39c51f95b88e3d66fa2d9f06d1fb45dd707"
+                "reference": "d7d2b64a45a89d607865927b176fa51c33ddbb58"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/console/zipball/1e92e39c51f95b88e3d66fa2d9f06d1fb45dd707",
-                "reference": "1e92e39c51f95b88e3d66fa2d9f06d1fb45dd707",
+                "url": "https://api.github.com/repos/symfony/console/zipball/d7d2b64a45a89d607865927b176fa51c33ddbb58",
+                "reference": "d7d2b64a45a89d607865927b176fa51c33ddbb58",
                 "shasum": ""
             },
             "require": {
@@ -10381,7 +10393,7 @@
                 "terminal"
             ],
             "support": {
-                "source": "https://github.com/symfony/console/tree/v7.4.8"
+                "source": "https://github.com/symfony/console/tree/v7.4.9"
             },
             "funding": [
                 {
@@ -10401,20 +10413,20 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2026-03-30T13:54:39+00:00"
+            "time": "2026-04-22T15:21:55+00:00"
         },
         {
             "name": "symfony/css-selector",
-            "version": "v8.0.8",
+            "version": "v8.0.9",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/css-selector.git",
-                "reference": "8db1c00226a94d8ab6aa89d9224eeee91e2ea2ed"
+                "reference": "3665cfade90565430909b906394c73c8739e57d0"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/css-selector/zipball/8db1c00226a94d8ab6aa89d9224eeee91e2ea2ed",
-                "reference": "8db1c00226a94d8ab6aa89d9224eeee91e2ea2ed",
+                "url": "https://api.github.com/repos/symfony/css-selector/zipball/3665cfade90565430909b906394c73c8739e57d0",
+                "reference": "3665cfade90565430909b906394c73c8739e57d0",
                 "shasum": ""
             },
             "require": {
@@ -10450,7 +10462,7 @@
             "description": "Converts CSS selectors to XPath expressions",
             "homepage": "https://symfony.com",
             "support": {
-                "source": "https://github.com/symfony/css-selector/tree/v8.0.8"
+                "source": "https://github.com/symfony/css-selector/tree/v8.0.9"
             },
             "funding": [
                 {
@@ -10470,7 +10482,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2026-03-30T15:14:47+00:00"
+            "time": "2026-04-18T13:51:42+00:00"
         },
         {
             "name": "symfony/deprecation-contracts",
@@ -10695,16 +10707,16 @@
         },
         {
             "name": "symfony/event-dispatcher",
-            "version": "v8.0.8",
+            "version": "v8.0.9",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/event-dispatcher.git",
-                "reference": "f662acc6ab22a3d6d716dcb44c381c6002940df6"
+                "reference": "0c3c1a17604c4dbbec4b93fe162c538482096e1f"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/event-dispatcher/zipball/f662acc6ab22a3d6d716dcb44c381c6002940df6",
-                "reference": "f662acc6ab22a3d6d716dcb44c381c6002940df6",
+                "url": "https://api.github.com/repos/symfony/event-dispatcher/zipball/0c3c1a17604c4dbbec4b93fe162c538482096e1f",
+                "reference": "0c3c1a17604c4dbbec4b93fe162c538482096e1f",
                 "shasum": ""
             },
             "require": {
@@ -10756,7 +10768,7 @@
             "description": "Provides tools that allow your application components to communicate with each other by dispatching events and listening to them",
             "homepage": "https://symfony.com",
             "support": {
-                "source": "https://github.com/symfony/event-dispatcher/tree/v8.0.8"
+                "source": "https://github.com/symfony/event-dispatcher/tree/v8.0.9"
             },
             "funding": [
                 {
@@ -10776,7 +10788,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2026-03-30T15:14:47+00:00"
+            "time": "2026-04-18T13:51:42+00:00"
         },
         {
             "name": "symfony/event-dispatcher-contracts",
@@ -10856,16 +10868,16 @@
         },
         {
             "name": "symfony/filesystem",
-            "version": "v8.0.8",
+            "version": "v8.0.9",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/filesystem.git",
-                "reference": "66b769ae743ce2d13e435528fbef4af03d623e5a"
+                "reference": "d1ec4543d5c6c2dac78503c2fae5ea0b3608ce40"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/filesystem/zipball/66b769ae743ce2d13e435528fbef4af03d623e5a",
-                "reference": "66b769ae743ce2d13e435528fbef4af03d623e5a",
+                "url": "https://api.github.com/repos/symfony/filesystem/zipball/d1ec4543d5c6c2dac78503c2fae5ea0b3608ce40",
+                "reference": "d1ec4543d5c6c2dac78503c2fae5ea0b3608ce40",
                 "shasum": ""
             },
             "require": {
@@ -10902,7 +10914,7 @@
             "description": "Provides basic utilities for the filesystem",
             "homepage": "https://symfony.com",
             "support": {
-                "source": "https://github.com/symfony/filesystem/tree/v8.0.8"
+                "source": "https://github.com/symfony/filesystem/tree/v8.0.9"
             },
             "funding": [
                 {
@@ -10922,7 +10934,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2026-03-30T15:14:47+00:00"
+            "time": "2026-04-18T13:51:42+00:00"
         },
         {
             "name": "symfony/finder",
@@ -11351,16 +11363,16 @@
         },
         {
             "name": "symfony/mime",
-            "version": "v7.4.8",
+            "version": "v7.4.9",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/mime.git",
-                "reference": "6df02f99998081032da3407a8d6c4e1dcb5d4379"
+                "reference": "2d550c4758ba4c47519a6667c36553d535705b0c"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/mime/zipball/6df02f99998081032da3407a8d6c4e1dcb5d4379",
-                "reference": "6df02f99998081032da3407a8d6c4e1dcb5d4379",
+                "url": "https://api.github.com/repos/symfony/mime/zipball/2d550c4758ba4c47519a6667c36553d535705b0c",
+                "reference": "2d550c4758ba4c47519a6667c36553d535705b0c",
                 "shasum": ""
             },
             "require": {
@@ -11416,7 +11428,7 @@
                 "mime-type"
             ],
             "support": {
-                "source": "https://github.com/symfony/mime/tree/v7.4.8"
+                "source": "https://github.com/symfony/mime/tree/v7.4.9"
             },
             "funding": [
                 {
@@ -11436,7 +11448,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2026-03-30T14:11:46+00:00"
+            "time": "2026-04-29T13:21:53+00:00"
         },
         {
             "name": "symfony/options-resolver",
@@ -12653,16 +12665,16 @@
         },
         {
             "name": "symfony/routing",
-            "version": "v7.4.8",
+            "version": "v7.4.9",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/routing.git",
-                "reference": "9608de9873ec86e754fb6c0a0fa7e5f1a960eb6b"
+                "reference": "287771d8bc86eacb30678dd10eda6c64a859951f"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/routing/zipball/9608de9873ec86e754fb6c0a0fa7e5f1a960eb6b",
-                "reference": "9608de9873ec86e754fb6c0a0fa7e5f1a960eb6b",
+                "url": "https://api.github.com/repos/symfony/routing/zipball/287771d8bc86eacb30678dd10eda6c64a859951f",
+                "reference": "287771d8bc86eacb30678dd10eda6c64a859951f",
                 "shasum": ""
             },
             "require": {
@@ -12714,7 +12726,7 @@
                 "url"
             ],
             "support": {
-                "source": "https://github.com/symfony/routing/tree/v7.4.8"
+                "source": "https://github.com/symfony/routing/tree/v7.4.9"
             },
             "funding": [
                 {
@@ -12734,7 +12746,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2026-03-24T13:12:05+00:00"
+            "time": "2026-04-22T15:21:55+00:00"
         },
         {
             "name": "symfony/service-contracts",
@@ -13090,16 +13102,16 @@
         },
         {
             "name": "symfony/uid",
-            "version": "v7.4.8",
+            "version": "v7.4.9",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/uid.git",
-                "reference": "6883ebdf7bf6a12b37519dbc0df62b0222401b56"
+                "reference": "2676b524340abcfe4d6151ec698463cebafee439"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/uid/zipball/6883ebdf7bf6a12b37519dbc0df62b0222401b56",
-                "reference": "6883ebdf7bf6a12b37519dbc0df62b0222401b56",
+                "url": "https://api.github.com/repos/symfony/uid/zipball/2676b524340abcfe4d6151ec698463cebafee439",
+                "reference": "2676b524340abcfe4d6151ec698463cebafee439",
                 "shasum": ""
             },
             "require": {
@@ -13144,7 +13156,7 @@
                 "uuid"
             ],
             "support": {
-                "source": "https://github.com/symfony/uid/tree/v7.4.8"
+                "source": "https://github.com/symfony/uid/tree/v7.4.9"
             },
             "funding": [
                 {
@@ -13164,7 +13176,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2026-03-24T13:12:05+00:00"
+            "time": "2026-04-30T15:19:22+00:00"
         },
         {
             "name": "symfony/var-dumper",
