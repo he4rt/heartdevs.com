@@ -100,3 +100,9 @@ import-db: ## Import a PostgreSQL dump file (usage: make import-db file=path/to/
 .PHONY: bot
 bot: ## Run the Discord bot
 	@php artisan bot:boot
+
+.PHONY: truncate
+truncate: ## Truncate laravel.log file
+	@truncate -s 0 storage/logs/laravel.log
+
+-include Makefile.local

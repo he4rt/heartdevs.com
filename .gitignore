@@ -42,3 +42,4 @@ tests/Browser/Screenshots
 /.github/git-commit-instructions.md
 /.laracord
 .claude
+Makefile.local
