@@ -73,7 +73,7 @@ enum IdentityProvider: string implements HasColor, HasDescription, HasIcon, HasL
             self::LeagueOfLegends => Color::Amber,
             self::RiotGames => Color::Red,
             self::BattleNet => Color::Blue,
-            self::EpicGames => Color::Dark,
+            self::EpicGames => Color::Zinc,
             self::PlayStation => Color::Blue,
             self::Facebook => Color::Indigo,
             self::Instagram => Color::Pink,
