@@ -9,7 +9,7 @@
 @endphp
 
 <nav class="w-full px-8">
-    <div class="container mx-auto flex items-center justify-between py-6">
+    <div class="container mx-auto flex items-center justify-between py-4 md:py-6">
         <x-portal::logo size="sm" />
 
         <div class="hidden items-center gap-8 md:flex">
@@ -23,8 +23,21 @@
             @endforeach
         </div>
 
-        <x-he4rt::button href="https://discord.gg/he4rt" size="sm" icon="fab-discord" iconPosition="leading">
+        <x-he4rt::button
+            href="https://discord.gg/he4rt"
+            size="xs"
+            icon="fab-discord"
+            iconPosition="leading"
+            iconOnly
+            class="w-auto! md:hidden"
+        >
             Discord
         </x-he4rt::button>
+
+        <div class="hidden md:block">
+            <x-he4rt::button href="https://discord.gg/he4rt" size="sm" icon="fab-discord" iconPosition="leading">
+                Discord
+            </x-he4rt::button>
+        </div>
     </div>
 </nav>

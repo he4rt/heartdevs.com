@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace He4rt\Portal\Livewire;
 
+use He4rt\Activity\Message\Models\Message;
+use He4rt\Gamification\Character\Models\Character;
 use He4rt\Identity\ExternalIdentity\Enums\IdentityProvider;
 use He4rt\Identity\ExternalIdentity\Models\ExternalIdentity;
 use He4rt\Identity\User\Models\User;
@@ -34,6 +36,19 @@ final class HeroSection extends Component
         return Cache::remember('portal:hero:avatars', now()->addHour(), fn () => $this->fetchAvatars());
     }
 
+    /**
+     * @return array<string, mixed>
+     */
+    #[Computed]
+    public function terminalStats(): array
+    {
+        if (!app()->isProduction()) {
+            return $this->fetchTerminalStats();
+        }
+
+        return Cache::remember('portal:hero:terminal', now()->addHour(), fn () => $this->fetchTerminalStats());
+    }
+
     public function render(): View
     {
         return view('portal::sections.hero');
@@ -49,9 +64,24 @@ final class HeroSection extends Component
             ->whereHas('messages', fn (Builder $query) => $query->where('sent_at', '>=', now()->subDays(30)))
             ->where(fn (Builder $query) => $query->whereHas('messages', operator: '>', count: 20))
             ->inRandomOrder()
-            ->limit(5)
+            ->limit(10)
             ->pluck('metadata')
             ->map(fn (array $metadata) => sprintf('https://github.com/%s.png', $metadata['username']))
             ->all();
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private function fetchTerminalStats(): array
+    {
+        $totalMessages = Message::query()->count();
+        $totalXp = Character::query()->sum('experience');
+
+        return [
+            'members' => number_format($this->usersCount, thousands_separator: '.'),
+            'messages' => number_format($totalMessages, thousands_separator: '.'),
+            'xp' => number_format((int) $totalXp, thousands_separator: '.'),
+        ];
     }
 }
