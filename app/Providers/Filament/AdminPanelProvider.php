@@ -6,12 +6,22 @@ namespace App\Providers\Filament;
 
 use App\Enums\FilamentPanel;
 use App\Filament\Pages\Login;
+use Filament\Http\Middleware\Authenticate;
+use Filament\Http\Middleware\AuthenticateSession;
+use Filament\Http\Middleware\DisableBladeIconComponents;
+use Filament\Http\Middleware\DispatchServingFilamentEvent;
 use Filament\Panel;
 use Filament\PanelProvider;
 use Filament\Support\Colors\Color;
 use He4rt\Identity\Tenant\Models\Tenant;
 use He4rt\PanelAdmin\Http\Middleware\ApplyTenantScopes;
 use He4rt\PanelAdmin\Pages\Dashboard;
+use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
+use Illuminate\Cookie\Middleware\EncryptCookies;
+use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
+use Illuminate\Routing\Middleware\SubstituteBindings;
+use Illuminate\Session\Middleware\StartSession;
+use Illuminate\View\Middleware\ShareErrorsFromSession;
 
 class AdminPanelProvider extends PanelProvider
 {
@@ -28,10 +38,24 @@ class AdminPanelProvider extends PanelProvider
             ->tenantMiddleware([
                 ApplyTenantScopes::class,
             ], isPersistent: true)
+            ->middleware([
+                EncryptCookies::class,
+                AddQueuedCookiesToResponse::class,
+                StartSession::class,
+                AuthenticateSession::class,
+                ShareErrorsFromSession::class,
+                VerifyCsrfToken::class,
+                SubstituteBindings::class,
+                DisableBladeIconComponents::class,
+                DispatchServingFilamentEvent::class,
+            ])
             ->pages([
                 Dashboard::class,
             ])
-            ->viteTheme('app-modules/he4rt/resources/css/theme.css');
+            ->viteTheme('app-modules/he4rt/resources/css/theme.css')
+            ->authMiddleware([
+                Authenticate::class,
+            ]);
 
         foreach (config('panel-admin.modules', []) as $module) {
             $panel->discoverResourcesForPanel($module, FilamentPanel::Admin);

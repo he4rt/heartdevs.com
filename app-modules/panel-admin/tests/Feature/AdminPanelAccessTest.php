@@ -6,6 +6,14 @@ use Filament\Facades\Filament;
 use He4rt\Identity\Tenant\Models\Tenant;
 use He4rt\Identity\User\Models\User;
 
+test('unauthenticated user is redirected to login', function (): void {
+    $tenant = Tenant::factory()->create(['slug' => 'he4rt-dev']);
+
+    $this
+        ->get('/admin/'.$tenant->slug)
+        ->assertRedirect('/admin/login');
+});
+
 test('admin login page renders', function (): void {
     $this
         ->get('/admin/login')
