@@ -17,16 +17,6 @@ final class ImportDiscordProfileAction
 {
     public function handle(DiscordProfileDTO $dto, int $tenantId): ExternalIdentity
     {
-        $existingIdentity = ExternalIdentity::query()
-            ->where('provider', IdentityProvider::Discord)
-            ->where('external_account_id', $dto->discordId)
-            ->where('tenant_id', $tenantId)
-            ->first();
-
-        if ($existingIdentity instanceof ExternalIdentity) {
-            return $existingIdentity;
-        }
-
         $user = User::query()->where('username', $dto->username)->first();
 
         if (!$user instanceof User) {
@@ -44,21 +34,25 @@ final class ImportDiscordProfileAction
 
         $user->tenants()->syncWithoutDetaching([$tenantId]);
 
-        $discordIdentity = ExternalIdentity::query()->create([
-            'provider' => IdentityProvider::Discord,
-            'external_account_id' => $dto->discordId,
-            'tenant_id' => $tenantId,
-            'model_type' => (new User)->getMorphClass(),
-            'model_id' => $user->id,
-            'type' => IdentityProvider::Discord->getType(),
-            'credentials_type' => CredentialsType::OAuth2,
-            'credentials' => ClientAccessManager::make(),
-            'connected_at' => $dto->joinedAt ? Date::parse($dto->joinedAt) : null,
-            'metadata' => $dto->metadata,
-        ]);
+        $discordIdentity = ExternalIdentity::query()->updateOrCreate(
+            [
+                'provider' => IdentityProvider::Discord,
+                'external_account_id' => $dto->discordId,
+                'tenant_id' => $tenantId,
+            ],
+            [
+                'model_type' => (new User)->getMorphClass(),
+                'model_id' => $user->id,
+                'type' => IdentityProvider::Discord->getType(),
+                'credentials_type' => CredentialsType::OAuth2,
+                'credentials' => ClientAccessManager::make(),
+                'connected_at' => $dto->joinedAt ? Date::parse($dto->joinedAt) : null,
+                'metadata' => $dto->metadata,
+            ],
+        );
 
         foreach ($dto->connectedAccounts as $account) {
-            ExternalIdentity::query()->firstOrCreate(
+            ExternalIdentity::query()->updateOrCreate(
                 [
                     'provider' => $account->provider,
                     'external_account_id' => $account->externalAccountId,

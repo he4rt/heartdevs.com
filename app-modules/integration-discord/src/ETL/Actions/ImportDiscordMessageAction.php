@@ -36,14 +36,23 @@ final class ImportDiscordMessageAction
         $identityId = $cachedIdentityId ?? $this->resolveAuthorIdentity($dto, $tenantId)->id;
         $adapter = IdentityProvider::Discord->getMessageAdapter();
 
-        $message = Message::query()->create(
-            $dto->toDatabase([
+        $payload = $dto->toDatabase([
+            'tenant_id' => $tenantId,
+            'external_identity_id' => $identityId,
+            'obtained_experience' => 0,
+            ...$this->extractProviderSignals($dto, $adapter),
+            'reply_to_message_id' => $this->resolveReplyTargetId($dto, $adapter, $replyCache, $tenantId),
+        ]);
+
+        $providerMessageId = $payload['provider_message_id'] ?? null;
+        unset($payload['provider_message_id']);
+
+        $message = Message::query()->updateOrCreate(
+            [
                 'tenant_id' => $tenantId,
-                'external_identity_id' => $identityId,
-                'obtained_experience' => 0,
-                ...$this->extractProviderSignals($dto, $adapter),
-                'reply_to_message_id' => $this->resolveReplyTargetId($dto, $adapter, $replyCache),
-            ]),
+                'provider_message_id' => $providerMessageId,
+            ],
+            $payload,
         );
 
         if ($adapter instanceof MessageActivityAdapter) {
@@ -224,6 +233,7 @@ final class ImportDiscordMessageAction
         DiscordMessageDTO $dto,
         ?MessageActivityAdapter $adapter,
         array $replyCache = [],
+        ?int $tenantId = null,
     ): ?string {
         if (!$adapter instanceof MessageActivityAdapter) {
             return null;
@@ -234,7 +244,18 @@ final class ImportDiscordMessageAction
             return null;
         }
 
-        return $replyCache[$reply->replyToProviderMessageId] ?? null;
+        if (isset($replyCache[$reply->replyToProviderMessageId])) {
+            return $replyCache[$reply->replyToProviderMessageId];
+        }
+
+        if ($tenantId === null) {
+            return null;
+        }
+
+        return Message::query()
+            ->where('tenant_id', $tenantId)
+            ->where('provider_message_id', $reply->replyToProviderMessageId)
+            ->value('id');
     }
 
     private function syncMentions(
