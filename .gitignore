@@ -41,7 +41,7 @@ yarn-error.log
 tests/Browser/Screenshots
 /.composer
 
-=== AI Agents ===
+# === AI Agents ===
 
 # Laravel Boost
 boost.json
