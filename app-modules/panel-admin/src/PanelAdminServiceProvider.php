@@ -12,11 +12,6 @@ class PanelAdminServiceProvider extends ServiceProvider
     public function register(): void
     {
         $this->mergeConfigFrom(__DIR__.'/../config/panel-admin.php', 'panel-admin');
-    }
-
-    public function boot(): void
-    {
-        $this->loadViewsFrom(__DIR__.'/../resources/views', 'panel-admin');
 
         Panel::configureUsing(function (Panel $panel): void {
             if ($panel->getId() !== 'admin') {
@@ -37,5 +32,11 @@ class PanelAdminServiceProvider extends ServiceProvider
                     for: 'He4rt\\PanelAdmin\\Moderation\\Widgets',
                 );
         });
+    }
+
+    public function boot(): void
+    {
+        $this->loadViewsFrom(__DIR__.'/../resources/views', 'panel-admin');
+
     }
 }

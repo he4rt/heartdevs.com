@@ -22,6 +22,8 @@ class ModerationCaseResource extends Resource
 {
     protected static ?string $model = ModerationCase::class;
 
+    protected static bool $isScopedToTenant = false;
+
     protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-shield-exclamation';
 
     protected static ?string $navigationLabel = 'Moderation Queue';
