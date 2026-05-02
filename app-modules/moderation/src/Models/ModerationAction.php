@@ -33,6 +33,7 @@ final class ModerationAction extends Model
         'metadata',
         'execution_results',
         'automated',
+        'created_at',
     ];
 
     /** @return BelongsTo<ModerationCase, $this> */
