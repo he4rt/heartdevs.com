@@ -20,16 +20,16 @@
     ];
 @endphp
 
-<div class="p-5 lg:p-7">
+<div class="p-4 sm:p-5 lg:p-7">
     {{-- Header --}}
-    <div class="mb-6">
-        <div class="mb-2 flex flex-wrap items-center gap-2.5">
-            <h2 class="text-lg font-semibold text-zinc-900 dark:text-zinc-100">
+    <div class="mb-4 sm:mb-6">
+        <div class="mb-2 flex flex-wrap items-center gap-1.5 sm:gap-2.5">
+            <h2 class="w-full text-base font-semibold text-zinc-900 sm:w-auto sm:text-lg dark:text-zinc-100">
                 {{ ucfirst($appeal->reason_category) }}
                 <span class="font-normal text-zinc-400 dark:text-zinc-500">—</span>
                 <span
                     class="font-medium text-zinc-600 dark:text-zinc-300"
-                    >{{ '@' . ($appeal->appellant?->name ?? '?') }}</span
+                    >{{ '@' . Str::limit($appeal->appellant?->name ?? '?', 20) }}</span
                 >
             </h2>
             <flux:badge color="{{ $statusColor }}">{{ $appeal->status->getLabel() }}</flux:badge>
@@ -72,7 +72,7 @@
     {{-- SLA overdue banner --}}
     @if ($isOverdue)
         <div
-            class="mb-6 flex items-start gap-3 rounded-lg border border-red-300/40 bg-red-50/80 p-4 dark:border-red-500/20 dark:bg-red-500/5"
+            class="mb-4 flex items-start gap-2.5 rounded-lg border border-red-300/40 bg-red-50/80 p-3 sm:mb-6 sm:gap-3 sm:p-4 dark:border-red-500/20 dark:bg-red-500/5"
         >
             <div class="mt-0.5 rounded-md bg-red-400/20 p-1.5 dark:bg-red-400/10">
                 <x-heroicon-o-exclamation-triangle class="size-4 text-red-600 dark:text-red-400" />
@@ -97,7 +97,9 @@
         {{-- Left: appeal reason + original action + original case --}}
         <div class="flex flex-col gap-4">
             {{-- Appeal reason --}}
-            <section class="rounded-lg border border-zinc-200/80 bg-white p-4 dark:border-white/5 dark:bg-white/[0.03]">
+            <section
+                class="rounded-lg border border-zinc-200/80 bg-white p-3 sm:p-4 dark:border-white/5 dark:bg-white/[0.03]"
+            >
                 <h3
                     class="mb-3 flex items-center gap-2 text-[11px] font-semibold tracking-wider text-zinc-400 uppercase dark:text-zinc-500"
                 >
@@ -116,7 +118,7 @@
                 </div>
                 @if ($appeal->reason_text)
                     <div
-                        class="rounded-md border border-zinc-100 bg-zinc-50 p-3.5 text-sm leading-relaxed text-zinc-800 dark:border-white/5 dark:bg-white/[0.03] dark:text-zinc-200"
+                        class="rounded-md border border-zinc-100 bg-zinc-50 p-3 text-xs leading-relaxed break-words text-zinc-800 sm:p-3.5 sm:text-sm dark:border-white/5 dark:bg-white/[0.03] dark:text-zinc-200"
                     >
                         {{ $appeal->reason_text }}
                     </div>
@@ -126,7 +128,7 @@
             {{-- Original action --}}
             @if ($appeal->action)
                 <section
-                    class="rounded-lg border border-zinc-200/80 bg-white p-4 dark:border-white/5 dark:bg-white/[0.03]"
+                    class="rounded-lg border border-zinc-200/80 bg-white p-3 sm:p-4 dark:border-white/5 dark:bg-white/[0.03]"
                 >
                     <h3
                         class="mb-3 flex items-center gap-2 text-[11px] font-semibold tracking-wider text-zinc-400 uppercase dark:text-zinc-500"
@@ -194,7 +196,7 @@
             {{-- Original case context --}}
             @if ($case)
                 <section
-                    class="rounded-lg border border-zinc-200/80 bg-white p-4 dark:border-white/5 dark:bg-white/[0.03]"
+                    class="rounded-lg border border-zinc-200/80 bg-white p-3 sm:p-4 dark:border-white/5 dark:bg-white/[0.03]"
                 >
                     <h3
                         class="mb-3 flex items-center gap-2 text-[11px] font-semibold tracking-wider text-zinc-400 uppercase dark:text-zinc-500"
@@ -256,7 +258,7 @@
                                 }}
                             </span>
                             <div
-                                class="rounded-md border border-zinc-100 bg-zinc-50 p-3 font-mono text-sm leading-relaxed text-zinc-800 dark:border-white/5 dark:bg-white/[0.03] dark:text-zinc-200"
+                                class="rounded-md border border-zinc-100 bg-zinc-50 p-3 font-mono text-xs leading-relaxed break-words text-zinc-800 sm:text-sm dark:border-white/5 dark:bg-white/[0.03] dark:text-zinc-200"
                             >
                                 {{ $case->content_snapshot['text'] }}
                             </div>
@@ -319,7 +321,9 @@
         {{-- Right: appellant + SLA + reviewer + actions --}}
         <div class="flex flex-col gap-4">
             {{-- Appellant --}}
-            <section class="rounded-lg border border-zinc-200/80 bg-white p-4 dark:border-white/5 dark:bg-white/[0.03]">
+            <section
+                class="rounded-lg border border-zinc-200/80 bg-white p-3 sm:p-4 dark:border-white/5 dark:bg-white/[0.03]"
+            >
                 <h3
                     class="mb-3 flex items-center gap-2 text-[11px] font-semibold tracking-wider text-zinc-400 uppercase dark:text-zinc-500"
                 >
@@ -350,7 +354,9 @@
             </section>
 
             {{-- SLA --}}
-            <section class="rounded-lg border border-zinc-200/80 bg-white p-4 dark:border-white/5 dark:bg-white/[0.03]">
+            <section
+                class="rounded-lg border border-zinc-200/80 bg-white p-3 sm:p-4 dark:border-white/5 dark:bg-white/[0.03]"
+            >
                 <h3
                     class="mb-3 flex items-center gap-2 text-[11px] font-semibold tracking-wider text-zinc-400 uppercase dark:text-zinc-500"
                 >
@@ -394,7 +400,7 @@
             {{-- Reviewer (if resolved) --}}
             @if ($appeal->status->isResolved() && $appeal->reviewer)
                 <section
-                    class="rounded-lg border border-zinc-200/80 bg-white p-4 dark:border-white/5 dark:bg-white/[0.03]"
+                    class="rounded-lg border border-zinc-200/80 bg-white p-3 sm:p-4 dark:border-white/5 dark:bg-white/[0.03]"
                 >
                     <h3
                         class="mb-3 flex items-center gap-2 text-[11px] font-semibold tracking-wider text-zinc-400 uppercase dark:text-zinc-500"
