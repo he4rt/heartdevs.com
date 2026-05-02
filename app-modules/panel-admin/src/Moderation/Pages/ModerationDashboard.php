@@ -11,7 +11,6 @@ use Filament\Pages\Dashboard\Concerns\HasFiltersForm;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
-use He4rt\PanelAdmin\Moderation\ModerationCluster;
 use He4rt\PanelAdmin\Moderation\Widgets\CasesByPlatformChartWidget;
 use He4rt\PanelAdmin\Moderation\Widgets\CasesByStatusChartWidget;
 use He4rt\PanelAdmin\Moderation\Widgets\ModerationStatsWidget;
@@ -21,8 +20,6 @@ use He4rt\PanelAdmin\Moderation\Widgets\TopViolationTypesChartWidget;
 class ModerationDashboard extends Dashboard
 {
     use HasFiltersForm;
-
-    protected static ?string $cluster = ModerationCluster::class;
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedChartBar;
 
