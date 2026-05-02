@@ -179,7 +179,7 @@ class ImportDiscordMessagesCommand extends Command
                         }
                     }
 
-                    foreach (array_chunk($dtos, 100) as $dtoBatch) {
+                    foreach (array_chunk($dtos, 250) as $dtoBatch) {
                         if ($limit !== null && $stats['messages'] >= $limit) {
                             break;
                         }
