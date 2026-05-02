@@ -77,6 +77,8 @@ class PanelAdminServiceProvider extends ServiceProvider
 
     private function defaultNavigation(NavigationBuilder $builder): NavigationBuilder
     {
+        dd(ModerationCluster::getNavigationItems());
+
         return $builder->groups([
             NavigationGroup::make(__('panel-admin::moderation.navigation.group_overview'))
                 ->items([
@@ -85,6 +87,7 @@ class PanelAdminServiceProvider extends ServiceProvider
                         ->url(Dashboard::getNavigationUrl()),
                 ]),
         ])->items([
+
             ...ModerationCluster::getNavigationItems(),
         ]);
     }
