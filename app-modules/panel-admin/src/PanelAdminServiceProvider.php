@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace He4rt\PanelAdmin;
 
 use Filament\Navigation\NavigationBuilder;
-use Filament\Navigation\NavigationGroup;
 use Filament\Navigation\NavigationItem;
 use Filament\Panel;
 use He4rt\PanelAdmin\Moderation\Livewire\AppealQueue;
@@ -77,28 +76,20 @@ class PanelAdminServiceProvider extends ServiceProvider
 
     private function defaultNavigation(NavigationBuilder $builder): NavigationBuilder
     {
-        dd(ModerationCluster::getNavigationItems());
-
-        return $builder->groups([
-            NavigationGroup::make(__('panel-admin::moderation.navigation.group_overview'))
-                ->items([
-                    NavigationItem::make(__('panel-admin::moderation.navigation.dashboard'))
-                        ->sort(-10)
-                        ->url(Dashboard::getNavigationUrl()),
-                ]),
-        ])->items([
-
+        return $builder->items([
+            ...Dashboard::getNavigationItems(),
             ...ModerationCluster::getNavigationItems(),
         ]);
     }
 
     private function moderationNavigation(NavigationBuilder $builder): NavigationBuilder
     {
-        return $builder->item(
+        return $builder->items([
             NavigationItem::make(__('panel-admin::moderation.navigation.back_to_admin'))
                 ->sort(0)
                 ->icon('heroicon-o-arrow-left')
-                ->url(Dashboard::getUrl())
-        )->groups(resolve(ModerationCluster::class)->getCachedSubNavigation());
+                ->url(Dashboard::getUrl()),
+
+        ])->groups(resolve(ModerationCluster::class)->getCachedSubNavigation());
     }
 }

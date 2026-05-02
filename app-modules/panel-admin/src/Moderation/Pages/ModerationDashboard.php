@@ -29,8 +29,6 @@ class ModerationDashboard extends Dashboard
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedChartBar;
 
-    protected static bool $shouldRegisterNavigation = false;
-
     protected static ?int $navigationSort = 0;
 
     protected static string $routePath = '/dashboard';

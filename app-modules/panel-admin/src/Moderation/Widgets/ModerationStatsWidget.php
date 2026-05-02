@@ -19,7 +19,7 @@ class ModerationStatsWidget extends StatsOverviewWidget
     use InteractsWithPageFilters;
     use ResolvesFilterPeriod;
 
-    protected static ?string $pollingInterval = null;
+    protected ?string $pollingInterval = null;
 
     protected int|string|array $columnSpan = 'full';
 

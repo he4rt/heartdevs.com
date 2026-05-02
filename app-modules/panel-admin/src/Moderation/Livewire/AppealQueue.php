@@ -23,6 +23,10 @@ use Illuminate\Support\Collection;
 use Livewire\Attributes\Computed;
 use Livewire\Component;
 
+/**
+ * @property Collection<int, ModerationAppeal> $appeals
+ * @property ModerationAppeal|null $selectedAppeal
+ */
 class AppealQueue extends Component implements HasActions, HasForms
 {
     use InteractsWithActions;
