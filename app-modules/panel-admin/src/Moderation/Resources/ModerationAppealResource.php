@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace He4rt\PanelAdmin\Moderation\Resources;
 
+use BackedEnum;
 use Filament\Resources\Resource;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
@@ -12,16 +13,17 @@ use He4rt\Moderation\Enums\AppealStatus;
 use He4rt\Moderation\Models\ModerationAppeal;
 use He4rt\PanelAdmin\Moderation\Resources\ModerationAppealResource\Pages\ListModerationAppeals;
 use He4rt\PanelAdmin\Moderation\Resources\ModerationAppealResource\Pages\ViewModerationAppeal;
+use UnitEnum;
 
 class ModerationAppealResource extends Resource
 {
     protected static ?string $model = ModerationAppeal::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-scale';
+    protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-scale';
 
     protected static ?string $navigationLabel = 'Appeals';
 
-    protected static ?string $navigationGroup = 'Moderation';
+    protected static string|UnitEnum|null $navigationGroup = 'Moderation';
 
     protected static ?int $navigationSort = 2;
 

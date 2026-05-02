@@ -26,6 +26,7 @@ class AdminPanelProvider extends PanelProvider
 {
     public function panel(Panel $panel): Panel
     {
+
         $panel
             ->id('admin')
             ->path('admin')

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace He4rt\PanelAdmin\Moderation\Resources;
 
+use BackedEnum;
 use Filament\Actions\EditAction;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
@@ -22,16 +23,17 @@ use He4rt\Moderation\Models\ModerationRule;
 use He4rt\PanelAdmin\Moderation\Resources\ModerationRuleResource\Pages\CreateModerationRule;
 use He4rt\PanelAdmin\Moderation\Resources\ModerationRuleResource\Pages\EditModerationRule;
 use He4rt\PanelAdmin\Moderation\Resources\ModerationRuleResource\Pages\ListModerationRules;
+use UnitEnum;
 
 class ModerationRuleResource extends Resource
 {
     protected static ?string $model = ModerationRule::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-funnel';
+    protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-funnel';
 
     protected static ?string $navigationLabel = 'Rules';
 
-    protected static ?string $navigationGroup = 'Moderation';
+    protected static string|UnitEnum|null $navigationGroup = 'Moderation';
 
     protected static ?int $navigationSort = 3;
 

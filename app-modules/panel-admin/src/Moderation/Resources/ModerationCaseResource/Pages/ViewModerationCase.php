@@ -8,9 +8,9 @@ use Filament\Actions\Action;
 use Filament\Forms\Components\CheckboxList;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
-use Filament\Infolists\Components\Section;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Resources\Pages\ViewRecord;
+use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 use He4rt\Moderation\Enums\ActionType;
 use He4rt\Moderation\Enums\CaseStatus;
@@ -20,6 +20,9 @@ use He4rt\Moderation\Models\ModerationAction;
 use He4rt\Moderation\Models\ModerationCase;
 use He4rt\PanelAdmin\Moderation\Resources\ModerationCaseResource;
 
+/**
+ * @property ModerationCase $record
+ */
 class ViewModerationCase extends ViewRecord
 {
     protected static string $resource = ModerationCaseResource::class;
@@ -44,10 +47,14 @@ class ViewModerationCase extends ViewRecord
                         ->badge(),
                     TextEntry::make('ai_scores')
                         ->label('AI Scores')
-                        ->formatStateUsing(fn ($state) => collect($state)
-                            ->map(fn ($score, $type) => $type.': '.number_format((float) $score, 2))
-                            ->implode(', ')
-                        ),
+                        ->formatStateUsing(function (mixed $state): string {
+                            /** @var array<string, float> $scores */
+                            $scores = is_array($state) ? $state : [];
+
+                            return collect($scores)
+                                ->map(fn (float $score, string $type) => $type.': '.number_format($score, 2))
+                                ->implode(', ');
+                        }),
                     TextEntry::make('suggested_action')
                         ->badge()
                         ->color('warning'),

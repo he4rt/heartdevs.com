@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace He4rt\Moderation\Models;
 
+use Carbon\Carbon;
 use He4rt\Identity\Tenant\Models\Tenant;
 use He4rt\Identity\User\Models\User;
 use He4rt\Moderation\Database\Factories\ModerationCaseFactory;
@@ -19,6 +20,28 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
+/**
+ * @property string $id
+ * @property string $content_type
+ * @property string $content_id
+ * @property array<string, mixed>|null $content_snapshot
+ * @property Platform $source_platform
+ * @property CaseSource $source
+ * @property CaseStatus $status
+ * @property int $priority
+ * @property Severity|null $severity
+ * @property ViolationType|null $violation_type
+ * @property array<string, float>|null $ai_scores
+ * @property string|null $classifier_version
+ * @property ActionType|null $suggested_action
+ * @property string|null $assigned_to
+ * @property string|null $author_id
+ * @property string|null $tenant_id
+ * @property Carbon|null $assigned_at
+ * @property Carbon|null $resolved_at
+ * @property Carbon $created_at
+ * @property Carbon $updated_at
+ */
 final class ModerationCase extends Model
 {
     /** @use HasFactory<ModerationCaseFactory> */

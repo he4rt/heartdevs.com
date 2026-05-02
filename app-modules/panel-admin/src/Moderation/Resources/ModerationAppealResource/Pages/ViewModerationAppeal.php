@@ -6,13 +6,17 @@ namespace He4rt\PanelAdmin\Moderation\Resources\ModerationAppealResource\Pages;
 
 use Filament\Actions\Action;
 use Filament\Forms\Components\Textarea;
-use Filament\Infolists\Components\Section;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Resources\Pages\ViewRecord;
+use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 use He4rt\Moderation\Enums\AppealStatus;
+use He4rt\Moderation\Models\ModerationAppeal;
 use He4rt\PanelAdmin\Moderation\Resources\ModerationAppealResource;
 
+/**
+ * @property ModerationAppeal $record
+ */
 class ViewModerationAppeal extends ViewRecord
 {
     protected static string $resource = ModerationAppealResource::class;

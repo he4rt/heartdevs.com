@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace He4rt\Moderation\Advisors;
 
-use He4rt\Identity\User\Models\User;
 use He4rt\Moderation\Contracts\PenaltyAdvisorContract;
 use He4rt\Moderation\DTOs\SuggestedPenaltyDTO;
 use He4rt\Moderation\Enums\ActionType;
@@ -12,17 +11,19 @@ use He4rt\Moderation\Enums\CaseStatus;
 use He4rt\Moderation\Enums\Severity;
 use He4rt\Moderation\Enums\ViolationType;
 use He4rt\Moderation\Models\ModerationAction;
+use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Contracts\Database\Query\Builder;
+use Illuminate\Database\Eloquent\Model;
 
 final class HistoryBasedPenaltyAdvisor implements PenaltyAdvisorContract
 {
-    public function suggest(User $user, ViolationType $violation, Severity $severity): SuggestedPenaltyDTO
+    public function suggest(Model&Authenticatable $user, ViolationType $violation, Severity $severity): SuggestedPenaltyDTO
     {
         $windowDays = config('moderation.penalties.escalation_window_days', 30);
 
         $priorActions = ModerationAction::query()
             ->whereHas('case', fn (Builder $q) => $q
-                ->where('author_id', $user->id)
+                ->where('author_id', $user->getKey())
                 ->where('status', CaseStatus::Resolved->value)
             )
             ->where('created_at', '>=', now()->subDays($windowDays))->latest()

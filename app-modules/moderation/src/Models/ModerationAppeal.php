@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace He4rt\Moderation\Models;
 
+use Carbon\Carbon;
 use He4rt\Identity\User\Models\User;
 use He4rt\Moderation\Database\Factories\ModerationAppealFactory;
 use He4rt\Moderation\Enums\AppealStatus;
@@ -12,6 +13,19 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
+/**
+ * @property string $id
+ * @property string $action_id
+ * @property string $appellant_id
+ * @property string $reason_category
+ * @property string|null $reason_text
+ * @property AppealStatus $status
+ * @property string|null $reviewer_id
+ * @property string|null $reviewer_notes
+ * @property Carbon|null $resolved_at
+ * @property Carbon $sla_deadline
+ * @property Carbon $created_at
+ */
 final class ModerationAppeal extends Model
 {
     /** @use HasFactory<ModerationAppealFactory> */
