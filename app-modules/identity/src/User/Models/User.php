@@ -56,6 +56,8 @@ final class User extends Authenticatable implements FilamentUser, HasMedia, HasN
         'email',
         'password',
         'is_donator',
+        'suspended_until',
+        'banned_at',
     ];
 
     public function isAdmin(): bool
@@ -174,6 +176,8 @@ final class User extends Authenticatable implements FilamentUser, HasMedia, HasN
         return [
             'is_donator' => 'boolean',
             'password' => 'hashed',
+            'suspended_until' => 'datetime',
+            'banned_at' => 'datetime',
         ];
     }
 }
