@@ -88,6 +88,7 @@ class PanelAdminServiceProvider extends ServiceProvider
         return $builder->item(
             NavigationItem::make('Voltar pro Admin')
                 ->sort(0)
+                ->icon('heroicon-o-arrow-left')
                 ->url(Dashboard::getUrl())
         )->groups(resolve(ModerationCluster::class)->getCachedSubNavigation());
     }
