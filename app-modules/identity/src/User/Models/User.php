@@ -25,6 +25,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Carbon;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
@@ -46,6 +47,7 @@ final class User extends Authenticatable implements FilamentUser, HasMedia, HasN
     use HasUuids;
     use InteractsWithMedia;
     use InteractsWithTenants;
+    use Notifiable;
 
     protected $table = 'users';
 

@@ -10,10 +10,16 @@ use He4rt\Moderation\DTOs\ModerationContentDTO;
 use He4rt\Moderation\Enforcement\ModerationAction;
 use He4rt\Moderation\Enums\ActionType;
 use He4rt\Moderation\Enums\Platform;
+use He4rt\Moderation\Platform\Notifications\ModerationActionNotification;
 use Throwable;
 
 final class WebModerationAdapter implements ModerationPlatformContract
 {
+    public static function make(): self
+    {
+        return new self();
+    }
+
     public function platform(): Platform
     {
         return Platform::Web;
@@ -28,10 +34,10 @@ final class WebModerationAdapter implements ModerationPlatformContract
     {
         try {
             match ($action->action_type) {
-                ActionType::Warn => $this->executeWarn(),
-                ActionType::Suspend => $this->executeSuspend($target, $action->duration),
-                ActionType::Ban => $this->executeBan($target),
-                ActionType::ContentRemove => $this->executeContentRemove(),
+                ActionType::Warn => $this->executeWarn($target, $action),
+                ActionType::Suspend => $this->executeSuspend($target, $action),
+                ActionType::Ban => $this->executeBan($target, $action),
+                ActionType::ContentRemove => $this->executeContentRemove($target, $action),
                 default => null,
             };
 
@@ -41,7 +47,21 @@ final class WebModerationAdapter implements ModerationPlatformContract
         }
     }
 
-    public function notify(User $user, string $message, array $context = []): void {}
+    public function notify(User $user, string $message, array $context = []): void
+    {
+        $action = $context['action'] ?? null;
+
+        if ($action instanceof ModerationAction) {
+            $user->notify(new ModerationActionNotification($action, $message));
+
+            return;
+        }
+
+        $user->notify(new ModerationActionNotification(
+            $action ?? new ModerationAction(),
+            $message,
+        ));
+    }
 
     /** @return array<ActionType> */
     public function supports(): array
@@ -54,11 +74,17 @@ final class WebModerationAdapter implements ModerationPlatformContract
         return User::query()->find($externalId);
     }
 
-    private function executeWarn(): void {}
-
-    private function executeSuspend(User $target, ?string $duration): void
+    private function executeWarn(User $target, ModerationAction $action): void
     {
-        $until = match ($duration) {
+        $target->notify(new ModerationActionNotification(
+            $action,
+            'You received a warning. Reason: '.$action->reason,
+        ));
+    }
+
+    private function executeSuspend(User $target, ModerationAction $action): void
+    {
+        $until = match ($action->duration) {
             '7d' => now()->addDays(7),
             '30d' => now()->addDays(30),
             '24h' => now()->addHours(24),
@@ -66,12 +92,28 @@ final class WebModerationAdapter implements ModerationPlatformContract
         };
 
         $target->update(['suspended_until' => $until]);
+
+        $target->notify(new ModerationActionNotification(
+            $action,
+            sprintf('Your account has been suspended until %s. Reason: %s', $until->toDateTimeString(), $action->reason),
+        ));
     }
 
-    private function executeBan(User $target): void
+    private function executeBan(User $target, ModerationAction $action): void
     {
         $target->update(['banned_at' => now()]);
+
+        $target->notify(new ModerationActionNotification(
+            $action,
+            sprintf('Your account has been banned. Duration: %s. Reason: %s', $action->duration, $action->reason),
+        ));
     }
 
-    private function executeContentRemove(): void {}
+    private function executeContentRemove(User $target, ModerationAction $action): void
+    {
+        $target->notify(new ModerationActionNotification(
+            $action,
+            'Content was removed. Reason: '.$action->reason,
+        ));
+    }
 }

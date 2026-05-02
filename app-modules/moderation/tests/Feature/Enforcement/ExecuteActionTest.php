@@ -9,8 +9,13 @@ use He4rt\Moderation\Enforcement\ExecuteAction;
 use He4rt\Moderation\Enforcement\ModerationAction;
 use He4rt\Moderation\Enums\CaseStatus;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Notification;
 
 uses(RefreshDatabase::class);
+
+beforeEach(function (): void {
+    Notification::fake();
+});
 
 test('executes action on web platform and records results', function (): void {
     $user = User::factory()->create();
