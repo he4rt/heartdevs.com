@@ -29,8 +29,6 @@ class ModerationRuleResource extends Resource
 {
     protected static ?string $model = ModerationRule::class;
 
-    protected static bool $isScopedToTenant = false;
-
     protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-funnel';
 
     protected static ?string $navigationLabel = 'Rules';

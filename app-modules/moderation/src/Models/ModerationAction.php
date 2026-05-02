@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace He4rt\Moderation\Models;
 
+use He4rt\Identity\Tenant\Models\Tenant;
 use He4rt\Identity\User\Models\User;
 use He4rt\Moderation\Database\Factories\ModerationActionFactory;
 use He4rt\Moderation\Enums\ActionType;
@@ -33,6 +34,7 @@ final class ModerationAction extends Model
         'metadata',
         'execution_results',
         'automated',
+        'tenant_id',
         'created_at',
     ];
 
@@ -46,6 +48,12 @@ final class ModerationAction extends Model
     public function moderator(): BelongsTo
     {
         return $this->belongsTo(User::class, 'moderator_id');
+    }
+
+    /** @return BelongsTo<Tenant, $this> */
+    public function tenant(): BelongsTo
+    {
+        return $this->belongsTo(Tenant::class);
     }
 
     /** @return HasOne<ModerationAppeal, $this> */

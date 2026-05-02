@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace He4rt\Moderation\Models;
 
 use Carbon\Carbon;
+use He4rt\Identity\Tenant\Models\Tenant;
 use He4rt\Identity\User\Models\User;
 use He4rt\Moderation\Database\Factories\ModerationAppealFactory;
 use He4rt\Moderation\Enums\AppealStatus;
@@ -46,7 +47,14 @@ final class ModerationAppeal extends Model
         'reviewer_notes',
         'resolved_at',
         'sla_deadline',
+        'tenant_id',
     ];
+
+    /** @return BelongsTo<Tenant, $this> */
+    public function tenant(): BelongsTo
+    {
+        return $this->belongsTo(Tenant::class);
+    }
 
     /** @return BelongsTo<ModerationAction, $this> */
     public function action(): BelongsTo
