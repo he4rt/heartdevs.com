@@ -15,6 +15,9 @@ use He4rt\Moderation\Enums\CaseStatus;
 use He4rt\Moderation\Enums\Platform;
 use He4rt\Moderation\Enums\Severity;
 use He4rt\Moderation\Enums\ViolationType;
+use Illuminate\Database\Eloquent\Attributes\Fillable;
+use Illuminate\Database\Eloquent\Attributes\Table;
+use Illuminate\Database\Eloquent\Attributes\UseFactory;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -43,33 +46,32 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property Carbon $created_at
  * @property Carbon $updated_at
  */
+#[Table('moderation_cases')]
+#[Fillable(
+    'content_type',
+    'content_id',
+    'content_snapshot',
+    'source_platform',
+    'source',
+    'status',
+    'priority',
+    'severity',
+    'violation_type',
+    'ai_scores',
+    'classifier_version',
+    'suggested_action',
+    'assigned_to',
+    'assigned_at',
+    'resolved_at',
+    'author_id',
+    'tenant_id',
+)]
+#[UseFactory(ModerationCaseFactory::class)]
 final class ModerationCase extends Model
 {
     /** @use HasFactory<ModerationCaseFactory> */
     use HasFactory;
     use HasUuids;
-
-    protected $table = 'moderation_cases';
-
-    protected $fillable = [
-        'content_type',
-        'content_id',
-        'content_snapshot',
-        'source_platform',
-        'source',
-        'status',
-        'priority',
-        'severity',
-        'violation_type',
-        'ai_scores',
-        'classifier_version',
-        'suggested_action',
-        'assigned_to',
-        'assigned_at',
-        'resolved_at',
-        'author_id',
-        'tenant_id',
-    ];
 
     /** @return BelongsTo<User, $this> */
     public function author(): BelongsTo
@@ -99,11 +101,6 @@ final class ModerationCase extends Model
     public function actions(): HasMany
     {
         return $this->hasMany(ModerationAction::class, 'case_id');
-    }
-
-    protected static function newFactory(): ModerationCaseFactory
-    {
-        return ModerationCaseFactory::new();
     }
 
     /** @return array<string, mixed> */
