@@ -7,7 +7,6 @@ namespace He4rt\Moderation\Classification\Actions\Classifiers;
 use He4rt\Moderation\Classification\Actions\ContentClassifierContract;
 use He4rt\Moderation\DTOs\ClassificationResultDTO;
 use He4rt\Moderation\DTOs\ModerationContentDTO;
-use He4rt\Moderation\Enums\Severity;
 use He4rt\Moderation\Enums\ViolationType;
 
 final class AggregateClassifier implements ContentClassifierContract
@@ -42,7 +41,7 @@ final class AggregateClassifier implements ContentClassifierContract
 
             $allMatchedRules = array_merge($allMatchedRules, $result->matchedRules);
 
-            if ($result->severity !== null && ($highestSeverity === null || $this->severityWeight($result->severity) > $this->severityWeight($highestSeverity))) {
+            if ($result->severity !== null && ($highestSeverity === null || $result->severity->weight() > $highestSeverity->weight())) {
                 $highestSeverity = $result->severity;
             }
         }
@@ -68,15 +67,5 @@ final class AggregateClassifier implements ContentClassifierContract
     public function name(): string
     {
         return 'aggregate';
-    }
-
-    private function severityWeight(Severity $severity): int
-    {
-        return match ($severity) {
-            Severity::Low => 1,
-            Severity::Medium => 2,
-            Severity::High => 3,
-            Severity::Critical => 4,
-        };
     }
 }

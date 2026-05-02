@@ -12,4 +12,11 @@ enum ActionType: string
     case Ban = 'ban';
     case Suspend = 'suspend';
     case ContentRemove = 'content_remove';
+
+    public static function random(): self
+    {
+        $cases = self::cases();
+
+        return $cases[array_rand($cases)];
+    }
 }

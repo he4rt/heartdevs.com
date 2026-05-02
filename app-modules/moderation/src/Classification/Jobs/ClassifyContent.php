@@ -25,8 +25,8 @@ final class ClassifyContent implements ShouldQueue
         $content = ModerationContentDTO::fromCase($this->case);
 
         $result = AggregateClassifier::make()
-            ->addClassifier(new RuleBasedClassifier())
-            ->addClassifier(new OpenAiClassifier())
+            ->addClassifier(RuleBasedClassifier::make())
+            ->addClassifier(OpenAiClassifier::make())
             ->classify($content);
 
         $this->case->update([

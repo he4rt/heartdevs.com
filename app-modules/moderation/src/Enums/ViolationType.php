@@ -13,4 +13,11 @@ enum ViolationType: string
     case Raid = 'raid';
     case Impersonation = 'impersonation';
     case Other = 'other';
+
+    public static function random(): self
+    {
+        $cases = self::cases();
+
+        return $cases[array_rand($cases)];
+    }
 }

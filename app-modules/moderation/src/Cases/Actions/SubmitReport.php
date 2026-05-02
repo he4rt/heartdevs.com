@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace He4rt\Moderation\Cases;
+namespace He4rt\Moderation\Cases\Actions;
 
 use He4rt\Identity\User\Models\User;
 use He4rt\Moderation\Cases\Models\ModerationCase;

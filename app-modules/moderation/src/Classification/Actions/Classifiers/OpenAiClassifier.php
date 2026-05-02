@@ -25,6 +25,11 @@ final class OpenAiClassifier implements ContentClassifierContract
         'harassment/threatening' => 'harassment',
     ];
 
+    public static function make(): self
+    {
+        return new self();
+    }
+
     public function classify(ModerationContentDTO $content): ClassificationResultDTO
     {
         if (!config('moderation.classifiers.openai.enabled')) {

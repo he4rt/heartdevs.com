@@ -10,4 +10,16 @@ enum AppealStatus: string
     case Reviewing = 'reviewing';
     case Upheld = 'upheld';
     case Overturned = 'overturned';
+
+    public static function random(): self
+    {
+        $cases = self::cases();
+
+        return $cases[array_rand($cases)];
+    }
+
+    public function isResolved(): bool
+    {
+        return in_array($this, [self::Upheld, self::Overturned]);
+    }
 }

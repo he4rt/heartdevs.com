@@ -10,4 +10,11 @@ enum CaseSource: string
     case AutoDetect = 'auto_detect';
     case RuleMatch = 'rule_match';
     case ManualFlag = 'manual_flag';
+
+    public static function random(): self
+    {
+        $cases = self::cases();
+
+        return $cases[array_rand($cases)];
+    }
 }

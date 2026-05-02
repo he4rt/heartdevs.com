@@ -7,12 +7,16 @@ namespace He4rt\Moderation\Classification\Actions\Classifiers;
 use He4rt\Moderation\Classification\Actions\ContentClassifierContract;
 use He4rt\Moderation\DTOs\ClassificationResultDTO;
 use He4rt\Moderation\DTOs\ModerationContentDTO;
-use He4rt\Moderation\Enums\Severity;
 use He4rt\Moderation\Rules\ModerationRule;
 use Illuminate\Contracts\Database\Query\Builder;
 
 final class RuleBasedClassifier implements ContentClassifierContract
 {
+    public static function make(): self
+    {
+        return new self();
+    }
+
     public function classify(ModerationContentDTO $content): ClassificationResultDTO
     {
         $rules = ModerationRule::query()
@@ -32,7 +36,7 @@ final class RuleBasedClassifier implements ContentClassifierContract
                 $scores[$violationType] = max($scores[$violationType] ?? 0, 0.95);
                 $matchedRules[] = $rule->id;
 
-                if ($highestSeverity === null || $this->severityWeight($rule->severity) > $this->severityWeight($highestSeverity)) {
+                if ($highestSeverity === null || $rule->severity->weight() > $highestSeverity->weight()) {
                     $highestSeverity = $rule->severity;
                 }
             }
@@ -71,15 +75,5 @@ final class RuleBasedClassifier implements ContentClassifierContract
     private function matchesRegex(string $pattern, string $text): bool
     {
         return (bool) @preg_match('~'.$pattern.'~i', $text);
-    }
-
-    private function severityWeight(Severity $severity): int
-    {
-        return match ($severity) {
-            Severity::Low => 1,
-            Severity::Medium => 2,
-            Severity::High => 3,
-            Severity::Critical => 4,
-        };
     }
 }
