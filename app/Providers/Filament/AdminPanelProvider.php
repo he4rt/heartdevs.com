@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Providers\Filament;
 
-use App\Enums\FilamentPanel;
 use App\Filament\Pages\Login;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
@@ -52,10 +51,6 @@ class AdminPanelProvider extends PanelProvider
             ->authMiddleware([
                 Authenticate::class,
             ]);
-
-        foreach (config('panel-admin.modules', []) as $module) {
-            $panel->discoverResourcesForPanel($module, FilamentPanel::Admin);
-        }
 
         return $panel;
     }
