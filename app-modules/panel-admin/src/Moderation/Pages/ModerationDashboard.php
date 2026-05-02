@@ -26,8 +26,6 @@ class ModerationDashboard extends Page
 
     protected static ?string $slug = 'dashboard';
 
-    protected string $view = 'panel-admin::filament-page';
-
     public function getHeaderWidgetsColumns(): int
     {
         return 2;

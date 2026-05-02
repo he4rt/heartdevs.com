@@ -66,10 +66,7 @@ class FilamentServiceProvider extends ServiceProvider
                     in: $in,
                     for: $for,
                 )
-                ->discoverWidgets(
-                    in: $filamentModulePath.'/Widgets',
-                    for: $filamentModuleNamespace.'\\Widgets',
-                )
+
                 ->discoverPages(
                     in: $filamentModulePath.'/Pages',
                     for: $filamentModuleNamespace.'\\Pages',
