@@ -3,11 +3,11 @@
 declare(strict_types=1);
 
 use He4rt\Identity\User\Models\User;
-use He4rt\Moderation\Adapters\WebModerationAdapter;
+use He4rt\Moderation\Cases\Models\ModerationCase;
+use He4rt\Moderation\Enforcement\ModerationAction;
 use He4rt\Moderation\Enums\ActionType;
 use He4rt\Moderation\Enums\Platform;
-use He4rt\Moderation\Models\ModerationAction;
-use He4rt\Moderation\Models\ModerationCase;
+use He4rt\Moderation\Platform\WebModerationAdapter;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
 uses(RefreshDatabase::class);

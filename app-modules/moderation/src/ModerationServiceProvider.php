@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace He4rt\Moderation;
 
-use He4rt\Moderation\Adapters\WebModerationAdapter;
-use He4rt\Moderation\Events\ActionExecuted;
-use He4rt\Moderation\Events\CaseCreated;
-use He4rt\Moderation\Events\CaseResolved;
-use He4rt\Moderation\Listeners\RecordAuditLog;
+use He4rt\Moderation\Audit\RecordAuditLog;
+use He4rt\Moderation\Cases\Events\CaseCreated;
+use He4rt\Moderation\Cases\Events\CaseResolved;
+use He4rt\Moderation\Enforcement\ActionExecuted;
+use He4rt\Moderation\Platform\WebModerationAdapter;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\ServiceProvider;
 

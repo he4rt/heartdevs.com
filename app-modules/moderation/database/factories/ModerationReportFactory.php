@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace He4rt\Moderation\Database\Factories;
 
 use He4rt\Identity\User\Models\User;
-use He4rt\Moderation\Models\ModerationCase;
-use He4rt\Moderation\Models\ModerationReport;
+use He4rt\Moderation\Cases\Models\ModerationCase;
+use He4rt\Moderation\Cases\Models\ModerationReport;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /** @extends Factory<ModerationReport> */

@@ -2,16 +2,16 @@
 
 declare(strict_types=1);
 
-use He4rt\Moderation\Classifiers\AggregateClassifier;
-use He4rt\Moderation\Classifiers\OpenAiClassifier;
-use He4rt\Moderation\Classifiers\RuleBasedClassifier;
-use He4rt\Moderation\Contracts\ContentClassifierContract;
+use He4rt\Moderation\Classification\Actions\Classifiers\AggregateClassifier;
+use He4rt\Moderation\Classification\Actions\Classifiers\OpenAiClassifier;
+use He4rt\Moderation\Classification\Actions\Classifiers\RuleBasedClassifier;
+use He4rt\Moderation\Classification\Actions\ContentClassifierContract;
 use He4rt\Moderation\DTOs\ClassificationResultDTO;
 use He4rt\Moderation\DTOs\ModerationContentDTO;
 use He4rt\Moderation\Enums\Platform;
 use He4rt\Moderation\Enums\Severity;
 use He4rt\Moderation\Enums\ViolationType;
-use He4rt\Moderation\Models\ModerationRule;
+use He4rt\Moderation\Rules\ModerationRule;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Http;
 
@@ -152,8 +152,10 @@ test('AggregateClassifier merges results from multiple classifiers', function ()
     $mockAi = Mockery::mock(ContentClassifierContract::class);
     $mockAi->shouldReceive('classify')->andReturn($aiResult);
 
-    $aggregate = new AggregateClassifier([$mockRule, $mockAi]);
-    $result = $aggregate->classify(makeContentDTO('spam content'));
+    $result = AggregateClassifier::make()
+        ->addClassifier($mockRule)
+        ->addClassifier($mockAi)
+        ->classify(makeContentDTO('spam content'));
 
     expect($result->scores['spam'])->toBe(0.95)
         ->and($result->scores['toxicity'])->toBe(0.30)

@@ -12,12 +12,12 @@ use Filament\Infolists\Components\TextEntry;
 use Filament\Resources\Pages\ViewRecord;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
+use He4rt\Moderation\Cases\Models\ModerationCase;
+use He4rt\Moderation\Enforcement\ExecuteAction;
+use He4rt\Moderation\Enforcement\ModerationAction;
 use He4rt\Moderation\Enums\ActionType;
 use He4rt\Moderation\Enums\CaseStatus;
 use He4rt\Moderation\Enums\Platform;
-use He4rt\Moderation\Jobs\ExecuteAction;
-use He4rt\Moderation\Models\ModerationAction;
-use He4rt\Moderation\Models\ModerationCase;
 use He4rt\PanelAdmin\Moderation\Resources\ModerationCaseResource;
 
 /**

@@ -4,15 +4,15 @@ declare(strict_types=1);
 
 use He4rt\Identity\Tenant\Models\Tenant;
 use He4rt\Identity\User\Models\User;
+use He4rt\Moderation\Appeals\ModerationAppeal;
+use He4rt\Moderation\Cases\Models\ModerationCase;
+use He4rt\Moderation\Cases\Models\ModerationReport;
+use He4rt\Moderation\Enforcement\ModerationAction;
 use He4rt\Moderation\Enums\CaseSource;
 use He4rt\Moderation\Enums\CaseStatus;
 use He4rt\Moderation\Enums\Platform;
 use He4rt\Moderation\Enums\Severity;
 use He4rt\Moderation\Enums\ViolationType;
-use He4rt\Moderation\Models\ModerationAction;
-use He4rt\Moderation\Models\ModerationAppeal;
-use He4rt\Moderation\Models\ModerationCase;
-use He4rt\Moderation\Models\ModerationReport;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
 uses(RefreshDatabase::class);

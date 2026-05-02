@@ -10,8 +10,8 @@ use Filament\Infolists\Components\TextEntry;
 use Filament\Resources\Pages\ViewRecord;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
+use He4rt\Moderation\Appeals\ModerationAppeal;
 use He4rt\Moderation\Enums\AppealStatus;
-use He4rt\Moderation\Models\ModerationAppeal;
 use He4rt\PanelAdmin\Moderation\Resources\ModerationAppealResource;
 
 /**

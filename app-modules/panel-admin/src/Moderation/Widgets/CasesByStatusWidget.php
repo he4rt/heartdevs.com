@@ -6,7 +6,7 @@ namespace He4rt\PanelAdmin\Moderation\Widgets;
 
 use Filament\Widgets\StatsOverviewWidget;
 use Filament\Widgets\StatsOverviewWidget\Stat;
-use He4rt\Moderation\Models\ModerationCase;
+use He4rt\Moderation\Cases\Models\ModerationCase;
 
 class CasesByStatusWidget extends StatsOverviewWidget
 {

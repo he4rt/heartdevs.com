@@ -17,4 +17,27 @@ final readonly class ExecutionResultDTO
         public ?string $error,
         public array $platformResponse,
     ) {}
+
+    /**
+     * @param  array<string, mixed>  $response
+     */
+    public static function success(Platform $platform, array $response = []): self
+    {
+        return new self(
+            platform: $platform,
+            success: true,
+            error: null,
+            platformResponse: $response,
+        );
+    }
+
+    public static function failure(Platform $platform, string $error): self
+    {
+        return new self(
+            platform: $platform,
+            success: false,
+            error: $error,
+            platformResponse: [],
+        );
+    }
 }

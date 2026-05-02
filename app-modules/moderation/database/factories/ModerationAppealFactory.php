@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace He4rt\Moderation\Database\Factories;
 
 use He4rt\Identity\User\Models\User;
-use He4rt\Moderation\Models\ModerationAction;
-use He4rt\Moderation\Models\ModerationAppeal;
+use He4rt\Moderation\Appeals\ModerationAppeal;
+use He4rt\Moderation\Enforcement\ModerationAction;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /** @extends Factory<ModerationAppeal> */

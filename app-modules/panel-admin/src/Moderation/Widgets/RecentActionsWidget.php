@@ -8,7 +8,7 @@ use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Filament\Widgets\TableWidget;
-use He4rt\Moderation\Models\ModerationAction;
+use He4rt\Moderation\Enforcement\ModerationAction;
 
 class RecentActionsWidget extends TableWidget
 {

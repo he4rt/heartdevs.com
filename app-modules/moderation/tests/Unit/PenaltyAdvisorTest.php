@@ -3,12 +3,12 @@
 declare(strict_types=1);
 
 use He4rt\Identity\User\Models\User;
-use He4rt\Moderation\Advisors\HistoryBasedPenaltyAdvisor;
+use He4rt\Moderation\Cases\Models\ModerationCase;
+use He4rt\Moderation\Classification\Actions\Advisors\HistoryBasedPenaltyAdvisor;
+use He4rt\Moderation\Enforcement\ModerationAction;
 use He4rt\Moderation\Enums\ActionType;
 use He4rt\Moderation\Enums\Severity;
 use He4rt\Moderation\Enums\ViolationType;
-use He4rt\Moderation\Models\ModerationAction;
-use He4rt\Moderation\Models\ModerationCase;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
 uses(RefreshDatabase::class);

@@ -3,15 +3,15 @@
 declare(strict_types=1);
 
 use He4rt\Identity\User\Models\User;
+use He4rt\Moderation\Cases\Models\ModerationCase;
+use He4rt\Moderation\Classification\Jobs\ClassifyContent;
+use He4rt\Moderation\Classification\Jobs\IngestContent;
+use He4rt\Moderation\Classification\Jobs\RouteDecision;
 use He4rt\Moderation\DTOs\ModerationContentDTO;
 use He4rt\Moderation\Enums\CaseSource;
 use He4rt\Moderation\Enums\CaseStatus;
 use He4rt\Moderation\Enums\Platform;
-use He4rt\Moderation\Jobs\ClassifyContent;
-use He4rt\Moderation\Jobs\IngestContent;
-use He4rt\Moderation\Jobs\RouteDecision;
-use He4rt\Moderation\Models\ModerationCase;
-use He4rt\Moderation\Models\ModerationRule;
+use He4rt\Moderation\Rules\ModerationRule;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Http;
 

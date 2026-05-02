@@ -3,12 +3,12 @@
 declare(strict_types=1);
 
 use He4rt\Identity\User\Models\User;
-use He4rt\Moderation\Actions\FileAppeal;
-use He4rt\Moderation\Actions\ReviewAppeal;
+use He4rt\Moderation\Appeals\FileAppeal;
+use He4rt\Moderation\Appeals\ModerationAppeal;
+use He4rt\Moderation\Appeals\ReviewAppeal;
+use He4rt\Moderation\Cases\Models\ModerationCase;
+use He4rt\Moderation\Enforcement\ModerationAction;
 use He4rt\Moderation\Enums\AppealStatus;
-use He4rt\Moderation\Models\ModerationAction;
-use He4rt\Moderation\Models\ModerationAppeal;
-use He4rt\Moderation\Models\ModerationCase;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
 uses(RefreshDatabase::class);
