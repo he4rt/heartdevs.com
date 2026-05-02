@@ -8,9 +8,12 @@ use Filament\Navigation\NavigationBuilder;
 use Filament\Navigation\NavigationGroup;
 use Filament\Navigation\NavigationItem;
 use Filament\Panel;
+use He4rt\PanelAdmin\Moderation\Livewire\AppealQueue;
+use He4rt\PanelAdmin\Moderation\Livewire\ModerationQueue;
 use He4rt\PanelAdmin\Moderation\ModerationCluster;
 use He4rt\PanelAdmin\Pages\Dashboard;
 use Illuminate\Support\ServiceProvider;
+use Livewire\Livewire;
 
 class PanelAdminServiceProvider extends ServiceProvider
 {
@@ -41,6 +44,9 @@ class PanelAdminServiceProvider extends ServiceProvider
     {
         $this->loadViewsFrom(__DIR__.'/../resources/views', 'panel-admin');
         $this->loadTranslationsFrom(__DIR__.'/../lang', 'panel-admin');
+
+        Livewire::component('moderation-queue', ModerationQueue::class);
+        Livewire::component('appeal-queue', AppealQueue::class);
     }
 
     private function buildNavigation(NavigationBuilder $builder): NavigationBuilder
@@ -72,9 +78,9 @@ class PanelAdminServiceProvider extends ServiceProvider
     private function defaultNavigation(NavigationBuilder $builder): NavigationBuilder
     {
         return $builder->groups([
-            NavigationGroup::make('Overview')
+            NavigationGroup::make(__('panel-admin::moderation.navigation.group_overview'))
                 ->items([
-                    NavigationItem::make('Dashboard')
+                    NavigationItem::make(__('panel-admin::moderation.navigation.dashboard'))
                         ->sort(-10)
                         ->url(Dashboard::getNavigationUrl()),
                 ]),
@@ -86,7 +92,7 @@ class PanelAdminServiceProvider extends ServiceProvider
     private function moderationNavigation(NavigationBuilder $builder): NavigationBuilder
     {
         return $builder->item(
-            NavigationItem::make('Voltar pro Admin')
+            NavigationItem::make(__('panel-admin::moderation.navigation.back_to_admin'))
                 ->sort(0)
                 ->icon('heroicon-o-arrow-left')
                 ->url(Dashboard::getUrl())

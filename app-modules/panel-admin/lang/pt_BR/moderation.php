@@ -4,11 +4,20 @@ declare(strict_types=1);
 
 return [
     'navigation' => [
-        'group' => 'Moderação',
+        'cluster' => 'Moderação',
+        'cluster_breadcrumb' => 'Moderação',
+        'back_to_admin' => 'Voltar pro Admin',
+        'group_moderation' => 'Moderação',
+        'group_overview' => 'Visão Geral',
+        'group_config' => 'Configuração',
+        'group_system' => 'Sistema',
+        'dashboard' => 'Mod Dashboard',
+        'queue' => 'Fila',
+        'appeals_queue' => 'Fila de Appeals',
         'cases' => 'Casos',
         'rules' => 'Regras',
         'appeals' => 'Apelações',
-        'dashboard' => 'Painel',
+        'audit_log' => 'Log de Auditoria',
     ],
 
     'cases' => [
@@ -23,6 +32,12 @@ return [
     'rules' => [
         'label' => 'Regra',
         'plural' => 'Regras',
+        'actions' => [
+            'test' => 'Testar Regra',
+            'test_input' => 'Cole um texto de exemplo para testar contra esta regra.',
+            'test_match' => 'Match! Violação: :violation | Severidade: :severity | Ação: :action',
+            'test_no_match' => 'Sem match — o texto não ativou esta regra.',
+        ],
     ],
 
     'appeals' => [
@@ -36,5 +51,86 @@ return [
 
     'dashboard' => [
         'heading' => 'Visão Geral da Moderação',
+    ],
+
+    'queue' => [
+        'navigation_label' => 'Fila',
+        'heading' => 'Fila de Moderação',
+        'cases_count' => ':count caso(s)',
+        'cases_label' => 'casos',
+        'priority_sort' => 'Prioridade ↓',
+        'no_cases' => 'Nenhum caso encontrado',
+        'no_case_selected' => 'Nenhum caso selecionado',
+        'no_case_selected_subtitle' => 'Selecione um caso na lista para ver os detalhes.',
+        'filters' => [
+            'status' => 'Status',
+            'platform' => 'Plataforma',
+            'violation' => 'Violação',
+            'severity' => 'Severidade',
+            'all' => 'Todos',
+        ],
+        'detail' => [
+            'content' => 'Conteúdo',
+            'ai_scores' => 'Scores IA',
+            'reports' => 'Denúncias',
+            'author' => 'Autor',
+            'member_since' => 'Membro desde :date',
+            'infractions' => 'Infrações',
+            'past_actions' => 'Ações Anteriores',
+            'suggested_action' => 'Sugestão: :action',
+            'prior_offenses' => ':count infração(ões) nos últimos 30 dias',
+            'no_history' => 'Sem histórico',
+            'matched_rules' => 'Regras: :rules',
+            'actions_heading' => 'Ações',
+        ],
+        'actions' => [
+            'take_action' => 'Tomar Ação',
+            'escalate' => 'Escalar',
+            'dismiss' => 'Dispensar',
+            'success' => 'Ação executada com sucesso',
+            'escalated' => 'Caso escalado',
+            'dismissed' => 'Caso dispensado',
+        ],
+    ],
+
+    'appeal_queue' => [
+        'navigation_label' => 'Fila de Appeals',
+        'heading' => 'Fila de Appeals',
+        'appeals_count' => ':count apelação(ões)',
+        'appeals_label' => 'apelações',
+        'sla_sort' => 'Prazo SLA ↑',
+        'no_appeals' => 'Nenhuma apelação encontrada',
+        'no_appeal_selected' => 'Nenhuma apelação selecionada',
+        'no_appeal_selected_subtitle' => 'Selecione uma apelação na lista para revisar.',
+        'filters' => [
+            'status' => 'Status',
+            'all' => 'Todos',
+        ],
+        'detail' => [
+            'appeal' => 'Apelação',
+            'reason' => 'Motivo',
+            'appellant' => 'Apelante',
+            'sla_deadline' => 'Prazo SLA',
+            'sla_overdue' => 'Atrasado',
+            'sla_remaining' => ':time restante',
+            'original_action' => 'Ação Original',
+            'action_type' => 'Ação',
+            'action_reason' => 'Motivo',
+            'action_moderator' => 'Moderador',
+            'action_duration' => 'Duração',
+            'original_case' => 'Caso Original',
+            'content' => 'Conteúdo',
+            'ai_scores' => 'Scores IA',
+            'violation_type' => 'Violação',
+            'severity' => 'Severidade',
+            'reviewer_notes' => 'Notas do Revisor',
+            'decision' => 'Decisão',
+        ],
+        'actions' => [
+            'uphold' => 'Manter Decisão',
+            'overturn' => 'Reverter Decisão',
+            'upheld' => 'Decisão mantida',
+            'overturned' => 'Decisão revertida',
+        ],
     ],
 ];

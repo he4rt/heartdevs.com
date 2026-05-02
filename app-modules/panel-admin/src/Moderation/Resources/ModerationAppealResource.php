@@ -15,7 +15,6 @@ use He4rt\Moderation\Enums\AppealStatus;
 use He4rt\PanelAdmin\Moderation\ModerationCluster;
 use He4rt\PanelAdmin\Moderation\Resources\ModerationAppealResource\Pages\ListModerationAppeals;
 use He4rt\PanelAdmin\Moderation\Resources\ModerationAppealResource\Pages\ViewModerationAppeal;
-use UnitEnum;
 
 class ModerationAppealResource extends Resource
 {
@@ -25,13 +24,21 @@ class ModerationAppealResource extends Resource
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedScale;
 
-    protected static ?string $navigationLabel = 'Appeals';
-
-    protected static string|UnitEnum|null $navigationGroup = 'Moderação';
+    protected static bool $shouldRegisterNavigation = false;
 
     protected static ?int $navigationSort = 2;
 
     protected static ?string $slug = 'appeals';
+
+    public static function getNavigationLabel(): string
+    {
+        return __('panel-admin::moderation.navigation.appeals');
+    }
+
+    public static function getNavigationGroup(): ?string
+    {
+        return __('panel-admin::moderation.navigation.group_moderation');
+    }
 
     public static function table(Table $table): Table
     {

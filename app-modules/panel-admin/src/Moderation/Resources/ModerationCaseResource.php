@@ -18,7 +18,6 @@ use He4rt\Moderation\Enums\ViolationType;
 use He4rt\PanelAdmin\Moderation\ModerationCluster;
 use He4rt\PanelAdmin\Moderation\Resources\ModerationCaseResource\Pages\ListModerationCases;
 use He4rt\PanelAdmin\Moderation\Resources\ModerationCaseResource\Pages\ViewModerationCase;
-use UnitEnum;
 
 class ModerationCaseResource extends Resource
 {
@@ -28,13 +27,21 @@ class ModerationCaseResource extends Resource
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedQueueList;
 
-    protected static ?string $navigationLabel = 'Fila';
-
-    protected static string|UnitEnum|null $navigationGroup = 'Moderação';
+    protected static bool $shouldRegisterNavigation = false;
 
     protected static ?int $navigationSort = 1;
 
     protected static ?string $slug = 'cases';
+
+    public static function getNavigationLabel(): string
+    {
+        return __('panel-admin::moderation.navigation.cases');
+    }
+
+    public static function getNavigationGroup(): ?string
+    {
+        return __('panel-admin::moderation.navigation.group_moderation');
+    }
 
     public static function table(Table $table): Table
     {

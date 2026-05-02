@@ -13,7 +13,6 @@ use Filament\Tables\Contracts\HasTable;
 use Filament\Tables\Table;
 use He4rt\Moderation\Audit\ModerationAuditLog;
 use He4rt\PanelAdmin\Moderation\ModerationCluster;
-use UnitEnum;
 
 class AuditLogPage extends Page implements HasTable
 {
@@ -23,15 +22,21 @@ class AuditLogPage extends Page implements HasTable
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedClipboardDocumentList;
 
-    protected static ?string $navigationLabel = 'Audit Log';
-
-    protected static string|UnitEnum|null $navigationGroup = 'Sistema';
-
     protected static ?int $navigationSort = 5;
 
     protected static ?string $slug = 'audit-log';
 
     protected string $view = 'panel-admin::filament-page';
+
+    public static function getNavigationLabel(): string
+    {
+        return __('panel-admin::moderation.navigation.audit_log');
+    }
+
+    public static function getNavigationGroup(): ?string
+    {
+        return __('panel-admin::moderation.navigation.group_system');
+    }
 
     public function table(Table $table): Table
     {

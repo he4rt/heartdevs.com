@@ -10,7 +10,6 @@ use Filament\Support\Icons\Heroicon;
 use He4rt\PanelAdmin\Moderation\ModerationCluster;
 use He4rt\PanelAdmin\Moderation\Widgets\CasesByStatusWidget;
 use He4rt\PanelAdmin\Moderation\Widgets\RecentActionsWidget;
-use UnitEnum;
 
 class ModerationDashboard extends Page
 {
@@ -18,13 +17,19 @@ class ModerationDashboard extends Page
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedChartBar;
 
-    protected static ?string $navigationLabel = 'Dashboard';
-
-    protected static string|UnitEnum|null $navigationGroup = 'Overview';
-
     protected static ?int $navigationSort = 0;
 
     protected static ?string $slug = 'dashboard';
+
+    public static function getNavigationLabel(): string
+    {
+        return __('panel-admin::moderation.navigation.dashboard');
+    }
+
+    public static function getNavigationGroup(): ?string
+    {
+        return __('panel-admin::moderation.navigation.group_overview');
+    }
 
     public function getHeaderWidgetsColumns(): int
     {

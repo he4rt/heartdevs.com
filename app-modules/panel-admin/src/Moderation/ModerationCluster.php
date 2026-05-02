@@ -14,12 +14,17 @@ class ModerationCluster extends Cluster
 
     protected static ?int $navigationSort = 10;
 
-    protected static ?string $navigationLabel = 'Moderação';
-
     protected static ?string $slug = 'mod';
-
-    protected static ?string $clusterBreadcrumb = 'Moderação';
 
     protected static bool $shouldRegisterSubNavigation = false;
 
+    public static function getNavigationLabel(): string
+    {
+        return __('panel-admin::moderation.navigation.cluster');
+    }
+
+    public static function getClusterBreadcrumb(): ?string
+    {
+        return __('panel-admin::moderation.navigation.cluster_breadcrumb');
+    }
 }
