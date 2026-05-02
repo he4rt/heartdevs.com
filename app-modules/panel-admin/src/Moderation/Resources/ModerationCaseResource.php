@@ -6,6 +6,7 @@ namespace He4rt\PanelAdmin\Moderation\Resources;
 
 use BackedEnum;
 use Filament\Resources\Resource;
+use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
@@ -14,21 +15,26 @@ use He4rt\Moderation\Enums\CaseStatus;
 use He4rt\Moderation\Enums\Platform;
 use He4rt\Moderation\Enums\Severity;
 use He4rt\Moderation\Enums\ViolationType;
+use He4rt\PanelAdmin\Moderation\ModerationCluster;
 use He4rt\PanelAdmin\Moderation\Resources\ModerationCaseResource\Pages\ListModerationCases;
 use He4rt\PanelAdmin\Moderation\Resources\ModerationCaseResource\Pages\ViewModerationCase;
 use UnitEnum;
 
 class ModerationCaseResource extends Resource
 {
+    protected static ?string $cluster = ModerationCluster::class;
+
     protected static ?string $model = ModerationCase::class;
 
-    protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-shield-exclamation';
+    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedQueueList;
 
-    protected static ?string $navigationLabel = 'Moderation Queue';
+    protected static ?string $navigationLabel = 'Fila';
 
-    protected static string|UnitEnum|null $navigationGroup = 'Moderation';
+    protected static string|UnitEnum|null $navigationGroup = 'Moderação';
 
     protected static ?int $navigationSort = 1;
+
+    protected static ?string $slug = 'cases';
 
     public static function table(Table $table): Table
     {

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace He4rt\PanelAdmin;
 
 use Filament\Panel;
+use He4rt\PanelAdmin\Moderation\ModerationCluster;
 use Illuminate\Support\ServiceProvider;
 
 class PanelAdminServiceProvider extends ServiceProvider
@@ -19,6 +20,7 @@ class PanelAdminServiceProvider extends ServiceProvider
             }
 
             $panel
+                ->pages([ModerationCluster::class])
                 ->discoverResources(
                     in: __DIR__.'/Moderation/Resources',
                     for: 'He4rt\\PanelAdmin\\Moderation\\Resources',

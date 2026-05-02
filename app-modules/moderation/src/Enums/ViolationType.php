@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace He4rt\Moderation\Enums;
 
+use Filament\Support\Colors\Color;
 use Filament\Support\Contracts\HasColor;
 use Filament\Support\Contracts\HasIcon;
 use Filament\Support\Contracts\HasLabel;
@@ -31,16 +32,16 @@ enum ViolationType: string implements HasColor, HasIcon, HasLabel
         return __('moderation::enums.violation_type.'.$this->value);
     }
 
-    public function getColor(): string
+    public function getColor(): array
     {
         return match ($this) {
-            self::Spam => 'gray',
-            self::Toxicity => 'orange',
-            self::Harassment => 'danger',
-            self::Nsfw => 'purple',
-            self::Raid => 'danger',
-            self::Impersonation => 'warning',
-            self::Other => 'info',
+            self::Spam => Color::Gray,
+            self::Toxicity => Color::Orange,
+            self::Harassment => Color::Red,
+            self::Nsfw => Color::Purple,
+            self::Raid => Color::Rose,
+            self::Impersonation => Color::Amber,
+            self::Other => Color::Blue,
         };
     }
 

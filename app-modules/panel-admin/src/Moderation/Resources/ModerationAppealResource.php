@@ -6,26 +6,32 @@ namespace He4rt\PanelAdmin\Moderation\Resources;
 
 use BackedEnum;
 use Filament\Resources\Resource;
+use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use He4rt\Moderation\Appeals\ModerationAppeal;
 use He4rt\Moderation\Enums\AppealStatus;
+use He4rt\PanelAdmin\Moderation\ModerationCluster;
 use He4rt\PanelAdmin\Moderation\Resources\ModerationAppealResource\Pages\ListModerationAppeals;
 use He4rt\PanelAdmin\Moderation\Resources\ModerationAppealResource\Pages\ViewModerationAppeal;
 use UnitEnum;
 
 class ModerationAppealResource extends Resource
 {
+    protected static ?string $cluster = ModerationCluster::class;
+
     protected static ?string $model = ModerationAppeal::class;
 
-    protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-scale';
+    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedScale;
 
     protected static ?string $navigationLabel = 'Appeals';
 
-    protected static string|UnitEnum|null $navigationGroup = 'Moderation';
+    protected static string|UnitEnum|null $navigationGroup = 'Moderação';
 
     protected static ?int $navigationSort = 2;
+
+    protected static ?string $slug = 'appeals';
 
     public static function table(Table $table): Table
     {

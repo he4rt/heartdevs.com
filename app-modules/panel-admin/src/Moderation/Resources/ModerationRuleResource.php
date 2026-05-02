@@ -12,6 +12,7 @@ use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
+use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
@@ -20,6 +21,7 @@ use He4rt\Moderation\Enums\Platform;
 use He4rt\Moderation\Enums\Severity;
 use He4rt\Moderation\Enums\ViolationType;
 use He4rt\Moderation\Rules\ModerationRule;
+use He4rt\PanelAdmin\Moderation\ModerationCluster;
 use He4rt\PanelAdmin\Moderation\Resources\ModerationRuleResource\Pages\CreateModerationRule;
 use He4rt\PanelAdmin\Moderation\Resources\ModerationRuleResource\Pages\EditModerationRule;
 use He4rt\PanelAdmin\Moderation\Resources\ModerationRuleResource\Pages\ListModerationRules;
@@ -27,15 +29,19 @@ use UnitEnum;
 
 class ModerationRuleResource extends Resource
 {
+    protected static ?string $cluster = ModerationCluster::class;
+
     protected static ?string $model = ModerationRule::class;
 
-    protected static string|BackedEnum|null $navigationIcon = 'heroicon-o-funnel';
+    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedFunnel;
 
-    protected static ?string $navigationLabel = 'Rules';
+    protected static ?string $navigationLabel = 'Regras';
 
-    protected static string|UnitEnum|null $navigationGroup = 'Moderation';
+    protected static string|UnitEnum|null $navigationGroup = 'Configuração';
 
     protected static ?int $navigationSort = 3;
+
+    protected static ?string $slug = 'rules';
 
     public static function form(Schema $schema): Schema
     {
