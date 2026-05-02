@@ -34,6 +34,7 @@ class AdminPanelProvider extends PanelProvider
                 'primary' => Color::Purple,
             ])
             ->tenant(Tenant::class, slugAttribute: 'slug')
+            ->viteTheme('resources/css/filament/admin/theme.css')
             ->middleware([
                 EncryptCookies::class,
                 AddQueuedCookiesToResponse::class,
