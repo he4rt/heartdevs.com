@@ -35,6 +35,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 #[UseFactory(ModerationAppealFactory::class)]
 final class ModerationAppeal extends Model
 {
+    /** @use HasFactory<ModerationAppealFactory> */
     use HasFactory;
     use HasUuids;
 
@@ -60,6 +61,11 @@ final class ModerationAppeal extends Model
     public function reviewer(): BelongsTo
     {
         return $this->belongsTo(User::class, 'reviewer_id');
+    }
+
+    protected static function newFactory(): ModerationAppealFactory
+    {
+        return ModerationAppealFactory::new();
     }
 
     /** @return array<string, mixed> */
