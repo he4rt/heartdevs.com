@@ -22,16 +22,6 @@ use Illuminate\Database\Eloquent\Model;
 #[Table('moderation_audit_log', timestamps: false)]
 final class ModerationAuditLog extends Model
 {
-    protected $fillable = [
-        'event_type',
-        'actor_id',
-        'actor_type',
-        'case_id',
-        'details',
-        'platform',
-        'tenant_id',
-    ];
-
     /** @return array<string, mixed> */
     protected function casts(): array
     {

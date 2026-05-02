@@ -38,19 +38,6 @@ final class ModerationAppeal extends Model
     use HasFactory;
     use HasUuids;
 
-    protected $fillable = [
-        'action_id',
-        'appellant_id',
-        'reason_category',
-        'reason_text',
-        'status',
-        'reviewer_id',
-        'reviewer_notes',
-        'resolved_at',
-        'sla_deadline',
-        'tenant_id',
-    ];
-
     /** @return BelongsTo<Tenant, $this> */
     public function tenant(): BelongsTo
     {

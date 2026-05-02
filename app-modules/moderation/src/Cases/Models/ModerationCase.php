@@ -53,26 +53,6 @@ final class ModerationCase extends Model
     use HasFactory;
     use HasUuids;
 
-    protected $fillable = [
-        'content_type',
-        'content_id',
-        'content_snapshot',
-        'source_platform',
-        'source',
-        'status',
-        'priority',
-        'severity',
-        'violation_type',
-        'ai_scores',
-        'classifier_version',
-        'suggested_action',
-        'assigned_to',
-        'assigned_at',
-        'resolved_at',
-        'author_id',
-        'tenant_id',
-    ];
-
     /** @return BelongsTo<User, $this> */
     public function author(): BelongsTo
     {

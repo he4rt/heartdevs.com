@@ -34,18 +34,6 @@ final class ModerationRule extends Model
 {
     use HasUuids;
 
-    protected $fillable = [
-        'name',
-        'type',
-        'platform',
-        'pattern',
-        'violation_type',
-        'severity',
-        'action_on_match',
-        'is_active',
-        'tenant_id',
-    ];
-
     /** @return BelongsTo<Tenant, $this> */
     public function tenant(): BelongsTo
     {

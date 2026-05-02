@@ -33,14 +33,6 @@ final class ModerationReport extends Model
     use HasFactory;
     use HasUuids;
 
-    protected $fillable = [
-        'case_id',
-        'reporter_id',
-        'reason',
-        'details',
-        'platform',
-    ];
-
     /** @return BelongsTo<ModerationCase, $this> */
     public function case(): BelongsTo
     {

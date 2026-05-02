@@ -41,20 +41,6 @@ final class ModerationAction extends Model
     use HasFactory;
     use HasUuids;
 
-    protected $fillable = [
-        'case_id',
-        'moderator_id',
-        'action_type',
-        'target_platforms',
-        'duration',
-        'reason',
-        'metadata',
-        'execution_results',
-        'automated',
-        'tenant_id',
-        'created_at',
-    ];
-
     /** @return BelongsTo<ModerationCase, $this> */
     public function case(): BelongsTo
     {
