@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace He4rt\Moderation\Enums;
 
+use Filament\Support\Colors\Color;
 use Filament\Support\Contracts\HasColor;
 use Filament\Support\Contracts\HasIcon;
 use Filament\Support\Contracts\HasLabel;
@@ -28,13 +29,13 @@ enum CaseSource: string implements HasColor, HasIcon, HasLabel
         return __('moderation::enums.case_source.'.$this->value);
     }
 
-    public function getColor(): string
+    public function getColor(): array
     {
         return match ($this) {
-            self::UserReport => 'info',
-            self::AutoDetect => 'purple',
-            self::RuleMatch => 'warning',
-            self::ManualFlag => 'gray',
+            self::UserReport => Color::Blue,
+            self::AutoDetect => Color::Purple,
+            self::RuleMatch => Color::Amber,
+            self::ManualFlag => Color::Gray,
         };
     }
 

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace He4rt\Moderation\Enums;
 
+use Filament\Support\Colors\Color;
 use Filament\Support\Contracts\HasColor;
 use Filament\Support\Contracts\HasIcon;
 use Filament\Support\Contracts\HasLabel;
@@ -30,15 +31,15 @@ enum ActionType: string implements HasColor, HasIcon, HasLabel
         return __('moderation::enums.action_type.'.$this->value);
     }
 
-    public function getColor(): string
+    public function getColor(): array
     {
         return match ($this) {
-            self::Warn => 'warning',
-            self::Mute => 'gray',
-            self::Kick => 'info',
-            self::Ban => 'danger',
-            self::Suspend => 'orange',
-            self::ContentRemove => 'purple',
+            self::Warn => Color::Amber,
+            self::Mute => Color::Gray,
+            self::Kick => Color::Blue,
+            self::Ban => Color::Red,
+            self::Suspend => Color::Orange,
+            self::ContentRemove => Color::Purple,
         };
     }
 

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace He4rt\Moderation\Enums;
 
+use Filament\Support\Colors\Color;
 use Filament\Support\Contracts\HasColor;
 use Filament\Support\Contracts\HasIcon;
 use Filament\Support\Contracts\HasLabel;
@@ -29,14 +30,14 @@ enum Platform: string implements HasColor, HasIcon, HasLabel
         return __('moderation::enums.platform.'.$this->value);
     }
 
-    public function getColor(): string
+    public function getColor(): array
     {
         return match ($this) {
-            self::Discord => 'purple',
-            self::Twitch => 'violet',
-            self::GitHub => 'gray',
-            self::Twitter => 'info',
-            self::Web => 'success',
+            self::Discord => Color::Purple,
+            self::Twitch => Color::Violet,
+            self::GitHub => Color::Gray,
+            self::Twitter => Color::Blue,
+            self::Web => Color::Green,
         };
     }
 
