@@ -51,6 +51,49 @@ return [
 
     'dashboard' => [
         'heading' => 'Moderation Overview',
+        'filter_period' => 'Period',
+        'periods' => [
+            '7d' => 'Last 7 days',
+            '30d' => 'Last 30 days',
+            '90d' => 'Last 90 days',
+            'month' => 'This month',
+            'year' => 'This year',
+        ],
+        'stats' => [
+            'pending' => 'Pending',
+            'pending_desc' => 'cases',
+            'resolved' => 'Resolved',
+            'resolved_desc' => 'this period',
+            'avg_time' => 'Avg. Time',
+            'avg_time_desc' => 'min to resolve',
+            'appeal_rate' => 'Appeal Rate',
+            'appeal_rate_desc' => 'of actions',
+        ],
+        'cases_by_status' => 'Cases by Status',
+        'cases_by_platform' => 'Cases by Platform',
+        'top_violations' => 'Top Violation Types',
+        'false_positive' => [
+            'heading' => 'False Positive Rate',
+            'improving' => '↓ improving (was :prev% last period)',
+            'worsening' => '↑ worsening (was :prev% last period)',
+            'stable' => '→ stable',
+            'by_classifier' => 'By classifier:',
+            'fp_suffix' => 'FP',
+        ],
+        'moderator_performance' => [
+            'heading' => 'Moderator Performance',
+            'cases' => 'Cases',
+            'avg_time' => 'Avg. Time',
+            'overturn' => 'Overturn',
+            'overall_overturn' => 'Overturned appeals (overall): :rate% (healthy: <15%)',
+        ],
+        'appeal_sla' => [
+            'heading' => 'Appeal SLA',
+            'remaining' => ':hours h remaining',
+            'overdue' => ':hours h overdue',
+            'compliance' => ':count appeals resolved within SLA this month (:rate%)',
+        ],
+        'recent_actions' => 'Recent Actions',
     ],
 
     'queue' => [

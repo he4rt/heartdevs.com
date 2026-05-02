@@ -51,6 +51,49 @@ return [
 
     'dashboard' => [
         'heading' => 'Visão Geral da Moderação',
+        'filter_period' => 'Período',
+        'periods' => [
+            '7d' => 'Últimos 7 dias',
+            '30d' => 'Últimos 30 dias',
+            '90d' => 'Últimos 90 dias',
+            'month' => 'Este mês',
+            'year' => 'Este ano',
+        ],
+        'stats' => [
+            'pending' => 'Pendentes',
+            'pending_desc' => 'casos',
+            'resolved' => 'Resolvidos',
+            'resolved_desc' => 'este período',
+            'avg_time' => 'Tempo Médio',
+            'avg_time_desc' => 'min p/ resolver',
+            'appeal_rate' => 'Taxa de Appeal',
+            'appeal_rate_desc' => 'das ações',
+        ],
+        'cases_by_status' => 'Casos por Status',
+        'cases_by_platform' => 'Casos por Plataforma',
+        'top_violations' => 'Top Tipos de Violação',
+        'false_positive' => [
+            'heading' => 'Taxa de Falso Positivo',
+            'improving' => '↓ melhorando (era :prev% período anterior)',
+            'worsening' => '↑ piorando (era :prev% período anterior)',
+            'stable' => '→ estável',
+            'by_classifier' => 'Por classificador:',
+            'fp_suffix' => 'FP',
+        ],
+        'moderator_performance' => [
+            'heading' => 'Performance dos Moderadores',
+            'cases' => 'Casos',
+            'avg_time' => 'Tempo Médio',
+            'overturn' => 'Overturn',
+            'overall_overturn' => 'Appeals revertidos (geral): :rate% (saudável: <15%)',
+        ],
+        'appeal_sla' => [
+            'heading' => 'SLA de Appeals',
+            'remaining' => ':hours h restantes',
+            'overdue' => ':hours h atrasado',
+            'compliance' => ':count appeals resolvidos no SLA este mês (:rate%)',
+        ],
+        'recent_actions' => 'Ações Recentes',
     ],
 
     'queue' => [
