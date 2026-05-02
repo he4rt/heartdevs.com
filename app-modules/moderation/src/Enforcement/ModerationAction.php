@@ -4,27 +4,42 @@ declare(strict_types=1);
 
 namespace He4rt\Moderation\Enforcement;
 
+use Carbon\Carbon;
 use He4rt\Identity\Tenant\Models\Tenant;
 use He4rt\Identity\User\Models\User;
 use He4rt\Moderation\Appeals\ModerationAppeal;
 use He4rt\Moderation\Cases\Models\ModerationCase;
 use He4rt\Moderation\Database\Factories\ModerationActionFactory;
 use He4rt\Moderation\Enums\ActionType;
+use Illuminate\Database\Eloquent\Attributes\Table;
+use Illuminate\Database\Eloquent\Attributes\UseFactory;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 
+/**
+ * @property string $id
+ * @property string $case_id
+ * @property string|null $moderator_id
+ * @property ActionType $action_type
+ * @property array<int, string> $target_platforms
+ * @property string|null $duration
+ * @property string|null $reason
+ * @property array<string, mixed>|null $metadata
+ * @property array<string, mixed>|null $execution_results
+ * @property bool $automated
+ * @property int|null $tenant_id
+ * @property Carbon $created_at
+ */
+#[Table('moderation_actions', timestamps: false)]
+#[UseFactory(ModerationActionFactory::class)]
 final class ModerationAction extends Model
 {
     /** @use HasFactory<ModerationActionFactory> */
     use HasFactory;
     use HasUuids;
-
-    public $timestamps = false;
-
-    protected $table = 'moderation_actions';
 
     protected $fillable = [
         'case_id',
@@ -62,11 +77,6 @@ final class ModerationAction extends Model
     public function appeal(): HasOne
     {
         return $this->hasOne(ModerationAppeal::class, 'action_id');
-    }
-
-    protected static function newFactory(): ModerationActionFactory
-    {
-        return ModerationActionFactory::new();
     }
 
     /** @return array<string, mixed> */
