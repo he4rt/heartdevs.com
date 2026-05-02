@@ -44,6 +44,7 @@ final class AppServiceProvider extends ServiceProvider
     private function configureDatabase(): void
     {
         Model::automaticallyEagerLoadRelationships();
+        Model::unguard();
         Relation::requireMorphMap();
     }
 
