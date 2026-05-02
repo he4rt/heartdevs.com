@@ -34,6 +34,15 @@ final class ModerationRule extends Model
 {
     use HasUuids;
 
+    public function matches(string $text): bool
+    {
+        return match ($this->type) {
+            'keyword' => $this->matchesKeyword($text),
+            'regex' => $this->matchesRegex($text),
+            default => false,
+        };
+    }
+
     /** @return BelongsTo<Tenant, $this> */
     public function tenant(): BelongsTo
     {
@@ -50,5 +59,18 @@ final class ModerationRule extends Model
             'action_on_match' => ActionType::class,
             'is_active' => 'boolean',
         ];
+    }
+
+    private function matchesKeyword(string $text): bool
+    {
+        $keywords = array_map(trim(...), explode(',', $this->pattern));
+        $lowerText = mb_strtolower($text);
+
+        return array_any($keywords, fn (string $keyword): bool => str_contains($lowerText, mb_strtolower($keyword)));
+    }
+
+    private function matchesRegex(string $text): bool
+    {
+        return (bool) @preg_match('~'.$this->pattern.'~i', $text);
     }
 }

@@ -10,4 +10,11 @@ use He4rt\PanelAdmin\Moderation\Resources\ModerationRuleResource;
 class EditModerationRule extends EditRecord
 {
     protected static string $resource = ModerationRuleResource::class;
+
+    protected function getHeaderActions(): array
+    {
+        return [
+            ModerationRuleResource::testRuleAction(),
+        ];
+    }
 }

@@ -31,7 +31,7 @@ final class RuleBasedClassifier implements ContentClassifierContract
         $highestSeverity = null;
 
         foreach ($rules as $rule) {
-            if ($this->matches($rule, $content->textContent)) {
+            if ($rule->matches($content->textContent)) {
                 $violationType = $rule->violation_type->value;
                 $scores[$violationType] = max($scores[$violationType] ?? 0, 0.95);
                 $matchedRules[] = $rule->id;
@@ -53,27 +53,5 @@ final class RuleBasedClassifier implements ContentClassifierContract
     public function name(): string
     {
         return 'rules';
-    }
-
-    private function matches(ModerationRule $rule, string $text): bool
-    {
-        return match ($rule->type) {
-            'keyword' => $this->matchesKeyword($rule->pattern, $text),
-            'regex' => $this->matchesRegex($rule->pattern, $text),
-            default => false,
-        };
-    }
-
-    private function matchesKeyword(string $pattern, string $text): bool
-    {
-        $keywords = array_map(trim(...), explode(',', $pattern));
-        $lowerText = mb_strtolower($text);
-
-        return array_any($keywords, fn ($keyword) => str_contains($lowerText, mb_strtolower((string) $keyword)));
-    }
-
-    private function matchesRegex(string $pattern, string $text): bool
-    {
-        return (bool) @preg_match('~'.$pattern.'~i', $text);
     }
 }

@@ -5,16 +5,18 @@ declare(strict_types=1);
 namespace He4rt\PanelAdmin\Moderation\Resources;
 
 use BackedEnum;
+use Filament\Actions\Action;
 use Filament\Actions\EditAction;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
+use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
-use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Columns\ToggleColumn;
 use Filament\Tables\Table;
 use He4rt\Moderation\Enums\ActionType;
 use He4rt\Moderation\Enums\Platform;
@@ -25,7 +27,6 @@ use He4rt\PanelAdmin\Moderation\ModerationCluster;
 use He4rt\PanelAdmin\Moderation\Resources\ModerationRuleResource\Pages\CreateModerationRule;
 use He4rt\PanelAdmin\Moderation\Resources\ModerationRuleResource\Pages\EditModerationRule;
 use He4rt\PanelAdmin\Moderation\Resources\ModerationRuleResource\Pages\ListModerationRules;
-use UnitEnum;
 
 class ModerationRuleResource extends Resource
 {
@@ -35,13 +36,19 @@ class ModerationRuleResource extends Resource
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedFunnel;
 
-    protected static ?string $navigationLabel = 'Regras';
-
-    protected static string|UnitEnum|null $navigationGroup = 'Configuração';
-
     protected static ?int $navigationSort = 3;
 
     protected static ?string $slug = 'rules';
+
+    public static function getNavigationLabel(): string
+    {
+        return __('panel-admin::moderation.navigation.rules');
+    }
+
+    public static function getNavigationGroup(): ?string
+    {
+        return __('panel-admin::moderation.navigation.group_config');
+    }
 
     public static function form(Schema $schema): Schema
     {
@@ -76,8 +83,7 @@ class ModerationRuleResource extends Resource
     {
         return $table
             ->columns([
-                IconColumn::make('is_active')
-                    ->boolean(),
+                ToggleColumn::make('is_active'),
                 TextColumn::make('name')
                     ->searchable(),
                 TextColumn::make('type')
@@ -91,8 +97,43 @@ class ModerationRuleResource extends Resource
                     ->badge(),
             ])
             ->recordActions([
+                self::testRuleAction(),
                 EditAction::make(),
             ]);
+    }
+
+    public static function testRuleAction(): Action
+    {
+        return Action::make('testRule')
+            ->label(__('panel-admin::moderation.rules.actions.test'))
+            ->icon(Heroicon::OutlinedBeaker)
+            ->color('gray')
+            ->schema([
+                Textarea::make('test_input')
+                    ->label(__('panel-admin::moderation.rules.actions.test_input'))
+                    ->required()
+                    ->rows(4),
+            ])
+            ->action(function (array $data, ModerationRule $record): void {
+                if ($record->matches($data['test_input'])) {
+                    Notification::make()
+                        ->success()
+                        ->title(__('panel-admin::moderation.rules.actions.test_match', [
+                            'violation' => $record->violation_type->getLabel(),
+                            'severity' => $record->severity->getLabel(),
+                            'action' => $record->action_on_match->getLabel(),
+                        ]))
+                        ->persistent()
+                        ->send();
+
+                    return;
+                }
+
+                Notification::make()
+                    ->warning()
+                    ->title(__('panel-admin::moderation.rules.actions.test_no_match'))
+                    ->send();
+            });
     }
 
     public static function getPages(): array
