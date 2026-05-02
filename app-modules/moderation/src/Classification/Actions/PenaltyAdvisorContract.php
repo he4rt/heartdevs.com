@@ -23,7 +23,7 @@ use He4rt\Moderation\Enums\ViolationType;
  * The suggestion includes reasoning text so moderators understand WHY a particular
  * penalty is recommended, enabling informed decision-making.
  *
- * @see \He4rt\Moderation\Classification\HistoryBasedPenaltyAdvisor
+ * @see Advisors\HistoryBasedPenaltyAdvisor
  */
 interface PenaltyAdvisorContract
 {
