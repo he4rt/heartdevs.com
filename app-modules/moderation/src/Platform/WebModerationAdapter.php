@@ -25,6 +25,7 @@ final class WebModerationAdapter implements ModerationPlatformContract
         return Platform::Web;
     }
 
+    /** @param array<string, mixed> $rawPayload */
     public function ingest(array $rawPayload): ModerationContentDTO
     {
         return ModerationContentDTO::fromPlatform(Platform::Web, $rawPayload);
@@ -47,6 +48,7 @@ final class WebModerationAdapter implements ModerationPlatformContract
         }
     }
 
+    /** @param array<string, mixed> $context */
     public function notify(User $user, string $message, array $context = []): void
     {
         $action = $context['action'] ?? null;

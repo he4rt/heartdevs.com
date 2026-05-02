@@ -62,6 +62,7 @@ final class OpenAiClassifier implements ContentClassifierContract
         return 'openai';
     }
 
+    /** @param array<string, mixed> $data */
     private function parseResponse(array $data): ClassificationResultDTO
     {
         $result = $data['results'][0] ?? [];

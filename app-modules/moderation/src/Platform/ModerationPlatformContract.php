@@ -15,10 +15,12 @@ interface ModerationPlatformContract
 {
     public function platform(): Platform;
 
+    /** @param array<string, mixed> $rawPayload */
     public function ingest(array $rawPayload): ModerationContentDTO;
 
     public function execute(ModerationAction $action, User $target): ExecutionResultDTO;
 
+    /** @param array<string, mixed> $context */
     public function notify(User $user, string $message, array $context = []): void;
 
     /** @return array<ActionType> */
