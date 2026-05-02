@@ -20,16 +20,16 @@
     ];
 @endphp
 
-<div class="p-5 lg:p-7">
+<div class="p-4 sm:p-5 lg:p-7">
     {{-- Header --}}
-    <div class="mb-6">
-        <div class="mb-2 flex flex-wrap items-center gap-2.5">
-            <h2 class="text-lg font-semibold text-zinc-900 dark:text-zinc-100">
+    <div class="mb-4 sm:mb-6">
+        <div class="mb-2 flex flex-wrap items-center gap-1.5 sm:gap-2.5">
+            <h2 class="w-full text-base font-semibold text-zinc-900 sm:w-auto sm:text-lg dark:text-zinc-100">
                 {{ $case->violation_type?->getLabel() ?? '—' }}
                 <span class="font-normal text-zinc-400 dark:text-zinc-500">—</span>
                 <span
                     class="font-medium text-zinc-600 dark:text-zinc-300"
-                    >{{ '@' . ($case->author?->name ?? '?') }}</span
+                    >{{ '@' . Str::limit($case->author?->name ?? '?', 20) }}</span
                 >
             </h2>
             <span
@@ -69,7 +69,7 @@
     {{-- Suggested action banner --}}
     @if ($case->suggested_action && $case->status === CaseStatus::Pending)
         <div
-            class="mb-6 flex items-start gap-3 rounded-lg border border-amber-300/40 bg-amber-50/80 p-4 dark:border-amber-500/20 dark:bg-amber-500/5"
+            class="mb-4 flex items-start gap-2.5 rounded-lg border border-amber-300/40 bg-amber-50/80 p-3 sm:mb-6 sm:gap-3 sm:p-4 dark:border-amber-500/20 dark:bg-amber-500/5"
         >
             <div class="mt-0.5 rounded-md bg-amber-400/20 p-1.5 dark:bg-amber-400/10">
                 <x-heroicon-o-light-bulb class="size-4 text-amber-600 dark:text-amber-400" />
@@ -110,7 +110,9 @@
         {{-- Left: content + scores + reports --}}
         <div class="flex flex-col gap-4">
             {{-- Content snapshot --}}
-            <section class="rounded-lg border border-zinc-200/80 bg-white p-4 dark:border-white/5 dark:bg-white/[0.03]">
+            <section
+                class="rounded-lg border border-zinc-200/80 bg-white p-3 sm:p-4 dark:border-white/5 dark:bg-white/[0.03]"
+            >
                 <h3
                     class="mb-3 flex items-center gap-2 text-[11px] font-semibold tracking-wider text-zinc-400 uppercase dark:text-zinc-500"
                 >
@@ -118,7 +120,7 @@
                     {{ __('panel-admin::moderation.queue.detail.content') }}
                 </h3>
                 <div
-                    class="rounded-md border border-zinc-100 bg-zinc-50 p-3.5 font-mono text-sm leading-relaxed text-zinc-800 dark:border-white/5 dark:bg-white/[0.03] dark:text-zinc-200"
+                    class="rounded-md border border-zinc-100 bg-zinc-50 p-3 font-mono text-xs leading-relaxed break-words text-zinc-800 sm:p-3.5 sm:text-sm dark:border-white/5 dark:bg-white/[0.03] dark:text-zinc-200"
                 >
                     {{ $case->content_snapshot['text'] ?? '—' }}
                 </div>
@@ -127,7 +129,7 @@
             {{-- AI Scores --}}
             @if ($case->ai_scores && count($case->ai_scores) > 0)
                 <section
-                    class="rounded-lg border border-zinc-200/80 bg-white p-4 dark:border-white/5 dark:bg-white/[0.03]"
+                    class="rounded-lg border border-zinc-200/80 bg-white p-3 sm:p-4 dark:border-white/5 dark:bg-white/[0.03]"
                 >
                     <h3
                         class="mb-3 flex items-center gap-2 text-[11px] font-semibold tracking-wider text-zinc-400 uppercase dark:text-zinc-500"
@@ -177,7 +179,7 @@
             {{-- Reports --}}
             @if ($case->reports->isNotEmpty())
                 <section
-                    class="rounded-lg border border-zinc-200/80 bg-white p-4 dark:border-white/5 dark:bg-white/[0.03]"
+                    class="rounded-lg border border-zinc-200/80 bg-white p-3 sm:p-4 dark:border-white/5 dark:bg-white/[0.03]"
                 >
                     <h3
                         class="mb-3 flex items-center gap-2 text-[11px] font-semibold tracking-wider text-zinc-400 uppercase dark:text-zinc-500"
@@ -211,7 +213,9 @@
         {{-- Right: user + actions --}}
         <div class="flex flex-col gap-4">
             {{-- User history --}}
-            <section class="rounded-lg border border-zinc-200/80 bg-white p-4 dark:border-white/5 dark:bg-white/[0.03]">
+            <section
+                class="rounded-lg border border-zinc-200/80 bg-white p-3 sm:p-4 dark:border-white/5 dark:bg-white/[0.03]"
+            >
                 <h3
                     class="mb-3 flex items-center gap-2 text-[11px] font-semibold tracking-wider text-zinc-400 uppercase dark:text-zinc-500"
                 >
@@ -295,6 +299,7 @@
             {{-- Action buttons --}}
             @if ($case->status->isOpen())
                 <section
+                    x-data
                     class="sticky top-4 rounded-lg border border-zinc-200/80 bg-white p-4 dark:border-white/5 dark:bg-white/[0.03]"
                 >
                     <h3
@@ -307,8 +312,35 @@
                             )
                         }}
                     </h3>
-                    <div class="[&_.fi-ac-action]:w-full [&_.fi-ac-action]:justify-center flex flex-col gap-2">
-                        {{ $this->takeActionAction }} {{ $this->escalateAction }} {{ $this->dismissAction }}
+                    <div class="flex flex-col gap-2">
+                        <button
+                            type="button"
+                            x-on:click="$dispatch('mount-queue-action', { action: 'takeAction', arguments: { caseId: '{{ $case->id }}' } })"
+                            class="bg-danger-600 hover:bg-danger-500 dark:bg-danger-500 dark:hover:bg-danger-400 inline-flex w-full items-center justify-center gap-2 rounded-lg px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition"
+                        >
+                            <x-heroicon-o-bolt class="size-4" />
+                            {{
+                                __(
+                                    'panel-admin::moderation.queue.actions.take_action',
+                                )
+                            }}
+                        </button>
+                        <button
+                            type="button"
+                            x-on:click="$dispatch('mount-queue-action', { action: 'escalate', arguments: { caseId: '{{ $case->id }}' } })"
+                            class="bg-warning-500 hover:bg-warning-400 dark:bg-warning-600 dark:hover:bg-warning-500 inline-flex w-full items-center justify-center gap-2 rounded-lg px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition"
+                        >
+                            <x-heroicon-o-arrow-up-circle class="size-4" />
+                            {{ __('panel-admin::moderation.queue.actions.escalate') }}
+                        </button>
+                        <button
+                            type="button"
+                            x-on:click="$dispatch('mount-queue-action', { action: 'dismiss', arguments: { caseId: '{{ $case->id }}' } })"
+                            class="inline-flex w-full items-center justify-center gap-2 rounded-lg border border-zinc-300 bg-white px-4 py-2.5 text-sm font-semibold text-zinc-700 shadow-sm transition hover:bg-zinc-50 dark:border-white/10 dark:bg-white/5 dark:text-zinc-300 dark:hover:bg-white/10"
+                        >
+                            <x-heroicon-o-x-circle class="size-4" />
+                            {{ __('panel-admin::moderation.queue.actions.dismiss') }}
+                        </button>
                     </div>
                 </section>
             @endif
