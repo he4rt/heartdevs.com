@@ -78,7 +78,7 @@ final class WebModerationAdapter implements ModerationPlatformContract
     {
         $target->notify(new ModerationActionNotification(
             $action,
-            'You received a warning. Reason: '.$action->reason,
+            __('moderation::notifications.warn', ['reason' => $action->reason]),
         ));
     }
 
@@ -95,7 +95,7 @@ final class WebModerationAdapter implements ModerationPlatformContract
 
         $target->notify(new ModerationActionNotification(
             $action,
-            sprintf('Your account has been suspended until %s. Reason: %s', $until->toDateTimeString(), $action->reason),
+            __('moderation::notifications.suspend', ['until' => $until->toDateTimeString(), 'reason' => $action->reason]),
         ));
     }
 
@@ -105,7 +105,7 @@ final class WebModerationAdapter implements ModerationPlatformContract
 
         $target->notify(new ModerationActionNotification(
             $action,
-            sprintf('Your account has been banned. Duration: %s. Reason: %s', $action->duration, $action->reason),
+            __('moderation::notifications.ban', ['duration' => $action->duration, 'reason' => $action->reason]),
         ));
     }
 
@@ -113,7 +113,7 @@ final class WebModerationAdapter implements ModerationPlatformContract
     {
         $target->notify(new ModerationActionNotification(
             $action,
-            'Content was removed. Reason: '.$action->reason,
+            __('moderation::notifications.content_remove', ['reason' => $action->reason]),
         ));
     }
 }

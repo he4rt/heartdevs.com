@@ -4,7 +4,12 @@ declare(strict_types=1);
 
 namespace He4rt\Moderation\Enums;
 
-enum CaseSource: string
+use Filament\Support\Contracts\HasColor;
+use Filament\Support\Contracts\HasIcon;
+use Filament\Support\Contracts\HasLabel;
+use Filament\Support\Icons\Heroicon;
+
+enum CaseSource: string implements HasColor, HasIcon, HasLabel
 {
     case UserReport = 'user_report';
     case AutoDetect = 'auto_detect';
@@ -16,5 +21,30 @@ enum CaseSource: string
         $cases = self::cases();
 
         return $cases[array_rand($cases)];
+    }
+
+    public function getLabel(): string
+    {
+        return __('moderation::enums.case_source.'.$this->value);
+    }
+
+    public function getColor(): string
+    {
+        return match ($this) {
+            self::UserReport => 'info',
+            self::AutoDetect => 'purple',
+            self::RuleMatch => 'warning',
+            self::ManualFlag => 'gray',
+        };
+    }
+
+    public function getIcon(): Heroicon
+    {
+        return match ($this) {
+            self::UserReport => Heroicon::Flag,
+            self::AutoDetect => Heroicon::Bolt,
+            self::RuleMatch => Heroicon::ShieldExclamation,
+            self::ManualFlag => Heroicon::HandRaised,
+        };
     }
 }

@@ -4,7 +4,12 @@ declare(strict_types=1);
 
 namespace He4rt\Moderation\Enums;
 
-enum ActionType: string
+use Filament\Support\Contracts\HasColor;
+use Filament\Support\Contracts\HasIcon;
+use Filament\Support\Contracts\HasLabel;
+use Filament\Support\Icons\Heroicon;
+
+enum ActionType: string implements HasColor, HasIcon, HasLabel
 {
     case Warn = 'warn';
     case Mute = 'mute';
@@ -18,5 +23,34 @@ enum ActionType: string
         $cases = self::cases();
 
         return $cases[array_rand($cases)];
+    }
+
+    public function getLabel(): string
+    {
+        return __('moderation::enums.action_type.'.$this->value);
+    }
+
+    public function getColor(): string
+    {
+        return match ($this) {
+            self::Warn => 'warning',
+            self::Mute => 'gray',
+            self::Kick => 'info',
+            self::Ban => 'danger',
+            self::Suspend => 'orange',
+            self::ContentRemove => 'purple',
+        };
+    }
+
+    public function getIcon(): Heroicon
+    {
+        return match ($this) {
+            self::Warn => Heroicon::ExclamationTriangle,
+            self::Mute => Heroicon::SpeakerXMark,
+            self::Kick => Heroicon::ArrowRightEndOnRectangle,
+            self::Ban => Heroicon::NoSymbol,
+            self::Suspend => Heroicon::Clock,
+            self::ContentRemove => Heroicon::Trash,
+        };
     }
 }

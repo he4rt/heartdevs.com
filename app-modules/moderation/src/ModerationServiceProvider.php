@@ -25,6 +25,7 @@ class ModerationServiceProvider extends ServiceProvider
     public function boot(): void
     {
         $this->loadMigrationsFrom(__DIR__.'/../database/migrations');
+        $this->loadTranslationsFrom(__DIR__.'/../lang', 'moderation');
 
         Event::listen(CaseCreated::class, [RecordAuditLog::class, 'handleCaseCreated']);
         Event::listen(CaseResolved::class, [RecordAuditLog::class, 'handleCaseResolved']);
