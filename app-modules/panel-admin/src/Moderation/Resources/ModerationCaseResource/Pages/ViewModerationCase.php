@@ -107,11 +107,14 @@ class ViewModerationCase extends ViewRecord
                         'duration' => $data['duration'],
                         'reason' => $data['reason'],
                         'automated' => false,
+                        'tenant_id' => $case->tenant_id,
                     ]);
 
                     if ($case->author) {
                         dispatch_sync(new ExecuteAction($action, $case->author));
                     }
+
+                    $this->redirect(static::getResource()::getUrl('index'));
                 }),
 
             Action::make('dismiss')
@@ -120,10 +123,14 @@ class ViewModerationCase extends ViewRecord
                 ->color('gray')
                 ->visible(fn () => in_array($this->record->status, [CaseStatus::Pending, CaseStatus::Assigned]))
                 ->requiresConfirmation()
-                ->action(fn () => $this->record->update([
-                    'status' => CaseStatus::Dismissed,
-                    'resolved_at' => now(),
-                ])),
+                ->action(function (): void {
+                    $this->record->update([
+                        'status' => CaseStatus::Dismissed,
+                        'resolved_at' => now(),
+                    ]);
+
+                    $this->redirect(static::getResource()::getUrl('index'));
+                }),
         ];
     }
 }

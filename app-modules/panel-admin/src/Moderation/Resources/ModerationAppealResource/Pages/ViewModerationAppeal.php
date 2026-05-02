@@ -59,6 +59,8 @@ class ViewModerationAppeal extends ViewRecord
                         'reviewer_notes' => $data['reviewer_notes'],
                         'resolved_at' => now(),
                     ]);
+
+                    $this->redirect(static::getResource()::getUrl('index'));
                 }),
 
             Action::make('overturn')
@@ -76,6 +78,8 @@ class ViewModerationAppeal extends ViewRecord
                         'reviewer_notes' => $data['reviewer_notes'],
                         'resolved_at' => now(),
                     ]);
+
+                    $this->redirect(static::getResource()::getUrl('index'));
                 }),
         ];
     }
