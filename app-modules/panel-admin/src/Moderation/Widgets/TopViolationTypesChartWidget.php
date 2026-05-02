@@ -17,7 +17,7 @@ class TopViolationTypesChartWidget extends ChartWidget
     use InteractsWithPageFilters;
     use ResolvesFilterPeriod;
 
-    protected static ?string $pollingInterval = null;
+    protected ?string $pollingInterval = null;
 
     protected int|string|array $columnSpan = 1;
 

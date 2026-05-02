@@ -38,15 +38,15 @@ class FalsePositiveRateWidget extends StatsOverviewWidget
         if ($currentRate < $previousRate) {
             $description = __('panel-admin::moderation.dashboard.false_positive.improving', ['prev' => $previousRate]);
             $descriptionColor = Color::Green;
-            $descriptionIcon = Heroicon::MiniArrowTrendingDown;
+            $descriptionIcon = Heroicon::ArrowTrendingDown;
         } elseif ($currentRate > $previousRate) {
             $description = __('panel-admin::moderation.dashboard.false_positive.worsening', ['prev' => $previousRate]);
             $descriptionColor = Color::Red;
-            $descriptionIcon = Heroicon::MiniArrowTrendingUp;
+            $descriptionIcon = Heroicon::ArrowTrendingUp;
         } else {
             $description = __('panel-admin::moderation.dashboard.false_positive.stable');
             $descriptionColor = Color::Gray;
-            $descriptionIcon = Heroicon::MiniMinus;
+            $descriptionIcon = Heroicon::Minus;
         }
 
         $stats = [

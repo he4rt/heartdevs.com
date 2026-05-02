@@ -33,7 +33,7 @@ class AppealSlaWidget extends TableWidget
                 IconColumn::make('sla_status')
                     ->label('')
                     ->state(fn (ModerationAppeal $record): string => $record->sla_deadline->isFuture() ? 'on_track' : 'overdue')
-                    ->icon(fn (string $state): Heroicon => $state === 'on_track' ? Heroicon::MiniCheckCircle : Heroicon::MiniExclamationCircle)
+                    ->icon(fn (string $state): Heroicon => $state === 'on_track' ? Heroicon::CheckCircle : Heroicon::ExclamationCircle)
                     ->color(fn (string $state): string => $state === 'on_track' ? 'success' : 'danger'),
                 TextColumn::make('id')
                     ->label('Appeal')

@@ -9,9 +9,12 @@ use He4rt\Moderation\Appeals\ModerationAppeal;
 use He4rt\Moderation\Cases\Models\ModerationCase;
 use He4rt\Moderation\Enforcement\ModerationAction;
 use He4rt\PanelAdmin\Moderation\Pages\ModerationDashboard;
+use He4rt\PanelAdmin\Moderation\Widgets\AppealSlaWidget;
 use He4rt\PanelAdmin\Moderation\Widgets\CasesByPlatformChartWidget;
 use He4rt\PanelAdmin\Moderation\Widgets\CasesByStatusChartWidget;
+use He4rt\PanelAdmin\Moderation\Widgets\FalsePositiveRateWidget;
 use He4rt\PanelAdmin\Moderation\Widgets\ModerationStatsWidget;
+use He4rt\PanelAdmin\Moderation\Widgets\ModeratorPerformanceWidget;
 use He4rt\PanelAdmin\Moderation\Widgets\RecentActionsWidget;
 use He4rt\PanelAdmin\Moderation\Widgets\TopViolationTypesChartWidget;
 
@@ -43,6 +46,9 @@ test('dashboard registers all widgets', function (): void {
         CasesByStatusChartWidget::class,
         CasesByPlatformChartWidget::class,
         TopViolationTypesChartWidget::class,
+        FalsePositiveRateWidget::class,
+        ModeratorPerformanceWidget::class,
+        AppealSlaWidget::class,
         RecentActionsWidget::class,
     ]);
 });
@@ -89,6 +95,33 @@ test('top violations chart widget renders', function (): void {
     ModerationCase::factory()->create(['violation_type' => 'toxicity']);
 
     livewire(TopViolationTypesChartWidget::class)
+        ->assertSuccessful();
+});
+
+test('false positive rate widget renders', function (): void {
+    ModerationCase::factory()->create(['status' => 'dismissed']);
+    ModerationCase::factory()->resolved()->create();
+
+    livewire(FalsePositiveRateWidget::class)
+        ->assertSuccessful();
+});
+
+test('moderator performance widget renders', function (): void {
+    $moderator = User::factory()->create();
+
+    ModerationAction::factory()->create(['moderator_id' => $moderator->id]);
+
+    livewire(ModeratorPerformanceWidget::class)
+        ->assertSuccessful();
+});
+
+test('appeal sla widget shows active appeals', function (): void {
+    ModerationAppeal::factory()->create([
+        'status' => 'pending',
+        'sla_deadline' => now()->addHours(30),
+    ]);
+
+    livewire(AppealSlaWidget::class)
         ->assertSuccessful();
 });
 
