@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "b1910e4d22f2b2b878bd6de24023411e",
+    "content-hash": "166a8d3218d47bc4572d17f422a534c9",
     "packages": [
         {
             "name": "blade-ui-kit/blade-heroicons",
@@ -3485,6 +3485,43 @@
             "license": [
                 "proprietary"
             ],
+            "transport-options": {
+                "symlink": true,
+                "relative": true
+            }
+        },
+        {
+            "name": "he4rt/moderation",
+            "version": "1.0",
+            "dist": {
+                "type": "path",
+                "url": "app-modules/moderation",
+                "reference": "78735bfbe8608a613d9bbc79d1ad097f92f2bac7"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "He4rt\\Moderation\\ModerationServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "He4rt\\Moderation\\": "src/",
+                    "He4rt\\Moderation\\Database\\Factories\\": "database/factories/",
+                    "He4rt\\Moderation\\Database\\Seeders\\": "database/seeders/"
+                }
+            },
+            "autoload-dev": {
+                "psr-4": {
+                    "He4rt\\Moderation\\Tests\\": "tests/"
+                }
+            },
+            "license": [
+                "proprietary"
+            ],
+            "description": "Platform-agnostic moderation system",
             "transport-options": {
                 "symlink": true,
                 "relative": true

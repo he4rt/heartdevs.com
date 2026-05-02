@@ -1,0 +1,28 @@
+{
+    "name": "he4rt/moderation",
+    "description": "Platform-agnostic moderation system",
+    "type": "library",
+    "version": "1.0",
+    "license": "proprietary",
+    "require": {},
+    "autoload": {
+        "psr-4": {
+            "He4rt\\Moderation\\": "src/",
+            "He4rt\\Moderation\\Database\\Factories\\": "database/factories/",
+            "He4rt\\Moderation\\Database\\Seeders\\": "database/seeders/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "He4rt\\Moderation\\Tests\\": "tests/"
+        }
+    },
+    "minimum-stability": "stable",
+    "extra": {
+        "laravel": {
+            "providers": [
+                "He4rt\\Moderation\\ModerationServiceProvider"
+            ]
+        }
+    }
+}
