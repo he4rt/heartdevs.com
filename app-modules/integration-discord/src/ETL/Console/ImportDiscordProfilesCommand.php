@@ -113,7 +113,7 @@ class ImportDiscordProfilesCommand extends Command
             $profileSection->clear();
             $this->renderBox($profileSection, $profileTitle, $profileCurrent, $totalProfiles);
 
-            foreach (array_chunk($profiles, 100) as $batch) {
+            foreach (array_chunk($profiles, 250) as $batch) {
                 DB::transaction(function () use (
                     $batch, $action, $tenantId, $chunkName,
                     &$stats, &$errorSamples, &$profileCurrent, $totalProfiles,

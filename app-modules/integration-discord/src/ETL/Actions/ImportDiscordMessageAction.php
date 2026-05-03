@@ -461,7 +461,19 @@ final class ImportDiscordMessageAction
 
     private function resolveOrCreateUser(DiscordMessageDTO $dto): User
     {
-        $existing = User::query()->where('username', $dto->authorUsername)->first();
+        $conflictingIds = ExternalIdentity::query()
+            ->where('provider', IdentityProvider::Discord)
+            ->where('external_account_id', '!=', $dto->authorDiscordId)
+            ->where('model_type', (new User)->getMorphClass())
+            ->pluck('model_id')
+            ->all();
+
+        $existing = User::query()
+            ->whereIn('username', [$dto->authorUsername, $dto->authorUsername.'#0'])
+            ->when($conflictingIds !== [], fn ($q) => $q->whereNotIn('id', $conflictingIds))
+            ->orderByRaw('CASE WHEN username = ? THEN 0 ELSE 1 END', [$dto->authorUsername])
+            ->first();
+
         if ($existing instanceof User) {
             return $existing;
         }

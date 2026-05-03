@@ -25,6 +25,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Support\Carbon;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
 
@@ -34,6 +35,8 @@ use Spatie\MediaLibrary\InteractsWithMedia;
  * @property string $username
  * @property string $email
  * @property bool $is_donator
+ * @property Carbon $created_at
+ * @property Carbon $updated_at
  */
 #[ObservedBy(UserObserver::class)]
 final class User extends Authenticatable implements FilamentUser, HasMedia, HasName, HasTenants
