@@ -8,6 +8,7 @@ use Filament\Navigation\NavigationBuilder;
 use Filament\Navigation\NavigationItem;
 use Filament\Panel;
 use He4rt\PanelAdmin\Moderation\Livewire\AppealQueue;
+use He4rt\PanelAdmin\Moderation\Livewire\ModerationDashboardLivewire;
 use He4rt\PanelAdmin\Moderation\Livewire\ModerationQueue;
 use He4rt\PanelAdmin\Moderation\ModerationCluster;
 use He4rt\PanelAdmin\Pages\Dashboard;
@@ -46,6 +47,7 @@ class PanelAdminServiceProvider extends ServiceProvider
 
         Livewire::component('moderation-queue', ModerationQueue::class);
         Livewire::component('appeal-queue', AppealQueue::class);
+        Livewire::component('moderation-dashboard', ModerationDashboardLivewire::class);
     }
 
     private function buildNavigation(NavigationBuilder $builder): NavigationBuilder
