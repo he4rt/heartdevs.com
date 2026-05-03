@@ -14,7 +14,7 @@ services:
     ports:
       - '5432:5432'
     volumes:
-      - he4rtbot-db:/var/lib/postgresql/data
+      - he4rtbot-db:/var/lib/postgresql
     networks:
       - dev-he4rtbot
     healthcheck:
