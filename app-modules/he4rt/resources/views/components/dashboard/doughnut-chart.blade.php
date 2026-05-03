@@ -1,13 +1,21 @@
 @props ([
-    'items', // array of ['label' => string, 'count' => int, 'color' => hex]
+    'items',
     'total' => null,
-    'size' => 130, // svg width/height
+    'size' => 130,
     'strokeWidth' => 16,
-    'radius' => 55
+    'radius' => 55,
+    'hideZero' => true,
+    'primaryMetric' => 'count'
 ])
 
 @php
-    $total = $total ?? collect($items)->sum('count');
+    $items = collect($items);
+    $total = $total ?? $items->sum('count');
+
+    if ($hideZero) {
+        $items = $items->filter(fn($i) => $i['count'] > 0)->values();
+    }
+
     $circumference = 2 * M_PI * $radius;
     $offset = -($circumference * 0.25);
     $segments = [];
@@ -22,7 +30,6 @@
         ];
         $offset += $dash;
     }
-    $center = $size / 2 + ($size - 130) / 2;
     $cx = 70;
     $cy = 70;
 @endphp
@@ -34,14 +41,14 @@
         )
     }}
 >
-    <svg viewBox="0 0 140 140" @class (['shrink-0', 'h-32 w-32' => $size === 130, 'h-28 w-28' => $size < 130])>
+    <svg viewBox="0 0 140 140" @class (['shrink-0', 'h-28 w-28' => $size <= 130])>
         <circle
             cx="{{ $cx }}"
             cy="{{ $cy }}"
             r="{{ $radius }}"
             fill="none"
             stroke-width="{{ $strokeWidth }}"
-            class="stroke-zinc-100 dark:stroke-zinc-700"
+            class="stroke-zinc-100 dark:stroke-zinc-700/60"
         />
         @foreach ($segments as $seg)
             @if ($seg['dash'] > 0.5)
@@ -61,28 +68,39 @@
         @endforeach
         <text
             x="{{ $cx }}"
-            y="{{ $cy - 4 }}"
+            y="{{ $cy + 5 }}"
             text-anchor="middle"
             class="fill-zinc-900 dark:fill-white"
-            font-size="20"
+            font-size="22"
             font-weight="800"
         >
             {{ $total }}
         </text>
-        <text x="{{ $cx }}" y="{{ $cy + 10 }}" text-anchor="middle" class="fill-zinc-400" font-size="9">total</text>
     </svg>
 
-    <div class="flex-1 space-y-1.5">
-        @foreach ($items as $item)
-            @php $pct = $total > 0 ? round(($item['count'] / $total) * 100) : 0; @endphp
-            <div class="flex items-center justify-between">
+    <div class="flex-1 space-y-1">
+        @foreach ($items as $idx => $item)
+            @php
+                $pct = $total > 0 ? round(($item['count'] / $total) * 100) : 0;
+                $isPrimary = $primaryMetric === 'count';
+            @endphp
+            <div class="flex items-center justify-between py-0.5">
                 <div class="flex items-center gap-2">
-                    <div class="h-2 w-2 rounded-sm" style="background:{{ $item['color'] }}"></div>
-                    <span class="text-sm font-medium dark:text-zinc-200">{{ $item['label'] }}</span>
+                    <div
+                        class="h-2.5 w-2.5 rounded-sm ring-1 ring-white/10"
+                        style="background:{{ $item['color'] }}"
+                    ></div>
+                    <span class="text-sm font-medium text-zinc-700 dark:text-zinc-200">{{ $item['label'] }}</span>
                 </div>
-                <div class="flex items-baseline gap-2">
-                    <span class="font-mono text-sm font-semibold dark:text-white">{{ $item['count'] }}</span>
-                    <span class="font-mono text-xs text-zinc-400">{{ $pct }}%</span>
+                <div class="flex items-baseline gap-1.5">
+                    <span
+                        class="font-mono text-sm font-bold text-zinc-900 dark:text-white"
+                        >{{ $isPrimary ? $item['count'] : $pct . '%' }}</span
+                    >
+                    <span
+                        class="font-mono text-[11px] text-zinc-400"
+                        >{{ $isPrimary ? $pct . '%' : $item['count'] }}</span
+                    >
                 </div>
             </div>
         @endforeach

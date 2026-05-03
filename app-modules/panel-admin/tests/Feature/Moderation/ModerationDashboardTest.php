@@ -33,7 +33,7 @@ test('dashboard page renders successfully', function (): void {
 
 test('livewire component renders overview tab by default', function (): void {
     livewire(ModerationDashboardLivewire::class)
-        ->assertSee(__('panel-admin::moderation.dashboard.heading'))
+        ->assertSee(__('panel-admin::moderation.dashboard.filter_period'))
         ->assertSuccessful();
 });
 

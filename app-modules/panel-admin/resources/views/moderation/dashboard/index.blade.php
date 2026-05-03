@@ -1,27 +1,48 @@
 <div wire:poll.60s>
-    {{-- Header + Period Filter --}}
-    <div class="mb-6 flex items-center justify-between">
-        <div>
-            <h2 class="text-xl font-bold text-zinc-900 dark:text-white">
-                {{ __('panel-admin::moderation.dashboard.heading') }}
-            </h2>
-            <p class="text-sm text-zinc-500 dark:text-zinc-400">Centro de comando da moderacao comunitaria</p>
+    {{-- Controls: Period filter + Tabs --}}
+    <div class="mb-6 space-y-3">
+        {{-- Period filter: select on mobile, segmented on desktop --}}
+        <div class="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+            <span
+                class="shrink-0 text-xs font-semibold tracking-widest text-zinc-400 uppercase"
+                >{{ __('panel-admin::moderation.dashboard.filter_period') }}</span
+            >
+            <div class="sm:hidden">
+                <flux:select wire:model.live="period" size="sm">
+                    @foreach (__('panel-admin::moderation.dashboard.periods') as $value => $label)
+                        <flux:select.option value="{{ $value }}">{{ $label }}</flux:select.option>
+                    @endforeach
+                </flux:select>
+            </div>
+            <div class="hidden sm:block">
+                <flux:radio.group wire:model.live="period" variant="segmented" size="sm">
+                    @foreach (__('panel-admin::moderation.dashboard.periods') as $value => $label)
+                        <flux:radio value="{{ $value }}" label="{{ $label }}" />
+                    @endforeach
+                </flux:radio.group>
+            </div>
         </div>
-        <flux:radio.group wire:model.live="period" variant="segmented" size="sm">
-            @foreach (__('panel-admin::moderation.dashboard.periods') as $value => $label)
-                <flux:radio value="{{ $value }}" label="{{ $label }}" />
-            @endforeach
-        </flux:radio.group>
-    </div>
 
-    {{-- Tabs --}}
-    <flux:radio.group wire:model.live="activeTab" variant="segmented" class="mb-6">
-        <flux:radio value="overview" label="Visao Geral" />
-        <flux:radio value="classification" label="Classificacao & IA" />
-        <flux:radio value="team" label="Equipe" />
-        <flux:radio value="appeals" label="Appeals & SLA" />
-        <flux:radio value="activity" label="Atividade" />
-    </flux:radio.group>
+        {{-- Tabs: select on mobile, segmented on desktop --}}
+        <div class="sm:hidden">
+            <flux:select wire:model.live="activeTab">
+                <flux:select.option value="overview">Visao Geral</flux:select.option>
+                <flux:select.option value="classification">Classificacao & IA</flux:select.option>
+                <flux:select.option value="team">Equipe</flux:select.option>
+                <flux:select.option value="appeals">Appeals & SLA</flux:select.option>
+                <flux:select.option value="activity">Atividade</flux:select.option>
+            </flux:select>
+        </div>
+        <div class="hidden sm:block">
+            <flux:radio.group wire:model.live="activeTab" variant="segmented">
+                <flux:radio value="overview" icon="chart-bar" label="Visao Geral" />
+                <flux:radio value="classification" icon="cpu-chip" label="IA" />
+                <flux:radio value="team" icon="user-group" label="Equipe" />
+                <flux:radio value="appeals" icon="scale" label="Appeals" />
+                <flux:radio value="activity" icon="bolt" label="Atividade" />
+            </flux:radio.group>
+        </div>
+    </div>
 
     {{-- ==================== TAB: OVERVIEW ==================== --}}
     @if ($activeTab === 'overview')
@@ -64,10 +85,7 @@
             </x-he4rt::dashboard.stat-row>
 
             <x-he4rt::dashboard.grid>
-                <x-he4rt::dashboard.panel
-                    :title="__('panel-admin::moderation.dashboard.cases_by_status')"
-                    :badge="$this->casesByStatus->sum() . ' total'"
-                >
+                <x-he4rt::dashboard.panel :title="__('panel-admin::moderation.dashboard.cases_by_status')">
                     <x-he4rt::dashboard.doughnut-chart
                         :items="
                             collect(\He4rt\Moderation\Enums\CaseStatus::cases())
@@ -106,25 +124,24 @@
 
             <x-he4rt::dashboard.grid>
                 <x-he4rt::dashboard.panel :title="__('panel-admin::moderation.dashboard.top_violations')">
-                    @php
-                        $violationTotal = $this->violationCounts->sum();
-                    @endphp
                     <x-he4rt::dashboard.bar-chart
                         :items="
                             $this->violationCounts
         ->map(
             fn($count, $type) => [
                 'label' => \He4rt\Moderation\Enums\ViolationType::from($type)->getLabel(),
-                'value' => $violationTotal > 0 ? round(($count / $violationTotal) * 100) : 0,
+                'value' => $count,
                 'color' => \Filament\Support\Colors\Color::convertToHex(
                     \He4rt\Moderation\Enums\ViolationType::from($type)->getColor()[500],
                 ),
+                'suffix' => '',
             ],
         )
         ->values()
         ->toArray()
                         "
-                        :max="100"
+                        labelWidth="w-32"
+                        :normalizeToTotal="true"
                     />
                 </x-he4rt::dashboard.panel>
 
