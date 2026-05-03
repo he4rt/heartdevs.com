@@ -7,7 +7,6 @@ use He4rt\Identity\Tenant\Models\Tenant;
 use He4rt\Identity\User\Models\User;
 use He4rt\Moderation\Cases\Models\ModerationCase;
 use He4rt\PanelAdmin\Moderation\Livewire\ModerationQueue;
-use He4rt\PanelAdmin\Moderation\Pages\ModerationQueuePage;
 
 use function Pest\Livewire\livewire;
 
@@ -121,8 +120,9 @@ test('dismiss action updates case status', function (): void {
         'tenant_id' => $this->tenant->id,
     ]);
 
-    livewire(ModerationQueuePage::class)
-        ->callAction('dismiss', arguments: ['caseId' => $case->id])
+    livewire(ModerationQueue::class)
+        ->call('selectCase', $case->id)
+        ->callAction('dismiss')
         ->assertNotified();
 
     $case->refresh();
@@ -136,8 +136,9 @@ test('escalate action updates case status', function (): void {
         'tenant_id' => $this->tenant->id,
     ]);
 
-    livewire(ModerationQueuePage::class)
-        ->callAction('escalate', arguments: ['caseId' => $case->id])
+    livewire(ModerationQueue::class)
+        ->call('selectCase', $case->id)
+        ->callAction('escalate')
         ->assertNotified();
 
     $case->refresh();
