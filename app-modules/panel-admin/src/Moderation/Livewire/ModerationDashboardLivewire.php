@@ -14,7 +14,35 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Livewire\Attributes\Computed;
 use Livewire\Component;
+use stdClass;
 
+/**
+ * @property Carbon $periodStart
+ * @property Carbon $previousPeriodStart
+ * @property int $pendingCount
+ * @property int $resolvedCount
+ * @property int $avgResolutionMinutes
+ * @property int $appealRate
+ * @property int $healthScore
+ * @property Collection<string, int> $casesByStatus
+ * @property Collection<string, int> $casesByPlatform
+ * @property Collection<string, int> $violationCounts
+ * @property int $falsePositiveRate
+ * @property int $previousFalsePositiveRate
+ * @property int $fpRateOpenAi
+ * @property int $fpRateRules
+ * @property int $automationRate
+ * @property array{auto: int, manual: int, total: int} $autoVsManualCounts
+ * @property Collection<int, stdClass> $moderatorStats
+ * @property int $overallOverturnRate
+ * @property Collection<int, ModerationAppeal> $openAppeals
+ * @property int $resolvedAppealsCount
+ * @property int $overturnedAppealsCount
+ * @property int $slaComplianceRate
+ * @property Collection<int, ModerationAction> $recentActions
+ * @property Collection<int, stdClass> $repeatOffenders
+ * @property array<int, array{day: int, hour: int, value: int}> $activityHeatmap
+ */
 class ModerationDashboardLivewire extends Component
 {
     public string $period = '30d';
@@ -174,6 +202,7 @@ class ModerationDashboardLivewire extends Component
         return $total > 0 ? (int) round(($auto / $total) * 100) : 0;
     }
 
+    /** @return array{auto: int, manual: int, total: int} */
     #[Computed]
     public function autoVsManualCounts(): array
     {
@@ -185,6 +214,7 @@ class ModerationDashboardLivewire extends Component
 
     // ==================== TAB: TEAM ====================
 
+    /** @return Collection<int, stdClass> */
     #[Computed]
     public function moderatorStats(): Collection
     {
@@ -230,6 +260,7 @@ class ModerationDashboardLivewire extends Component
 
     // ==================== TAB: APPEALS ====================
 
+    /** @return Collection<int, ModerationAppeal> */
     #[Computed]
     public function openAppeals(): Collection
     {
@@ -277,6 +308,7 @@ class ModerationDashboardLivewire extends Component
 
     // ==================== TAB: ACTIVITY ====================
 
+    /** @return Collection<int, ModerationAction> */
     #[Computed]
     public function recentActions(): Collection
     {
@@ -288,6 +320,7 @@ class ModerationDashboardLivewire extends Component
             ->get();
     }
 
+    /** @return Collection<int, stdClass> */
     #[Computed]
     public function repeatOffenders(): Collection
     {
@@ -303,7 +336,7 @@ class ModerationDashboardLivewire extends Component
             ->get()
             ->map(function (object $row): object {
                 $user = DB::table('users')->where('id', $row->author_id)->first(['username']);
-                $row->username = $user?->username ?? 'unknown';
+                $row->username = $user->username ?? 'unknown';
 
                 return $row;
             });
@@ -313,7 +346,7 @@ class ModerationDashboardLivewire extends Component
     #[Computed]
     public function activityHeatmap(): array
     {
-        $dbData = ModerationAction::query()
+        $dbData = DB::table('moderation_actions')
             ->where('created_at', '>=', now()->subDays(30))
             ->selectRaw('EXTRACT(DOW FROM created_at) as dow, EXTRACT(HOUR FROM created_at) as hour, count(*) as total')
             ->groupByRaw('EXTRACT(DOW FROM created_at), EXTRACT(HOUR FROM created_at)')
