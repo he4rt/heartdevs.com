@@ -4,6 +4,7 @@
     class="flex flex-col gap-3"
     style="height: calc(100vh - 200px)"
 >
+    <x-filament-actions::modals />
     {{-- Filters --}}
     <div class="flex flex-wrap items-center gap-2 sm:gap-3">
         <flux:select
@@ -152,6 +153,4 @@
             @endif
         </div>
     </div>
-
-    <x-filament-actions::modals />
 </div>

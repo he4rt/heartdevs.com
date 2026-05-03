@@ -311,8 +311,8 @@
                             )
                         }}
                     </h3>
-                    <div class="[&_.fi-ac-action]:w-full [&_.fi-ac-action]:justify-center flex flex-col gap-2">
-                        {{ $this->takeActionAction }} {{ $this->escalateAction }} {{ $this->dismissAction }}
+                    <div class="[&_.fi-ac-action]:justify-center flex flex-col gap-2">
+                        {{ $this->handleAction }} {{ $this->escalateAction }} {{ $this->dismissAction }}
                     </div>
                 </section>
             @endif

@@ -33,6 +33,7 @@ class AdminPanelProvider extends PanelProvider
             ->colors([
                 'primary' => Color::Purple,
             ])
+            ->sidebarCollapsibleOnDesktop()
             ->tenant(Tenant::class, slugAttribute: 'slug')
             ->viteTheme('resources/css/filament/admin/theme.css')
             ->middleware([

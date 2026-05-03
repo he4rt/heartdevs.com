@@ -13,6 +13,7 @@ use Filament\Forms\Components\Textarea;
 use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Contracts\HasForms;
 use Filament\Notifications\Notification;
+use Filament\Support\Colors\Color;
 use Filament\Support\Icons\Heroicon;
 use He4rt\Moderation\Cases\Models\ModerationCase;
 use He4rt\Moderation\Enforcement\ExecuteAction;
@@ -102,13 +103,15 @@ class ModerationQueue extends Component implements HasActions, HasForms
         $this->resetSelection();
     }
 
-    public function takeActionAction(): Action
+    public function handleAction(): Action
     {
-        return Action::make('takeAction')
+
+        return Action::make('handle')
             ->label(__('panel-admin::moderation.queue.actions.take_action'))
-            ->icon(Heroicon::OutlinedBolt)
-            ->color('danger')
+            ->icon(Heroicon::OutlinedArrowUpCircle)
+            ->color(Color::Red)
             ->size('lg')
+            ->requiresConfirmation()
             ->schema([
                 Select::make('action_type')
                     ->options(ActionType::class)
@@ -165,6 +168,23 @@ class ModerationQueue extends Component implements HasActions, HasForms
             ->color('warning')
             ->size('lg')
             ->requiresConfirmation()
+            ->schema([
+                Select::make('action_type')
+                    ->options(ActionType::class)
+                    ->required(),
+                Select::make('duration')
+                    ->options([
+                        '24h' => '24 hours',
+                        '7d' => '7 days',
+                        '30d' => '30 days',
+                        'permanent' => 'Permanent',
+                    ]),
+                CheckboxList::make('target_platforms')
+                    ->options(Platform::class)
+                    ->required(),
+                Textarea::make('reason')
+                    ->required(),
+            ])
             ->action(function (): void {
                 $this->selectedCase?->update([
                     'status' => CaseStatus::Escalated,
