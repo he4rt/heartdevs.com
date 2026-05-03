@@ -33,7 +33,11 @@ return RectorConfig::configure()
         __DIR__.'/app-modules/*/routes',
         __DIR__.'/app-modules/*/tests',
     ])
-    ->withSkip([__DIR__.'/bootstrap/cache'])
+    ->withSkip([
+        __DIR__.'/bootstrap/cache',
+        __DIR__.'resources/views/flux/flux-styles.blade.php',
+        __DIR__.'resources/views/flux/flux-scripts.blade.php',
+    ])
     ->withCache(cacheDirectory: __DIR__.'/.rector.result.cache', cacheClass: FileCacheStorage::class)
     ->withImportNames(removeUnusedImports: true)
     ->withRootFiles()
