@@ -131,6 +131,7 @@ return [
             'escalate' => 'Escalar',
             'dismiss' => 'Dispensar',
             'success' => 'Ação executada com sucesso',
+            'execution_failed' => 'Ação registrada mas a execução falhou em algumas plataformas',
             'escalated' => 'Caso escalado',
             'dismissed' => 'Caso dispensado',
         ],

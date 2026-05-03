@@ -13,6 +13,7 @@ use Filament\Panel;
 use Filament\PanelProvider;
 use Filament\Support\Colors\Color;
 use He4rt\Identity\Tenant\Models\Tenant;
+use He4rt\PanelAdmin\Http\Middleware\ApplyTenantScopes;
 use He4rt\PanelAdmin\Pages\Dashboard;
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
 use Illuminate\Cookie\Middleware\EncryptCookies;
@@ -32,6 +33,7 @@ class AdminPanelProvider extends PanelProvider
             ->login(Login::class)
             ->colors([
                 'primary' => Color::Purple,
+                'gray' => Color::Zinc,
             ])
             ->sidebarCollapsibleOnDesktop()
             ->tenant(Tenant::class, slugAttribute: 'slug')
@@ -52,6 +54,9 @@ class AdminPanelProvider extends PanelProvider
             ])
             ->authMiddleware([
                 Authenticate::class,
+            ])
+            ->tenantMiddleware([
+                ApplyTenantScopes::class,
             ]);
 
         return $panel;

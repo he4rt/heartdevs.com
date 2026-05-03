@@ -131,6 +131,7 @@ return [
             'escalate' => 'Escalate',
             'dismiss' => 'Dismiss',
             'success' => 'Action executed successfully',
+            'execution_failed' => 'Action recorded but execution failed on some platforms',
             'escalated' => 'Case escalated',
             'dismissed' => 'Case dismissed',
         ],

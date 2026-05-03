@@ -25,6 +25,7 @@ use Illuminate\Contracts\View\View;
 use Illuminate\Support\Collection;
 use Livewire\Attributes\Computed;
 use Livewire\Component;
+use Throwable;
 
 /**
  * @property Collection<int, ModerationCase> $cases
@@ -148,7 +149,21 @@ class ModerationQueue extends Component implements HasActions, HasForms
                 ]);
 
                 if ($case->author) {
-                    dispatch_sync(new ExecuteAction($action, $case->author));
+                    try {
+                        dispatch_sync(new ExecuteAction($action, $case->author));
+                    } catch (Throwable $e) {
+                        report($e);
+
+                        Notification::make()
+                            ->warning()
+                            ->title(__('panel-admin::moderation.queue.actions.execution_failed'))
+                            ->body($e->getMessage())
+                            ->send();
+
+                        $this->advanceToNextCase();
+
+                        return;
+                    }
                 }
 
                 Notification::make()
@@ -168,23 +183,6 @@ class ModerationQueue extends Component implements HasActions, HasForms
             ->color('warning')
             ->size('lg')
             ->requiresConfirmation()
-            ->schema([
-                Select::make('action_type')
-                    ->options(ActionType::class)
-                    ->required(),
-                Select::make('duration')
-                    ->options([
-                        '24h' => '24 hours',
-                        '7d' => '7 days',
-                        '30d' => '30 days',
-                        'permanent' => 'Permanent',
-                    ]),
-                CheckboxList::make('target_platforms')
-                    ->options(Platform::class)
-                    ->required(),
-                Textarea::make('reason')
-                    ->required(),
-            ])
             ->action(function (): void {
                 $this->selectedCase?->update([
                     'status' => CaseStatus::Escalated,
