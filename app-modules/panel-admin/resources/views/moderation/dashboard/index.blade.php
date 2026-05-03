@@ -30,7 +30,6 @@
                 <flux:select.option value="classification">Classificacao & IA</flux:select.option>
                 <flux:select.option value="team">Equipe</flux:select.option>
                 <flux:select.option value="appeals">Appeals & SLA</flux:select.option>
-                <flux:select.option value="activity">Atividade</flux:select.option>
             </flux:select>
         </div>
         <div class="hidden sm:block">
@@ -39,7 +38,6 @@
                 <flux:radio value="classification" icon="cpu-chip" label="IA" />
                 <flux:radio value="team" icon="user-group" label="Equipe" />
                 <flux:radio value="appeals" icon="scale" label="Appeals" />
-                <flux:radio value="activity" icon="bolt" label="Atividade" />
             </flux:radio.group>
         </div>
     </div>
@@ -84,9 +82,28 @@
                 />
             </x-he4rt::dashboard.stat-row>
 
+            <x-he4rt::dashboard.grid columns="1">
+                <x-he4rt::dashboard.panel
+                    title="Atividade por hora e dia"
+                    subtitle="ultimos 30 dias"
+                    :badge="$this->casesByStatus->sum() . ' total'"
+                >
+                    <x-he4rt::dashboard.heatmap
+                        variant="week"
+                        :data="$this->activityHeatmap"
+                        icon="shield-check"
+                        :highlightNow="true"
+                        insightDetail="Concentre staff de plantao nos horarios de pico"
+                    />
+                </x-he4rt::dashboard.panel>
+            </x-he4rt::dashboard.grid>
+
             <x-he4rt::dashboard.grid>
-                <x-he4rt::dashboard.panel :title="__('panel-admin::moderation.dashboard.cases_by_status')">
-                    <x-he4rt::dashboard.doughnut-chart
+                <x-he4rt::dashboard.panel
+                    :title="__('panel-admin::moderation.dashboard.cases_by_status')"
+                    :badge="$this->casesByStatus->sum() . ' total'"
+                >
+                    <x-he4rt::dashboard.progress-list
                         :items="
                             collect(\He4rt\Moderation\Enums\CaseStatus::cases())
         ->map(
@@ -96,6 +113,8 @@
                 'color' => \Filament\Support\Colors\Color::convertToHex($s->getColor()[500]),
             ],
         )
+        ->filter(fn($i) => $i['count'] > 0)
+        ->values()
         ->toArray()
                         "
                         :total="$this->casesByStatus->sum()"
@@ -103,7 +122,7 @@
                 </x-he4rt::dashboard.panel>
 
                 <x-he4rt::dashboard.panel :title="__('panel-admin::moderation.dashboard.cases_by_platform')">
-                    <x-he4rt::dashboard.doughnut-chart
+                    <x-he4rt::dashboard.progress-list
                         :items="
                             collect(\He4rt\Moderation\Enums\Platform::cases())
         ->map(
@@ -124,24 +143,25 @@
 
             <x-he4rt::dashboard.grid>
                 <x-he4rt::dashboard.panel :title="__('panel-admin::moderation.dashboard.top_violations')">
+                    @php
+                        $violationTotal = $this->violationCounts->sum();
+                    @endphp
                     <x-he4rt::dashboard.bar-chart
                         :items="
                             $this->violationCounts
         ->map(
             fn($count, $type) => [
                 'label' => \He4rt\Moderation\Enums\ViolationType::from($type)->getLabel(),
-                'value' => $count,
+                'value' => $violationTotal > 0 ? round(($count / $violationTotal) * 100) : 0,
                 'color' => \Filament\Support\Colors\Color::convertToHex(
                     \He4rt\Moderation\Enums\ViolationType::from($type)->getColor()[500],
                 ),
-                'suffix' => '',
             ],
         )
         ->values()
         ->toArray()
                         "
-                        labelWidth="w-32"
-                        :normalizeToTotal="true"
+                        :max="100"
                     />
                 </x-he4rt::dashboard.panel>
 
@@ -196,6 +216,108 @@
                     </div>
                 </x-he4rt::dashboard.panel>
             </x-he4rt::dashboard.grid>
+
+            {{-- Activity: Repeat Offenders --}}
+            <x-he4rt::dashboard.grid>
+                <x-he4rt::dashboard.panel title="Reincidentes" badge="top 5">
+                    @forelse ($this->repeatOffenders as $offender)
+                        <div
+                            class="flex items-center justify-between border-b border-zinc-100 py-2.5 last:border-0 dark:border-zinc-700/50"
+                        >
+                            <div class="flex items-center gap-3">
+                                <span
+                                    @class ([
+                                        'font-mono text-sm font-bold',
+                                        'text-red-500' => $offender->offense_count >= 5,
+                                        'text-amber-500' => $offender->offense_count >= 3 && $offender->offense_count < 5,
+                                        'text-zinc-400' => $offender->offense_count < 3
+                                    ])
+                                    >{{ $offender->offense_count }}</span
+                                >
+                                <span
+                                    class="text-sm font-medium dark:text-zinc-200"
+                                    >{{ '@' . $offender->username }}</span
+                                >
+                            </div>
+                            <flux:badge
+                                size="sm"
+                                :color="$offender->offense_count >= 5 ? 'red' : ($offender->offense_count >= 3 ? 'amber' : 'zinc')"
+                                >{{ $offender->offense_count }} infracoes
+                            </flux:badge>
+                        </div>
+                    @empty
+                        <p class="text-sm text-zinc-400">Nenhum reincidente no periodo</p>
+                    @endforelse
+                </x-he4rt::dashboard.panel>
+            </x-he4rt::dashboard.grid>
+
+            {{-- Recent Actions --}}
+            <x-he4rt::dashboard.panel
+                :title="__('panel-admin::moderation.dashboard.recent_actions')"
+                badge="ultimas 12"
+                :compact="true"
+            >
+                <flux:table>
+                    <flux:table.columns>
+                        <flux:table.column>Acao</flux:table.column>
+                        <flux:table.column>Moderador</flux:table.column>
+                        <flux:table.column>Violacao</flux:table.column>
+                        <flux:table.column>Auto</flux:table.column>
+                        <flux:table.column align="end">Quando</flux:table.column>
+                    </flux:table.columns>
+                    <flux:table.rows>
+                        @foreach ($this->recentActions as $action)
+                            <flux:table.row>
+                                <flux:table.cell>
+                                    <flux:badge
+                                        size="sm"
+                                        :color="
+                                            match ($action->action_type->value) {
+        'ban' => 'red',
+        'warn' => 'amber',
+        'mute' => 'zinc',
+        'kick' => 'blue',
+        'suspend' => 'orange',
+        'content_remove' => 'violet',
+        default => 'zinc',
+    }
+                                        "
+                                    >
+                                        {{ strtoupper($action->action_type->value) }}
+                                    </flux:badge>
+                                </flux:table.cell>
+                                <flux:table.cell>{{
+                                    $action->moderator
+                                        ? '@' . $action->moderator->username
+                                        : 'sistema'
+                                }}</flux:table.cell>
+                                <flux:table.cell>
+                                    @if ($action->case?->violation_type)
+                                        <flux:badge
+                                            size="sm"
+                                            color="zinc"
+                                            >{{ $action->case->violation_type->getLabel() }}</flux:badge
+                                        >
+                                    @else
+                                        <span class="text-zinc-400">--</span>
+                                    @endif
+                                </flux:table.cell>
+                                <flux:table.cell>
+                                    @if ($action->automated)
+                                        <flux:icon name="bolt" class="h-4 w-4 text-cyan-400" />
+                                    @endif
+                                </flux:table.cell>
+                                <flux:table.cell align="end">
+                                    <span
+                                        class="text-sm text-zinc-400"
+                                        >{{ $action->created_at->diffForHumans(short: true) }}</span
+                                    >
+                                </flux:table.cell>
+                            </flux:table.row>
+                        @endforeach
+                    </flux:table.rows>
+                </flux:table>
+            </x-he4rt::dashboard.panel>
         </div>
     @endif
 
@@ -482,119 +604,10 @@
                         @empty
                             <flux:table.row>
                                 <flux:table.cell colspan="5" class="text-center text-zinc-400">
-                                    Nenhum appeal aberto</flux:table.cell
-                                >
+                                    Nenhum appeal aberto
+                                </flux:table.cell>
                             </flux:table.row>
                         @endforelse
-                    </flux:table.rows>
-                </flux:table>
-            </x-he4rt::dashboard.panel>
-        </div>
-    @endif
-
-    {{-- ==================== TAB: ACTIVITY ==================== --}}
-    @if ($activeTab === 'activity')
-        <div class="space-y-4">
-            <x-he4rt::dashboard.grid>
-                <x-he4rt::dashboard.panel title="Heatmap de Atividade" badge="hora x dia">
-                    <x-he4rt::dashboard.heatmap :data="$this->activityHeatmap" />
-                </x-he4rt::dashboard.panel>
-
-                <x-he4rt::dashboard.panel title="Reincidentes" badge="top 5">
-                    @forelse ($this->repeatOffenders as $offender)
-                        <div
-                            class="flex items-center justify-between border-b border-zinc-100 py-2.5 last:border-0 dark:border-zinc-700/50"
-                        >
-                            <div class="flex items-center gap-3">
-                                <span
-                                    @class ([
-                                        'font-mono text-sm font-bold',
-                                        'text-red-500' => $offender->offense_count >= 5,
-                                        'text-amber-500' => $offender->offense_count >= 3 && $offender->offense_count < 5,
-                                        'text-zinc-400' => $offender->offense_count < 3
-                                    ])
-                                    >{{ $offender->offense_count }}</span
-                                >
-                                <span
-                                    class="text-sm font-medium dark:text-zinc-200"
-                                    >{{ '@' . $offender->username }}</span
-                                >
-                            </div>
-                            <flux:badge
-                                size="sm"
-                                :color="$offender->offense_count >= 5 ? 'red' : ($offender->offense_count >= 3 ? 'amber' : 'zinc')"
-                                >{{ $offender->offense_count }} infracoes</flux:badge
-                            >
-                        </div>
-                    @empty
-                        <p class="text-sm text-zinc-400">Nenhum reincidente no periodo</p>
-                    @endforelse
-                </x-he4rt::dashboard.panel>
-            </x-he4rt::dashboard.grid>
-
-            <x-he4rt::dashboard.panel
-                :title="__('panel-admin::moderation.dashboard.recent_actions')"
-                badge="ultimas 12"
-                :compact="true"
-            >
-                <flux:table>
-                    <flux:table.columns>
-                        <flux:table.column>Acao</flux:table.column>
-                        <flux:table.column>Moderador</flux:table.column>
-                        <flux:table.column>Violacao</flux:table.column>
-                        <flux:table.column>Auto</flux:table.column>
-                        <flux:table.column align="end">Quando</flux:table.column>
-                    </flux:table.columns>
-                    <flux:table.rows>
-                        @foreach ($this->recentActions as $action)
-                            <flux:table.row>
-                                <flux:table.cell>
-                                    <flux:badge
-                                        size="sm"
-                                        :color="
-                                            match ($action->action_type->value) {
-        'ban' => 'red',
-        'warn' => 'amber',
-        'mute' => 'zinc',
-        'kick' => 'blue',
-        'suspend' => 'orange',
-        'content_remove' => 'violet',
-        default => 'zinc',
-    }
-                                        "
-                                    >
-                                        {{ strtoupper($action->action_type->value) }}
-                                    </flux:badge>
-                                </flux:table.cell>
-                                <flux:table.cell>{{
-                                    $action->moderator
-                                        ? '@' . $action->moderator->username
-                                        : 'sistema'
-                                }}</flux:table.cell>
-                                <flux:table.cell>
-                                    @if ($action->case?->violation_type)
-                                        <flux:badge
-                                            size="sm"
-                                            color="zinc"
-                                            >{{ $action->case->violation_type->getLabel() }}</flux:badge
-                                        >
-                                    @else
-                                        <span class="text-zinc-400">--</span>
-                                    @endif
-                                </flux:table.cell>
-                                <flux:table.cell>
-                                    @if ($action->automated)
-                                        <flux:icon name="bolt" class="h-4 w-4 text-cyan-400" />
-                                    @endif
-                                </flux:table.cell>
-                                <flux:table.cell align="end">
-                                    <span
-                                        class="text-sm text-zinc-400"
-                                        >{{ $action->created_at->diffForHumans(short: true) }}</span
-                                    ></flux:table.cell
-                                >
-                            </flux:table.row>
-                        @endforeach
                     </flux:table.rows>
                 </flux:table>
             </x-he4rt::dashboard.panel>

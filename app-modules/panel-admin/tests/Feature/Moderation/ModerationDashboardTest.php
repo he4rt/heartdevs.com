@@ -87,12 +87,11 @@ test('appeals tab shows active appeals', function (): void {
         ->assertSuccessful();
 });
 
-test('activity tab renders heatmap and recent actions', function (): void {
+test('overview tab renders heatmap and recent actions', function (): void {
     ModerationAction::factory()->create();
 
     livewire(ModerationDashboardLivewire::class)
-        ->set('activeTab', 'activity')
-        ->assertSee('Heatmap')
+        ->assertSee('Atividade por hora e dia')
         ->assertSuccessful();
 });
 

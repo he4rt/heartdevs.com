@@ -309,11 +309,11 @@ class ModerationDashboardLivewire extends Component
             });
     }
 
-    /** @return array<int, array<int, int>> */
+    /** @return array<int, array{day: int, hour: int, value: int}> */
     #[Computed]
     public function activityHeatmap(): array
     {
-        $data = ModerationAction::query()
+        $dbData = ModerationAction::query()
             ->where('created_at', '>=', now()->subDays(30))
             ->selectRaw('EXTRACT(DOW FROM created_at) as dow, EXTRACT(HOUR FROM created_at) as hour, count(*) as total')
             ->groupByRaw('EXTRACT(DOW FROM created_at), EXTRACT(HOUR FROM created_at)')
@@ -321,13 +321,11 @@ class ModerationDashboardLivewire extends Component
 
         $grid = array_fill(0, 7, array_fill(0, 24, 0));
 
-        foreach ($data as $row) {
-            $dow = (int) $row->dow;
-            $hour = (int) $row->hour;
-            $grid[$dow][$hour] = (int) $row->total;
+        foreach ($dbData as $row) {
+            $grid[(int) $row->dow][(int) $row->hour] = (int) $row->total;
         }
 
-        // Mon=0..Sun=6 (PG DOW: 0=Sun,1=Mon..6=Sat) — shift to Mon-first
+        // PG DOW: 0=Sun,1=Mon..6=Sat → shift to Mon=0..Sun=6
         $reordered = [];
         for ($i = 1; $i <= 6; $i++) {
             $reordered[] = $grid[$i];
@@ -335,13 +333,14 @@ class ModerationDashboardLivewire extends Component
 
         $reordered[] = $grid[0];
 
-        // Normalize to 0-5 scale
-        $max = max(1, max(array_map(max(...), $reordered)));
-        foreach ($reordered as &$row) {
-            $row = array_map(fn (int $v): int => (int) round(($v / $max) * 5), $row);
+        $result = [];
+        foreach ($reordered as $day => $hours) {
+            foreach ($hours as $hour => $value) {
+                $result[] = ['day' => $day, 'hour' => $hour, 'value' => $value];
+            }
         }
 
-        return $reordered;
+        return $result;
     }
 
     // --- Private helpers ---
