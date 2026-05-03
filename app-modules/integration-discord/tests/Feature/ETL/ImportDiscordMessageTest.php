@@ -1158,3 +1158,26 @@ test('membership_events are idempotent on re-import', function (): void {
 
     expect(MembershipEvent::query()->count())->toBe(1);
 });
+
+test('resolveOrCreateUser reuses existing legacy #0 user when no discord identity exists', function (): void {
+    $tenant = Tenant::factory()->create(['slug' => 'he4rt']);
+
+    $existing = User::factory()->create(['username' => 'oldbie#0', 'name' => 'Oldbie']);
+
+    $raw = discordMessage([
+        'id' => 'msg-legacy',
+        'author' => ['id' => '999000', 'username' => 'oldbie', 'global_name' => 'Oldbie'],
+    ]);
+
+    $action = resolve(ImportDiscordMessageAction::class);
+    $message = $action->handle(DiscordMessageDTO::fromDump($raw), $tenant->getKey());
+
+    $identity = ExternalIdentity::query()
+        ->where('provider', IdentityProvider::Discord)
+        ->where('external_account_id', '999000')
+        ->first();
+
+    expect((string) $identity->model_id)->toBe((string) $existing->id)
+        ->and((string) $message->external_identity_id)->toBe((string) $identity->id)
+        ->and(User::query()->where('username', 'like', 'oldbie%')->count())->toBe(1);
+});

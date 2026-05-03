@@ -9,7 +9,6 @@ use He4rt\Gamification\Character\Models\Character;
 use He4rt\Identity\ExternalIdentity\Enums\IdentityProvider;
 use He4rt\Identity\ExternalIdentity\Models\ExternalIdentity;
 use He4rt\Identity\User\Models\User;
-use Illuminate\Contracts\Database\Query\Builder;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Facades\Cache;
 use Livewire\Attributes\Computed;
@@ -59,14 +58,33 @@ final class HeroSection extends Component
      */
     private function fetchAvatars(): array
     {
+        $activeDiscordIdentityIds = Message::query()
+            ->where('sent_at', '>=', now()->subDays(30))
+            ->select('external_identity_id')
+            ->groupBy('external_identity_id')
+            ->havingRaw('COUNT(*) > 20')
+            ->pluck('external_identity_id');
+
+        if ($activeDiscordIdentityIds->isEmpty()) {
+            return [];
+        }
+
+        $activeUserIds = ExternalIdentity::query()
+            ->where('provider', IdentityProvider::Discord)
+            ->whereIn('id', $activeDiscordIdentityIds)
+            ->pluck('model_id');
+
+        if ($activeUserIds->isEmpty()) {
+            return [];
+        }
+
         return ExternalIdentity::query()
             ->where('provider', IdentityProvider::GitHub)
-            ->whereHas('messages', fn (Builder $query) => $query->where('sent_at', '>=', now()->subDays(30)))
-            ->where(fn (Builder $query) => $query->whereHas('messages', operator: '>', count: 20))
+            ->whereIn('model_id', $activeUserIds)
             ->inRandomOrder()
             ->limit(10)
             ->pluck('metadata')
-            ->map(fn (array $metadata) => sprintf('https://github.com/%s.png', $metadata['username']))
+            ->map(fn (array $metadata) => sprintf('https://github.com/%s.png', $metadata['name']))
             ->all();
     }
 
