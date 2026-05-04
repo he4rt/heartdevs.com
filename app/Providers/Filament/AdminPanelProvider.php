@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Providers\Filament;
 
-use App\Enums\FilamentPanel;
 use App\Filament\Pages\Login;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
@@ -14,6 +13,7 @@ use Filament\Panel;
 use Filament\PanelProvider;
 use Filament\Support\Colors\Color;
 use He4rt\Identity\Tenant\Models\Tenant;
+use He4rt\PanelAdmin\Http\Middleware\ApplyTenantScopes;
 use He4rt\PanelAdmin\Pages\Dashboard;
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
 use Illuminate\Cookie\Middleware\EncryptCookies;
@@ -26,14 +26,18 @@ class AdminPanelProvider extends PanelProvider
 {
     public function panel(Panel $panel): Panel
     {
+
         $panel
             ->id('admin')
             ->path('admin')
             ->login(Login::class)
             ->colors([
                 'primary' => Color::Purple,
+                'gray' => Color::Zinc,
             ])
+            ->sidebarCollapsibleOnDesktop()
             ->tenant(Tenant::class, slugAttribute: 'slug')
+            ->viteTheme('resources/css/filament/admin/theme.css')
             ->middleware([
                 EncryptCookies::class,
                 AddQueuedCookiesToResponse::class,
@@ -50,11 +54,10 @@ class AdminPanelProvider extends PanelProvider
             ])
             ->authMiddleware([
                 Authenticate::class,
+            ])
+            ->tenantMiddleware([
+                ApplyTenantScopes::class,
             ]);
-
-        foreach (config('panel-admin.modules', []) as $module) {
-            $panel->discoverResourcesForPanel($module, FilamentPanel::Admin);
-        }
 
         return $panel;
     }
