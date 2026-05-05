@@ -4,11 +4,13 @@ declare(strict_types=1);
 
 namespace He4rt\BotDiscord\Actions\VoiceChannel;
 
+use He4rt\BotDiscord\DTO\VoiceChannelDTO;
+
 final class HandleStateChannelAction
 {
     public function execute(int|string $userId, ?string $channelId): void
     {
-        $activeChannels = cache()->tags(['voice_channels'])->get('active_voice_channels_keys', []);
+        $activeChannels = $this->loadChannels();
         $oldChannelId = $this->getUserLastChannel($userId);
 
         if ($this->isLeavingVoice($channelId, $oldChannelId)) {
@@ -16,6 +18,7 @@ final class HandleStateChannelAction
                 activeChannels: $activeChannels,
                 user: $userId
             );
+            $this->saveChannels($activeChannels);
 
             $this->clearUserLastChannel($userId);
 
@@ -33,6 +36,7 @@ final class HandleStateChannelAction
                 activeChannels: $activeChannels,
                 user: $userId
             );
+            $this->saveChannels($activeChannels);
 
             $this->setUserLastChannel($userId, $channelId);
 
@@ -45,6 +49,7 @@ final class HandleStateChannelAction
                 activeChannels: $activeChannels,
                 user: $userId
             );
+            $this->saveChannels($activeChannels);
             $this->setUserLastChannel($userId, $channelId);
 
             return;
@@ -93,5 +98,42 @@ final class HandleStateChannelAction
     private function isUpdatingInSameChannel(?string $newChannelId, ?string $oldChannelId): bool
     {
         return !is_null($newChannelId) && $oldChannelId === $newChannelId;
+    }
+
+    /**
+     * @return array<VoiceChannelDTO>
+     */
+    private function loadChannels(): array
+    {
+        $channels = cache()->tags(['voice_channels'])->get('active_voice_channels_keys', []);
+
+        return array_map(function ($channel): ?VoiceChannelDTO {
+            if ($channel instanceof VoiceChannelDTO) {
+                return $channel;
+            }
+
+            if (is_array($channel) && isset($channel['guildId'], $channel['channelId'], $channel['ownerId'])) {
+                return VoiceChannelDTO::make($channel);
+            }
+
+            return null;
+        }, $channels);
+    }
+
+    /**
+     * @param  array<VoiceChannelDTO>  $channels
+     */
+    private function saveChannels(array $channels): void
+    {
+        $arrays = array_map(fn (VoiceChannelDTO $dto) => [
+            'guildId' => $dto->guildId,
+            'channelId' => $dto->channelId,
+            'ownerId' => $dto->ownerId,
+            'usersCount' => $dto->usersCount,
+            'users' => $dto->users,
+            'lastJoinedAt' => $dto->lastJoinedAt?->toIso8601String(),
+        ], $channels);
+
+        cache()->tags(['voice_channels'])->put('active_voice_channels_keys', $arrays);
     }
 }

@@ -81,7 +81,7 @@ class DynamicVoiceCommand extends SlashCommand
             'users' => [],
             'lastJoinedAt' => now(),
         ]);
-        $channels[] = $channelDto;
+        $channels[] = $this->dtoToArray($channelDto);
 
         cache()->tags(['voice_channels'])->put('active_voice_channels_keys', $channels);
 
@@ -148,5 +148,17 @@ class DynamicVoiceCommand extends SlashCommand
         $this->message()
             ->content(sprintf('Sala Criada com sucesso !! <#%s>', $channel->id))
             ->reply($interaction, true);
+    }
+
+    private function dtoToArray(VoiceChannelDTO $dto): array
+    {
+        return [
+            'guildId' => $dto->guildId,
+            'channelId' => $dto->channelId,
+            'ownerId' => $dto->ownerId,
+            'usersCount' => $dto->usersCount,
+            'users' => $dto->users,
+            'lastJoinedAt' => $dto->lastJoinedAt?->toIso8601String(),
+        ];
     }
 }

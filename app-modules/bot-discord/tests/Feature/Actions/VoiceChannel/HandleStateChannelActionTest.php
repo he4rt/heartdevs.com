@@ -26,8 +26,24 @@ beforeEach(function (): void {
         'users' => [],
     ]);
 
-    $activeChannels[] = $this->firstChannel;
-    $activeChannels[] = $this->secondChannel;
+    $activeChannels = [
+        [
+            'guildId' => 'guild-123-id',
+            'channelId' => $this->firstChannelId,
+            'ownerId' => $this->userId,
+            'usersCount' => 0,
+            'users' => [],
+            'lastJoinedAt' => null,
+        ],
+        [
+            'guildId' => 'guild-123-id',
+            'channelId' => $this->secondChannelId,
+            'ownerId' => $this->userId,
+            'usersCount' => 0,
+            'users' => [],
+            'lastJoinedAt' => null,
+        ],
+    ];
     cache()->tags(['voice_channels'])->put('active_voice_channels_keys', $activeChannels);
 
 });
@@ -37,10 +53,8 @@ test('user is joining in a channel', function (): void {
 
     $cachedChannels = cache()->tags(['voice_channels'])->get('active_voice_channels_keys');
 
-    /** @var VoiceChannelDTO $activeChannelFromCache */
-    $activeChannelFromCache = $cachedChannels[0];
+    $activeChannelFromCache = VoiceChannelDTO::make($cachedChannels[0]);
     expect($cachedChannels)->not->toBeEmpty()
-        ->and($activeChannelFromCache)->toBeInstanceOf(VoiceChannelDTO::class)
         ->and($activeChannelFromCache->guildId)->toBe($this->firstChannel->guildId)
         ->and($activeChannelFromCache->channelId)->toBe($this->firstChannel->channelId)
         ->and($activeChannelFromCache->usersCount)->toBe(1)
@@ -57,9 +71,8 @@ describe('moving between different channels', function (): void {
 
         $cachedChannels = cache()->tags(['voice_channels'])->get('active_voice_channels_keys');
 
-        $firstChannelFromCache = $cachedChannels[0];
+        $firstChannelFromCache = VoiceChannelDTO::make($cachedChannels[0]);
         expect($cachedChannels)->not->toBeEmpty()
-            ->and($firstChannelFromCache)->toBeInstanceOf(VoiceChannelDTO::class)
             ->and($firstChannelFromCache->guildId)->toBe($this->firstChannel->guildId)
             ->and($firstChannelFromCache->channelId)->toBe($this->firstChannel->channelId)
             ->and($firstChannelFromCache->usersCount)->toBe(1)
@@ -71,9 +84,8 @@ describe('moving between different channels', function (): void {
         expect($userLastChannel)->not->toBeEmpty()
             ->and($userLastChannel)->toBe($this->firstChannel->channelId);
 
-        $secondChannelFromCache = $cachedChannels[1];
+        $secondChannelFromCache = VoiceChannelDTO::make($cachedChannels[1]);
         expect($cachedChannels)->not->toBeEmpty()
-            ->and($secondChannelFromCache)->toBeInstanceOf(VoiceChannelDTO::class)
             ->and($secondChannelFromCache->channelId)->toBe($this->secondChannel->channelId)
             ->and($secondChannelFromCache->usersCount)->toBe(0)
             ->and($secondChannelFromCache->lastJoinedAt)->toBeNull()
@@ -83,8 +95,9 @@ describe('moving between different channels', function (): void {
 
         $action->execute($this->userId, $this->secondChannelId);
 
+        $cachedChannels = cache()->tags(['voice_channels'])->get('active_voice_channels_keys');
+        $firstChannelFromCache = VoiceChannelDTO::make($cachedChannels[0]);
         expect($cachedChannels)->not->toBeEmpty()
-            ->and($firstChannelFromCache)->toBeInstanceOf(VoiceChannelDTO::class)
             ->and($firstChannelFromCache->guildId)->toBe($this->firstChannel->guildId)
             ->and($firstChannelFromCache->channelId)->toBe($this->firstChannel->channelId)
             ->and($firstChannelFromCache->usersCount)->toBe(0)
@@ -94,9 +107,9 @@ describe('moving between different channels', function (): void {
         // user is now at second channel
 
         $userLastChannel = cache()->tags(['voice_tracking'])->get('user_last_channel_'.$this->userId);
+        $secondChannelFromCache = VoiceChannelDTO::make($cachedChannels[1]);
         expect($userLastChannel)->toBe($this->secondChannel->channelId)
             ->and($cachedChannels)->not->toBeEmpty()
-            ->and($secondChannelFromCache)->toBeInstanceOf(VoiceChannelDTO::class)
             ->and($secondChannelFromCache->channelId)->toBe($this->secondChannel->channelId)
             ->and($secondChannelFromCache->usersCount)->toBe(1)
             ->and($secondChannelFromCache->lastJoinedAt)->not->toBeNull()
@@ -111,9 +124,8 @@ describe('moving between different channels', function (): void {
 
         $cachedChannels = cache()->tags(['voice_channels'])->get('active_voice_channels_keys');
 
-        $firstChannelFromCache = $cachedChannels[0];
+        $firstChannelFromCache = VoiceChannelDTO::make($cachedChannels[0]);
         expect($cachedChannels)->not->toBeEmpty()
-            ->and($firstChannelFromCache)->toBeInstanceOf(VoiceChannelDTO::class)
             ->and($firstChannelFromCache->guildId)->toBe($this->firstChannel->guildId)
             ->and($firstChannelFromCache->channelId)->toBe($this->firstChannel->channelId)
             ->and($firstChannelFromCache->usersCount)->toBe(1)
@@ -140,10 +152,9 @@ test('user leave voice', function (): void {
     expect($userLastChannel)->toBeNull();
 
     $cachedChannels = cache()->tags(['voice_channels'])->get('active_voice_channels_keys');
-    $firstChannelFromCache = $cachedChannels[0];
+    $firstChannelFromCache = VoiceChannelDTO::make($cachedChannels[0]);
 
     expect($cachedChannels)->not->toBeEmpty()
-        ->and($firstChannelFromCache)->toBeInstanceOf(VoiceChannelDTO::class)
         ->and($firstChannelFromCache->guildId)->toBe($this->firstChannel->guildId)
         ->and($firstChannelFromCache->channelId)->toBe($this->firstChannel->channelId)
         ->and($firstChannelFromCache->usersCount)->toBe(0)

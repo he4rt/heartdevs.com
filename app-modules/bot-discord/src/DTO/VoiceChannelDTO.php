@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace He4rt\BotDiscord\DTO;
 
 use Carbon\CarbonInterface;
+use Illuminate\Support\Facades\Date;
 
 final class VoiceChannelDTO
 {
@@ -23,13 +24,22 @@ final class VoiceChannelDTO
      */
     public static function make(array $data): self
     {
+        $lastJoinedAt = null;
+        if (filled($data['lastJoinedAt'])) {
+            if ($data['lastJoinedAt'] instanceof CarbonInterface) {
+                $lastJoinedAt = $data['lastJoinedAt'];
+            } elseif (is_string($data['lastJoinedAt'])) {
+                $lastJoinedAt = Date::parse($data['lastJoinedAt']);
+            }
+        }
+
         return new self(
             guildId: $data['guildId'],
             channelId: $data['channelId'],
             ownerId: $data['ownerId'],
             usersCount: $data['usersCount'],
             users: $data['users'],
-            lastJoinedAt: $data['lastJoinedAt'] ?? null,
+            lastJoinedAt: $lastJoinedAt,
         );
     }
 
