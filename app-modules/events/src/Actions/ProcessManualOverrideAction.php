@@ -28,7 +28,7 @@ final readonly class ProcessManualOverrideAction
 
         $baseXp = $event->xp_value;
         $this->incrementExperience->incrementByEventAttendance(
-            $character->id,
+            (string) $character->id,
             $baseXp,
             1.0
         );
