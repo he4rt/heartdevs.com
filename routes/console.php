@@ -24,3 +24,5 @@ Schedule::command('backup:monitor')
     ->when(fn () => config('backup.enabled'))
     ->daily()
     ->at('09:00');
+
+Schedule::command('events:process-streaks')->everyMinute();

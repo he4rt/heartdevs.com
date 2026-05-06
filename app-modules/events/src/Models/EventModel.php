@@ -24,6 +24,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasManyThrough;
+use Illuminate\Support\Facades\Date;
 
 /**
  * @property bool $active
@@ -188,6 +189,31 @@ class EventModel extends Model
             ->using(SponsorAttend::class)
             ->withPivot(['level'])
             ->withTimestamps();
+    }
+
+    public function isVerificationWindowClosed(): bool
+    {
+        return Date::now()->greaterThanOrEqualTo(
+            $this->end_at->copy()->addMinutes(30)
+        );
+    }
+
+    public function verifyAttendance(int $userId): void
+    {
+        $this->attendees()->updateExistingPivot($userId, [
+            'verified_at' => Date::now(),
+        ]);
+    }
+
+    public function hasVerifiedAttendance(int $userId): bool
+    {
+        $attendee = $this->attendees()->where('user_id', $userId)->first();
+
+        if (!$attendee) {
+            return false;
+        }
+
+        return $attendee->pivot->verified_at !== null;
     }
 
     /** @return Attribute<int, never> */

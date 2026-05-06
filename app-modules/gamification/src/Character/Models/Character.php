@@ -8,6 +8,7 @@ use Carbon\Carbon;
 use He4rt\Activity\Tracking\Concerns\HasInteractions;
 use He4rt\Economy\Concerns\HasWallet;
 use He4rt\Gamification\Badge\Models\Badge;
+use He4rt\Gamification\Character\Enums\StreakMultiplierEnum;
 use He4rt\Gamification\Database\Factories\CharacterFactory;
 use He4rt\Identity\Tenant\Models\Tenant;
 use He4rt\Identity\User\Models\User;
@@ -40,16 +41,56 @@ final class Character extends Model
     use HasWallet;
 
     public const array LEVEL_THRESHOLDS = [
-        1 => 0, 2 => 120, 3 => 250, 4 => 510, 5 => 1000,
-        6 => 1500, 7 => 2100, 8 => 2800, 9 => 3600, 10 => 4500,
-        11 => 5500, 12 => 6650, 13 => 7800, 14 => 9100, 15 => 10500,
-        16 => 12000, 17 => 13700, 18 => 15500, 19 => 17500, 20 => 20000,
-        21 => 23000, 22 => 26500, 23 => 30000, 24 => 34500, 25 => 39000,
-        26 => 44000, 27 => 49500, 28 => 55500, 29 => 62000, 30 => 69000,
-        31 => 77000, 32 => 85500, 33 => 95000, 34 => 105000, 35 => 116000,
-        36 => 128000, 37 => 141000, 38 => 155000, 39 => 170000, 40 => 190000,
-        41 => 210000, 42 => 230000, 43 => 250000, 44 => 270000, 45 => 290000,
-        46 => 310000, 47 => 330000, 48 => 350000, 49 => 370000, 50 => 400000,
+        1 => 0,
+        2 => 120,
+        3 => 250,
+        4 => 510,
+        5 => 1000,
+        6 => 1500,
+        7 => 2100,
+        8 => 2800,
+        9 => 3600,
+        10 => 4500,
+        11 => 5500,
+        12 => 6650,
+        13 => 7800,
+        14 => 9100,
+        15 => 10500,
+        16 => 12000,
+        17 => 13700,
+        18 => 15500,
+        19 => 17500,
+        20 => 20000,
+        21 => 23000,
+        22 => 26500,
+        23 => 30000,
+        24 => 34500,
+        25 => 39000,
+        26 => 44000,
+        27 => 49500,
+        28 => 55500,
+        29 => 62000,
+        30 => 69000,
+        31 => 77000,
+        32 => 85500,
+        33 => 95000,
+        34 => 105000,
+        35 => 116000,
+        36 => 128000,
+        37 => 141000,
+        38 => 155000,
+        39 => 170000,
+        40 => 190000,
+        41 => 210000,
+        42 => 230000,
+        43 => 250000,
+        44 => 270000,
+        45 => 290000,
+        46 => 310000,
+        47 => 330000,
+        48 => 350000,
+        49 => 370000,
+        50 => 400000,
     ];
 
     protected $table = 'characters';
@@ -60,6 +101,7 @@ final class Character extends Model
         'user_id',
         'reputation',
         'experience',
+        'streak',
         'daily_bonus_claimed_at',
     ];
 
@@ -115,6 +157,16 @@ final class Character extends Model
     protected static function newFactory(): CharacterFactory
     {
         return CharacterFactory::new();
+    }
+
+    protected function streakMultiplier(): Attribute
+    {
+        return Attribute::get(function (): float {
+            $streak = $this->streak ?? 0;
+
+            return StreakMultiplierEnum::fromStreak($streak)
+                ->getMultiplier();
+        });
     }
 
     protected function getRankingAttribute(): int
