@@ -2,7 +2,6 @@
 
 declare(strict_types=1);
 
-use He4rt\Identity\ExternalIdentity\Models\ExternalIdentity;
 use Illuminate\Support\Str;
 
 return [
@@ -122,14 +121,12 @@ return [
     | Serializable Classes
     |--------------------------------------------------------------------------
     |
-    | Classes that may be unserialized from cache. Laravel 13 defaults to
-    | blocking all class unserialization for security. List classes that
-    | your application intentionally stores as objects in cache.
+    | This option controls which classes may be unserialized from the cache.
+    | Setting this to false prevents all object unserialization, hardening
+    | your application against PHP deserialization attacks.
     |
     */
 
-    'serializable_classes' => [
-        ExternalIdentity::class,
-    ],
+    'serializable_classes' => true,
 
 ];
