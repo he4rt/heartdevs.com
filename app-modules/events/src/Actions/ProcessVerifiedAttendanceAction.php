@@ -32,14 +32,12 @@ final readonly class ProcessVerifiedAttendanceAction
             ->where('tenant_id', $event->tenant_id)
             ->firstOrFail();
 
-        $this->incrementStreak->execute($character->id);
-
+        $this->incrementStreak->execute((string) $character->id);
         $character->refresh();
-        $multiplier = $this->calculateMultiplier->execute($character->id);
-
+        $multiplier = $this->calculateMultiplier->execute((string) $character->id);
         $baseXp = $event->xp_value;
         $this->incrementExperience->incrementByEventAttendance(
-            $character->id,
+            (string) $character->id,
             $baseXp,
             $multiplier
         );

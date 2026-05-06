@@ -19,11 +19,18 @@ use He4rt\Identity\User\Models\User;
 it('increments streak and applies multiplier on attendance verification', function (): void {
     // Setup
     $user = User::factory()->create();
+    $event = EventModel::factory()->create(['xp_value' => 200]);
     $character = Character::factory()->create([
         'user_id' => $user->id,
+        'tenant_id' => $event->tenant_id,
         'streak' => 5,
+        'experience' => 0,
     ]);
-    $event = EventModel::factory()->create(['xp_value' => 200]);
+
+    $event->attendees()->attach($user->id, [
+        'status' => AttendingStatusEnum::Attending,
+        'verified_at' => null,
+    ]);
 
     $action = new ProcessVerifiedAttendanceAction(
         new VerifyAttendanceAction(),
@@ -44,11 +51,12 @@ it('resets streak for users who pre-confirmed but did not show up', function ():
         'end_at' => now()->subHours(2),
         'active' => true,
     ]);
-
     $user = User::factory()->create();
     $character = Character::factory()->create([
         'user_id' => $user->id,
+        'tenant_id' => $event->tenant_id,
         'streak' => 5,
+        'experience' => 0,
     ]);
 
     $event->attendees()->attach($user->id, [
@@ -66,11 +74,12 @@ it('does not change streak for users who did not pre-confirm', function (): void
     $event = EventModel::factory()->create([
         'end_at' => now()->subHours(2),
     ]);
-
     $user = User::factory()->create();
     $character = Character::factory()->create([
         'user_id' => $user->id,
+        'tenant_id' => $event->tenant_id,
         'streak' => 5,
+        'experience' => 0,
     ]);
 
     expect($event->attendees()->where('user_id', $user->id)->exists())->toBeFalse();
@@ -83,12 +92,14 @@ it('does not change streak for users who did not pre-confirm', function (): void
 
 it('manual override does not affect streak and awards base XP', function (): void {
     $user = User::factory()->create();
+    $event = EventModel::factory()->create(['xp_value' => 200]);
+
     $character = Character::factory()->create([
         'user_id' => $user->id,
+        'tenant_id' => $event->tenant_id, // <- adicionar
         'streak' => 5,
         'experience' => 1000,
     ]);
-    $event = EventModel::factory()->create(['xp_value' => 200]);
 
     $action = new ProcessManualOverrideAction(
         new IncrementExperience(),
@@ -106,10 +117,10 @@ it('does not affect streaks when event is cancelled', function (): void {
         'end_at' => now()->subHours(2),
         'active' => false,
     ]);
-
     $user = User::factory()->create();
     $character = Character::factory()->create([
         'user_id' => $user->id,
+        'tenant_id' => $event->tenant_id, // <- adicionar
         'streak' => 5,
     ]);
 

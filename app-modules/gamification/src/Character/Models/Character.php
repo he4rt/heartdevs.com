@@ -159,6 +159,7 @@ final class Character extends Model
         return CharacterFactory::new();
     }
 
+    /** @return Attribute<float, never> */
     protected function streakMultiplier(): Attribute
     {
         return Attribute::get(function (): float {

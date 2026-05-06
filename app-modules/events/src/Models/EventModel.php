@@ -34,6 +34,7 @@ use Illuminate\Support\Facades\Date;
  * @property string $description
  * @property string $location
  * @property int $max_attendees
+ * @property int $xp_value
  * @property int $attendees_count
  * @property int $waitlist_count
  * @property int $tenant_id
@@ -60,6 +61,7 @@ class EventModel extends Model
         'end_at',
         'location',
         'max_attendees',
+        'xp_value',
         'attendees_count',
         'waitlist_count',
         'tenant_id',
