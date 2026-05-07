@@ -31,9 +31,9 @@ final class IngestContent implements ShouldQueue
 
         if ($authorId === null && $this->content->authorExternalId !== '') {
             $authorId = ExternalIdentity::query()
-                ->where('model_type', (new User)->getMorphClass())
+                ->where('model_type', User::class)
                 ->where('provider', IdentityProvider::Discord)
-                ->where('external_account_id', $this->content->authorExternalId)
+                ->where('tenant_id', $this->content->tenantId)
                 ->value('model_id');
         }
 
