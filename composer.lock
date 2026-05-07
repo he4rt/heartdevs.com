@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "5c3424bb162c697c09747bd505998dce",
+    "content-hash": "475a0cc0cd74430b5e7021462dc5a411",
     "packages": [
         {
             "name": "blade-ui-kit/blade-heroicons",
@@ -3341,6 +3341,43 @@
             "license": [
                 "proprietary"
             ],
+            "transport-options": {
+                "symlink": true,
+                "relative": true
+            }
+        },
+        {
+            "name": "he4rt/hub",
+            "version": "1.0",
+            "dist": {
+                "type": "path",
+                "url": "app-modules/hub",
+                "reference": "9cf4651b1d232ea7ea90a4abb05fcf6fc0de2235"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "He4rt\\Hub\\HubServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "He4rt\\Hub\\": "src/",
+                    "He4rt\\Hub\\Database\\Factories\\": "database/factories/",
+                    "He4rt\\Hub\\Database\\Seeders\\": "database/seeders/"
+                }
+            },
+            "autoload-dev": {
+                "psr-4": {
+                    "He4rt\\Hub\\Tests\\": "tests/"
+                }
+            },
+            "license": [
+                "proprietary"
+            ],
+            "description": "User Hub panel for He4rt Developers platform",
             "transport-options": {
                 "symlink": true,
                 "relative": true
@@ -18063,6 +18100,6 @@
     "platform": {
         "php": "^8.4"
     },
-    "platform-dev": {},
-    "plugin-api-version": "2.9.0"
+    "platform-dev": [],
+    "plugin-api-version": "2.6.0"
 }
