@@ -57,4 +57,7 @@ return [
         'enabled' => env('DEVTO_OAUTH_ENABLED', false),
     ],
 
+    'openai' => [
+        'api_key' => env('OPENAI_API_KEY'),
+    ],
 ];
