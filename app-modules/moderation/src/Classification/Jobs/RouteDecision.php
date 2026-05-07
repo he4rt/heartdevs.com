@@ -55,7 +55,7 @@ final class RouteDecision implements ShouldQueue
         $this->case->update([
             'status' => CaseStatus::Pending,
             'priority' => $priority,
-            'suggested_action' => $suggestedAction,
+            'suggested_action' => $suggestedAction ?? $this->case->suggested_action,
         ]);
     }
 }
