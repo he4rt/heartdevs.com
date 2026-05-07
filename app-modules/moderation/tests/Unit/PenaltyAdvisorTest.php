@@ -13,51 +13,70 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 
 uses(RefreshDatabase::class);
 
-test('suggests warn for first offense low severity', function (): void {
+// --- First offense (0 prior) ---
+
+test('first offense low severity gives mute 24h', function (): void {
     $user = User::factory()->create();
-    $advisor = new HistoryBasedPenaltyAdvisor();
+    $result = new HistoryBasedPenaltyAdvisor()->suggest($user, ViolationType::Spam, Severity::Low);
 
-    $result = $advisor->suggest($user, ViolationType::Spam, Severity::Low);
-
-    expect($result->action)->toBe(ActionType::Warn)
-        ->and($result->duration)->toBeNull()
+    expect($result->action)->toBe(ActionType::Mute)
+        ->and($result->duration)->toBe('24h')
         ->and($result->priorOffenses)->toBe(0);
 });
 
-test('suggests warn for first offense medium severity', function (): void {
+test('first offense medium severity gives mute 24h', function (): void {
     $user = User::factory()->create();
-    $advisor = new HistoryBasedPenaltyAdvisor();
-
-    $result = $advisor->suggest($user, ViolationType::Toxicity, Severity::Medium);
-
-    expect($result->action)->toBe(ActionType::Warn)
-        ->and($result->duration)->toBeNull();
-});
-
-test('suggests mute 24h for first offense high severity', function (): void {
-    $user = User::factory()->create();
-    $advisor = new HistoryBasedPenaltyAdvisor();
-
-    $result = $advisor->suggest($user, ViolationType::Harassment, Severity::High);
+    $result = new HistoryBasedPenaltyAdvisor()->suggest($user, ViolationType::Toxicity, Severity::Medium);
 
     expect($result->action)->toBe(ActionType::Mute)
         ->and($result->duration)->toBe('24h');
 });
 
-test('suggests mute 24h for second offense medium severity', function (): void {
+test('first offense high severity gives ban 24h', function (): void {
+    $user = User::factory()->create();
+    $result = new HistoryBasedPenaltyAdvisor()->suggest($user, ViolationType::Harassment, Severity::High);
+
+    expect($result->action)->toBe(ActionType::Ban)
+        ->and($result->duration)->toBe('24h');
+});
+
+test('first offense critical severity gives ban 24h', function (): void {
+    $user = User::factory()->create();
+    $result = new HistoryBasedPenaltyAdvisor()->suggest($user, ViolationType::Harassment, Severity::Critical);
+
+    expect($result->action)->toBe(ActionType::Ban)
+        ->and($result->duration)->toBe('24h');
+});
+
+// --- Second offense (1 prior) ---
+
+test('second offense medium severity gives mute 7d', function (): void {
     $user = User::factory()->create();
     $case = ModerationCase::factory()->create(['author_id' => $user->id, 'status' => 'resolved']);
     ModerationAction::factory()->create(['case_id' => $case->id, 'created_at' => now()->subDays(5)]);
 
-    $advisor = new HistoryBasedPenaltyAdvisor();
-    $result = $advisor->suggest($user, ViolationType::Toxicity, Severity::Medium);
+    $result = new HistoryBasedPenaltyAdvisor()->suggest($user, ViolationType::Toxicity, Severity::Medium);
 
     expect($result->action)->toBe(ActionType::Mute)
-        ->and($result->duration)->toBe('24h')
+        ->and($result->duration)->toBe('7d')
         ->and($result->priorOffenses)->toBe(1);
 });
 
-test('suggests ban 7d for third offense', function (): void {
+test('second offense high severity gives ban 7d', function (): void {
+    $user = User::factory()->create();
+    $case = ModerationCase::factory()->create(['author_id' => $user->id, 'status' => 'resolved']);
+    ModerationAction::factory()->create(['case_id' => $case->id, 'created_at' => now()->subDays(5)]);
+
+    $result = new HistoryBasedPenaltyAdvisor()->suggest($user, ViolationType::Harassment, Severity::High);
+
+    expect($result->action)->toBe(ActionType::Ban)
+        ->and($result->duration)->toBe('7d')
+        ->and($result->priorOffenses)->toBe(1);
+});
+
+// --- Third offense and beyond (2+ prior) ---
+
+test('third offense medium severity gives mute 28d', function (): void {
     $user = User::factory()->create();
 
     for ($i = 0; $i < 2; $i++) {
@@ -65,56 +84,53 @@ test('suggests ban 7d for third offense', function (): void {
         ModerationAction::factory()->create(['case_id' => $case->id, 'created_at' => now()->subDays(10 - $i)]);
     }
 
-    $advisor = new HistoryBasedPenaltyAdvisor();
-    $result = $advisor->suggest($user, ViolationType::Spam, Severity::Medium);
+    $result = new HistoryBasedPenaltyAdvisor()->suggest($user, ViolationType::Spam, Severity::Medium);
 
-    expect($result->action)->toBe(ActionType::Ban)
-        ->and($result->duration)->toBe('7d')
+    expect($result->action)->toBe(ActionType::Mute)
+        ->and($result->duration)->toBe('28d')
         ->and($result->priorOffenses)->toBe(2);
 });
 
-test('suggests ban 30d for fourth offense', function (): void {
+test('third offense high severity gives permanent ban', function (): void {
     $user = User::factory()->create();
 
-    for ($i = 0; $i < 3; $i++) {
+    for ($i = 0; $i < 2; $i++) {
         $case = ModerationCase::factory()->create(['author_id' => $user->id, 'status' => 'resolved']);
-        ModerationAction::factory()->create(['case_id' => $case->id, 'created_at' => now()->subDays(15 - $i)]);
+        ModerationAction::factory()->create(['case_id' => $case->id, 'created_at' => now()->subDays(10 - $i)]);
     }
 
-    $advisor = new HistoryBasedPenaltyAdvisor();
-    $result = $advisor->suggest($user, ViolationType::Harassment, Severity::High);
+    $result = new HistoryBasedPenaltyAdvisor()->suggest($user, ViolationType::Harassment, Severity::High);
 
     expect($result->action)->toBe(ActionType::Ban)
-        ->and($result->duration)->toBe('30d')
-        ->and($result->priorOffenses)->toBe(3);
+        ->and($result->duration)->toBe('permanent')
+        ->and($result->priorOffenses)->toBe(2);
 });
 
-test('suggests permanent ban for fifth offense', function (): void {
+test('fourth offense medium severity still gives mute 28d', function (): void {
     $user = User::factory()->create();
 
-    for ($i = 0; $i < 5; $i++) {
+    for ($i = 0; $i < 4; $i++) {
         $case = ModerationCase::factory()->create(['author_id' => $user->id, 'status' => 'resolved']);
         ModerationAction::factory()->create(['case_id' => $case->id, 'created_at' => now()->subDays(20 - $i)]);
     }
 
-    $advisor = new HistoryBasedPenaltyAdvisor();
-    $result = $advisor->suggest($user, ViolationType::Spam, Severity::Low);
+    $result = new HistoryBasedPenaltyAdvisor()->suggest($user, ViolationType::Spam, Severity::Medium);
 
-    expect($result->action)->toBe(ActionType::Ban)
-        ->and($result->duration)->toBe('permanent')
-        ->and($result->priorOffenses)->toBe(5);
+    expect($result->action)->toBe(ActionType::Mute)
+        ->and($result->duration)->toBe('28d');
 });
+
+// --- Window and history ---
 
 test('only counts offenses within escalation window', function (): void {
     $user = User::factory()->create();
     $case = ModerationCase::factory()->create(['author_id' => $user->id, 'status' => 'resolved']);
     ModerationAction::factory()->create(['case_id' => $case->id, 'created_at' => now()->subDays(45)]);
 
-    $advisor = new HistoryBasedPenaltyAdvisor();
-    $result = $advisor->suggest($user, ViolationType::Spam, Severity::Low);
+    $result = new HistoryBasedPenaltyAdvisor()->suggest($user, ViolationType::Spam, Severity::Low);
 
     expect($result->priorOffenses)->toBe(0)
-        ->and($result->action)->toBe(ActionType::Warn);
+        ->and($result->duration)->toBe('24h');
 });
 
 test('includes history in suggestion', function (): void {
@@ -126,12 +142,11 @@ test('includes history in suggestion', function (): void {
     ]);
     ModerationAction::factory()->create([
         'case_id' => $case->id,
-        'action_type' => 'warn',
+        'action_type' => 'mute',
         'created_at' => now()->subDays(5),
     ]);
 
-    $advisor = new HistoryBasedPenaltyAdvisor();
-    $result = $advisor->suggest($user, ViolationType::Toxicity, Severity::Medium);
+    $result = new HistoryBasedPenaltyAdvisor()->suggest($user, ViolationType::Toxicity, Severity::Medium);
 
     expect($result->history)->toHaveCount(1)
         ->and($result->reasoning)->toContain('1');

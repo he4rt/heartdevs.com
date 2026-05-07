@@ -9,6 +9,7 @@ use He4rt\Moderation\Classification\Jobs\RouteDecision;
 use He4rt\Moderation\Enforcement\ModerationAction;
 use He4rt\Moderation\Enums\ActionType;
 use He4rt\Moderation\Enums\CaseStatus;
+use He4rt\Moderation\Enums\Platform;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
 uses(RefreshDatabase::class);
@@ -163,6 +164,20 @@ test('handles null scores gracefully', function (): void {
     expect($case->status)->toBe(CaseStatus::Dismissed);
 });
 
+test('keeps discord high severity cases open when ai scores are empty', function (): void {
+    $case = ModerationCase::factory()->create([
+        'ai_scores' => [],
+        'source_platform' => Platform::Discord,
+        'severity' => 'critical',
+        'status' => CaseStatus::Pending,
+    ]);
+
+    new RouteDecision($case)->handle();
+    $case->refresh();
+
+    expect($case->status)->toBe(CaseStatus::Pending);
+});
+
 test('escalates suggestion based on prior offenses', function (): void {
     $user = User::factory()->create();
 
@@ -181,5 +196,6 @@ test('escalates suggestion based on prior offenses', function (): void {
     new RouteDecision($case)->handle();
     $case->refresh();
 
-    expect($case->suggested_action)->toBe(ActionType::Ban);
+    // 2 prior offenses + medium severity → mute 28d (Discord timeout cap)
+    expect($case->suggested_action)->toBe(ActionType::Mute);
 });
