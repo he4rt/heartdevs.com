@@ -7,8 +7,9 @@ namespace He4rt\Moderation\DTOs;
 use He4rt\Identity\User\Models\User;
 use He4rt\Moderation\Cases\Models\ModerationCase;
 use He4rt\Moderation\Enums\Platform;
+use JsonSerializable;
 
-final readonly class ModerationContentDTO
+final readonly class ModerationContentDTO implements JsonSerializable
 {
     /**
      * @param  array<string>  $mediaUrls
@@ -54,12 +55,28 @@ final readonly class ModerationContentDTO
             contentType: $rawPayload['content_type'] ?? 'message',
             sourcePlatform: $platform,
             authorExternalId: $rawPayload['author_external_id'] ?? '',
-            author: null,
+            author: $rawPayload['author'] ?? null,
             textContent: $rawPayload['text'] ?? '',
             mediaUrls: $rawPayload['media_urls'] ?? [],
             metadata: $rawPayload['metadata'] ?? [],
             snapshot: $rawPayload,
             tenantId: $rawPayload['tenant_id'] ?? null,
         );
+    }
+
+    public function jsonSerialize(): array
+    {
+        return [
+            'content_id' => $this->contentId,
+            'content_type' => $this->contentType,
+            'source_platform' => $this->sourcePlatform->value,
+            'author_external_id' => $this->authorExternalId,
+            'author' => $this->author?->toArray(),
+            'text_content' => $this->textContent,
+            'media_urls' => $this->mediaUrls,
+            'metadata' => $this->metadata,
+            'snapshot' => $this->snapshot,
+            'tenant_id' => $this->tenantId,
+        ];
     }
 }
