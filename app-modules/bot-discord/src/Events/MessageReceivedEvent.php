@@ -93,7 +93,7 @@ class MessageReceivedEvent extends Event
                     'tenant_id' => $case->tenant_id,
                 ]);
 
-                dispatch_sync(new ExecuteAction($action, $case->author));
+                dispatch(new ExecuteAction($action, $case->author));
             }
 
         } catch (Throwable $throwable) {
