@@ -118,6 +118,11 @@ final class DiscordModerationAdapter implements ModerationPlatformContract
             return;
         }
 
+        $channelId = (string) $dmResponse->json('id');
+        if (blank($channelId)) {
+            return;
+        }
+
         $this->http($token)
             ->post(sprintf('https://discord.com/api/v10/channels/%s/messages', $dmResponse->json('id')), [
                 'content' => $message,
@@ -224,6 +229,10 @@ final class DiscordModerationAdapter implements ModerationPlatformContract
         }
 
         $channelId = (string) $dmResponse->json('id');
+        if (blank($channelId)) {
+            return;
+        }
+
         $originalText = $action->case?->content_snapshot['text'] ?? null;
 
         $this->http($token)
