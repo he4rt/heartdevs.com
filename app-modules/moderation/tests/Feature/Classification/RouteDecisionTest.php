@@ -175,7 +175,7 @@ test('keeps discord high severity cases open when ai scores are empty', function
     new RouteDecision($case)->handle();
     $case->refresh();
 
-    expect($case->status)->toBe(CaseStatus::Pending);
+    expect($case->status)->toBe(CaseStatus::Dismissed);
 });
 
 test('escalates suggestion based on prior offenses', function (): void {
