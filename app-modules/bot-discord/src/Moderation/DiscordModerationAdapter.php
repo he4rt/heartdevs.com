@@ -15,6 +15,7 @@ use He4rt\Moderation\Enforcement\ModerationAction;
 use He4rt\Moderation\Enums\ActionType;
 use He4rt\Moderation\Enums\Platform;
 use He4rt\Moderation\Platform\ModerationPlatformContract;
+use Illuminate\Http\Client\PendingRequest;
 use Illuminate\Http\Client\Response;
 use Illuminate\Support\Facades\Http;
 use Throwable;
@@ -108,7 +109,7 @@ final class DiscordModerationAdapter implements ModerationPlatformContract
             return;
         }
 
-        $dmResponse = Http::withHeaders(['Authorization' => 'Bot '.$token])
+        $dmResponse = $this->http($token)
             ->post('https://discord.com/api/v10/users/@me/channels', [
                 'recipient_id' => $discordId,
             ]);
@@ -117,7 +118,7 @@ final class DiscordModerationAdapter implements ModerationPlatformContract
             return;
         }
 
-        Http::withHeaders(['Authorization' => 'Bot '.$token])
+        $this->http($token)
             ->post(sprintf('https://discord.com/api/v10/channels/%s/messages', $dmResponse->json('id')), [
                 'content' => $message,
             ]);
@@ -153,11 +154,16 @@ final class DiscordModerationAdapter implements ModerationPlatformContract
             ->value('external_account_id');
     }
 
+    private function http(string $token): PendingRequest
+    {
+        return Http::withHeaders(['Authorization' => 'Bot '.$token])->timeout(10);
+    }
+
     private function timeoutMember(string $token, string $guildId, string $discordId, ?string $duration): Response
     {
         $until = $this->parseDuration($duration);
 
-        return Http::withHeaders(['Authorization' => 'Bot '.$token])
+        return $this->http($token)
             ->patch(sprintf('https://discord.com/api/v10/guilds/%s/members/%s', $guildId, $discordId), [
                 'communication_disabled_until' => $until?->format(DateTimeInterface::ATOM),
             ]);
@@ -171,7 +177,7 @@ final class DiscordModerationAdapter implements ModerationPlatformContract
             default => 0,
         };
 
-        return Http::withHeaders(['Authorization' => 'Bot '.$token])
+        return $this->http($token)
             ->put(sprintf('https://discord.com/api/v10/guilds/%s/bans/%s', $guildId, $discordId), [
                 'delete_message_seconds' => $deleteSeconds,
             ]);
@@ -179,7 +185,7 @@ final class DiscordModerationAdapter implements ModerationPlatformContract
 
     private function kickMember(string $token, string $guildId, string $discordId): Response
     {
-        return Http::withHeaders(['Authorization' => 'Bot '.$token])
+        return $this->http($token)
             ->delete(sprintf('https://discord.com/api/v10/guilds/%s/members/%s', $guildId, $discordId));
     }
 
@@ -202,13 +208,13 @@ final class DiscordModerationAdapter implements ModerationPlatformContract
             return;
         }
 
-        Http::withHeaders(['Authorization' => 'Bot '.$token])
+        $this->http($token)
             ->delete(sprintf('https://discord.com/api/v10/channels/%s/messages/%s', $channelId, $messageId));
     }
 
     private function sendDmNotification(string $token, string $discordId, ModerationAction $action): void
     {
-        $dmResponse = Http::withHeaders(['Authorization' => 'Bot '.$token])
+        $dmResponse = $this->http($token)
             ->post('https://discord.com/api/v10/users/@me/channels', [
                 'recipient_id' => $discordId,
             ]);
@@ -220,7 +226,7 @@ final class DiscordModerationAdapter implements ModerationPlatformContract
         $channelId = (string) $dmResponse->json('id');
         $originalText = $action->case?->content_snapshot['text'] ?? null;
 
-        Http::withHeaders(['Authorization' => 'Bot '.$token])
+        $this->http($token)
             ->post(sprintf('https://discord.com/api/v10/channels/%s/messages', $channelId), [
                 'embeds' => [[
                     'title' => __('moderation::notifications.discord_dm.title'),
