@@ -53,29 +53,25 @@ final class HistoryBasedPenaltyAdvisor implements PenaltyAdvisorContract
     /** @return array{ActionType, ?string} */
     private function escalate(int $priorOffenses, Severity $severity): array
     {
-        if ($priorOffenses >= 5) {
-            return [ActionType::Ban, 'permanent'];
-        }
-
-        if ($priorOffenses >= 3) {
-            return [ActionType::Ban, '30d'];
-        }
-
         if ($priorOffenses >= 2) {
-            return [ActionType::Ban, '7d'];
+            return match (true) {
+                $severity === Severity::High || $severity === Severity::Critical => [ActionType::Ban, 'permanent'],
+                $severity === Severity::Medium => [ActionType::Mute, '28d'],
+                default => [ActionType::Mute, '24h'],
+            };
         }
 
         if ($priorOffenses === 1) {
             return match (true) {
-                $severity === Severity::High || $severity === Severity::Critical => [ActionType::Mute, '7d'],
-                $severity === Severity::Medium => [ActionType::Mute, '24h'],
-                default => [ActionType::Warn, null],
+                $severity === Severity::High || $severity === Severity::Critical => [ActionType::Ban, '7d'],
+                $severity === Severity::Medium => [ActionType::Mute, '7d'],
+                default => [ActionType::Mute, '24h'],
             };
         }
 
         return match (true) {
-            $severity === Severity::High || $severity === Severity::Critical => [ActionType::Mute, '24h'],
-            default => [ActionType::Warn, null],
+            $severity === Severity::High || $severity === Severity::Critical => [ActionType::Ban, '24h'],
+            default => [ActionType::Mute, '24h'],
         };
     }
 
