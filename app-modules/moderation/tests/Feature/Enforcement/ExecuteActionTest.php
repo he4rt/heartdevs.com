@@ -80,7 +80,7 @@ test('skips platforms not in target list', function (): void {
     $action = ModerationAction::factory()->create([
         'case_id' => $case->id,
         'action_type' => 'ban',
-        'target_platforms' => ['discord'],
+        'target_platforms' => ['skype'],
     ]);
 
     new ExecuteAction($action, $user)->handle();
