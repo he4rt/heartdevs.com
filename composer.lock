@@ -3347,43 +3347,6 @@
             }
         },
         {
-            "name": "he4rt/hub",
-            "version": "1.0",
-            "dist": {
-                "type": "path",
-                "url": "app-modules/hub",
-                "reference": "9cf4651b1d232ea7ea90a4abb05fcf6fc0de2235"
-            },
-            "type": "library",
-            "extra": {
-                "laravel": {
-                    "providers": [
-                        "He4rt\\Hub\\HubServiceProvider"
-                    ]
-                }
-            },
-            "autoload": {
-                "psr-4": {
-                    "He4rt\\Hub\\": "src/",
-                    "He4rt\\Hub\\Database\\Factories\\": "database/factories/",
-                    "He4rt\\Hub\\Database\\Seeders\\": "database/seeders/"
-                }
-            },
-            "autoload-dev": {
-                "psr-4": {
-                    "He4rt\\Hub\\Tests\\": "tests/"
-                }
-            },
-            "license": [
-                "proprietary"
-            ],
-            "description": "User Hub panel for He4rt Developers platform",
-            "transport-options": {
-                "symlink": true,
-                "relative": true
-            }
-        },
-        {
             "name": "he4rt/identity",
             "version": "1.0",
             "dist": {
