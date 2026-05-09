@@ -36,7 +36,7 @@ final readonly class CreateReply
             return Timeline::query()->create([
                 'user_id' => $dto->userId,
                 'tenant_id' => $parentTimeline->tenant_id,
-                'postable_type' => 'post_entry',
+                'postable_type' => $postEntry->getMorphClass(),
                 'postable_id' => $postEntry->id,
                 'root_id' => $rootId,
                 'parent_id' => $rootId,

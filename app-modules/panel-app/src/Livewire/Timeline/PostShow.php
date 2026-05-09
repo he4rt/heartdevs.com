@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace He4rt\PanelApp\Livewire\Timeline;
 
-use Filament\Facades\Filament;
 use He4rt\Activity\Timeline\Actions\TogglePinPost;
 use He4rt\Activity\Timeline\Timeline;
 use He4rt\Identity\User\Models\User;
@@ -32,7 +31,7 @@ final class PostShow extends Component
 
         $timeline = Timeline::query()
             ->where('id', $this->timelineId)
-            ->where('tenant_id', Filament::getTenant()->id)
+            ->where('tenant_id', filament()->getTenant()->getKey())
             ->firstOrFail();
 
         resolve(TogglePinPost::class)->handle($user, $timeline);
@@ -44,7 +43,7 @@ final class PostShow extends Component
     {
         $timeline = Timeline::query()
             ->where('id', $this->timelineId)
-            ->where('tenant_id', Filament::getTenant()->id)
+            ->where('tenant_id', filament()->getTenant()->getKey())
             ->with([
                 'user',
                 'postable',

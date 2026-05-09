@@ -6,7 +6,6 @@ namespace He4rt\Activity\Timeline\Listeners;
 
 use He4rt\Activity\Moderation\Enums\ModerationType;
 use He4rt\Activity\Moderation\Models\ModerationEvent;
-use He4rt\Identity\ExternalIdentity\Models\ExternalIdentity;
 use He4rt\Moderation\Enforcement\ActionExecuted;
 use He4rt\Moderation\Enums\ActionType;
 
@@ -32,13 +31,11 @@ final class PublishModerationToTimeline
         }
 
         $case = $action->case;
-        $subjectIdentityId = $this->resolveIdentity($case?->author_id, $tenantId);
-        $moderatorIdentityId = $this->resolveIdentity($action->moderator_id, $tenantId);
 
         ModerationEvent::query()->create([
             'tenant_id' => $tenantId,
-            'external_identity_id' => $subjectIdentityId,
-            'moderator_identity_id' => $moderatorIdentityId,
+            'external_identity_id' => $case?->author_id,
+            'moderator_identity_id' => $action->moderator_id,
             'type' => ModerationType::from($action->action_type->value),
             'reason' => $action->reason ?? $case?->content_snapshot['text'] ?? null,
             'metadata' => [
@@ -51,18 +48,5 @@ final class PublishModerationToTimeline
             ],
             'occurred_at' => $action->created_at ?? now(),
         ]);
-    }
-
-    private function resolveIdentity(?string $userId, int $tenantId): ?string
-    {
-        if ($userId === null) {
-            return null;
-        }
-
-        return ExternalIdentity::query()
-            ->where('model_id', $userId)
-            ->where('model_type', 'user')
-            ->where('tenant_id', $tenantId)
-            ->value('id');
     }
 }

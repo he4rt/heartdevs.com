@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace He4rt\PanelApp\Pages;
 
 use BackedEnum;
-use Filament\Facades\Filament;
 use Filament\Pages\Page;
 use He4rt\Activity\Timeline\Timeline;
 
@@ -27,7 +26,7 @@ class ThreadPage extends Page
     {
         $exists = Timeline::query()
             ->where('id', $record)
-            ->where('tenant_id', Filament::getTenant()->id)
+            ->where('tenant_id', filament()->getTenant()->getKey())
             ->whereNull('parent_id')
             ->exists();
 
@@ -40,15 +39,10 @@ class ThreadPage extends Page
     {
         return Timeline::query()
             ->where('id', $this->record)
-            ->where('tenant_id', Filament::getTenant()->id)
+            ->where('tenant_id', filament()->getTenant()->getKey())
             ->whereNull('parent_id')
             ->with(['user', 'postable', 'reactions'])
             ->withCount('children', 'reactions')
             ->firstOrFail();
-    }
-
-    public function getTitle(): string
-    {
-        return 'Thread';
     }
 }

@@ -6,9 +6,9 @@ namespace He4rt\Activity;
 
 use He4rt\Activity\Message\Models\Message;
 use He4rt\Activity\Moderation\Models\ModerationEvent;
-use He4rt\Activity\Timeline\Actions\PublishModerationEntry;
 use He4rt\Activity\Timeline\Delegated\PostEntry;
 use He4rt\Activity\Timeline\Listeners\PublishModerationToTimeline;
+use He4rt\Activity\Timeline\Observers\ModerationEventObserver;
 use He4rt\Activity\Timeline\Timeline;
 use He4rt\Activity\Voice\Models\Voice;
 use He4rt\Moderation\Enforcement\ActionExecuted;
@@ -36,9 +36,7 @@ class ActivityServiceProvider extends ServiceProvider
             'timeline' => Timeline::class,
         ]);
 
-        ModerationEvent::created(function (ModerationEvent $event): void {
-            resolve(PublishModerationEntry::class)->handle($event);
-        });
+        ModerationEvent::observe(ModerationEventObserver::class);
 
         Event::listen(ActionExecuted::class, [PublishModerationToTimeline::class, 'handle']);
     }

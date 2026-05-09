@@ -32,7 +32,7 @@ final readonly class CreatePost
             return Timeline::query()->create([
                 'user_id' => $dto->userId,
                 'tenant_id' => $dto->tenantId,
-                'postable_type' => 'post_entry',
+                'postable_type' => $postEntry->getMorphClass(),
                 'postable_id' => $postEntry->id,
             ]);
         });
