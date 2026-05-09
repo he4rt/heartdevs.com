@@ -21,8 +21,14 @@ final readonly class PublishModerationEntry
             return null;
         }
 
+        $userId = $event->moderator?->model_id ?? $event->subject?->model_id;
+
+        if ($userId === null) {
+            return null;
+        }
+
         return Timeline::query()->create([
-            'user_id' => $event->moderator?->model_id ?? $event->subject?->model_id,
+            'user_id' => $userId,
             'tenant_id' => $event->tenant_id,
             'postable_type' => 'moderation_event',
             'postable_id' => $event->id,
