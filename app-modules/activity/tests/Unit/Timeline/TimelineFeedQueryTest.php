@@ -17,14 +17,14 @@ test('returns only root posts for tenant ordered by newest first', function (): 
 
     $older = Timeline::factory()->for($user)->create([
         'tenant_id' => $tenant->id,
-        'postable_type' => 'post_entry',
+        'postable_type' => (new PostEntry)->getMorphClass(),
         'postable_id' => PostEntry::factory()->create()->id,
         'created_at' => now()->subHour(),
     ]);
 
     $newer = Timeline::factory()->for($user)->create([
         'tenant_id' => $tenant->id,
-        'postable_type' => 'post_entry',
+        'postable_type' => (new PostEntry)->getMorphClass(),
         'postable_id' => PostEntry::factory()->create()->id,
         'created_at' => now(),
     ]);
@@ -42,14 +42,14 @@ test('excludes replies from feed', function (): void {
 
     $root = Timeline::factory()->for($user)->create([
         'tenant_id' => $tenant->id,
-        'postable_type' => 'post_entry',
+        'postable_type' => (new PostEntry)->getMorphClass(),
         'postable_id' => $postEntry->id,
     ]);
 
     $replyEntry = PostEntry::factory()->create();
     Timeline::factory()->for($user)->create([
         'tenant_id' => $tenant->id,
-        'postable_type' => 'post_entry',
+        'postable_type' => (new PostEntry)->getMorphClass(),
         'postable_id' => $replyEntry->id,
         'root_id' => $root->id,
         'parent_id' => $root->id,
@@ -67,14 +67,14 @@ test('excludes ignored posts from feed', function (): void {
 
     Timeline::factory()->for($user)->create([
         'tenant_id' => $tenant->id,
-        'postable_type' => 'post_entry',
+        'postable_type' => (new PostEntry)->getMorphClass(),
         'postable_id' => PostEntry::factory()->create()->id,
         'is_ignored' => true,
     ]);
 
     $visible = Timeline::factory()->for($user)->create([
         'tenant_id' => $tenant->id,
-        'postable_type' => 'post_entry',
+        'postable_type' => (new PostEntry)->getMorphClass(),
         'postable_id' => PostEntry::factory()->create()->id,
     ]);
 
@@ -91,13 +91,13 @@ test('does not show posts from other tenants', function (): void {
 
     Timeline::factory()->for($user)->create([
         'tenant_id' => $tenantA->id,
-        'postable_type' => 'post_entry',
+        'postable_type' => (new PostEntry)->getMorphClass(),
         'postable_id' => PostEntry::factory()->create()->id,
     ]);
 
     Timeline::factory()->for($user)->create([
         'tenant_id' => $tenantB->id,
-        'postable_type' => 'post_entry',
+        'postable_type' => (new PostEntry)->getMorphClass(),
         'postable_id' => PostEntry::factory()->create()->id,
     ]);
 

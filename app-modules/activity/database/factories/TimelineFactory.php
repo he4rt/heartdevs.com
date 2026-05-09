@@ -21,7 +21,7 @@ final class TimelineFactory extends Factory
         return [
             'user_id' => User::factory(),
             'tenant_id' => Tenant::factory(),
-            'postable_type' => 'post_entry',
+            'postable_type' => (new PostEntry)->getMorphClass(),
             'postable_id' => PostEntry::factory(),
             'is_ignored' => false,
             'pinned' => false,

@@ -19,7 +19,7 @@ test('timeline belongs to user and tenant', function (): void {
         ->for($user)
         ->create([
             'tenant_id' => $tenant->id,
-            'postable_type' => 'post_entry',
+            'postable_type' => (new PostEntry)->getMorphClass(),
             'postable_id' => $postEntry->id,
         ]);
 
@@ -38,7 +38,7 @@ test('timeline has children and parent for threading', function (): void {
         ->for($user)
         ->create([
             'tenant_id' => $tenant->id,
-            'postable_type' => 'post_entry',
+            'postable_type' => (new PostEntry)->getMorphClass(),
             'postable_id' => $parentEntry->id,
         ]);
 
@@ -46,7 +46,7 @@ test('timeline has children and parent for threading', function (): void {
         ->for($user)
         ->create([
             'tenant_id' => $tenant->id,
-            'postable_type' => 'post_entry',
+            'postable_type' => (new PostEntry)->getMorphClass(),
             'postable_id' => $childEntry->id,
             'root_id' => $parent->id,
             'parent_id' => $parent->id,
@@ -67,7 +67,7 @@ test('timeline has reactions via HasReactions trait', function (): void {
         ->for($user)
         ->create([
             'tenant_id' => $tenant->id,
-            'postable_type' => 'post_entry',
+            'postable_type' => (new PostEntry)->getMorphClass(),
             'postable_id' => $postEntry->id,
         ]);
 

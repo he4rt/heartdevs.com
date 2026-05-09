@@ -21,7 +21,7 @@ test('creates a reply to a root post', function (): void {
         ->for($user)
         ->create([
             'tenant_id' => $tenant->id,
-            'postable_type' => 'post_entry',
+            'postable_type' => (new PostEntry)->getMorphClass(),
             'postable_id' => $postEntry->id,
         ]);
 
@@ -48,7 +48,7 @@ test('reply to a reply flattens to root level', function (): void {
         ->for($user)
         ->create([
             'tenant_id' => $tenant->id,
-            'postable_type' => 'post_entry',
+            'postable_type' => (new PostEntry)->getMorphClass(),
             'postable_id' => $postEntry->id,
         ]);
 
@@ -57,7 +57,7 @@ test('reply to a reply flattens to root level', function (): void {
         ->for($user)
         ->create([
             'tenant_id' => $tenant->id,
-            'postable_type' => 'post_entry',
+            'postable_type' => (new PostEntry)->getMorphClass(),
             'postable_id' => $replyEntry->id,
             'root_id' => $rootPost->id,
             'parent_id' => $rootPost->id,
@@ -84,7 +84,7 @@ test('reply creation is atomic — no orphaned PostEntry on Timeline failure', f
         ->for($user)
         ->create([
             'tenant_id' => $tenant->id,
-            'postable_type' => 'post_entry',
+            'postable_type' => (new PostEntry)->getMorphClass(),
             'postable_id' => $postEntry->id,
         ]);
 

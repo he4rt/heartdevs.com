@@ -25,7 +25,7 @@ test('creates a post entry and timeline record', function (): void {
     expect($timeline)->toBeInstanceOf(Timeline::class)
         ->and($timeline->user_id)->toBe($user->id)
         ->and($timeline->tenant_id)->toBe($tenant->id)
-        ->and($timeline->postable_type)->toBe('post_entry')
+        ->and($timeline->postable_type)->toBe((new PostEntry)->getMorphClass())
         ->and($timeline->postable)->toBeInstanceOf(PostEntry::class)
         ->and($timeline->postable->content)->toBe('Hello **He4rt** community!')
         ->and($timeline->root_id)->toBeNull()

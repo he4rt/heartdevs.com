@@ -21,7 +21,7 @@ test('user can pin their own post', function (): void {
         ->for($user)
         ->create([
             'tenant_id' => $tenant->id,
-            'postable_type' => 'post_entry',
+            'postable_type' => (new PostEntry)->getMorphClass(),
             'postable_id' => $postEntry->id,
         ]);
 
@@ -39,7 +39,7 @@ test('pinning a post unpins the previously pinned post', function (): void {
         ->for($user)
         ->create([
             'tenant_id' => $tenant->id,
-            'postable_type' => 'post_entry',
+            'postable_type' => (new PostEntry)->getMorphClass(),
             'postable_id' => $firstEntry->id,
             'pinned' => true,
         ]);
@@ -49,7 +49,7 @@ test('pinning a post unpins the previously pinned post', function (): void {
         ->for($user)
         ->create([
             'tenant_id' => $tenant->id,
-            'postable_type' => 'post_entry',
+            'postable_type' => (new PostEntry)->getMorphClass(),
             'postable_id' => $secondEntry->id,
         ]);
 
@@ -68,7 +68,7 @@ test('user can unpin their own post', function (): void {
         ->for($user)
         ->create([
             'tenant_id' => $tenant->id,
-            'postable_type' => 'post_entry',
+            'postable_type' => (new PostEntry)->getMorphClass(),
             'postable_id' => $postEntry->id,
             'pinned' => true,
         ]);
@@ -88,7 +88,7 @@ test('user cannot pin another users post', function (): void {
         ->for($owner)
         ->create([
             'tenant_id' => $tenant->id,
-            'postable_type' => 'post_entry',
+            'postable_type' => (new PostEntry)->getMorphClass(),
             'postable_id' => $postEntry->id,
         ]);
 

@@ -32,12 +32,12 @@ test('publishes a timeline entry for a ban moderation event via observer', funct
 
     $this->assertDatabaseCount('activity_timeline', 1);
 
-    $timeline = Timeline::query()->where('postable_type', 'moderation_event')->first();
+    $timeline = Timeline::query()->where('postable_type', (new ModerationEvent)->getMorphClass())->first();
 
     expect($timeline)->not->toBeNull()
         ->and($timeline->user_id)->toBe($user->id)
         ->and($timeline->tenant_id)->toBe($tenant->id)
-        ->and($timeline->postable_type)->toBe('moderation_event')
+        ->and($timeline->postable_type)->toBe((new ModerationEvent)->getMorphClass())
         ->and($timeline->postable_id)->toBe($event->id);
 });
 
@@ -68,11 +68,11 @@ test('publishes a timeline entry for a kick moderation event via observer', func
 
     $this->assertDatabaseCount('activity_timeline', 1);
 
-    $timeline = Timeline::query()->where('postable_type', 'moderation_event')->first();
+    $timeline = Timeline::query()->where('postable_type', (new ModerationEvent)->getMorphClass())->first();
 
     expect($timeline)->not->toBeNull()
         ->and($timeline->user_id)->toBe($moderator->id)
-        ->and($timeline->postable_type)->toBe('moderation_event');
+        ->and($timeline->postable_type)->toBe((new ModerationEvent)->getMorphClass());
 });
 
 test('does not publish a timeline entry when moderator identity is missing', function (): void {

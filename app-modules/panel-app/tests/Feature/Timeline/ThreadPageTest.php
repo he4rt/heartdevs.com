@@ -29,7 +29,7 @@ beforeEach(function (): void {
         ->for($this->user)
         ->create([
             'tenant_id' => $this->tenant->id,
-            'postable_type' => 'post_entry',
+            'postable_type' => (new PostEntry)->getMorphClass(),
             'postable_id' => $postEntry->id,
         ]);
 });
@@ -61,7 +61,7 @@ test('thread replies shows all replies in chronological order', function (): voi
     $entry1 = PostEntry::factory()->create(['content' => 'First reply']);
     Timeline::factory()->for($replier)->create([
         'tenant_id' => $this->tenant->id,
-        'postable_type' => 'post_entry',
+        'postable_type' => (new PostEntry)->getMorphClass(),
         'postable_id' => $entry1->id,
         'root_id' => $this->rootPost->id,
         'parent_id' => $this->rootPost->id,
@@ -71,7 +71,7 @@ test('thread replies shows all replies in chronological order', function (): voi
     $entry2 = PostEntry::factory()->create(['content' => 'Second reply']);
     Timeline::factory()->for($this->user)->create([
         'tenant_id' => $this->tenant->id,
-        'postable_type' => 'post_entry',
+        'postable_type' => (new PostEntry)->getMorphClass(),
         'postable_id' => $entry2->id,
         'root_id' => $this->rootPost->id,
         'parent_id' => $this->rootPost->id,
@@ -91,7 +91,7 @@ test('thread page returns 404 for post from another tenant', function (): void {
     $otherEntry = PostEntry::factory()->create(['content' => 'Other tenant post']);
     $otherPost = Timeline::factory()->for($this->user)->create([
         'tenant_id' => $otherTenant->id,
-        'postable_type' => 'post_entry',
+        'postable_type' => (new PostEntry)->getMorphClass(),
         'postable_id' => $otherEntry->id,
     ]);
 
@@ -104,14 +104,14 @@ test('thread replies does not show replies from another tenant', function (): vo
     $otherEntry = PostEntry::factory()->create(['content' => 'Other tenant post']);
     $otherPost = Timeline::factory()->for($this->user)->create([
         'tenant_id' => $otherTenant->id,
-        'postable_type' => 'post_entry',
+        'postable_type' => (new PostEntry)->getMorphClass(),
         'postable_id' => $otherEntry->id,
     ]);
 
     $replyEntry = PostEntry::factory()->create(['content' => 'Cross-tenant reply']);
     Timeline::factory()->for($this->user)->create([
         'tenant_id' => $otherTenant->id,
-        'postable_type' => 'post_entry',
+        'postable_type' => (new PostEntry)->getMorphClass(),
         'postable_id' => $replyEntry->id,
         'root_id' => $otherPost->id,
         'parent_id' => $otherPost->id,
@@ -126,14 +126,14 @@ test('cannot delete reply from another tenant', function (): void {
     $otherEntry = PostEntry::factory()->create(['content' => 'Other post']);
     $otherPost = Timeline::factory()->for($this->user)->create([
         'tenant_id' => $otherTenant->id,
-        'postable_type' => 'post_entry',
+        'postable_type' => (new PostEntry)->getMorphClass(),
         'postable_id' => $otherEntry->id,
     ]);
 
     $replyEntry = PostEntry::factory()->create(['content' => 'Other reply']);
     $otherReply = Timeline::factory()->for($this->user)->create([
         'tenant_id' => $otherTenant->id,
-        'postable_type' => 'post_entry',
+        'postable_type' => (new PostEntry)->getMorphClass(),
         'postable_id' => $replyEntry->id,
         'root_id' => $otherPost->id,
         'parent_id' => $otherPost->id,
@@ -149,7 +149,7 @@ test('owner can delete their own reply', function (): void {
     $replyEntry = PostEntry::factory()->create(['content' => 'My reply']);
     $reply = Timeline::factory()->for($this->user)->create([
         'tenant_id' => $this->tenant->id,
-        'postable_type' => 'post_entry',
+        'postable_type' => (new PostEntry)->getMorphClass(),
         'postable_id' => $replyEntry->id,
         'root_id' => $this->rootPost->id,
         'parent_id' => $this->rootPost->id,
