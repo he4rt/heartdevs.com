@@ -11,8 +11,8 @@
 
     <x-panel-app::timeline.engagement :timeline="$timeline" :is-owner="auth()->id() === $timeline->user_id" />
 
-    @if ($timeline->children_count > 0)
-        <div class="space-y-3 border-t border-gray-200 px-4 py-3 dark:border-white/10">
+    @if ($showReplies && $timeline->children_count > 0)
+        <div class="space-y-3 border-t border-gray-200 px-3 py-3 sm:px-4 dark:border-white/10">
             @foreach ($timeline->children as $reply)
                 <div class="flex gap-3">
                     <div
@@ -40,6 +40,15 @@
                     </div>
                 </div>
             @endforeach
+
+            @if ($timeline->children_count > 3)
+                <a
+                    href="{{ \He4rt\PanelApp\Pages\ThreadPage::getUrl(['record' => $timeline->id]) }}"
+                    class="text-primary-600 hover:text-primary-500 block text-center text-sm font-medium transition"
+                >
+                    Ver todas as {{ $timeline->children_count }} respostas &rarr;
+                </a>
+            @endif
         </div>
     @endif
 </article>

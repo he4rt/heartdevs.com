@@ -18,6 +18,8 @@ final class PostShow extends Component
     #[Locked]
     public string $timelineId;
 
+    public bool $showReplies = true;
+
     #[On('timeline.post-updated')]
     public function refresh(): void {}
 

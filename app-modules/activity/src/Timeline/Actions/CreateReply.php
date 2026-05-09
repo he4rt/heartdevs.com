@@ -7,6 +7,7 @@ namespace He4rt\Activity\Timeline\Actions;
 use He4rt\Activity\Timeline\Delegated\PostEntry;
 use He4rt\Activity\Timeline\DTOs\CreateReplyDTO;
 use He4rt\Activity\Timeline\Timeline;
+use Illuminate\Support\Facades\Storage;
 use InvalidArgumentException;
 
 final readonly class CreateReply
@@ -24,6 +25,11 @@ final readonly class CreateReply
         $postEntry = PostEntry::query()->create([
             'content' => $content,
         ]);
+
+        foreach ($dto->images as $image) {
+            $path = Storage::disk('public')->path($image);
+            $postEntry->addMedia($path)->toMediaCollection('images');
+        }
 
         return Timeline::query()->create([
             'user_id' => $dto->userId,
