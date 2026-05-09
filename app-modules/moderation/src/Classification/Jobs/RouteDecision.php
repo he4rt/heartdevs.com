@@ -42,7 +42,7 @@ final class RouteDecision implements ShouldQueue
         $priority = min($priority + $reportBoost, 100);
 
         $suggestedAction = null;
-        if ($this->case->author && $this->case->violation_type && $this->case->severity) {
+        if ($this->case->suggested_action === null && $this->case->author && $this->case->violation_type && $this->case->severity) {
             $advisor = new HistoryBasedPenaltyAdvisor();
             $suggestion = $advisor->suggest(
                 $this->case->author,
