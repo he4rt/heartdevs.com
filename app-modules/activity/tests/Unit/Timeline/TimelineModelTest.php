@@ -1,0 +1,85 @@
+<?php
+
+declare(strict_types=1);
+
+use He4rt\Activity\Timeline\Delegated\PostEntry;
+use He4rt\Activity\Timeline\Timeline;
+use He4rt\Identity\Tenant\Models\Tenant;
+use He4rt\Identity\User\Models\User;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+
+uses(RefreshDatabase::class);
+
+test('timeline belongs to user and tenant', function (): void {
+    $tenant = Tenant::factory()->create();
+    $user = User::factory()->create();
+    $postEntry = PostEntry::factory()->create();
+
+    $timeline = Timeline::factory()
+        ->for($user)
+        ->create([
+            'tenant_id' => $tenant->id,
+            'postable_type' => 'post_entry',
+            'postable_id' => $postEntry->id,
+        ]);
+
+    expect($timeline->user->id)->toBe($user->id)
+        ->and($timeline->tenant->id)->toBe($tenant->id)
+        ->and($timeline->postable)->toBeInstanceOf(PostEntry::class);
+});
+
+test('timeline has children and parent for threading', function (): void {
+    $tenant = Tenant::factory()->create();
+    $user = User::factory()->create();
+    $parentEntry = PostEntry::factory()->create();
+    $childEntry = PostEntry::factory()->create();
+
+    $parent = Timeline::factory()
+        ->for($user)
+        ->create([
+            'tenant_id' => $tenant->id,
+            'postable_type' => 'post_entry',
+            'postable_id' => $parentEntry->id,
+        ]);
+
+    $child = Timeline::factory()
+        ->for($user)
+        ->create([
+            'tenant_id' => $tenant->id,
+            'postable_type' => 'post_entry',
+            'postable_id' => $childEntry->id,
+            'root_id' => $parent->id,
+            'parent_id' => $parent->id,
+        ]);
+
+    expect($child->parent->id)->toBe($parent->id)
+        ->and($child->root->id)->toBe($parent->id)
+        ->and($parent->children)->toHaveCount(1)
+        ->and($parent->children->first()->id)->toBe($child->id);
+});
+
+test('timeline has reactions via HasReactions trait', function (): void {
+    $tenant = Tenant::factory()->create();
+    $user = User::factory()->create();
+    $postEntry = PostEntry::factory()->create();
+
+    $timeline = Timeline::factory()
+        ->for($user)
+        ->create([
+            'tenant_id' => $tenant->id,
+            'postable_type' => 'post_entry',
+            'postable_id' => $postEntry->id,
+        ]);
+
+    $timeline->reactions()->create([
+        'tenant_id' => $tenant->id,
+        'emoji_key' => '❤️',
+        'emoji_name' => 'heart',
+        'count' => 1,
+        'count_burst' => 0,
+        'count_normal' => 1,
+    ]);
+
+    expect($timeline->reactions)->toHaveCount(1)
+        ->and($timeline->reactions->first()->emoji_key)->toBe('❤️');
+});

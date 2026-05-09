@@ -5,7 +5,10 @@ declare(strict_types=1);
 namespace He4rt\Activity;
 
 use He4rt\Activity\Message\Models\Message;
+use He4rt\Activity\Moderation\Models\ModerationEvent;
+use He4rt\Activity\Timeline\Delegated\PostEntry;
 use He4rt\Activity\Timeline\Prototype\PrototypeTimelineCommand;
+use He4rt\Activity\Timeline\Timeline;
 use He4rt\Activity\Voice\Models\Voice;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\ServiceProvider;
@@ -30,6 +33,9 @@ class ActivityServiceProvider extends ServiceProvider
         Relation::morphMap([
             'message' => Message::class,
             'voice' => Voice::class,
+            'post_entry' => PostEntry::class,
+            'moderation_event' => ModerationEvent::class,
+            'timeline' => Timeline::class,
         ]);
     }
 }

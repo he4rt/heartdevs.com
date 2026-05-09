@@ -27,7 +27,6 @@ return new class extends Migration
             $table->timestamps();
 
             $table->unique(['id'], 'activity_timeline_pkey');
-            $table->index(['postable_type', 'postable_id'], 'activity_timeline_postable_type_postable_id_index');
         });
     }
 
