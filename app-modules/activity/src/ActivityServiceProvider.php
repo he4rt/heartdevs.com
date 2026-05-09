@@ -6,6 +6,7 @@ namespace He4rt\Activity;
 
 use He4rt\Activity\Message\Models\Message;
 use He4rt\Activity\Moderation\Models\ModerationEvent;
+use He4rt\Activity\Timeline\Actions\PublishModerationEntry;
 use He4rt\Activity\Timeline\Delegated\PostEntry;
 use He4rt\Activity\Timeline\Prototype\PrototypeTimelineCommand;
 use He4rt\Activity\Timeline\Timeline;
@@ -37,5 +38,9 @@ class ActivityServiceProvider extends ServiceProvider
             'moderation_event' => ModerationEvent::class,
             'timeline' => Timeline::class,
         ]);
+
+        ModerationEvent::created(function (ModerationEvent $event): void {
+            resolve(PublishModerationEntry::class)->handle($event);
+        });
     }
 }

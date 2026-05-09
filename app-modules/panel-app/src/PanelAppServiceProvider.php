@@ -6,7 +6,10 @@ namespace He4rt\PanelApp;
 
 use App\Enums\FilamentPanel;
 use Filament\Panel;
+use He4rt\PanelApp\Livewire\Timeline\Feed;
+use He4rt\PanelApp\Livewire\Timeline\PostShow;
 use Illuminate\Support\ServiceProvider;
+use Livewire\Livewire;
 
 class PanelAppServiceProvider extends ServiceProvider
 {
@@ -29,5 +32,8 @@ class PanelAppServiceProvider extends ServiceProvider
     {
         $this->loadViewsFrom(__DIR__.'/../resources/views', 'panel-app');
         $this->loadTranslationsFrom(__DIR__.'/../lang', 'panel-app');
+
+        Livewire::component('timeline-feed', Feed::class);
+        Livewire::component('timeline-post-show', PostShow::class);
     }
 }
