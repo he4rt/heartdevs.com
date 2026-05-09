@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Providers\Filament;
 
+use App\Enums\FilamentPanel;
 use App\Filament\Pages\Login;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
@@ -12,7 +13,8 @@ use Filament\Http\Middleware\DispatchServingFilamentEvent;
 use Filament\Panel;
 use Filament\PanelProvider;
 use Filament\Support\Colors\Color;
-use He4rt\PanelAdmin\Pages\Dashboard;
+use He4rt\Identity\Tenant\Models\Tenant;
+use He4rt\PanelApp\Pages\TimelinePage;
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
 use Illuminate\Cookie\Middleware\EncryptCookies;
 use Illuminate\Foundation\Http\Middleware\PreventRequestForgery;
@@ -20,25 +22,31 @@ use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Session\Middleware\StartSession;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
 
-class HubPanelProvider extends PanelProvider
+class AppPanelProvider extends PanelProvider
 {
+    public FilamentPanel $panelId = FilamentPanel::App;
+
     public function panel(Panel $panel): Panel
     {
         return $panel
-            ->id('hub')
-            ->path('hub')
+            ->id($this->panelId->value)
+            ->path($this->panelId->value)
             ->login(Login::class)
+            ->tenant(
+                model: Tenant::class,
+                slugAttribute: 'slug'
+            )
             ->colors([
                 'primary' => Color::Purple,
                 'gray' => Color::Zinc,
             ])
             ->viteTheme('resources/css/filament/admin/theme.css')
             ->sidebarCollapsibleOnDesktop()
-            ->discoverResources(in: app_path('Filament/Hub/Resources'), for: 'App\Filament\Hub\Resources')
-            ->discoverPages(in: app_path('Filament/Hub/Pages'), for: 'App\Filament\Hub\Pages')
-            ->discoverWidgets(in: app_path('Filament/Hub/Widgets'), for: 'App\Filament\Hub\Widgets')
+            ->discoverResources(in: app_path('Filament/App/Resources'), for: 'App\Filament\App\Resources')
+            ->discoverPages(in: app_path('Filament/App/Pages'), for: 'App\Filament\App\Pages')
+            ->discoverWidgets(in: app_path('Filament/App/Widgets'), for: 'App\Filament\App\Widgets')
             ->pages([
-                Dashboard::class,
+                TimelinePage::class,
             ])
             ->middleware([
                 EncryptCookies::class,

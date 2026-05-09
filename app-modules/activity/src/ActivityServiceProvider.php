@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace He4rt\Activity;
 
 use He4rt\Activity\Message\Models\Message;
+use He4rt\Activity\Timeline\Prototype\PrototypeTimelineCommand;
 use He4rt\Activity\Voice\Models\Voice;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\ServiceProvider;
@@ -14,6 +15,12 @@ class ActivityServiceProvider extends ServiceProvider
     public function register(): void
     {
         $this->mergeConfigFrom(__DIR__.'/../config/activity-tracking.php', 'activity-tracking');
+
+        if ($this->app->runningInConsole()) {
+            $this->commands([
+                PrototypeTimelineCommand::class,
+            ]);
+        }
     }
 
     public function boot(): void

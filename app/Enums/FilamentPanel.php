@@ -7,14 +7,5 @@ namespace App\Enums;
 enum FilamentPanel: string
 {
     case Admin = 'admin';
-    case Partner = 'partner';
-    case User = 'user';
-    case Guest = 'guest';
-
-    case Event = 'event';
-
-    public function moduleName(string $module): string
-    {
-        return sprintf('%s-%s', $this->value, $module);
-    }
+    case App = 'app';
 }
