@@ -13,10 +13,7 @@
                         ->upper()
                 }}
             </div>
-            <div
-                class="[&_.fi-fo-field-wrp]:gap-0 [&_.fi-fo-field-wrp-label]:hidden [&_.composer-images-upload]:hidden min-w-0 flex-1"
-                :class="showUpload && '![&_.composer-images-upload]:block'"
-            >
+            <div class="[&_.fi-fo-field-wrp]:gap-0 [&_.fi-fo-field-wrp-label]:hidden min-w-0 flex-1">
                 {{ $this->form }}
             </div>
         </div>

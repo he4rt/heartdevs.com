@@ -44,7 +44,11 @@ final class Composer extends Component implements HasSchemas
                     ->disk('public')
                     ->directory('timeline-uploads')
                     ->panelLayout('compact')
-                    ->extraAttributes(['class' => 'composer-images-upload']),
+                    ->extraFieldWrapperAttributes([
+                        'x-show' => 'showUpload',
+                        'x-cloak' => true,
+                        'x-transition' => true,
+                    ]),
             ])
             ->statePath('data');
     }
