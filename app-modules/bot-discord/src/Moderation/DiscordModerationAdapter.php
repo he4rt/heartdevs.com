@@ -423,6 +423,7 @@ final class DiscordModerationAdapter implements ModerationPlatformContract
         return $base;
     }
 
+    /** @param array<string, mixed> $payload */
     private function discordRequest(
         string $token,
         string $method,
