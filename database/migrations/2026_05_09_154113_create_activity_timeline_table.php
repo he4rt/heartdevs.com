@@ -17,7 +17,7 @@ return new class extends Migration
         Schema::create('activity_timeline', function (Blueprint $table): void {
             $table->uuid('id')->primary();
             $table->foreignIdFor(User::class, 'user_id');
-            $table->morphs('postable');
+            $table->uuidMorphs('postable');
             $table->foreignUuid('root_id')->nullable();
             $table->foreignUuid('parent_id')->nullable();
             $table->boolean('is_reported')->default(false);

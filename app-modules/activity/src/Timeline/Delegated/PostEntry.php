@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace He4rt\Activity\Timeline\Delegated;
 
 use He4rt\Activity\Database\Factories\PostEntryFactory;
+use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -15,6 +16,7 @@ final class PostEntry extends Model implements HasMedia
 {
     /** @use HasFactory<PostEntryFactory> */
     use HasFactory;
+    use HasUuids;
     use InteractsWithMedia;
     use SoftDeletes;
 
