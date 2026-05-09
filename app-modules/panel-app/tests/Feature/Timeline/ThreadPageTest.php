@@ -10,6 +10,7 @@ use He4rt\Identity\User\Models\User;
 use He4rt\PanelApp\Livewire\Timeline\ReplyComposer;
 use He4rt\PanelApp\Livewire\Timeline\ThreadReplies;
 use He4rt\PanelApp\Pages\ThreadPage;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 
 use function Pest\Livewire\livewire;
 
@@ -81,6 +82,67 @@ test('thread replies shows all replies in chronological order', function (): voi
         ->assertSee('First reply')
         ->assertSee('Second reply')
         ->assertSeeInOrder(['First reply', 'Second reply']);
+});
+
+// --- Critical: Tenant isolation ---
+
+test('thread page returns 404 for post from another tenant', function (): void {
+    $otherTenant = Tenant::factory()->create(['slug' => 'other-tenant']);
+    $otherEntry = PostEntry::factory()->create(['content' => 'Other tenant post']);
+    $otherPost = Timeline::factory()->for($this->user)->create([
+        'tenant_id' => $otherTenant->id,
+        'postable_type' => 'post_entry',
+        'postable_id' => $otherEntry->id,
+    ]);
+
+    $this->get(ThreadPage::getUrl(['record' => $otherPost->id]))
+        ->assertNotFound();
+});
+
+test('thread replies does not show replies from another tenant', function (): void {
+    $otherTenant = Tenant::factory()->create(['slug' => 'other-tenant']);
+    $otherEntry = PostEntry::factory()->create(['content' => 'Other tenant post']);
+    $otherPost = Timeline::factory()->for($this->user)->create([
+        'tenant_id' => $otherTenant->id,
+        'postable_type' => 'post_entry',
+        'postable_id' => $otherEntry->id,
+    ]);
+
+    $replyEntry = PostEntry::factory()->create(['content' => 'Cross-tenant reply']);
+    Timeline::factory()->for($this->user)->create([
+        'tenant_id' => $otherTenant->id,
+        'postable_type' => 'post_entry',
+        'postable_id' => $replyEntry->id,
+        'root_id' => $otherPost->id,
+        'parent_id' => $otherPost->id,
+    ]);
+
+    livewire(ThreadReplies::class, ['timelineId' => $otherPost->id])
+        ->assertDontSee('Cross-tenant reply');
+});
+
+test('cannot delete reply from another tenant', function (): void {
+    $otherTenant = Tenant::factory()->create(['slug' => 'other-tenant']);
+    $otherEntry = PostEntry::factory()->create(['content' => 'Other post']);
+    $otherPost = Timeline::factory()->for($this->user)->create([
+        'tenant_id' => $otherTenant->id,
+        'postable_type' => 'post_entry',
+        'postable_id' => $otherEntry->id,
+    ]);
+
+    $replyEntry = PostEntry::factory()->create(['content' => 'Other reply']);
+    $otherReply = Timeline::factory()->for($this->user)->create([
+        'tenant_id' => $otherTenant->id,
+        'postable_type' => 'post_entry',
+        'postable_id' => $replyEntry->id,
+        'root_id' => $otherPost->id,
+        'parent_id' => $otherPost->id,
+    ]);
+
+    $this->expectException(ModelNotFoundException::class);
+
+    livewire(ThreadReplies::class, ['timelineId' => $otherPost->id])
+        ->call('deleteReply', $otherReply->id);
 });
 
 test('owner can delete their own reply', function (): void {

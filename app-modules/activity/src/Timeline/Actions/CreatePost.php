@@ -7,6 +7,7 @@ namespace He4rt\Activity\Timeline\Actions;
 use He4rt\Activity\Timeline\Delegated\PostEntry;
 use He4rt\Activity\Timeline\DTOs\CreatePostDTO;
 use He4rt\Activity\Timeline\Timeline;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use InvalidArgumentException;
 
@@ -18,20 +19,22 @@ final readonly class CreatePost
 
         throw_if($content === '', InvalidArgumentException::class, 'Post content cannot be empty.');
 
-        $postEntry = PostEntry::query()->create([
-            'content' => $content,
-        ]);
+        return DB::transaction(function () use ($dto, $content): Timeline {
+            $postEntry = PostEntry::query()->create([
+                'content' => $content,
+            ]);
 
-        foreach ($dto->images as $image) {
-            $path = Storage::disk('public')->path($image);
-            $postEntry->addMedia($path)->toMediaCollection('images');
-        }
+            foreach ($dto->images as $image) {
+                $path = Storage::disk('public')->path($image);
+                $postEntry->addMedia($path)->toMediaCollection('images');
+            }
 
-        return Timeline::query()->create([
-            'user_id' => $dto->userId,
-            'tenant_id' => $dto->tenantId,
-            'postable_type' => 'post_entry',
-            'postable_id' => $postEntry->id,
-        ]);
+            return Timeline::query()->create([
+                'user_id' => $dto->userId,
+                'tenant_id' => $dto->tenantId,
+                'postable_type' => 'post_entry',
+                'postable_id' => $postEntry->id,
+            ]);
+        });
     }
 }

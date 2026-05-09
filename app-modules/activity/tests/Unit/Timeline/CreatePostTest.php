@@ -35,6 +35,35 @@ test('creates a post entry and timeline record', function (): void {
     $this->assertDatabaseCount('activity_timeline', 1);
 });
 
+test('creates a post with long content succeeds', function (): void {
+    $tenant = Tenant::factory()->create();
+    $user = User::factory()->create();
+    $longContent = str_repeat('a', 2000);
+
+    $timeline = resolve(CreatePost::class)->handle(new CreatePostDTO(
+        userId: $user->id,
+        tenantId: $tenant->id,
+        content: $longContent,
+    ));
+
+    expect($timeline->postable->content)->toBe($longContent);
+});
+
+test('post creation is atomic — no orphaned PostEntry on Timeline failure', function (): void {
+    $tenant = Tenant::factory()->create();
+
+    try {
+        resolve(CreatePost::class)->handle(new CreatePostDTO(
+            userId: 'not-a-valid-uuid',
+            tenantId: $tenant->id,
+            content: 'This should fail',
+        ));
+    } catch (Throwable) {
+    }
+
+    $this->assertDatabaseCount('activity_post_entries', 0);
+});
+
 test('creates a post with empty content is rejected', function (): void {
     $tenant = Tenant::factory()->create();
     $user = User::factory()->create();

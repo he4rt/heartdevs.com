@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace He4rt\PanelApp\Livewire\Timeline;
 
+use Filament\Facades\Filament;
 use He4rt\Activity\Timeline\Actions\DeleteReply;
 use He4rt\Activity\Timeline\Timeline;
 use He4rt\Identity\User\Models\User;
@@ -27,7 +28,10 @@ final class ThreadReplies extends Component
             return;
         }
 
-        $reply = Timeline::query()->findOrFail($replyId);
+        $reply = Timeline::query()
+            ->where('id', $replyId)
+            ->where('tenant_id', Filament::getTenant()->id)
+            ->firstOrFail();
 
         resolve(DeleteReply::class)->handle($user, $reply);
 
@@ -38,6 +42,7 @@ final class ThreadReplies extends Component
     {
         $replies = Timeline::query()
             ->where('root_id', $this->timelineId)
+            ->where('tenant_id', Filament::getTenant()->id)
             ->whereNotNull('parent_id')
             ->with(['user', 'postable'])
             ->oldest()

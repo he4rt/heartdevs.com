@@ -7,6 +7,7 @@ namespace He4rt\Activity\Timeline\Actions;
 use He4rt\Activity\Timeline\Delegated\PostEntry;
 use He4rt\Activity\Timeline\DTOs\CreateReplyDTO;
 use He4rt\Activity\Timeline\Timeline;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use InvalidArgumentException;
 
@@ -22,22 +23,24 @@ final readonly class CreateReply
 
         $rootId = $parentTimeline->root_id ?? $parentTimeline->id;
 
-        $postEntry = PostEntry::query()->create([
-            'content' => $content,
-        ]);
+        return DB::transaction(function () use ($dto, $content, $parentTimeline, $rootId): Timeline {
+            $postEntry = PostEntry::query()->create([
+                'content' => $content,
+            ]);
 
-        foreach ($dto->images as $image) {
-            $path = Storage::disk('public')->path($image);
-            $postEntry->addMedia($path)->toMediaCollection('images');
-        }
+            foreach ($dto->images as $image) {
+                $path = Storage::disk('public')->path($image);
+                $postEntry->addMedia($path)->toMediaCollection('images');
+            }
 
-        return Timeline::query()->create([
-            'user_id' => $dto->userId,
-            'tenant_id' => $parentTimeline->tenant_id,
-            'postable_type' => 'post_entry',
-            'postable_id' => $postEntry->id,
-            'root_id' => $rootId,
-            'parent_id' => $rootId,
-        ]);
+            return Timeline::query()->create([
+                'user_id' => $dto->userId,
+                'tenant_id' => $parentTimeline->tenant_id,
+                'postable_type' => 'post_entry',
+                'postable_id' => $postEntry->id,
+                'root_id' => $rootId,
+                'parent_id' => $rootId,
+            ]);
+        });
     }
 }

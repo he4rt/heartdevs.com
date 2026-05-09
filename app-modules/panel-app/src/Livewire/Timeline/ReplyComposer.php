@@ -39,7 +39,8 @@ final class ReplyComposer extends Component implements HasSchemas
                     ->hiddenLabel()
                     ->placeholder('Escreva uma resposta...')
                     ->toolbarButtons([])
-                    ->required(),
+                    ->required()
+                    ->maxLength(5000),
                 FileUpload::make('images')
                     ->hiddenLabel()
                     ->image()

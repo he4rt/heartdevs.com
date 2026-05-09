@@ -9,7 +9,6 @@ use He4rt\Activity\Moderation\Models\ModerationEvent;
 use He4rt\Activity\Timeline\Actions\PublishModerationEntry;
 use He4rt\Activity\Timeline\Delegated\PostEntry;
 use He4rt\Activity\Timeline\Listeners\PublishModerationToTimeline;
-use He4rt\Activity\Timeline\Prototype\PrototypeTimelineCommand;
 use He4rt\Activity\Timeline\Timeline;
 use He4rt\Activity\Voice\Models\Voice;
 use He4rt\Moderation\Enforcement\ActionExecuted;
@@ -23,11 +22,6 @@ class ActivityServiceProvider extends ServiceProvider
     {
         $this->mergeConfigFrom(__DIR__.'/../config/activity-tracking.php', 'activity-tracking');
 
-        if ($this->app->runningInConsole()) {
-            $this->commands([
-                PrototypeTimelineCommand::class,
-            ]);
-        }
     }
 
     public function boot(): void

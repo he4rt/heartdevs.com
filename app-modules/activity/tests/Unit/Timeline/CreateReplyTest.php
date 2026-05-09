@@ -74,3 +74,30 @@ test('reply to a reply flattens to root level', function (): void {
     expect($replyToReply->root_id)->toBe($rootPost->id)
         ->and($replyToReply->parent_id)->toBe($rootPost->id);
 });
+
+test('reply creation is atomic — no orphaned PostEntry on Timeline failure', function (): void {
+    $tenant = Tenant::factory()->create();
+    $user = User::factory()->create();
+    $postEntry = PostEntry::factory()->create();
+
+    $rootPost = Timeline::factory()
+        ->for($user)
+        ->create([
+            'tenant_id' => $tenant->id,
+            'postable_type' => 'post_entry',
+            'postable_id' => $postEntry->id,
+        ]);
+
+    $initialCount = PostEntry::query()->count();
+
+    try {
+        resolve(CreateReply::class)->handle(new CreateReplyDTO(
+            userId: 'non-existent-user-id',
+            parentTimelineId: $rootPost->id,
+            content: 'This should fail',
+        ));
+    } catch (Throwable) {
+    }
+
+    expect(PostEntry::query()->count())->toBe($initialCount);
+});
