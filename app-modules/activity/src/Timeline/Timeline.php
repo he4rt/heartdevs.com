@@ -14,7 +14,22 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
+use Illuminate\Support\Carbon;
 
+/**
+ * @property string $id
+ * @property string $user_id
+ * @property int $tenant_id
+ * @property string $postable_type
+ * @property string $postable_id
+ * @property string|null $root_id
+ * @property string|null $parent_id
+ * @property bool $is_ignored
+ * @property bool $pinned
+ * @property int $views
+ * @property Carbon $created_at
+ * @property Carbon $updated_at
+ */
 final class Timeline extends Model
 {
     /** @use HasFactory<TimelineFactory> */
@@ -81,6 +96,8 @@ final class Timeline extends Model
     protected function casts(): array
     {
         return [
+            'user_id' => 'string',
+            'tenant_id' => 'integer',
             'root_id' => 'string',
             'parent_id' => 'string',
             'is_ignored' => 'boolean',
