@@ -2,7 +2,7 @@
     <section class="space-y-4">
         @forelse ($items as $item)
             <div wire:key="tl-{{ $item->id }}">
-                @if (in_array($item->postable_type, ['moderation_event', 'moderation_action']))
+                @if ($item->postable_type === 'moderation_event')
                     <x-panel-app::timeline.moderation-event :timeline="$item" />
                 @else
                     <livewire:timeline-post-show :timeline-id="$item->id" :key="'post-' . $item->id" />

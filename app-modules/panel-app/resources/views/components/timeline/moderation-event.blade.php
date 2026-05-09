@@ -1,30 +1,11 @@
 @props (['timeline'])
 
 @php
-    $postable = $timeline->postable;
-    $isAction = $timeline->postable_type === 'moderation_action';
-
-    if ($isAction) {
-        $actionLabel = $postable->action_type->getLabel();
-        $isBan = $postable->action_type === \He4rt\Moderation\Enums\ActionType::Ban;
-        $reason = $postable->reason;
-        $moderatorName = $postable->moderator?->name;
-        $moderatorVisible = $postable->metadata['moderator_visible'] ?? true;
-        $subjectName = $postable->case?->author?->name ?? $postable->case?->author?->username;
-        $timestamp = $postable->created_at;
-        $reportsCount = $postable->case?->reports()?->count() ?? 0;
-        $violationType = $postable->case?->violation_type;
-    } else {
-        $actionLabel = $postable->type->getLabel();
-        $isBan = $postable->type === \He4rt\Activity\Moderation\Enums\ModerationType::Ban;
-        $reason = $postable->reason;
-        $moderatorName = $postable->moderator?->display_name ?? $postable->moderator?->external_id;
-        $moderatorVisible = $postable->metadata['moderator_visible'] ?? false;
-        $subjectName = $postable->subject?->display_name ?? $postable->subject?->external_id;
-        $timestamp = $postable->occurred_at;
-        $reportsCount = 0;
-        $violationType = null;
-    }
+    $event = $timeline->postable;
+    $moderatorVisible = $event->metadata['moderator_visible'] ?? false;
+    $reportsCount = $event->metadata['reports_count'] ?? 0;
+    $violationType = $event->metadata['violation_type'] ?? null;
+    $isBan = $event->type === \He4rt\Activity\Moderation\Enums\ModerationType::Ban;
 @endphp
 
 <div
@@ -44,14 +25,16 @@
                 <span
                     class="bg-danger-500 rounded-full px-2 py-0.5 text-[9px] font-bold tracking-wider text-white uppercase"
                 >
-                    {{ $actionLabel }}
+                    {{ $event->type->getLabel() }}
                 </span>
                 <span class="text-xs text-gray-400 dark:text-gray-600"
-                    >· {{ $timestamp->diffForHumans(short: true) }}</span
+                    >· {{ $event->occurred_at->diffForHumans(short: true) }}</span
                 >
             </div>
-            @if ($moderatorVisible && $moderatorName)
-                <span class="text-xs text-gray-400 dark:text-gray-500">por {{ $moderatorName }}</span>
+            @if ($moderatorVisible && $event->moderator)
+                <span class="text-xs text-gray-400 dark:text-gray-500">
+                    por {{ $event->moderator->display_name ?? $event->moderator->external_id }}
+                </span>
             @endif
         </div>
     </div>
@@ -65,18 +48,23 @@
             >
                 <x-heroicon-s-no-symbol class="text-danger-500 h-7 w-7" />
             </div>
-            @if ($subjectName)
-                <p class="text-lg font-bold text-gray-900 dark:text-white">{{ $subjectName }}</p>
+            @if ($event->subject)
+                <p class="text-lg font-bold text-gray-900 dark:text-white">
+                    {{
+                        $event->subject->display_name ??
+                            $event->subject->external_id
+                    }}
+                </p>
             @endif
             <p class="mt-0.5 text-sm text-gray-500 dark:text-gray-400">foi {{ $isBan ? 'banido permanentemente' : 'removido' }} da comunidade</p>
         </div>
 
-        @if ($reason)
+        @if ($event->reason)
             <div
                 class="border-danger-100 bg-danger-50/50 dark:border-danger-500/10 dark:bg-danger-500/5 border-t px-5 py-3"
             >
                 <p class="text-sm text-gray-700 dark:text-gray-300">
-                    <span class="text-danger-600 dark:text-danger-400 font-semibold">Motivo:</span> {{ $reason }}
+                    <span class="text-danger-600 dark:text-danger-400 font-semibold">Motivo:</span> {{ $event->reason }}
                 </p>
             </div>
         @endif
@@ -94,11 +82,7 @@
                 @if ($violationType)
                     <span class="flex items-center gap-1.5">
                         <x-heroicon-o-exclamation-triangle class="text-warning-500 h-3.5 w-3.5" />
-                        {{
-                            $violationType instanceof \BackedEnum
-                                ? $violationType->getLabel()
-                                : $violationType
-                        }}
+                        {{ $violationType }}
                     </span>
                 @endif
             </div>
