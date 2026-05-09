@@ -1,6 +1,6 @@
 @props (['content'])
 
-<div class="px-4 pb-3">
+<div class="px-3 pb-3 sm:px-4">
     <div class="prose prose-sm dark:prose-invert max-w-none break-words">
         {!! str($content->content)->markdown()->sanitizeHtml() !!}
     </div>

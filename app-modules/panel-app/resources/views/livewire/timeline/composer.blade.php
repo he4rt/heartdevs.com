@@ -3,9 +3,9 @@
     class="overflow-hidden rounded-xl border border-gray-200 bg-white dark:border-white/10 dark:bg-white/5"
 >
     <form wire:submit="post">
-        <div class="flex gap-3 px-4 pt-4 pb-3">
+        <div class="flex gap-2 px-3 pt-3 pb-2 sm:gap-3 sm:px-4 sm:pt-4 sm:pb-3">
             <div
-                class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-purple-500 to-amber-500 text-sm font-semibold text-white"
+                class="hidden h-10 w-10 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-purple-500 to-amber-500 text-sm font-semibold text-white sm:flex"
             >
                 {{
                     str(auth()->user()->name)
@@ -17,7 +17,7 @@
                 {{ $this->form }}
             </div>
         </div>
-        <div class="flex items-center justify-between border-t border-gray-100 px-4 py-2.5 dark:border-white/5">
+        <div class="flex items-center justify-between border-t border-gray-100 px-3 py-2.5 sm:px-4 dark:border-white/5">
             <div class="flex items-center gap-1">
                 <button
                     type="button"

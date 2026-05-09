@@ -13,14 +13,14 @@
 >
     <div class="from-danger-500 to-danger-400 h-1 bg-gradient-to-r"></div>
 
-    <div class="flex items-center gap-3 px-5 pt-4 pb-2">
+    <div class="flex items-center gap-3 px-3 pt-3 pb-2 sm:px-5 sm:pt-4">
         <div
-            class="bg-danger-100 ring-danger-500/20 dark:bg-danger-500/15 flex h-11 w-11 shrink-0 items-center justify-center rounded-full ring-2"
+            class="bg-danger-100 ring-danger-500/20 dark:bg-danger-500/15 flex h-9 w-9 shrink-0 items-center justify-center rounded-full ring-2 sm:h-11 sm:w-11"
         >
-            <x-heroicon-s-shield-exclamation class="text-danger-500 h-5 w-5" />
+            <x-heroicon-s-shield-exclamation class="text-danger-500 h-4 w-4 sm:h-5 sm:w-5" />
         </div>
         <div class="min-w-0 flex-1">
-            <div class="flex flex-wrap items-center gap-2">
+            <div class="flex flex-wrap items-center gap-1.5 sm:gap-2">
                 <span class="text-sm font-semibold text-gray-900 dark:text-white">Moderação</span>
                 <span
                     class="bg-danger-500 rounded-full px-2 py-0.5 text-[9px] font-bold tracking-wider text-white uppercase"
@@ -40,16 +40,16 @@
     </div>
 
     <div
-        class="border-danger-200 from-danger-50 to-danger-50/50 dark:border-danger-500/20 dark:from-danger-950/40 dark:to-danger-950/20 mx-5 mb-4 overflow-hidden rounded-xl border bg-gradient-to-br via-white dark:via-zinc-900"
+        class="border-danger-200 from-danger-50 to-danger-50/50 dark:border-danger-500/20 dark:from-danger-950/40 dark:to-danger-950/20 mx-3 mb-3 overflow-hidden rounded-xl border bg-gradient-to-br via-white sm:mx-5 sm:mb-4 dark:via-zinc-900"
     >
-        <div class="px-5 py-5 text-center">
+        <div class="px-4 py-4 text-center sm:px-5 sm:py-5">
             <div
-                class="bg-danger-100 dark:bg-danger-500/15 mb-3 inline-flex h-14 w-14 items-center justify-center rounded-full"
+                class="bg-danger-100 dark:bg-danger-500/15 mb-3 inline-flex h-12 w-12 items-center justify-center rounded-full sm:h-14 sm:w-14"
             >
-                <x-heroicon-s-no-symbol class="text-danger-500 h-7 w-7" />
+                <x-heroicon-s-no-symbol class="text-danger-500 h-6 w-6 sm:h-7 sm:w-7" />
             </div>
             @if ($event->subject)
-                <p class="text-lg font-bold text-gray-900 dark:text-white">
+                <p class="text-base font-bold text-gray-900 sm:text-lg dark:text-white">
                     {{
                         $event->subject->display_name ??
                             $event->subject->external_id
@@ -61,7 +61,7 @@
 
         @if ($event->reason)
             <div
-                class="border-danger-100 bg-danger-50/50 dark:border-danger-500/10 dark:bg-danger-500/5 border-t px-5 py-3"
+                class="border-danger-100 bg-danger-50/50 dark:border-danger-500/10 dark:bg-danger-500/5 border-t px-3 py-3 sm:px-5"
             >
                 <p class="text-sm text-gray-700 dark:text-gray-300">
                     <span class="text-danger-600 dark:text-danger-400 font-semibold">Motivo:</span> {{ $event->reason }}
@@ -71,7 +71,7 @@
 
         @if ($reportsCount > 0 || $violationType)
             <div
-                class="border-danger-100 dark:border-danger-500/10 flex items-center justify-center gap-5 border-t px-5 py-2.5 text-xs text-gray-400 dark:text-gray-500"
+                class="border-danger-100 dark:border-danger-500/10 flex flex-wrap items-center justify-center gap-3 border-t px-3 py-2.5 text-xs text-gray-400 sm:gap-5 sm:px-5 dark:text-gray-500"
             >
                 @if ($reportsCount > 0)
                     <span class="flex items-center gap-1.5">
