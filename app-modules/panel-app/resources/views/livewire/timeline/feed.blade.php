@@ -1,5 +1,7 @@
 <div>
-    <section class="space-y-4">
+    <livewire:timeline-composer />
+
+    <section class="mt-4 space-y-4">
         @forelse ($items as $item)
             <div wire:key="tl-{{ $item->id }}">
                 @if ($item->postable_type === 'moderation_event')

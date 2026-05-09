@@ -10,6 +10,7 @@ use Filament\Facades\Filament;
 use Filament\Forms\Components\MarkdownEditor;
 use Filament\Forms\Components\SpatieMediaLibraryFileUpload;
 use Filament\Pages\Dashboard as BaseDashboard;
+use Filament\Support\Enums\Width;
 use He4rt\Activity\Timeline\Actions\CreatePost;
 use He4rt\Activity\Timeline\DTOs\CreatePostDTO;
 
@@ -18,6 +19,8 @@ class TimelinePage extends BaseDashboard
     protected static string|null|BackedEnum $navigationIcon = 'heroicon-o-home';
 
     protected static ?string $title = 'Timeline';
+
+    protected Width|string|null $maxContentWidth = Width::Full;
 
     protected string $view = 'panel-app::dashboard';
 
