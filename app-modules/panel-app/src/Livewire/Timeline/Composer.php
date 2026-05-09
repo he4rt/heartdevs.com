@@ -6,7 +6,7 @@ namespace He4rt\PanelApp\Livewire\Timeline;
 
 use Filament\Facades\Filament;
 use Filament\Forms\Components\FileUpload;
-use Filament\Forms\Components\Textarea;
+use Filament\Forms\Components\MarkdownEditor;
 use Filament\Schemas\Concerns\InteractsWithSchemas;
 use Filament\Schemas\Contracts\HasSchemas;
 use Filament\Schemas\Schema;
@@ -31,12 +31,11 @@ final class Composer extends Component implements HasSchemas
     {
         return $schema
             ->components([
-                Textarea::make('content')
+                MarkdownEditor::make('content')
                     ->hiddenLabel()
                     ->placeholder('O que está acontecendo?')
-                    ->required()
-                    ->rows(2)
-                    ->autosize(),
+                    ->toolbarButtons([])
+                    ->required(),
                 FileUpload::make('images')
                     ->hiddenLabel()
                     ->image()
@@ -44,7 +43,8 @@ final class Composer extends Component implements HasSchemas
                     ->maxFiles(4)
                     ->disk('public')
                     ->directory('timeline-uploads')
-                    ->panelLayout('compact'),
+                    ->panelLayout('compact')
+                    ->extraAttributes(['class' => 'composer-images-upload']),
             ])
             ->statePath('data');
     }

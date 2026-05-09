@@ -1,4 +1,7 @@
-<div class="overflow-hidden rounded-xl border border-gray-200 bg-white dark:border-white/10 dark:bg-white/5">
+<div
+    x-data="{ showUpload: false }"
+    class="overflow-hidden rounded-xl border border-gray-200 bg-white dark:border-white/10 dark:bg-white/5"
+>
     <form wire:submit="post">
         <div class="flex gap-3 px-4 pt-4 pb-3">
             <div
@@ -10,16 +13,24 @@
                         ->upper()
                 }}
             </div>
-            <div class="[&_.fi-fo-field-wrp]:gap-0 [&_.fi-fo-field-wrp-label]:hidden min-w-0 flex-1">
+            <div
+                class="[&_.fi-fo-field-wrp]:gap-0 [&_.fi-fo-field-wrp-label]:hidden [&_.composer-images-upload]:hidden min-w-0 flex-1"
+                :class="showUpload && '![&_.composer-images-upload]:block'"
+            >
                 {{ $this->form }}
             </div>
         </div>
         <div class="flex items-center justify-between border-t border-gray-100 px-4 py-2.5 dark:border-white/5">
-            <div class="text-xs text-gray-400 dark:text-gray-500">
-                <kbd class="rounded border border-gray-200 px-1 py-0.5 text-[10px] dark:border-white/10"
-                    >Ctrl+Enter</kbd
+            <div class="flex items-center gap-1">
+                <button
+                    type="button"
+                    @click="showUpload = !showUpload"
+                    class="hover:bg-primary-500/10 hover:text-primary-500 rounded-full p-1.5 text-gray-400 transition dark:text-gray-500"
+                    :class="showUpload && 'text-primary-500 bg-primary-500/10'"
+                    title="Adicionar imagens"
                 >
-                para postar
+                    <x-heroicon-o-photo class="h-4.5 w-4.5" />
+                </button>
             </div>
             <button
                 type="submit"
