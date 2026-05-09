@@ -37,6 +37,7 @@ class AppPanelProvider extends PanelProvider
                 model: Tenant::class,
                 slugAttribute: 'slug'
             )
+            ->topbar(false)
             ->colors([
                 'primary' => Color::Purple,
                 'gray' => Color::Zinc,
