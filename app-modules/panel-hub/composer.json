@@ -1,0 +1,32 @@
+{
+    "name": "he4rt/panel-hub",
+    "description": "",
+    "type": "library",
+    "version": "1.0",
+    "license": "proprietary",
+    "require": {
+        "php": "^8.4",
+        "filament/filament": "^5.6",
+        "illuminate/support": "^13.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "He4rt\\PanelHub\\": "src/",
+            "He4rt\\PanelHub\\Database\\Factories\\": "database/factories/",
+            "He4rt\\PanelHub\\Database\\Seeders\\": "database/seeders/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "He4rt\\PanelHub\\Tests\\": "tests/"
+        }
+    },
+    "minimum-stability": "stable",
+    "extra": {
+        "laravel": {
+            "providers": [
+                "He4rt\\PanelHub\\PanelHubServiceProvider"
+            ]
+        }
+    }
+}
