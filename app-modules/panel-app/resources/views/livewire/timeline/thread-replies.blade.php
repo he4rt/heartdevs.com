@@ -4,7 +4,7 @@
             <div
                 class="px-3 py-2.5 text-xs font-semibold tracking-wide text-gray-500 uppercase sm:px-4 dark:text-gray-400"
             >
-                {{ $replies->count() }} {{ str('resposta')->plural($replies->count()) }}
+                Respostas
             </div>
 
             <div class="divide-y divide-gray-100 dark:divide-white/5">
@@ -73,6 +73,12 @@
                     </div>
                 @endforeach
             </div>
+
+            @if ($replies->hasMorePages())
+                <div x-data x-intersect="$wire.loadMore()" class="flex justify-center py-4">
+                    <x-filament::loading-indicator class="h-5 w-5" />
+                </div>
+            @endif
         </div>
     @else
         <div class="rounded-xl border border-dashed border-gray-200 py-8 text-center dark:border-white/10">

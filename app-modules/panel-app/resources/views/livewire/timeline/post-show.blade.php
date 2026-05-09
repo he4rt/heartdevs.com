@@ -13,7 +13,7 @@
 
     @if ($showReplies && $timeline->children_count > 0)
         <div class="space-y-3 border-t border-gray-200 px-3 py-3 sm:px-4 dark:border-white/10">
-            @foreach ($timeline->children as $reply)
+            @foreach ($timeline->children->take(3) as $reply)
                 <div class="flex gap-3">
                     <div
                         class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-purple-500 to-amber-500 text-xs font-semibold text-white"

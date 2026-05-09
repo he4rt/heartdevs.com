@@ -21,7 +21,7 @@ final readonly class PublishModerationEntry
             return null;
         }
 
-        $userId = $event->moderator?->model_id ?? $event->subject?->model_id;
+        $userId = $event->moderator?->model_id;
 
         if ($userId === null) {
             return null;

@@ -8,6 +8,7 @@ use Filament\Facades\Filament;
 use He4rt\Activity\Timeline\Actions\DeleteReply;
 use He4rt\Activity\Timeline\Timeline;
 use He4rt\Identity\User\Models\User;
+use He4rt\PanelApp\Livewire\Timeline\Concerns\HasLoadMore;
 use Illuminate\Container\Attributes\CurrentUser;
 use Illuminate\View\View;
 use Livewire\Attributes\Locked;
@@ -16,6 +17,8 @@ use Livewire\Component;
 
 final class ThreadReplies extends Component
 {
+    use HasLoadMore;
+
     #[Locked]
     public string $timelineId;
 
@@ -46,7 +49,7 @@ final class ThreadReplies extends Component
             ->whereNotNull('parent_id')
             ->with(['user', 'postable'])
             ->oldest()
-            ->get();
+            ->simplePaginate($this->perPage);
 
         return view('panel-app::livewire.timeline.thread-replies', [
             'replies' => $replies,

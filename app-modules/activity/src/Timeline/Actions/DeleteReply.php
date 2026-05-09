@@ -19,6 +19,6 @@ final readonly class DeleteReply
 
         $reply->delete();
 
-        $postable?->delete();
+        $postable?->forceDelete();
     }
 }

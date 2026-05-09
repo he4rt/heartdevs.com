@@ -43,17 +43,24 @@ test('publishes a timeline entry for a ban moderation event via observer', funct
 
 test('publishes a timeline entry for a kick moderation event via observer', function (): void {
     $tenant = Tenant::factory()->create();
-    $user = User::factory()->create();
+    $moderator = User::factory()->create();
+    $moderatorIdentity = ExternalIdentity::factory()->create([
+        'tenant_id' => $tenant->id,
+        'model_id' => $moderator->id,
+        'model_type' => (new User)->getMorphClass(),
+    ]);
+
+    $subject = User::factory()->create();
     $subjectIdentity = ExternalIdentity::factory()->create([
         'tenant_id' => $tenant->id,
-        'model_id' => $user->id,
+        'model_id' => $subject->id,
         'model_type' => (new User)->getMorphClass(),
     ]);
 
     $event = ModerationEvent::query()->create([
         'tenant_id' => $tenant->id,
         'external_identity_id' => $subjectIdentity->id,
-        'moderator_identity_id' => null,
+        'moderator_identity_id' => $moderatorIdentity->id,
         'type' => ModerationType::Kick,
         'reason' => 'Disruptive behavior',
         'occurred_at' => now(),
@@ -64,8 +71,29 @@ test('publishes a timeline entry for a kick moderation event via observer', func
     $timeline = Timeline::query()->where('postable_type', 'moderation_event')->first();
 
     expect($timeline)->not->toBeNull()
-        ->and($timeline->user_id)->toBe($user->id)
+        ->and($timeline->user_id)->toBe($moderator->id)
         ->and($timeline->postable_type)->toBe('moderation_event');
+});
+
+test('does not publish a timeline entry when moderator identity is missing', function (): void {
+    $tenant = Tenant::factory()->create();
+    $user = User::factory()->create();
+    $subjectIdentity = ExternalIdentity::factory()->create([
+        'tenant_id' => $tenant->id,
+        'model_id' => $user->id,
+        'model_type' => (new User)->getMorphClass(),
+    ]);
+
+    ModerationEvent::query()->create([
+        'tenant_id' => $tenant->id,
+        'external_identity_id' => $subjectIdentity->id,
+        'moderator_identity_id' => null,
+        'type' => ModerationType::Kick,
+        'reason' => 'Disruptive behavior',
+        'occurred_at' => now(),
+    ]);
+
+    $this->assertDatabaseCount('activity_timeline', 0);
 });
 
 test('does not publish a timeline entry for a warn moderation event', function (): void {

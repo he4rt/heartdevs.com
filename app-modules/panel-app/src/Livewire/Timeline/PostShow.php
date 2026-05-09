@@ -49,7 +49,7 @@ final class PostShow extends Component
                 'user',
                 'postable',
                 'reactions',
-                'children' => fn ($q) => $q->with('user', 'postable')->latest()->limit(3),
+                'children' => fn ($q) => $q->with('user', 'postable')->latest(),
             ])
             ->withCount('children', 'reactions')
             ->firstOrFail();
