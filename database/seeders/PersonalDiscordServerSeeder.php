@@ -12,7 +12,6 @@ use He4rt\Identity\ExternalIdentity\Models\ExternalIdentity;
 use He4rt\Identity\Tenant\Models\Tenant;
 use He4rt\Identity\User\Models\User;
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\Hash;
 
 class PersonalDiscordServerSeeder extends Seeder
 {
@@ -32,12 +31,7 @@ class PersonalDiscordServerSeeder extends Seeder
             return;
         }
 
-        $owner = User::factory()->create([
-            'username' => 'local-owner',
-            'name' => 'Local Owner',
-            'email' => 'local@local.dev',
-            'password' => Hash::make('password'),
-        ]);
+        $owner = User::query()->first();
 
         $tenant = Tenant::factory()
             ->for($owner, 'owner')
