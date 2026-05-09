@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use He4rt\Activity\Timeline\Actions\CreateReply;
 use He4rt\Activity\Timeline\Delegated\PostEntry;
+use He4rt\Activity\Timeline\DTOs\CreateReplyDTO;
 use He4rt\Activity\Timeline\Timeline;
 use He4rt\Identity\Tenant\Models\Tenant;
 use He4rt\Identity\User\Models\User;
@@ -26,11 +27,11 @@ test('creates a reply to a root post', function (): void {
 
     $replier = User::factory()->create();
 
-    $reply = resolve(CreateReply::class)->handle(
-        user: $replier,
-        parentTimeline: $rootPost,
+    $reply = resolve(CreateReply::class)->handle(new CreateReplyDTO(
+        userId: $replier->id,
+        parentTimelineId: $rootPost->id,
         content: 'Great post!',
-    );
+    ));
 
     expect($reply->parent_id)->toBe($rootPost->id)
         ->and($reply->root_id)->toBe($rootPost->id)
@@ -64,11 +65,11 @@ test('reply to a reply flattens to root level', function (): void {
 
     $secondReplier = User::factory()->create();
 
-    $replyToReply = resolve(CreateReply::class)->handle(
-        user: $secondReplier,
-        parentTimeline: $reply,
+    $replyToReply = resolve(CreateReply::class)->handle(new CreateReplyDTO(
+        userId: $secondReplier->id,
+        parentTimelineId: $reply->id,
         content: 'Replying to a reply',
-    );
+    ));
 
     expect($replyToReply->root_id)->toBe($rootPost->id)
         ->and($replyToReply->parent_id)->toBe($rootPost->id);

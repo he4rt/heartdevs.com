@@ -5,23 +5,15 @@ declare(strict_types=1);
 namespace He4rt\Activity\Timeline\Actions;
 
 use He4rt\Activity\Timeline\Delegated\PostEntry;
+use He4rt\Activity\Timeline\DTOs\CreatePostDTO;
 use He4rt\Activity\Timeline\Timeline;
-use He4rt\Identity\User\Models\User;
-use Illuminate\Http\UploadedFile;
 use InvalidArgumentException;
 
 final readonly class CreatePost
 {
-    /**
-     * @param  array<int, UploadedFile>  $images
-     */
-    public function handle(
-        User $user,
-        int $tenantId,
-        string $content,
-        array $images = [],
-    ): Timeline {
-        $content = mb_trim($content);
+    public function handle(CreatePostDTO $dto): Timeline
+    {
+        $content = mb_trim($dto->content);
 
         throw_if($content === '', InvalidArgumentException::class, 'Post content cannot be empty.');
 
@@ -29,13 +21,13 @@ final readonly class CreatePost
             'content' => $content,
         ]);
 
-        foreach ($images as $image) {
+        foreach ($dto->images as $image) {
             $postEntry->addMedia($image)->toMediaCollection('images');
         }
 
         return Timeline::query()->create([
-            'user_id' => $user->id,
-            'tenant_id' => $tenantId,
+            'user_id' => $dto->userId,
+            'tenant_id' => $dto->tenantId,
             'postable_type' => 'post_entry',
             'postable_id' => $postEntry->id,
         ]);

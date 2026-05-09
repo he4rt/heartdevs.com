@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use He4rt\Activity\Timeline\Actions\CreatePost;
 use He4rt\Activity\Timeline\Delegated\PostEntry;
+use He4rt\Activity\Timeline\DTOs\CreatePostDTO;
 use He4rt\Activity\Timeline\Timeline;
 use He4rt\Identity\Tenant\Models\Tenant;
 use He4rt\Identity\User\Models\User;
@@ -15,11 +16,11 @@ test('creates a post entry and timeline record', function (): void {
     $tenant = Tenant::factory()->create();
     $user = User::factory()->create();
 
-    $timeline = resolve(CreatePost::class)->handle(
-        user: $user,
+    $timeline = resolve(CreatePost::class)->handle(new CreatePostDTO(
+        userId: $user->id,
         tenantId: $tenant->id,
         content: 'Hello **He4rt** community!',
-    );
+    ));
 
     expect($timeline)->toBeInstanceOf(Timeline::class)
         ->and($timeline->user_id)->toBe($user->id)
@@ -38,9 +39,9 @@ test('creates a post with empty content is rejected', function (): void {
     $tenant = Tenant::factory()->create();
     $user = User::factory()->create();
 
-    resolve(CreatePost::class)->handle(
-        user: $user,
+    resolve(CreatePost::class)->handle(new CreatePostDTO(
+        userId: $user->id,
         tenantId: $tenant->id,
         content: '',
-    );
+    ));
 })->throws(InvalidArgumentException::class);

@@ -11,6 +11,7 @@ use Filament\Forms\Components\MarkdownEditor;
 use Filament\Forms\Components\SpatieMediaLibraryFileUpload;
 use Filament\Pages\Dashboard as BaseDashboard;
 use He4rt\Activity\Timeline\Actions\CreatePost;
+use He4rt\Activity\Timeline\DTOs\CreatePostDTO;
 
 class TimelinePage extends BaseDashboard
 {
@@ -51,12 +52,12 @@ class TimelinePage extends BaseDashboard
                 ->action(function (array $data): void {
                     $tenant = Filament::getTenant();
 
-                    resolve(CreatePost::class)->handle(
-                        user: auth()->user(),
+                    resolve(CreatePost::class)->handle(new CreatePostDTO(
+                        userId: auth()->id(),
                         tenantId: $tenant->id,
                         content: $data['content'],
                         images: $data['images'] ?? [],
-                    );
+                    ));
 
                     $this->dispatch('timeline.post-created');
                 })
