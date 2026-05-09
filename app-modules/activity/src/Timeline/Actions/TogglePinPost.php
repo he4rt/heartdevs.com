@@ -7,6 +7,7 @@ namespace He4rt\Activity\Timeline\Actions;
 use He4rt\Activity\Timeline\Timeline;
 use He4rt\Identity\User\Models\User;
 use Illuminate\Auth\Access\AuthorizationException;
+use Illuminate\Support\Facades\DB;
 
 final readonly class TogglePinPost
 {
@@ -14,20 +15,22 @@ final readonly class TogglePinPost
     {
         throw_if($timeline->user_id !== $user->id, AuthorizationException::class, 'You can only pin your own posts.');
 
-        if ($timeline->pinned) {
-            Timeline::withoutTimestamps(fn () => $timeline->update(['pinned' => false]));
+        DB::transaction(function () use ($user, $timeline): void {
+            if ($timeline->pinned) {
+                Timeline::withoutTimestamps(fn () => $timeline->update(['pinned' => false]));
 
-            return;
-        }
+                return;
+            }
 
-        Timeline::withoutTimestamps(function () use ($user, $timeline): void {
-            Timeline::query()
-                ->where('user_id', $user->id)
-                ->where('tenant_id', $timeline->tenant_id)
-                ->where('pinned', true)
-                ->update(['pinned' => false]);
+            Timeline::withoutTimestamps(function () use ($user, $timeline): void {
+                Timeline::query()
+                    ->where('user_id', $user->id)
+                    ->where('tenant_id', $timeline->tenant_id)
+                    ->where('pinned', true)
+                    ->update(['pinned' => false]);
 
-            $timeline->update(['pinned' => true]);
+                $timeline->update(['pinned' => true]);
+            });
         });
     }
 }

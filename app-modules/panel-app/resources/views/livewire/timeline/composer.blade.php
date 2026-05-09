@@ -31,6 +31,8 @@
             </div>
             <button
                 type="submit"
+                wire:loading.attr="disabled"
+                wire:loading.class="opacity-50"
                 class="bg-primary-600 hover:bg-primary-500 rounded-lg px-4 py-1.5 text-xs font-semibold text-white transition disabled:cursor-not-allowed disabled:opacity-50"
             >
                 Postar

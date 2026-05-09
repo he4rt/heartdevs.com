@@ -29,16 +29,6 @@
                 <span>{{ Number::abbreviate($timeline->reactions_count) }}</span>
             @endif
         </span>
-
-        <span
-            class="flex cursor-help items-center gap-1.5"
-            title="{{ Number::format($timeline->views) }} {{ str('visualização')->plural($timeline->views) }}"
-        >
-            <x-heroicon-o-eye class="h-4 w-4" />
-            @if ($timeline->views > 0)
-                <span>{{ Number::abbreviate($timeline->views) }}</span>
-            @endif
-        </span>
     </div>
 
     @if ($isOwner)

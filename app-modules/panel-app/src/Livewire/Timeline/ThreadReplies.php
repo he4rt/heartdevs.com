@@ -23,6 +23,7 @@ final class ThreadReplies extends Component
     public string $timelineId;
 
     #[On('timeline.reply-created')]
+    #[On('timeline.reply-deleted')]
     public function refresh(): void {}
 
     public function deleteReply(string $replyId, #[CurrentUser] ?User $user): void
@@ -38,7 +39,7 @@ final class ThreadReplies extends Component
 
         resolve(DeleteReply::class)->handle($user, $reply);
 
-        $this->dispatch('timeline.reply-created');
+        $this->dispatch('timeline.reply-deleted');
     }
 
     public function render(): View

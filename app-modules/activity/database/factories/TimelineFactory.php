@@ -6,6 +6,7 @@ namespace He4rt\Activity\Database\Factories;
 
 use He4rt\Activity\Timeline\Delegated\PostEntry;
 use He4rt\Activity\Timeline\Timeline;
+use He4rt\Identity\Tenant\Models\Tenant;
 use He4rt\Identity\User\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
@@ -19,7 +20,7 @@ final class TimelineFactory extends Factory
     {
         return [
             'user_id' => User::factory(),
-            'tenant_id' => null,
+            'tenant_id' => Tenant::factory(),
             'postable_type' => 'post_entry',
             'postable_id' => PostEntry::factory(),
             'is_ignored' => false,

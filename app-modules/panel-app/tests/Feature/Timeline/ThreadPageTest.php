@@ -157,7 +157,7 @@ test('owner can delete their own reply', function (): void {
 
     livewire(ThreadReplies::class, ['timelineId' => $this->rootPost->id])
         ->call('deleteReply', $reply->id)
-        ->assertDispatched('timeline.reply-created');
+        ->assertDispatched('timeline.reply-deleted');
 
     expect(Timeline::query()->find($reply->id))->toBeNull();
 });

@@ -20,6 +20,7 @@ final class Feed extends Component
 
     #[On('timeline.post-created')]
     #[On('timeline.reply-created')]
+    #[On('timeline.reply-deleted')]
     public function refresh(): void {}
 
     public function render(): View
