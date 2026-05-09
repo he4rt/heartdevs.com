@@ -84,7 +84,7 @@ Timeline::query()->create([
 ]);
 ```
 
-For cross-module events, use a listener (like `PublishModerationToTimeline` listens for `ActionExecuted`):
+> For cross-module events, use a listener (like `PublishModerationToTimeline` listens for `ActionExecuted`):
 
 ```php
 // In ActivityServiceProvider::boot()
