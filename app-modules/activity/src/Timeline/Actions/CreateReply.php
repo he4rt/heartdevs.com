@@ -16,7 +16,7 @@ final readonly class CreateReply
     {
         $content = mb_trim($dto->content);
 
-        throw_if($content === '', InvalidArgumentException::class, 'Reply content cannot be empty.');
+        throw_if(blank($content), InvalidArgumentException::class, 'Reply content cannot be empty.');
 
         $parentTimeline = Timeline::query()
             ->where('id', $dto->parentTimelineId)
