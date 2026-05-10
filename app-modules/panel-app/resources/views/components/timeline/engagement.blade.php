@@ -33,6 +33,7 @@
 
     @if ($isOwner)
         <button
+            type="button"
             wire:click="togglePin"
             class="flex shrink-0 items-center gap-1 text-xs transition-colors hover:text-amber-500 {{ $timeline->pinned ? 'text-amber-500' : '' }}"
             title="{{ $timeline->pinned ? 'Desafixar' : 'Fixar' }}"

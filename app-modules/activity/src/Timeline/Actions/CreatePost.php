@@ -8,7 +8,6 @@ use He4rt\Activity\Timeline\Delegated\PostEntry;
 use He4rt\Activity\Timeline\DTOs\CreatePostDTO;
 use He4rt\Activity\Timeline\Timeline;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Storage;
 use InvalidArgumentException;
 
 final readonly class CreatePost
@@ -25,8 +24,7 @@ final readonly class CreatePost
             ]);
 
             foreach ($dto->images as $image) {
-                $path = Storage::disk('public')->path($image);
-                $postEntry->addMedia($path)->toMediaCollection('images');
+                $postEntry->addMediaFromDisk($image, 'public')->toMediaCollection('images');
             }
 
             return Timeline::query()->create([

@@ -34,15 +34,4 @@ class ThreadPage extends Page
 
         $this->record = $record;
     }
-
-    public function getTimeline(): Timeline
-    {
-        return Timeline::query()
-            ->where('id', $this->record)
-            ->where('tenant_id', filament()->getTenant()->getKey())
-            ->whereNull('parent_id')
-            ->with(['user', 'postable', 'reactions'])
-            ->withCount('children', 'reactions')
-            ->firstOrFail();
-    }
 }

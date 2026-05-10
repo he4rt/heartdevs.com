@@ -8,7 +8,6 @@ use He4rt\Activity\Timeline\Delegated\PostEntry;
 use He4rt\Activity\Timeline\DTOs\CreateReplyDTO;
 use He4rt\Activity\Timeline\Timeline;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Storage;
 use InvalidArgumentException;
 
 final readonly class CreateReply
@@ -19,7 +18,10 @@ final readonly class CreateReply
 
         throw_if($content === '', InvalidArgumentException::class, 'Reply content cannot be empty.');
 
-        $parentTimeline = Timeline::query()->findOrFail($dto->parentTimelineId);
+        $parentTimeline = Timeline::query()
+            ->where('id', $dto->parentTimelineId)
+            ->where('tenant_id', $dto->tenantId)
+            ->firstOrFail();
 
         $rootId = $parentTimeline->root_id ?? $parentTimeline->id;
 
@@ -29,8 +31,7 @@ final readonly class CreateReply
             ]);
 
             foreach ($dto->images as $image) {
-                $path = Storage::disk('public')->path($image);
-                $postEntry->addMedia($path)->toMediaCollection('images');
+                $postEntry->addMediaFromDisk($image, 'public')->toMediaCollection('images');
             }
 
             return Timeline::query()->create([

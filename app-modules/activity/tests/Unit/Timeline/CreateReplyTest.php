@@ -29,6 +29,7 @@ test('creates a reply to a root post', function (): void {
 
     $reply = resolve(CreateReply::class)->handle(new CreateReplyDTO(
         userId: $replier->id,
+        tenantId: $tenant->id,
         parentTimelineId: $rootPost->id,
         content: 'Great post!',
     ));
@@ -67,6 +68,7 @@ test('reply to a reply flattens to root level', function (): void {
 
     $replyToReply = resolve(CreateReply::class)->handle(new CreateReplyDTO(
         userId: $secondReplier->id,
+        tenantId: $tenant->id,
         parentTimelineId: $reply->id,
         content: 'Replying to a reply',
     ));
@@ -93,6 +95,7 @@ test('reply creation is atomic — no orphaned PostEntry on Timeline failure', f
     try {
         resolve(CreateReply::class)->handle(new CreateReplyDTO(
             userId: 'non-existent-user-id',
+            tenantId: $tenant->id,
             parentTimelineId: $rootPost->id,
             content: 'This should fail',
         ));
