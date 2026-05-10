@@ -7,8 +7,10 @@ namespace He4rt\Activity\Moderation\Models;
 use Carbon\Carbon;
 use He4rt\Activity\Message\Models\Message;
 use He4rt\Activity\Moderation\Enums\ModerationType;
+use He4rt\Activity\Timeline\Observers\ModerationEventObserver;
 use He4rt\Identity\ExternalIdentity\Models\ExternalIdentity;
 use He4rt\Identity\Tenant\Models\Tenant;
+use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -28,6 +30,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
  */
+#[ObservedBy(ModerationEventObserver::class)]
 final class ModerationEvent extends Model
 {
     use HasUuids;

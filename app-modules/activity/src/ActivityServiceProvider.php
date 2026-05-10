@@ -8,7 +8,6 @@ use He4rt\Activity\Message\Models\Message;
 use He4rt\Activity\Moderation\Models\ModerationEvent;
 use He4rt\Activity\Timeline\Delegated\PostEntry;
 use He4rt\Activity\Timeline\Listeners\PublishModerationToTimeline;
-use He4rt\Activity\Timeline\Observers\ModerationEventObserver;
 use He4rt\Activity\Timeline\Timeline;
 use He4rt\Activity\Voice\Models\Voice;
 use He4rt\Moderation\Enforcement\ActionExecuted;
@@ -35,8 +34,6 @@ class ActivityServiceProvider extends ServiceProvider
             'moderation_event' => ModerationEvent::class,
             'timeline' => Timeline::class,
         ]);
-
-        ModerationEvent::observe(ModerationEventObserver::class);
 
         Event::listen(ActionExecuted::class, [PublishModerationToTimeline::class, 'handle']);
     }

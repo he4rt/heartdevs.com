@@ -12,19 +12,21 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 
 uses(RefreshDatabase::class);
 
-test('creates a post entry and timeline record', function (): void {
-    $tenant = Tenant::factory()->create();
-    $user = User::factory()->create();
+beforeEach(function (): void {
+    $this->tenant = Tenant::factory()->create();
+    $this->user = User::factory()->create();
+});
 
+test('creates a post entry and timeline record', function (): void {
     $timeline = resolve(CreatePost::class)->handle(new CreatePostDTO(
-        userId: $user->id,
-        tenantId: $tenant->id,
+        userId: $this->user->id,
+        tenantId: $this->tenant->id,
         content: 'Hello **He4rt** community!',
     ));
 
     expect($timeline)->toBeInstanceOf(Timeline::class)
-        ->and($timeline->user_id)->toBe($user->id)
-        ->and($timeline->tenant_id)->toBe($tenant->id)
+        ->and($timeline->user_id)->toBe($this->user->id)
+        ->and($timeline->tenant_id)->toBe($this->tenant->id)
         ->and($timeline->postable_type)->toBe((new PostEntry)->getMorphClass())
         ->and($timeline->postable)->toBeInstanceOf(PostEntry::class)
         ->and($timeline->postable->content)->toBe('Hello **He4rt** community!')
@@ -36,13 +38,11 @@ test('creates a post entry and timeline record', function (): void {
 });
 
 test('creates a post with long content succeeds', function (): void {
-    $tenant = Tenant::factory()->create();
-    $user = User::factory()->create();
     $longContent = str_repeat('a', 2000);
 
     $timeline = resolve(CreatePost::class)->handle(new CreatePostDTO(
-        userId: $user->id,
-        tenantId: $tenant->id,
+        userId: $this->user->id,
+        tenantId: $this->tenant->id,
         content: $longContent,
     ));
 
@@ -50,12 +50,10 @@ test('creates a post with long content succeeds', function (): void {
 });
 
 test('post creation is atomic — no orphaned PostEntry on Timeline failure', function (): void {
-    $tenant = Tenant::factory()->create();
-
     try {
         resolve(CreatePost::class)->handle(new CreatePostDTO(
             userId: 'not-a-valid-uuid',
-            tenantId: $tenant->id,
+            tenantId: $this->tenant->id,
             content: 'This should fail',
         ));
     } catch (Throwable) {
@@ -65,12 +63,9 @@ test('post creation is atomic — no orphaned PostEntry on Timeline failure', fu
 });
 
 test('creates a post with empty content is rejected', function (): void {
-    $tenant = Tenant::factory()->create();
-    $user = User::factory()->create();
-
     resolve(CreatePost::class)->handle(new CreatePostDTO(
-        userId: $user->id,
-        tenantId: $tenant->id,
+        userId: $this->user->id,
+        tenantId: $this->tenant->id,
         content: '',
     ));
 })->throws(InvalidArgumentException::class);
