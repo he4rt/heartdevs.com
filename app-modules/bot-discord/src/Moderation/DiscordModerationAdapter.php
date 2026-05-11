@@ -72,6 +72,24 @@ final class DiscordModerationAdapter implements ModerationPlatformContract
                 );
             }
 
+            if ($this->isPunitiveAction($action->action_type)) {
+                $tier = $this->resolveTargetProtectionTier($token, $guildId, $discordId);
+
+                if ($tier === 'admin') {
+                    return ExecutionResultDTO::failure(
+                        Platform::Discord,
+                        'Target user is an administrator and cannot receive punitive actions.',
+                    );
+                }
+
+                if ($tier === 'mod' && !$this->actorIsAdmin($token, $guildId, $action)) {
+                    return ExecutionResultDTO::failure(
+                        Platform::Discord,
+                        'Only administrators can apply punitive actions to moderators.',
+                    );
+                }
+            }
+
             $response = $this->executeAction(
                 $action,
                 $token,
@@ -421,6 +439,80 @@ final class DiscordModerationAdapter implements ModerationPlatformContract
         }
 
         return $base;
+    }
+
+    private function isPunitiveAction(ActionType $type): bool
+    {
+        return in_array($type, [ActionType::Ban, ActionType::Kick, ActionType::Mute, ActionType::Suspend], true);
+    }
+
+    /**
+     * Returns 'admin', 'mod', or null based on the target's Discord roles.
+     * Admins can never be punished. Mods can only be punished by admins.
+     */
+    private function resolveTargetProtectionTier(string $token, string $guildId, string $discordId): ?string
+    {
+        $response = $this->discordRequest(
+            $token,
+            'get',
+            sprintf('https://discord.com/api/v10/guilds/%s/members/%s', $guildId, $discordId),
+        );
+
+        if ($response->failed()) {
+            return null;
+        }
+
+        /** @var array<int, string> $memberRoles */
+        $memberRoles = $response->json('roles') ?? [];
+
+        /** @var array<int, string> $adminRoles */
+        $adminRoles = config('he4rt.discord.moderation.admin_role_ids', []);
+
+        /** @var array<int, string> $modRoles */
+        $modRoles = config('he4rt.discord.moderation.mod_role_ids', []);
+
+        if (array_intersect($memberRoles, $adminRoles) !== []) {
+            return 'admin';
+        }
+
+        if (array_intersect($memberRoles, $modRoles) !== []) {
+            return 'mod';
+        }
+
+        return null;
+    }
+
+    private function actorIsAdmin(string $token, string $guildId, ModerationAction $action): bool
+    {
+        $moderator = $action->moderator;
+
+        if ($moderator === null) {
+            return false;
+        }
+
+        $actorDiscordId = $this->resolveDiscordId($moderator);
+
+        if ($actorDiscordId === null) {
+            return false;
+        }
+
+        $response = $this->discordRequest(
+            $token,
+            'get',
+            sprintf('https://discord.com/api/v10/guilds/%s/members/%s', $guildId, $actorDiscordId),
+        );
+
+        if ($response->failed()) {
+            return false;
+        }
+
+        /** @var array<int, string> $actorRoles */
+        $actorRoles = $response->json('roles') ?? [];
+
+        /** @var array<int, string> $adminRoles */
+        $adminRoles = config('he4rt.discord.moderation.admin_role_ids', []);
+
+        return array_intersect($actorRoles, $adminRoles) !== [];
     }
 
     /** @param array<string, mixed> $payload */
