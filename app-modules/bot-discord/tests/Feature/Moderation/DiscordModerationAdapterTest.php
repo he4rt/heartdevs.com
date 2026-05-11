@@ -324,3 +324,174 @@ test('returns failure when bot token is not configured', function (): void {
     expect($result->success)->toBeFalse()
         ->and($result->error)->toContain('not configured');
 });
+
+// --- Protection hierarchy tests ---
+
+test('ban is blocked when target is an admin, regardless of who acts', function (): void {
+    config()->set('he4rt.discord.moderation.admin_role_ids', ['547549573959385098']);
+    config()->set('he4rt.discord.moderation.mod_role_ids', []);
+
+    Http::fake([
+        'discord.com/api/v10/guilds/*/members/*' => Http::response(
+            ['roles' => ['547549573959385098']],
+            200,
+        ),
+    ]);
+
+    $user = makeUserWithDiscord('eeeee');
+    $action = makeAction($user, ActionType::Ban, 'permanent');
+
+    $result = DiscordModerationAdapter::make()->execute($action, $user);
+
+    expect($result->success)->toBeFalse()
+        ->and($result->error)->toContain('administrator');
+});
+
+test('kick is blocked when target is an admin', function (): void {
+    config()->set('he4rt.discord.moderation.admin_role_ids', ['547549573959385098']);
+    config()->set('he4rt.discord.moderation.mod_role_ids', []);
+
+    Http::fake([
+        'discord.com/api/v10/guilds/*/members/*' => Http::response(
+            ['roles' => ['547549573959385098']],
+            200,
+        ),
+    ]);
+
+    $user = makeUserWithDiscord('fffff');
+    $action = makeAction($user, ActionType::Kick);
+
+    $result = DiscordModerationAdapter::make()->execute($action, $user);
+
+    expect($result->success)->toBeFalse()
+        ->and($result->error)->toContain('administrator');
+});
+
+test('mute is blocked when target is an admin', function (): void {
+    config()->set('he4rt.discord.moderation.admin_role_ids', ['547549573959385098']);
+    config()->set('he4rt.discord.moderation.mod_role_ids', []);
+
+    Http::fake([
+        'discord.com/api/v10/guilds/*/members/*' => Http::response(
+            ['roles' => ['547549573959385098']],
+            200,
+        ),
+    ]);
+
+    $user = makeUserWithDiscord('ggggg');
+    $action = makeAction($user, ActionType::Mute, '24h');
+
+    $result = DiscordModerationAdapter::make()->execute($action, $user);
+
+    expect($result->success)->toBeFalse()
+        ->and($result->error)->toContain('administrator');
+});
+
+test('ban is blocked when a mod tries to ban another mod', function (): void {
+    config()->set('he4rt.discord.moderation.admin_role_ids', ['admin-role']);
+    config()->set('he4rt.discord.moderation.mod_role_ids', ['mod-role']);
+
+    // target is a mod; actor (moderator) is also a mod
+    $actor = makeUserWithDiscord('actor-mod');
+    $target = makeUserWithDiscord('target-mod');
+
+    $case = ModerationCase::factory()->create(['author_id' => $target->id]);
+    $action = ModerationAction::factory()->create([
+        'case_id' => $case->id,
+        'action_type' => ActionType::Ban,
+        'target_platforms' => [Platform::Discord->value],
+        'moderator_id' => $actor->id,
+    ]);
+
+    Http::fake([
+        'discord.com/api/v10/guilds/*/members/target-mod' => Http::response(['roles' => ['mod-role']], 200),
+        'discord.com/api/v10/guilds/*/members/actor-mod' => Http::response(['roles' => ['mod-role']], 200),
+    ]);
+
+    $result = DiscordModerationAdapter::make()->execute($action, $target);
+
+    expect($result->success)->toBeFalse()
+        ->and($result->error)->toContain('moderators');
+});
+
+test('admin can ban a moderator', function (): void {
+    config()->set('he4rt.discord.moderation.admin_role_ids', ['admin-role']);
+    config()->set('he4rt.discord.moderation.mod_role_ids', ['mod-role']);
+
+    $actor = makeUserWithDiscord('actor-admin');
+    $target = makeUserWithDiscord('target-mod2');
+
+    $case = ModerationCase::factory()->create(['author_id' => $target->id]);
+    $action = ModerationAction::factory()->create([
+        'case_id' => $case->id,
+        'action_type' => ActionType::Ban,
+        'target_platforms' => [Platform::Discord->value],
+        'moderator_id' => $actor->id,
+    ]);
+
+    Http::fake([
+        'discord.com/api/v10/guilds/*/members/target-mod2' => Http::response(['roles' => ['mod-role']], 200),
+        'discord.com/api/v10/guilds/*/members/actor-admin' => Http::response(['roles' => ['admin-role']], 200),
+        'discord.com/api/v10/guilds/*/bans/*' => Http::response([], 200),
+        'discord.com/*' => Http::response(['id' => 'dm-chan'], 200),
+    ]);
+
+    $result = DiscordModerationAdapter::make()->execute($action, $target);
+
+    expect($result->success)->toBeTrue();
+});
+
+test('automated action cannot ban a moderator', function (): void {
+    config()->set('he4rt.discord.moderation.admin_role_ids', ['admin-role']);
+    config()->set('he4rt.discord.moderation.mod_role_ids', ['mod-role']);
+
+    $target = makeUserWithDiscord('target-mod3');
+
+    $case = ModerationCase::factory()->create(['author_id' => $target->id]);
+    $action = ModerationAction::factory()->create([
+        'case_id' => $case->id,
+        'action_type' => ActionType::Ban,
+        'target_platforms' => [Platform::Discord->value],
+        'moderator_id' => null,
+        'automated' => true,
+    ]);
+
+    Http::fake([
+        'discord.com/api/v10/guilds/*/members/target-mod3' => Http::response(['roles' => ['mod-role']], 200),
+    ]);
+
+    $result = DiscordModerationAdapter::make()->execute($action, $target);
+
+    expect($result->success)->toBeFalse()
+        ->and($result->error)->toContain('moderators');
+});
+
+test('ban proceeds normally when target has no protected role', function (): void {
+    config()->set('he4rt.discord.moderation.admin_role_ids', ['admin-role']);
+    config()->set('he4rt.discord.moderation.mod_role_ids', ['mod-role']);
+
+    Http::fake([
+        'discord.com/api/v10/guilds/*/members/*' => Http::response(['roles' => ['123456789']], 200),
+        'discord.com/*' => Http::response([], 200),
+    ]);
+
+    $user = makeUserWithDiscord('hhhhh');
+    $action = makeAction($user, ActionType::Ban, 'permanent');
+
+    $result = DiscordModerationAdapter::make()->execute($action, $user);
+
+    expect($result->success)->toBeTrue();
+});
+
+test('warn is not blocked even when target is an admin', function (): void {
+    config()->set('he4rt.discord.moderation.admin_role_ids', ['admin-role']);
+
+    Http::fake(['discord.com/*' => Http::response(['id' => 'dm-channel-warn'], 200)]);
+
+    $user = makeUserWithDiscord('iiiii');
+    $action = makeAction($user, ActionType::Warn);
+
+    $result = DiscordModerationAdapter::make()->execute($action, $user);
+
+    expect($result->success)->toBeTrue();
+});
