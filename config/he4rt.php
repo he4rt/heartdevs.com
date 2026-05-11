@@ -15,6 +15,11 @@ return [
         'token' => env('HE4RT_DISCORD_BOT_KEY'),
         'levelup_channel_id' => env('HE4RT_DISCORD_LEVELUP_CHANNEL', '552332704381927424'),
         'guild_id' => env('HE4RT_DISCORD_GUILD', '452926217558163456'),
+        'moderation' => [
+            'admin_role_ids' => explode(',', (string) env('HE4RT_DISCORD_MODERATION_ADMIN_ROLES', '547549573959385098,547543574091268118,547549400164073472')),
+            'mod_role_ids' => explode(',', (string) env('HE4RT_DISCORD_MODERATION_MOD_ROLES', '547549463942791181')),
+            'mod_channel_id' => env('HE4RT_DISCORD_MODERATION_CHANNEL', '1095115912820043829'),
+        ],
     ],
     'channels' => [
         'commands' => '542840741588762637',
