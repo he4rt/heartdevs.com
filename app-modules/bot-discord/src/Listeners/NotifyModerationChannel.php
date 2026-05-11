@@ -25,7 +25,10 @@ final class NotifyModerationChannel
         $response = Http::withHeaders(['Authorization' => 'Bot '.$token])
             ->post(
                 sprintf('https://discord.com/api/v10/channels/%s/messages', $channelId),
-                ['embeds' => [$this->buildEmbed($case)]],
+                [
+                    'content' => $this->buildMentions(),
+                    'embeds' => [$this->buildEmbed($case)],
+                ],
             );
 
         if ($response->failed()) {
@@ -35,6 +38,22 @@ final class NotifyModerationChannel
                 'response' => $response->json() ?: $response->body(),
             ]);
         }
+    }
+
+    private function buildMentions(): string
+    {
+        /** @var array<int, string> $adminRoles */
+        $adminRoles = config('he4rt.discord.moderation.admin_role_ids', []);
+
+        /** @var array<int, string> $modRoles */
+        $modRoles = config('he4rt.discord.moderation.mod_role_ids', []);
+
+        $mentions = array_map(
+            fn (string $id): string => sprintf('<@&%s>', $id),
+            array_merge($adminRoles, $modRoles),
+        );
+
+        return implode(' ', $mentions);
     }
 
     /** @return array<string, mixed> */

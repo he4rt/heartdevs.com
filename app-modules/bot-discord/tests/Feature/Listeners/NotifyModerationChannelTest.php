@@ -13,6 +13,8 @@ uses(RefreshDatabase::class);
 beforeEach(function (): void {
     config()->set('discord.token', 'bot-token');
     config()->set('he4rt.discord.moderation.mod_channel_id', '1095115912820043829');
+    config()->set('he4rt.discord.moderation.admin_role_ids', ['111111111111111111']);
+    config()->set('he4rt.discord.moderation.mod_role_ids', ['222222222222222222']);
 });
 
 test('sends embed to mod channel when a new case is created', function (): void {
@@ -37,6 +39,21 @@ test('embed contains the case id', function (): void {
         $embeds = $req->data()['embeds'] ?? [];
 
         return isset($embeds[0]['description']) && str_contains((string) $embeds[0]['description'], $case->id);
+    });
+});
+
+test('message content includes role mentions for admins and mods', function (): void {
+    Http::fake(['discord.com/*' => Http::response([], 200)]);
+
+    $case = ModerationCase::factory()->create();
+
+    new NotifyModerationChannel()->handle(new CaseCreated($case));
+
+    Http::assertSent(function ($req): bool {
+        $content = $req->data()['content'] ?? '';
+
+        return str_contains($content, '<@&111111111111111111>')
+            && str_contains($content, '<@&222222222222222222>');
     });
 });
 
