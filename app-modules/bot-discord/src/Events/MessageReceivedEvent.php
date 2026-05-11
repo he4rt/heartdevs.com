@@ -81,7 +81,9 @@ class MessageReceivedEvent extends Event
             $case->refresh();
             $this->logger()->info('[Moderation] After route: status='.$case->status->value.' priority='.$case->priority);
 
-            if ($case->suggested_action && $case->author) {
+            // Only auto-execute when the action was set by a deterministic rule (classifier_version='rules').
+            // AI-only suggestions stay pending for human moderator review.
+            if ($case->suggested_action && $case->author && $case->classifier_version === 'rules') {
                 $action = ModerationAction::query()->create([
                     'case_id' => $case->id,
                     'moderator_id' => null,
