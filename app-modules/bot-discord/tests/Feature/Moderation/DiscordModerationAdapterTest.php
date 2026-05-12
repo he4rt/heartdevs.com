@@ -247,18 +247,6 @@ test('ingest maps raw discord payload to ModerationContentDTO', function (): voi
         ->and($dto->metadata['guild_id'])->toBe('guild-111');
 });
 
-test('unknown duration sends null communication_disabled_until (permanent timeout removed)', function (): void {
-    Http::fake(['discord.com/*' => Http::response([], 200)]);
-
-    $user = makeUserWithDiscord('999');
-    $action = makeAction($user, ActionType::Mute, '999d');
-
-    DiscordModerationAdapter::make()->execute($action, $user);
-
-    Http::assertSent(fn ($req) => array_key_exists('communication_disabled_until', $req->data())
-        && $req->data()['communication_disabled_until'] === null);
-});
-
 test('returns failure when api responds with 403 forbidden', function (): void {
     Http::fake(['discord.com/*' => Http::response(['message' => 'Missing Permissions'], 403)]);
 

@@ -89,7 +89,11 @@ class MessageReceivedEvent extends Event
                     'moderator_id' => null,
                     'action_type' => $case->suggested_action,
                     'target_platforms' => [Platform::Discord->value],
-                    'duration' => $case->suggested_action === ActionType::Ban ? 'permanent' : null,
+                    'duration' => match ($case->suggested_action) {
+                        ActionType::Ban => 'permanent',
+                        ActionType::Mute, ActionType::Suspend => '24h',
+                        default => null,
+                    },
                     'reason' => 'Auto-moderation triggered by Discord message classification.',
                     'automated' => true,
                     'tenant_id' => $case->tenant_id,

@@ -238,7 +238,7 @@ final class DiscordModerationAdapter implements ModerationPlatformContract
         string $discordId,
         ?string $duration,
     ): Response {
-        $until = $this->parseDuration($duration);
+        $until = $this->parseDuration($duration) ?? now()->addHours(24)->toDateTimeImmutable();
 
         return $this->discordRequest(
             $token,
@@ -303,7 +303,10 @@ final class DiscordModerationAdapter implements ModerationPlatformContract
         return in_array($type, [
             ActionType::Warn,
             ActionType::ContentRemove,
+            ActionType::Mute,
             ActionType::Suspend,
+            ActionType::Kick,
+            ActionType::Ban,
         ], true);
     }
 
