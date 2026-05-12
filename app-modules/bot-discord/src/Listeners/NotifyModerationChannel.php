@@ -4,14 +4,14 @@ declare(strict_types=1);
 
 namespace He4rt\BotDiscord\Listeners;
 
-use He4rt\Moderation\Cases\Events\CaseCreated;
+use He4rt\Moderation\Cases\Events\CaseQueued;
 use He4rt\Moderation\Cases\Models\ModerationCase;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 
 final class NotifyModerationChannel
 {
-    public function handle(CaseCreated $event): void
+    public function handle(CaseQueued $event): void
     {
         $token = config('discord.token', config('he4rt.discord.token'));
         $channelId = config()->string('he4rt.discord.moderation.mod_channel_id');

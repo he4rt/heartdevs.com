@@ -6,7 +6,7 @@ namespace He4rt\BotDiscord;
 
 use He4rt\BotDiscord\Listeners\NotifyModerationChannel;
 use He4rt\BotDiscord\Moderation\DiscordModerationAdapter;
-use He4rt\Moderation\Cases\Events\CaseCreated;
+use He4rt\Moderation\Cases\Events\CaseQueued;
 use Illuminate\Support\Facades\Event;
 use Laracord\Laracord;
 use Laracord\LaracordServiceProvider;
@@ -27,7 +27,7 @@ class BotDiscordServiceProvider extends LaracordServiceProvider
     {
         parent::boot();
 
-        Event::listen(CaseCreated::class, [NotifyModerationChannel::class, 'handle']);
+        Event::listen(CaseQueued::class, [NotifyModerationChannel::class, 'handle']);
 
         if ($this->app->runningInConsole()) {
             $this->publishes([
