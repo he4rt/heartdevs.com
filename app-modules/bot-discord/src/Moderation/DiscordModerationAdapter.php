@@ -249,9 +249,7 @@ final class DiscordModerationAdapter implements ModerationPlatformContract
                 $discordId,
             ),
             [
-                'communication_disabled_until' => $until?->format(
-                    DateTimeInterface::ATOM,
-                ),
+                'communication_disabled_until' => $until->format(DateTimeInterface::ATOM),
             ],
         );
     }
