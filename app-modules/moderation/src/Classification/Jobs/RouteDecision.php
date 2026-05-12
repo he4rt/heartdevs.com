@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace He4rt\Moderation\Classification\Jobs;
 
+use He4rt\Moderation\Cases\Events\CaseQueued;
 use He4rt\Moderation\Cases\Models\ModerationCase;
 use He4rt\Moderation\Classification\Actions\Advisors\HistoryBasedPenaltyAdvisor;
 use He4rt\Moderation\Enums\CaseStatus;
@@ -57,5 +58,7 @@ final class RouteDecision implements ShouldQueue
             'priority' => $priority,
             'suggested_action' => $suggestedAction ?? $this->case->suggested_action,
         ]);
+
+        event(new CaseQueued($this->case));
     }
 }
