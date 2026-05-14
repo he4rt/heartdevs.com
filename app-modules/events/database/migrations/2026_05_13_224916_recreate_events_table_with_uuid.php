@@ -11,22 +11,22 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('events_talks', function (Blueprint $table): void {
-            $table->dropForeignKey('events_talks_event_id_foreign');
+            $table->dropForeign('events_talks_event_id_foreign');
             $table->dropColumn('event_id');
         });
 
         Schema::table('events_attendees', function (Blueprint $table): void {
-            $table->dropForeignKey('events_attendees_event_id_foreign');
+            $table->dropForeign('events_attendees_event_id_foreign');
             $table->dropColumn('event_id');
         });
 
         Schema::table('events_sponsors', function (Blueprint $table): void {
-            $table->dropForeignKey('events_sponsors_event_id_foreign');
+            $table->dropForeign('events_sponsors_event_id_foreign');
             $table->dropColumn('event_id');
         });
 
         Schema::table('events_agenda', function (Blueprint $table): void {
-            $table->dropForeignKey('events_agenda_event_id_foreign');
+            $table->dropForeign('events_agenda_event_id_foreign');
             $table->dropColumn('event_id');
         });
 
@@ -70,22 +70,22 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('events_talks', function (Blueprint $table): void {
-            $table->dropForeignKey('events_talks_event_id_foreign');
+            $table->dropForeign('events_talks_event_id_foreign');
             $table->dropColumn('event_id');
         });
 
         Schema::table('events_attendees', function (Blueprint $table): void {
-            $table->dropForeignKey('events_attendees_event_id_foreign');
+            $table->dropForeign('events_attendees_event_id_foreign');
             $table->dropColumn('event_id');
         });
 
         Schema::table('events_sponsors', function (Blueprint $table): void {
-            $table->dropForeignKey('events_sponsors_event_id_foreign');
+            $table->dropForeign('events_sponsors_event_id_foreign');
             $table->dropColumn('event_id');
         });
 
         Schema::table('events_agenda', function (Blueprint $table): void {
-            $table->dropForeignKey('events_agenda_event_id_foreign');
+            $table->dropForeign('events_agenda_event_id_foreign');
             $table->dropColumn('event_id');
         });
 
