@@ -12,7 +12,9 @@ use He4rt\BotDiscord\Moderation\DiscordModerationAdapter;
 use He4rt\Identity\ExternalIdentity\Enums\IdentityProvider;
 use He4rt\Identity\ExternalIdentity\Models\ExternalIdentity;
 use He4rt\Identity\Tenant\Models\Tenant;
-use He4rt\Moderation\Classification\Jobs\ClassifyContent;
+use He4rt\Moderation\Classification\Actions\Classifiers\AggregateClassifier;
+use He4rt\Moderation\Classification\Actions\Classifiers\OpenAiClassifier;
+use He4rt\Moderation\Classification\Actions\Classifiers\RuleBasedClassifier;
 use He4rt\Moderation\Classification\Jobs\IngestContent;
 use He4rt\Moderation\Classification\Jobs\RouteDecision;
 use He4rt\Moderation\Enforcement\ExecuteAction;
@@ -20,6 +22,7 @@ use He4rt\Moderation\Enforcement\ModerationAction;
 use He4rt\Moderation\Enums\ActionType;
 use He4rt\Moderation\Enums\CaseSource;
 use He4rt\Moderation\Enums\Platform;
+use He4rt\Moderation\Rules\ModerationRule;
 use Laracord\Events\Event;
 use Throwable;
 
@@ -72,11 +75,52 @@ class MessageReceivedEvent extends Event
                 'author' => $authorIdentity?->user,
             ]);
 
+            $this->logger()->info('[Moderation] Pre-screening message: '.$message->id);
+
+            $ruleResult = RuleBasedClassifier::make()->classify($content);
+            $hasRuleMatch = $ruleResult->matchedRules !== [];
+
+            $ruleAction = null;
+            if ($hasRuleMatch) {
+                $ruleAction = ModerationRule::query()
+                    ->whereIn('id', $ruleResult->matchedRules)
+                    ->get()
+                    ->sortByDesc(fn (ModerationRule $rule): int => $rule->severity->weight())
+                    ->first()?->action_on_match;
+            }
+
+            $aiResult = $hasRuleMatch
+                ? $ruleResult
+                : AggregateClassifier::make()
+                    ->addClassifier(OpenAiClassifier::make())
+                    ->classify($content);
+
+            $maxScore = blank($aiResult->scores) ? 0.0 : max($aiResult->scores);
+            $flagThreshold = config('moderation.thresholds.flag', 0.7);
+
+            $shouldCreateCase = $hasRuleMatch || $maxScore >= $flagThreshold;
+
+            $this->logger()->info(
+                '[Moderation] Pre-screening result: rule_match='.($hasRuleMatch ? 'yes' : 'no')
+                .' max_score='.$maxScore.' threshold='.$flagThreshold
+                .' create_case='.($shouldCreateCase ? 'yes' : 'no')
+            );
+
+            if (!$shouldCreateCase) {
+                return;
+            }
+
             $case = new IngestContent($content, CaseSource::AutoDetect)->handle();
             $this->logger()->info('[Moderation] Case created: '.$case->id.' status='.$case->status->value);
-            new ClassifyContent($case)->handle();
-            $case->refresh();
-            $this->logger()->info('[Moderation] After classify: scores='.json_encode($case->ai_scores).' status='.$case->status->value);
+
+            $case->update([
+                'ai_scores' => $aiResult->scores,
+                'violation_type' => $aiResult->primary,
+                'severity' => $aiResult->severity,
+                'classifier_version' => $aiResult->classifierName,
+                'suggested_action' => $ruleAction,
+            ]);
+
             new RouteDecision($case)->handle();
             $case->refresh();
             $this->logger()->info('[Moderation] After route: status='.$case->status->value.' priority='.$case->priority);
