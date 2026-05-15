@@ -16,6 +16,7 @@ class EventsServiceProvider extends ServiceProvider
     {
         $this->loadMigrationsFrom(__DIR__.'/../database/migrations');
         $this->loadViewsFrom(__DIR__.'/../resources/views', 'events');
+        $this->loadRoutesFrom(__DIR__.'/../routes/checkin-routes.php');
 
         Relation::morphMap([
             'event_submission' => EventSubmission::class,

@@ -8,6 +8,7 @@ use Carbon\Carbon;
 use Exception;
 use He4rt\Events\Database\Factories\EventFactory;
 use He4rt\Events\Enums\AttendingStatusEnum;
+use He4rt\Events\Enums\EventStatusEnum;
 use He4rt\Events\Enums\EventTypeEnum;
 use He4rt\Events\Enums\Talks\TalkStatusEnum;
 use He4rt\Events\Models\Pivot\EventAttend;
@@ -56,8 +57,13 @@ class EventModel extends Model
         'description',
         'event_at',
         'start_at',
+        'status',
         'end_at',
         'location',
+        'location_lat',
+        'location_lng',
+        'gps_radius',
+        'xp_base',
         'max_attendees',
         'attendees_count',
         'waitlist_count',
@@ -77,7 +83,13 @@ class EventModel extends Model
                 'user_id'
             )
             ->using(EventAttend::class)
-            ->withPivot(['status', 'attend_order'])
+            ->withPivot(['status',
+                'attend_order',
+                'state',
+                'verified_at',
+                'verification_method',
+                'xp_awarded',
+                'streak_multiplier'])
             ->withTimestamps();
     }
 
@@ -259,6 +271,9 @@ class EventModel extends Model
             'start_at' => 'datetime',
             'end_at' => 'datetime',
             'event_type' => EventTypeEnum::class,
+            'status' => EventStatusEnum::class,
+            'location_lat' => 'float',
+            'location_lng' => 'float',
         ];
     }
 }
