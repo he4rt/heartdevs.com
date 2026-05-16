@@ -8,6 +8,7 @@ use He4rt\Moderation\Cases\Models\ModerationCase;
 use He4rt\Moderation\Enforcement\ExecuteAction;
 use He4rt\Moderation\Enforcement\ModerationAction;
 use He4rt\Moderation\Enums\CaseStatus;
+use He4rt\Moderation\Platform\PlatformRegistry;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Notification;
 
@@ -27,7 +28,7 @@ test('executes action on web platform and records results', function (): void {
         'duration' => '7d',
     ]);
 
-    new ExecuteAction($action, $user)->handle();
+    new ExecuteAction($action, $user)->handle(resolve(PlatformRegistry::class));
 
     $action->refresh();
     expect($action->execution_results)->not->toBeNull()
@@ -47,7 +48,7 @@ test('resolves case after action execution', function (): void {
         'target_platforms' => ['web'],
     ]);
 
-    new ExecuteAction($action, $user)->handle();
+    new ExecuteAction($action, $user)->handle(resolve(PlatformRegistry::class));
 
     $case->refresh();
     expect($case->status)->toBe(CaseStatus::Resolved)
@@ -65,7 +66,7 @@ test('records audit log entry after execution', function (): void {
         'moderator_id' => User::factory()->create()->id,
     ]);
 
-    new ExecuteAction($action, $user)->handle();
+    new ExecuteAction($action, $user)->handle(resolve(PlatformRegistry::class));
 
     expect(ModerationAuditLog::query()->where('event_type', 'action_executed')->count())->toBe(1);
 
@@ -83,7 +84,7 @@ test('skips platforms not in target list', function (): void {
         'target_platforms' => ['skype'],
     ]);
 
-    new ExecuteAction($action, $user)->handle();
+    new ExecuteAction($action, $user)->handle(resolve(PlatformRegistry::class));
 
     $action->refresh();
     expect($action->execution_results)->toBeEmpty();
@@ -101,7 +102,7 @@ test('handles multiple target platforms', function (): void {
         'target_platforms' => ['web', 'discord'],
     ]);
 
-    new ExecuteAction($action, $user)->handle();
+    new ExecuteAction($action, $user)->handle(resolve(PlatformRegistry::class));
 
     $action->refresh();
     $webResult = collect($action->execution_results)->firstWhere('platform', 'web');
@@ -118,7 +119,7 @@ test('handles empty target platforms array', function (): void {
         'target_platforms' => [],
     ]);
 
-    new ExecuteAction($action, $user)->handle();
+    new ExecuteAction($action, $user)->handle(resolve(PlatformRegistry::class));
 
     $action->refresh();
     expect($action->execution_results)->toBeEmpty();
