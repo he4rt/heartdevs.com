@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "bd9ac465244e6f66fcff70f0a50a4425",
+    "content-hash": "4cda5177e73cfcd5a61098bfe216f7d4",
     "packages": [
         {
             "name": "blade-ui-kit/blade-heroicons",
@@ -3564,12 +3564,12 @@
             }
         },
         {
-            "name": "he4rt/panel-hub",
+            "name": "he4rt/panel-app",
             "version": "1.0",
             "dist": {
                 "type": "path",
-                "url": "app-modules/panel-hub",
-                "reference": "1624d5602cc0f8b850c03469bb6db921fef67e3a"
+                "url": "app-modules/panel-app",
+                "reference": "02eeddd07e58ed1e1524ca1c83dc5b0955205c57"
             },
             "require": {
                 "filament/filament": "^5.6",
@@ -3580,20 +3580,20 @@
             "extra": {
                 "laravel": {
                     "providers": [
-                        "He4rt\\PanelHub\\PanelHubServiceProvider"
+                        "He4rt\\PanelApp\\PanelAppServiceProvider"
                     ]
                 }
             },
             "autoload": {
                 "psr-4": {
-                    "He4rt\\PanelHub\\": "src/",
-                    "He4rt\\PanelHub\\Database\\Factories\\": "database/factories/",
-                    "He4rt\\PanelHub\\Database\\Seeders\\": "database/seeders/"
+                    "He4rt\\PanelApp\\": "src/",
+                    "He4rt\\PanelApp\\Database\\Factories\\": "database/factories/",
+                    "He4rt\\PanelApp\\Database\\Seeders\\": "database/seeders/"
                 }
             },
             "autoload-dev": {
                 "psr-4": {
-                    "He4rt\\PanelHub\\Tests\\": "tests/"
+                    "He4rt\\PanelApp\\Tests\\": "tests/"
                 }
             },
             "license": [
