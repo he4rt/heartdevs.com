@@ -24,7 +24,6 @@ function makeContentDTO(string $text = 'hello world'): ModerationContentDTO
         contentType: 'message',
         sourcePlatform: Platform::Discord,
         authorExternalId: '123',
-        author: null,
         textContent: $text,
         mediaUrls: [],
         metadata: [],

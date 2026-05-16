@@ -23,14 +23,13 @@ beforeEach(function (): void {
     ])]);
 });
 
-function makeReportDTO(string $contentId = 'msg-1', string $text = 'test', ?User $author = null): ModerationContentDTO
+function makeReportDTO(string $contentId = 'msg-1', string $text = 'test'): ModerationContentDTO
 {
     return new ModerationContentDTO(
         contentId: $contentId,
         contentType: 'message',
         sourcePlatform: Platform::Discord,
         authorExternalId: 'ext-1',
-        author: $author ?? User::factory()->create(),
         textContent: $text,
         mediaUrls: [],
         metadata: [],
@@ -94,7 +93,7 @@ test('does not dedup against resolved cases', function (): void {
         'author_id' => $author->id,
     ]);
 
-    $dto = makeReportDTO('msg-resolved', 'same content', $author);
+    $dto = makeReportDTO('msg-resolved', 'same content');
     $newCase = resolve(SubmitReport::class)->handle($reporter, $dto, ViolationType::Toxicity, null, Platform::Discord);
 
     expect($newCase->id)->not->toBe($resolvedCase->id);
@@ -111,7 +110,7 @@ test('does not dedup against dismissed cases', function (): void {
         'author_id' => $author->id,
     ]);
 
-    $dto = makeReportDTO('msg-dismissed', 'content', $author);
+    $dto = makeReportDTO('msg-dismissed', 'content');
     $newCase = resolve(SubmitReport::class)->handle($reporter, $dto, ViolationType::Spam, null, Platform::Web);
 
     expect($newCase->id)->not->toBe($dismissedCase->id);

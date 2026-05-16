@@ -20,7 +20,6 @@ function contentDTO(string $text, ?string $tenantId = null): ModerationContentDT
         contentType: 'message',
         sourcePlatform: Platform::Discord,
         authorExternalId: '123',
-        author: null,
         textContent: $text,
         mediaUrls: [],
         metadata: [],

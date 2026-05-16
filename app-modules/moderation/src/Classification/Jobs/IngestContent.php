@@ -4,9 +4,8 @@ declare(strict_types=1);
 
 namespace He4rt\Moderation\Classification\Jobs;
 
+use He4rt\Identity\ExternalIdentity\Actions\FindExternalIdentity;
 use He4rt\Identity\ExternalIdentity\Enums\IdentityProvider;
-use He4rt\Identity\ExternalIdentity\Models\ExternalIdentity;
-use He4rt\Identity\User\Models\User;
 use He4rt\Moderation\Cases\Events\CaseCreated;
 use He4rt\Moderation\Cases\Models\ModerationCase;
 use He4rt\Moderation\DTOs\ModerationContentDTO;
@@ -15,6 +14,7 @@ use He4rt\Moderation\Enums\CaseStatus;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\InteractsWithQueue;
+use Throwable;
 
 final class IngestContent implements ShouldQueue
 {
@@ -28,14 +28,19 @@ final class IngestContent implements ShouldQueue
 
     public function handle(): ModerationCase
     {
-        $authorId = $this->content->author?->id;
+        $authorId = null;
 
-        if ($authorId === null && $this->content->authorExternalId !== '') {
-            $authorId = ExternalIdentity::query()
-                ->where('model_type', (new User)->getMorphClass())
-                ->where('provider', IdentityProvider::Discord)
-                ->where('external_account_id', $this->content->authorExternalId)
-                ->value('model_id');
+        if ($this->content->authorExternalId !== '') {
+            try {
+                $identity = resolve(FindExternalIdentity::class)->handle(
+                    provider: IdentityProvider::Discord->value,
+                    providerId: $this->content->authorExternalId,
+                    tenantId: $this->content->tenantId,
+                );
+                $authorId = $identity->model_id;
+            } catch (Throwable) {
+                // Author not found in system — proceed with null author_id
+            }
         }
 
         $case = ModerationCase::query()->create([

@@ -17,7 +17,6 @@ test('ModerationContentDTO holds all fields', function (): void {
         contentType: 'message',
         sourcePlatform: Platform::Discord,
         authorExternalId: '999888777',
-        author: null,
         textContent: 'spam content here',
         mediaUrls: ['https://example.com/img.png'],
         metadata: ['channel_id' => '123', 'guild_id' => '456'],
@@ -29,7 +28,6 @@ test('ModerationContentDTO holds all fields', function (): void {
         ->and($dto->contentType)->toBe('message')
         ->and($dto->sourcePlatform)->toBe(Platform::Discord)
         ->and($dto->authorExternalId)->toBe('999888777')
-        ->and($dto->author)->toBeNull()
         ->and($dto->textContent)->toBe('spam content here')
         ->and($dto->mediaUrls)->toBe(['https://example.com/img.png'])
         ->and($dto->metadata)->toBe(['channel_id' => '123', 'guild_id' => '456'])
@@ -93,4 +91,68 @@ test('ExecutionResultDTO captures failure', function (): void {
 
     expect($dto->success)->toBeFalse()
         ->and($dto->error)->toBe('User not found on platform');
+});
+
+test('ModerationContentDTO can be json_encoded', function (): void {
+    $dto = new ModerationContentDTO(
+        contentId: 'msg-ser-1',
+        contentType: 'message',
+        sourcePlatform: Platform::Discord,
+        authorExternalId: 'ext-123',
+        textContent: 'test serialization',
+        mediaUrls: ['https://example.com/file.png'],
+        metadata: ['channel_id' => 'ch-1'],
+        snapshot: ['text' => 'test serialization'],
+        tenantId: 'tenant-1',
+    );
+
+    $json = json_encode($dto);
+
+    expect($json)->toBeString();
+
+    $decoded = json_decode($json, true);
+    expect($decoded['content_id'])->toBe('msg-ser-1')
+        ->and($decoded['source_platform'])->toBe('discord')
+        ->and($decoded['author_external_id'])->toBe('ext-123')
+        ->and($decoded['text_content'])->toBe('test serialization')
+        ->and($decoded['tenant_id'])->toBe('tenant-1')
+        ->and($decoded)->not->toHaveKey('author');
+});
+
+test('ModerationContentDTO serialized output has no author key', function (): void {
+    $dto = new ModerationContentDTO(
+        contentId: 'msg-no-author',
+        contentType: 'message',
+        sourcePlatform: Platform::Web,
+        authorExternalId: 'user-456',
+        textContent: 'content without author',
+        mediaUrls: [],
+        metadata: [],
+        snapshot: ['text' => 'content without author'],
+        tenantId: null,
+    );
+
+    $serialized = $dto->jsonSerialize();
+
+    expect($serialized)->not->toHaveKey('author')
+        ->and($serialized)->toHaveKey('author_external_id')
+        ->and($serialized['author_external_id'])->toBe('user-456');
+});
+
+test('ModerationContentDTO fromPlatform produces correct DTO without author', function (): void {
+    $dto = ModerationContentDTO::fromPlatform(Platform::Discord, [
+        'content_id' => 'msg-fp-1',
+        'content_type' => 'message',
+        'author_external_id' => 'ext-789',
+        'text' => 'platform content',
+        'media_urls' => [],
+        'metadata' => ['guild_id' => 'g-1'],
+        'tenant_id' => 'tenant-2',
+    ]);
+
+    expect($dto->contentId)->toBe('msg-fp-1')
+        ->and($dto->sourcePlatform)->toBe(Platform::Discord)
+        ->and($dto->authorExternalId)->toBe('ext-789')
+        ->and($dto->textContent)->toBe('platform content')
+        ->and($dto->tenantId)->toBe('tenant-2');
 });

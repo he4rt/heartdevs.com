@@ -18,13 +18,11 @@ use Illuminate\Support\Facades\Http;
 uses(RefreshDatabase::class);
 
 test('IngestContent creates a ModerationCase from DTO', function (): void {
-    $user = User::factory()->create();
     $dto = new ModerationContentDTO(
         contentId: 'msg-999',
         contentType: 'message',
         sourcePlatform: Platform::Discord,
         authorExternalId: '12345',
-        author: $user,
         textContent: 'some spam content',
         mediaUrls: [],
         metadata: ['channel_id' => 'ch-1'],
@@ -41,7 +39,6 @@ test('IngestContent creates a ModerationCase from DTO', function (): void {
         ->and($case->source_platform)->toBe(Platform::Discord)
         ->and($case->source)->toBe(CaseSource::UserReport)
         ->and($case->status)->toBe(CaseStatus::Pending)
-        ->and($case->author_id)->toBe($user->id)
         ->and($case->content_snapshot)->toBe(['text' => 'some spam content']);
 });
 
@@ -126,13 +123,11 @@ test('full pipeline flow: ingest -> classify -> route', function (): void {
         ]),
     ]);
 
-    $user = User::factory()->create();
     $dto = new ModerationContentDTO(
         contentId: 'msg-full-test',
         contentType: 'message',
         sourcePlatform: Platform::Discord,
         authorExternalId: 'ext-1',
-        author: $user,
         textContent: 'Get free followers at spam.com',
         mediaUrls: [],
         metadata: [],

@@ -72,7 +72,6 @@ class MessageReceivedEvent extends Event
                 'username' => $message->author->username,
                 'attachments' => [],
                 'tenant_id' => (string) $tenantProvider->tenant_id,
-                'author' => $authorIdentity?->user,
             ]);
 
             $this->logger()->info('[Moderation] Pre-screening message: '.$message->id);
