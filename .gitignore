@@ -11,6 +11,7 @@
 /.fleet
 /.idea
 /.kiro
+/.agents
 /.laracord
 /.nova
 /.phpunit.cache

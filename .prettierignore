@@ -7,3 +7,4 @@ public/
 package-lock.json
 composer.lock
 storage/
+.ai
