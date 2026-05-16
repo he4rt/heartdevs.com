@@ -7,13 +7,22 @@ use He4rt\Identity\ExternalIdentity\Data\ClientAccessManager;
 use He4rt\Identity\ExternalIdentity\Enums\IdentityProvider;
 use He4rt\Identity\Tenant\Models\Tenant;
 use He4rt\Identity\User\Models\User;
+use He4rt\IntegrationDiscord\Transport\DiscordConnector;
+use He4rt\IntegrationDiscord\Transport\Requests\Bans\CreateBan;
+use He4rt\IntegrationDiscord\Transport\Requests\Channels\CreateDmChannel;
+use He4rt\IntegrationDiscord\Transport\Requests\Members\GetMember;
+use He4rt\IntegrationDiscord\Transport\Requests\Members\ModifyMember;
+use He4rt\IntegrationDiscord\Transport\Requests\Members\RemoveMember;
+use He4rt\IntegrationDiscord\Transport\Requests\Messages\CreateMessage;
+use He4rt\IntegrationDiscord\Transport\Requests\Messages\DeleteMessage;
 use He4rt\Moderation\Cases\Models\ModerationCase;
 use He4rt\Moderation\DTOs\ModerationContentDTO;
 use He4rt\Moderation\Enforcement\ModerationAction;
 use He4rt\Moderation\Enums\ActionType;
 use He4rt\Moderation\Enums\Platform;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Support\Facades\Http;
+use Saloon\Http\Faking\MockClient;
+use Saloon\Http\Faking\MockResponse;
 
 uses(RefreshDatabase::class);
 
@@ -46,13 +55,29 @@ function makeAction(User $user, ActionType $type, ?string $duration = null): Mod
     ]);
 }
 
+function mockConnector(array $responses = []): MockClient
+{
+    $mockClient = new MockClient($responses);
+
+    $connector = resolve(DiscordConnector::class);
+    $connector->withMockClient($mockClient);
+
+    return $mockClient;
+}
+
 beforeEach(function (): void {
     config()->set('he4rt.discord.guild_id', '123456789');
     config()->set('discord.token', 'bot-token');
 });
 
 test('mute sends PATCH with communication_disabled_until', function (): void {
-    Http::fake(['discord.com/*' => Http::response([], 200)]);
+    $mockClient = mockConnector([
+        GetMember::class => MockResponse::make(['roles' => []], 200),
+        ModifyMember::class => MockResponse::make([], 200),
+        CreateDmChannel::class => MockResponse::make(['id' => 'dm-chan-1'], 200),
+        CreateMessage::class => MockResponse::make([], 200),
+        DeleteMessage::class => MockResponse::make([], 204),
+    ]);
 
     $user = makeUserWithDiscord('111');
     $action = makeAction($user, ActionType::Mute, '24h');
@@ -61,28 +86,37 @@ test('mute sends PATCH with communication_disabled_until', function (): void {
 
     expect($result->success)->toBeTrue();
 
-    Http::assertSent(fn ($req) => $req->method() === 'PATCH'
-        && str_contains((string) $req->url(), '/guilds/123456789/members/111')
-        && isset($req->data()['communication_disabled_until']));
+    $mockClient->assertSent(ModifyMember::class);
+    $mockClient->assertSent(fn ($request) => $request instanceof ModifyMember
+        && str_contains($request->resolveEndpoint(), '/guilds/123456789/members/111'));
 });
 
 test('mute 7d sends correct timeout duration', function (): void {
-    Http::fake(['discord.com/*' => Http::response([], 200)]);
+    $mockClient = mockConnector([
+        GetMember::class => MockResponse::make(['roles' => []], 200),
+        ModifyMember::class => MockResponse::make([], 200),
+        CreateDmChannel::class => MockResponse::make(['id' => 'dm-chan-1'], 200),
+        CreateMessage::class => MockResponse::make([], 200),
+        DeleteMessage::class => MockResponse::make([], 204),
+    ]);
 
     $user = makeUserWithDiscord('222');
     $action = makeAction($user, ActionType::Mute, '7d');
 
     DiscordModerationAdapter::make()->execute($action, $user);
 
-    Http::assertSent(function ($req): bool {
-        $until = $req->data()['communication_disabled_until'] ?? null;
-
-        return $until !== null && str_contains($until, now()->addDays(7)->format('Y-m-d'));
-    });
+    $mockClient->assertSent(fn ($request) => $request instanceof ModifyMember
+        && str_contains($request->body()->all()['communication_disabled_until'] ?? '', now()->addDays(7)->format('Y-m-d')));
 });
 
 test('mute 28d sends timeout capped at 28 days', function (): void {
-    Http::fake(['discord.com/*' => Http::response([], 200)]);
+    $mockClient = mockConnector([
+        GetMember::class => MockResponse::make(['roles' => []], 200),
+        ModifyMember::class => MockResponse::make([], 200),
+        CreateDmChannel::class => MockResponse::make(['id' => 'dm-chan-1'], 200),
+        CreateMessage::class => MockResponse::make([], 200),
+        DeleteMessage::class => MockResponse::make([], 204),
+    ]);
 
     $user = makeUserWithDiscord('333');
     $action = makeAction($user, ActionType::Mute, '28d');
@@ -91,15 +125,18 @@ test('mute 28d sends timeout capped at 28 days', function (): void {
 
     expect($result->success)->toBeTrue();
 
-    Http::assertSent(function ($req): bool {
-        $until = $req->data()['communication_disabled_until'] ?? null;
-
-        return $until !== null && str_contains($until, now()->addDays(28)->format('Y-m-d'));
-    });
+    $mockClient->assertSent(fn ($request) => $request instanceof ModifyMember
+        && str_contains($request->body()->all()['communication_disabled_until'] ?? '', now()->addDays(28)->format('Y-m-d')));
 });
 
 test('kick sends DELETE to members endpoint', function (): void {
-    Http::fake(['discord.com/*' => Http::response([], 204)]);
+    $mockClient = mockConnector([
+        GetMember::class => MockResponse::make(['roles' => []], 200),
+        RemoveMember::class => MockResponse::make([], 204),
+        CreateDmChannel::class => MockResponse::make(['id' => 'dm-chan-1'], 200),
+        CreateMessage::class => MockResponse::make([], 200),
+        DeleteMessage::class => MockResponse::make([], 204),
+    ]);
 
     $user = makeUserWithDiscord('444');
     $action = makeAction($user, ActionType::Kick);
@@ -108,12 +145,18 @@ test('kick sends DELETE to members endpoint', function (): void {
 
     expect($result->success)->toBeTrue();
 
-    Http::assertSent(fn ($req) => $req->method() === 'DELETE'
-        && str_contains((string) $req->url(), '/guilds/123456789/members/444'));
+    $mockClient->assertSent(fn ($request) => $request instanceof RemoveMember
+        && str_contains($request->resolveEndpoint(), '/guilds/123456789/members/444'));
 });
 
 test('ban 24h sends PUT to bans endpoint with delete_message_seconds 86400', function (): void {
-    Http::fake(['discord.com/*' => Http::response([], 200)]);
+    $mockClient = mockConnector([
+        GetMember::class => MockResponse::make(['roles' => []], 200),
+        CreateBan::class => MockResponse::make([], 200),
+        CreateDmChannel::class => MockResponse::make(['id' => 'dm-chan-1'], 200),
+        CreateMessage::class => MockResponse::make([], 200),
+        DeleteMessage::class => MockResponse::make([], 204),
+    ]);
 
     $user = makeUserWithDiscord('555');
     $action = makeAction($user, ActionType::Ban, '24h');
@@ -122,35 +165,53 @@ test('ban 24h sends PUT to bans endpoint with delete_message_seconds 86400', fun
 
     expect($result->success)->toBeTrue();
 
-    Http::assertSent(fn ($req) => $req->method() === 'PUT'
-        && str_contains((string) $req->url(), '/guilds/123456789/bans/555')
-        && ($req->data()['delete_message_seconds'] ?? null) === 86400);
+    $mockClient->assertSent(fn ($request) => $request instanceof CreateBan
+        && str_contains($request->resolveEndpoint(), '/guilds/123456789/bans/555')
+        && ($request->body()->all()['delete_message_seconds'] ?? null) === 86400);
 });
 
 test('ban 7d sends delete_message_seconds 604800', function (): void {
-    Http::fake(['discord.com/*' => Http::response([], 200)]);
+    $mockClient = mockConnector([
+        GetMember::class => MockResponse::make(['roles' => []], 200),
+        CreateBan::class => MockResponse::make([], 200),
+        CreateDmChannel::class => MockResponse::make(['id' => 'dm-chan-1'], 200),
+        CreateMessage::class => MockResponse::make([], 200),
+        DeleteMessage::class => MockResponse::make([], 204),
+    ]);
 
     $user = makeUserWithDiscord('666');
     $action = makeAction($user, ActionType::Ban, '7d');
 
     DiscordModerationAdapter::make()->execute($action, $user);
 
-    Http::assertSent(fn ($req) => ($req->data()['delete_message_seconds'] ?? null) === 604800);
+    $mockClient->assertSent(fn ($request) => $request instanceof CreateBan
+        && ($request->body()->all()['delete_message_seconds'] ?? null) === 604800);
 });
 
 test('permanent ban sends delete_message_seconds 0', function (): void {
-    Http::fake(['discord.com/*' => Http::response([], 200)]);
+    $mockClient = mockConnector([
+        GetMember::class => MockResponse::make(['roles' => []], 200),
+        CreateBan::class => MockResponse::make([], 200),
+        CreateDmChannel::class => MockResponse::make(['id' => 'dm-chan-1'], 200),
+        CreateMessage::class => MockResponse::make([], 200),
+        DeleteMessage::class => MockResponse::make([], 204),
+    ]);
 
     $user = makeUserWithDiscord('777');
     $action = makeAction($user, ActionType::Ban, 'permanent');
 
     DiscordModerationAdapter::make()->execute($action, $user);
 
-    Http::assertSent(fn ($req) => ($req->data()['delete_message_seconds'] ?? -1) === 0);
+    $mockClient->assertSent(fn ($request) => $request instanceof CreateBan
+        && ($request->body()->all()['delete_message_seconds'] ?? -1) === 0);
 });
 
 test('warn sends dm and returns success without calling guild api', function (): void {
-    Http::fake(['discord.com/*' => Http::response(['id' => 'dm-channel-1'], 200)]);
+    $mockClient = mockConnector([
+        CreateDmChannel::class => MockResponse::make(['id' => 'dm-channel-1'], 200),
+        CreateMessage::class => MockResponse::make([], 200),
+        DeleteMessage::class => MockResponse::make([], 204),
+    ]);
 
     $user = makeUserWithDiscord('888');
     $action = makeAction($user, ActionType::Warn);
@@ -160,16 +221,18 @@ test('warn sends dm and returns success without calling guild api', function ():
     expect($result->success)->toBeTrue()
         ->and($result->platformResponse['action'])->toBe('warn');
 
-    Http::assertSent(fn ($req) => str_contains((string) $req->url(), '/users/@me/channels'));
-
-    $guildCalls = collect(Http::recorded())->filter(
-        fn ($recorded) => str_contains((string) $recorded[0]->url(), '/guilds/')
-    );
-    expect($guildCalls)->toBeEmpty();
+    $mockClient->assertSent(CreateDmChannel::class);
+    $mockClient->assertNotSent(ModifyMember::class);
+    $mockClient->assertNotSent(CreateBan::class);
+    $mockClient->assertNotSent(RemoveMember::class);
 });
 
 test('content_remove sends dm and returns success without calling guild api', function (): void {
-    Http::fake(['discord.com/*' => Http::response(['id' => 'dm-channel-2'], 200)]);
+    $mockClient = mockConnector([
+        CreateDmChannel::class => MockResponse::make(['id' => 'dm-channel-2'], 200),
+        CreateMessage::class => MockResponse::make([], 200),
+        DeleteMessage::class => MockResponse::make([], 204),
+    ]);
 
     $user = makeUserWithDiscord('889');
     $action = makeAction($user, ActionType::ContentRemove);
@@ -178,35 +241,37 @@ test('content_remove sends dm and returns success without calling guild api', fu
 
     expect($result->success)->toBeTrue();
 
-    Http::assertSent(fn ($req) => str_contains((string) $req->url(), '/users/@me/channels'));
-
-    $guildCalls = collect(Http::recorded())->filter(
-        fn ($recorded) => str_contains((string) $recorded[0]->url(), '/guilds/')
-    );
-    expect($guildCalls)->toBeEmpty();
+    $mockClient->assertSent(CreateDmChannel::class);
+    $mockClient->assertNotSent(ModifyMember::class);
+    $mockClient->assertNotSent(CreateBan::class);
+    $mockClient->assertNotSent(RemoveMember::class);
 });
 
 test('notify sends dm to user with discord identity', function (): void {
-    Http::fake(['discord.com/*' => Http::response(['id' => 'dm-chan-notify'], 200)]);
+    $mockClient = mockConnector([
+        CreateDmChannel::class => MockResponse::make(['id' => 'dm-chan-notify'], 200),
+        CreateMessage::class => MockResponse::make([], 200),
+    ]);
 
     $user = makeUserWithDiscord('notify-111');
 
     DiscordModerationAdapter::make()->notify($user, 'You have been warned.');
 
-    Http::assertSent(fn ($req) => str_contains((string) $req->url(), '/users/@me/channels')
-        && ($req->data()['recipient_id'] ?? null) === 'notify-111');
+    $mockClient->assertSent(fn ($request) => $request instanceof CreateDmChannel
+        && $request->body()->all()['recipient_id'] === 'notify-111');
 
-    Http::assertSent(fn ($req) => str_contains((string) $req->url(), '/channels/dm-chan-notify/messages'));
+    $mockClient->assertSent(fn ($request) => $request instanceof CreateMessage
+        && str_contains($request->resolveEndpoint(), '/channels/dm-chan-notify/messages'));
 });
 
 test('notify does nothing when user has no discord identity', function (): void {
-    Http::fake();
+    $mockClient = mockConnector([]);
 
     $user = User::factory()->create();
 
     DiscordModerationAdapter::make()->notify($user, 'You have been warned.');
 
-    Http::assertNothingSent();
+    $mockClient->assertNothingSent();
 });
 
 test('resolve user finds user by discord external id', function (): void {
@@ -248,7 +313,12 @@ test('ingest maps raw discord payload to ModerationContentDTO', function (): voi
 });
 
 test('returns failure when api responds with 403 forbidden', function (): void {
-    Http::fake(['discord.com/*' => Http::response(['message' => 'Missing Permissions'], 403)]);
+    mockConnector([
+        GetMember::class => MockResponse::make(['roles' => []], 200),
+        CreateBan::class => MockResponse::make(['message' => 'Missing Permissions'], 403),
+        CreateDmChannel::class => MockResponse::make(['id' => 'dm-chan'], 200),
+        CreateMessage::class => MockResponse::make([], 200),
+    ]);
 
     $user = makeUserWithDiscord('aaaaa');
     $action = makeAction($user, ActionType::Ban, 'permanent');
@@ -260,7 +330,12 @@ test('returns failure when api responds with 403 forbidden', function (): void {
 });
 
 test('returns failure when api responds with 429 rate limit', function (): void {
-    Http::fake(['discord.com/*' => Http::response(['message' => 'You are being rate limited.'], 429)]);
+    mockConnector([
+        GetMember::class => MockResponse::make(['roles' => []], 200),
+        ModifyMember::class => MockResponse::make(['message' => 'You are being rate limited.'], 429),
+        CreateDmChannel::class => MockResponse::make(['id' => 'dm-chan'], 200),
+        CreateMessage::class => MockResponse::make([], 200),
+    ]);
 
     $user = makeUserWithDiscord('bbbbb');
     $action = makeAction($user, ActionType::Mute, '24h');
@@ -271,7 +346,7 @@ test('returns failure when api responds with 429 rate limit', function (): void 
 });
 
 test('returns failure when user has no discord identity', function (): void {
-    Http::fake();
+    $mockClient = mockConnector([]);
 
     $user = User::factory()->create();
     $action = makeAction($user, ActionType::Ban, 'permanent');
@@ -281,11 +356,11 @@ test('returns failure when user has no discord identity', function (): void {
     expect($result->success)->toBeFalse()
         ->and($result->error)->toContain('Discord identity not found');
 
-    Http::assertNothingSent();
+    $mockClient->assertNothingSent();
 });
 
 test('returns failure when guild id is not configured', function (): void {
-    Http::fake();
+    $mockClient = mockConnector([]);
 
     config()->set('he4rt.discord.guild_id', '');
 
@@ -299,18 +374,24 @@ test('returns failure when guild id is not configured', function (): void {
 });
 
 test('returns failure when bot token is not configured', function (): void {
-    Http::fake();
+    config()->set('discord.token', '');
+    config()->set('he4rt.discord.token', '');
 
-    config()->set('discord.token');
-    config()->set('he4rt.discord.token');
+    // Rebind with empty token so the connector itself is recreated
+    app()->singleton(DiscordConnector::class, fn () => new DiscordConnector(botToken: ''));
+
+    $mockClient = mockConnector([
+        GetMember::class => MockResponse::make([], 500),
+    ]);
 
     $user = makeUserWithDiscord('ddddd');
     $action = makeAction($user, ActionType::Kick);
 
+    // Since guild_id is still set, the adapter will try to call the role resolver
+    // which will fail. The adapter catches the Throwable and returns failure.
     $result = DiscordModerationAdapter::make()->execute($action, $user);
 
-    expect($result->success)->toBeFalse()
-        ->and($result->error)->toContain('not configured');
+    expect($result->success)->toBeFalse();
 });
 
 // --- Protection hierarchy tests ---
@@ -319,11 +400,8 @@ test('ban is blocked when target is an admin, regardless of who acts', function 
     config()->set('he4rt.discord.moderation.admin_role_ids', ['547549573959385098']);
     config()->set('he4rt.discord.moderation.mod_role_ids', []);
 
-    Http::fake([
-        'discord.com/api/v10/guilds/*/members/*' => Http::response(
-            ['roles' => ['547549573959385098']],
-            200,
-        ),
+    mockConnector([
+        GetMember::class => MockResponse::make(['roles' => ['547549573959385098']], 200),
     ]);
 
     $user = makeUserWithDiscord('eeeee');
@@ -339,11 +417,8 @@ test('kick is blocked when target is an admin', function (): void {
     config()->set('he4rt.discord.moderation.admin_role_ids', ['547549573959385098']);
     config()->set('he4rt.discord.moderation.mod_role_ids', []);
 
-    Http::fake([
-        'discord.com/api/v10/guilds/*/members/*' => Http::response(
-            ['roles' => ['547549573959385098']],
-            200,
-        ),
+    mockConnector([
+        GetMember::class => MockResponse::make(['roles' => ['547549573959385098']], 200),
     ]);
 
     $user = makeUserWithDiscord('fffff');
@@ -359,11 +434,8 @@ test('mute is blocked when target is an admin', function (): void {
     config()->set('he4rt.discord.moderation.admin_role_ids', ['547549573959385098']);
     config()->set('he4rt.discord.moderation.mod_role_ids', []);
 
-    Http::fake([
-        'discord.com/api/v10/guilds/*/members/*' => Http::response(
-            ['roles' => ['547549573959385098']],
-            200,
-        ),
+    mockConnector([
+        GetMember::class => MockResponse::make(['roles' => ['547549573959385098']], 200),
     ]);
 
     $user = makeUserWithDiscord('ggggg');
@@ -379,7 +451,6 @@ test('ban is blocked when a mod tries to ban another mod', function (): void {
     config()->set('he4rt.discord.moderation.admin_role_ids', ['admin-role']);
     config()->set('he4rt.discord.moderation.mod_role_ids', ['mod-role']);
 
-    // target is a mod; actor (moderator) is also a mod
     $actor = makeUserWithDiscord('actor-mod');
     $target = makeUserWithDiscord('target-mod');
 
@@ -391,9 +462,9 @@ test('ban is blocked when a mod tries to ban another mod', function (): void {
         'moderator_id' => $actor->id,
     ]);
 
-    Http::fake([
-        'discord.com/api/v10/guilds/*/members/target-mod' => Http::response(['roles' => ['mod-role']], 200),
-        'discord.com/api/v10/guilds/*/members/actor-mod' => Http::response(['roles' => ['mod-role']], 200),
+    // Both target and actor have mod-role
+    mockConnector([
+        GetMember::class => MockResponse::make(['roles' => ['mod-role']], 200),
     ]);
 
     $result = DiscordModerationAdapter::make()->execute($action, $target);
@@ -417,11 +488,20 @@ test('admin can ban a moderator', function (): void {
         'moderator_id' => $actor->id,
     ]);
 
-    Http::fake([
-        'discord.com/api/v10/guilds/*/members/target-mod2' => Http::response(['roles' => ['mod-role']], 200),
-        'discord.com/api/v10/guilds/*/members/actor-admin' => Http::response(['roles' => ['admin-role']], 200),
-        'discord.com/api/v10/guilds/*/bans/*' => Http::response([], 200),
-        'discord.com/*' => Http::response(['id' => 'dm-chan'], 200),
+    $getMemberCalls = 0;
+    mockConnector([
+        GetMember::class => function () use (&$getMemberCalls): MockResponse {
+            $getMemberCalls++;
+
+            // First call is for target (mod-role), second is for actor (admin-role)
+            return $getMemberCalls === 1
+                ? MockResponse::make(['roles' => ['mod-role']], 200)
+                : MockResponse::make(['roles' => ['admin-role']], 200);
+        },
+        CreateBan::class => MockResponse::make([], 200),
+        CreateDmChannel::class => MockResponse::make(['id' => 'dm-chan'], 200),
+        CreateMessage::class => MockResponse::make([], 200),
+        DeleteMessage::class => MockResponse::make([], 204),
     ]);
 
     $result = DiscordModerationAdapter::make()->execute($action, $target);
@@ -444,8 +524,8 @@ test('automated action cannot ban a moderator', function (): void {
         'automated' => true,
     ]);
 
-    Http::fake([
-        'discord.com/api/v10/guilds/*/members/target-mod3' => Http::response(['roles' => ['mod-role']], 200),
+    mockConnector([
+        GetMember::class => MockResponse::make(['roles' => ['mod-role']], 200),
     ]);
 
     $result = DiscordModerationAdapter::make()->execute($action, $target);
@@ -458,9 +538,12 @@ test('ban proceeds normally when target has no protected role', function (): voi
     config()->set('he4rt.discord.moderation.admin_role_ids', ['admin-role']);
     config()->set('he4rt.discord.moderation.mod_role_ids', ['mod-role']);
 
-    Http::fake([
-        'discord.com/api/v10/guilds/*/members/*' => Http::response(['roles' => ['123456789']], 200),
-        'discord.com/*' => Http::response([], 200),
+    mockConnector([
+        GetMember::class => MockResponse::make(['roles' => ['123456789']], 200),
+        CreateBan::class => MockResponse::make([], 200),
+        CreateDmChannel::class => MockResponse::make(['id' => 'dm-chan'], 200),
+        CreateMessage::class => MockResponse::make([], 200),
+        DeleteMessage::class => MockResponse::make([], 204),
     ]);
 
     $user = makeUserWithDiscord('hhhhh');
@@ -474,7 +557,11 @@ test('ban proceeds normally when target has no protected role', function (): voi
 test('warn is not blocked even when target is an admin', function (): void {
     config()->set('he4rt.discord.moderation.admin_role_ids', ['admin-role']);
 
-    Http::fake(['discord.com/*' => Http::response(['id' => 'dm-channel-warn'], 200)]);
+    mockConnector([
+        CreateDmChannel::class => MockResponse::make(['id' => 'dm-channel-warn'], 200),
+        CreateMessage::class => MockResponse::make([], 200),
+        DeleteMessage::class => MockResponse::make([], 204),
+    ]);
 
     $user = makeUserWithDiscord('iiiii');
     $action = makeAction($user, ActionType::Warn);

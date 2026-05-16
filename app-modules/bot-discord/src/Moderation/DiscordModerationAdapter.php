@@ -9,22 +9,34 @@ use DateTimeInterface;
 use He4rt\Identity\ExternalIdentity\Enums\IdentityProvider;
 use He4rt\Identity\ExternalIdentity\Models\ExternalIdentity;
 use He4rt\Identity\User\Models\User;
+use He4rt\IntegrationDiscord\Transport\DiscordConnector;
+use He4rt\IntegrationDiscord\Transport\DiscordRoleResolver;
+use He4rt\IntegrationDiscord\Transport\Requests\Bans\CreateBan;
+use He4rt\IntegrationDiscord\Transport\Requests\Channels\CreateDmChannel;
+use He4rt\IntegrationDiscord\Transport\Requests\Members\ModifyMember;
+use He4rt\IntegrationDiscord\Transport\Requests\Members\RemoveMember;
+use He4rt\IntegrationDiscord\Transport\Requests\Messages\CreateMessage;
+use He4rt\IntegrationDiscord\Transport\Requests\Messages\DeleteMessage;
 use He4rt\Moderation\DTOs\ExecutionResultDTO;
 use He4rt\Moderation\DTOs\ModerationContentDTO;
 use He4rt\Moderation\Enforcement\ModerationAction;
 use He4rt\Moderation\Enums\ActionType;
 use He4rt\Moderation\Enums\Platform;
 use He4rt\Moderation\Platform\ModerationPlatformContract;
-use Illuminate\Http\Client\Response;
-use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
+use Saloon\Http\Response;
 use Throwable;
 
-final class DiscordModerationAdapter implements ModerationPlatformContract
+final readonly class DiscordModerationAdapter implements ModerationPlatformContract
 {
+    public function __construct(
+        private DiscordConnector $connector,
+        private DiscordRoleResolver $roleResolver,
+    ) {}
+
     public static function make(): self
     {
-        return new self();
+        return resolve(self::class);
     }
 
     public function platform(): Platform
@@ -63,9 +75,8 @@ final class DiscordModerationAdapter implements ModerationPlatformContract
             }
 
             $guildId = config()->string('he4rt.discord.guild_id');
-            $token = config('discord.token', config('he4rt.discord.token'));
 
-            if (blank($guildId) || !is_string($token) || blank($token)) {
+            if (blank($guildId)) {
                 return ExecutionResultDTO::failure(
                     Platform::Discord,
                     'Discord bot token or guild id is not configured.',
@@ -73,7 +84,7 @@ final class DiscordModerationAdapter implements ModerationPlatformContract
             }
 
             if ($this->isPunitiveAction($action->action_type)) {
-                $tier = $this->resolveTargetProtectionTier($token, $guildId, $discordId);
+                $tier = $this->roleResolver->resolveProtectionTier($guildId, $discordId);
 
                 if ($tier === 'admin') {
                     return ExecutionResultDTO::failure(
@@ -82,7 +93,7 @@ final class DiscordModerationAdapter implements ModerationPlatformContract
                     );
                 }
 
-                if ($tier === 'mod' && !$this->actorIsAdmin($token, $guildId, $action)) {
+                if ($tier === 'mod' && !$this->actorIsAdmin($guildId, $action)) {
                     return ExecutionResultDTO::failure(
                         Platform::Discord,
                         'Only administrators can apply punitive actions to moderators.',
@@ -90,26 +101,17 @@ final class DiscordModerationAdapter implements ModerationPlatformContract
                 }
             }
 
-            $response = $this->executeAction(
-                $action,
-                $token,
-                $guildId,
-                $discordId,
-            );
+            $response = $this->executeAction($action, $guildId, $discordId);
 
             try {
-                $this->sendDmNotification(
-                    $token,
-                    $discordId,
-                    $action,
-                );
+                $this->sendDmNotification($discordId, $action);
             } catch (Throwable) {
                 // ignore dm failures
             }
 
             if ($this->shouldDeleteContent($action->action_type)) {
                 try {
-                    $this->deleteOriginalMessage($token, $action);
+                    $this->deleteOriginalMessage($action);
                 } catch (Throwable) {
                     // ignore delete failures
                 }
@@ -145,36 +147,22 @@ final class DiscordModerationAdapter implements ModerationPlatformContract
     public function notify(User $user, string $message, array $context = []): void
     {
         $discordId = $this->resolveDiscordId($user);
-        $token = config('discord.token', config('he4rt.discord.token'));
 
-        if ($discordId === null || !is_string($token) || blank($token)) {
+        if ($discordId === null) {
             return;
         }
 
-        $dmResponse = $this->discordRequest(
-            $token,
-            'post',
-            'https://discord.com/api/v10/users/@me/channels',
-            [
-                'recipient_id' => $discordId,
-            ],
-        );
+        $dmResponse = $this->connector->send(new CreateDmChannel($discordId));
 
         if ($dmResponse->failed()) {
             return;
         }
 
-        $this->discordRequest(
-            $token,
-            'post',
-            sprintf(
-                'https://discord.com/api/v10/channels/%s/messages',
-                $dmResponse->json('id'),
-            ),
-            [
-                'content' => $message,
-            ],
-        );
+        $channelId = (string) $dmResponse->json('id');
+
+        $this->connector->send(new CreateMessage($channelId, [
+            'content' => $message,
+        ]));
     }
 
     /** @return array<ActionType> */
@@ -202,30 +190,19 @@ final class DiscordModerationAdapter implements ModerationPlatformContract
 
     private function executeAction(
         ModerationAction $action,
-        string $token,
         string $guildId,
         string $discordId,
     ): ?Response {
         return match ($action->action_type) {
             ActionType::Mute, ActionType::Suspend => $this->suspendMember(
-                $token,
                 $guildId,
                 $discordId,
                 $action->duration,
             ),
 
-            ActionType::Kick => $this->kickMember(
-                $token,
-                $guildId,
-                $discordId,
-            ),
+            ActionType::Kick => $this->kickMember($guildId, $discordId),
 
-            ActionType::Ban => $this->banMember(
-                $token,
-                $guildId,
-                $discordId,
-                $action->duration,
-            ),
+            ActionType::Ban => $this->banMember($guildId, $discordId, $action->duration),
 
             ActionType::Warn,
             ActionType::ContentRemove => null,
@@ -233,29 +210,18 @@ final class DiscordModerationAdapter implements ModerationPlatformContract
     }
 
     private function suspendMember(
-        string $token,
         string $guildId,
         string $discordId,
         ?string $duration,
     ): Response {
         $until = $this->parseDuration($duration) ?? now()->addHours(24)->toDateTimeImmutable();
 
-        return $this->discordRequest(
-            $token,
-            'patch',
-            sprintf(
-                'https://discord.com/api/v10/guilds/%s/members/%s',
-                $guildId,
-                $discordId,
-            ),
-            [
-                'communication_disabled_until' => $until->format(DateTimeInterface::ATOM),
-            ],
-        );
+        return $this->connector->send(new ModifyMember($guildId, $discordId, [
+            'communication_disabled_until' => $until->format(DateTimeInterface::ATOM),
+        ]));
     }
 
     private function banMember(
-        string $token,
         string $guildId,
         string $discordId,
         ?string $duration,
@@ -266,34 +232,12 @@ final class DiscordModerationAdapter implements ModerationPlatformContract
             default => 0,
         };
 
-        return $this->discordRequest(
-            $token,
-            'put',
-            sprintf(
-                'https://discord.com/api/v10/guilds/%s/bans/%s',
-                $guildId,
-                $discordId,
-            ),
-            [
-                'delete_message_seconds' => $deleteSeconds,
-            ],
-        );
+        return $this->connector->send(new CreateBan($guildId, $discordId, $deleteSeconds));
     }
 
-    private function kickMember(
-        string $token,
-        string $guildId,
-        string $discordId,
-    ): Response {
-        return $this->discordRequest(
-            $token,
-            'delete',
-            sprintf(
-                'https://discord.com/api/v10/guilds/%s/members/%s',
-                $guildId,
-                $discordId,
-            ),
-        );
+    private function kickMember(string $guildId, string $discordId): Response
+    {
+        return $this->connector->send(new RemoveMember($guildId, $discordId));
     }
 
     private function shouldDeleteContent(ActionType $type): bool
@@ -325,10 +269,8 @@ final class DiscordModerationAdapter implements ModerationPlatformContract
         };
     }
 
-    private function deleteOriginalMessage(
-        string $token,
-        ModerationAction $action,
-    ): void {
+    private function deleteOriginalMessage(ModerationAction $action): void
+    {
         $messageId = $action->case?->content_id;
         $channelId = $action->case?->content_snapshot['metadata']['channel_id'] ?? null;
 
@@ -336,30 +278,22 @@ final class DiscordModerationAdapter implements ModerationPlatformContract
             return;
         }
 
-        $this->discordRequest(
-            $token,
-            'delete',
-            sprintf(
-                'https://discord.com/api/v10/channels/%s/messages/%s',
-                $channelId,
-                $messageId,
-            ),
-        );
+        $response = $this->connector->send(new DeleteMessage($channelId, $messageId));
+
+        if ($response->failed()) {
+            Log::warning('Failed to delete original message.', [
+                'channel_id' => $channelId,
+                'message_id' => $messageId,
+                'status' => $response->status(),
+            ]);
+        }
     }
 
     private function sendDmNotification(
-        string $token,
         string $discordId,
         ModerationAction $action,
     ): void {
-        $dmResponse = $this->discordRequest(
-            $token,
-            'post',
-            'https://discord.com/api/v10/users/@me/channels',
-            [
-                'recipient_id' => $discordId,
-            ],
-        );
+        $dmResponse = $this->connector->send(new CreateDmChannel($discordId));
 
         if ($dmResponse->failed()) {
             return;
@@ -368,45 +302,34 @@ final class DiscordModerationAdapter implements ModerationPlatformContract
         $channelId = (string) $dmResponse->json('id');
         $originalText = $action->case?->content_snapshot['text'] ?? null;
 
-        $this->discordRequest(
-            $token,
-            'post',
-            sprintf(
-                'https://discord.com/api/v10/channels/%s/messages',
-                $channelId,
-            ),
-            [
-                'embeds' => [[
-                    'title' => __('moderation::notifications.discord_dm.title'),
-                    'description' => $this->buildDmDescription(
-                        $action,
-                        $originalText,
-                    ),
-                    'color' => 0xFF4444,
-                    'fields' => [
-                        [
-                            'name' => __('moderation::notifications.discord_dm.field_type'),
-                            'value' => $action->action_type->getLabel(),
-                            'inline' => true,
-                        ],
-                        [
-                            'name' => __('moderation::notifications.discord_dm.field_duration'),
-                            'value' => $action->duration ?? 'N/A',
-                            'inline' => true,
-                        ],
-                        [
-                            'name' => __('moderation::notifications.discord_dm.field_reason'),
-                            'value' => $action->reason
-                                ?? __('moderation::notifications.discord_dm.default_reason'),
-                            'inline' => false,
-                        ],
+        $this->connector->send(new CreateMessage($channelId, [
+            'embeds' => [[
+                'title' => __('moderation::notifications.discord_dm.title'),
+                'description' => $this->buildDmDescription($action, $originalText),
+                'color' => 0xFF4444,
+                'fields' => [
+                    [
+                        'name' => __('moderation::notifications.discord_dm.field_type'),
+                        'value' => $action->action_type->getLabel(),
+                        'inline' => true,
                     ],
-                    'footer' => [
-                        'text' => __('moderation::notifications.discord_dm.footer'),
+                    [
+                        'name' => __('moderation::notifications.discord_dm.field_duration'),
+                        'value' => $action->duration ?? 'N/A',
+                        'inline' => true,
                     ],
-                ]],
-            ],
-        );
+                    [
+                        'name' => __('moderation::notifications.discord_dm.field_reason'),
+                        'value' => $action->reason
+                            ?? __('moderation::notifications.discord_dm.default_reason'),
+                        'inline' => false,
+                    ],
+                ],
+                'footer' => [
+                    'text' => __('moderation::notifications.discord_dm.footer'),
+                ],
+            ]],
+        ]));
     }
 
     private function buildDmDescription(
@@ -447,43 +370,7 @@ final class DiscordModerationAdapter implements ModerationPlatformContract
         return in_array($type, [ActionType::Ban, ActionType::Kick, ActionType::Mute, ActionType::Suspend], true);
     }
 
-    /**
-     * Returns 'admin', 'mod', or null based on the target's Discord roles.
-     * Admins can never be punished. Mods can only be punished by admins.
-     */
-    private function resolveTargetProtectionTier(string $token, string $guildId, string $discordId): ?string
-    {
-        $response = $this->discordRequest(
-            $token,
-            'get',
-            sprintf('https://discord.com/api/v10/guilds/%s/members/%s', $guildId, $discordId),
-        );
-
-        if ($response->failed()) {
-            return null;
-        }
-
-        /** @var array<int, string> $memberRoles */
-        $memberRoles = $response->json('roles') ?? [];
-
-        /** @var array<int, string> $adminRoles */
-        $adminRoles = config('he4rt.discord.moderation.admin_role_ids', []);
-
-        /** @var array<int, string> $modRoles */
-        $modRoles = config('he4rt.discord.moderation.mod_role_ids', []);
-
-        if (array_intersect($memberRoles, $adminRoles) !== []) {
-            return 'admin';
-        }
-
-        if (array_intersect($memberRoles, $modRoles) !== []) {
-            return 'mod';
-        }
-
-        return null;
-    }
-
-    private function actorIsAdmin(string $token, string $guildId, ModerationAction $action): bool
+    private function actorIsAdmin(string $guildId, ModerationAction $action): bool
     {
         $moderator = $action->moderator;
 
@@ -497,52 +384,8 @@ final class DiscordModerationAdapter implements ModerationPlatformContract
             return false;
         }
 
-        $response = $this->discordRequest(
-            $token,
-            'get',
-            sprintf('https://discord.com/api/v10/guilds/%s/members/%s', $guildId, $actorDiscordId),
-        );
+        $tier = $this->roleResolver->resolveProtectionTier($guildId, $actorDiscordId);
 
-        if ($response->failed()) {
-            return false;
-        }
-
-        /** @var array<int, string> $actorRoles */
-        $actorRoles = $response->json('roles') ?? [];
-
-        /** @var array<int, string> $adminRoles */
-        $adminRoles = config('he4rt.discord.moderation.admin_role_ids', []);
-
-        return array_intersect($actorRoles, $adminRoles) !== [];
-    }
-
-    /** @param array<string, mixed> $payload */
-    private function discordRequest(
-        string $token,
-        string $method,
-        string $url,
-        array $payload = [],
-    ): Response {
-        $options = [];
-
-        if ($payload !== []) {
-            $options['json'] = $payload;
-        }
-
-        $response = Http::withHeaders([
-            'Authorization' => 'Bot '.$token,
-        ])->send($method, $url, $options);
-
-        if ($response->failed()) {
-            Log::warning('Discord API request failed.', [
-                'method' => mb_strtoupper($method),
-                'url' => $url,
-                'payload' => $payload,
-                'status' => $response->status(),
-                'response' => $response->json() ?: $response->body(),
-            ]);
-        }
-
-        return $response;
+        return $tier === 'admin';
     }
 }
