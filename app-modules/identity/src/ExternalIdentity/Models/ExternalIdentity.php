@@ -11,6 +11,7 @@ use He4rt\Identity\ExternalIdentity\Data\ClientAccessManager;
 use He4rt\Identity\ExternalIdentity\Enums\CredentialsType;
 use He4rt\Identity\ExternalIdentity\Enums\IdentityProvider;
 use He4rt\Identity\ExternalIdentity\Enums\IdentityType;
+use He4rt\Identity\Tenant\Models\Tenant;
 use He4rt\Identity\User\Models\User;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -98,6 +99,14 @@ final class ExternalIdentity extends Model
     public function messages(): HasMany
     {
         return $this->hasMany(Message::class, 'external_identity_id');
+    }
+
+    /**
+     * @return BelongsTo<Tenant, $this>
+     */
+    public function tenant(): BelongsTo
+    {
+        return $this->belongsTo(Tenant::class, 'tenant_id', 'id');
     }
 
     public function isConnected(): bool

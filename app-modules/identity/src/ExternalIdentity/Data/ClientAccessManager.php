@@ -5,8 +5,9 @@ declare(strict_types=1);
 namespace He4rt\Identity\ExternalIdentity\Data;
 
 use Illuminate\Support\Facades\Crypt;
+use Livewire\Wireable;
 
-class ClientAccessManager
+final class ClientAccessManager implements Wireable
 {
     public function __construct(
         public ?string $clientId = null,
@@ -49,6 +50,21 @@ class ClientAccessManager
         );
     }
 
+    /** @param array<string, mixed> $value */
+    public static function fromLivewire(mixed $value): static
+    {
+        return new self(
+            clientId: $value['clientId'] ?? null,
+            clientSecret: $value['clientSecret'] ?? null,
+            accessToken: $value['accessToken'] ?? null,
+            refreshToken: $value['refreshToken'] ?? null,
+            expiresIn: $value['expiresIn'] ?? null,
+            username: $value['username'] ?? null,
+            password: $value['password'] ?? null,
+            apiKey: $value['apiKey'] ?? null,
+        );
+    }
+
     public function getClientId(): ?string
     {
         return $this->clientId !== null ? Crypt::decrypt($this->clientId) : null;
@@ -87,5 +103,20 @@ class ClientAccessManager
     public function getApiKey(): ?string
     {
         return $this->apiKey !== null ? Crypt::decrypt($this->apiKey) : null;
+    }
+
+    /** @return array<string, mixed> */
+    public function toLivewire(): array
+    {
+        return [
+            'clientId' => $this->clientId,
+            'clientSecret' => $this->clientSecret,
+            'accessToken' => $this->accessToken,
+            'refreshToken' => $this->refreshToken,
+            'expiresIn' => $this->expiresIn,
+            'username' => $this->username,
+            'password' => $this->password,
+            'apiKey' => $this->apiKey,
+        ];
     }
 }

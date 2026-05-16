@@ -74,7 +74,10 @@ class ExternalIdentityResource extends Resource
      */
     public static function getGlobalSearchEloquentQuery(): Builder
     {
-        return parent::getGlobalSearchEloquentQuery()->with(['connectedByUser', 'user']);
+        /** @var Builder<ExternalIdentity> $query */
+        $query = parent::getGlobalSearchEloquentQuery()->with(['connectedByUser', 'user']);
+
+        return $query;
     }
 
     public static function getGloballySearchableAttributes(): array
