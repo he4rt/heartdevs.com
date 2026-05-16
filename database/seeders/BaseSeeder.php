@@ -6,7 +6,6 @@ namespace Database\Seeders;
 
 use He4rt\Activity\Message\Models\Message;
 use He4rt\Community\Meeting\Models\Meeting;
-use He4rt\Events\Models\EventModel;
 use He4rt\Gamification\Character\Models\Character;
 use He4rt\Gamification\Season\Models\Season;
 use He4rt\Identity\ExternalIdentity\Models\ExternalIdentity;
@@ -15,7 +14,6 @@ use He4rt\Identity\User\Models\Address;
 use He4rt\Identity\User\Models\Information;
 use He4rt\Identity\User\Models\User;
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\Hash;
 
 class BaseSeeder extends Seeder
@@ -54,13 +52,6 @@ class BaseSeeder extends Seeder
             ->recycle($admin)
             ->recycle($he4rt)
             ->createOne();
-
-        EventModel::factory()
-            ->withStatus()
-            ->recycle($he4rt)
-            ->create([
-                'end_at' => Date::tomorrow(),
-            ]);
 
         Season::factory()
             ->recycle($he4rt)

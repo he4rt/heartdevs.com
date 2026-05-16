@@ -2,9 +2,6 @@
 
 declare(strict_types=1);
 
-use He4rt\Events\Models\EventSegment;
-use He4rt\Events\Models\EventSubmission;
-use He4rt\Events\Models\Sponsor;
 use He4rt\Gamification\Badge\Models\Badge;
 use He4rt\Gamification\Character\Models\Character;
 use He4rt\Identity\Tenant\Models\Tenant;
@@ -38,13 +35,13 @@ return new class extends Migration
             'He4rt\\Badge\\Models\\Badge',
         ],
         'event_submission' => [
-            EventSubmission::class,
+            'He4rt\\Events\\Models\\EventSubmission',
         ],
         'event_segment' => [
-            EventSegment::class,
+            'He4rt\\Events\\Models\\EventSegment',
         ],
         'sponsor' => [
-            Sponsor::class,
+            'He4rt\\Events\\Models\\Sponsor',
             'He4rt\\Sponsors\\Models\\Sponsor',
         ],
     ];
@@ -83,9 +80,9 @@ return new class extends Migration
             'tenant' => Tenant::class,
             'character' => Character::class,
             'badge' => Badge::class,
-            'event_submission' => EventSubmission::class,
-            'event_segment' => EventSegment::class,
-            'sponsor' => Sponsor::class,
+            'event_submission' => 'He4rt\\Events\\Models\\EventSubmission',
+            'event_segment' => 'He4rt\\Events\\Models\\EventSegment',
+            'sponsor' => 'He4rt\\Events\\Models\\Sponsor',
         ];
 
         foreach (self::TABLES as $table => $column) {

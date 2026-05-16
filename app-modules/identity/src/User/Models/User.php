@@ -8,9 +8,6 @@ use Filament\Models\Contracts\FilamentUser;
 use Filament\Models\Contracts\HasName;
 use Filament\Models\Contracts\HasTenants;
 use Filament\Panel;
-use He4rt\Events\Models\EventModel;
-use He4rt\Events\Models\EventSubmission;
-use He4rt\Events\Models\Pivot\EventAttend;
 use He4rt\Gamification\Character\Models\Character;
 use He4rt\Identity\Database\Factories\UserFactory;
 use He4rt\Identity\ExternalIdentity\Models\ExternalIdentity;
@@ -20,8 +17,6 @@ use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Relations\BelongsToMany;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -76,23 +71,6 @@ final class User extends Authenticatable implements FilamentUser, HasMedia, HasN
     }
 
     /**
-     * @return BelongsToMany<EventModel, $this, EventAttend, 'pivot'>
-     */
-    public function events(): BelongsToMany
-    {
-        return $this
-            ->belongsToMany(
-                EventModel::class,
-                'events_attendees',
-                'user_id',
-                'event_id'
-            )
-            ->using(EventAttend::class)
-            ->withPivot('status')
-            ->withTimestamps();
-    }
-
-    /**
      * @return HasOne<Information, $this>
      */
     public function information(): HasOne
@@ -106,14 +84,6 @@ final class User extends Authenticatable implements FilamentUser, HasMedia, HasN
     public function providers(): MorphMany
     {
         return $this->morphMany(ExternalIdentity::class, 'model');
-    }
-
-    /**
-     * @return HasMany<EventSubmission, $this>
-     */
-    public function talks(): HasMany
-    {
-        return $this->hasMany(EventSubmission::class, 'user_id');
     }
 
     /**

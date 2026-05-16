@@ -6,7 +6,6 @@ namespace He4rt\Identity\Tenant\Models;
 
 use Carbon\Carbon;
 use He4rt\Activity\Message\Models\Message;
-use He4rt\Events\Models\EventModel;
 use He4rt\Gamification\Character\Models\PastSeason;
 use He4rt\Gamification\Season\Models\Season;
 use He4rt\Identity\Database\Factories\TenantFactory;
@@ -77,14 +76,6 @@ class Tenant extends Model
     public function providers(): MorphMany
     {
         return $this->morphMany(ExternalIdentity::class, 'model');
-    }
-
-    /**
-     * @return HasMany<EventModel, $this>
-     */
-    public function events(): HasMany
-    {
-        return $this->hasMany(EventModel::class);
     }
 
     /**

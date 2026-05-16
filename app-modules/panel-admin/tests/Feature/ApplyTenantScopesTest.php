@@ -3,7 +3,6 @@
 declare(strict_types=1);
 
 use Filament\Facades\Filament;
-use He4rt\Events\Models\EventModel;
 use He4rt\Identity\Tenant\Models\Tenant;
 use He4rt\Identity\User\Models\User;
 use He4rt\PanelAdmin\Http\Middleware\ApplyTenantScopes;
@@ -17,7 +16,7 @@ test('applies global scope to configured models when tenant is set', function ()
         ->andReturn($tenant);
 
     config(['panel-admin.tenant_scoped_models' => [
-        EventModel::class,
+        User::class,
     ]]);
 
     $middleware = new ApplyTenantScopes();
@@ -27,7 +26,7 @@ test('applies global scope to configured models when tenant is set', function ()
         fn () => new Response(),
     );
 
-    $query = EventModel::query()->toSql();
+    $query = User::query()->toSql();
 
     expect($query)->toContain('where');
 });
