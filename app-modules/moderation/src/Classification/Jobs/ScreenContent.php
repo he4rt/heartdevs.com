@@ -22,6 +22,19 @@ use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Support\Facades\Log;
 use Throwable;
 
+/**
+ * Async AI screening for content that didn't match any deterministic rule.
+ *
+ * This is the "no-match" path from SubmitForModeration. It calls the AI classifier
+ * and only creates a case if the score exceeds the flag threshold — keeping the
+ * moderation_cases table clean from false positives.
+ *
+ * Self-contained: if AI flags the content, this job creates the case AND routes it
+ * in one pass (no second job needed). This avoids a redundant AI call.
+ *
+ * Note: Since classifier_version will always be 'aggregate'/'openai' here (never 'rules'),
+ * CaseReadyForEnforcement is never emitted — AI-only results always go to human review.
+ */
 final class ScreenContent implements ShouldQueue
 {
     use InteractsWithQueue;
@@ -46,12 +59,14 @@ final class ScreenContent implements ShouldQueue
         $maxScore = blank($result->scores) ? 0 : max($result->scores);
         $flagThreshold = config('moderation.thresholds.flag', 0.7);
 
+        // Below threshold = content is safe. No case created, no DB noise.
         if ($maxScore < $flagThreshold) {
             return;
         }
 
         $authorId = $this->resolveAuthorId();
 
+        // AI flagged this content — create case with scores already populated.
         $case = ModerationCase::query()->create([
             'content_type' => $this->content->contentType,
             'content_id' => $this->content->contentId,
@@ -70,10 +85,12 @@ final class ScreenContent implements ShouldQueue
 
         event(new CaseCreated($case));
 
+        // Route inline — no need for a separate job since we already have all the data.
         $routeAction->execute($case);
 
         event(new CaseQueued($case));
 
+        // Auto-execution guard: AI-only classifications never auto-execute (classifier_version != 'rules').
         if ($case->classifier_version === 'rules' && $case->suggested_action !== null && $case->author_id !== null) {
             event(new CaseReadyForEnforcement($case));
         }

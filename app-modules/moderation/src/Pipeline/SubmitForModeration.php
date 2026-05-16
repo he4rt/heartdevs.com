@@ -16,18 +16,33 @@ use He4rt\Moderation\Enums\CaseSource;
 use He4rt\Moderation\Enums\CaseStatus;
 use He4rt\Moderation\Rules\ModerationRule;
 
+/**
+ * Single entry point for the moderation pipeline. All platforms submit content here.
+ *
+ * Flow (C2 hybrid pattern):
+ *   1. Pre-screen sync with rules only (<5ms, regex/keyword match)
+ *   2a. Rule match → create case immediately + dispatch ClassifyAndRoute (AI enrichment)
+ *   2b. No match → dispatch ScreenContent to queue (AI decides if it's worth a case)
+ *
+ * This avoids creating cases for ~99% of safe messages while keeping the caller non-blocking.
+ */
 final readonly class SubmitForModeration
 {
     public function __construct(
         private RuleBasedClassifier $ruleClassifier,
     ) {}
 
+    /**
+     * @return ModerationCase|null The case if a rule matched (immediate), null if dispatched to AI queue.
+     */
     public function execute(ModerationContentDTO $content, CaseSource $source): ?ModerationCase
     {
+        // Sync pre-screen: rules are deterministic and fast (DB regex), safe to run inline.
         $ruleResult = $this->ruleClassifier->classify($content);
         $hasRuleMatch = $ruleResult->matchedRules !== [];
 
         if ($hasRuleMatch) {
+            // Pick the highest-severity rule's action as the suggested enforcement.
             $ruleAction = ModerationRule::query()
                 ->whereIn('id', $ruleResult->matchedRules)
                 ->get()
@@ -52,11 +67,14 @@ final readonly class SubmitForModeration
             ]);
 
             event(new CaseCreated($case));
+
+            // Enrich with AI scores async (won't block the caller, adds context for moderators).
             dispatch(new ClassifyAndRoute($case));
 
             return $case;
         }
 
+        // No rule match — let the AI evaluate async. No case created yet to avoid DB noise.
         dispatch(new ScreenContent($content, $source));
 
         return null;

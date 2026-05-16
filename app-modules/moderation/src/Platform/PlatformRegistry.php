@@ -7,6 +7,14 @@ namespace He4rt\Moderation\Platform;
 use He4rt\Moderation\Enums\Platform;
 use RuntimeException;
 
+/**
+ * Maps Platform enum → adapter instance. Replaces service container tags for O(1) lookup.
+ *
+ * Each module registers its adapter in its ServiceProvider:
+ *   $registry->register(Platform::Discord, DiscordModerationAdapter::class);
+ *
+ * Lazy: adapters are only instantiated when resolve() is called (via the container).
+ */
 final class PlatformRegistry
 {
     /** @var array<string, class-string<ModerationPlatformContract>> */
