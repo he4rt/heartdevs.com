@@ -10,12 +10,22 @@ use He4rt\Moderation\Enforcement\ModerationAction;
 use He4rt\Moderation\Enums\ActionType;
 use He4rt\Moderation\Enums\Platform;
 
+/**
+ * Listens to CaseReadyForEnforcement and auto-executes the suggested action on Discord.
+ *
+ * This is the "how" side of enforcement for Discord. The moderation module already decided
+ * "this case is safe to auto-execute" (deterministic rule match). This listener just creates
+ * the action record and dispatches execution.
+ *
+ * Only acts on Discord-sourced cases. Other platforms register their own listeners.
+ */
 final class AutoExecuteAction
 {
     public function handle(CaseReadyForEnforcement $event): void
     {
         $case = $event->case;
 
+        // Each platform handles its own cases — skip if not Discord.
         if ($case->source_platform !== Platform::Discord) {
             return;
         }
@@ -35,6 +45,7 @@ final class AutoExecuteAction
             'tenant_id' => $case->tenant_id,
         ]);
 
+        // Async: enforcement runs in the queue (API calls, DM, delete — may fail/retry).
         dispatch(new ExecuteAction($action, $case->author));
     }
 

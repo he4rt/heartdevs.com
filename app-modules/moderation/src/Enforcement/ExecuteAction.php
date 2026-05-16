@@ -13,6 +13,12 @@ use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\InteractsWithQueue;
 
+/**
+ * Dispatches a moderation action to all target platforms via their registered adapters.
+ *
+ * Resolves adapters through PlatformRegistry (O(1) per platform, lazy instantiation).
+ * After execution, marks the case as resolved and emits ActionExecuted for audit logging.
+ */
 final class ExecuteAction implements ShouldQueue
 {
     use InteractsWithQueue;
@@ -27,6 +33,7 @@ final class ExecuteAction implements ShouldQueue
     {
         $results = [];
 
+        // An action can target multiple platforms (e.g., Discord + Web ban simultaneously).
         foreach ($this->action->target_platforms as $platformValue) {
             $platform = Platform::tryFrom($platformValue);
 

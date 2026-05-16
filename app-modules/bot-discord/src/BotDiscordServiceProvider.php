@@ -23,6 +23,7 @@ class BotDiscordServiceProvider extends LaracordServiceProvider
 
         $this->app->singleton(DiscordModerationAdapter::class);
 
+        // Register Discord adapter in the moderation PlatformRegistry for O(1) lookup during enforcement.
         $this->app->afterResolving(PlatformRegistry::class, function (PlatformRegistry $registry): void {
             $registry->register(Platform::Discord, DiscordModerationAdapter::class);
         });
@@ -34,6 +35,7 @@ class BotDiscordServiceProvider extends LaracordServiceProvider
     {
         parent::boot();
 
+        // Domain event listeners: moderation module emits events, bot-discord reacts with Discord-specific behavior.
         Event::listen(CaseQueued::class, [NotifyModerationChannel::class, 'handle']);
         Event::listen(CaseReadyForEnforcement::class, [AutoExecuteAction::class, 'handle']);
 

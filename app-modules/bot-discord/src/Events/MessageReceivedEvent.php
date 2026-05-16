@@ -17,13 +17,14 @@ use He4rt\Moderation\Pipeline\SubmitForModeration;
 use Laracord\Events\Event;
 use Throwable;
 
+/**
+ * Thin event handler for Discord MESSAGE_CREATE.
+ *
+ * Responsibilities: resolve tenant, track activity, submit to moderation pipeline.
+ * All classification, routing, and enforcement logic lives in the moderation module.
+ */
 class MessageReceivedEvent extends Event
 {
-    /**
-     * The event handler.
-     *
-     * @var string
-     */
     protected $handler = Events::MESSAGE_CREATE;
 
     public function handle(Message $message): void
@@ -33,16 +34,13 @@ class MessageReceivedEvent extends Event
         }
 
         try {
+            // Resolve which tenant (Discord guild) this message belongs to.
             $tenantProvider = ExternalIdentity::query()
                 ->where('model_type', (new Tenant)->getMorphClass())
                 ->where('external_account_id', (string) $message->guild_id)
                 ->firstOrFail();
 
-            $authorIdentity = ExternalIdentity::query()
-                ->where('provider', IdentityProvider::Discord)
-                ->where('external_account_id', (string) $message->user_id)
-                ->first();
-
+            // Activity tracking — records message for XP/gamification regardless of moderation outcome.
             resolve(NewMessage::class)->persist(new NewMessageDTO(
                 tenantId: $tenantProvider->tenant_id,
                 provider: IdentityProvider::Discord,
@@ -54,6 +52,8 @@ class MessageReceivedEvent extends Event
                 sentAt: $message->timestamp->toDateTimeImmutable()
             ));
 
+            // Moderation pipeline — SubmitForModeration handles pre-screen (sync) + async AI.
+            // See ADR-0001 for architecture details.
             $content = DiscordModerationAdapter::make()->ingest([
                 'message_id' => $message->id,
                 'author_id' => $message->user_id,

@@ -10,6 +10,10 @@ use He4rt\IntegrationDiscord\Transport\Requests\Messages\CreateMessage;
 use He4rt\Moderation\Cases\Events\CaseQueued;
 use Illuminate\Support\Facades\Log;
 
+/**
+ * Sends an embed notification to the moderation channel when a new case is queued for review.
+ * Mentions admin and mod roles so the team is alerted immediately.
+ */
 final readonly class NotifyModerationChannel
 {
     public function __construct(

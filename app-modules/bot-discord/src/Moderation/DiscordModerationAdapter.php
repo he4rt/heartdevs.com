@@ -27,6 +27,13 @@ use Illuminate\Support\Facades\Log;
 use Saloon\Http\Response;
 use Throwable;
 
+/**
+ * Discord implementation of ModerationPlatformContract.
+ *
+ * Handles the "how" of enforcement on Discord: mute (timeout), kick, ban, warn (DM), content removal.
+ * All HTTP goes through DiscordConnector (Saloon) in integration-discord.
+ * Protection hierarchy (admin/mod immunity) is resolved by DiscordRoleResolver.
+ */
 final readonly class DiscordModerationAdapter implements ModerationPlatformContract
 {
     public function __construct(
@@ -62,6 +69,12 @@ final readonly class DiscordModerationAdapter implements ModerationPlatformContr
         ]);
     }
 
+    /**
+     * Execute a moderation action against a user on Discord.
+     *
+     * Flow: check protection tier → apply action → DM user → delete content.
+     * DM and delete failures are non-fatal (best-effort).
+     */
     public function execute(ModerationAction $action, User $target): ExecutionResultDTO
     {
         try {
@@ -83,6 +96,7 @@ final readonly class DiscordModerationAdapter implements ModerationPlatformContr
                 );
             }
 
+            // Protection hierarchy: admins are immune, mods can only be punished by admins.
             if ($this->isPunitiveAction($action->action_type)) {
                 $tier = $this->roleResolver->resolveProtectionTier($guildId, $discordId);
 
@@ -103,17 +117,16 @@ final readonly class DiscordModerationAdapter implements ModerationPlatformContr
 
             $response = $this->executeAction($action, $guildId, $discordId);
 
+            // Best-effort: DM notification and content deletion are non-fatal.
             try {
                 $this->sendDmNotification($discordId, $action);
             } catch (Throwable) {
-                // ignore dm failures
             }
 
             if ($this->shouldDeleteContent($action->action_type)) {
                 try {
                     $this->deleteOriginalMessage($action);
                 } catch (Throwable) {
-                    // ignore delete failures
                 }
             }
 
