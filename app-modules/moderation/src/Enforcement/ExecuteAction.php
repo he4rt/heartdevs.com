@@ -7,7 +7,8 @@ namespace He4rt\Moderation\Enforcement;
 use He4rt\Identity\User\Models\User;
 use He4rt\Moderation\DTOs\ExecutionResultDTO;
 use He4rt\Moderation\Enums\CaseStatus;
-use He4rt\Moderation\Platform\ModerationPlatformContract;
+use He4rt\Moderation\Enums\Platform;
+use He4rt\Moderation\Platform\PlatformRegistry;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\InteractsWithQueue;
@@ -22,16 +23,18 @@ final class ExecuteAction implements ShouldQueue
         private readonly User $target,
     ) {}
 
-    public function handle(): void
+    public function handle(PlatformRegistry $registry): void
     {
-        $platforms = app()->tagged('moderation.platforms');
         $results = [];
 
-        foreach ($platforms as $adapter) {
-            /** @var ModerationPlatformContract $adapter */
-            if (in_array($adapter->platform()->value, $this->action->target_platforms, true)) {
-                $results[] = $adapter->execute($this->action, $this->target);
+        foreach ($this->action->target_platforms as $platformValue) {
+            $platform = Platform::tryFrom($platformValue);
+
+            if ($platform === null || !$registry->has($platform)) {
+                continue;
             }
+
+            $results[] = $registry->resolve($platform)->execute($this->action, $this->target);
         }
 
         $this->action->update([
