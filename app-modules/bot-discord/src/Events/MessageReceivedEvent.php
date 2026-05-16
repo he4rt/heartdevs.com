@@ -12,17 +12,8 @@ use He4rt\BotDiscord\Moderation\DiscordModerationAdapter;
 use He4rt\Identity\ExternalIdentity\Enums\IdentityProvider;
 use He4rt\Identity\ExternalIdentity\Models\ExternalIdentity;
 use He4rt\Identity\Tenant\Models\Tenant;
-use He4rt\Moderation\Classification\Actions\Classifiers\AggregateClassifier;
-use He4rt\Moderation\Classification\Actions\Classifiers\OpenAiClassifier;
-use He4rt\Moderation\Classification\Actions\Classifiers\RuleBasedClassifier;
-use He4rt\Moderation\Classification\Jobs\IngestContent;
-use He4rt\Moderation\Classification\Jobs\RouteDecision;
-use He4rt\Moderation\Enforcement\ExecuteAction;
-use He4rt\Moderation\Enforcement\ModerationAction;
-use He4rt\Moderation\Enums\ActionType;
 use He4rt\Moderation\Enums\CaseSource;
-use He4rt\Moderation\Enums\Platform;
-use He4rt\Moderation\Rules\ModerationRule;
+use He4rt\Moderation\Pipeline\SubmitForModeration;
 use Laracord\Events\Event;
 use Throwable;
 
@@ -74,82 +65,12 @@ class MessageReceivedEvent extends Event
                 'tenant_id' => (string) $tenantProvider->tenant_id,
             ]);
 
-            $this->logger()->info('[Moderation] Pre-screening message: '.$message->id);
-
-            $ruleResult = RuleBasedClassifier::make()->classify($content);
-            $hasRuleMatch = $ruleResult->matchedRules !== [];
-
-            $ruleAction = null;
-            if ($hasRuleMatch) {
-                $ruleAction = ModerationRule::query()
-                    ->whereIn('id', $ruleResult->matchedRules)
-                    ->get()
-                    ->sortByDesc(fn (ModerationRule $rule): int => $rule->severity->weight())
-                    ->first()?->action_on_match;
-            }
-
-            $aiResult = $hasRuleMatch
-                ? $ruleResult
-                : AggregateClassifier::make()
-                    ->addClassifier(OpenAiClassifier::make())
-                    ->classify($content);
-
-            $maxScore = blank($aiResult->scores) ? 0.0 : max($aiResult->scores);
-            $flagThreshold = config('moderation.thresholds.flag', 0.7);
-
-            $shouldCreateCase = $hasRuleMatch || $maxScore >= $flagThreshold;
-
-            $this->logger()->info(
-                '[Moderation] Pre-screening result: rule_match='.($hasRuleMatch ? 'yes' : 'no')
-                .' max_score='.$maxScore.' threshold='.$flagThreshold
-                .' create_case='.($shouldCreateCase ? 'yes' : 'no')
-            );
-
-            if (!$shouldCreateCase) {
-                return;
-            }
-
-            $case = new IngestContent($content, CaseSource::AutoDetect)->handle();
-            $this->logger()->info('[Moderation] Case created: '.$case->id.' status='.$case->status->value);
-
-            $case->update([
-                'ai_scores' => $aiResult->scores,
-                'violation_type' => $aiResult->primary,
-                'severity' => $aiResult->severity,
-                'classifier_version' => $aiResult->classifierName,
-                'suggested_action' => $ruleAction,
-            ]);
-
-            new RouteDecision($case)->handle();
-            $case->refresh();
-            $this->logger()->info('[Moderation] After route: status='.$case->status->value.' priority='.$case->priority);
-
-            // Only auto-execute when the action was set by a deterministic rule (classifier_version='rules').
-            // AI-only suggestions stay pending for human moderator review.
-            if ($case->suggested_action && $case->author && $case->classifier_version === 'rules') {
-                $action = ModerationAction::query()->create([
-                    'case_id' => $case->id,
-                    'moderator_id' => null,
-                    'action_type' => $case->suggested_action,
-                    'target_platforms' => [Platform::Discord->value],
-                    'duration' => match ($case->suggested_action) {
-                        ActionType::Ban => 'permanent',
-                        ActionType::Mute, ActionType::Suspend => '24h',
-                        default => null,
-                    },
-                    'reason' => 'Auto-moderation triggered by Discord message classification.',
-                    'automated' => true,
-                    'tenant_id' => $case->tenant_id,
-                ]);
-
-                dispatch(new ExecuteAction($action, $case->author));
-            }
+            resolve(SubmitForModeration::class)->execute($content, CaseSource::AutoDetect);
 
         } catch (Throwable $throwable) {
             $this->logger()->error(
-                sprintf('%s | File: %s | Line: %s | Trace: %s', $throwable->getMessage(), $throwable->getFile(), $throwable->getLine(), $throwable->getTraceAsString()),
+                sprintf('%s | File: %s | Line: %s', $throwable->getMessage(), $throwable->getFile(), $throwable->getLine()),
             );
         }
-
     }
 }
