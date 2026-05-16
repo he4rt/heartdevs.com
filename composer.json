@@ -11,8 +11,8 @@
         "php": "^8.4",
         "calebporzio/sushi": "^2.5.4",
         "dedoc/scramble": "^0.13.22",
-        "filament/filament": "^5.6.2",
-        "filament/spatie-laravel-media-library-plugin": "^5.6.2",
+        "filament/filament": "^5.6.3",
+        "filament/spatie-laravel-media-library-plugin": "^5.6.3",
         "guzzlehttp/guzzle": "^7.10.0",
         "he4rt/activity": ">=1",
         "he4rt/bot-discord": ">=1.0",
@@ -32,9 +32,9 @@
         "he4rt/portal": ">=1",
         "internachi/modular": "^3.0.2",
         "laracord/framework": "dev-next",
-        "laravel/framework": "^13.7.0",
+        "laravel/framework": "^13.9.0",
         "laravel/nightwatch": "^1.26.1",
-        "laravel/sanctum": "^4.3.1",
+        "laravel/sanctum": "^4.3.2",
         "laravel/telescope": "^5.20.0",
         "laravel/tinker": "^3.0.2",
         "league/flysystem-sftp-v3": "^3.33.0",
@@ -44,8 +44,9 @@
         "owenvoke/blade-fontawesome": "^3.2.2",
         "predis/predis": "^3.4.2",
         "ryangjchandler/commonmark-blade-block": "^1.1.1",
+        "saloonphp/saloon": "^4.0",
         "spatie/laravel-backup": "^10.2.1",
-        "spatie/laravel-medialibrary": "^11.22.0",
+        "spatie/laravel-medialibrary": "^11.22.1",
         "symfony/dom-crawler": "^8.0.8"
     },
     "require-dev": {
@@ -58,16 +59,16 @@
         "laravel/pail": "^1.2.6",
         "laravel/pao": "^1.0.6",
         "laravel/pint": "^1.29.1",
-        "laravel/sail": "^1.58.0",
+        "laravel/sail": "^1.59.0",
         "mockery/mockery": "^1.6.12",
         "nunomaduro/collision": "^8.9.4",
-        "pestphp/pest": "^4.6.3",
+        "pestphp/pest": "^4.7.0",
         "pestphp/pest-plugin-drift": "^4.1.0",
         "pestphp/pest-plugin-faker": "^4.0.0",
         "pestphp/pest-plugin-laravel": "^4.1.0",
         "pestphp/pest-plugin-livewire": "^4.1.0",
         "phpstan/extension-installer": "^1.4.3",
-        "rector/rector": "^2.4.2"
+        "rector/rector": "^2.4.3"
     },
     "autoload": {
         "psr-4": {

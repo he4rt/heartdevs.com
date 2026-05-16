@@ -8,16 +8,22 @@ use App\Contracts\OAuthClientContract;
 use He4rt\Identity\Auth\DTOs\OAuthAccessDTO;
 use He4rt\Identity\Auth\DTOs\OAuthStateDTO;
 use He4rt\Identity\Auth\DTOs\OAuthUserDTO;
-use Illuminate\Support\Facades\Http;
+use He4rt\IntegrationDiscord\Transport\DiscordOAuthConnector;
+use He4rt\IntegrationDiscord\Transport\Requests\OAuth\ExchangeCodeForToken;
+use He4rt\IntegrationDiscord\Transport\Requests\OAuth\GetCurrentUser;
 
 class DiscordOAuthClient implements OAuthClientContract
 {
+    public function __construct(
+        private readonly DiscordOAuthConnector $connector,
+    ) {}
+
     public function redirectUrl(?OAuthStateDTO $state = null): string
     {
         return 'https://discord.com/oauth2/authorize?'.http_build_query([
-            'client_id' => config('services.discord.client_id'),
+            'client_id' => $this->connector->clientId,
             'response_type' => 'code',
-            'redirect_uri' => config('services.discord.redirect_uri'),
+            'redirect_uri' => $this->connector->redirectUri,
             'scope' => config('services.discord.scopes'),
             'state' => (string) $state,
         ]);
@@ -25,21 +31,21 @@ class DiscordOAuthClient implements OAuthClientContract
 
     public function auth(string $code): OAuthAccessDTO
     {
-        $request = Http::asForm()->post('https://discord.com/api/oauth2/token', [
-            'grant_type' => 'authorization_code',
-            'code' => $code,
-            'redirect_uri' => config('services.discord.redirect_uri'),
-            'client_id' => config('services.discord.client_id'),
-            'client_secret' => config('services.discord.client_secret'),
-        ]);
+        $response = $this->connector->send(new ExchangeCodeForToken(
+            code: $code,
+            clientId: $this->connector->clientId,
+            clientSecret: $this->connector->clientSecret,
+            redirectUri: $this->connector->redirectUri,
+        ));
 
-        return DiscordOAuthAccessDTO::make($request->json());
+        return DiscordOAuthAccessDTO::make($response->json());
     }
 
     public function getAuthenticatedUser(OAuthAccessDTO $credentials): OAuthUserDTO
     {
-        $response = Http::withToken($credentials->accessToken)
-            ->get('https://discord.com/api/v10/users/@me');
+        $response = $this->connector->send(new GetCurrentUser(
+            accessToken: $credentials->accessToken,
+        ));
 
         return DiscordOAuthUser::make($credentials, $response->json());
     }
