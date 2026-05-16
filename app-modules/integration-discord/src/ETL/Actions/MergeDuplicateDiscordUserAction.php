@@ -60,9 +60,6 @@ final class MergeDuplicateDiscordUserAction
     {
         $simpleUserIdTables = [
             'characters',
-            'events_talks',
-            'event_submission_speakers',
-            'events_attendees',
             'meeting_participants',
         ];
 
