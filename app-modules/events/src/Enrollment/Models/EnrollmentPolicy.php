@@ -6,11 +6,13 @@ namespace He4rt\Events\Enrollment\Models;
 
 use Carbon\Carbon;
 use He4rt\Events\CheckIn\Enums\CheckInMethod;
+use He4rt\Events\Database\Factories\EnrollmentPolicyFactory;
 use He4rt\Events\Enrollment\Enums\AttendanceRequirement;
 use He4rt\Events\Enrollment\Enums\EnrollmentMethod;
 use He4rt\Events\Event\Models\Event;
 use Illuminate\Database\Eloquent\Attributes\Table;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
@@ -34,12 +36,19 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 #[Table('events_enrollment_policies')]
 final class EnrollmentPolicy extends Model
 {
+    /** @use HasFactory<EnrollmentPolicyFactory> */
+    use HasFactory;
     use HasUuids;
 
     /** @return BelongsTo<Event, $this> */
     public function event(): BelongsTo
     {
         return $this->belongsTo(Event::class);
+    }
+
+    protected static function newFactory(): EnrollmentPolicyFactory
+    {
+        return EnrollmentPolicyFactory::new();
     }
 
     /** @return array<string, mixed> */

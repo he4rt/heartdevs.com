@@ -6,10 +6,12 @@ namespace He4rt\Events\CheckIn\Models;
 
 use Carbon\Carbon;
 use He4rt\Events\CheckIn\Enums\CheckInMethod;
+use He4rt\Events\Database\Factories\CheckInFactory;
 use He4rt\Events\Enrollment\Models\Enrollment;
 use He4rt\Identity\User\Models\User;
 use Illuminate\Database\Eloquent\Attributes\Table;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
@@ -25,6 +27,8 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 #[Table('events_check_ins')]
 final class CheckIn extends Model
 {
+    /** @use HasFactory<CheckInFactory> */
+    use HasFactory;
     use HasUuids;
 
     public const UPDATED_AT = null;
@@ -39,6 +43,11 @@ final class CheckIn extends Model
     public function recordedBy(): BelongsTo
     {
         return $this->belongsTo(User::class, 'recorded_by');
+    }
+
+    protected static function newFactory(): CheckInFactory
+    {
+        return CheckInFactory::new();
     }
 
     /** @return array<string, mixed> */

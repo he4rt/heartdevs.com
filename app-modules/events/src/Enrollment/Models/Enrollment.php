@@ -7,12 +7,14 @@ namespace He4rt\Events\Enrollment\Models;
 use Carbon\Carbon;
 use He4rt\Events\CheckIn\Models\CheckIn;
 use He4rt\Events\CheckIn\Models\QrToken;
+use He4rt\Events\Database\Factories\EnrollmentFactory;
 use He4rt\Events\Enrollment\Enums\EnrollmentStatus;
 use He4rt\Events\Event\Models\Event;
 use He4rt\Identity\Tenant\Models\Tenant;
 use He4rt\Identity\User\Models\User;
 use Illuminate\Database\Eloquent\Attributes\Table;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -38,6 +40,8 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
 #[Table('events_enrollments')]
 final class Enrollment extends Model
 {
+    /** @use HasFactory<EnrollmentFactory> */
+    use HasFactory;
     use HasUuids;
 
     /** @return BelongsTo<Event, $this> */
@@ -74,6 +78,11 @@ final class Enrollment extends Model
     public function qrToken(): HasOne
     {
         return $this->hasOne(QrToken::class);
+    }
+
+    protected static function newFactory(): EnrollmentFactory
+    {
+        return EnrollmentFactory::new();
     }
 
     /** @return array<string, mixed> */

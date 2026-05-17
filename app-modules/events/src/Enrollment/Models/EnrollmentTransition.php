@@ -5,10 +5,12 @@ declare(strict_types=1);
 namespace He4rt\Events\Enrollment\Models;
 
 use Carbon\Carbon;
+use He4rt\Events\Database\Factories\EnrollmentTransitionFactory;
 use He4rt\Events\Enrollment\Enums\EnrollmentStatus;
 use He4rt\Identity\User\Models\User;
 use Illuminate\Database\Eloquent\Attributes\Table;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
@@ -25,6 +27,8 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 #[Table('events_enrollment_transitions')]
 final class EnrollmentTransition extends Model
 {
+    /** @use HasFactory<EnrollmentTransitionFactory> */
+    use HasFactory;
     use HasUuids;
 
     public const UPDATED_AT = null;
@@ -39,6 +43,11 @@ final class EnrollmentTransition extends Model
     public function actor(): BelongsTo
     {
         return $this->belongsTo(User::class, 'actor_id');
+    }
+
+    protected static function newFactory(): EnrollmentTransitionFactory
+    {
+        return EnrollmentTransitionFactory::new();
     }
 
     /** @return array<string, mixed> */

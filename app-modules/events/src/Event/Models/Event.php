@@ -6,12 +6,14 @@ namespace He4rt\Events\Event\Models;
 
 use Carbon\Carbon;
 use He4rt\Events\CheckIn\Models\CheckInCode;
+use He4rt\Events\Database\Factories\EventFactory;
 use He4rt\Events\Enrollment\Models\Enrollment;
 use He4rt\Events\Enrollment\Models\EnrollmentPolicy;
 use He4rt\Events\Event\Enums\EventType;
 use He4rt\Identity\Tenant\Models\Tenant;
 use Illuminate\Database\Eloquent\Attributes\Table;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -34,6 +36,8 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
 #[Table('events')]
 final class Event extends Model
 {
+    /** @use HasFactory<EventFactory> */
+    use HasFactory;
     use HasUuids;
 
     /** @return BelongsTo<Tenant, $this> */
@@ -58,6 +62,11 @@ final class Event extends Model
     public function checkInCodes(): HasMany
     {
         return $this->hasMany(CheckInCode::class);
+    }
+
+    protected static function newFactory(): EventFactory
+    {
+        return EventFactory::new();
     }
 
     /** @return array<string, mixed> */

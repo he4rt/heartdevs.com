@@ -5,9 +5,11 @@ declare(strict_types=1);
 namespace He4rt\Events\CheckIn\Models;
 
 use Carbon\Carbon;
+use He4rt\Events\Database\Factories\CheckInCodeFactory;
 use He4rt\Events\Event\Models\Event;
 use Illuminate\Database\Eloquent\Attributes\Table;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
@@ -26,12 +28,19 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 #[Table('events_check_in_codes')]
 final class CheckInCode extends Model
 {
+    /** @use HasFactory<CheckInCodeFactory> */
+    use HasFactory;
     use HasUuids;
 
     /** @return BelongsTo<Event, $this> */
     public function event(): BelongsTo
     {
         return $this->belongsTo(Event::class);
+    }
+
+    protected static function newFactory(): CheckInCodeFactory
+    {
+        return CheckInCodeFactory::new();
     }
 
     /** @return array<string, mixed> */

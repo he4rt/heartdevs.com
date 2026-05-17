@@ -5,9 +5,11 @@ declare(strict_types=1);
 namespace He4rt\Events\CheckIn\Models;
 
 use Carbon\Carbon;
+use He4rt\Events\Database\Factories\QrTokenFactory;
 use He4rt\Events\Enrollment\Models\Enrollment;
 use Illuminate\Database\Eloquent\Attributes\Table;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
@@ -22,12 +24,19 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 #[Table('events_qr_tokens')]
 final class QrToken extends Model
 {
+    /** @use HasFactory<QrTokenFactory> */
+    use HasFactory;
     use HasUuids;
 
     /** @return BelongsTo<Enrollment, $this> */
     public function enrollment(): BelongsTo
     {
         return $this->belongsTo(Enrollment::class);
+    }
+
+    protected static function newFactory(): QrTokenFactory
+    {
+        return QrTokenFactory::new();
     }
 
     /** @return array<string, mixed> */
