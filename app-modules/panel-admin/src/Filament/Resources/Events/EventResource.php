@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace He4rt\Events\Filament\Resources\Events;
+namespace He4rt\PanelAdmin\Filament\Resources\Events;
 
 use BackedEnum;
 use Filament\Resources\Resource;
@@ -10,13 +10,13 @@ use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
 use He4rt\Events\Event\Models\Event;
-use He4rt\Events\Filament\Resources\Events\Pages\CreateEvent;
-use He4rt\Events\Filament\Resources\Events\Pages\EditEvent;
-use He4rt\Events\Filament\Resources\Events\Pages\ListEvents;
-use He4rt\Events\Filament\Resources\Events\RelationManagers\EnrollmentsRelationManager;
-use He4rt\Events\Filament\Resources\Events\Schemas\EventForm;
-use He4rt\Events\Filament\Resources\Events\Schemas\EventInfolist;
-use He4rt\Events\Filament\Resources\Events\Tables\EventsTable;
+use He4rt\PanelAdmin\Filament\Resources\Events\Pages\CreateEvent;
+use He4rt\PanelAdmin\Filament\Resources\Events\Pages\EditEvent;
+use He4rt\PanelAdmin\Filament\Resources\Events\Pages\ListEvents;
+use He4rt\PanelAdmin\Filament\Resources\Events\RelationManagers\EnrollmentsRelationManager;
+use He4rt\PanelAdmin\Filament\Resources\Events\Schemas\EventForm;
+use He4rt\PanelAdmin\Filament\Resources\Events\Schemas\EventInfolist;
+use He4rt\PanelAdmin\Filament\Resources\Events\Tables\EventsTable;
 
 final class EventResource extends Resource
 {
