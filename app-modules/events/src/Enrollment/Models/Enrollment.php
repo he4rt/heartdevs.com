@@ -1,0 +1,92 @@
+<?php
+
+declare(strict_types=1);
+
+namespace He4rt\Events\Enrollment\Models;
+
+use Carbon\Carbon;
+use He4rt\Events\CheckIn\Models\CheckIn;
+use He4rt\Events\CheckIn\Models\QrToken;
+use He4rt\Events\Enrollment\Enums\EnrollmentStatus;
+use He4rt\Events\Event\Models\Event;
+use He4rt\Identity\Tenant\Models\Tenant;
+use He4rt\Identity\User\Models\User;
+use Illuminate\Database\Eloquent\Attributes\Table;
+use Illuminate\Database\Eloquent\Concerns\HasUuids;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
+
+/**
+ * @property string $id
+ * @property string $event_id
+ * @property string $user_id
+ * @property string|null $tenant_id
+ * @property EnrollmentStatus $status
+ * @property int|null $waitlist_position
+ * @property array<string, mixed>|null $application_data
+ * @property string|null $rejection_reason
+ * @property Carbon|null $enrolled_at
+ * @property Carbon|null $confirmed_at
+ * @property Carbon|null $checked_in_at
+ * @property Carbon|null $attended_at
+ * @property Carbon|null $cancelled_at
+ * @property Carbon $created_at
+ * @property Carbon $updated_at
+ */
+#[Table('events_enrollments')]
+final class Enrollment extends Model
+{
+    use HasUuids;
+
+    /** @return BelongsTo<Event, $this> */
+    public function event(): BelongsTo
+    {
+        return $this->belongsTo(Event::class);
+    }
+
+    /** @return BelongsTo<User, $this> */
+    public function user(): BelongsTo
+    {
+        return $this->belongsTo(User::class);
+    }
+
+    /** @return BelongsTo<Tenant, $this> */
+    public function tenant(): BelongsTo
+    {
+        return $this->belongsTo(Tenant::class);
+    }
+
+    /** @return HasMany<EnrollmentTransition, $this> */
+    public function transitions(): HasMany
+    {
+        return $this->hasMany(EnrollmentTransition::class);
+    }
+
+    /** @return HasMany<CheckIn, $this> */
+    public function checkIns(): HasMany
+    {
+        return $this->hasMany(CheckIn::class);
+    }
+
+    /** @return HasOne<QrToken, $this> */
+    public function qrToken(): HasOne
+    {
+        return $this->hasOne(QrToken::class);
+    }
+
+    /** @return array<string, mixed> */
+    protected function casts(): array
+    {
+        return [
+            'status' => EnrollmentStatus::class,
+            'application_data' => 'array',
+            'enrolled_at' => 'datetime',
+            'confirmed_at' => 'datetime',
+            'checked_in_at' => 'datetime',
+            'attended_at' => 'datetime',
+            'cancelled_at' => 'datetime',
+        ];
+    }
+}
