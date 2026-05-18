@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace He4rt\PanelAdmin\Filament\Resources\Events\Schemas;
 
 use Filament\Forms\Components\DateTimePicker;
+use Filament\Forms\Components\KeyValue;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
@@ -123,6 +124,14 @@ final class EventForm
                             ->integer()
                             ->minValue(0)
                             ->default(0),
+
+                        KeyValue::make('application_schema')
+                            ->label('Application Form Schema')
+                            ->keyLabel('Field name')
+                            ->valueLabel('Field type / label')
+                            ->nullable()
+                            ->columnSpanFull()
+                            ->visible(fn (callable $get): bool => $get('enrollment_method') === 'application'),
                     ]),
             ]);
     }
