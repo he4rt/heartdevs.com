@@ -35,7 +35,7 @@ enum CheckInMethod: string implements HasColor, HasIcon, HasLabel
         return match ($this) {
             self::Manual => Heroicon::HandRaised,
             self::NumericCode => Heroicon::InformationCircle,
-            self::QrCode => Heroicon::Eye,
+            self::QrCode => Heroicon::QrCode,
         };
     }
 }

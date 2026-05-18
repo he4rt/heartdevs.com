@@ -35,7 +35,7 @@ enum EnrollmentMethod: string implements HasColor, HasIcon, HasLabel
         return match ($this) {
             self::Rsvp => Heroicon::CheckCircle,
             self::RsvpCheckin => Heroicon::Flag,
-            self::Application => Heroicon::Eye,
+            self::Application => Heroicon::ClipboardDocumentList,
         };
     }
 }

@@ -66,7 +66,8 @@ final class EventForm
 
                 Toggle::make('is_published')
                     ->label('Published')
-                    ->default(false),
+                    ->default(false)
+                    ->columnSpanFull(),
 
                 Section::make('Enrollment Policy')
                     ->relationship('enrollmentPolicy')

@@ -24,6 +24,8 @@ final class EventResource extends Resource
 
     protected static ?string $slug = 'events';
 
+    protected static ?string $recordTitleAttribute = 'title';
+
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedCalendarDays;
 
     public static function form(Schema $schema): Schema
