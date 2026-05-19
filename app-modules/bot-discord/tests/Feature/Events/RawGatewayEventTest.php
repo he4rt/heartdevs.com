@@ -30,7 +30,7 @@ test('persists a dispatch event to discord_event_logs', function (): void {
         ->and($log->guild_id)->toBe('123456789')
         ->and($log->user_id)->toBe('987654321')
         ->and($log->payload)->toBeArray()
-        ->and($log->payload['roles'])->toBe([]);
+        ->and($log->payload['d']['roles'])->toBe([]);
 });
 
 test('extracts user_id from author when user_id is absent', function (): void {
@@ -52,6 +52,45 @@ test('extracts user_id from author when user_id is absent', function (): void {
 
     expect($log->user_id)->toBe('555666777')
         ->and($log->channel_id)->toBe('111222333');
+});
+
+test('extracts user_id from user object when user_id and author are absent', function (): void {
+    $payload = (object) [
+        'op' => 0,
+        't' => 'GUILD_MEMBER_UPDATE',
+        's' => 25,
+        'd' => (object) [
+            'guild_id' => '123456789',
+            'user' => (object) ['id' => '444555666'],
+            'roles' => [],
+        ],
+    ];
+
+    (new RawGatewayEvent)->handle($payload);
+
+    $log = DiscordEventLog::query()->first();
+
+    expect($log->user_id)->toBe('444555666');
+});
+
+test('falls back to id for channel_id when channel_id is absent', function (): void {
+    $payload = (object) [
+        'op' => 0,
+        't' => 'VOICE_CHANNEL_STATUS_UPDATE',
+        's' => 5,
+        'd' => (object) [
+            'id' => '1501350540737646784',
+            'status' => null,
+            'guild_id' => '123456789',
+        ],
+    ];
+
+    (new RawGatewayEvent)->handle($payload);
+
+    $log = DiscordEventLog::query()->first();
+
+    expect($log->channel_id)->toBe('1501350540737646784')
+        ->and($log->guild_id)->toBe('123456789');
 });
 
 test('skips non-dispatch events without type', function (): void {
