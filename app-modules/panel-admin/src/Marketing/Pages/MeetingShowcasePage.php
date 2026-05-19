@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace He4rt\PanelAdmin\Pages;
+namespace He4rt\PanelAdmin\Marketing\Pages;
 
 use BackedEnum;
 use Filament\Pages\Page;
@@ -10,6 +10,7 @@ use Filament\Support\Enums\Width;
 use Filament\Support\Icons\Heroicon;
 use He4rt\Activity\Message\Models\Message;
 use He4rt\Identity\ExternalIdentity\Models\ExternalIdentity;
+use He4rt\PanelAdmin\Marketing\MarketingCluster;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\DB;
 
@@ -26,17 +27,27 @@ class MeetingShowcasePage extends Page
 
     public bool $loaded = false;
 
+    protected static ?string $cluster = MarketingCluster::class;
+
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedCamera;
 
-    protected static ?string $title = 'Meeting Showcase';
-
-    protected static ?string $navigationLabel = 'Meeting Showcase';
+    protected static ?int $navigationSort = 1;
 
     protected static ?string $slug = 'meeting-showcase';
 
     protected string $view = 'panel-admin::pages.meeting-showcase';
 
     protected Width|string|null $maxContentWidth = Width::Full;
+
+    public static function getNavigationLabel(): string
+    {
+        return __('panel-admin::marketing.navigation.meeting_showcase');
+    }
+
+    public function getTitle(): string
+    {
+        return __('panel-admin::marketing.navigation.meeting_showcase');
+    }
 
     public function loadParticipants(): void
     {

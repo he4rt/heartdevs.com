@@ -8,12 +8,12 @@ use Filament\Navigation\NavigationBuilder;
 use Filament\Navigation\NavigationItem;
 use Filament\Panel;
 use He4rt\PanelAdmin\Filament\Resources\ExternalIdentities\ExternalIdentityResource;
+use He4rt\PanelAdmin\Marketing\MarketingCluster;
 use He4rt\PanelAdmin\Moderation\Livewire\AppealQueue;
 use He4rt\PanelAdmin\Moderation\Livewire\ModerationDashboardLivewire;
 use He4rt\PanelAdmin\Moderation\Livewire\ModerationQueue;
 use He4rt\PanelAdmin\Moderation\ModerationCluster;
 use He4rt\PanelAdmin\Pages\Dashboard;
-use He4rt\PanelAdmin\Pages\MeetingShowcasePage;
 use Illuminate\Support\ServiceProvider;
 use Livewire\Livewire;
 
@@ -29,7 +29,7 @@ class PanelAdminServiceProvider extends ServiceProvider
             }
 
             $panel
-                ->pages([ModerationCluster::class, MeetingShowcasePage::class])
+                ->pages([ModerationCluster::class, MarketingCluster::class])
                 ->navigation($this->buildNavigation(...))
                 ->resources([
                     ExternalIdentityResource::class,
@@ -41,6 +41,10 @@ class PanelAdminServiceProvider extends ServiceProvider
                 ->discoverPages(
                     in: __DIR__.'/Moderation/Pages',
                     for: 'He4rt\\PanelAdmin\\Moderation\\Pages',
+                )
+                ->discoverPages(
+                    in: __DIR__.'/Marketing/Pages',
+                    for: 'He4rt\\PanelAdmin\\Marketing\\Pages',
                 );
         });
     }
@@ -76,6 +80,7 @@ class PanelAdminServiceProvider extends ServiceProvider
 
         return match (true) {
             $requestPath->contains('mod/') => $this->moderationNavigation($builder),
+            $requestPath->contains('marketing/') => $this->marketingNavigation($builder),
             default => $this->defaultNavigation($builder),
         };
 
@@ -86,8 +91,8 @@ class PanelAdminServiceProvider extends ServiceProvider
         return $builder->items([
             ...Dashboard::getNavigationItems(),
             ...ModerationCluster::getNavigationItems(),
+            ...MarketingCluster::getNavigationItems(),
             ...ExternalIdentityResource::getNavigationItems(),
-            ...MeetingShowcasePage::getNavigationItems(),
         ]);
     }
 
@@ -100,5 +105,16 @@ class PanelAdminServiceProvider extends ServiceProvider
                 ->url(Dashboard::getUrl()),
 
         ])->groups(resolve(ModerationCluster::class)->getCachedSubNavigation());
+    }
+
+    private function marketingNavigation(NavigationBuilder $builder): NavigationBuilder
+    {
+        return $builder->items([
+            NavigationItem::make(__('panel-admin::marketing.navigation.back_to_admin'))
+                ->sort(0)
+                ->icon('heroicon-o-arrow-left')
+                ->url(Dashboard::getUrl()),
+
+        ])->groups(resolve(MarketingCluster::class)->getCachedSubNavigation());
     }
 }
