@@ -17,7 +17,7 @@ final class RawGatewayEvent
         DiscordEventLog::query()->create([
             'event_type' => $payload->t,
             'guild_id' => $payload->d->guild_id ?? null,
-            'user_id' => $payload->d->user_id ?? $payload->d->author?->id ?? null,
+            'user_id' => $payload->d->user_id ?? (isset($payload->d->author) ? $payload->d->author->id : null),
             'channel_id' => $payload->d->channel_id ?? null,
             'payload' => json_decode(json_encode($payload->d), true),
             'occurred_at' => now(),

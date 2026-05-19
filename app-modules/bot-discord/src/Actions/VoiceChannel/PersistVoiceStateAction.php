@@ -22,7 +22,7 @@ final class PersistVoiceStateAction
 
         $tenantProvider = ExternalIdentity::query()
             ->where('model_type', (new Tenant)->getMorphClass())
-            ->where('external_account_id', (string) $state->guild_id)
+            ->where('external_account_id', (string) $state->guild_id) // @phpstan-ignore property.notFound
             ->first();
 
         if (!$tenantProvider) {
@@ -56,8 +56,8 @@ final class PersistVoiceStateAction
      */
     private function resolveEvents(VoiceStateUpdate $state, ?VoiceStateUpdate $oldState): array
     {
-        $newChannelId = $state->channel_id;
-        $oldChannelId = $oldState?->channel_id;
+        $newChannelId = $state->channel_id; // @phpstan-ignore property.notFound
+        $oldChannelId = $oldState?->channel_id; // @phpstan-ignore property.notFound
 
         if ($newChannelId === null && $oldChannelId !== null) {
             return [['channel_id' => $oldChannelId, 'state' => 'left']];
