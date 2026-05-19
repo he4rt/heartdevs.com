@@ -56,3 +56,9 @@ panel-admin/
 ## Navigation pattern
 
 Each cluster has a dedicated navigation builder method in `PanelAdminServiceProvider`. When the URL path contains the cluster slug (e.g. `marketing/`), the sidebar switches to show a "Back to Admin" link + the cluster's sub-navigation. Default navigation shows all clusters as top-level items.
+
+## Architectural decisions
+
+Recorded in [`docs/adr/`](docs/adr/):
+
+- [ADR-0001](docs/adr/0001-discord-dashboard-architecture.md) — Discord Dashboard: widget structure, rolling comparison pattern, query layer, timezone handling, component extensions
