@@ -21,6 +21,7 @@ final class PersistVoiceStateAction
         }
 
         $tenantProvider = ExternalIdentity::query()
+            ->where('provider', IdentityProvider::Discord)
             ->where('model_type', (new Tenant)->getMorphClass())
             ->where('external_account_id', (string) $state->guild_id) // @phpstan-ignore property.notFound
             ->first();
