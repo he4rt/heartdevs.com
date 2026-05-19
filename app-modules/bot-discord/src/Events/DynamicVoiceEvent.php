@@ -8,7 +8,9 @@ use Discord\Discord;
 use Discord\Parts\WebSockets\VoiceStateUpdate;
 use Discord\WebSockets\Event as Events;
 use He4rt\BotDiscord\Actions\VoiceChannel\HandleStateChannelAction;
+use He4rt\BotDiscord\Actions\VoiceChannel\PersistVoiceStateAction;
 use Laracord\Events\Event;
+use Throwable;
 
 class DynamicVoiceEvent extends Event
 {
@@ -31,5 +33,13 @@ class DynamicVoiceEvent extends Event
             userId: $userId,
             channelId: $channelId,
         );
+
+        try {
+            resolve(PersistVoiceStateAction::class)->execute($state, $oldState);
+        } catch (Throwable $throwable) {
+            $this->logger()->error(
+                sprintf('%s | File: %s | Line: %s', $throwable->getMessage(), $throwable->getFile(), $throwable->getLine()),
+            );
+        }
     }
 }
