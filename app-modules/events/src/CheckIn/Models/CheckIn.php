@@ -17,10 +17,11 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 /**
  * @property string $id
  * @property string $enrollment_id
- * @property Carbon $check_in
+ * @property Carbon $event_date
  * @property CheckInMethod $method
  * @property array<string, mixed>|null $payload
  * @property Carbon $created_at
+ * @property Carbon $updated_at
  */
 #[Table('events_check_ins')]
 final class CheckIn extends Model
@@ -29,11 +30,9 @@ final class CheckIn extends Model
     use HasFactory;
     use HasUuids;
 
-    public const UPDATED_AT = null;
-
     protected $fillable = [
         'enrollment_id',
-        'check_in',
+        'event_date',
         'method',
         'payload',
     ];
@@ -53,10 +52,9 @@ final class CheckIn extends Model
     protected function casts(): array
     {
         return [
-            'check_in' => 'date',
+            'event_date' => 'date',
             'method' => CheckInMethod::class,
             'payload' => 'array',
-            'created_at' => 'datetime',
         ];
     }
 }

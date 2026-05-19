@@ -3,6 +3,13 @@
 declare(strict_types=1);
 
 return [
+    'event_status' => [
+        'draft' => 'Rascunho',
+        'published' => 'Publicado',
+        'completed' => 'Concluído',
+        'cancelled' => 'Cancelado',
+    ],
+
     'event_type' => [
         'meetup' => 'Meetup',
         'workshop' => 'Workshop',

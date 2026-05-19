@@ -19,7 +19,7 @@ final class CheckInFactory extends Factory
     {
         return [
             'enrollment_id' => Enrollment::factory(),
-            'check_in' => Date::today(),
+            'event_date' => Date::today(),
             'method' => fake()->randomElement(CheckInMethod::cases()),
             'payload' => null,
         ];

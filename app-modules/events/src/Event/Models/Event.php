@@ -9,6 +9,7 @@ use He4rt\Events\CheckIn\Models\CheckInCode;
 use He4rt\Events\Database\Factories\EventFactory;
 use He4rt\Events\Enrollment\Models\Enrollment;
 use He4rt\Events\Enrollment\Models\EnrollmentPolicy;
+use He4rt\Events\Event\Enums\EventStatus;
 use He4rt\Events\Event\Enums\EventType;
 use He4rt\Identity\Tenant\Models\Tenant;
 use Illuminate\Database\Eloquent\Attributes\Table;
@@ -30,7 +31,7 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
  * @property string|null $location
  * @property Carbon $starts_at
  * @property Carbon $ends_at
- * @property bool $active
+ * @property EventStatus $status
  * @property Carbon $created_at
  * @property Carbon $updated_at
  */
@@ -50,11 +51,11 @@ final class Event extends Model
         'location',
         'starts_at',
         'ends_at',
-        'active',
+        'status',
     ];
 
     protected $attributes = [
-        'active' => false,
+        'status' => 'draft',
     ];
 
     /** @return BelongsTo<Tenant, $this> */
@@ -96,14 +97,20 @@ final class Event extends Model
         return EventFactory::new();
     }
 
-    protected function scopeActive(Builder $query): void
+    protected function scopePublished(Builder $query): void
     {
-        $query->where('active', true);
+        $query->where('status', EventStatus::Published);
     }
 
     protected function scopeUpcoming(Builder $query): void
     {
         $query->where('starts_at', '>', now());
+    }
+
+    protected function scopeActive(Builder $query): void
+    {
+        $query->where('status', EventStatus::Published)
+            ->where('starts_at', '>', now());
     }
 
     /** @return array<string, mixed> */
@@ -113,7 +120,7 @@ final class Event extends Model
             'event_type' => EventType::class,
             'starts_at' => 'datetime',
             'ends_at' => 'datetime',
-            'active' => 'boolean',
+            'status' => EventStatus::class,
         ];
     }
 }

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace He4rt\Events\Database\Factories;
 
+use He4rt\Events\Event\Enums\EventStatus;
 use He4rt\Events\Event\Enums\EventType;
 use He4rt\Events\Event\Models\Event;
 use He4rt\Identity\Tenant\Models\Tenant;
@@ -28,7 +29,7 @@ final class EventFactory extends Factory
             'location' => fake()->optional()->address(),
             'starts_at' => $startsAt,
             'ends_at' => $startsAt->clone()->addHours(fake()->numberBetween(2, 8)),
-            'active' => false,
+            'status' => EventStatus::Draft,
         ];
     }
 }
