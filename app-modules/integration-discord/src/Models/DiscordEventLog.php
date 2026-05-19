@@ -14,7 +14,6 @@ final class DiscordEventLog extends Model
         'user_id',
         'channel_id',
         'payload',
-        'occurred_at',
     ];
 
     /**
@@ -24,7 +23,6 @@ final class DiscordEventLog extends Model
     {
         return [
             'payload' => 'array',
-            'occurred_at' => 'datetime',
         ];
     }
 }

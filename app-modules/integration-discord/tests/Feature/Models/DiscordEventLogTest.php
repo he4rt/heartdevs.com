@@ -14,7 +14,6 @@ test('persists a raw gateway event', function (): void {
         'user_id' => '987654321',
         'channel_id' => '111222333',
         'payload' => ['content' => 'hello world', 'author' => ['id' => '987654321']],
-        'occurred_at' => now(),
     ]);
 
     expect($log)->not->toBeNull()
@@ -31,7 +30,6 @@ test('allows nullable guild_id, user_id, and channel_id', function (): void {
         'user_id' => null,
         'channel_id' => null,
         'payload' => ['v' => 10, 'session_id' => 'abc'],
-        'occurred_at' => now(),
     ]);
 
     expect($log->guild_id)->toBeNull()
