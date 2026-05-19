@@ -20,7 +20,6 @@ final class RawGatewayEvent
             'user_id' => $payload->d->user_id ?? $payload->d->author->id ?? null,
             'channel_id' => $payload->d->channel_id ?? null,
             'payload' => json_decode(json_encode($payload->d), true),
-            'occurred_at' => now(),
         ]);
     }
 }
