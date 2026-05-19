@@ -74,7 +74,8 @@ class MeetingShowcasePage extends Page
             ->get()
             ->keyBy('id');
 
-        $this->participants = $messageStats->map(function (object $stat) use ($identities): array {
+        $this->participants = $messageStats->map(function (Message $stat) use ($identities): array {
+            /** @var object{external_identity_id: string, total_messages: int} $stat */
             $identity = $identities->get($stat->external_identity_id);
 
             return $this->extractDiscordData($identity, (int) $stat->total_messages);
