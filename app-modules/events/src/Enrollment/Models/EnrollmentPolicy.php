@@ -40,6 +40,29 @@ final class EnrollmentPolicy extends Model
     use HasFactory;
     use HasUuids;
 
+    protected $fillable = [
+        'event_id',
+        'enrollment_method',
+        'check_in_method',
+        'capacity',
+        'waitlist_enabled',
+        'attendance_requirement',
+        'minimum_days',
+        'cancellation_deadline_hours',
+        'xp_on_confirmed',
+        'xp_on_checked_in',
+        'xp_on_attended',
+        'application_schema',
+    ];
+
+    protected $attributes = [
+        'waitlist_enabled' => false,
+        'attendance_requirement' => 'all_days',
+        'xp_on_confirmed' => 0,
+        'xp_on_checked_in' => 0,
+        'xp_on_attended' => 0,
+    ];
+
     /** @return BelongsTo<Event, $this> */
     public function event(): BelongsTo
     {

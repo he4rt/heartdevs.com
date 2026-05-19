@@ -35,6 +35,16 @@ final class EnrollmentTransition extends Model
 
     public const UPDATED_AT = null;
 
+    protected $fillable = [
+        'enrollment_id',
+        'from_status',
+        'to_status',
+        'actor_id',
+        'triggered_by',
+        'reason',
+        'metadata',
+    ];
+
     /** @return BelongsTo<Enrollment, $this> */
     public function enrollment(): BelongsTo
     {

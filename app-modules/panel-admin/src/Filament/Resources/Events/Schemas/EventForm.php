@@ -11,6 +11,7 @@ use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Schemas\Components\Section;
+use Filament\Schemas\Components\Utilities\Get;
 use Filament\Schemas\Schema;
 use He4rt\Events\CheckIn\Enums\CheckInMethod;
 use He4rt\Events\Enrollment\Enums\AttendanceRequirement;
@@ -76,6 +77,7 @@ final class EventForm
                         Select::make('enrollment_method')
                             ->label('Enrollment Method')
                             ->options(EnrollmentMethod::class)
+                            ->live()
                             ->required(),
 
                         Select::make('check_in_method')
@@ -104,8 +106,10 @@ final class EventForm
                             ->minValue(1)
                             ->nullable(),
 
-                        DateTimePicker::make('cancellation_deadline')
-                            ->label('Cancellation Deadline')
+                        TextInput::make('cancellation_deadline_hours')
+                            ->label('Cancellation Deadline (hours before event)')
+                            ->integer()
+                            ->minValue(0)
                             ->nullable(),
 
                         TextInput::make('xp_on_confirmed')
@@ -132,7 +136,7 @@ final class EventForm
                             ->valueLabel('Field type / label')
                             ->nullable()
                             ->columnSpanFull()
-                            ->visible(fn (callable $get): bool => $get('enrollment_method') === 'application'),
+                            ->visible(fn (Get $get): bool => $get('enrollment_method') === EnrollmentMethod::Application->value),
                     ]),
             ]);
     }

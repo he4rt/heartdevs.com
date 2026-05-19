@@ -18,6 +18,7 @@ return new class extends Migration
             $table->foreignUuid('actor_id')->nullable()->constrained('users')->nullOnDelete();
             $table->string('triggered_by', 20);
             $table->string('reason', 500)->nullable();
+            // contexto adicional para audit trail: notas do admin, job ID, código de razão, etc.
             $table->jsonb('metadata')->nullable();
             $table->timestampTz('created_at')->useCurrent();
 

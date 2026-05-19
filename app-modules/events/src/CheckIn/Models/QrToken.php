@@ -28,6 +28,12 @@ final class QrToken extends Model
     use HasFactory;
     use HasUuids;
 
+    protected $fillable = [
+        'enrollment_id',
+        'token',
+        'expires_at',
+    ];
+
     /** @return BelongsTo<Enrollment, $this> */
     public function enrollment(): BelongsTo
     {

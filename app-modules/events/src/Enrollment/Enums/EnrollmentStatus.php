@@ -57,10 +57,10 @@ enum EnrollmentStatus: string implements HasColor, HasIcon, HasLabel
     public function canTransitionTo(self $target): bool
     {
         return match ($this) {
-            self::Pending => in_array($target, [self::Confirmed, self::Rejected, self::Cancelled], strict: true),
+            self::Pending => in_array($target, [self::Confirmed, self::Waitlisted, self::Rejected, self::Cancelled], strict: true),
             self::Waitlisted => in_array($target, [self::Confirmed, self::Cancelled], strict: true),
             self::Confirmed => in_array($target, [self::CheckedIn, self::Cancelled, self::NoShow], strict: true),
-            self::CheckedIn => $target === self::Attended,
+            self::CheckedIn => in_array($target, [self::Attended, self::NoShow], strict: true),
             self::Attended, self::Cancelled, self::Rejected, self::NoShow => false,
         };
     }

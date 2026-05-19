@@ -32,6 +32,16 @@ final class CheckInCode extends Model
     use HasFactory;
     use HasUuids;
 
+    protected $fillable = [
+        'event_id',
+        'event_date',
+        'code',
+        'starts_at',
+        'expires_at',
+        'max_uses',
+        'uses_count',
+    ];
+
     /** @return BelongsTo<Event, $this> */
     public function event(): BelongsTo
     {

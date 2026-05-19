@@ -18,6 +18,7 @@ return new class extends Migration
             $table->unsignedInteger('capacity')->nullable();
             $table->boolean('waitlist_enabled')->default(false);
             $table->string('attendance_requirement', 20)->default('all_days');
+            // número mínimo de dias que o participante deve comparecer para receber XP/certificado (usado quando attendance_requirement = 'minimum_days')
             $table->unsignedSmallInteger('minimum_days')->nullable();
             $table->unsignedSmallInteger('cancellation_deadline_hours')->nullable();
             $table->unsignedInteger('xp_on_confirmed')->default(0);

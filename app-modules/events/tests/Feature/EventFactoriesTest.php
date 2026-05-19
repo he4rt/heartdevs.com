@@ -49,7 +49,7 @@ test('when creating a check-in via factory, then it is linked to an enrollment',
 
     expect($checkIn->id)->not->toBeNull()
         ->and($checkIn->enrollment_id)->not->toBeNull()
-        ->and($checkIn->check_in_date)->not->toBeNull();
+        ->and($checkIn->event_date)->not->toBeNull();
 });
 
 test('when creating a check-in code via factory, then it is linked to an event with valid dates', function (): void {

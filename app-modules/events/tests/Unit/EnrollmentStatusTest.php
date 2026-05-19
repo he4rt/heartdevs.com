@@ -10,9 +10,12 @@ test('when a pending enrollment is evaluated, then it can transition to confirme
         ->and(EnrollmentStatus::Pending->canTransitionTo(EnrollmentStatus::Cancelled))->toBeTrue();
 });
 
-test('when a pending enrollment is evaluated, then it cannot transition to terminal or mid-flow states', function (): void {
-    expect(EnrollmentStatus::Pending->canTransitionTo(EnrollmentStatus::Waitlisted))->toBeFalse()
-        ->and(EnrollmentStatus::Pending->canTransitionTo(EnrollmentStatus::CheckedIn))->toBeFalse()
+test('when a pending enrollment is evaluated, then it can transition to waitlisted when capacity is full', function (): void {
+    expect(EnrollmentStatus::Pending->canTransitionTo(EnrollmentStatus::Waitlisted))->toBeTrue();
+});
+
+test('when a pending enrollment is evaluated, then it cannot transition to mid-flow or terminal states', function (): void {
+    expect(EnrollmentStatus::Pending->canTransitionTo(EnrollmentStatus::CheckedIn))->toBeFalse()
         ->and(EnrollmentStatus::Pending->canTransitionTo(EnrollmentStatus::Attended))->toBeFalse()
         ->and(EnrollmentStatus::Pending->canTransitionTo(EnrollmentStatus::NoShow))->toBeFalse();
 });
@@ -28,8 +31,9 @@ test('when a confirmed enrollment is evaluated, then it can transition to checke
         ->and(EnrollmentStatus::Confirmed->canTransitionTo(EnrollmentStatus::NoShow))->toBeTrue();
 });
 
-test('when a checked_in enrollment is evaluated, then it can only transition to attended', function (): void {
+test('when a checked_in enrollment is evaluated, then it can transition to attended or no_show', function (): void {
     expect(EnrollmentStatus::CheckedIn->canTransitionTo(EnrollmentStatus::Attended))->toBeTrue()
+        ->and(EnrollmentStatus::CheckedIn->canTransitionTo(EnrollmentStatus::NoShow))->toBeTrue()
         ->and(EnrollmentStatus::CheckedIn->canTransitionTo(EnrollmentStatus::Confirmed))->toBeFalse()
         ->and(EnrollmentStatus::CheckedIn->canTransitionTo(EnrollmentStatus::Cancelled))->toBeFalse();
 });

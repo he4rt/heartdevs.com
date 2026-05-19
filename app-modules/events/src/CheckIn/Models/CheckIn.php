@@ -33,6 +33,14 @@ final class CheckIn extends Model
 
     public const UPDATED_AT = null;
 
+    protected $fillable = [
+        'enrollment_id',
+        'event_date',
+        'method',
+        'payload',
+        'recorded_by',
+    ];
+
     /** @return BelongsTo<Enrollment, $this> */
     public function enrollment(): BelongsTo
     {

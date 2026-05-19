@@ -12,6 +12,7 @@ use He4rt\Events\Enrollment\Models\EnrollmentPolicy;
 use He4rt\Events\Event\Enums\EventType;
 use He4rt\Identity\Tenant\Models\Tenant;
 use Illuminate\Database\Eloquent\Attributes\Table;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -40,6 +41,22 @@ final class Event extends Model
     use HasFactory;
     use HasUuids;
 
+    protected $fillable = [
+        'tenant_id',
+        'slug',
+        'title',
+        'description',
+        'event_type',
+        'location',
+        'starts_at',
+        'ends_at',
+        'is_published',
+    ];
+
+    protected $attributes = [
+        'is_published' => false,
+    ];
+
     /** @return BelongsTo<Tenant, $this> */
     public function tenant(): BelongsTo
     {
@@ -64,9 +81,29 @@ final class Event extends Model
         return $this->hasMany(CheckInCode::class);
     }
 
+    public function isPast(): bool
+    {
+        return $this->ends_at->isPast();
+    }
+
+    public function totalDays(): int
+    {
+        return (int) $this->starts_at->startOfDay()->diffInDays($this->ends_at->startOfDay()) + 1;
+    }
+
     protected static function newFactory(): EventFactory
     {
         return EventFactory::new();
+    }
+
+    protected function scopeActive(Builder $query): void
+    {
+        $query->where('is_published', true);
+    }
+
+    protected function scopeUpcoming(Builder $query): void
+    {
+        $query->where('starts_at', '>', now());
     }
 
     /** @return array<string, mixed> */

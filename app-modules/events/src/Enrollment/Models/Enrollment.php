@@ -12,6 +12,7 @@ use He4rt\Events\Enrollment\Enums\EnrollmentStatus;
 use He4rt\Events\Event\Models\Event;
 use He4rt\Identity\User\Models\User;
 use Illuminate\Database\Eloquent\Attributes\Table;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -42,6 +43,24 @@ final class Enrollment extends Model
     /** @use HasFactory<EnrollmentFactory> */
     use HasFactory;
     use HasUuids;
+
+    protected $fillable = [
+        'event_id',
+        'user_id',
+        'is_public',
+        'application_data',
+        'rejection_reason',
+        'enrolled_at',
+        'confirmed_at',
+        'checked_in_at',
+        'attended_at',
+        'cancelled_at',
+    ];
+
+    protected $attributes = [
+        'status' => 'pending',
+        'is_public' => true,
+    ];
 
     /** @return BelongsTo<Event, $this> */
     public function event(): BelongsTo
@@ -76,6 +95,25 @@ final class Enrollment extends Model
     protected static function newFactory(): EnrollmentFactory
     {
         return EnrollmentFactory::new();
+    }
+
+    protected function scopeConfirmed(Builder $query): void
+    {
+        $query->where('status', EnrollmentStatus::Confirmed);
+    }
+
+    protected function scopeWaitlisted(Builder $query): void
+    {
+        $query->where('status', EnrollmentStatus::Waitlisted);
+    }
+
+    protected function scopeActive(Builder $query): void
+    {
+        $query->whereNotIn('status', [
+            EnrollmentStatus::Cancelled,
+            EnrollmentStatus::Rejected,
+            EnrollmentStatus::NoShow,
+        ]);
     }
 
     /** @return array<string, mixed> */
