@@ -20,6 +20,7 @@ return new class extends Migration
             $table->string('user_id')->nullable();
             $table->string('channel_id')->nullable();
             $table->jsonb('payload');
+            $table->timestamp('occurred_at')->index();
             $table->timestamps();
         });
     }
