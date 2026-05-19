@@ -37,4 +37,10 @@ return [
         'numeric_code' => 'Código numérico',
         'qr_code' => 'QR Code',
     ],
+
+    'triggered_by' => [
+        'user' => 'Usuário',
+        'admin' => 'Administrador',
+        'system' => 'Sistema',
+    ],
 ];

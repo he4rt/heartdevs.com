@@ -37,4 +37,10 @@ return [
         'numeric_code' => 'Numeric Code',
         'qr_code' => 'QR Code',
     ],
+
+    'triggered_by' => [
+        'user' => 'User',
+        'admin' => 'Admin',
+        'system' => 'System',
+    ],
 ];

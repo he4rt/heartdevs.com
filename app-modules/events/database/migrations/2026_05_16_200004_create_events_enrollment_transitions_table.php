@@ -16,6 +16,7 @@ return new class extends Migration
             $table->string('from_status', 20)->nullable();
             $table->string('to_status', 20);
             $table->foreignUuid('actor_id')->nullable()->constrained('users')->nullOnDelete();
+            $table->string('triggered_by', 20);
             $table->string('reason', 500)->nullable();
             $table->jsonb('metadata')->nullable();
             $table->timestampTz('created_at')->useCurrent();

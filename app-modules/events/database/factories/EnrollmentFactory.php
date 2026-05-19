@@ -20,8 +20,8 @@ final class EnrollmentFactory extends Factory
         return [
             'event_id' => Event::factory(),
             'user_id' => User::factory(),
-            'tenant_id' => null,
             'status' => EnrollmentStatus::Pending,
+            'is_public' => true,
             'waitlist_position' => null,
             'application_data' => null,
             'rejection_reason' => null,

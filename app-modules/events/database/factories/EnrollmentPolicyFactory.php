@@ -26,7 +26,7 @@ final class EnrollmentPolicyFactory extends Factory
             'waitlist_enabled' => false,
             'attendance_requirement' => AttendanceRequirement::AllDays,
             'minimum_days' => null,
-            'cancellation_deadline' => null,
+            'cancellation_deadline_hours' => null,
             'xp_on_confirmed' => 0,
             'xp_on_checked_in' => 0,
             'xp_on_attended' => 0,

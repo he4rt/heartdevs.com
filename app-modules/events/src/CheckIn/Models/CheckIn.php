@@ -18,7 +18,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 /**
  * @property string $id
  * @property string $enrollment_id
- * @property Carbon $check_in_date
+ * @property Carbon $event_date
  * @property CheckInMethod $method
  * @property array<string, mixed>|null $payload
  * @property string|null $recorded_by
@@ -54,7 +54,7 @@ final class CheckIn extends Model
     protected function casts(): array
     {
         return [
-            'check_in_date' => 'date',
+            'event_date' => 'date',
             'method' => CheckInMethod::class,
             'payload' => 'array',
             'created_at' => 'datetime',

@@ -79,9 +79,8 @@ final class EventInfolist
                         TextEntry::make('minimum_days')
                             ->label('Minimum Days'),
 
-                        TextEntry::make('cancellation_deadline')
-                            ->label('Cancellation Deadline')
-                            ->dateTime(),
+                        TextEntry::make('cancellation_deadline_hours')
+                            ->label('Cancellation Deadline (hours before event)'),
 
                         TextEntry::make('xp_on_confirmed')
                             ->label('XP on Confirmed'),

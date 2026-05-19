@@ -7,6 +7,7 @@ namespace He4rt\Events\Enrollment\Models;
 use Carbon\Carbon;
 use He4rt\Events\Database\Factories\EnrollmentTransitionFactory;
 use He4rt\Events\Enrollment\Enums\EnrollmentStatus;
+use He4rt\Events\Enrollment\Enums\TriggeredBy;
 use He4rt\Identity\User\Models\User;
 use Illuminate\Database\Eloquent\Attributes\Table;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
@@ -20,6 +21,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property EnrollmentStatus|null $from_status
  * @property EnrollmentStatus $to_status
  * @property string|null $actor_id
+ * @property TriggeredBy $triggered_by
  * @property string|null $reason
  * @property array<string, mixed>|null $metadata
  * @property Carbon $created_at
@@ -56,6 +58,7 @@ final class EnrollmentTransition extends Model
         return [
             'from_status' => EnrollmentStatus::class,
             'to_status' => EnrollmentStatus::class,
+            'triggered_by' => TriggeredBy::class,
             'metadata' => 'array',
             'created_at' => 'datetime',
         ];

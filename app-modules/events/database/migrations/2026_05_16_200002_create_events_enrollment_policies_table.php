@@ -19,7 +19,7 @@ return new class extends Migration
             $table->boolean('waitlist_enabled')->default(false);
             $table->string('attendance_requirement', 20)->default('all_days');
             $table->unsignedSmallInteger('minimum_days')->nullable();
-            $table->timestampTz('cancellation_deadline')->nullable();
+            $table->unsignedSmallInteger('cancellation_deadline_hours')->nullable();
             $table->unsignedInteger('xp_on_confirmed')->default(0);
             $table->unsignedInteger('xp_on_checked_in')->default(0);
             $table->unsignedInteger('xp_on_attended')->default(0);

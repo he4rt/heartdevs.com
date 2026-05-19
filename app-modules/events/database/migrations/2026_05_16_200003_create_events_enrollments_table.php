@@ -14,8 +14,8 @@ return new class extends Migration
             $table->uuid('id')->primary();
             $table->foreignUuid('event_id')->constrained('events')->cascadeOnDelete();
             $table->foreignUuid('user_id')->constrained('users')->cascadeOnDelete();
-            $table->foreignId('tenant_id')->nullable()->constrained('tenants')->nullOnDelete();
             $table->string('status', 20)->default('pending');
+            $table->boolean('is_public')->default(true);
             $table->unsignedInteger('waitlist_position')->nullable();
             $table->jsonb('application_data')->nullable();
             $table->string('rejection_reason', 500)->nullable();

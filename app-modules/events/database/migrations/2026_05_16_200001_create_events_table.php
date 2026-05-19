@@ -15,7 +15,7 @@ return new class extends Migration
             $table->foreignId('tenant_id')->nullable()->constrained('tenants')->nullOnDelete();
             $table->string('slug', 120);
             $table->string('title', 200);
-            $table->text('description')->nullable();
+            $table->longText('description')->nullable();
             $table->string('event_type', 20);
             $table->string('location')->nullable();
             $table->timestampTz('starts_at');

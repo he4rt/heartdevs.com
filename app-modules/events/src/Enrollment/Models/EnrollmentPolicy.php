@@ -25,7 +25,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property bool $waitlist_enabled
  * @property AttendanceRequirement $attendance_requirement
  * @property int|null $minimum_days
- * @property Carbon|null $cancellation_deadline
+ * @property int|null $cancellation_deadline_hours
  * @property int $xp_on_confirmed
  * @property int $xp_on_checked_in
  * @property int $xp_on_attended
@@ -59,7 +59,6 @@ final class EnrollmentPolicy extends Model
             'check_in_method' => CheckInMethod::class,
             'attendance_requirement' => AttendanceRequirement::class,
             'waitlist_enabled' => 'boolean',
-            'cancellation_deadline' => 'datetime',
             'application_schema' => 'array',
         ];
     }

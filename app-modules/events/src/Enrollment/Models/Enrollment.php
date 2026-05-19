@@ -10,7 +10,6 @@ use He4rt\Events\CheckIn\Models\QrToken;
 use He4rt\Events\Database\Factories\EnrollmentFactory;
 use He4rt\Events\Enrollment\Enums\EnrollmentStatus;
 use He4rt\Events\Event\Models\Event;
-use He4rt\Identity\Tenant\Models\Tenant;
 use He4rt\Identity\User\Models\User;
 use Illuminate\Database\Eloquent\Attributes\Table;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
@@ -24,8 +23,8 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
  * @property string $id
  * @property string $event_id
  * @property string $user_id
- * @property string|null $tenant_id
  * @property EnrollmentStatus $status
+ * @property bool $is_public
  * @property int|null $waitlist_position
  * @property array<string, mixed>|null $application_data
  * @property string|null $rejection_reason
@@ -56,12 +55,6 @@ final class Enrollment extends Model
         return $this->belongsTo(User::class);
     }
 
-    /** @return BelongsTo<Tenant, $this> */
-    public function tenant(): BelongsTo
-    {
-        return $this->belongsTo(Tenant::class);
-    }
-
     /** @return HasMany<EnrollmentTransition, $this> */
     public function transitions(): HasMany
     {
@@ -90,6 +83,7 @@ final class Enrollment extends Model
     {
         return [
             'status' => EnrollmentStatus::class,
+            'is_public' => 'boolean',
             'application_data' => 'array',
             'enrolled_at' => 'datetime',
             'confirmed_at' => 'datetime',
