@@ -65,7 +65,7 @@ final class EventForm
                     ->required()
                     ->after('starts_at'),
 
-                Toggle::make('is_published')
+                Toggle::make('active')
                     ->label('Published')
                     ->default(false)
                     ->columnSpanFull(),
@@ -91,7 +91,7 @@ final class EventForm
                             ->minValue(1)
                             ->nullable(),
 
-                        Toggle::make('waitlist_enabled')
+                        Toggle::make('has_waitlist')
                             ->label('Waitlist Enabled')
                             ->default(false),
 

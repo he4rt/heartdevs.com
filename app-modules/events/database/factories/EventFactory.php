@@ -28,7 +28,7 @@ final class EventFactory extends Factory
             'location' => fake()->optional()->address(),
             'starts_at' => $startsAt,
             'ends_at' => $startsAt->clone()->addHours(fake()->numberBetween(2, 8)),
-            'is_published' => false,
+            'active' => false,
         ];
     }
 }

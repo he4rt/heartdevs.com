@@ -45,7 +45,7 @@ final class EventInfolist
                     ->label('Ends At')
                     ->dateTime(),
 
-                IconEntry::make('is_published')
+                IconEntry::make('active')
                     ->label('Published')
                     ->boolean(),
 
@@ -68,7 +68,7 @@ final class EventInfolist
                         TextEntry::make('capacity')
                             ->label('Capacity'),
 
-                        IconEntry::make('waitlist_enabled')
+                        IconEntry::make('has_waitlist')
                             ->label('Waitlist Enabled')
                             ->boolean(),
 

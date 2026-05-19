@@ -45,7 +45,7 @@ final class EventsTable
                     ->dateTime()
                     ->sortable(),
 
-                IconColumn::make('is_published')
+                IconColumn::make('active')
                     ->label('Published')
                     ->boolean(),
 

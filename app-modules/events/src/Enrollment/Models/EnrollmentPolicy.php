@@ -22,7 +22,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property EnrollmentMethod $enrollment_method
  * @property CheckInMethod $check_in_method
  * @property int|null $capacity
- * @property bool $waitlist_enabled
+ * @property bool $has_waitlist
  * @property AttendanceRequirement $attendance_requirement
  * @property int|null $minimum_days
  * @property int|null $cancellation_deadline_hours
@@ -45,7 +45,7 @@ final class EnrollmentPolicy extends Model
         'enrollment_method',
         'check_in_method',
         'capacity',
-        'waitlist_enabled',
+        'has_waitlist',
         'attendance_requirement',
         'minimum_days',
         'cancellation_deadline_hours',
@@ -56,7 +56,7 @@ final class EnrollmentPolicy extends Model
     ];
 
     protected $attributes = [
-        'waitlist_enabled' => false,
+        'has_waitlist' => false,
         'attendance_requirement' => 'all_days',
         'xp_on_confirmed' => 0,
         'xp_on_checked_in' => 0,
@@ -81,7 +81,7 @@ final class EnrollmentPolicy extends Model
             'enrollment_method' => EnrollmentMethod::class,
             'check_in_method' => CheckInMethod::class,
             'attendance_requirement' => AttendanceRequirement::class,
-            'waitlist_enabled' => 'boolean',
+            'has_waitlist' => 'boolean',
             'application_schema' => 'array',
         ];
     }

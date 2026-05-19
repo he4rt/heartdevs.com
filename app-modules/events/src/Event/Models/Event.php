@@ -30,7 +30,7 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
  * @property string|null $location
  * @property Carbon $starts_at
  * @property Carbon $ends_at
- * @property bool $is_published
+ * @property bool $active
  * @property Carbon $created_at
  * @property Carbon $updated_at
  */
@@ -50,11 +50,11 @@ final class Event extends Model
         'location',
         'starts_at',
         'ends_at',
-        'is_published',
+        'active',
     ];
 
     protected $attributes = [
-        'is_published' => false,
+        'active' => false,
     ];
 
     /** @return BelongsTo<Tenant, $this> */
@@ -98,7 +98,7 @@ final class Event extends Model
 
     protected function scopeActive(Builder $query): void
     {
-        $query->where('is_published', true);
+        $query->where('active', true);
     }
 
     protected function scopeUpcoming(Builder $query): void
@@ -113,7 +113,7 @@ final class Event extends Model
             'event_type' => EventType::class,
             'starts_at' => 'datetime',
             'ends_at' => 'datetime',
-            'is_published' => 'boolean',
+            'active' => 'boolean',
         ];
     }
 }

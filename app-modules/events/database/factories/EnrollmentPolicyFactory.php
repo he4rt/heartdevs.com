@@ -23,7 +23,7 @@ final class EnrollmentPolicyFactory extends Factory
             'enrollment_method' => fake()->randomElement(EnrollmentMethod::cases()),
             'check_in_method' => fake()->randomElement(CheckInMethod::cases()),
             'capacity' => fake()->optional()->numberBetween(10, 200),
-            'waitlist_enabled' => false,
+            'has_waitlist' => false,
             'attendance_requirement' => AttendanceRequirement::AllDays,
             'minimum_days' => null,
             'cancellation_deadline_hours' => null,
