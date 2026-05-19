@@ -20,9 +20,8 @@ return new class extends Migration
             $table->string('location')->nullable();
             $table->timestampTz('starts_at');
             $table->timestampTz('ends_at');
-            $table->boolean('is_published')->default(false);
+            $table->boolean('active')->default(false);
             $table->timestampsTz();
-
             $table->unique(['tenant_id', 'slug'], 'idx_events_tenant_slug');
             $table->index(['tenant_id', 'starts_at'], 'idx_events_tenant_window');
             $table->index(['event_type', 'starts_at'], 'idx_events_type_window');

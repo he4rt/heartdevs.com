@@ -13,14 +13,12 @@ return new class extends Migration
         Schema::create('events_check_ins', function (Blueprint $table): void {
             $table->uuid('id')->primary();
             $table->foreignUuid('enrollment_id')->constrained('events_enrollments')->cascadeOnDelete();
-            $table->date('event_date');
+            $table->date('check_in');
             $table->string('method', 20);
             $table->jsonb('payload')->nullable();
-            $table->foreignUuid('recorded_by')->nullable()->constrained('users')->nullOnDelete();
             $table->timestampTz('created_at')->useCurrent();
-
-            $table->unique(['enrollment_id', 'event_date'], 'idx_check_ins_unique_per_day');
-            $table->index('event_date', 'idx_check_ins_date');
+            $table->unique(['enrollment_id', 'check_in'], 'idx_check_ins_unique_per_day');
+            $table->index('check_in', 'idx_check_ins_date');
         });
     }
 
