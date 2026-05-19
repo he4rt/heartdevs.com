@@ -1,0 +1,765 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Meeting Showcase</title>
+<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg-page: #1a1a2e;
+    --bg-panel: #16213e;
+    --text: #e0e0e0;
+    --text-muted: #8a8a9a;
+    --accent: #7c3aed;
+    --accent-hover: #6d28d9;
+    --border: #2a2a4a;
+    --input-bg: #0f1629;
+  }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+    background: var(--bg-page);
+    color: var(--text);
+    min-height: 100vh;
+    display: flex;
+  }
+
+  /* ── Sidebar Panel ── */
+  .panel {
+    width: 320px;
+    min-width: 320px;
+    background: var(--bg-panel);
+    border-right: 1px solid var(--border);
+    padding: 20px;
+    overflow-y: auto;
+    height: 100vh;
+    position: sticky;
+    top: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .panel h2 {
+    font-size: 14px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--accent);
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .panel-section {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .control-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+  }
+
+  .control-row label {
+    font-size: 12px;
+    color: var(--text-muted);
+    white-space: nowrap;
+    min-width: 90px;
+  }
+
+  .control-row input[type="range"] {
+    flex: 1;
+    accent-color: var(--accent);
+    height: 4px;
+  }
+
+  .control-row .value {
+    font-size: 11px;
+    color: var(--text);
+    min-width: 36px;
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* Toggle switch */
+  .toggle-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 4px 0;
+  }
+
+  .toggle-row label {
+    font-size: 12px;
+    color: var(--text-muted);
+    cursor: pointer;
+  }
+
+  .toggle {
+    position: relative;
+    width: 36px;
+    height: 20px;
+    cursor: pointer;
+  }
+
+  .toggle input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+  }
+
+  .toggle .slider {
+    position: absolute;
+    inset: 0;
+    background: var(--border);
+    border-radius: 10px;
+    transition: background 0.2s;
+  }
+
+  .toggle .slider::before {
+    content: '';
+    position: absolute;
+    width: 14px;
+    height: 14px;
+    left: 3px;
+    top: 3px;
+    background: var(--text);
+    border-radius: 50%;
+    transition: transform 0.2s;
+  }
+
+  .toggle input:checked + .slider {
+    background: var(--accent);
+  }
+
+  .toggle input:checked + .slider::before {
+    transform: translateX(16px);
+  }
+
+  /* JSON input */
+  .json-area {
+    width: 100%;
+    min-height: 80px;
+    max-height: 160px;
+    background: var(--input-bg);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    color: var(--text);
+    font-family: 'Fira Code', monospace;
+    font-size: 11px;
+    padding: 8px;
+    resize: vertical;
+  }
+
+  .json-area:focus {
+    outline: 1px solid var(--accent);
+    border-color: var(--accent);
+  }
+
+  .btn {
+    padding: 8px 16px;
+    border: none;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+
+  .btn-primary {
+    background: var(--accent);
+    color: white;
+  }
+
+  .btn-primary:hover {
+    background: var(--accent-hover);
+  }
+
+  .btn-outline {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--text);
+  }
+
+  .btn-outline:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+
+  .btn-row {
+    display: flex;
+    gap: 8px;
+  }
+
+  .btn-row .btn { flex: 1; }
+
+  .counter-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: var(--input-bg);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 6px 10px;
+    font-size: 12px;
+    color: var(--text-muted);
+  }
+
+  .counter-badge strong {
+    color: var(--accent);
+    font-size: 16px;
+  }
+
+  /* Color picker row */
+  .color-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+  }
+
+  .color-row label {
+    font-size: 12px;
+    color: var(--text-muted);
+  }
+
+  .color-row input[type="color"] {
+    width: 32px;
+    height: 24px;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    background: none;
+    cursor: pointer;
+    padding: 0;
+  }
+
+  /* ── Canvas Area ── */
+  .canvas-area {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 40px;
+    min-height: 100vh;
+    background-image:
+      linear-gradient(45deg, #222 25%, transparent 25%),
+      linear-gradient(-45deg, #222 25%, transparent 25%),
+      linear-gradient(45deg, transparent 75%, #222 75%),
+      linear-gradient(-45deg, transparent 75%, #222 75%);
+    background-size: 20px 20px;
+    background-position: 0 0, 0 10px, 10px -10px, -10px 0;
+    background-color: #1a1a1a;
+  }
+
+  /* ── Showcase Container ── */
+  #showcase {
+    background: rgba(0, 0, 0, 0.85);
+    border-radius: 16px;
+    padding: 32px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 24px;
+    transition: all 0.2s;
+  }
+
+  #showcase.no-bg {
+    background: transparent !important;
+  }
+
+  #showcase-title {
+    font-size: 24px;
+    font-weight: 700;
+    color: #ffffff;
+    text-align: center;
+    cursor: text;
+    border: 1px dashed transparent;
+    padding: 4px 12px;
+    border-radius: 6px;
+    outline: none;
+    min-width: 100px;
+    transition: border-color 0.2s;
+  }
+
+  #showcase-title:hover {
+    border-color: rgba(124, 58, 237, 0.4);
+  }
+
+  #showcase-title:focus {
+    border-color: var(--accent);
+  }
+
+  #showcase-title.hidden { display: none; }
+
+  .subtitle {
+    font-size: 14px;
+    color: rgba(255,255,255,0.5);
+    margin-top: -16px;
+    font-weight: 400;
+  }
+
+  .subtitle.hidden { display: none; }
+
+  .grid {
+    display: grid;
+    justify-content: center;
+    justify-items: center;
+  }
+
+  .user-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    text-align: center;
+  }
+
+  .user-card img {
+    border-radius: 50%;
+    object-fit: cover;
+    background: #2a2a4a;
+    flex-shrink: 0;
+  }
+
+  .user-card .name {
+    font-weight: 600;
+    color: #ffffff;
+    line-height: 1.2;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 100%;
+  }
+
+  .user-card .username {
+    color: rgba(255,255,255,0.4);
+    line-height: 1.2;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 100%;
+  }
+
+  .user-card .msgs {
+    color: var(--accent);
+    font-weight: 600;
+    line-height: 1.2;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .user-card .name.hidden,
+  .user-card .username.hidden,
+  .user-card .msgs.hidden { display: none; }
+
+  /* ── Export watermark ── */
+  .export-notice {
+    font-size: 10px;
+    color: rgba(255,255,255,0.15);
+    text-align: center;
+    display: none;
+  }
+
+  /* ── Empty state ── */
+  .empty-state {
+    color: var(--text-muted);
+    font-size: 14px;
+    text-align: center;
+    padding: 60px 20px;
+  }
+
+  .empty-state p { margin-bottom: 8px; }
+
+  /* Preset buttons */
+  .preset-row {
+    display: flex;
+    gap: 4px;
+    flex-wrap: wrap;
+  }
+
+  .preset-btn {
+    padding: 4px 8px;
+    font-size: 10px;
+    background: var(--input-bg);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    color: var(--text-muted);
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+
+  .preset-btn:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+</style>
+</head>
+<body>
+
+<div class="panel">
+  <h2>Data</h2>
+  <div class="panel-section">
+    <textarea class="json-area" id="jsonInput" placeholder='Cole o JSON aqui... [{"discord_id": "...", "username": "...", "global_name": "...", "avatar_url": "...", "total_messages": 0}]'></textarea>
+    <div class="btn-row">
+      <button class="btn btn-primary" onclick="loadJSON()">Carregar</button>
+      <button class="btn btn-outline" onclick="clearData()">Limpar</button>
+    </div>
+    <div class="counter-badge">
+      Participantes: <strong id="userCount">0</strong>
+    </div>
+  </div>
+
+  <h2>Layout</h2>
+  <div class="panel-section">
+    <div class="control-row">
+      <label>Largura</label>
+      <input type="range" id="ctrlWidth" min="300" max="1920" value="900" oninput="applySettings()">
+      <span class="value" id="valWidth">900</span>
+    </div>
+    <div class="control-row">
+      <label>Colunas</label>
+      <input type="range" id="ctrlCols" min="2" max="20" value="8" oninput="applySettings()">
+      <span class="value" id="valCols">8</span>
+    </div>
+    <div class="control-row">
+      <label>Gap</label>
+      <input type="range" id="ctrlGap" min="4" max="48" value="16" oninput="applySettings()">
+      <span class="value" id="valGap">16</span>
+    </div>
+    <div class="control-row">
+      <label>Padding</label>
+      <input type="range" id="ctrlPadding" min="0" max="80" value="32" oninput="applySettings()">
+      <span class="value" id="valPadding">32</span>
+    </div>
+    <div class="control-row">
+      <label>Border Radius</label>
+      <input type="range" id="ctrlRadius" min="0" max="48" value="16" oninput="applySettings()">
+      <span class="value" id="valRadius">16</span>
+    </div>
+
+    <label style="font-size:11px;color:var(--text-muted);margin-top:4px">Presets</label>
+    <div class="preset-row">
+      <button class="preset-btn" onclick="applyPreset('story')">Story 9:16</button>
+      <button class="preset-btn" onclick="applyPreset('post')">Post 1:1</button>
+      <button class="preset-btn" onclick="applyPreset('wide')">Wide 16:9</button>
+      <button class="preset-btn" onclick="applyPreset('banner')">Banner</button>
+    </div>
+  </div>
+
+  <h2>Avatar</h2>
+  <div class="panel-section">
+    <div class="control-row">
+      <label>Tamanho</label>
+      <input type="range" id="ctrlAvatar" min="24" max="128" value="56" oninput="applySettings()">
+      <span class="value" id="valAvatar">56</span>
+    </div>
+    <div class="control-row">
+      <label>Borda</label>
+      <input type="range" id="ctrlAvatarBorder" min="0" max="6" value="0" oninput="applySettings()">
+      <span class="value" id="valAvatarBorder">0</span>
+    </div>
+    <div class="color-row">
+      <label>Cor da borda</label>
+      <input type="color" id="ctrlAvatarBorderColor" value="#7c3aed" oninput="applySettings()">
+    </div>
+  </div>
+
+  <h2>Tipografia</h2>
+  <div class="panel-section">
+    <div class="control-row">
+      <label>Fonte nome</label>
+      <input type="range" id="ctrlFontName" min="8" max="24" value="12" oninput="applySettings()">
+      <span class="value" id="valFontName">12</span>
+    </div>
+    <div class="control-row">
+      <label>Fonte username</label>
+      <input type="range" id="ctrlFontUser" min="6" max="20" value="10" oninput="applySettings()">
+      <span class="value" id="valFontUser">10</span>
+    </div>
+    <div class="control-row">
+      <label>Fonte msgs</label>
+      <input type="range" id="ctrlFontMsgs" min="6" max="20" value="10" oninput="applySettings()">
+      <span class="value" id="valFontMsgs">10</span>
+    </div>
+    <div class="control-row">
+      <label>Fonte titulo</label>
+      <input type="range" id="ctrlFontTitle" min="12" max="48" value="24" oninput="applySettings()">
+      <span class="value" id="valFontTitle">24</span>
+    </div>
+  </div>
+
+  <h2>Visibilidade</h2>
+  <div class="panel-section">
+    <div class="toggle-row">
+      <label>Titulo</label>
+      <label class="toggle"><input type="checkbox" id="togTitle" checked onchange="applySettings()"><span class="slider"></span></label>
+    </div>
+    <div class="toggle-row">
+      <label>Subtitulo (contagem)</label>
+      <label class="toggle"><input type="checkbox" id="togSubtitle" checked onchange="applySettings()"><span class="slider"></span></label>
+    </div>
+    <div class="toggle-row">
+      <label>Nome</label>
+      <label class="toggle"><input type="checkbox" id="togName" checked onchange="applySettings()"><span class="slider"></span></label>
+    </div>
+    <div class="toggle-row">
+      <label>Username</label>
+      <label class="toggle"><input type="checkbox" id="togUsername" checked onchange="applySettings()"><span class="slider"></span></label>
+    </div>
+    <div class="toggle-row">
+      <label>Mensagens</label>
+      <label class="toggle"><input type="checkbox" id="togMsgs" onchange="applySettings()"><span class="slider"></span></label>
+    </div>
+    <div class="toggle-row">
+      <label>Fundo</label>
+      <label class="toggle"><input type="checkbox" id="togBg" checked onchange="applySettings()"><span class="slider"></span></label>
+    </div>
+  </div>
+
+  <h2>Fundo</h2>
+  <div class="panel-section">
+    <div class="control-row">
+      <label>Opacidade</label>
+      <input type="range" id="ctrlOpacity" min="0" max="100" value="85" oninput="applySettings()">
+      <span class="value" id="valOpacity">85%</span>
+    </div>
+    <div class="color-row">
+      <label>Cor do fundo</label>
+      <input type="color" id="ctrlBgColor" value="#000000" oninput="applySettings()">
+    </div>
+    <div class="color-row">
+      <label>Cor do texto</label>
+      <input type="color" id="ctrlTextColor" value="#ffffff" oninput="applySettings()">
+    </div>
+  </div>
+
+  <h2>Export</h2>
+  <div class="panel-section">
+    <div class="control-row">
+      <label>Escala</label>
+      <input type="range" id="ctrlScale" min="1" max="4" value="2" oninput="document.getElementById('valScale').textContent=this.value+'x'">
+      <span class="value" id="valScale">2x</span>
+    </div>
+    <button class="btn btn-primary" onclick="exportPNG()" style="width:100%">Exportar PNG</button>
+  </div>
+</div>
+
+<div class="canvas-area" id="canvasArea">
+  <div id="showcase">
+    <div id="showcase-title" contenteditable="true" spellcheck="false">Reuniao 11/05</div>
+    <div class="subtitle" id="showcase-subtitle">58 participantes</div>
+    <div class="grid" id="grid">
+      <div class="empty-state">
+        <p>Nenhum dado carregado.</p>
+        <p>Cole o JSON no painel e clique em <strong>Carregar</strong>.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+let users = [];
+
+function loadJSON() {
+  const raw = document.getElementById('jsonInput').value.trim();
+  if (!raw) return;
+  try {
+    users = JSON.parse(raw);
+    if (!Array.isArray(users)) throw new Error('not array');
+    renderGrid();
+    applySettings();
+  } catch (e) {
+    alert('JSON invalido: ' + e.message);
+  }
+}
+
+function clearData() {
+  users = [];
+  document.getElementById('jsonInput').value = '';
+  renderGrid();
+  applySettings();
+}
+
+function renderGrid() {
+  const grid = document.getElementById('grid');
+  document.getElementById('userCount').textContent = users.length;
+  document.getElementById('showcase-subtitle').textContent = users.length + ' participantes';
+
+  if (!users.length) {
+    grid.innerHTML = '<div class="empty-state"><p>Nenhum dado carregado.</p><p>Cole o JSON no painel e clique em <strong>Carregar</strong>.</p></div>';
+    return;
+  }
+
+  grid.innerHTML = users.map(u => {
+    const name = u.global_name || u.username || '?';
+    const uname = '@' + (u.username || '?');
+    const msgs = u.total_messages != null ? u.total_messages + ' msgs' : '';
+    const avatar = u.avatar_url || '';
+    return `<div class="user-card">
+      <img src="${avatar}" alt="${name}" loading="lazy" crossorigin="anonymous" onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 80 80%22><rect fill=%22%232a2a4a%22 width=%2280%22 height=%2280%22/><text x=%2240%22 y=%2248%22 text-anchor=%22middle%22 fill=%22%23888%22 font-size=%2228%22>${name.charAt(0).toUpperCase()}</text></svg>'">
+      <span class="name">${name}</span>
+      <span class="username">${uname}</span>
+      <span class="msgs">${msgs}</span>
+    </div>`;
+  }).join('');
+}
+
+function applySettings() {
+  const showcase = document.getElementById('showcase');
+  const grid = document.getElementById('grid');
+  const title = document.getElementById('showcase-title');
+  const subtitle = document.getElementById('showcase-subtitle');
+
+  const width = document.getElementById('ctrlWidth').value;
+  const cols = document.getElementById('ctrlCols').value;
+  const gap = document.getElementById('ctrlGap').value;
+  const padding = document.getElementById('ctrlPadding').value;
+  const radius = document.getElementById('ctrlRadius').value;
+  const avatarSize = document.getElementById('ctrlAvatar').value;
+  const avatarBorder = document.getElementById('ctrlAvatarBorder').value;
+  const avatarBorderColor = document.getElementById('ctrlAvatarBorderColor').value;
+  const fontName = document.getElementById('ctrlFontName').value;
+  const fontUser = document.getElementById('ctrlFontUser').value;
+  const fontMsgs = document.getElementById('ctrlFontMsgs').value;
+  const fontTitle = document.getElementById('ctrlFontTitle').value;
+  const opacity = document.getElementById('ctrlOpacity').value;
+  const bgColor = document.getElementById('ctrlBgColor').value;
+  const textColor = document.getElementById('ctrlTextColor').value;
+
+  const showTitle = document.getElementById('togTitle').checked;
+  const showSubtitle = document.getElementById('togSubtitle').checked;
+  const showName = document.getElementById('togName').checked;
+  const showUsername = document.getElementById('togUsername').checked;
+  const showMsgs = document.getElementById('togMsgs').checked;
+  const showBg = document.getElementById('togBg').checked;
+
+  // Update value labels
+  document.getElementById('valWidth').textContent = width;
+  document.getElementById('valCols').textContent = cols;
+  document.getElementById('valGap').textContent = gap;
+  document.getElementById('valPadding').textContent = padding;
+  document.getElementById('valRadius').textContent = radius;
+  document.getElementById('valAvatar').textContent = avatarSize;
+  document.getElementById('valAvatarBorder').textContent = avatarBorder;
+  document.getElementById('valFontName').textContent = fontName;
+  document.getElementById('valFontUser').textContent = fontUser;
+  document.getElementById('valFontMsgs').textContent = fontMsgs;
+  document.getElementById('valFontTitle').textContent = fontTitle;
+  document.getElementById('valOpacity').textContent = opacity + '%';
+
+  // Container
+  showcase.style.width = width + 'px';
+  showcase.style.padding = padding + 'px';
+  showcase.style.borderRadius = radius + 'px';
+
+  // Background
+  const r = parseInt(bgColor.slice(1,3), 16);
+  const g = parseInt(bgColor.slice(3,5), 16);
+  const b = parseInt(bgColor.slice(5,7), 16);
+
+  if (showBg) {
+    showcase.classList.remove('no-bg');
+    showcase.style.background = `rgba(${r},${g},${b},${opacity/100})`;
+  } else {
+    showcase.classList.add('no-bg');
+  }
+
+  // Grid
+  grid.style.gridTemplateColumns = `repeat(${cols}, 1fr)`;
+  grid.style.gap = gap + 'px';
+  grid.style.width = '100%';
+
+  // Title
+  title.classList.toggle('hidden', !showTitle);
+  title.style.fontSize = fontTitle + 'px';
+  title.style.color = textColor;
+
+  subtitle.classList.toggle('hidden', !showSubtitle);
+  subtitle.style.color = textColor;
+  subtitle.style.opacity = '0.5';
+
+  // Cards
+  document.querySelectorAll('.user-card img').forEach(img => {
+    img.style.width = avatarSize + 'px';
+    img.style.height = avatarSize + 'px';
+    img.style.border = avatarBorder > 0 ? `${avatarBorder}px solid ${avatarBorderColor}` : 'none';
+  });
+
+  document.querySelectorAll('.user-card .name').forEach(el => {
+    el.classList.toggle('hidden', !showName);
+    el.style.fontSize = fontName + 'px';
+    el.style.color = textColor;
+  });
+
+  document.querySelectorAll('.user-card .username').forEach(el => {
+    el.classList.toggle('hidden', !showUsername);
+    el.style.fontSize = fontUser + 'px';
+    el.style.color = textColor;
+    el.style.opacity = '0.4';
+  });
+
+  document.querySelectorAll('.user-card .msgs').forEach(el => {
+    el.classList.toggle('hidden', !showMsgs);
+    el.style.fontSize = fontMsgs + 'px';
+  });
+}
+
+function applyPreset(name) {
+  const w = document.getElementById('ctrlWidth');
+  const c = document.getElementById('ctrlCols');
+  const g = document.getElementById('ctrlGap');
+  const a = document.getElementById('ctrlAvatar');
+  const p = document.getElementById('ctrlPadding');
+  const fn = document.getElementById('ctrlFontName');
+  const ft = document.getElementById('ctrlFontTitle');
+
+  switch(name) {
+    case 'story':
+      w.value = 540; c.value = 5; g.value = 12; a.value = 48; p.value = 24; fn.value = 10; ft.value = 20;
+      break;
+    case 'post':
+      w.value = 800; c.value = 7; g.value = 16; a.value = 56; p.value = 32; fn.value = 11; ft.value = 22;
+      break;
+    case 'wide':
+      w.value = 1280; c.value = 12; g.value = 16; a.value = 56; p.value = 32; fn.value = 12; ft.value = 24;
+      break;
+    case 'banner':
+      w.value = 1920; c.value = 16; g.value = 12; a.value = 48; p.value = 24; fn.value = 10; ft.value = 28;
+      break;
+  }
+  applySettings();
+}
+
+async function exportPNG() {
+  const showcase = document.getElementById('showcase');
+  const scale = parseInt(document.getElementById('ctrlScale').value);
+  const showBg = document.getElementById('togBg').checked;
+
+  try {
+    const canvas = await html2canvas(showcase, {
+      scale: scale,
+      backgroundColor: showBg ? null : null,
+      useCORS: true,
+      allowTaint: true,
+      logging: false,
+    });
+
+    const link = document.createElement('a');
+    link.download = 'meeting-showcase.png';
+    link.href = canvas.toDataURL('image/png');
+    link.click();
+  } catch(e) {
+    alert('Erro ao exportar: ' + e.message);
+  }
+}
+
+renderGrid();
+applySettings();
+</script>
+</body>
+</html>

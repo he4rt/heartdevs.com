@@ -13,6 +13,7 @@ use He4rt\PanelAdmin\Moderation\Livewire\ModerationDashboardLivewire;
 use He4rt\PanelAdmin\Moderation\Livewire\ModerationQueue;
 use He4rt\PanelAdmin\Moderation\ModerationCluster;
 use He4rt\PanelAdmin\Pages\Dashboard;
+use He4rt\PanelAdmin\Pages\MeetingShowcasePage;
 use Illuminate\Support\ServiceProvider;
 use Livewire\Livewire;
 
@@ -28,7 +29,7 @@ class PanelAdminServiceProvider extends ServiceProvider
             }
 
             $panel
-                ->pages([ModerationCluster::class])
+                ->pages([ModerationCluster::class, MeetingShowcasePage::class])
                 ->navigation($this->buildNavigation(...))
                 ->resources([
                     ExternalIdentityResource::class,
@@ -86,6 +87,7 @@ class PanelAdminServiceProvider extends ServiceProvider
             ...Dashboard::getNavigationItems(),
             ...ModerationCluster::getNavigationItems(),
             ...ExternalIdentityResource::getNavigationItems(),
+            ...MeetingShowcasePage::getNavigationItems(),
         ]);
     }
 
