@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace He4rt\IntegrationDiscord;
 
+use He4rt\IntegrationDiscord\ETL\Console\BackfillVoiceLogsCommand;
 use He4rt\IntegrationDiscord\ETL\Console\ImportDiscordMessagesCommand;
 use He4rt\IntegrationDiscord\ETL\Console\ImportDiscordProfilesCommand;
 use He4rt\IntegrationDiscord\ETL\Console\MergeDuplicateDiscordProfilesCommand;
@@ -39,6 +40,7 @@ class IntegrationDiscordServiceProvider extends ServiceProvider
                 ImportDiscordMessagesCommand::class,
                 MergeDuplicateDiscordProfilesCommand::class,
                 SyncDiscordGuildCommand::class,
+                BackfillVoiceLogsCommand::class,
             ]);
         }
     }
