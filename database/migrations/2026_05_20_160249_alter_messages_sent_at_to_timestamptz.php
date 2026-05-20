@@ -11,9 +11,4 @@ return new class extends Migration
     {
         DB::statement("ALTER TABLE messages ALTER COLUMN sent_at TYPE timestamptz USING sent_at AT TIME ZONE 'UTC'");
     }
-
-    public function down(): void
-    {
-        DB::statement('ALTER TABLE messages ALTER COLUMN sent_at TYPE timestamp(0) WITHOUT TIME ZONE');
-    }
 };
