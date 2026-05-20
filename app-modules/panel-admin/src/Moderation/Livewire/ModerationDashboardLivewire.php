@@ -346,10 +346,14 @@ class ModerationDashboardLivewire extends Component
     #[Computed]
     public function activityHeatmap(): array
     {
+        $tz = config('app.display_timezone');
+
         $dbData = DB::table('moderation_actions')
             ->where('created_at', '>=', now()->subDays(30))
-            ->selectRaw('EXTRACT(DOW FROM created_at) as dow, EXTRACT(HOUR FROM created_at) as hour, count(*) as total')
-            ->groupByRaw('EXTRACT(DOW FROM created_at), EXTRACT(HOUR FROM created_at)')
+            ->selectRaw("EXTRACT(DOW FROM created_at AT TIME ZONE 'UTC' AT TIME ZONE ?)::int AS dow", [$tz])
+            ->selectRaw("EXTRACT(HOUR FROM created_at AT TIME ZONE 'UTC' AT TIME ZONE ?)::int AS hour", [$tz])
+            ->selectRaw('COUNT(*) AS total')
+            ->groupBy('dow', 'hour')
             ->get();
 
         $grid = array_fill(0, 7, array_fill(0, 24, 0));
