@@ -20,8 +20,8 @@ final readonly class VoiceHeatmap
         $start = Date::now($tz)->subDays($this->rangeDays)->startOfDay()->utc();
 
         return DB::table('voice_messages')
-            ->selectRaw('EXTRACT(DOW FROM occurred_at AT TIME ZONE ?)::int AS dow', [$tz])
-            ->selectRaw('EXTRACT(HOUR FROM occurred_at AT TIME ZONE ?)::int AS hour', [$tz])
+            ->selectRaw("EXTRACT(DOW FROM occurred_at AT TIME ZONE 'UTC' AT TIME ZONE ?)::int AS dow", [$tz])
+            ->selectRaw("EXTRACT(HOUR FROM occurred_at AT TIME ZONE 'UTC' AT TIME ZONE ?)::int AS hour", [$tz])
             ->selectRaw('COUNT(*) AS total')
             ->where('occurred_at', '>=', $start)
             ->whereNotNull('occurred_at')
