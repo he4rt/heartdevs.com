@@ -32,4 +32,31 @@ final class EventFactory extends Factory
             'status' => EventStatus::Draft,
         ];
     }
+
+    public function published(): static
+    {
+        return $this->state(fn (): array => [
+            'status' => EventStatus::Published,
+        ]);
+    }
+
+    public function upcoming(): static
+    {
+        $startsAt = Date::now()->addDays(7);
+
+        return $this->state(fn (): array => [
+            'starts_at' => $startsAt,
+            'ends_at' => $startsAt->clone()->addHours(3),
+        ]);
+    }
+
+    public function past(): static
+    {
+        $startsAt = Date::now()->subDays(7);
+
+        return $this->state(fn (): array => [
+            'starts_at' => $startsAt,
+            'ends_at' => $startsAt->clone()->addHours(3),
+        ]);
+    }
 }
