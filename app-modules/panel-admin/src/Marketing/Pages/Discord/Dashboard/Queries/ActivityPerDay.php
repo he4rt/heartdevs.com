@@ -21,7 +21,7 @@ final readonly class ActivityPerDay
         $start = Date::now($tz)->subDays($this->rangeDays)->startOfDay()->utc();
 
         return DB::table('messages')
-            ->selectRaw("(sent_at AT TIME ZONE 'UTC' AT TIME ZONE ?)::date AS day", [$tz])
+            ->selectRaw('(sent_at AT TIME ZONE ?)::date AS day', [$tz])
             ->selectRaw('COUNT(*) AS total_messages')
             ->selectRaw('COUNT(DISTINCT external_identity_id) AS unique_users')
             ->where('sent_at', '>=', $start)

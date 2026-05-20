@@ -20,8 +20,8 @@ final readonly class MessageHeatmap
         $start = Date::now($tz)->subDays($this->rangeDays)->startOfDay()->utc();
 
         return DB::table('messages')
-            ->selectRaw("EXTRACT(DOW FROM sent_at AT TIME ZONE 'UTC' AT TIME ZONE ?)::int AS dow", [$tz])
-            ->selectRaw("EXTRACT(HOUR FROM sent_at AT TIME ZONE 'UTC' AT TIME ZONE ?)::int AS hour", [$tz])
+            ->selectRaw('EXTRACT(DOW FROM sent_at AT TIME ZONE ?)::int AS dow', [$tz])
+            ->selectRaw('EXTRACT(HOUR FROM sent_at AT TIME ZONE ?)::int AS hour', [$tz])
             ->selectRaw('COUNT(*) AS total')
             ->where('sent_at', '>=', $start)
             ->whereNotNull('sent_at')

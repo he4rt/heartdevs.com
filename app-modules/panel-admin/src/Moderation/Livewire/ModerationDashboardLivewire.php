@@ -350,8 +350,8 @@ class ModerationDashboardLivewire extends Component
 
         $dbData = DB::table('moderation_actions')
             ->where('created_at', '>=', now()->subDays(30))
-            ->selectRaw("EXTRACT(DOW FROM created_at AT TIME ZONE 'UTC' AT TIME ZONE ?)::int AS dow", [$tz])
-            ->selectRaw("EXTRACT(HOUR FROM created_at AT TIME ZONE 'UTC' AT TIME ZONE ?)::int AS hour", [$tz])
+            ->selectRaw('EXTRACT(DOW FROM created_at AT TIME ZONE ?)::int AS dow', [$tz])
+            ->selectRaw('EXTRACT(HOUR FROM created_at AT TIME ZONE ?)::int AS hour', [$tz])
             ->selectRaw('COUNT(*) AS total')
             ->groupBy('dow', 'hour')
             ->get();
