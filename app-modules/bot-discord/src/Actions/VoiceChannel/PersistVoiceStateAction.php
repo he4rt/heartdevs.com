@@ -46,7 +46,7 @@ final class PersistVoiceStateAction
                 'external_identity_id' => $identity->id,
                 'channel_name' => $event['channel_id'],
                 'state' => $event['state'],
-                'occurred_at' => now(),
+                'occurred_at' => now()->utc(),
                 'obtained_experience' => 0,
             ]);
         }
