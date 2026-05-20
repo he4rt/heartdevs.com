@@ -18,6 +18,8 @@ use He4rt\Events\Enrollment\Enums\AttendanceRequirement;
 use He4rt\Events\Enrollment\Enums\EnrollmentMethod;
 use He4rt\Events\Event\Enums\EventStatus;
 use He4rt\Events\Event\Enums\EventType;
+use He4rt\Events\Event\Models\Event;
+use Illuminate\Validation\Rules\Unique;
 
 final class EventForm
 {
@@ -35,7 +37,19 @@ final class EventForm
                 TextInput::make('slug')
                     ->label('Slug')
                     ->required()
-                    ->maxLength(120),
+                    ->maxLength(120)
+                    ->unique(
+                        table: Event::class,
+                        column: 'slug',
+                        ignoreRecord: true,
+                        modifyRuleUsing: function (Unique $rule, Get $get): Unique {
+                            $tenantId = $get('tenant_id');
+
+                            return filled($tenantId)
+                                ? $rule->where('tenant_id', $tenantId)
+                                : $rule->whereNull('tenant_id');
+                        },
+                    ),
 
                 Select::make('event_type')
                     ->label('Type')

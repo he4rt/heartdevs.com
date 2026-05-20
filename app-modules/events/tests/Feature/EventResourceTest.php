@@ -88,6 +88,33 @@ test('when submitting the create form with valid data, then event and enrollment
         ->and($event->enrollmentPolicy->enrollment_method)->toBe(EnrollmentMethod::Rsvp);
 });
 
+test('when submitting the create form with a duplicate slug for the same tenant, then validation fails', function (): void {
+    $tenant = Filament::getTenant();
+    $startsAt = now()->addDay();
+
+    Event::factory()->for($tenant)->create(['slug' => 'duplicate-slug']);
+
+    livewire(CreateEvent::class)
+        ->fillForm([
+            'title' => 'Another Event',
+            'slug' => 'duplicate-slug',
+            'tenant_id' => $tenant->getKey(),
+            'event_type' => EventType::Meetup,
+            'starts_at' => $startsAt,
+            'ends_at' => $startsAt->clone()->addHours(3),
+            'enrollmentPolicy' => [
+                'enrollment_method' => EnrollmentMethod::Rsvp,
+                'check_in_method' => CheckInMethod::Manual,
+                'attendance_requirement' => AttendanceRequirement::AllDays,
+                'xp_on_confirmed' => 0,
+                'xp_on_checked_in' => 0,
+                'xp_on_attended' => 0,
+            ],
+        ])
+        ->call('create')
+        ->assertHasFormErrors(['slug' => 'unique']);
+});
+
 test('when submitting the edit form with a new title, then it is updated in the database', function (): void {
     $event = Event::factory()
         ->has(EnrollmentPolicy::factory(), 'enrollmentPolicy')
