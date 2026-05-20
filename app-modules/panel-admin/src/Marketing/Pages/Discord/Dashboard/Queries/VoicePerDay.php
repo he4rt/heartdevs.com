@@ -17,10 +17,11 @@ final readonly class VoicePerDay
     /** @return Collection<int, array{day: string, joins: int, hours: float}> */
     public function get(): Collection
     {
-        $start = Date::now('America/Sao_Paulo')->subDays($this->rangeDays)->startOfDay()->utc();
+        $tz = config('app.display_timezone');
+        $start = Date::now($tz)->subDays($this->rangeDays)->startOfDay()->utc();
 
         return DB::table('voice_messages')
-            ->selectRaw("(occurred_at AT TIME ZONE 'America/Sao_Paulo')::date AS day")
+            ->selectRaw('(occurred_at AT TIME ZONE ?)::date AS day', [$tz])
             ->selectRaw('COUNT(*) AS total_joins')
             ->where('occurred_at', '>=', $start)
             ->whereNotNull('occurred_at')

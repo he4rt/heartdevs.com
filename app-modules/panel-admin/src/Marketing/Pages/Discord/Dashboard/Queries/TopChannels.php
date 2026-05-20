@@ -17,7 +17,8 @@ final readonly class TopChannels
     /** @return Collection<int, array{channel_id: string, total_messages: int, unique_users: int}> */
     public function get(): Collection
     {
-        $start = Date::now('America/Sao_Paulo')->subDays($this->rangeDays)->startOfDay()->utc();
+        $tz = config('app.display_timezone');
+        $start = Date::now($tz)->subDays($this->rangeDays)->startOfDay()->utc();
 
         return DB::table('messages')
             ->select('channel_id')

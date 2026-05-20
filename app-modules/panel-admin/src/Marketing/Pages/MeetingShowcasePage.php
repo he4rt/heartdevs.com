@@ -55,8 +55,9 @@ class MeetingShowcasePage extends Page
             return;
         }
 
-        $start = Date::parse($this->startDate, 'America/Sao_Paulo')->utc();
-        $end = Date::parse($this->endDate, 'America/Sao_Paulo')->utc();
+        $tz = config('app.display_timezone');
+        $start = Date::parse($this->startDate, $tz)->utc();
+        $end = Date::parse($this->endDate, $tz)->utc();
 
         $messageStats = Message::query()
             ->where('channel_id', $this->channelId)

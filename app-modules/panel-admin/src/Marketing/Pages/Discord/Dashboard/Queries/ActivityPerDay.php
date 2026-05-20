@@ -17,10 +17,11 @@ final readonly class ActivityPerDay
     /** @return Collection<int, array{day: string, msgs: int, users: int}> */
     public function get(): Collection
     {
-        $start = Date::now('America/Sao_Paulo')->subDays($this->rangeDays)->startOfDay()->utc();
+        $tz = config('app.display_timezone');
+        $start = Date::now($tz)->subDays($this->rangeDays)->startOfDay()->utc();
 
         return DB::table('messages')
-            ->selectRaw("(sent_at AT TIME ZONE 'UTC' AT TIME ZONE 'America/Sao_Paulo')::date AS day")
+            ->selectRaw("(sent_at AT TIME ZONE 'UTC' AT TIME ZONE ?)::date AS day", [$tz])
             ->selectRaw('COUNT(*) AS total_messages')
             ->selectRaw('COUNT(DISTINCT external_identity_id) AS unique_users')
             ->where('sent_at', '>=', $start)

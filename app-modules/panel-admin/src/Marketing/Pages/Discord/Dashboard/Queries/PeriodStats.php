@@ -182,7 +182,7 @@ final readonly class PeriodStats
     private function subdivisions(): array
     {
         return once(function (): array {
-            $now = Date::now('America/Sao_Paulo');
+            $now = Date::now(config('app.display_timezone'));
 
             [$blockCount, $blockSize, $unit] = match (true) {
                 $this->rangeDays >= 90 => [3, 30, 'days'],

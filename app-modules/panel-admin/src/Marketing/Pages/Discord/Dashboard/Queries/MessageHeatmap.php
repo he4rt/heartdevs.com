@@ -16,11 +16,12 @@ final readonly class MessageHeatmap
     /** @return array<int, array{row: int, col: int, value: int}> */
     public function get(): array
     {
-        $start = Date::now('America/Sao_Paulo')->subDays($this->rangeDays)->startOfDay()->utc();
+        $tz = config('app.display_timezone');
+        $start = Date::now($tz)->subDays($this->rangeDays)->startOfDay()->utc();
 
         return DB::table('messages')
-            ->selectRaw("EXTRACT(DOW FROM sent_at AT TIME ZONE 'UTC' AT TIME ZONE 'America/Sao_Paulo')::int AS dow")
-            ->selectRaw("EXTRACT(HOUR FROM sent_at AT TIME ZONE 'UTC' AT TIME ZONE 'America/Sao_Paulo')::int AS hour")
+            ->selectRaw("EXTRACT(DOW FROM sent_at AT TIME ZONE 'UTC' AT TIME ZONE ?)::int AS dow", [$tz])
+            ->selectRaw("EXTRACT(HOUR FROM sent_at AT TIME ZONE 'UTC' AT TIME ZONE ?)::int AS hour", [$tz])
             ->selectRaw('COUNT(*) AS total')
             ->where('sent_at', '>=', $start)
             ->whereNotNull('sent_at')
