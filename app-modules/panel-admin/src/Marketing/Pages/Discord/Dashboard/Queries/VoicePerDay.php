@@ -20,7 +20,7 @@ final readonly class VoicePerDay
         $start = Date::now('America/Sao_Paulo')->subDays($this->rangeDays)->startOfDay()->utc();
 
         return DB::table('voice_messages')
-            ->selectRaw("(occurred_at AT TIME ZONE 'UTC' AT TIME ZONE 'America/Sao_Paulo')::date AS day")
+            ->selectRaw("(occurred_at AT TIME ZONE 'America/Sao_Paulo')::date AS day")
             ->selectRaw('COUNT(*) AS total_joins')
             ->where('occurred_at', '>=', $start)
             ->whereNotNull('occurred_at')
