@@ -6,6 +6,7 @@ namespace He4rt\PanelApp\Livewire\Events;
 
 use Filament\Notifications\Notification;
 use He4rt\Events\Enrollment\Actions\EnrollUserAction;
+use He4rt\Events\Enrollment\DTOs\EnrollUserDTO;
 use He4rt\Events\Enrollment\Enums\EnrollmentMethod;
 use He4rt\Events\Enrollment\Exceptions\EnrollmentException;
 use He4rt\Events\Enrollment\Models\Enrollment;
@@ -67,7 +68,9 @@ final class EventDetail extends Component
         $user = auth()->user();
 
         try {
-            resolve(EnrollUserAction::class)->handle($this->event, $user);
+            resolve(EnrollUserAction::class)->handle(
+                EnrollUserDTO::fromModels($this->event, $user),
+            );
 
             unset($this->enrollment, $this->canConfirmPresence);
 

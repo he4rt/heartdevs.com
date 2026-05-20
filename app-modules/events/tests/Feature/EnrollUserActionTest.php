@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use He4rt\Events\Enrollment\Actions\EnrollUserAction;
+use He4rt\Events\Enrollment\DTOs\EnrollUserDTO;
 use He4rt\Events\Enrollment\Enums\EnrollmentMethod;
 use He4rt\Events\Enrollment\Enums\EnrollmentStatus;
 use He4rt\Events\Enrollment\Enums\TriggeredBy;
@@ -37,7 +38,7 @@ test('when a user enrolls in an rsvp event, then enrollment is confirmed with au
     $tenant = Tenant::factory()->create();
     $event = createRsvpEvent($tenant, [], ['xp_on_confirmed' => 50]);
 
-    $enrollment = resolve(EnrollUserAction::class)->handle($event, $user);
+    $enrollment = resolve(EnrollUserAction::class)->handle(EnrollUserDTO::fromModels($event, $user));
 
     expect($enrollment->status)->toBe(EnrollmentStatus::Confirmed)
         ->and($enrollment->enrolled_at)->not->toBeNull()
@@ -64,9 +65,9 @@ test('when a user enrolls twice in the same event, then duplicate enrollment is 
     $tenant = Tenant::factory()->create();
     $event = createRsvpEvent($tenant);
 
-    resolve(EnrollUserAction::class)->handle($event, $user);
+    resolve(EnrollUserAction::class)->handle(EnrollUserDTO::fromModels($event, $user));
 
-    resolve(EnrollUserAction::class)->handle($event, $user);
+    resolve(EnrollUserAction::class)->handle(EnrollUserDTO::fromModels($event, $user));
 })->throws(EnrollmentException::class);
 
 test('when a user enrolls in a past event, then enrollment is rejected', function (): void {
@@ -79,7 +80,7 @@ test('when a user enrolls in a past event, then enrollment is rejected', functio
         ->has(EnrollmentPolicy::factory()->rsvp(), 'enrollmentPolicy')
         ->create();
 
-    resolve(EnrollUserAction::class)->handle($event, $user);
+    resolve(EnrollUserAction::class)->handle(EnrollUserDTO::fromModels($event, $user));
 })->throws(EnrollmentException::class);
 
 test('when a user enrolls in a draft event, then enrollment is rejected', function (): void {
@@ -91,7 +92,7 @@ test('when a user enrolls in a draft event, then enrollment is rejected', functi
         ->has(EnrollmentPolicy::factory()->rsvp(), 'enrollmentPolicy')
         ->create(['status' => EventStatus::Draft]);
 
-    resolve(EnrollUserAction::class)->handle($event, $user);
+    resolve(EnrollUserAction::class)->handle(EnrollUserDTO::fromModels($event, $user));
 })->throws(EnrollmentException::class);
 
 test('when an event uses application enrollment method, then rsvp enrollment is rejected', function (): void {
@@ -106,7 +107,7 @@ test('when an event uses application enrollment method, then rsvp enrollment is 
         ]), 'enrollmentPolicy')
         ->create();
 
-    resolve(EnrollUserAction::class)->handle($event, $user);
+    resolve(EnrollUserAction::class)->handle(EnrollUserDTO::fromModels($event, $user));
 })->throws(EnrollmentException::class);
 
 test('when duplicate enrollment exists in database, then only one enrollment record is kept', function (): void {
@@ -114,7 +115,7 @@ test('when duplicate enrollment exists in database, then only one enrollment rec
     $tenant = Tenant::factory()->create();
     $event = createRsvpEvent($tenant);
 
-    resolve(EnrollUserAction::class)->handle($event, $user);
+    resolve(EnrollUserAction::class)->handle(EnrollUserDTO::fromModels($event, $user));
 
     expect(Enrollment::query()->where('event_id', $event->id)->where('user_id', $user->id)->count())->toBe(1);
 });
