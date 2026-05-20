@@ -16,7 +16,7 @@
             @foreach ($links as $link)
                 <a
                     href="{{ $link['anchor'] }}"
-                    class="text-sm font-medium text-gray-400 transition-colors hover:text-white"
+                    class="relative pb-1 text-sm font-medium text-gray-400 transition-colors after:absolute after:-bottom-1 after:left-0 after:h-0.5 after:w-0 after:rounded-full after:bg-[var(--primary)] after:transition-all after:duration-200 hover:text-white hover:after:w-full focus-visible:text-white focus-visible:after:w-full"
                 >
                     {{ $link['label'] }}
                 </a>
