@@ -143,7 +143,7 @@ final class BackfillVoiceLogsCommand extends Command
 
                     foreach ($messages as $message) {
                         $timestamp = CarbonImmutable::parse($message['timestamp']);
-                        $oldestTimestamp = $timestamp->format('Y-m-d H:i');
+                        $oldestTimestamp = $timestamp->timezone(config('app.display_timezone'))->format('Y-m-d H:i');
 
                         if ($timestamp->isBefore($since)) {
                             $reachedSince = true;
@@ -181,7 +181,7 @@ final class BackfillVoiceLogsCommand extends Command
                             $this->alreadyExistsCount++;
                             $logger->line(sprintf(
                                 '%s <@%s> %s #%s [EXISTS]',
-                                $timestamp->format('m/d H:i'),
+                                $timestamp->timezone(config('app.display_timezone'))->format('m/d H:i'),
                                 $voiceDto->userDiscordId,
                                 $voiceDto->action,
                                 $channelName,
@@ -201,7 +201,7 @@ final class BackfillVoiceLogsCommand extends Command
 
                             $logger->line(sprintf(
                                 '%s <@%s> %s #%s [NEW]',
-                                $timestamp->format('m/d H:i'),
+                                $timestamp->timezone(config('app.display_timezone'))->format('m/d H:i'),
                                 $voiceDto->userDiscordId,
                                 $voiceDto->action,
                                 $channelName,
