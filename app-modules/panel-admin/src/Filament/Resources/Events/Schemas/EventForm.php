@@ -16,6 +16,7 @@ use Filament\Schemas\Schema;
 use He4rt\Events\CheckIn\Enums\CheckInMethod;
 use He4rt\Events\Enrollment\Enums\AttendanceRequirement;
 use He4rt\Events\Enrollment\Enums\EnrollmentMethod;
+use He4rt\Events\Event\Enums\EventStatus;
 use He4rt\Events\Event\Enums\EventType;
 
 final class EventForm
@@ -65,9 +66,11 @@ final class EventForm
                     ->required()
                     ->after('starts_at'),
 
-                Toggle::make('active')
-                    ->label('Published')
-                    ->default(false)
+                Select::make('status')
+                    ->label('Status')
+                    ->options(EventStatus::class)
+                    ->default(EventStatus::Draft)
+                    ->required()
                     ->columnSpanFull(),
 
                 Section::make('Enrollment Policy')
