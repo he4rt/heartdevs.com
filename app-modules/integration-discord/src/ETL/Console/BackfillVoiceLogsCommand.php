@@ -133,7 +133,7 @@ final class BackfillVoiceLogsCommand extends Command
                     /** @var list<array<string, mixed>> $messages */
                     $messages = $response->json();
 
-                    if (!is_array($messages) || $messages === []) {
+                    if ($messages === []) {
                         break;
                     }
 
