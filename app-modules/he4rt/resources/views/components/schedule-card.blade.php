@@ -1,14 +1,11 @@
-@props([
-    'startsAt',
-    'endsAt',
-    'title',
-    'icon',
-    'speakers',
-])
+@props (['startsAt', 'endsAt', 'title', 'icon', 'speakers'])
 
 @php
     /** @var \Carbon\Carbon $startsAt */
     /** @var \Carbon\Carbon $endsAt */
+
+    $startsAt = $startsAt->timezone(config('app.display_timezone'));
+    $endsAt = $endsAt->timezone(config('app.display_timezone'));
 
     $config = match (true) {
         $endsAt->isPast() => [
@@ -51,7 +48,7 @@
 
                     @if ($speakers)
                         <span class="text-text-medium">
-                            // {{ $speakers->map(fn ($speaker) => $speaker->name)->implode(',  ') }} \\
+                            // {{ $speakers->map(fn($speaker) => $speaker->name)->implode(',  ') }} \\
                         </span>
                     @endif
                 </div>

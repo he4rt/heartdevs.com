@@ -152,8 +152,8 @@
     };
 
     // Now indicator
-    $nowRow = $highlightNow && $isWeek ? (int) now()->format('N') - 1 : -1;
-    $nowCol = $highlightNow && $isWeek ? (int) now()->format('G') : -1;
+    $nowRow = $highlightNow && $isWeek ? (int) now(config('app.display_timezone'))->format('N') - 1 : -1;
+    $nowCol = $highlightNow && $isWeek ? (int) now(config('app.display_timezone'))->format('G') : -1;
 
     // Auto insight
     $autoHeadline = $insightHeadline;
