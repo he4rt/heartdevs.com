@@ -47,6 +47,8 @@ return [
         'redirect_uri' => env('TWITCH_OAUTH_REDIRECT_URI', 'https://localhost:8000/auth/oauth/twitch'),
         'scopes' => env('TWITCH_OAUTH_SCOPES', ''),
         'enabled' => env('TWITCH_OAUTH_ENABLED', true),
+        'eventsub_secret' => env('TWITCH_EVENTSUB_SECRET'),
+        'eventsub_callback' => env('TWITCH_EVENTSUB_CALLBACK'),
     ],
 
     'devto' => [

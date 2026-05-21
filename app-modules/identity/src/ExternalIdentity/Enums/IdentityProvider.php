@@ -15,7 +15,7 @@ use He4rt\Identity\Auth\DTOs\OAuthStateDTO;
 use He4rt\IntegrationDevTo\OAuth\DevToOAuthClient;
 use He4rt\IntegrationDiscord\ETL\Adapters\DiscordMessageAdapter;
 use He4rt\IntegrationDiscord\OAuth\DiscordOAuthClient;
-use He4rt\IntegrationTwitch\OAuth\Contracts\TwitchOAuthService;
+use He4rt\IntegrationTwitch\OAuth\TwitchOAuthClient;
 use LogicException;
 
 enum IdentityProvider: string implements HasColor, HasDescription, HasIcon, HasLabel
@@ -51,7 +51,7 @@ enum IdentityProvider: string implements HasColor, HasDescription, HasIcon, HasL
     public function getClient(): ?OAuthClientContract
     {
         return match ($this) {
-            self::Twitch => resolve(TwitchOAuthService::class),
+            self::Twitch => resolve(TwitchOAuthClient::class),
             self::Discord => resolve(DiscordOAuthClient::class),
             self::DevTo => resolve(DevToOAuthClient::class),
             default => null,
