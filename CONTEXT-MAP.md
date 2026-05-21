@@ -11,6 +11,7 @@ This is a modular monorepo (`internachi/modular`). Each bounded context lives un
 | Integration Discord | `app-modules/integration-discord/` | Discord platform transport (REST API via Saloon), OAuth, ETL                |
 | Identity            | `app-modules/identity/`            | Users, tenants, external identities, authentication                         |
 | Panel Admin         | `app-modules/panel-admin/`         | Filament admin panel — dashboards, resources, moderation UI, marketing      |
+| Integration Twitch  | `app-modules/integration-twitch/`  | Twitch platform transport (Helix API via Saloon), OAuth, EventSub webhooks  |
 
 ## Relationships
 
@@ -28,15 +29,16 @@ This is a modular monorepo (`internachi/modular`). Each bounded context lives un
 └────────┬────────┘
          │ resolves identities
          ▼
-┌─────────────────┐
-│    Identity     │
-│ (users/tenants) │
-└─────────────────┘
+┌─────────────────┐         ┌──────────────────────┐
+│    Identity     │◀────────│ Integration Twitch   │
+│ (users/tenants) │         │ (transport/webhooks) │
+└─────────────────┘         └──────────────────────┘
 ```
 
 ### Dependency rules
 
-- **Moderation** is platform-agnostic. It never imports from `bot-discord` or `integration-discord`.
+- **Moderation** is platform-agnostic. It never imports from `bot-discord`, `integration-discord`, or `integration-twitch`.
 - **Bot Discord** depends on Moderation (listens to domain events) and Integration Discord (uses transport).
 - **Integration Discord** depends on Identity (OAuth user resolution). It never imports from Moderation.
+- **Integration Twitch** depends on Identity (OAuth user resolution, ExternalIdentity for tenant linking). It never imports from Moderation, Integration Discord, or Bot Discord.
 - **Identity** has no upstream dependencies on other contexts listed here.
