@@ -418,7 +418,11 @@ class ImportDiscordMessagesCommand extends Command
         $map = [];
 
         foreach ($channels as $channel) {
-            if (!is_array($channel) || !isset($channel['id'])) {
+            if (!is_array($channel)) {
+                continue;
+            }
+
+            if (!isset($channel['id'])) {
                 continue;
             }
 
@@ -462,7 +466,11 @@ class ImportDiscordMessagesCommand extends Command
         $dirs = [];
 
         foreach (scandir($basePath) as $entry) {
-            if ($entry === '.' || $entry === '..') {
+            if ($entry === '.') {
+                continue;
+            }
+
+            if ($entry === '..') {
                 continue;
             }
 

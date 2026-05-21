@@ -316,7 +316,11 @@ class MergeDuplicateDiscordProfilesCommand extends Command
         }
 
         foreach ($metadata['badges'] ?? [] as $badge) {
-            if (!is_array($badge) || ($badge['id'] ?? null) !== 'legacy_username') {
+            if (!is_array($badge)) {
+                continue;
+            }
+
+            if (($badge['id'] ?? null) !== 'legacy_username') {
                 continue;
             }
 

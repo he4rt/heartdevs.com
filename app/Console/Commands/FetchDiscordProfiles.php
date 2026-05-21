@@ -294,7 +294,11 @@ class FetchDiscordProfiles extends Command
         array_shift($lines);
 
         foreach ($lines as $line) {
-            if ($line === '' || $line === '0') {
+            if ($line === '') {
+                continue;
+            }
+
+            if ($line === '0') {
                 continue;
             }
 

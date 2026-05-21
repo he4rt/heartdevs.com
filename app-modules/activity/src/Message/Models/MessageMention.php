@@ -7,6 +7,8 @@ namespace He4rt\Activity\Message\Models;
 use Carbon\Carbon;
 use He4rt\Identity\ExternalIdentity\Models\ExternalIdentity;
 use He4rt\Identity\Tenant\Models\Tenant;
+use Illuminate\Database\Eloquent\Attributes\Fillable;
+use Illuminate\Database\Eloquent\Attributes\Table;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -22,21 +24,19 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
  */
+#[Fillable([
+    'id',
+    'tenant_id',
+    'message_id',
+    'mentioned_identity_id',
+    'mentioned_provider_account_id',
+    'mentioned_username',
+    'position',
+])]
+#[Table(name: 'message_mentions')]
 final class MessageMention extends Model
 {
     use HasUuids;
-
-    protected $table = 'message_mentions';
-
-    protected $fillable = [
-        'id',
-        'tenant_id',
-        'message_id',
-        'mentioned_identity_id',
-        'mentioned_provider_account_id',
-        'mentioned_username',
-        'position',
-    ];
 
     /**
      * @return BelongsTo<Message, $this>

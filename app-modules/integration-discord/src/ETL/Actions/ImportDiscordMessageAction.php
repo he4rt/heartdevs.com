@@ -140,7 +140,11 @@ final class ImportDiscordMessageAction
     {
         $newAuthors = [];
         foreach ($dtos as $dto) {
-            if (isset($existingCache[$dto->authorDiscordId]) || isset($newAuthors[$dto->authorDiscordId])) {
+            if (isset($existingCache[$dto->authorDiscordId])) {
+                continue;
+            }
+
+            if (isset($newAuthors[$dto->authorDiscordId])) {
                 continue;
             }
 

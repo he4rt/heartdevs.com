@@ -7,6 +7,7 @@ namespace He4rt\IntegrationDiscord\Models;
 use Carbon\Carbon;
 use He4rt\Identity\ExternalIdentity\Models\ExternalIdentity;
 use He4rt\IntegrationDiscord\Database\Factories\DiscordMemberFactory;
+use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -36,26 +37,25 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property-read Collection<int, DiscordRole> $roles
  * @property-read Collection<int, DiscordMemberRoleHistory> $roleHistory
  */
+#[Fillable([
+    'discord_guild_id',
+    'discord_user_id',
+    'external_identity_id',
+    'username',
+    'global_name',
+    'avatar',
+    'nickname',
+    'is_bot',
+    'is_pending',
+    'joined_at',
+    'premium_since',
+    'communication_disabled_until',
+    'left_at',
+])]
 final class DiscordMember extends Model
 {
     /** @use HasFactory<DiscordMemberFactory> */
     use HasFactory;
-
-    protected $fillable = [
-        'discord_guild_id',
-        'discord_user_id',
-        'external_identity_id',
-        'username',
-        'global_name',
-        'avatar',
-        'nickname',
-        'is_bot',
-        'is_pending',
-        'joined_at',
-        'premium_since',
-        'communication_disabled_until',
-        'left_at',
-    ];
 
     /**
      * @return BelongsTo<DiscordGuild, $this>

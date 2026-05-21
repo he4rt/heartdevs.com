@@ -8,6 +8,8 @@ use He4rt\Activity\Database\Factories\TimelineFactory;
 use He4rt\Activity\Reaction\Concerns\HasReactions;
 use He4rt\Identity\Tenant\Models\Tenant;
 use He4rt\Identity\User\Models\User;
+use Illuminate\Database\Eloquent\Attributes\Fillable;
+use Illuminate\Database\Eloquent\Attributes\Table;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -30,26 +32,24 @@ use Illuminate\Support\Carbon;
  * @property Carbon $created_at
  * @property Carbon $updated_at
  */
+#[Fillable([
+    'user_id',
+    'tenant_id',
+    'postable_type',
+    'postable_id',
+    'root_id',
+    'parent_id',
+    'is_ignored',
+    'pinned',
+    'views',
+])]
+#[Table(name: 'activity_timeline')]
 final class Timeline extends Model
 {
     /** @use HasFactory<TimelineFactory> */
     use HasFactory;
     use HasReactions;
     use HasUuids;
-
-    protected $table = 'activity_timeline';
-
-    protected $fillable = [
-        'user_id',
-        'tenant_id',
-        'postable_type',
-        'postable_id',
-        'root_id',
-        'parent_id',
-        'is_ignored',
-        'pinned',
-        'views',
-    ];
 
     /** @return BelongsTo<User, $this> */
     public function user(): BelongsTo

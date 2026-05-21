@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace He4rt\Activity\Timeline\Delegated;
 
 use He4rt\Activity\Database\Factories\PostEntryFactory;
+use Illuminate\Database\Eloquent\Attributes\Fillable;
+use Illuminate\Database\Eloquent\Attributes\Table;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -12,6 +14,10 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
 
+#[Fillable([
+    'content',
+])]
+#[Table(name: 'activity_post_entries')]
 final class PostEntry extends Model implements HasMedia
 {
     /** @use HasFactory<PostEntryFactory> */
@@ -19,12 +25,6 @@ final class PostEntry extends Model implements HasMedia
     use HasUuids;
     use InteractsWithMedia;
     use SoftDeletes;
-
-    protected $table = 'activity_post_entries';
-
-    protected $fillable = [
-        'content',
-    ];
 
     public function registerMediaCollections(): void
     {

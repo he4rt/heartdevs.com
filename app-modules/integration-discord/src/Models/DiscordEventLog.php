@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace He4rt\IntegrationDiscord\Models;
 
 use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Model;
 
 /**
@@ -17,16 +18,15 @@ use Illuminate\Database\Eloquent\Model;
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
  */
+#[Fillable([
+    'event_type',
+    'guild_id',
+    'user_id',
+    'channel_id',
+    'payload',
+])]
 final class DiscordEventLog extends Model
 {
-    protected $fillable = [
-        'event_type',
-        'guild_id',
-        'user_id',
-        'channel_id',
-        'payload',
-    ];
-
     /**
      * @return array<string, string>
      */
