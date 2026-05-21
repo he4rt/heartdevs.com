@@ -8,6 +8,7 @@ use He4rt\Activity\Timeline\DTOs\CreatePostDTO;
 use He4rt\Activity\Timeline\Timeline;
 use He4rt\Identity\Tenant\Models\Tenant;
 use He4rt\Identity\User\Models\User;
+use Illuminate\Database\QueryException;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
 uses(RefreshDatabase::class);
@@ -50,14 +51,11 @@ test('creates a post with long content succeeds', function (): void {
 });
 
 test('post creation is atomic — no orphaned PostEntry on Timeline failure', function (): void {
-    try {
-        resolve(CreatePost::class)->handle(new CreatePostDTO(
-            userId: 'not-a-valid-uuid',
-            tenantId: $this->tenant->id,
-            content: 'This should fail',
-        ));
-    } catch (Throwable) {
-    }
+    expect(fn () => resolve(CreatePost::class)->handle(new CreatePostDTO(
+        userId: 'not-a-valid-uuid',
+        tenantId: $this->tenant->id,
+        content: 'This should fail',
+    )))->toThrow(QueryException::class);
 
     $this->assertDatabaseCount('activity_post_entries', 0);
 });

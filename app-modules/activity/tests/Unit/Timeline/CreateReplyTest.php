@@ -8,6 +8,7 @@ use He4rt\Activity\Timeline\DTOs\CreateReplyDTO;
 use He4rt\Activity\Timeline\Timeline;
 use He4rt\Identity\Tenant\Models\Tenant;
 use He4rt\Identity\User\Models\User;
+use Illuminate\Database\QueryException;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
 uses(RefreshDatabase::class);
@@ -92,15 +93,12 @@ test('reply creation is atomic — no orphaned PostEntry on Timeline failure', f
 
     $initialCount = PostEntry::query()->count();
 
-    try {
-        resolve(CreateReply::class)->handle(new CreateReplyDTO(
-            userId: 'non-existent-user-id',
-            tenantId: $tenant->id,
-            parentTimelineId: $rootPost->id,
-            content: 'This should fail',
-        ));
-    } catch (Throwable) {
-    }
+    expect(fn () => resolve(CreateReply::class)->handle(new CreateReplyDTO(
+        userId: 'non-existent-user-id',
+        tenantId: $tenant->id,
+        parentTimelineId: $rootPost->id,
+        content: 'This should fail',
+    )))->toThrow(QueryException::class);
 
     expect(PostEntry::query()->count())->toBe($initialCount);
 });
