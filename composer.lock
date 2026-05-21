@@ -3642,6 +3642,42 @@
             }
         },
         {
+            "name": "he4rt/profile",
+            "version": "1.0",
+            "dist": {
+                "type": "path",
+                "url": "app-modules/profile",
+                "reference": null
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "He4rt\\Profile\\ProfileServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "He4rt\\Profile\\": "src/",
+                    "He4rt\\Profile\\Database\\Factories\\": "database/factories/",
+                    "He4rt\\Profile\\Database\\Seeders\\": "database/seeders/"
+                }
+            },
+            "autoload-dev": {
+                "psr-4": {
+                    "He4rt\\Profile\\Tests\\": "tests/"
+                }
+            },
+            "license": [
+                "proprietary"
+            ],
+            "transport-options": {
+                "symlink": true,
+                "relative": true
+            }
+        },
+        {
             "name": "internachi/modular",
             "version": "3.0.2",
             "source": {

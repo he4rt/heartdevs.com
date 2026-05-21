@@ -30,6 +30,7 @@
         "he4rt/panel-admin": ">=1",
         "he4rt/panel-app": ">=1",
         "he4rt/portal": ">=1",
+        "he4rt/profile": ">=1",
         "internachi/modular": "^3.0.2",
         "laracord/framework": "dev-next",
         "laravel/framework": "^13.11.2",
