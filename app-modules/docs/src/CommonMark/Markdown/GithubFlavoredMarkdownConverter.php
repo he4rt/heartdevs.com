@@ -10,8 +10,6 @@ use League\CommonMark\Extension\Attributes\AttributesExtension;
 use League\CommonMark\Extension\CommonMark\CommonMarkCoreExtension;
 use League\CommonMark\MarkdownConverter;
 
-use function assert;
-
 /**
  * Converts GitHub Flavored Markdown to HTML.
  */
@@ -34,8 +32,6 @@ final class GithubFlavoredMarkdownConverter extends MarkdownConverter
 
     public function getEnvironment(): EnvironmentInterface
     {
-        assert($this->environment instanceof EnvironmentInterface);
-
         return $this->environment;
     }
 }

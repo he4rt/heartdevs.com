@@ -47,7 +47,7 @@ class SyncDevToArticles extends Command
                 match ($result) {
                     'created' => $totalCreated++,
                     'updated' => $totalUpdated++,
-                    'skipped' => $totalSkipped++,
+                    default => $totalSkipped++,
                 };
             }
 
@@ -59,6 +59,7 @@ class SyncDevToArticles extends Command
         return self::SUCCESS;
     }
 
+    /** @param array<string, mixed> $article */
     private function processArticle(array $article): string
     {
         $devToUsername = $article['user']['username'] ?? null;
@@ -119,7 +120,7 @@ class SyncDevToArticles extends Command
         $articleDetails = $this->apiClient->getArticle($article['id']);
 
         $this->trackActivity->handle(new TrackActivityDTO(
-            characterId: $character->id,
+            characterId: (string) $character->id,
             tenantId: (int) $externalIdentity->tenant_id,
             type: ActivityType::Article,
             provider: IdentityProvider::DevTo,

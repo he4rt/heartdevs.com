@@ -10,7 +10,7 @@ use Illuminate\Contracts\Cache\Repository as Cache;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
-use League\CommonMark\Output\RenderedContent;
+use League\CommonMark\Output\RenderedContentInterface;
 
 class Documentation
 {
@@ -25,9 +25,9 @@ class Documentation
      * @param  string  $version
      * @param  string  $content
      */
-    public static function replaceLinks($version, RenderedContent|string $content): string
+    public static function replaceLinks($version, RenderedContentInterface|string $content): string
     {
-        $content = $content instanceof RenderedContent ? $content->getContent() : $content;
+        $content = $content instanceof RenderedContentInterface ? $content->getContent() : $content;
 
         return str_replace('%7B%7Bversion%7D%7D', $version, $content);
     }
@@ -107,7 +107,7 @@ class Documentation
             return [
                 'pages' => collect(explode(PHP_EOL, static::replaceLinks($version, $this->files->get($path))))
                     ->filter(fn ($line) => Str::contains($line, '/docs/{{version}}/'))
-                    ->map(fn ($line) => resource_path(Str::of($line)->afterLast('(/')->before(')')->replace('{{version}}', $version)->append('.md')))
+                    ->map(fn ($line) => resource_path(Str::of($line)->afterLast('(/')->before(')')->replace('{{version}}', $version)->append('.md')->toString()))
                     ->filter(fn ($path) => $this->files->exists($path))
                     ->mapWithKeys(function ($path): array {
                         $contents = $this->files->get($path);
@@ -170,8 +170,11 @@ class Documentation
 
             foreach ($lines as $line) {
                 $line = mb_trim($line);
+                if ($line === '') {
+                    continue;
+                }
 
-                if ($line === '' || $line === '0') {
+                if ($line === '0') {
                     continue;
                 }
 
@@ -208,7 +211,7 @@ class Documentation
     }
 
     /**
-     * @return array<string, mixed>
+     * @return list<array<string, int|string|null>>
      */
     public function getToc(string $markdown): array
     {
