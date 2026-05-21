@@ -5,7 +5,6 @@ declare(strict_types=1);
 use Rector\Caching\ValueObject\Storage\FileCacheStorage;
 use Rector\CodingStyle\Rector\PostInc\PostIncDecToPreIncDecRector;
 use Rector\Config\RectorConfig;
-use Rector\EarlyReturn\Rector\If_\ChangeOrIfContinueToMultiContinueRector;
 use Rector\Php70\Rector\StaticCall\StaticCallOnNonStaticToInstanceCallRector;
 use Rector\Php83\Rector\ClassMethod\AddOverrideAttributeToOverriddenMethodsRector;
 use Rector\TypeDeclaration\Rector\ArrowFunction\AddArrowFunctionReturnTypeRector;
@@ -18,6 +17,7 @@ use RectorLaravel\Rector\FuncCall\ConfigToTypedConfigMethodCallRector;
 use RectorLaravel\Rector\MethodCall\RefactorBlueprintGeometryColumnsRector;
 use RectorLaravel\Rector\PropertyFetch\ReplaceFakerInstanceWithHelperRector;
 use RectorLaravel\Set\LaravelSetList;
+use RectorPest\Set\PestSetList;
 
 return RectorConfig::configure()
     ->withPaths([
@@ -34,9 +34,12 @@ return RectorConfig::configure()
         __DIR__.'/app-modules/*/tests',
     ])
     ->withSkip([
+        AddArrowFunctionReturnTypeRector::class,
+        AddHasFactoryToModelsRector::class,
+        AddOverrideAttributeToOverriddenMethodsRector::class,
+        PostIncDecToPreIncDecRector::class,
+        StaticCallOnNonStaticToInstanceCallRector::class,
         __DIR__.'/bootstrap/cache',
-        __DIR__.'resources/views/flux/flux-styles.blade.php',
-        __DIR__.'resources/views/flux/flux-scripts.blade.php',
     ])
     ->withCache(cacheDirectory: __DIR__.'/.rector.result.cache', cacheClass: FileCacheStorage::class)
     ->withImportNames(removeUnusedImports: true)
@@ -78,12 +81,7 @@ return RectorConfig::configure()
         LaravelSetList::LARAVEL_IF_HELPERS,
         LaravelSetList::LARAVEL_TESTING,
         LaravelSetList::LARAVEL_TYPE_DECLARATIONS,
-    ])
-    ->withSkip([
-        AddOverrideAttributeToOverriddenMethodsRector::class,
-        ChangeOrIfContinueToMultiContinueRector::class,
-        PostIncDecToPreIncDecRector::class,
-        AddArrowFunctionReturnTypeRector::class,
-        StaticCallOnNonStaticToInstanceCallRector::class,
-        AddHasFactoryToModelsRector::class,
+        PestSetList::PEST_CODE_QUALITY,
+        PestSetList::PEST_LARAVEL,
+        LaravelSetList::LARAVEL_130,
     ]);

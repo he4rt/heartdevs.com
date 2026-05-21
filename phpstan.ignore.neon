@@ -1,31 +1,7 @@
 parameters:
     ignoreErrors:
-        - message: '#^Call to an undefined method App\\Providers\\FilamentServiceProvider::getId\(\)\.$#'
-          identifier: method.notFound
-          count: 2
-          path: app/Providers/FilamentServiceProvider.php
-
-        - message: '#^Call to an undefined method App\\Providers\\FilamentServiceProvider::colors\(\)\.$#'
-          identifier: method.notFound
-          count: 1
-          path: app/Providers/FilamentServiceProvider.php
-
-        - message: '#^Call to an undefined method App\\Providers\\FilamentServiceProvider::discoverResources\(\)\.$#'
-          identifier: method.notFound
-          count: 1
-          path: app/Providers/FilamentServiceProvider.php
-
-        - message: '#^Call to an undefined method App\\Providers\\FilamentServiceProvider::viteTheme\(\)\.$#'
-          identifier: method.notFound
-          count: 1
-          path: app/Providers/FilamentServiceProvider.php
-
-        - message: '#^Function module_path not found\.$#'
-          identifier: function.notFound
-          count: 1
-          path: app/Providers/FilamentServiceProvider.php
-
-        - message: '#^Call to an undefined method Filament\\Panel::discoverResourcesForPanel\(\)\.$#'
-          identifier: method.notFound
-          count: 1
-          path: app/Providers/Filament/AdminPanelProvider.php
+        -
+            message: '#^Call to an undefined method App\\Providers\\FilamentServiceProvider::getId\(\)\.$#'
+            identifier: method.notFound
+            count: 1
+            path: app/Providers/FilamentServiceProvider.php
