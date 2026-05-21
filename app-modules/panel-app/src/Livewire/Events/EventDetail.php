@@ -33,7 +33,7 @@ final class EventDetail extends Component
             ->with('enrollmentPolicy')
             ->where('id', $this->eventId)
             ->where('tenant_id', filament()->getTenant()->getKey())
-            ->where('status', EventStatus::Published)
+            ->whereIn('status', [EventStatus::Published, EventStatus::Completed])
             ->firstOrFail();
     }
 

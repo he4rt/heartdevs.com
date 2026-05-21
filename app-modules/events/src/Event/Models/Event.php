@@ -110,7 +110,7 @@ final class Event extends Model
     protected function scopeActive(Builder $query): void
     {
         $query->where('status', EventStatus::Published)
-            ->where('starts_at', '>', now());
+            ->where('ends_at', '>', now());
     }
 
     /** @return array<string, mixed> */
