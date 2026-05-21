@@ -30,7 +30,7 @@ test('persists a dispatch event to discord_event_logs', function (): void {
         ->and($log->guild_id)->toBe('123456789')
         ->and($log->user_id)->toBe('987654321')
         ->and($log->payload)->toBeArray()
-        ->and($log->payload['roles'])->toBe([]);
+        ->and($log->payload['roles'])->toBeEmpty();
 });
 
 test('extracts user_id from author when user_id is absent', function (): void {

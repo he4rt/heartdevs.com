@@ -181,7 +181,7 @@ test('DiscordMessageReactionDTO returns empty array for message without reaction
     $raw = discordMessage(['reactions' => []]);
     $reactions = DiscordMessageReactionDTO::fromDumpMessage($raw);
 
-    expect($reactions)->toBe([]);
+    expect($reactions)->toBeEmpty();
 });
 
 test('DiscordMessageReactionDTO extracts unicode emoji with null emoji_id', function (): void {
