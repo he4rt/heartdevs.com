@@ -155,6 +155,6 @@ test('empty state shows when no cases match filters', function (): void {
         ->set('statusFilter', 'all')
         ->set('platformFilter', 'github');
 
-    expect($component->get('cases'))->toHaveCount(0);
+    expect($component->get('cases'))->toBeEmpty();
     expect($component->get('selectedCaseId'))->toBeNull();
 });

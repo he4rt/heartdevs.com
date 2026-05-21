@@ -126,6 +126,6 @@ test('empty state shows when no appeals match filter', function (): void {
     $component = livewire(AppealQueue::class)
         ->set('statusFilter', 'upheld');
 
-    expect($component->get('appeals'))->toHaveCount(0);
+    expect($component->get('appeals'))->toBeEmpty();
     expect($component->get('selectedAppealId'))->toBeNull();
 });
