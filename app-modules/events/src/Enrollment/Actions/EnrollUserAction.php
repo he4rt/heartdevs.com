@@ -13,6 +13,7 @@ use He4rt\Events\Enrollment\Exceptions\EnrollmentException;
 use He4rt\Events\Enrollment\Models\Enrollment;
 use He4rt\Events\Enrollment\Models\EnrollmentTransition;
 use He4rt\Events\Event\Enums\EventStatus;
+use Illuminate\Database\UniqueConstraintViolationException;
 use Illuminate\Support\Facades\DB;
 
 final readonly class EnrollUserAction
@@ -30,33 +31,37 @@ final readonly class EnrollUserAction
                 EnrollmentException::alreadyEnrolled(),
             );
 
-            $now = now();
+            try {
+                $now = now();
 
-            $enrollment = new Enrollment([
-                'event_id' => $dto->eventId,
-                'user_id' => $dto->userId,
-                'enrolled_at' => $now,
-                'confirmed_at' => $now,
-            ]);
-            $enrollment->status = EnrollmentStatus::Confirmed;
-            $enrollment->save();
+                $enrollment = new Enrollment([
+                    'event_id' => $dto->eventId,
+                    'user_id' => $dto->userId,
+                    'enrolled_at' => $now,
+                    'confirmed_at' => $now,
+                ]);
+                $enrollment->status = EnrollmentStatus::Confirmed;
+                $enrollment->save();
 
-            EnrollmentTransition::query()->create([
-                'enrollment_id' => $enrollment->id,
-                'from_status' => null,
-                'to_status' => EnrollmentStatus::Confirmed,
-                'actor_id' => $dto->userId,
-                'triggered_by' => TriggeredBy::User,
-            ]);
+                EnrollmentTransition::query()->create([
+                    'enrollment_id' => $enrollment->id,
+                    'from_status' => null,
+                    'to_status' => EnrollmentStatus::Confirmed,
+                    'actor_id' => $dto->userId,
+                    'triggered_by' => TriggeredBy::User,
+                ]);
 
-            event(new EnrollmentConfirmed(
-                enrollmentId: $enrollment->id,
-                eventId: $dto->eventId,
-                userId: $dto->userId,
-                xpRewardRsvp: $dto->xpRewardOnConfirmed,
-            ));
+                event(new EnrollmentConfirmed(
+                    enrollmentId: $enrollment->id,
+                    eventId: $dto->eventId,
+                    userId: $dto->userId,
+                    xpRewardRsvp: $dto->xpRewardOnConfirmed,
+                ));
 
-            return $enrollment->fresh(['event.enrollmentPolicy']);
+                return $enrollment->fresh(['event.enrollmentPolicy']);
+            } catch (UniqueConstraintViolationException) {
+                throw EnrollmentException::alreadyEnrolled();
+            }
         });
     }
 

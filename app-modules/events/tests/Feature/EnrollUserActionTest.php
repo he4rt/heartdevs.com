@@ -60,6 +60,40 @@ test('when a user enrolls in an rsvp event, then enrollment is confirmed with au
         && $event->xpRewardRsvp === 50);
 });
 
+test('when concurrent enrollment hits unique index, then already enrolled exception is thrown', function (): void {
+    $user = User::factory()->create();
+    $tenant = Tenant::factory()->create();
+    $event = createRsvpEvent($tenant);
+    $dto = EnrollUserDTO::fromModels($event, $user);
+
+    $raced = false;
+
+    Enrollment::creating(function (Enrollment $enrollment) use (&$raced): void {
+        if ($raced) {
+            return;
+        }
+
+        $raced = true;
+
+        Enrollment::withoutEvents(function () use ($enrollment): void {
+            Enrollment::factory()->create([
+                'event_id' => $enrollment->event_id,
+                'user_id' => $enrollment->user_id,
+                'status' => EnrollmentStatus::Confirmed,
+                'enrolled_at' => now(),
+                'confirmed_at' => now(),
+            ]);
+        });
+    });
+
+    try {
+        expect(fn (): Enrollment => resolve(EnrollUserAction::class)->handle($dto))
+            ->toThrow(EnrollmentException::class);
+    } finally {
+        Enrollment::flushEventListeners();
+    }
+});
+
 test('when a user enrolls twice in the same event, then duplicate enrollment is rejected', function (): void {
     $user = User::factory()->create();
     $tenant = Tenant::factory()->create();
