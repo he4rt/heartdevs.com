@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace He4rt\IntegrationTwitch;
 
+use He4rt\IntegrationTwitch\Console\LinkTwitchChannelCommand;
 use He4rt\IntegrationTwitch\OAuth\TwitchAppTokenService;
 use He4rt\IntegrationTwitch\OAuth\TwitchOAuthClient;
 use He4rt\IntegrationTwitch\Transport\TwitchHelixConnector;
@@ -30,5 +31,12 @@ class IntegrationTwitchServiceProvider extends ServiceProvider
         $this->app->singleton(TwitchOAuthClient::class);
     }
 
-    public function boot(): void {}
+    public function boot(): void
+    {
+        if ($this->app->runningInConsole()) {
+            $this->commands([
+                LinkTwitchChannelCommand::class,
+            ]);
+        }
+    }
 }
