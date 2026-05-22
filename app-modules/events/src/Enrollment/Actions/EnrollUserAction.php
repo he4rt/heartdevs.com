@@ -41,17 +41,14 @@ final readonly class EnrollUserAction
             $initial = $this->resolveInitialEnrollment($dto);
 
             try {
-                $now = now();
-
-                $enrollment = new Enrollment([
+                $enrollment = Enrollment::query()->create([
                     'event_id' => $dto->eventId,
                     'user_id' => $dto->userId,
-                    'enrolled_at' => $now,
+                    'status' => $initial['status'],
+                    'enrolled_at' => now(),
                     'confirmed_at' => $initial['confirmedAt'],
                     'waitlist_position' => $initial['waitlistPosition'],
                 ]);
-                $enrollment->status = $initial['status'];
-                $enrollment->save();
 
                 EnrollmentTransition::query()->create([
                     'enrollment_id' => $enrollment->id,
