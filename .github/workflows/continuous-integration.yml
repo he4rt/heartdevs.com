@@ -11,12 +11,16 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
 
+permissions: {}
+
 jobs:
   setup:
     name: Setup PHP
     runs-on: ubuntu-latest
     if: ${{ !github.event.pull_request.draft }}
     timeout-minutes: 5
+    permissions:
+      contents: read
     outputs:
       CACHE_KEY: ${{ steps.cache.outputs.key }}
       PHP_VERSION: ${{ steps.setup.outputs.PHP_VERSION }}
@@ -26,6 +30,9 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          fetch-depth: 0
+          persist-credentials: false
 
       - name: Setup job outputs
         id: setup
@@ -37,10 +44,15 @@ jobs:
 
       - name: Create cache key
         id: cache
+        shell: bash
+        env:
+          RUNNER_OS: ${{ runner.os }}
+          RUNNER_ARCH: ${{ runner.arch }}
+          HASHED_COMPOSER_LOCK: ${{ hashFiles('composer.lock') }}
         run: |
-          composer_hash=${{ hashFiles('**/composer.lock') }}
-          os_lower=$(echo ${{ runner.os }} | tr '[:upper:]' '[:lower:]')
-          arch_lower=$(echo ${{ runner.arch }} | tr '[:upper:]' '[:lower:]')
+          composer_hash=${HASHED_COMPOSER_LOCK}
+          os_lower=$(echo ${RUNNER_OS} | tr '[:upper:]' '[:lower:]')
+          arch_lower=$(echo ${RUNNER_ARCH} | tr '[:upper:]' '[:lower:]')
           combined_key="${os_lower}-${arch_lower}-composer-${composer_hash}"
           echo "key=${combined_key}" >> "$GITHUB_OUTPUT"
 
@@ -63,6 +75,8 @@ jobs:
     name: Perform Pint format
     needs: [setup]
     if: ${{ !github.event.pull_request.draft }}
+    permissions:
+      contents: read
     uses: ./.github/workflows/_pint.yml
     with:
       CACHE_KEY: ${{ needs.setup.outputs.CACHE_KEY }}
@@ -75,6 +89,8 @@ jobs:
     name: Perform Rector Check
     needs: [setup]
     if: ${{ !github.event.pull_request.draft }}
+    permissions:
+      contents: read
     uses: ./.github/workflows/_rector.yml
     with:
       CACHE_KEY: ${{ needs.setup.outputs.CACHE_KEY }}
@@ -87,6 +103,8 @@ jobs:
     name: Perform Phpstan Check
     needs: [setup]
     if: ${{ !github.event.pull_request.draft }}
+    permissions:
+      contents: read
     uses: ./.github/workflows/_phpstan.yml
     with:
       CACHE_KEY: ${{ needs.setup.outputs.CACHE_KEY }}
@@ -99,6 +117,8 @@ jobs:
     name: Perform Pest Tests
     needs: [setup]
     if: ${{ !github.event.pull_request.draft }}
+    permissions:
+      contents: read
     uses: ./.github/workflows/_pest.yml
     with:
       CACHE_KEY: ${{ needs.setup.outputs.CACHE_KEY }}
