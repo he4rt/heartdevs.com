@@ -58,7 +58,7 @@ final readonly class EnrollUserAction
                     'triggered_by' => TriggeredBy::User,
                 ]);
 
-                if ($initial['status'] === EnrollmentStatus::Confirmed) {
+                if ($initial['status']->isConfirmed()) {
                     event(new EnrollmentConfirmed(
                         enrollmentId: $enrollment->id,
                         eventId: $dto->eventId,

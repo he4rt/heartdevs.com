@@ -59,3 +59,18 @@ test('when enrollment statuses are evaluated, then terminal states are correctly
         ->and(EnrollmentStatus::Waitlisted->isTerminal())->toBeFalse()
         ->and(EnrollmentStatus::CheckedIn->isTerminal())->toBeFalse();
 });
+
+test('when enrollment status helpers are evaluated, then is and named checks work', function (): void {
+    expect(EnrollmentStatus::Confirmed->isConfirmed())->toBeTrue()
+        ->and(EnrollmentStatus::Confirmed->is(EnrollmentStatus::Confirmed))->toBeTrue()
+        ->and(EnrollmentStatus::Confirmed->is(EnrollmentStatus::Waitlisted))->toBeFalse()
+        ->and(EnrollmentStatus::Waitlisted->isWaitlisted())->toBeTrue()
+        ->and(EnrollmentStatus::Pending->is(EnrollmentStatus::Confirmed, EnrollmentStatus::Waitlisted))->toBeFalse();
+});
+
+test('when rsvp enrollment status is evaluated, then response message matches status', function (EnrollmentStatus $status, string $expectedKey): void {
+    expect($status->getResponseMessage())->toBe(__($expectedKey));
+})->with([
+    [EnrollmentStatus::Confirmed, 'events::pages.confirm_presence_success'],
+    [EnrollmentStatus::Waitlisted, 'events::pages.waitlist_success'],
+]);

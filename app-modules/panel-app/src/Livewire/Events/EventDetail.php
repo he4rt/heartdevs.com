@@ -96,13 +96,9 @@ final class EventDetail extends Component
 
             unset($this->enrollment, $this->canConfirmPresence);
 
-            $successMessage = $enrollment->status === EnrollmentStatus::Confirmed
-                ? __('events::pages.confirm_presence_success')
-                : __('events::pages.waitlist_success');
-
             Notification::make()
                 ->success()
-                ->title($successMessage)
+                ->title($enrollment->status->getResponseMessage())
                 ->send();
         } catch (EnrollmentException $enrollmentException) {
             Notification::make()
