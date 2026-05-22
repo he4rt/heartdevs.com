@@ -50,6 +50,7 @@ class AuthenticateAction
 
         Auth::logout();
         Auth::login($provider->user);
+        filament()->setCurrentPanel(filament()->getPanel($state->panel));
         filament()->auth()->setUser($provider->user);
     }
 
