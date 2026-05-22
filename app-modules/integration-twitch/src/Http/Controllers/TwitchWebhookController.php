@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace He4rt\IntegrationTwitch\Http\Controllers;
 
+use He4rt\Identity\Tenant\Models\Tenant;
 use He4rt\IntegrationTwitch\Events\TwitchEventReceived;
 use He4rt\IntegrationTwitch\Models\TwitchEventLog;
 use Illuminate\Http\Request;
@@ -11,7 +12,7 @@ use Symfony\Component\HttpFoundation\Response;
 
 final class TwitchWebhookController
 {
-    public function __invoke(Request $request): Response
+    public function __invoke(Request $request, Tenant $tenant): Response
     {
         $messageType = $request->header('Twitch-Eventsub-Message-Type');
 
@@ -26,6 +27,7 @@ final class TwitchWebhookController
         $messageId = $request->header('Twitch-Eventsub-Message-Id');
 
         $inserted = TwitchEventLog::query()->insertOrIgnore([
+            'tenant_id' => $tenant->getKey(),
             'event_type' => $subscription['type'] ?? $messageType,
             'broadcaster_user_id' => $event['broadcaster_user_id']
                 ?? $event['to_broadcaster_user_id']
