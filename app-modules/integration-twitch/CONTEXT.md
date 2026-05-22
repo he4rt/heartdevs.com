@@ -66,6 +66,63 @@ src/
 - Gamification or XP from Twitch events (belongs to `character` / `ranking`)
 - Discord notifications about Twitch events (belongs to `bot-discord`)
 
+## Local Testing with Twitch CLI
+
+The [Twitch CLI](https://dev.twitch.tv/docs/cli/) (`twitch-cli`) fires signed mock EventSub webhooks to your local server — no ngrok or real subscriptions needed.
+
+### Setup
+
+```bash
+# Required .env vars
+TWITCH_EVENTSUB_SECRET=he4rt-eventsub-local-test          # Any string, must match -s flag
+TWITCH_EVENTSUB_CALLBACK=http://localhost:8000/api/webhooks/twitch/eventsub
+```
+
+### Firing events
+
+```bash
+# Basic syntax
+twitch event trigger {event_type} \
+  -F http://localhost:8000/api/webhooks/twitch/eventsub \
+  -s he4rt-eventsub-local-test \
+  -t {broadcaster_user_id}
+
+# Examples
+twitch event trigger stream.online   -F http://localhost:8000/api/webhooks/twitch/eventsub -s he4rt-eventsub-local-test -t 227168488
+twitch event trigger stream.offline  -F http://localhost:8000/api/webhooks/twitch/eventsub -s he4rt-eventsub-local-test -t 227168488
+twitch event trigger channel.follow  -F http://localhost:8000/api/webhooks/twitch/eventsub -s he4rt-eventsub-local-test -t 227168488
+twitch event trigger channel.subscribe -F http://localhost:8000/api/webhooks/twitch/eventsub -s he4rt-eventsub-local-test -t 227168488
+twitch event trigger channel.cheer   -F http://localhost:8000/api/webhooks/twitch/eventsub -s he4rt-eventsub-local-test -t 227168488
+twitch event trigger channel.raid    -F http://localhost:8000/api/webhooks/twitch/eventsub -s he4rt-eventsub-local-test -t 227168488
+```
+
+### Key flags
+
+| Flag | Description                                  |
+| ---- | -------------------------------------------- |
+| `-F` | Forward address (your local webhook URL)     |
+| `-s` | Secret (must match `TWITCH_EVENTSUB_SECRET`) |
+| `-t` | To-user / broadcaster user ID                |
+| `-f` | From-user / sender user ID                   |
+| `-c` | Count (repeat the event N times)             |
+| `-C` | Cost (bits, channel points, etc.)            |
+
+### Supported events
+
+Run `twitch event trigger --help` for the full list. Notable ones **not** supported by the CLI: `channel.chat.message`.
+
+### Verification
+
+Events are logged in `twitch_event_logs`. Check with:
+
+```bash
+php artisan tinker --execute 'dd(\He4rt\IntegrationTwitch\Models\TwitchEventLog::latest()->take(5)->get(["id","event_type","broadcaster_user_id","user_id","created_at"])->toArray());'
+```
+
+### Known quirks
+
+- **`channel.raid`**: Uses `to_broadcaster_user_id` / `from_broadcaster_user_id` instead of `broadcaster_user_id` / `user_id`, so those columns are null in `twitch_event_logs`. Full data is preserved in the `payload` JSONB column.
+
 ## Dependencies
 
 - **Identity** — OAuth user resolution (`OAuthClientContract`, `ExternalIdentity`)
