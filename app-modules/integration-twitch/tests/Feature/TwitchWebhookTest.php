@@ -143,3 +143,62 @@ test('handles duplicate twitch_message_id gracefully', function (): void {
 
     expect(TwitchEventLog::query()->count())->toBe(1);
 });
+
+test('extracts chatter_user_id from chat message events', function (): void {
+    $payload = [
+        'subscription' => [
+            'id' => 'sub-chat',
+            'type' => 'channel.chat.message',
+            'version' => '1',
+            'status' => 'enabled',
+            'condition' => ['broadcaster_user_id' => '12345', 'user_id' => '12345'],
+            'transport' => ['method' => 'webhook', 'callback' => 'https://example.com'],
+        ],
+        'event' => [
+            'broadcaster_user_id' => '12345',
+            'broadcaster_user_login' => 'danielhe4rt',
+            'broadcaster_user_name' => 'danielhe4rt',
+            'chatter_user_id' => '77777',
+            'chatter_user_login' => 'viewer_lucas',
+            'chatter_user_name' => 'viewer_lucas',
+            'message' => ['text' => 'Hello!', 'fragments' => []],
+            'message_type' => 'text',
+        ],
+    ];
+
+    postTwitchWebhook($payload)->assertNoContent();
+
+    $log = TwitchEventLog::query()->latest('id')->first();
+
+    expect($log->user_id)->toBe('77777')
+        ->and($log->broadcaster_user_id)->toBe('12345');
+});
+
+test('extracts from_broadcaster_user_id from raid events', function (): void {
+    $payload = [
+        'subscription' => [
+            'id' => 'sub-raid',
+            'type' => 'channel.raid',
+            'version' => '1',
+            'status' => 'enabled',
+            'condition' => ['to_broadcaster_user_id' => '12345'],
+            'transport' => ['method' => 'webhook', 'callback' => 'https://example.com'],
+        ],
+        'event' => [
+            'from_broadcaster_user_id' => '99999',
+            'from_broadcaster_user_login' => 'raider',
+            'from_broadcaster_user_name' => 'raider',
+            'to_broadcaster_user_id' => '12345',
+            'to_broadcaster_user_login' => 'danielhe4rt',
+            'to_broadcaster_user_name' => 'danielhe4rt',
+            'viewers' => 150,
+        ],
+    ];
+
+    postTwitchWebhook($payload)->assertNoContent();
+
+    $log = TwitchEventLog::query()->latest('id')->first();
+
+    expect($log->user_id)->toBe('99999')
+        ->and($log->broadcaster_user_id)->toBe('12345');
+});

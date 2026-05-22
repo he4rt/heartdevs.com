@@ -28,9 +28,14 @@ final class TwitchWebhookController
         $inserted = TwitchEventLog::query()->insertOrIgnore([
             'event_type' => $subscription['type'] ?? $messageType,
             'broadcaster_user_id' => $event['broadcaster_user_id']
+                ?? $event['to_broadcaster_user_id']
                 ?? $subscription['condition']['broadcaster_user_id']
+                ?? $subscription['condition']['to_broadcaster_user_id']
                 ?? null,
-            'user_id' => $event['user_id'] ?? null,
+            'user_id' => $event['user_id']
+                ?? $event['chatter_user_id']
+                ?? $event['from_broadcaster_user_id']
+                ?? null,
             'twitch_message_id' => $messageId,
             'payload' => json_encode($body),
             'created_at' => now(),
