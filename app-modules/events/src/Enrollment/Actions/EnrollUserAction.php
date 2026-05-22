@@ -15,6 +15,7 @@ use He4rt\Events\Enrollment\Models\Enrollment;
 use He4rt\Events\Enrollment\Models\EnrollmentPolicy;
 use He4rt\Events\Enrollment\Models\EnrollmentTransition;
 use He4rt\Events\Event\Enums\EventStatus;
+use He4rt\Events\Event\Models\Event;
 use Illuminate\Database\UniqueConstraintViolationException;
 use Illuminate\Support\Facades\DB;
 
@@ -22,9 +23,19 @@ final readonly class EnrollUserAction
 {
     public function handle(EnrollUserDTO $dto): Enrollment
     {
-        $this->validate($dto);
-
         return DB::transaction(function () use ($dto): Enrollment {
+            $event = Event::query()
+                ->whereKey($dto->eventId)
+                ->lockForUpdate()
+                ->firstOrFail();
+
+            $policy = EnrollmentPolicy::query()
+                ->where('event_id', $dto->eventId)
+                ->lockForUpdate()
+                ->first();
+
+            $this->validate($event, $policy);
+
             throw_if(
                 Enrollment::query()
                     ->where('event_id', $dto->eventId)
@@ -33,12 +44,7 @@ final readonly class EnrollUserAction
                 EnrollmentException::alreadyEnrolled(),
             );
 
-            EnrollmentPolicy::query()
-                ->where('event_id', $dto->eventId)
-                ->lockForUpdate()
-                ->first();
-
-            $initial = $this->resolveInitialEnrollment($dto);
+            $initial = $this->resolveInitialEnrollment($dto->eventId, $policy);
 
             try {
                 $enrollment = Enrollment::query()->create([
@@ -63,7 +69,7 @@ final readonly class EnrollUserAction
                         enrollmentId: $enrollment->id,
                         eventId: $dto->eventId,
                         userId: $dto->userId,
-                        xpRewardOnConfirmed: $dto->xpRewardOnConfirmed,
+                        xpRewardOnConfirmed: $policy?->xp_on_confirmed ?? 0,
                     ));
                 }
 
@@ -77,9 +83,11 @@ final readonly class EnrollUserAction
     /**
      * @return array{status: EnrollmentStatus, waitlistPosition: ?int, confirmedAt: ?CarbonInterface}
      */
-    private function resolveInitialEnrollment(EnrollUserDTO $dto): array
+    private function resolveInitialEnrollment(string $eventId, ?EnrollmentPolicy $policy): array
     {
-        if ($dto->capacity === null) {
+        $capacity = $policy?->capacity;
+
+        if ($capacity === null) {
             return [
                 'status' => EnrollmentStatus::Confirmed,
                 'waitlistPosition' => null,
@@ -88,11 +96,11 @@ final readonly class EnrollUserAction
         }
 
         $confirmedCount = Enrollment::query()
-            ->where('event_id', $dto->eventId)
+            ->where('event_id', $eventId)
             ->confirmed()
             ->count();
 
-        if ($confirmedCount < $dto->capacity) {
+        if ($confirmedCount < $capacity) {
             return [
                 'status' => EnrollmentStatus::Confirmed,
                 'waitlistPosition' => null,
@@ -100,9 +108,9 @@ final readonly class EnrollUserAction
             ];
         }
 
-        if ($dto->hasWaitlist) {
+        if ($policy->has_waitlist) {
             $nextPosition = (int) Enrollment::query()
-                ->where('event_id', $dto->eventId)
+                ->where('event_id', $eventId)
                 ->waitlisted()
                 ->max('waitlist_position') + 1;
 
@@ -116,33 +124,25 @@ final readonly class EnrollUserAction
         throw EnrollmentException::eventFull();
     }
 
-    private function validate(EnrollUserDTO $dto): void
+    private function validate(Event $event, ?EnrollmentPolicy $policy): void
     {
         throw_unless(
-            $dto->eventStatus === EventStatus::Published,
+            $event->status === EventStatus::Published,
             EnrollmentException::eventNotActive(),
         );
 
         throw_if(
-            $dto->eventStartsAt->lte(now()),
+            $event->starts_at->lte(now()),
             EnrollmentException::eventPast(),
         );
 
         throw_unless(
             in_array(
-                $dto->enrollmentMethod,
+                $policy?->enrollment_method,
                 [EnrollmentMethod::Rsvp, EnrollmentMethod::RsvpCheckin],
                 strict: true,
             ),
             EnrollmentException::invalidEnrollmentMethod(),
-        );
-
-        throw_if(
-            Enrollment::query()
-                ->where('event_id', $dto->eventId)
-                ->where('user_id', $dto->userId)
-                ->exists(),
-            EnrollmentException::alreadyEnrolled(),
         );
     }
 }
