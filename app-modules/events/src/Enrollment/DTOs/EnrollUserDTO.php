@@ -14,13 +14,7 @@ final readonly class EnrollUserDTO
 {
     public function __construct(
         public string $eventId,
-        public string $userId,
-        public EventStatus $eventStatus,
-        public CarbonInterface $eventStartsAt,
-        public ?EnrollmentMethod $enrollmentMethod,
-        public ?int $capacity,
-        public bool $hasWaitlist,
-        public int $xpRewardOnConfirmed,
+        public string $userId
     ) {}
 
     public static function fromModels(Event $event, User $user): self
