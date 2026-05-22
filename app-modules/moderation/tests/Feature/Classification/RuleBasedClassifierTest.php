@@ -9,9 +9,6 @@ use He4rt\Moderation\Enums\Platform;
 use He4rt\Moderation\Enums\Severity;
 use He4rt\Moderation\Enums\ViolationType;
 use He4rt\Moderation\Rules\ModerationRule;
-use Illuminate\Foundation\Testing\RefreshDatabase;
-
-uses(RefreshDatabase::class);
 
 function contentDTO(string $text, ?string $tenantId = null): ModerationContentDTO
 {

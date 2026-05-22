@@ -3,9 +3,6 @@
 declare(strict_types=1);
 
 use He4rt\IntegrationDiscord\Models\DiscordEventLog;
-use Illuminate\Foundation\Testing\RefreshDatabase;
-
-uses(RefreshDatabase::class);
 
 test('persists a raw gateway event', function (): void {
     $log = DiscordEventLog::query()->create([

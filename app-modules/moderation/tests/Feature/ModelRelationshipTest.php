@@ -13,9 +13,6 @@ use He4rt\Moderation\Enums\CaseStatus;
 use He4rt\Moderation\Enums\Platform;
 use He4rt\Moderation\Enums\Severity;
 use He4rt\Moderation\Enums\ViolationType;
-use Illuminate\Foundation\Testing\RefreshDatabase;
-
-uses(RefreshDatabase::class);
 
 test('ModerationCase has reports', function (): void {
     $case = ModerationCase::factory()->create();

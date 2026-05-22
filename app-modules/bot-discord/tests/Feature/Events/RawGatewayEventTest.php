@@ -4,9 +4,6 @@ declare(strict_types=1);
 
 use He4rt\BotDiscord\Events\RawGatewayEvent;
 use He4rt\IntegrationDiscord\Models\DiscordEventLog;
-use Illuminate\Foundation\Testing\RefreshDatabase;
-
-uses(RefreshDatabase::class);
 
 test('persists a dispatch event to discord_event_logs', function (): void {
     $payload = (object) [

@@ -9,10 +9,7 @@ use He4rt\Identity\ExternalIdentity\Enums\IdentityProvider;
 use He4rt\Identity\ExternalIdentity\Models\ExternalIdentity;
 use He4rt\Identity\Tenant\Models\Tenant;
 use He4rt\Identity\User\Models\User;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Http;
-
-uses(RefreshDatabase::class);
 
 test('syncs articles and creates interactions for linked authors', function (): void {
     Http::fake([

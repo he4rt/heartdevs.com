@@ -10,10 +10,7 @@ use He4rt\Moderation\DTOs\ModerationContentDTO;
 use He4rt\Moderation\Enums\CaseSource;
 use He4rt\Moderation\Enums\Platform;
 use He4rt\Moderation\Enums\ViolationType;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Http;
-
-uses(RefreshDatabase::class);
 
 test('SubmitReport creates case and runs pipeline', function (): void {
     Http::fake(['api.openai.com/*' => Http::response([

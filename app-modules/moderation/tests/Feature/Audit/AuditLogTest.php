@@ -12,9 +12,6 @@ use He4rt\Moderation\Cases\Models\ModerationCase;
 use He4rt\Moderation\Enforcement\ActionExecuted;
 use He4rt\Moderation\Enforcement\ModerationAction;
 use He4rt\Moderation\Enums\CaseStatus;
-use Illuminate\Foundation\Testing\RefreshDatabase;
-
-uses(RefreshDatabase::class);
 
 test('records audit log on CaseCreated event', function (): void {
     $case = ModerationCase::factory()->create();

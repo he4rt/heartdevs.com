@@ -8,11 +8,8 @@ use He4rt\Moderation\Cases\Events\CaseReadyForEnforcement;
 use He4rt\Moderation\Cases\Models\ModerationCase;
 use He4rt\Moderation\Classification\Actions\RouteCaseAction;
 use He4rt\Moderation\Classification\Jobs\ClassifyAndRoute;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Http;
-
-uses(RefreshDatabase::class);
 
 test('enriches case with AI scores and calls RouteCaseAction', function (): void {
     Event::fake([CaseQueued::class, CaseReadyForEnforcement::class]);

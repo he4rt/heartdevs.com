@@ -8,9 +8,6 @@ use He4rt\Moderation\Appeals\ModerationAppeal;
 use He4rt\Moderation\Cases\Models\ModerationCase;
 use He4rt\Moderation\Enforcement\ModerationAction;
 use He4rt\Moderation\Enums\AppealStatus;
-use Illuminate\Foundation\Testing\RefreshDatabase;
-
-uses(RefreshDatabase::class);
 
 test('creates appeal with correct SLA deadline', function (): void {
     $user = User::factory()->create();

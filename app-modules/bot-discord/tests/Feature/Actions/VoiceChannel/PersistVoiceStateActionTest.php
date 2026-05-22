@@ -9,9 +9,6 @@ use He4rt\Identity\ExternalIdentity\Enums\IdentityProvider;
 use He4rt\Identity\ExternalIdentity\Models\ExternalIdentity;
 use He4rt\Identity\Tenant\Models\Tenant;
 use He4rt\Identity\User\Models\User;
-use Illuminate\Foundation\Testing\RefreshDatabase;
-
-uses(RefreshDatabase::class);
 
 function makeVoiceState(?string $guildId, ?string $channelId, string $userId): VoiceStateUpdate
 {
