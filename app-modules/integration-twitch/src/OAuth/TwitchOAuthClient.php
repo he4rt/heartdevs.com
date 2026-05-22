@@ -23,7 +23,7 @@ final readonly class TwitchOAuthClient implements OAuthClientContract
 
     public function redirectUrl(?OAuthStateDTO $state = null): string
     {
-        $panel = $state?->panel ?? 'app';
+        $panel = $state->panel ?? 'app';
         $scopes = config('services.twitch.scopes.'.$panel, config('services.twitch.scopes.app'));
 
         return 'https://id.twitch.tv/oauth2/authorize?'.http_build_query([

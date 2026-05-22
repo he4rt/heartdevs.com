@@ -48,6 +48,7 @@ enum IdentityProvider: string implements HasColor, HasDescription, HasIcon, HasL
     case Bungie = 'bungie';
     case Ebay = 'ebay';
 
+    /** @return array<int, self> */
     public static function supportedProviders(): array
     {
         return [
