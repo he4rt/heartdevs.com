@@ -45,7 +45,10 @@ return [
         'client_id' => env('TWITCH_OAUTH_CLIENT_ID'),
         'client_secret' => env('TWITCH_OAUTH_CLIENT_SECRET'),
         'redirect_uri' => env('TWITCH_OAUTH_REDIRECT_URI', 'https://localhost:8000/auth/oauth/twitch'),
-        'scopes' => env('TWITCH_OAUTH_SCOPES', ''),
+        'scopes' => [
+            'admin' => env('TWITCH_OAUTH_SCOPES_ADMIN', 'user:read:email moderator:read:followers channel:read:subscriptions bits:read moderation:read channel:read:redemptions channel:read:polls channel:read:predictions channel:read:hype_train channel:read:goals channel:read:ads channel:bot'),
+            'app' => env('TWITCH_OAUTH_SCOPES_APP', 'user:read:email'),
+        ],
         'enabled' => env('TWITCH_OAUTH_ENABLED', true),
         'eventsub_secret' => env('TWITCH_EVENTSUB_SECRET'),
         'eventsub_callback' => env('TWITCH_EVENTSUB_CALLBACK'),

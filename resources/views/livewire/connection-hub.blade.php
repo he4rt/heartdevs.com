@@ -39,8 +39,8 @@
                             }}</strong>
                         @else
                             Nessa autenticação iremos pedir acesso à:
-                            @foreach ($provider->getScopes() as $scope)
-                                <x-filament::badge color="sky">{{ $scope }}</x-filament::badge>
+                            @foreach ($provider->getScopes($panel) as $scope)
+                                <x-filament::badge color="orange">{{ $scope }}</x-filament::badge>
                             @endforeach
                         @endif
                     </p>

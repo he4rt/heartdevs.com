@@ -174,11 +174,11 @@ enum IdentityProvider: string implements HasColor, HasDescription, HasIcon, HasL
     /**
      * @return array<int, string>
      */
-    public function getScopes(): array
+    public function getScopes(?string $panel = null): array
     {
         $scopes = match ($this) {
             self::Discord => config('services.discord.scopes'),
-            self::Twitch => config('services.twitch.scopes'),
+            self::Twitch => config('services.twitch.scopes.'.($panel ?? 'app'), config('services.twitch.scopes.app')),
             self::DevTo => config('services.devto.scopes'),
             default => '',
         };
