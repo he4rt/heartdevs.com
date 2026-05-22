@@ -19,7 +19,7 @@ final readonly class TwitchAppTokenService
         return Cache::remember('twitch_app_access_token', $this->getCacheTtl(), function (): string {
             $response = $this->connector->send(new GetAppAccessToken(
                 clientId: $this->connector->clientId,
-                clientSecret: $this->connector->clientSecret,
+                clientSecret: $this->connector->getClientSecret(),
             ));
 
             $accessToken = $response->json('access_token');

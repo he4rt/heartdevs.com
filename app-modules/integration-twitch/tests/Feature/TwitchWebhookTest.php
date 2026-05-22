@@ -3,11 +3,8 @@
 declare(strict_types=1);
 
 use He4rt\IntegrationTwitch\Models\TwitchEventLog;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Str;
 use Illuminate\Testing\TestResponse;
-
-uses(RefreshDatabase::class);
 
 function twitchWebhookPayload(string $eventType = 'stream.online', string $messageType = 'notification'): array
 {

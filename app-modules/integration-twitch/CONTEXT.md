@@ -16,7 +16,7 @@ Transport and integration layer for the Twitch platform. Owns all HTTP communica
 
 ## Structure
 
-```
+```text
 src/
 ├── Console/
 │   ├── LinkTwitchChannelCommand.php       ← Links channel to tenant via ExternalIdentity

@@ -42,7 +42,7 @@ enum TwitchEventSubType: string
     case ChannelAdBreakBegin = 'channel.ad_break.begin';
     case ChannelChatMessage = 'channel.chat.message';
 
-    public function version(): string
+    public function getVersion(): string
     {
         return match ($this) {
             self::ChannelUpdate,
@@ -52,24 +52,24 @@ enum TwitchEventSubType: string
     }
 
     /**
+     * Build the condition payload for creating an EventSub subscription.
+     *
      * @return array<string, string>
      */
-    public function condition(string $broadcasterId, ?string $userId = null): array
+    public function getCondition(string $broadcasterId, ?string $moderatorOrUserId = null): array
     {
         return match ($this) {
             self::ChannelFollow,
             self::ChannelShieldModeBegin,
             self::ChannelShieldModeEnd,
             self::ChannelShoutoutCreate,
-            self::ChannelShoutoutReceive,
+            self::ChannelShoutoutReceive => [
+                'broadcaster_user_id' => $broadcasterId,
+                'moderator_user_id' => $moderatorOrUserId ?? $broadcasterId,
+            ],
             self::ChannelChatMessage => [
                 'broadcaster_user_id' => $broadcasterId,
-                'user_id' => $userId ?? $broadcasterId,
-            ],
-            self::ChannelModeratorAdd,
-            self::ChannelModeratorRemove => [
-                'broadcaster_user_id' => $broadcasterId,
-                'moderator_user_id' => $userId ?? $broadcasterId,
+                'user_id' => $moderatorOrUserId ?? $broadcasterId,
             ],
             self::ChannelRaid => [
                 'to_broadcaster_user_id' => $broadcasterId,

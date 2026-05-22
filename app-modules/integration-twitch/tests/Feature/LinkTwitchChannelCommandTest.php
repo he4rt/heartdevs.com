@@ -6,11 +6,8 @@ use He4rt\Identity\ExternalIdentity\Enums\IdentityProvider;
 use He4rt\Identity\ExternalIdentity\Models\ExternalIdentity;
 use He4rt\Identity\Tenant\Models\Tenant;
 use He4rt\IntegrationTwitch\Transport\TwitchHelixConnector;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Saloon\Http\Faking\MockClient;
 use Saloon\Http\Faking\MockResponse;
-
-uses(RefreshDatabase::class);
 
 function mockHelixUsersResponse(string $id = '12345', string $login = 'danielhe4rt', string $displayName = 'danielhe4rt'): MockClient
 {

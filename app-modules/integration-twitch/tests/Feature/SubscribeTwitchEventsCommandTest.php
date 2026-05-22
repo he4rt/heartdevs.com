@@ -81,29 +81,38 @@ test('fails without type or all flag', function (): void {
         ->assertFailed();
 });
 
-test('enum version returns correct values', function (): void {
-    expect(TwitchEventSubType::StreamOnline->version())->toBe('1')
-        ->and(TwitchEventSubType::ChannelFollow->version())->toBe('2')
-        ->and(TwitchEventSubType::ChannelUpdate->version())->toBe('2')
-        ->and(TwitchEventSubType::ChannelSubscribe->version())->toBe('1');
+test('enum getVersion returns correct values', function (): void {
+    expect(TwitchEventSubType::StreamOnline->getVersion())->toBe('1')
+        ->and(TwitchEventSubType::ChannelFollow->getVersion())->toBe('2')
+        ->and(TwitchEventSubType::ChannelUpdate->getVersion())->toBe('2')
+        ->and(TwitchEventSubType::ChannelSubscribe->getVersion())->toBe('1');
 });
 
-test('enum condition returns correct structure', function (): void {
-    $simple = TwitchEventSubType::StreamOnline->condition('12345');
+test('enum getCondition returns correct structure', function (): void {
+    $simple = TwitchEventSubType::StreamOnline->getCondition('12345');
     expect($simple)->toBe(['broadcaster_user_id' => '12345']);
 
-    $withUser = TwitchEventSubType::ChannelFollow->condition('12345', '67890');
-    expect($withUser)->toBe([
+    $withModerator = TwitchEventSubType::ChannelFollow->getCondition('12345', '67890');
+    expect($withModerator)->toBe([
+        'broadcaster_user_id' => '12345',
+        'moderator_user_id' => '67890',
+    ]);
+
+    $chatMessage = TwitchEventSubType::ChannelChatMessage->getCondition('12345', '67890');
+    expect($chatMessage)->toBe([
         'broadcaster_user_id' => '12345',
         'user_id' => '67890',
     ]);
 
-    $raid = TwitchEventSubType::ChannelRaid->condition('12345');
+    $raid = TwitchEventSubType::ChannelRaid->getCondition('12345');
     expect($raid)->toBe(['to_broadcaster_user_id' => '12345']);
 
-    $moderator = TwitchEventSubType::ChannelModeratorAdd->condition('12345');
-    expect($moderator)->toBe([
+    $moderatorAdd = TwitchEventSubType::ChannelModeratorAdd->getCondition('12345');
+    expect($moderatorAdd)->toBe(['broadcaster_user_id' => '12345']);
+
+    $shieldMode = TwitchEventSubType::ChannelShieldModeBegin->getCondition('12345', '67890');
+    expect($shieldMode)->toBe([
         'broadcaster_user_id' => '12345',
-        'moderator_user_id' => '12345',
+        'moderator_user_id' => '67890',
     ]);
 });

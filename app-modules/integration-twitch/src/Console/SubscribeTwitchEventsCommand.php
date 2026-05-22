@@ -44,7 +44,7 @@ final class SubscribeTwitchEventsCommand extends Command
 
         foreach ($types as $type) {
             if (in_array($type->value, $existingTypes, true)) {
-                $results[] = [$type->value, $type->version(), 'already_exists'];
+                $results[] = [$type->value, $type->getVersion(), 'already_exists'];
 
                 continue;
             }
@@ -52,17 +52,17 @@ final class SubscribeTwitchEventsCommand extends Command
             try {
                 $helix->send(new CreateSubscription(
                     type: $type->value,
-                    version: $type->version(),
-                    condition: $type->condition($broadcasterId),
+                    version: $type->getVersion(),
+                    condition: $type->getCondition($broadcasterId),
                     callbackUrl: $callbackUrl,
                     secret: $secret,
                 ));
 
-                $results[] = [$type->value, $type->version(), 'created'];
+                $results[] = [$type->value, $type->getVersion(), 'created'];
             } catch (RequestException $e) {
                 $status = $e->getResponse()->status();
                 $message = $status === 403 ? 'missing_scope' : sprintf('error_%d', $status);
-                $results[] = [$type->value, $type->version(), $message];
+                $results[] = [$type->value, $type->getVersion(), $message];
             }
         }
 

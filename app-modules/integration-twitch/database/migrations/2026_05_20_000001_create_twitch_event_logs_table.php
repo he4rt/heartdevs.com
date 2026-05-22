@@ -15,7 +15,7 @@ return new class extends Migration
             $table->string('event_type')->index();
             $table->string('broadcaster_user_id')->nullable()->index();
             $table->string('user_id')->nullable();
-            $table->string('twitch_message_id')->nullable()->unique();
+            $table->string('twitch_message_id')->unique();
             $table->jsonb('payload');
             $table->timestamps();
         });

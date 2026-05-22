@@ -37,7 +37,7 @@ final readonly class TwitchOAuthClient implements OAuthClientContract
         $response = $this->oauthConnector->send(new ExchangeCodeForToken(
             code: $code,
             clientId: $this->oauthConnector->clientId,
-            clientSecret: $this->oauthConnector->clientSecret,
+            clientSecret: $this->oauthConnector->getClientSecret(),
             redirectUri: $this->oauthConnector->redirectUri,
         ));
 

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace He4rt\IntegrationTwitch\Http\Controllers;
 
+use He4rt\IntegrationTwitch\Events\TwitchEventReceived;
 use He4rt\IntegrationTwitch\Models\TwitchEventLog;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -19,25 +20,32 @@ final class TwitchWebhookController
                 ->header('Content-Type', 'text/plain');
         }
 
-        $messageId = $request->header('Twitch-Eventsub-Message-Id');
-
-        if ($messageId && TwitchEventLog::query()->where('twitch_message_id', $messageId)->exists()) {
-            return response('', 204);
-        }
-
         $body = $request->all();
         $subscription = $body['subscription'] ?? [];
         $event = $body['event'] ?? [];
+        $messageId = $request->header('Twitch-Eventsub-Message-Id');
 
-        TwitchEventLog::query()->create([
+        $inserted = TwitchEventLog::query()->insertOrIgnore([
             'event_type' => $subscription['type'] ?? $messageType,
             'broadcaster_user_id' => $event['broadcaster_user_id']
                 ?? $subscription['condition']['broadcaster_user_id']
                 ?? null,
             'user_id' => $event['user_id'] ?? null,
             'twitch_message_id' => $messageId,
-            'payload' => $body,
+            'payload' => json_encode($body),
+            'created_at' => now(),
+            'updated_at' => now(),
         ]);
+
+        if ($inserted > 0) {
+            $eventLog = TwitchEventLog::query()
+                ->where('twitch_message_id', $messageId)
+                ->first();
+
+            if ($eventLog) {
+                event(new TwitchEventReceived($eventLog));
+            }
+        }
 
         return response('', 204);
     }
