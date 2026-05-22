@@ -6,7 +6,6 @@ namespace He4rt\Activity\Message\Models;
 
 use Carbon\Carbon;
 use He4rt\Identity\Tenant\Models\Tenant;
-use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Table;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Model;
@@ -27,19 +26,6 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
  */
-#[Fillable([
-    'id',
-    'tenant_id',
-    'message_id',
-    'url',
-    'title',
-    'description',
-    'source_domain',
-    'kind',
-    'thumbnail_url',
-    'raw',
-    'position',
-])]
 #[Table(name: 'message_embeds')]
 final class MessageEmbed extends Model
 {

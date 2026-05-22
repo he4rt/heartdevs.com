@@ -6,7 +6,6 @@ namespace He4rt\Economy\Models;
 
 use He4rt\Economy\Database\Factories\TransactionFactory;
 use He4rt\Economy\Enums\TransactionType;
-use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -23,15 +22,6 @@ use Illuminate\Database\Eloquent\Relations\MorphTo;
  * @property string|null $reference_id
  * @property string|null $description
  */
-#[Fillable([
-    'wallet_id',
-    'type',
-    'amount',
-    'balance_after',
-    'reference_type',
-    'reference_id',
-    'description',
-])]
 final class Transaction extends Model
 {
     /** @use HasFactory<TransactionFactory> */

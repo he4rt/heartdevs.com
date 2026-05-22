@@ -6,7 +6,6 @@ namespace He4rt\IntegrationDiscord\Models;
 
 use Carbon\Carbon;
 use He4rt\IntegrationDiscord\Enums\RoleHistoryAction;
-use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Table;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -24,13 +23,6 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property-read DiscordRole $role
  * @property-read DiscordEventLog|null $sourceEventLog
  */
-#[Fillable([
-    'discord_member_id',
-    'discord_role_id',
-    'action',
-    'occurred_at',
-    'source_event_log_id',
-])]
 #[Table(name: 'discord_member_role_history')]
 final class DiscordMemberRoleHistory extends Model
 {

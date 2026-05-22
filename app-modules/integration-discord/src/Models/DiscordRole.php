@@ -6,7 +6,6 @@ namespace He4rt\IntegrationDiscord\Models;
 
 use Carbon\Carbon;
 use He4rt\IntegrationDiscord\Database\Factories\DiscordRoleFactory;
-use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -30,18 +29,6 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
  * @property-read DiscordGuild $guild
  * @property-read Collection<int, DiscordMember> $members
  */
-#[Fillable([
-    'discord_guild_id',
-    'discord_role_id',
-    'name',
-    'color',
-    'position',
-    'permissions',
-    'is_hoisted',
-    'is_mentionable',
-    'is_managed',
-    'icon',
-])]
 final class DiscordRole extends Model
 {
     /** @use HasFactory<DiscordRoleFactory> */

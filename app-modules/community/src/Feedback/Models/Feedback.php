@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace He4rt\Community\Feedback\Models;
 
+use Carbon\Carbon;
 use He4rt\Community\Database\Factories\FeedbackFactory;
 use He4rt\Identity\Tenant\Models\Tenant;
 use He4rt\Identity\User\Models\User;
-use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Table;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -15,14 +15,16 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 
-#[Fillable([
-    'id',
-    'tenant_id',
-    'sender_id',
-    'target_id',
-    'type',
-    'message',
-])]
+/**
+ * @property string $id
+ * @property int $tenant_id
+ * @property string $sender_id
+ * @property string $target_id
+ * @property string $type
+ * @property string $message
+ * @property Carbon|null $created_at
+ * @property Carbon|null $updated_at
+ */
 #[Table(name: 'feedbacks')]
 final class Feedback extends Model
 {

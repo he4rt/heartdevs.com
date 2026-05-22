@@ -14,7 +14,6 @@ use He4rt\Identity\ExternalIdentity\Enums\IdentityType;
 use He4rt\Identity\Tenant\Models\Tenant;
 use He4rt\Identity\User\Models\User;
 use Illuminate\Database\Eloquent\Attributes\Appends;
-use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Table;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -46,22 +45,6 @@ use Illuminate\Support\Carbon;
  */
 #[Appends([
     'messages_count',
-])]
-#[Fillable([
-    'id',
-    'tenant_id',
-    'model_type',
-    'model_id',
-    'type',
-    'provider',
-    'credentials_type',
-    'credentials',
-    'external_account_id',
-    'connected_by',
-    'connected_at',
-    'disconnected_at',
-    'metadata',
-    'email',
 ])]
 #[Table(name: 'external_identities')]
 final class ExternalIdentity extends Model

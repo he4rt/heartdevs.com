@@ -6,7 +6,6 @@ namespace He4rt\Activity\Message\Models;
 
 use Carbon\Carbon;
 use He4rt\Identity\Tenant\Models\Tenant;
-use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Table;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Model;
@@ -26,18 +25,6 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
  */
-#[Fillable([
-    'id',
-    'tenant_id',
-    'message_id',
-    'provider_attachment_id',
-    'url',
-    'filename',
-    'content_type',
-    'size',
-    'width',
-    'height',
-])]
 #[Table(name: 'message_attachments')]
 final class MessageAttachment extends Model
 {

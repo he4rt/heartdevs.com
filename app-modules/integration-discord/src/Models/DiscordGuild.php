@@ -7,7 +7,6 @@ namespace He4rt\IntegrationDiscord\Models;
 use Carbon\Carbon;
 use He4rt\Identity\Tenant\Models\Tenant;
 use He4rt\IntegrationDiscord\Database\Factories\DiscordGuildFactory;
-use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -32,17 +31,6 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property-read Collection<int, DiscordRole> $roles
  * @property-read Collection<int, DiscordMember> $members
  */
-#[Fillable([
-    'tenant_id',
-    'discord_guild_id',
-    'name',
-    'icon',
-    'description',
-    'member_count',
-    'premium_tier',
-    'features',
-    'synced_at',
-])]
 final class DiscordGuild extends Model
 {
     /** @use HasFactory<DiscordGuildFactory> */

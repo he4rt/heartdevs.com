@@ -6,7 +6,6 @@ namespace He4rt\Economy\Models;
 
 use He4rt\Economy\Database\Factories\WalletFactory;
 use He4rt\Economy\Enums\Currency;
-use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -20,12 +19,6 @@ use Illuminate\Database\Eloquent\Relations\MorphTo;
  * @property Currency $currency
  * @property int $balance
  */
-#[Fillable([
-    'owner_type',
-    'owner_id',
-    'currency',
-    'balance',
-])]
 final class Wallet extends Model
 {
     /** @use HasFactory<WalletFactory> */

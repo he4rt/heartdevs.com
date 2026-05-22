@@ -9,6 +9,7 @@ use Rector\Php70\Rector\StaticCall\StaticCallOnNonStaticToInstanceCallRector;
 use Rector\Php83\Rector\ClassMethod\AddOverrideAttributeToOverriddenMethodsRector;
 use Rector\TypeDeclaration\Rector\ArrowFunction\AddArrowFunctionReturnTypeRector;
 use RectorLaravel\Rector\Class_\AddHasFactoryToModelsRector;
+use RectorLaravel\Rector\Class_\FillablePropertyToFillableAttributeRector;
 use RectorLaravel\Rector\Class_\ModelCastsPropertyToCastsMethodRector;
 use RectorLaravel\Rector\Class_\ReplaceExpectsMethodsInTestsRector;
 use RectorLaravel\Rector\Coalesce\ApplyDefaultInsteadOfNullCoalesceRector;
@@ -37,6 +38,7 @@ return RectorConfig::configure()
         AddArrowFunctionReturnTypeRector::class,
         AddHasFactoryToModelsRector::class,
         AddOverrideAttributeToOverriddenMethodsRector::class,
+        FillablePropertyToFillableAttributeRector::class,
         PostIncDecToPreIncDecRector::class,
         StaticCallOnNonStaticToInstanceCallRector::class,
         __DIR__.'/bootstrap/cache',

@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace He4rt\Identity\User\Models;
 
 use He4rt\Identity\Database\Factories\AddressFactory;
-use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Table;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -20,14 +19,6 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property string $zip_code
  * @property string $country
  */
-#[Fillable([
-    'id',
-    'user_id',
-    'country',
-    'state',
-    'city',
-    'zip_code',
-])]
 #[Table(name: 'user_address')]
 final class Address extends Model
 {

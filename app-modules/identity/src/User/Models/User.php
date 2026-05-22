@@ -13,7 +13,6 @@ use He4rt\Identity\Database\Factories\UserFactory;
 use He4rt\Identity\ExternalIdentity\Models\ExternalIdentity;
 use He4rt\Identity\Tenant\Concerns\InteractsWithTenants;
 use He4rt\Identity\User\Observers\UserObserver;
-use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Attributes\Table;
 use Illuminate\Database\Eloquent\Casts\Attribute;
@@ -37,16 +36,6 @@ use Spatie\MediaLibrary\InteractsWithMedia;
  * @property Carbon $updated_at
  */
 #[ObservedBy(UserObserver::class)]
-#[Fillable([
-    'id',
-    'username',
-    'name',
-    'email',
-    'password',
-    'is_donator',
-    'suspended_until',
-    'banned_at',
-])]
 #[Table(name: 'users')]
 final class User extends Authenticatable implements FilamentUser, HasMedia, HasName, HasTenants
 {

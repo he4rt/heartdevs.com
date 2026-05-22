@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace He4rt\Gamification\Badge\Models;
 
+use Carbon\Carbon;
 use He4rt\Gamification\Character\Models\Character;
 use He4rt\Gamification\Database\Factories\BadgeFactory;
 use He4rt\Identity\ExternalIdentity\Enums\IdentityProvider;
 use He4rt\Identity\Tenant\Models\Tenant;
-use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Table;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -18,14 +18,17 @@ use Illuminate\Database\Eloquent\Relations\Pivot;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
 
-#[Fillable([
-    'provider',
-    'name',
-    'description',
-    'redeem_code',
-    'active',
-    'tenant_id',
-])]
+/**
+ * @property int $id
+ * @property int $tenant_id
+ * @property IdentityProvider $provider
+ * @property string $name
+ * @property string $description
+ * @property string $redeem_code
+ * @property bool $active
+ * @property Carbon|null $created_at
+ * @property Carbon|null $updated_at
+ */
 #[Table(name: 'badges', keyType: 'string')]
 final class Badge extends Model implements HasMedia
 {

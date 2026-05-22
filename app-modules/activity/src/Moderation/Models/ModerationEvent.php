@@ -10,7 +10,6 @@ use He4rt\Activity\Moderation\Enums\ModerationType;
 use He4rt\Activity\Timeline\Observers\ModerationEventObserver;
 use He4rt\Identity\ExternalIdentity\Models\ExternalIdentity;
 use He4rt\Identity\Tenant\Models\Tenant;
-use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Attributes\Table;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
@@ -33,19 +32,6 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property Carbon|null $updated_at
  */
 #[ObservedBy(ModerationEventObserver::class)]
-#[Fillable([
-    'id',
-    'tenant_id',
-    'external_identity_id',
-    'moderator_identity_id',
-    'type',
-    'reason',
-    'source_identity_id',
-    'source_message_id',
-    'provider_message_id',
-    'metadata',
-    'occurred_at',
-])]
 #[Table(name: 'moderation_events')]
 final class ModerationEvent extends Model
 {

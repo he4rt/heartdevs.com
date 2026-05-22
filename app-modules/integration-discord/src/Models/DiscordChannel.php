@@ -7,7 +7,6 @@ namespace He4rt\IntegrationDiscord\Models;
 use Carbon\Carbon;
 use He4rt\IntegrationDiscord\Database\Factories\DiscordChannelFactory;
 use He4rt\IntegrationDiscord\Enums\DiscordChannelType;
-use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -32,18 +31,6 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property-read DiscordChannel|null $parent
  * @property-read Collection<int, DiscordChannel> $children
  */
-#[Fillable([
-    'discord_guild_id',
-    'discord_channel_id',
-    'parent_id',
-    'name',
-    'type',
-    'topic',
-    'position',
-    'nsfw',
-    'bitrate',
-    'user_limit',
-])]
 final class DiscordChannel extends Model
 {
     /** @use HasFactory<DiscordChannelFactory> */

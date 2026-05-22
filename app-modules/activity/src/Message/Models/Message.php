@@ -11,7 +11,6 @@ use He4rt\Activity\Message\Enums\MessageSourceKind;
 use He4rt\Activity\Reaction\Concerns\HasReactions;
 use He4rt\Identity\ExternalIdentity\Models\ExternalIdentity;
 use He4rt\Identity\Tenant\Models\Tenant;
-use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Table;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -44,28 +43,6 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
  */
-#[Fillable([
-    'id',
-    'tenant_id',
-    'external_identity_id',
-    'provider_message_id',
-    'channel_id',
-    'content',
-    'sent_at',
-    'obtained_experience',
-    'metadata',
-    'reactions_count',
-    'reactions_total',
-    'kind',
-    'raw_message_type',
-    'source_kind',
-    'is_pinned',
-    'mentions_everyone',
-    'mention_role_count',
-    'edited_at',
-    'reply_to_provider_message_id',
-    'reply_to_message_id',
-])]
 #[Table(name: 'messages')]
 final class Message extends Model
 {

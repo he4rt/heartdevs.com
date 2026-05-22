@@ -12,7 +12,6 @@ use He4rt\Gamification\Database\Factories\CharacterFactory;
 use He4rt\Identity\Tenant\Models\Tenant;
 use He4rt\Identity\User\Models\User;
 use Illuminate\Database\Eloquent\Attributes\Appends;
-use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Table;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
@@ -37,14 +36,6 @@ use Illuminate\Support\Facades\Date;
 #[Appends([
     'ranking',
     'level',
-])]
-#[Fillable([
-    'id',
-    'tenant_id',
-    'user_id',
-    'reputation',
-    'experience',
-    'daily_bonus_claimed_at',
 ])]
 #[Table(name: 'characters')]
 final class Character extends Model
