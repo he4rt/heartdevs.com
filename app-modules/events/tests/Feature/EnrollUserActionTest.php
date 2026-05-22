@@ -57,7 +57,7 @@ test('when a user enrolls in an rsvp event, then enrollment is confirmed with au
     EventFacade::assertDispatched(fn (EnrollmentConfirmed $event): bool => $event->enrollmentId === $enrollment->id
         && $event->eventId === $enrollment->event_id
         && $event->userId === $user->id
-        && $event->xpRewardRsvp === 50);
+        && $event->xpRewardOnConfirmed === 50);
 });
 
 test('when concurrent enrollment hits unique index, then already enrolled exception is thrown', function (): void {
@@ -143,6 +143,81 @@ test('when an event uses application enrollment method, then rsvp enrollment is 
 
     resolve(EnrollUserAction::class)->handle(EnrollUserDTO::fromModels($event, $user));
 })->throws(EnrollmentException::class);
+
+test('when event is at capacity with waitlist enabled, then enrollment is waitlisted', function (): void {
+    EventFacade::fake([EnrollmentConfirmed::class]);
+
+    $user = User::factory()->create();
+    $tenant = Tenant::factory()->create();
+    $event = createRsvpEvent($tenant, [], [
+        'capacity' => 1,
+        'has_waitlist' => true,
+    ]);
+
+    $existingUser = User::factory()->create();
+    Enrollment::factory()->create([
+        'event_id' => $event->id,
+        'user_id' => $existingUser->id,
+        'status' => EnrollmentStatus::Confirmed,
+        'enrolled_at' => now(),
+        'confirmed_at' => now(),
+    ]);
+
+    $enrollment = resolve(EnrollUserAction::class)->handle(EnrollUserDTO::fromModels($event, $user));
+
+    expect($enrollment->status)->toBe(EnrollmentStatus::Waitlisted)
+        ->and($enrollment->waitlist_position)->toBe(1)
+        ->and($enrollment->confirmed_at)->toBeNull();
+
+    EventFacade::assertNotDispatched(EnrollmentConfirmed::class);
+});
+
+test('when event is at capacity without waitlist, then enrollment is rejected', function (): void {
+    $user = User::factory()->create();
+    $tenant = Tenant::factory()->create();
+    $event = createRsvpEvent($tenant, [], [
+        'capacity' => 1,
+        'has_waitlist' => false,
+    ]);
+
+    $existingUser = User::factory()->create();
+    Enrollment::factory()->create([
+        'event_id' => $event->id,
+        'user_id' => $existingUser->id,
+        'status' => EnrollmentStatus::Confirmed,
+        'enrolled_at' => now(),
+        'confirmed_at' => now(),
+    ]);
+
+    resolve(EnrollUserAction::class)->handle(EnrollUserDTO::fromModels($event, $user));
+})->throws(EnrollmentException::class);
+
+test('when event has available capacity, then enrollment is confirmed', function (): void {
+    EventFacade::fake([EnrollmentConfirmed::class]);
+
+    $user = User::factory()->create();
+    $tenant = Tenant::factory()->create();
+    $event = createRsvpEvent($tenant, [], [
+        'capacity' => 2,
+        'has_waitlist' => true,
+    ]);
+
+    $existingUser = User::factory()->create();
+    Enrollment::factory()->create([
+        'event_id' => $event->id,
+        'user_id' => $existingUser->id,
+        'status' => EnrollmentStatus::Confirmed,
+        'enrolled_at' => now(),
+        'confirmed_at' => now(),
+    ]);
+
+    $enrollment = resolve(EnrollUserAction::class)->handle(EnrollUserDTO::fromModels($event, $user));
+
+    expect($enrollment->status)->toBe(EnrollmentStatus::Confirmed)
+        ->and($enrollment->confirmed_at)->not->toBeNull();
+
+    EventFacade::assertDispatched(EnrollmentConfirmed::class);
+});
 
 test('when duplicate enrollment exists in database, then only one enrollment record is kept', function (): void {
     $user = User::factory()->create();

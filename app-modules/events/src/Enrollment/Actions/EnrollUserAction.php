@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace He4rt\Events\Enrollment\Actions;
 
+use Carbon\CarbonInterface;
 use He4rt\Events\Enrollment\DTOs\EnrollUserDTO;
 use He4rt\Events\Enrollment\Enums\EnrollmentMethod;
 use He4rt\Events\Enrollment\Enums\EnrollmentStatus;
@@ -11,6 +12,7 @@ use He4rt\Events\Enrollment\Enums\TriggeredBy;
 use He4rt\Events\Enrollment\Events\EnrollmentConfirmed;
 use He4rt\Events\Enrollment\Exceptions\EnrollmentException;
 use He4rt\Events\Enrollment\Models\Enrollment;
+use He4rt\Events\Enrollment\Models\EnrollmentPolicy;
 use He4rt\Events\Enrollment\Models\EnrollmentTransition;
 use He4rt\Events\Event\Enums\EventStatus;
 use Illuminate\Database\UniqueConstraintViolationException;
@@ -31,6 +33,13 @@ final readonly class EnrollUserAction
                 EnrollmentException::alreadyEnrolled(),
             );
 
+            EnrollmentPolicy::query()
+                ->where('event_id', $dto->eventId)
+                ->lockForUpdate()
+                ->first();
+
+            $initial = $this->resolveInitialEnrollment($dto);
+
             try {
                 $now = now();
 
@@ -38,31 +47,76 @@ final readonly class EnrollUserAction
                     'event_id' => $dto->eventId,
                     'user_id' => $dto->userId,
                     'enrolled_at' => $now,
-                    'confirmed_at' => $now,
+                    'confirmed_at' => $initial['confirmedAt'],
+                    'waitlist_position' => $initial['waitlistPosition'],
                 ]);
-                $enrollment->status = EnrollmentStatus::Confirmed;
+                $enrollment->status = $initial['status'];
                 $enrollment->save();
 
                 EnrollmentTransition::query()->create([
                     'enrollment_id' => $enrollment->id,
                     'from_status' => null,
-                    'to_status' => EnrollmentStatus::Confirmed,
+                    'to_status' => $initial['status'],
                     'actor_id' => $dto->userId,
                     'triggered_by' => TriggeredBy::User,
                 ]);
 
-                event(new EnrollmentConfirmed(
-                    enrollmentId: $enrollment->id,
-                    eventId: $dto->eventId,
-                    userId: $dto->userId,
-                    xpRewardRsvp: $dto->xpRewardOnConfirmed,
-                ));
+                if ($initial['status'] === EnrollmentStatus::Confirmed) {
+                    event(new EnrollmentConfirmed(
+                        enrollmentId: $enrollment->id,
+                        eventId: $dto->eventId,
+                        userId: $dto->userId,
+                        xpRewardOnConfirmed: $dto->xpRewardOnConfirmed,
+                    ));
+                }
 
                 return $enrollment->fresh(['event.enrollmentPolicy']);
             } catch (UniqueConstraintViolationException) {
                 throw EnrollmentException::alreadyEnrolled();
             }
         });
+    }
+
+    /**
+     * @return array{status: EnrollmentStatus, waitlistPosition: ?int, confirmedAt: ?CarbonInterface}
+     */
+    private function resolveInitialEnrollment(EnrollUserDTO $dto): array
+    {
+        if ($dto->capacity === null) {
+            return [
+                'status' => EnrollmentStatus::Confirmed,
+                'waitlistPosition' => null,
+                'confirmedAt' => now(),
+            ];
+        }
+
+        $confirmedCount = Enrollment::query()
+            ->where('event_id', $dto->eventId)
+            ->confirmed()
+            ->count();
+
+        if ($confirmedCount < $dto->capacity) {
+            return [
+                'status' => EnrollmentStatus::Confirmed,
+                'waitlistPosition' => null,
+                'confirmedAt' => now(),
+            ];
+        }
+
+        if ($dto->hasWaitlist) {
+            $nextPosition = (int) Enrollment::query()
+                ->where('event_id', $dto->eventId)
+                ->waitlisted()
+                ->max('waitlist_position') + 1;
+
+            return [
+                'status' => EnrollmentStatus::Waitlisted,
+                'waitlistPosition' => $nextPosition,
+                'confirmedAt' => null,
+            ];
+        }
+
+        throw EnrollmentException::eventFull();
     }
 
     private function validate(EnrollUserDTO $dto): void

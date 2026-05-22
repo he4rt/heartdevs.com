@@ -40,4 +40,12 @@ final class EnrollmentException extends Exception
             Response::HTTP_UNPROCESSABLE_ENTITY,
         );
     }
+
+    public static function eventFull(): self
+    {
+        return new self(
+            __('events::exceptions.event_full'),
+            Response::HTTP_UNPROCESSABLE_ENTITY,
+        );
+    }
 }

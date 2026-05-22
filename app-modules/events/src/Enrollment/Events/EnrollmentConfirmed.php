@@ -15,6 +15,6 @@ final readonly class EnrollmentConfirmed implements ShouldDispatchAfterCommit
         public string $enrollmentId,
         public string $eventId,
         public string $userId,
-        public int $xpRewardRsvp,
+        public int $xpRewardOnConfirmed,
     ) {}
 }

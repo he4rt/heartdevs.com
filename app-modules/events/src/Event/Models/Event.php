@@ -102,6 +102,11 @@ final class Event extends Model
         $query->where('status', EventStatus::Published);
     }
 
+    protected function scopeViewableByParticipant(Builder $query): void
+    {
+        $query->whereIn('status', EventStatus::viewableByParticipant());
+    }
+
     protected function scopeUpcoming(Builder $query): void
     {
         $query->where('starts_at', '>', now());

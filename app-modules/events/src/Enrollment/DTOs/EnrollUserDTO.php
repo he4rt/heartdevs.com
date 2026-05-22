@@ -18,6 +18,8 @@ final readonly class EnrollUserDTO
         public EventStatus $eventStatus,
         public CarbonInterface $eventStartsAt,
         public ?EnrollmentMethod $enrollmentMethod,
+        public ?int $capacity,
+        public bool $hasWaitlist,
         public int $xpRewardOnConfirmed,
     ) {}
 
@@ -31,6 +33,8 @@ final readonly class EnrollUserDTO
             eventStatus: $event->status,
             eventStartsAt: $event->starts_at,
             enrollmentMethod: $event->enrollmentPolicy?->enrollment_method,
+            capacity: $event->enrollmentPolicy?->capacity,
+            hasWaitlist: $event->enrollmentPolicy?->has_waitlist ?? false,
             xpRewardOnConfirmed: $event->enrollmentPolicy?->xp_on_confirmed ?? 0,
         );
     }

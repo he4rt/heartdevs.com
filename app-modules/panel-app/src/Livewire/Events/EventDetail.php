@@ -8,6 +8,7 @@ use Filament\Notifications\Notification;
 use He4rt\Events\Enrollment\Actions\EnrollUserAction;
 use He4rt\Events\Enrollment\DTOs\EnrollUserDTO;
 use He4rt\Events\Enrollment\Enums\EnrollmentMethod;
+use He4rt\Events\Enrollment\Enums\EnrollmentStatus;
 use He4rt\Events\Enrollment\Exceptions\EnrollmentException;
 use He4rt\Events\Enrollment\Models\Enrollment;
 use He4rt\Events\Event\Enums\EventStatus;
@@ -33,7 +34,7 @@ final class EventDetail extends Component
             ->with('enrollmentPolicy')
             ->where('id', $this->eventId)
             ->where('tenant_id', filament()->getTenant()->getKey())
-            ->whereIn('status', [EventStatus::Published, EventStatus::Completed])
+            ->viewableByParticipant()
             ->firstOrFail();
     }
 
@@ -49,17 +50,38 @@ final class EventDetail extends Component
     #[Computed]
     public function canConfirmPresence(): bool
     {
+        if ($this->event->status !== EventStatus::Published) {
+            return false;
+        }
+
         if ($this->enrollment !== null) {
             return false;
         }
 
-        $method = $this->event->enrollmentPolicy?->enrollment_method;
+        $policy = $this->event->enrollmentPolicy;
 
-        if (!in_array($method, [EnrollmentMethod::Rsvp, EnrollmentMethod::RsvpCheckin], strict: true)) {
+        if (!in_array($policy?->enrollment_method, [EnrollmentMethod::Rsvp, EnrollmentMethod::RsvpCheckin], strict: true)) {
             return false;
         }
 
-        return $this->event->starts_at->isFuture();
+        if (!$this->event->starts_at->isFuture()) {
+            return false;
+        }
+
+        if ($policy->capacity === null) {
+            return true;
+        }
+
+        $confirmedCount = Enrollment::query()
+            ->where('event_id', $this->eventId)
+            ->where('status', EnrollmentStatus::Confirmed)
+            ->count();
+
+        if ($confirmedCount < $policy->capacity) {
+            return true;
+        }
+
+        return $policy->has_waitlist;
     }
 
     public function confirmPresence(): void
@@ -68,15 +90,19 @@ final class EventDetail extends Component
         $user = auth()->user();
 
         try {
-            resolve(EnrollUserAction::class)->handle(
+            $enrollment = resolve(EnrollUserAction::class)->handle(
                 EnrollUserDTO::fromModels($this->event, $user),
             );
 
             unset($this->enrollment, $this->canConfirmPresence);
 
+            $successMessage = $enrollment->status === EnrollmentStatus::Confirmed
+                ? __('events::pages.confirm_presence_success')
+                : __('events::pages.waitlist_success');
+
             Notification::make()
                 ->success()
-                ->title(__('events::pages.confirm_presence_success'))
+                ->title($successMessage)
                 ->send();
         } catch (EnrollmentException $enrollmentException) {
             Notification::make()

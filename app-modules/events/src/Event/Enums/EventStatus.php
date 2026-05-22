@@ -17,6 +17,16 @@ enum EventStatus: string implements HasColor, HasIcon, HasLabel
     case Completed = 'completed';
     case Cancelled = 'cancelled';
 
+    /** @return list<self> */
+    public static function viewableByParticipant(): array
+    {
+        return [
+            self::Published,
+            self::Completed,
+            self::Cancelled,
+        ];
+    }
+
     public function getLabel(): string
     {
         return __('events::enums.event_status.'.$this->value);
@@ -54,5 +64,13 @@ enum EventStatus: string implements HasColor, HasIcon, HasLabel
     public function isTerminal(): bool
     {
         return in_array($this, [self::Completed, self::Cancelled], strict: true);
+    }
+
+    public function isViewableByParticipant(): bool
+    {
+        return match ($this) {
+            self::Published, self::Completed, self::Cancelled => true,
+            self::Draft => false,
+        };
     }
 }

@@ -6,7 +6,6 @@ namespace He4rt\PanelApp\Pages;
 
 use BackedEnum;
 use Filament\Pages\Page;
-use He4rt\Events\Event\Enums\EventStatus;
 use He4rt\Events\Event\Models\Event;
 
 class EventPage extends Page
@@ -28,7 +27,7 @@ class EventPage extends Page
         $exists = Event::query()
             ->where('id', $record)
             ->where('tenant_id', filament()->getTenant()->getKey())
-            ->where('status', EventStatus::Published)
+            ->viewableByParticipant()
             ->exists();
 
         abort_unless($exists, 404);
