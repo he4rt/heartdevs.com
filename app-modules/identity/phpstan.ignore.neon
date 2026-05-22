@@ -1,7 +1,2 @@
 parameters:
-    ignoreErrors:
-        -
-            message: '#^Parameter \#1 \$profileDTO of method He4rt\\Identity\\User\\Actions\\UpdateProfile::handle\(\) expects He4rt\\Identity\\User\\DTOs\\UpdateProfileDTO, string given\.$#'
-            identifier: argument.type
-            count: 1
-            path: src/User/Http/Controllers/UsersController.php
+    ignoreErrors: []
