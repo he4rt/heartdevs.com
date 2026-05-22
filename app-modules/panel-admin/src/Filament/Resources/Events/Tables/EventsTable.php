@@ -8,10 +8,10 @@ use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
-use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
+use He4rt\Events\Event\Enums\EventStatus;
 use He4rt\Events\Event\Enums\EventType;
 
 final class EventsTable
@@ -45,9 +45,10 @@ final class EventsTable
                     ->dateTime()
                     ->sortable(),
 
-                IconColumn::make('active')
-                    ->label('Published')
-                    ->boolean(),
+                TextColumn::make('status')
+                    ->label('Status')
+                    ->badge()
+                    ->sortable(),
 
                 TextColumn::make('created_at')
                     ->label('Created At')
@@ -59,6 +60,10 @@ final class EventsTable
                 SelectFilter::make('event_type')
                     ->label('Type')
                     ->options(EventType::class),
+
+                SelectFilter::make('status')
+                    ->label('Status')
+                    ->options(EventStatus::class),
             ])
             ->recordActions([
                 EditAction::make(),

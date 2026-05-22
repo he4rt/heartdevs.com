@@ -2,12 +2,17 @@
 
 declare(strict_types=1);
 
+use He4rt\Events\CheckIn\Enums\CheckInMethod;
 use He4rt\Events\CheckIn\Models\CheckIn;
 use He4rt\Events\CheckIn\Models\CheckInCode;
 use He4rt\Events\CheckIn\Models\QrToken;
+use He4rt\Events\Enrollment\Enums\AttendanceRequirement;
+use He4rt\Events\Enrollment\Enums\EnrollmentMethod;
 use He4rt\Events\Enrollment\Models\Enrollment;
 use He4rt\Events\Enrollment\Models\EnrollmentPolicy;
 use He4rt\Events\Enrollment\Models\EnrollmentTransition;
+use He4rt\Events\Event\Enums\EventStatus;
+use He4rt\Events\Event\Enums\EventType;
 use He4rt\Events\Event\Models\Event;
 use Illuminate\Database\Eloquent\Collection;
 
@@ -49,7 +54,7 @@ test('when creating a check-in via factory, then it is linked to an enrollment',
 
     expect($checkIn->id)->not->toBeNull()
         ->and($checkIn->enrollment_id)->not->toBeNull()
-        ->and($checkIn->check_in)->not->toBeNull();
+        ->and($checkIn->event_date)->not->toBeNull();
 });
 
 test('when creating a check-in code via factory, then it is linked to an event with valid dates', function (): void {
@@ -95,4 +100,60 @@ test('when an event has check-in codes, then they are accessible via the relatio
 
     expect($event->checkInCodes)->toHaveCount(2)
         ->and($event->checkInCodes->first()->event_id)->toBe($event->id);
+});
+
+test('when creating a workshop via factory preset, then event and enrollment policy match community defaults', function (): void {
+    $event = Event::factory()->asWorkshop()->upcoming()->create();
+
+    $event->load('enrollmentPolicy');
+
+    expect($event->event_type)->toBe(EventType::Workshop)
+        ->and($event->status)->toBe(EventStatus::Published)
+        ->and($event->enrollmentPolicy)->not->toBeNull()
+        ->and($event->enrollmentPolicy->enrollment_method)->toBe(EnrollmentMethod::RsvpCheckin)
+        ->and($event->enrollmentPolicy->check_in_method)->toBe(CheckInMethod::NumericCode)
+        ->and($event->enrollmentPolicy->capacity)->toBe(50)
+        ->and($event->enrollmentPolicy->has_waitlist)->toBeTrue()
+        ->and($event->enrollmentPolicy->attendance_requirement)->toBe(AttendanceRequirement::AllDays)
+        ->and($event->enrollmentPolicy->xp_on_confirmed)->toBe(100);
+});
+
+test('when creating a meetup via factory preset, then event has open rsvp enrollment policy', function (): void {
+    $event = Event::factory()->asMeetup()->create();
+
+    $event->load('enrollmentPolicy');
+
+    expect($event->event_type)->toBe(EventType::Meetup)
+        ->and($event->enrollmentPolicy->enrollment_method)->toBe(EnrollmentMethod::Rsvp)
+        ->and($event->enrollmentPolicy->check_in_method)->toBe(CheckInMethod::Manual)
+        ->and($event->enrollmentPolicy->capacity)->toBeNull()
+        ->and($event->enrollmentPolicy->has_waitlist)->toBeFalse();
+});
+
+test('when creating a conference via factory preset, then event has application enrollment with waitlist', function (): void {
+    $event = Event::factory()->asConference()->past()->create();
+
+    $event->load('enrollmentPolicy');
+
+    expect($event->event_type)->toBe(EventType::Conference)
+        ->and($event->enrollmentPolicy->enrollment_method)->toBe(EnrollmentMethod::Application)
+        ->and($event->enrollmentPolicy->check_in_method)->toBe(CheckInMethod::QrCode)
+        ->and($event->enrollmentPolicy->capacity)->toBe(200)
+        ->and($event->enrollmentPolicy->has_waitlist)->toBeTrue()
+        ->and($event->enrollmentPolicy->attendance_requirement)->toBe(AttendanceRequirement::MinimumDays)
+        ->and($event->enrollmentPolicy->minimum_days)->toBe(2)
+        ->and($event->enrollmentPolicy->cancellation_deadline_hours)->toBe(48);
+});
+
+test('when creating multiple meetup presets, then each event gets its own enrollment policy', function (): void {
+    $events = Event::factory()->count(3)->asMeetup()->create();
+
+    expect($events)->toHaveCount(3);
+
+    foreach ($events as $event) {
+        $event->load('enrollmentPolicy');
+
+        expect($event->enrollmentPolicy)->not->toBeNull()
+            ->and($event->enrollmentPolicy->enrollment_method)->toBe(EnrollmentMethod::Rsvp);
+    }
 });

@@ -33,4 +33,11 @@ final class EnrollmentPolicyFactory extends Factory
             'application_schema' => null,
         ];
     }
+
+    public function rsvp(): static
+    {
+        return $this->state(fn (): array => [
+            'enrollment_method' => EnrollmentMethod::Rsvp,
+        ]);
+    }
 }

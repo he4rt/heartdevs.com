@@ -69,4 +69,27 @@ enum EnrollmentStatus: string implements HasColor, HasIcon, HasLabel
     {
         return in_array($this, [self::Attended, self::Cancelled, self::Rejected, self::NoShow], strict: true);
     }
+
+    public function is(self ...$statuses): bool
+    {
+        return in_array($this, $statuses, strict: true);
+    }
+
+    public function isConfirmed(): bool
+    {
+        return $this->is(self::Confirmed);
+    }
+
+    public function isWaitlisted(): bool
+    {
+        return $this->is(self::Waitlisted);
+    }
+
+    public function getResponseMessage(): string
+    {
+        return match ($this) {
+            self::Confirmed => __('events::pages.confirm_presence_success'),
+            self::Waitlisted => __('events::pages.waitlist_success'),
+        };
+    }
 }

@@ -45,9 +45,9 @@ final class EventInfolist
                     ->label('Ends At')
                     ->dateTime(),
 
-                IconEntry::make('active')
-                    ->label('Published')
-                    ->boolean(),
+                TextEntry::make('status')
+                    ->label('Status')
+                    ->badge(),
 
                 TextEntry::make('created_at')
                     ->label('Created At')
