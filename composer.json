@@ -42,6 +42,7 @@
         "marvinlabs/laravel-discord-logger": "^1.4.4",
         "monicahq/laravel-cloudflare": "^4.1",
         "owenvoke/blade-fontawesome": "^3.2.2",
+        "phiki/phiki": "^2.2",
         "predis/predis": "^3.4.2",
         "ryangjchandler/commonmark-blade-block": "^1.1.1",
         "saloonphp/saloon": "^4.0",
