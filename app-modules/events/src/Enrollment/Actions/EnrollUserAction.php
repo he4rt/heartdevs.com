@@ -24,25 +24,9 @@ final readonly class EnrollUserAction
     public function handle(EnrollUserDTO $dto): Enrollment
     {
         return DB::transaction(function () use ($dto): Enrollment {
-            $event = Event::query()
-                ->whereKey($dto->eventId)
-                ->lockForUpdate()
-                ->firstOrFail();
+            [$event, $policy] = $this->loadLockedEnrollmentContext($dto->eventId);
 
-            $policy = EnrollmentPolicy::query()
-                ->where('event_id', $dto->eventId)
-                ->lockForUpdate()
-                ->first();
-
-            $this->validate($event, $policy);
-
-            throw_if(
-                Enrollment::query()
-                    ->where('event_id', $dto->eventId)
-                    ->where('user_id', $dto->userId)
-                    ->exists(),
-                EnrollmentException::alreadyEnrolled(),
-            );
+            $this->validate($event, $policy, $dto->userId);
 
             $initial = $this->resolveInitialEnrollment($dto->eventId, $policy);
 
@@ -78,6 +62,30 @@ final readonly class EnrollUserAction
                 throw EnrollmentException::alreadyEnrolled();
             }
         });
+    }
+
+    /**
+     * Load event and policy for validation and capacity checks.
+     *
+     * lockForUpdate() runs SELECT ... FOR UPDATE. Row locks are held until this
+     * DB::transaction commits or rolls back — there is no explicit unlock in code.
+     * Returned models are reused below so rules run on fresh DB state, not caller snapshots.
+     *
+     * @return array{0: Event, 1: ?EnrollmentPolicy}
+     */
+    private function loadLockedEnrollmentContext(string $eventId): array
+    {
+        $event = Event::query()
+            ->whereKey($eventId)
+            ->lockForUpdate()
+            ->firstOrFail();
+
+        $policy = EnrollmentPolicy::query()
+            ->where('event_id', $eventId)
+            ->lockForUpdate()
+            ->first();
+
+        return [$event, $policy];
     }
 
     /**
@@ -124,7 +132,7 @@ final readonly class EnrollUserAction
         throw EnrollmentException::eventFull();
     }
 
-    private function validate(Event $event, ?EnrollmentPolicy $policy): void
+    private function validate(Event $event, ?EnrollmentPolicy $policy, string $userId): void
     {
         throw_unless(
             $event->status === EventStatus::Published,
@@ -143,6 +151,14 @@ final readonly class EnrollUserAction
                 strict: true,
             ),
             EnrollmentException::invalidEnrollmentMethod(),
+        );
+
+        throw_if(
+            Enrollment::query()
+                ->where('event_id', $event->id)
+                ->where('user_id', $userId)
+                ->exists(),
+            EnrollmentException::alreadyEnrolled(),
         );
     }
 }
