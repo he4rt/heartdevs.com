@@ -26,6 +26,8 @@ final class SubscribeTwitchEventsCommand extends Command
     {
         $broadcasterId = $this->argument('broadcaster_user_id');
 
+        $this->showConfig($broadcasterId);
+
         if ($this->option('clear-all')) {
             return $this->clearAllSubscriptions($helix, $broadcasterId);
         }
@@ -39,6 +41,19 @@ final class SubscribeTwitchEventsCommand extends Command
         }
 
         return $this->createSubscriptions($helix, $broadcasterId, $specificType);
+    }
+
+    private function showConfig(string $broadcasterId): void
+    {
+        $callbackUrl = config()->string('services.twitch.eventsub_callback');
+        $secret = config()->string('services.twitch.eventsub_secret');
+        $maskedSecret = mb_substr($secret, 0, 4).str_repeat('*', max(mb_strlen($secret) - 4, 0));
+
+        $this->table(['Setting', 'Value'], [
+            ['Broadcaster ID', $broadcasterId],
+            ['Callback URL', $callbackUrl],
+            ['Secret', $maskedSecret],
+        ]);
     }
 
     private function createSubscriptions(TwitchHelixConnector $helix, string $broadcasterId, ?string $specificType): int
