@@ -132,8 +132,7 @@ class FilamentServiceProvider extends ServiceProvider
             ->native(false)
             ->selectablePlaceholder(fn (Select $component) => !$component->isRequired())
             ->searchable(fn (Select $component) => $component->hasRelationship())
-            ->preload(fn (Select $component) => $component->isSearchable())
-            ->searchable()
+            ->preload(fn (Select $component): bool => $component->isSearchable() && !$component->hasRelationship())
             ->translateLabel());
     }
 
