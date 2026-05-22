@@ -48,6 +48,15 @@ enum IdentityProvider: string implements HasColor, HasDescription, HasIcon, HasL
     case Bungie = 'bungie';
     case Ebay = 'ebay';
 
+    public static function supportedProviders(): array
+    {
+        return [
+            self::GitHub,
+            self::Discord,
+            self::Twitch,
+        ];
+    }
+
     public function getClient(): ?OAuthClientContract
     {
         return match ($this) {
