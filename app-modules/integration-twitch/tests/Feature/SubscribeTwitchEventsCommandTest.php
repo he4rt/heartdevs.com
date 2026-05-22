@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use He4rt\IntegrationTwitch\Enums\TwitchEventSubType;
 use He4rt\IntegrationTwitch\Transport\Requests\EventSub\CreateSubscription;
+use He4rt\IntegrationTwitch\Transport\Requests\EventSub\DeleteSubscription;
 use He4rt\IntegrationTwitch\Transport\Requests\EventSub\ListSubscriptions;
 use He4rt\IntegrationTwitch\Transport\TwitchHelixConnector;
 use Saloon\Http\Faking\MockClient;
@@ -20,6 +21,7 @@ function mockEventSubResponses(array $existingSubscriptions = []): MockClient
             'data' => [['id' => 'sub-123', 'status' => 'webhook_callback_verification_pending']],
             'total' => 1,
         ], 202),
+        DeleteSubscription::class => MockResponse::make([], 204),
     ]);
 
     app()->instance(TwitchHelixConnector::class, tap(
@@ -74,11 +76,44 @@ test('skips already existing subscriptions', function (): void {
         ->expectsOutputToContain('already_exists');
 });
 
-test('fails without type or all flag', function (): void {
+test('fails without type, all, or clear-all flag', function (): void {
     mockEventSubResponses();
 
     $this->artisan('twitch:subscribe', ['broadcaster_user_id' => '12345'])
         ->assertFailed();
+});
+
+test('clear-all deletes all subscriptions for broadcaster', function (): void {
+    $mock = mockEventSubResponses([
+        [
+            'id' => 'sub-aaa',
+            'type' => 'stream.online',
+            'condition' => ['broadcaster_user_id' => '12345'],
+        ],
+        [
+            'id' => 'sub-bbb',
+            'type' => 'channel.follow',
+            'condition' => ['broadcaster_user_id' => '12345'],
+        ],
+    ]);
+
+    $this->artisan('twitch:subscribe', [
+        'broadcaster_user_id' => '12345',
+        '--clear-all' => true,
+    ])->assertSuccessful()
+        ->expectsOutputToContain('2 subscription(s) deleted.');
+
+    $mock->assertSent(DeleteSubscription::class);
+});
+
+test('clear-all with no subscriptions shows info message', function (): void {
+    mockEventSubResponses();
+
+    $this->artisan('twitch:subscribe', [
+        'broadcaster_user_id' => '12345',
+        '--clear-all' => true,
+    ])->assertSuccessful()
+        ->expectsOutputToContain('No subscriptions found');
 });
 
 test('enum getVersion returns correct values', function (): void {

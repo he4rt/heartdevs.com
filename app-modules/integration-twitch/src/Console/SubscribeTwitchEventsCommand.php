@@ -6,6 +6,7 @@ namespace He4rt\IntegrationTwitch\Console;
 
 use He4rt\IntegrationTwitch\Enums\TwitchEventSubType;
 use He4rt\IntegrationTwitch\Transport\Requests\EventSub\CreateSubscription;
+use He4rt\IntegrationTwitch\Transport\Requests\EventSub\DeleteSubscription;
 use He4rt\IntegrationTwitch\Transport\Requests\EventSub\ListSubscriptions;
 use He4rt\IntegrationTwitch\Transport\TwitchHelixConnector;
 use Illuminate\Console\Command;
@@ -16,22 +17,33 @@ final class SubscribeTwitchEventsCommand extends Command
     protected $signature = 'twitch:subscribe
         {broadcaster_user_id : The Twitch broadcaster user ID}
         {--type= : Subscribe to a specific event type}
-        {--all : Subscribe to all available event types}';
+        {--all : Subscribe to all available event types}
+        {--clear-all : Delete all existing subscriptions for this broadcaster}';
 
-    protected $description = 'Create Twitch EventSub webhook subscriptions for a broadcaster';
+    protected $description = 'Manage Twitch EventSub webhook subscriptions for a broadcaster';
 
     public function handle(TwitchHelixConnector $helix): int
     {
         $broadcasterId = $this->argument('broadcaster_user_id');
+
+        if ($this->option('clear-all')) {
+            return $this->clearAllSubscriptions($helix, $broadcasterId);
+        }
+
         $specificType = $this->option('type');
 
         if (!$specificType && !$this->option('all')) {
-            $this->error('Specify --type=<event_type> or --all.');
+            $this->error('Specify --type=<event_type>, --all, or --clear-all.');
 
             return self::FAILURE;
         }
 
-        $existingTypes = $this->getExistingSubscriptions($helix, $broadcasterId);
+        return $this->createSubscriptions($helix, $broadcasterId, $specificType);
+    }
+
+    private function createSubscriptions(TwitchHelixConnector $helix, string $broadcasterId, ?string $specificType): int
+    {
+        $existingTypes = $this->getExistingSubscriptionTypes($helix, $broadcasterId);
 
         $types = $specificType
             ? [TwitchEventSubType::from($specificType)]
@@ -74,20 +86,61 @@ final class SubscribeTwitchEventsCommand extends Command
         return self::SUCCESS;
     }
 
+    private function clearAllSubscriptions(TwitchHelixConnector $helix, string $broadcasterId): int
+    {
+        $subscriptions = $this->getExistingSubscriptions($helix, $broadcasterId);
+
+        if ($subscriptions === []) {
+            $this->info('No subscriptions found for this broadcaster.');
+
+            return self::SUCCESS;
+        }
+
+        $this->info(sprintf('Deleting %d subscription(s)...', count($subscriptions)));
+
+        $results = [];
+
+        foreach ($subscriptions as $sub) {
+            try {
+                $helix->send(new DeleteSubscription(subscriptionId: $sub['id']));
+                $results[] = [$sub['type'], $sub['id'], 'deleted'];
+            } catch (RequestException $e) {
+                $results[] = [$sub['type'], $sub['id'], sprintf('error_%d', $e->getResponse()->status())];
+            }
+        }
+
+        $this->table(['Type', 'Subscription ID', 'Status'], $results);
+
+        $deleted = count(array_filter($results, fn (array $r): bool => $r[2] === 'deleted'));
+        $this->info(sprintf('%d subscription(s) deleted.', $deleted));
+
+        return self::SUCCESS;
+    }
+
     /**
      * @return array<int, string>
+     */
+    private function getExistingSubscriptionTypes(TwitchHelixConnector $helix, string $broadcasterId): array
+    {
+        return collect($this->getExistingSubscriptions($helix, $broadcasterId))
+            ->pluck('type')
+            ->all();
+    }
+
+    /**
+     * @return array<int, array{id: string, type: string, condition: array<string, string>}>
      */
     private function getExistingSubscriptions(TwitchHelixConnector $helix, string $broadcasterId): array
     {
         $response = $helix->send(new ListSubscriptions());
 
-        /** @var array<int, array{type: string, condition: array<string, string>}> $subscriptions */
+        /** @var array<int, array{id: string, type: string, condition: array<string, string>}> $subscriptions */
         $subscriptions = $response->json('data', []);
 
         return collect($subscriptions)
             ->filter(fn (array $sub): bool => ($sub['condition']['broadcaster_user_id'] ?? null) === $broadcasterId
                 || ($sub['condition']['to_broadcaster_user_id'] ?? null) === $broadcasterId)
-            ->pluck('type')
+            ->values()
             ->all();
     }
 }
