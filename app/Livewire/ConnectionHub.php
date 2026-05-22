@@ -11,35 +11,45 @@ use He4rt\Identity\ExternalIdentity\Models\ExternalIdentity;
 use He4rt\Identity\Tenant\Models\Tenant;
 use Illuminate\Contracts\View\View;
 use Illuminate\Database\Eloquent\Collection;
-use Livewire\Attributes\Computed;
 use Livewire\Component;
 
 class ConnectionHub extends Component
 {
-    /** @return Collection<int, ExternalIdentity> */
-    #[Computed]
-    public function userProviders(): Collection
+    public string $panel = 'app';
+
+    public int $tenantId = 0;
+
+    public function mount(): void
     {
-        return auth()->user()->providers()->where('tenant_id', filament()->getTenant()->getKey())->get();
+        $this->panel = filament()->getCurrentPanel()?->getId() ?? 'app';
+        $this->tenantId = filament()->getTenant()?->getKey() ?? 0;
     }
 
     public function render(): View
     {
+        $supportedProviders = IdentityProvider::supportedProviders();
+
+        if ($this->panel === 'admin') {
+            return view('livewire.connection-hub-admin', [
+                'tenantProviders' => $this->getTenantProviders(),
+                'supportedProviders' => $supportedProviders,
+                'panel' => $this->panel,
+            ]);
+        }
+
         return view('livewire.connection-hub', [
-            'userProviders' => $this->userProviders(),
-            'supportedProviders' => IdentityProvider::supportedProviders(),
-            'panel' => filament()->getCurrentPanel()->getId(),
+            'userProviders' => $this->getUserProviders(),
+            'supportedProviders' => $supportedProviders,
+            'panel' => $this->panel,
         ]);
     }
 
     public function connect(IdentityProvider $provider): void
     {
-        /** @var Tenant $tenant */
-        $tenant = filament()->getTenant();
-        $panel = filament()->getCurrentPanel()->getId();
+        $tenant = Tenant::query()->find($this->tenantId);
 
         session()->put('tenant', $tenant->slug);
-        $state = new OAuthStateDTO(panel: $panel, tenant: $tenant->slug);
+        $state = new OAuthStateDTO(panel: $this->panel, tenant: $tenant->slug);
         $redirectUri = $provider->getClient()->redirectUrl($state);
 
         $this->redirect($redirectUri);
@@ -47,12 +57,9 @@ class ConnectionHub extends Component
 
     public function disconnect(IdentityProvider $provider): void
     {
-        /** @var Tenant $tenant */
-        $tenant = filament()->getTenant();
-
         $identity = auth()->user()
             ->providers()
-            ->where('tenant_id', $tenant->getKey())
+            ->where('tenant_id', $this->tenantId)
             ->where('provider', $provider->value)
             ->whereNotNull('connected_at')
             ->whereNull('disconnected_at')
@@ -69,11 +76,52 @@ class ConnectionHub extends Component
 
         $identity->update(['disconnected_at' => now()]);
 
-        unset($this->userProviders);
-
         Notification::make()
             ->title($provider->getLabel().' disconnected successfully')
             ->success()
             ->send();
+    }
+
+    public function disconnectById(string $identityId): void
+    {
+        $identity = ExternalIdentity::query()
+            ->where('id', $identityId)
+            ->where('tenant_id', $this->tenantId)
+            ->whereNotNull('connected_at')
+            ->whereNull('disconnected_at')
+            ->first();
+
+        if (!$identity) {
+            Notification::make()
+                ->title('Connection not found')
+                ->warning()
+                ->send();
+
+            return;
+        }
+
+        $identity->update(['disconnected_at' => now()]);
+
+        Notification::make()
+            ->title($identity->provider->getLabel().' disconnected successfully')
+            ->success()
+            ->send();
+    }
+
+    /** @return Collection<int, ExternalIdentity> */
+    private function getUserProviders(): Collection
+    {
+        return auth()->user()->providers()->where('tenant_id', $this->tenantId)->get();
+    }
+
+    /** @return Collection<int, ExternalIdentity> */
+    private function getTenantProviders(): Collection
+    {
+        return ExternalIdentity::query()
+            ->where('tenant_id', $this->tenantId)
+            ->whereNotNull('connected_at')
+            ->whereNull('disconnected_at')
+            ->with('user')
+            ->get();
     }
 }
