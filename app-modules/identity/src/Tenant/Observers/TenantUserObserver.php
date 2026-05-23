@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace He4rt\Profile\Observers;
+namespace He4rt\Identity\Tenant\Observers;
 
 use He4rt\Identity\Tenant\Models\TenantUser;
 use He4rt\Profile\Models\Profile;
