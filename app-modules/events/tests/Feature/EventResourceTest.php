@@ -4,8 +4,11 @@ declare(strict_types=1);
 
 use Filament\Facades\Filament;
 use He4rt\Events\CheckIn\Enums\CheckInMethod;
+use He4rt\Events\CheckIn\Models\CheckIn;
 use He4rt\Events\Enrollment\Enums\AttendanceRequirement;
 use He4rt\Events\Enrollment\Enums\EnrollmentMethod;
+use He4rt\Events\Enrollment\Enums\EnrollmentStatus;
+use He4rt\Events\Enrollment\Models\Enrollment;
 use He4rt\Events\Enrollment\Models\EnrollmentPolicy;
 use He4rt\Events\Event\Enums\EventType;
 use He4rt\Events\Event\Models\Event;
@@ -136,4 +139,89 @@ test('when visiting the enrollments relation manager, then it renders successful
         'pageClass' => EditEvent::class,
     ])
         ->assertSuccessful();
+});
+
+test('when admin checks in an enrollment from relation manager, then participant is checked in', function (): void {
+    $event = Event::factory()->create([
+        'starts_at' => now()->setTime(9, 0),
+        'ends_at' => now()->setTime(18, 0),
+    ]);
+
+    $enrollment = Enrollment::factory()->create([
+        'event_id' => $event->id,
+        'status' => EnrollmentStatus::Confirmed,
+        'confirmed_at' => now(),
+    ]);
+
+    livewire(EnrollmentsRelationManager::class, [
+        'ownerRecord' => $event,
+        'pageClass' => EditEvent::class,
+    ])
+        ->callTableAction('checkIn', $enrollment, data: [
+            'event_date' => now()->toDateString(),
+        ])
+        ->assertHasNoTableActionErrors();
+
+    expect($enrollment->fresh()->status)->toBe(EnrollmentStatus::CheckedIn)
+        ->and(CheckIn::query()->where('enrollment_id', $enrollment->id)->count())->toBe(1);
+});
+
+test('when admin bulk checks in selected enrollments, then all selected participants are checked in', function (): void {
+    $event = Event::factory()->create([
+        'starts_at' => now()->setTime(9, 0),
+        'ends_at' => now()->setTime(18, 0),
+    ]);
+
+    $enrollments = Enrollment::factory()
+        ->count(2)
+        ->create([
+            'event_id' => $event->id,
+            'status' => EnrollmentStatus::Confirmed,
+            'confirmed_at' => now(),
+        ]);
+
+    livewire(EnrollmentsRelationManager::class, [
+        'ownerRecord' => $event,
+        'pageClass' => EditEvent::class,
+    ])
+        ->callTableBulkAction('checkInSelected', $enrollments, data: [
+            'event_date' => now()->toDateString(),
+        ])
+        ->assertHasNoTableBulkActionErrors();
+
+    expect(Enrollment::query()->whereKey($enrollments->pluck('id'))->where('status', EnrollmentStatus::CheckedIn)->count())->toBe(2)
+        ->and(CheckIn::query()->whereIn('enrollment_id', $enrollments->pluck('id'))->count())->toBe(2);
+});
+
+test('when enrollment has check-ins, then relation manager shows check-in history', function (): void {
+    $startsAt = now()->setTime(9, 0);
+    $event = Event::factory()->create([
+        'starts_at' => $startsAt,
+        'ends_at' => $startsAt->clone()->addDay()->setTime(18, 0),
+    ]);
+
+    $enrollment = Enrollment::factory()->create([
+        'event_id' => $event->id,
+        'status' => EnrollmentStatus::CheckedIn,
+        'checked_in_at' => now(),
+    ]);
+
+    CheckIn::factory()->create([
+        'enrollment_id' => $enrollment->id,
+        'event_date' => $startsAt->toDateString(),
+        'method' => CheckInMethod::Manual,
+    ]);
+
+    CheckIn::factory()->create([
+        'enrollment_id' => $enrollment->id,
+        'event_date' => $startsAt->clone()->addDay()->toDateString(),
+        'method' => CheckInMethod::Manual,
+    ]);
+
+    livewire(EnrollmentsRelationManager::class, [
+        'ownerRecord' => $event,
+        'pageClass' => EditEvent::class,
+    ])
+        ->assertSee($startsAt->toDateString())
+        ->assertSee($startsAt->clone()->addDay()->toDateString());
 });

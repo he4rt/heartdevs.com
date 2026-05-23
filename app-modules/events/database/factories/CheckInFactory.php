@@ -22,6 +22,7 @@ final class CheckInFactory extends Factory
             'event_date' => Date::today(),
             'method' => fake()->randomElement(CheckInMethod::cases()),
             'payload' => null,
+            'checked_in_at' => Date::now(),
         ];
     }
 }

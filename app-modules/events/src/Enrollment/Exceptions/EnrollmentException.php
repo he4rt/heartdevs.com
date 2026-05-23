@@ -48,4 +48,36 @@ final class EnrollmentException extends Exception
             Response::HTTP_UNPROCESSABLE_ENTITY,
         );
     }
+
+    public static function invalidCheckInStatus(): self
+    {
+        return new self(
+            __('events::exceptions.invalid_check_in_status'),
+            Response::HTTP_UNPROCESSABLE_ENTITY,
+        );
+    }
+
+    public static function checkInOutsideEventDateRange(): self
+    {
+        return new self(
+            __('events::exceptions.check_in_outside_event_date_range'),
+            Response::HTTP_UNPROCESSABLE_ENTITY,
+        );
+    }
+
+    public static function alreadyCheckedInForDate(): self
+    {
+        return new self(
+            __('events::exceptions.already_checked_in_for_date'),
+            Response::HTTP_CONFLICT,
+        );
+    }
+
+    public static function invalidCheckInActor(): self
+    {
+        return new self(
+            __('events::exceptions.invalid_check_in_actor'),
+            Response::HTTP_UNPROCESSABLE_ENTITY,
+        );
+    }
 }
