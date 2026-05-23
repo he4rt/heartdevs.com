@@ -4,24 +4,17 @@ declare(strict_types=1);
 
 namespace He4rt\Profile\Enums;
 
-enum SocialPlatform: string
+use Filament\Support\Contracts\HasIcon;
+use Filament\Support\Contracts\HasLabel;
+use Filament\Support\Icons\Heroicon;
+
+enum SocialPlatform: string implements HasIcon, HasLabel
 {
     case Instagram = 'instagram';
     case Twitter = 'twitter';
     case Website = 'website';
     case YouTube = 'youtube';
     case Bluesky = 'bluesky';
-
-    public function label(): string
-    {
-        return match ($this) {
-            self::Instagram => 'Instagram',
-            self::Twitter => 'Twitter',
-            self::Website => 'Website',
-            self::YouTube => 'YouTube',
-            self::Bluesky => 'Bluesky',
-        };
-    }
 
     /**
      * @return array<int, string>
@@ -32,5 +25,21 @@ enum SocialPlatform: string
             fn (self $platform): string => $platform->value,
             self::cases(),
         );
+    }
+
+    public function getLabel(): string
+    {
+        return __('profile::enums.social_platform.'.$this->value);
+    }
+
+    public function getIcon(): Heroicon
+    {
+        return match ($this) {
+            self::Instagram => Heroicon::Camera,
+            self::Twitter => Heroicon::ChatBubbleLeft,
+            self::Website => Heroicon::GlobeAlt,
+            self::YouTube => Heroicon::PlayCircle,
+            self::Bluesky => Heroicon::Cloud,
+        };
     }
 }

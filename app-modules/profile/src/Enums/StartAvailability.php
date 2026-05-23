@@ -4,7 +4,13 @@ declare(strict_types=1);
 
 namespace He4rt\Profile\Enums;
 
-enum StartAvailability: string
+use Filament\Support\Colors\Color;
+use Filament\Support\Contracts\HasColor;
+use Filament\Support\Contracts\HasIcon;
+use Filament\Support\Contracts\HasLabel;
+use Filament\Support\Icons\Heroicon;
+
+enum StartAvailability: string implements HasColor, HasIcon, HasLabel
 {
     case Immediate = 'immediate';
     case OneWeek = '1_week';
@@ -14,16 +20,28 @@ enum StartAvailability: string
     case TwoMonths = '2_months';
     case Negotiable = 'negotiable';
 
-    public function label(): string
+    public function getLabel(): string
+    {
+        return __('profile::enums.start_availability.'.$this->value);
+    }
+
+    public function getColor(): array
     {
         return match ($this) {
-            self::Immediate => 'Imediato',
-            self::OneWeek => '1 semana',
-            self::TwoWeeks => '2 semanas',
-            self::ThreeWeeks => '3 semanas',
-            self::OneMonth => '1 mês',
-            self::TwoMonths => '2 meses',
-            self::Negotiable => 'Negociável',
+            self::Immediate => Color::Green,
+            self::OneWeek, self::TwoWeeks => Color::Amber,
+            self::ThreeWeeks, self::OneMonth, self::TwoMonths => Color::Red,
+            self::Negotiable => Color::Gray,
+        };
+    }
+
+    public function getIcon(): Heroicon
+    {
+        return match ($this) {
+            self::Immediate => Heroicon::BoltSlash,
+            self::OneWeek, self::TwoWeeks, self::ThreeWeeks => Heroicon::Clock,
+            self::OneMonth, self::TwoMonths => Heroicon::CalendarDays,
+            self::Negotiable => Heroicon::ChatBubbleBottomCenterText,
         };
     }
 }

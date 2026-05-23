@@ -6,20 +6,20 @@ namespace He4rt\Identity\Tenant\Concerns;
 
 use Filament\Panel;
 use He4rt\Identity\Tenant\Models\Tenant;
+use He4rt\Identity\Tenant\Models\TenantUser;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\Relations\Pivot;
 use Illuminate\Support\Collection;
 
 trait InteractsWithTenants
 {
     /**
-     * @return BelongsToMany<Tenant, $this, Pivot>
+     * @return BelongsToMany<Tenant, $this, TenantUser>
      */
     public function tenants(): BelongsToMany
     {
-        return $this->belongsToMany(Tenant::class, 'tenant_users');
+        return $this->belongsToMany(Tenant::class, 'tenant_users')->using(TenantUser::class);
     }
 
     public function canAccessTenant(Model $tenant): bool

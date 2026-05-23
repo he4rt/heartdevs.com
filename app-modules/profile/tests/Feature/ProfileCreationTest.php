@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 use He4rt\Identity\Tenant\Models\Tenant;
 use He4rt\Identity\User\Models\User;
-use He4rt\Profile\Listeners\CreateProfileForTenantMember;
 use He4rt\Profile\Models\Profile;
 
 test('profile is created when user joins tenant', function (): void {
@@ -41,8 +40,7 @@ test('profile is not duplicated when it already exists', function (): void {
         'headline' => 'Existing headline',
     ]);
 
-    app(CreateProfileForTenantMember::class)
-        ->handle($user->id, $tenant->id);
+    $tenant->members()->attach($user);
 
     expect(Profile::query()
         ->whereBelongsTo($user)
@@ -67,14 +65,13 @@ test('member can have independent profiles in multiple tenants', function (): vo
 
     $profiles = Profile::query()
         ->whereBelongsTo($user)
-        ->orderBy('tenant_id')
         ->get();
 
+    $tenantIds = $profiles->pluck('tenant_id')->sort()->values()->all();
+    $expectedTenantIds = collect([$firstTenant->id, $secondTenant->id])->sort()->values()->all();
+
     expect($profiles)->toHaveCount(2)
-        ->and($profiles->pluck('tenant_id')->all())->toBe([
-            $firstTenant->id,
-            $secondTenant->id,
-        ])
+        ->and($tenantIds)->toBe($expectedTenantIds)
         ->and($profiles->pluck('id')->unique())->toHaveCount(2);
 });
 

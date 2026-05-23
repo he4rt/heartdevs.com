@@ -17,7 +17,6 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
-use Illuminate\Database\Eloquent\Relations\Pivot;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
@@ -55,11 +54,11 @@ class Tenant extends Model
     }
 
     /**
-     * @return BelongsToMany<User, $this, Pivot>
+     * @return BelongsToMany<User, $this, TenantUser>
      */
     public function members(): BelongsToMany
     {
-        return $this->belongsToMany(User::class, 'tenant_users');
+        return $this->belongsToMany(User::class, 'tenant_users')->using(TenantUser::class);
     }
 
     /**
