@@ -9,6 +9,7 @@ use Filament\Support\Contracts\HasColor;
 use Filament\Support\Contracts\HasIcon;
 use Filament\Support\Contracts\HasLabel;
 use Filament\Support\Icons\Heroicon;
+use He4rt\Events\Enrollment\Exceptions\EnrollmentException;
 
 enum EnrollmentStatus: string implements HasColor, HasIcon, HasLabel
 {
@@ -65,6 +66,14 @@ enum EnrollmentStatus: string implements HasColor, HasIcon, HasLabel
         };
     }
 
+    public function timestampColumn(): ?string
+    {
+        return match ($this) {
+            self::Confirmed, self::CheckedIn, self::Attended, self::Cancelled => $this->value.'_at',
+            default => null,
+        };
+    }
+
     public function isTerminal(): bool
     {
         return in_array($this, [self::Attended, self::Cancelled, self::Rejected, self::NoShow], strict: true);
@@ -90,6 +99,7 @@ enum EnrollmentStatus: string implements HasColor, HasIcon, HasLabel
         return match ($this) {
             self::Confirmed => __('events::pages.confirm_presence_success'),
             self::Waitlisted => __('events::pages.waitlist_success'),
+            default => throw EnrollmentException::responseMessageNotImplemented($this),
         };
     }
 }

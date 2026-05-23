@@ -97,21 +97,25 @@ final class Event extends Model
         return EventFactory::new();
     }
 
+    /** @param  Builder<self>  $query */
     protected function scopePublished(Builder $query): void
     {
         $query->where('status', EventStatus::Published);
     }
 
+    /** @param  Builder<self>  $query */
     protected function scopeViewableByParticipant(Builder $query): void
     {
         $query->whereIn('status', EventStatus::viewableByParticipant());
     }
 
+    /** @param  Builder<self>  $query */
     protected function scopeUpcoming(Builder $query): void
     {
         $query->where('starts_at', '>', now());
     }
 
+    /** @param  Builder<self>  $query */
     protected function scopeActive(Builder $query): void
     {
         $query->where('status', EventStatus::Published)

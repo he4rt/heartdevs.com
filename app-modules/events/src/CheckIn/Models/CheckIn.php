@@ -20,6 +20,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property Carbon $event_date
  * @property CheckInMethod $method
  * @property array<string, mixed>|null $payload
+ * @property Carbon $checked_in_at
  * @property Carbon $created_at
  * @property Carbon $updated_at
  */
@@ -35,6 +36,7 @@ final class CheckIn extends Model
         'event_date',
         'method',
         'payload',
+        'checked_in_at',
     ];
 
     /** @return BelongsTo<Enrollment, $this> */
@@ -55,6 +57,7 @@ final class CheckIn extends Model
             'event_date' => 'date',
             'method' => CheckInMethod::class,
             'payload' => 'array',
+            'checked_in_at' => 'datetime',
         ];
     }
 }

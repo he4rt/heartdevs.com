@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use He4rt\Events\Enrollment\Enums\EnrollmentStatus;
+use He4rt\Events\Enrollment\Exceptions\EnrollmentException;
 
 test('when a pending enrollment is evaluated, then it can transition to confirmed, rejected, or cancelled', function (): void {
     expect(EnrollmentStatus::Pending->canTransitionTo(EnrollmentStatus::Confirmed))->toBeTrue()
@@ -74,3 +75,8 @@ test('when rsvp enrollment status is evaluated, then response message matches st
     [EnrollmentStatus::Confirmed, 'events::pages.confirm_presence_success'],
     [EnrollmentStatus::Waitlisted, 'events::pages.waitlist_success'],
 ]);
+
+test('when response message is requested for unsupported enrollment status, then it fails explicitly', function (): void {
+    expect(fn (): string => EnrollmentStatus::Pending->getResponseMessage())
+        ->toThrow(EnrollmentException::class);
+});

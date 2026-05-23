@@ -4,11 +4,25 @@ declare(strict_types=1);
 
 namespace He4rt\PanelAdmin\Filament\Resources\Events\RelationManagers;
 
+use Filament\Actions\Action;
+use Filament\Actions\BulkAction;
+use Filament\Actions\BulkActionGroup;
+use Filament\Forms\Components\DatePicker;
+use Filament\Notifications\Notification;
 use Filament\Resources\RelationManagers\RelationManager;
+use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
+use He4rt\Events\CheckIn\Actions\ManualCheckInAction;
+use He4rt\Events\CheckIn\DTOs\ManualCheckInDTO;
+use He4rt\Events\CheckIn\Models\CheckIn;
 use He4rt\Events\Enrollment\Enums\EnrollmentStatus;
+use He4rt\Events\Enrollment\Models\Enrollment;
+use He4rt\Events\Event\Models\Event;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Support\Facades\Date;
 
 final class EnrollmentsRelationManager extends RelationManager
 {
@@ -23,6 +37,7 @@ final class EnrollmentsRelationManager extends RelationManager
     {
         return $table
             ->recordTitleAttribute('id')
+            ->modifyQueryUsing(fn (Builder $query): Builder => $query->with(['checkIns', 'user']))
             ->columns([
                 TextColumn::make('user.name')
                     ->label('Participant')
@@ -44,6 +59,15 @@ final class EnrollmentsRelationManager extends RelationManager
                     ->dateTime()
                     ->sortable(),
 
+                TextColumn::make('check_in_history')
+                    ->label('Check-in History')
+                    ->state(fn (Enrollment $record): string => $record->checkIns
+                        ->sortBy('event_date')
+                        ->map(fn (CheckIn $checkIn): string => $checkIn->event_date->toDateString())
+                        ->implode(', '))
+                    ->placeholder('-')
+                    ->toggleable(),
+
                 TextColumn::make('cancelled_at')
                     ->label('Cancelled At')
                     ->dateTime()
@@ -54,6 +78,88 @@ final class EnrollmentsRelationManager extends RelationManager
                 SelectFilter::make('status')
                     ->label('Status')
                     ->options(EnrollmentStatus::class),
+            ])
+            ->recordActions([
+                $this->checkInAction(),
+            ])
+            ->toolbarActions([
+                BulkActionGroup::make([
+                    $this->bulkCheckInAction(),
+                ]),
             ]);
+    }
+
+    private function checkInAction(): Action
+    {
+        return Action::make('checkIn')
+            ->label('Check In')
+            ->icon(Heroicon::OutlinedCheckCircle)
+            ->color('success')
+            ->visible(fn (Enrollment $record): bool => $record->status->is(EnrollmentStatus::Confirmed, EnrollmentStatus::CheckedIn))
+            ->schema($this->checkInSchema())
+            ->action(function (Enrollment $record, array $data): void {
+                $this->checkIn($record, $data);
+
+                Notification::make()
+                    ->success()
+                    ->title('Participant checked in.')
+                    ->send();
+            });
+    }
+
+    private function bulkCheckInAction(): BulkAction
+    {
+        return BulkAction::make('checkInSelected')
+            ->label('Check In Selected')
+            ->icon(Heroicon::OutlinedCheckCircle)
+            ->color('success')
+            ->schema($this->checkInSchema())
+            ->action(function (Collection $records, array $data): void {
+                foreach ($records as $record) {
+                    if (!$record instanceof Enrollment) {
+                        continue;
+                    }
+
+                    $this->checkIn($record, $data);
+                }
+
+                Notification::make()
+                    ->success()
+                    ->title('Selected participants checked in.')
+                    ->send();
+            })
+            ->deselectRecordsAfterCompletion();
+    }
+
+    /**
+     * @return array<int, DatePicker>
+     */
+    private function checkInSchema(): array
+    {
+        /** @var Event $event */
+        $event = $this->getOwnerRecord();
+
+        return [
+            DatePicker::make('event_date')
+                ->label('Date')
+                ->default(now())
+                ->minDate($event->starts_at->toDateString())
+                ->maxDate($event->ends_at->toDateString())
+                ->required(),
+        ];
+    }
+
+    /**
+     * @param  array<string, mixed>  $data
+     */
+    private function checkIn(Enrollment $enrollment, array $data): CheckIn
+    {
+        return resolve(ManualCheckInAction::class)->handle(
+            new ManualCheckInDTO(
+                enrollment: $enrollment,
+                actorUserId: (string) auth()->id(),
+                eventDate: Date::parse($data['event_date']),
+            ),
+        );
     }
 }

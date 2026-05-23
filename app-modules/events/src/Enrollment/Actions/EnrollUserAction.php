@@ -53,7 +53,7 @@ final readonly class EnrollUserAction
                         enrollmentId: $enrollment->id,
                         eventId: $dto->eventId,
                         userId: $dto->userId,
-                        xpRewardOnConfirmed: $policy?->xp_on_confirmed ?? 0,
+                        xpRewardOnConfirmed: $policy->xp_on_confirmed ?? 0,
                     ));
                 }
 

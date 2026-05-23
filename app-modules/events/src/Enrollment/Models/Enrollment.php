@@ -97,16 +97,19 @@ final class Enrollment extends Model
         return EnrollmentFactory::new();
     }
 
+    /** @param  Builder<Enrollment>  $query */
     protected function scopeConfirmed(Builder $query): void
     {
         $query->where('status', EnrollmentStatus::Confirmed);
     }
 
+    /** @param  Builder<Enrollment>  $query */
     protected function scopeWaitlisted(Builder $query): void
     {
         $query->where('status', EnrollmentStatus::Waitlisted);
     }
 
+    /** @param  Builder<Enrollment>  $query */
     protected function scopeActive(Builder $query): void
     {
         $query->whereNotIn('status', [

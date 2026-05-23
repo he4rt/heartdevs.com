@@ -5,10 +5,19 @@ declare(strict_types=1);
 namespace He4rt\Events\Enrollment\Exceptions;
 
 use Exception;
+use He4rt\Events\Enrollment\Enums\EnrollmentStatus;
 use Symfony\Component\HttpFoundation\Response;
 
 final class EnrollmentException extends Exception
 {
+    public static function invalidTransition(EnrollmentStatus $from, EnrollmentStatus $to): self
+    {
+        return new self(
+            __('events::exceptions.invalid_transition', ['from' => $from->value, 'to' => $to->value]),
+            Response::HTTP_UNPROCESSABLE_ENTITY,
+        );
+    }
+
     public static function alreadyEnrolled(): self
     {
         return new self(
@@ -46,6 +55,14 @@ final class EnrollmentException extends Exception
         return new self(
             __('events::exceptions.event_full'),
             Response::HTTP_UNPROCESSABLE_ENTITY,
+        );
+    }
+
+    public static function responseMessageNotImplemented(EnrollmentStatus $status): self
+    {
+        return new self(
+            __('events::exceptions.response_message_not_implemented', ['status' => $status->value]),
+            Response::HTTP_INTERNAL_SERVER_ERROR,
         );
     }
 }
