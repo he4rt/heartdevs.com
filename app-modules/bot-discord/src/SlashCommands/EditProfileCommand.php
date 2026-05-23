@@ -7,8 +7,9 @@ namespace He4rt\BotDiscord\SlashCommands;
 use Discord\Builders\Components\TextInput;
 use Discord\Helpers\Collection;
 use Discord\Parts\Interactions\Interaction;
-use He4rt\Identity\User\Actions\UpdateProfile;
-use He4rt\Identity\User\DTOs\UpdateProfileDTO;
+use He4rt\Profile\Actions\UpsertProfile;
+use He4rt\Profile\DTOs\UpsertProfileDTO;
+use He4rt\Profile\Models\Profile;
 use Illuminate\Support\Facades\Date;
 use Throwable;
 
@@ -61,7 +62,12 @@ class EditProfileCommand extends AbstractSlashCommand
      */
     public function handle(Interaction $interaction): void
     {
-        if (!$this->memberProvider?->user?->information) {
+        $profile = Profile::query()
+            ->where('user_id', $this->memberProvider?->user?->id)
+            ->where('tenant_id', $this->memberProvider?->tenant_id)
+            ->first();
+
+        if (!$profile) {
             $interaction->respondWithMessage(
                 'Parece que você ainda não completou sua apresentação. Use o comando `/apresentar` para continuar.',
                 true
@@ -70,8 +76,6 @@ class EditProfileCommand extends AbstractSlashCommand
             return;
         }
 
-        $profile = $this->memberProvider->user->information;
-
         $this->modal('Editar Perfil')
             ->components([
                 TextInput::new('Nome', TextInput::STYLE_SHORT)
@@ -79,7 +83,7 @@ class EditProfileCommand extends AbstractSlashCommand
                     ->setMinLength(2)
                     ->setMaxLength(32)
                     ->setPlaceholder('Seu nome')
-                    ->setValue($profile->name ?? '')
+                    ->setValue($this->memberProvider->user->name ?? '')
                     ->setRequired(true),
 
                 TextInput::new('Nickname', TextInput::STYLE_SHORT)
@@ -90,26 +94,10 @@ class EditProfileCommand extends AbstractSlashCommand
                     ->setValue($profile->nickname ?? '')
                     ->setRequired(true),
 
-                TextInput::new('Git/Github (Opcional)', TextInput::STYLE_SHORT)
-                    ->setCustomId('github_url')
-                    ->setMinLength(0)
-                    ->setMaxLength(60)
-                    ->setPlaceholder('https://github.com/...')
-                    ->setValue($profile->github_url ?? '')
-                    ->setRequired(false),
-
-                TextInput::new('Linkedin (Opcional)', TextInput::STYLE_SHORT)
-                    ->setCustomId('linkedin_url')
-                    ->setMinLength(0)
-                    ->setMaxLength(60)
-                    ->setPlaceholder('https://linkedin.com/in/...')
-                    ->setValue($profile->linkedin_url ?? '')
-                    ->setRequired(false),
-
                 TextInput::new('Nos conte um pouco sobre você', TextInput::STYLE_PARAGRAPH)
                     ->setCustomId('about')
                     ->setMinLength(5)
-                    ->setMaxLength(1000)
+                    ->setMaxLength(500)
                     ->setPlaceholder('Fale mais sobre você...')
                     ->setValue($profile->about ?? '')
                     ->setRequired(true),
@@ -130,37 +118,34 @@ class EditProfileCommand extends AbstractSlashCommand
         Collection $components
     ): void {
         try {
-            $payload = UpdateProfileDTO::fromPayload([
-                'tenant_id' => $this->memberProvider->tenant_id,
-                'provider' => $this->memberProvider->provider,
-                'external_account_id' => $interaction->user->id,
-                'name' => $components->get('custom_id', 'name')?->value,
-                'nickname' => $components->get('custom_id', 'nickname')?->value,
-                'linkedin_url' => $components->get('custom_id', 'linkedin_url')?->value,
-                'github_url' => $components->get('custom_id', 'github_url')?->value,
-                'birthdate' => $components->get('custom_id', 'birthdate')?->value,
-                'about' => $components->get('custom_id', 'about')?->value,
+            $name = $components->get('custom_id', 'name')?->value;
+            $nickname = $components->get('custom_id', 'nickname')?->value;
+            $about = $components->get('custom_id', 'about')?->value;
+
+            $this->memberProvider->user->update(['name' => $name]);
+
+            $profile = Profile::query()
+                ->where('user_id', $this->memberProvider->user->id)
+                ->where('tenant_id', $this->memberProvider->tenant_id)
+                ->firstOrFail();
+
+            $dto = UpsertProfileDTO::fromArray([
+                'nickname' => $nickname,
+                'about' => $about,
             ]);
 
-            resolve(UpdateProfile::class)->handle($payload);
+            resolve(UpsertProfile::class)->handle($profile, $dto);
 
             $this
                 ->message('Perfil atualizado!')
                 ->content('https://heartdevs.com/')
                 ->color('800080')
-                ->title('Perfil '.$payload->nickname)
+                ->title('Perfil '.$nickname)
                 ->thumbnailUrl($interaction->user->avatar)
-                ->fields([ // max 3 fields per row
-                    'Nome/Nickname' => $payload->nickname,
-                    'Sobre' => $payload->about,
+                ->fields([
+                    'Nome/Nickname' => $nickname,
+                    'Sobre' => $about,
                 ])
-                ->fields(
-                    [ // max 3 fields per row
-                        'Git/Github' => $payload->githubUrl ?? '-',
-                        'Linkedin' => $payload->linkedinUrl ?? '-',
-                    ],
-                    inline: false
-                )
                 ->footerIcon($interaction->guild->icon)
                 ->footerText(Date::now()->format('Y').' © He4rt Developers')
                 ->timestamp(now())

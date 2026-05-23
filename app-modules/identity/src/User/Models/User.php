@@ -54,14 +54,6 @@ final class User extends Authenticatable implements FilamentUser, HasMedia, HasN
     }
 
     /**
-     * @return HasOne<Information, $this>
-     */
-    public function information(): HasOne
-    {
-        return $this->hasOne(Information::class);
-    }
-
-    /**
      * @return MorphMany<ExternalIdentity, $this>
      */
     public function providers(): MorphMany
