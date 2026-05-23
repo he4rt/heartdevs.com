@@ -108,4 +108,4 @@ jobs:
           XDEBUG_MODE: coverage
           DB_PORT: ${{ job.services.postgres.ports['5432'] }}
         run: |
-          vendor/bin/pest --ci --tia --parallel
+          vendor/bin/pest --ci --tia
