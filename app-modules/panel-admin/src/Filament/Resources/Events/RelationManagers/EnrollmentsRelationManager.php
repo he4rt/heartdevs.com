@@ -14,8 +14,7 @@ use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
-use He4rt\Events\CheckIn\Actions\CheckInAction;
-use He4rt\Events\CheckIn\Enums\CheckInMethod;
+use He4rt\Events\CheckIn\Actions\ManualCheckInAction;
 use He4rt\Events\CheckIn\Models\CheckIn;
 use He4rt\Events\Enrollment\Enums\EnrollmentStatus;
 use He4rt\Events\Enrollment\Models\Enrollment;
@@ -154,10 +153,9 @@ final class EnrollmentsRelationManager extends RelationManager
      */
     private function checkIn(Enrollment $enrollment, array $data): CheckIn
     {
-        return resolve(CheckInAction::class)->handle(
+        return resolve(ManualCheckInAction::class)->handle(
             enrollment: $enrollment,
-            method: CheckInMethod::Manual,
-            payload: ['actor_user_id' => auth()->id()],
+            actorUserId: (string) auth()->id(),
             eventDate: Date::parse($data['event_date']),
         );
     }

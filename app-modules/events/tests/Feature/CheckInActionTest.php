@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-use He4rt\Events\CheckIn\Actions\CheckInAction;
+use He4rt\Events\CheckIn\Actions\ManualCheckInAction;
 use He4rt\Events\CheckIn\Enums\CheckInMethod;
 use He4rt\Events\CheckIn\Events\ParticipantCheckedIn;
 use He4rt\Events\CheckIn\Exceptions\CheckInException;
@@ -45,10 +45,9 @@ test('when organizer checks in confirmed enrollment, then check-in is recorded a
     $organizer = User::factory()->create();
     $enrollment = createConfirmedEnrollmentForCheckIn();
 
-    $checkIn = resolve(CheckInAction::class)->handle(
+    $checkIn = resolve(ManualCheckInAction::class)->handle(
         enrollment: $enrollment,
-        method: CheckInMethod::Manual,
-        payload: ['actor_user_id' => $organizer->id],
+        actorUserId: $organizer->id,
         eventDate: now(),
     );
 
@@ -94,10 +93,9 @@ test('when checked-in enrollment checks in on another event date, then only chec
         'checked_in_at' => now(),
     ]);
 
-    $checkIn = resolve(CheckInAction::class)->handle(
+    $checkIn = resolve(ManualCheckInAction::class)->handle(
         enrollment: $enrollment,
-        method: CheckInMethod::Manual,
-        payload: ['actor_user_id' => $organizer->id],
+        actorUserId: $organizer->id,
         eventDate: $startsAt->clone()->addDay(),
     );
 
@@ -118,10 +116,9 @@ test('when enrollment already has check-in for event date, then duplicate is rej
         'method' => CheckInMethod::Manual,
     ]);
 
-    expect(fn (): CheckIn => resolve(CheckInAction::class)->handle(
+    expect(fn (): CheckIn => resolve(ManualCheckInAction::class)->handle(
         enrollment: $enrollment,
-        method: CheckInMethod::Manual,
-        payload: ['actor_user_id' => User::factory()->create()->id],
+        actorUserId: User::factory()->create()->id,
         eventDate: now(),
     ))->toThrow(CheckInException::class);
 });
@@ -133,10 +130,9 @@ test('when check-in date is outside event date range, then check-in is rejected'
         'ends_at' => $startsAt->clone()->setTime(18, 0),
     ]);
 
-    expect(fn (): CheckIn => resolve(CheckInAction::class)->handle(
+    expect(fn (): CheckIn => resolve(ManualCheckInAction::class)->handle(
         enrollment: $enrollment,
-        method: CheckInMethod::Manual,
-        payload: ['actor_user_id' => User::factory()->create()->id],
+        actorUserId: User::factory()->create()->id,
         eventDate: $startsAt->clone()->addDay(),
     ))->toThrow(CheckInException::class);
 });
@@ -147,10 +143,9 @@ test('when enrollment status is not confirmed or checked in, then check-in is re
         'confirmed_at' => null,
     ]);
 
-    expect(fn (): CheckIn => resolve(CheckInAction::class)->handle(
+    expect(fn (): CheckIn => resolve(ManualCheckInAction::class)->handle(
         enrollment: $enrollment,
-        method: CheckInMethod::Manual,
-        payload: ['actor_user_id' => User::factory()->create()->id],
+        actorUserId: User::factory()->create()->id,
         eventDate: now(),
     ))->toThrow(CheckInException::class);
 });
@@ -158,10 +153,9 @@ test('when enrollment status is not confirmed or checked in, then check-in is re
 test('when manual check-in has no actor user id, then check-in is rejected', function (): void {
     $enrollment = createConfirmedEnrollmentForCheckIn();
 
-    expect(fn (): CheckIn => resolve(CheckInAction::class)->handle(
+    expect(fn (): CheckIn => resolve(ManualCheckInAction::class)->handle(
         enrollment: $enrollment,
-        method: CheckInMethod::Manual,
-        payload: [],
+        actorUserId: '',
         eventDate: now(),
     ))->toThrow(CheckInException::class);
 });

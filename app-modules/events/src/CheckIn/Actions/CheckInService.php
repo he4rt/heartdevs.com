@@ -17,7 +17,7 @@ use Illuminate\Database\UniqueConstraintViolationException;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\DB;
 
-final readonly class CheckInAction
+final readonly class CheckInService
 {
     /**
      * @param  array<string, mixed>  $payload
@@ -27,14 +27,15 @@ final readonly class CheckInAction
         CheckInMethod $method,
         array $payload,
         CarbonInterface $eventDate,
+        string $actorUserId,
+        TriggeredBy $triggeredBy,
     ): CheckIn {
-        return DB::transaction(function () use ($enrollment, $method, $payload, $eventDate): CheckIn {
+        return DB::transaction(function () use ($enrollment, $method, $payload, $eventDate, $actorUserId, $triggeredBy): CheckIn {
             $enrollment = $this->loadLockedEnrollment($enrollment);
             $event = $enrollment->event;
             $normalizedEventDate = Date::parse($eventDate->toDateString())->startOfDay();
-            $actorUserId = $payload['actor_user_id'] ?? null;
 
-            $this->validate($enrollment, $method, $payload, $normalizedEventDate);
+            $this->validateCommonRules($enrollment, $normalizedEventDate);
             $isFirstCheckIn = !CheckIn::query()
                 ->where('enrollment_id', $enrollment->id)
                 ->exists();
@@ -55,8 +56,8 @@ final readonly class CheckInAction
                 resolve(TransitionEnrollmentAction::class)->handle(
                     enrollment: $enrollment,
                     toStatus: EnrollmentStatus::CheckedIn,
-                    triggeredBy: TriggeredBy::Admin,
-                    actorId: is_string($actorUserId) ? $actorUserId : null,
+                    triggeredBy: $triggeredBy,
+                    actorId: $actorUserId,
                     timestamp: $checkIn->checked_in_at,
                 );
             }
@@ -85,16 +86,8 @@ final readonly class CheckInAction
             ->firstOrFail();
     }
 
-    /**
-     * @param  array<string, mixed>  $payload
-     */
-    private function validate(Enrollment $enrollment, CheckInMethod $method, array $payload, CarbonInterface $eventDate): void
+    private function validateCommonRules(Enrollment $enrollment, CarbonInterface $eventDate): void
     {
-        throw_if(
-            $method === CheckInMethod::Manual && blank($payload['actor_user_id'] ?? null),
-            CheckInException::invalidCheckInActor(),
-        );
-
         throw_unless(
             in_array($enrollment->status, [EnrollmentStatus::Confirmed, EnrollmentStatus::CheckedIn], strict: true),
             CheckInException::invalidCheckInStatus(),
