@@ -1,4 +1,6 @@
-@props(['priority' => 'high'])
+@php
+/** @var \Laravel\Boost\Install\GuidelineAssist $assist */
+@endphp
 
 # Model PHPDoc Sync — Mandatory on Schema Changes
 
@@ -10,7 +12,7 @@ When you **add, remove, rename, or change the type** of any database column (via
 
 ## What triggers this rule
 
-- `php artisan make:migration` that adds/removes/alters columns
+- `{{ $assist->artisanCommand('make:migration') }}` that adds/removes/alters columns
 - Any edit to an existing migration file
 - Any raw SQL that changes table structure
 - Renaming a column
@@ -20,9 +22,8 @@ When you **add, remove, rename, or change the type** of any database column (via
 
 ## PHPDoc format
 
-Follow the existing convention:
-
-```php
+@verbatim
+<code-snippet name="Model PHPDoc block" lang="php">
 /**
  * @property string $id
  * @property int $tenant_id
@@ -35,7 +36,8 @@ Follow the existing convention:
  */
 #[Table(name: 'example_table')]
 final class Example extends Model
-```
+</code-snippet>
+@endverbatim
 
 ## Type mapping
 
@@ -61,4 +63,4 @@ Before marking a migration task as done, confirm:
 1. The model file has a `/** @property ... */` block above the class
 2. Every column in the table has a corresponding `@property` line
 3. Types match the column definition and any explicit `casts()`
-4. PHPStan passes (`vendor/bin/phpstan analyse`)
+4. PHPStan passes (`{{ $assist->binCommand('phpstan analyse') }}`)

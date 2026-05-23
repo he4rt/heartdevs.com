@@ -1,3 +1,7 @@
+@php
+/** @var \Laravel\Boost\Install\GuidelineAssist $assist */
+@endphp
+
 # PHPStan — ignoreErrors Conventions
 
 When adding entries to `ignoreErrors` in any `phpstan.neon` file, always use
@@ -7,7 +11,8 @@ scrolling and hurts readability.
 
 ## Correct format
 
-```neon
+@verbatim
+<code-snippet name="ignoreErrors block style" lang="neon">
 parameters:
     ignoreErrors:
         -
@@ -15,7 +20,8 @@ parameters:
             identifier: error.identifier
             count: 1
             path: src/Path/To/File.php
-```
+</code-snippet>
+@endverbatim
 
 ## Rules
 
@@ -30,6 +36,6 @@ parameters:
 
 ## Baseline
 
-Prefer running `./vendor/bin/phpstan analyse --generate-baseline` for bulk
+Prefer running `{{ $assist->binCommand('phpstan analyse --generate-baseline') }}` for bulk
 legacy errors. Manual `ignoreErrors` entries are reserved for intentional,
 documented suppressions only.

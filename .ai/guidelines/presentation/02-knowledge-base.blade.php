@@ -1,3 +1,7 @@
+@php
+/** @var \Laravel\Boost\Install\GuidelineAssist $assist */
+@endphp
+
 # Knowledge Base Documentation
 
 This project uses `guava/filament-knowledge-base` for embedded docs inside the Filament admin panel. Docs are Markdown files rendered in the sidebar.
@@ -36,24 +40,28 @@ docs/admin/{lang}/
 
 ### Front Matter
 
-```yaml
+@verbatim
+<code-snippet name="Page front matter" lang="yaml">
 ---
 title: Page Title
 icon: heroicon-o-document
 order: 1
 ---
-```
+</code-snippet>
+@endverbatim
 
 For groups, add `type: group`:
 
-```yaml
+@verbatim
+<code-snippet name="Group front matter" lang="yaml">
 ---
 title: Group Name
 icon: heroicon-o-folder
 order: 2
 type: group
 ---
-```
+</code-snippet>
+@endverbatim
 
 ## Keeping Docs in Sync
 
@@ -76,7 +84,8 @@ When changes affect user-facing behavior, update `docs/admin/en/`:
 
 Resources can implement `HasKnowledgeBase` for per-resource sidebar help:
 
-```php
+@verbatim
+<code-snippet name="HasKnowledgeBase implementation" lang="php">
 use Guava\FilamentKnowledgeBase\Contracts\HasKnowledgeBase;
 
 class UserResource extends Resource implements HasKnowledgeBase
@@ -86,6 +95,7 @@ class UserResource extends Resource implements HasKnowledgeBase
         return ['users.managing-users', 'users.roles'];
     }
 }
-```
+</code-snippet>
+@endverbatim
 
 Doc IDs follow `{group}.{file-slug}` matching paths under `docs/admin/en/`.

@@ -1,3 +1,7 @@
+@php
+/** @var \Laravel\Boost\Install\GuidelineAssist $assist */
+@endphp
+
 # Issue tracker: GitHub
 
 Issues and PRDs for this repo live as GitHub issues on `he4rt/he4rt-bot-api`. Use the `gh` CLI for all operations.
