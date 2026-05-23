@@ -203,7 +203,6 @@ test('when enrollment has check-ins, then relation manager shows check-in histor
     $enrollment = Enrollment::factory()->create([
         'event_id' => $event->id,
         'status' => EnrollmentStatus::CheckedIn,
-        'checked_in_at' => now(),
     ]);
 
     CheckIn::factory()->create([

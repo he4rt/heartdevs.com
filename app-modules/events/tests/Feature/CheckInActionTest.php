@@ -5,10 +5,10 @@ declare(strict_types=1);
 use He4rt\Events\CheckIn\Actions\CheckInAction;
 use He4rt\Events\CheckIn\Enums\CheckInMethod;
 use He4rt\Events\CheckIn\Events\ParticipantCheckedIn;
+use He4rt\Events\CheckIn\Exceptions\CheckInException;
 use He4rt\Events\CheckIn\Models\CheckIn;
 use He4rt\Events\Enrollment\Enums\EnrollmentStatus;
 use He4rt\Events\Enrollment\Enums\TriggeredBy;
-use He4rt\Events\Enrollment\Exceptions\EnrollmentException;
 use He4rt\Events\Enrollment\Models\Enrollment;
 use He4rt\Events\Enrollment\Models\EnrollmentTransition;
 use He4rt\Events\Event\Enums\EventStatus;
@@ -85,13 +85,13 @@ test('when checked-in enrollment checks in on another event date, then only chec
         'ends_at' => $startsAt->clone()->addDay()->setTime(18, 0),
     ], [
         'status' => EnrollmentStatus::CheckedIn,
-        'checked_in_at' => now(),
     ]);
 
     CheckIn::factory()->create([
         'enrollment_id' => $enrollment->id,
         'event_date' => $startsAt->toDateString(),
         'method' => CheckInMethod::Manual,
+        'checked_in_at' => now(),
     ]);
 
     $checkIn = resolve(CheckInAction::class)->handle(
@@ -123,7 +123,7 @@ test('when enrollment already has check-in for event date, then duplicate is rej
         method: CheckInMethod::Manual,
         payload: ['actor_user_id' => User::factory()->create()->id],
         eventDate: now(),
-    ))->toThrow(EnrollmentException::class);
+    ))->toThrow(CheckInException::class);
 });
 
 test('when check-in date is outside event date range, then check-in is rejected', function (): void {
@@ -138,7 +138,7 @@ test('when check-in date is outside event date range, then check-in is rejected'
         method: CheckInMethod::Manual,
         payload: ['actor_user_id' => User::factory()->create()->id],
         eventDate: $startsAt->clone()->addDay(),
-    ))->toThrow(EnrollmentException::class);
+    ))->toThrow(CheckInException::class);
 });
 
 test('when enrollment status is not confirmed or checked in, then check-in is rejected', function (): void {
@@ -152,7 +152,7 @@ test('when enrollment status is not confirmed or checked in, then check-in is re
         method: CheckInMethod::Manual,
         payload: ['actor_user_id' => User::factory()->create()->id],
         eventDate: now(),
-    ))->toThrow(EnrollmentException::class);
+    ))->toThrow(CheckInException::class);
 });
 
 test('when manual check-in has no actor user id, then check-in is rejected', function (): void {
@@ -163,5 +163,5 @@ test('when manual check-in has no actor user id, then check-in is rejected', fun
         method: CheckInMethod::Manual,
         payload: [],
         eventDate: now(),
-    ))->toThrow(EnrollmentException::class);
+    ))->toThrow(CheckInException::class);
 });

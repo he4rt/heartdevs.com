@@ -7,12 +7,12 @@ namespace He4rt\Events\CheckIn\Actions;
 use Carbon\CarbonInterface;
 use He4rt\Events\CheckIn\Enums\CheckInMethod;
 use He4rt\Events\CheckIn\Events\ParticipantCheckedIn;
+use He4rt\Events\CheckIn\Exceptions\CheckInException;
 use He4rt\Events\CheckIn\Models\CheckIn;
+use He4rt\Events\Enrollment\Actions\TransitionEnrollmentAction;
 use He4rt\Events\Enrollment\Enums\EnrollmentStatus;
 use He4rt\Events\Enrollment\Enums\TriggeredBy;
-use He4rt\Events\Enrollment\Exceptions\EnrollmentException;
 use He4rt\Events\Enrollment\Models\Enrollment;
-use He4rt\Events\Enrollment\Models\EnrollmentTransition;
 use Illuminate\Database\UniqueConstraintViolationException;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\DB;
@@ -48,11 +48,17 @@ final readonly class CheckInAction
                     'checked_in_at' => now(),
                 ]);
             } catch (UniqueConstraintViolationException) {
-                throw EnrollmentException::alreadyCheckedInForDate();
+                throw CheckInException::alreadyCheckedInForDate();
             }
 
             if ($isFirstCheckIn && $enrollment->status === EnrollmentStatus::Confirmed) {
-                $this->transitionToCheckedIn($enrollment, is_string($actorUserId) ? $actorUserId : null);
+                resolve(TransitionEnrollmentAction::class)->handle(
+                    enrollment: $enrollment,
+                    toStatus: EnrollmentStatus::CheckedIn,
+                    triggeredBy: TriggeredBy::Admin,
+                    actorId: is_string($actorUserId) ? $actorUserId : null,
+                    timestamp: $checkIn->checked_in_at,
+                );
             }
 
             $xpRewardOnCheckedIn = (int) ($event->enrollmentPolicy->xp_on_checked_in ?? 0);
@@ -86,12 +92,12 @@ final readonly class CheckInAction
     {
         throw_if(
             $method === CheckInMethod::Manual && blank($payload['actor_user_id'] ?? null),
-            EnrollmentException::invalidCheckInActor(),
+            CheckInException::invalidCheckInActor(),
         );
 
         throw_unless(
             in_array($enrollment->status, [EnrollmentStatus::Confirmed, EnrollmentStatus::CheckedIn], strict: true),
-            EnrollmentException::invalidCheckInStatus(),
+            CheckInException::invalidCheckInStatus(),
         );
 
         $event = $enrollment->event;
@@ -99,7 +105,7 @@ final readonly class CheckInAction
 
         throw_unless(
             $eventDateString >= $event->starts_at->toDateString() && $eventDateString <= $event->ends_at->toDateString(),
-            EnrollmentException::checkInOutsideEventDateRange(),
+            CheckInException::checkInOutsideEventDateRange(),
         );
 
         throw_if(
@@ -107,30 +113,7 @@ final readonly class CheckInAction
                 ->where('enrollment_id', $enrollment->id)
                 ->whereDate('event_date', $eventDate->toDateString())
                 ->exists(),
-            EnrollmentException::alreadyCheckedInForDate(),
+            CheckInException::alreadyCheckedInForDate(),
         );
-    }
-
-    private function transitionToCheckedIn(Enrollment $enrollment, ?string $actorUserId): void
-    {
-        $fromStatus = $enrollment->status;
-
-        throw_unless(
-            $fromStatus->canTransitionTo(EnrollmentStatus::CheckedIn),
-            EnrollmentException::invalidCheckInStatus(),
-        );
-
-        $enrollment->forceFill([
-            'status' => EnrollmentStatus::CheckedIn,
-            'checked_in_at' => now(),
-        ])->save();
-
-        EnrollmentTransition::query()->create([
-            'enrollment_id' => $enrollment->id,
-            'from_status' => $fromStatus,
-            'to_status' => EnrollmentStatus::CheckedIn,
-            'actor_id' => $actorUserId,
-            'triggered_by' => TriggeredBy::Admin,
-        ]);
     }
 }

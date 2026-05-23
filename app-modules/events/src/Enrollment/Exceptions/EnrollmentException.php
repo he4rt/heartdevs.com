@@ -5,10 +5,19 @@ declare(strict_types=1);
 namespace He4rt\Events\Enrollment\Exceptions;
 
 use Exception;
+use He4rt\Events\Enrollment\Enums\EnrollmentStatus;
 use Symfony\Component\HttpFoundation\Response;
 
 final class EnrollmentException extends Exception
 {
+    public static function invalidTransition(EnrollmentStatus $from, EnrollmentStatus $to): self
+    {
+        return new self(
+            __('events::exceptions.invalid_transition', ['from' => $from->value, 'to' => $to->value]),
+            Response::HTTP_UNPROCESSABLE_ENTITY,
+        );
+    }
+
     public static function alreadyEnrolled(): self
     {
         return new self(
@@ -45,38 +54,6 @@ final class EnrollmentException extends Exception
     {
         return new self(
             __('events::exceptions.event_full'),
-            Response::HTTP_UNPROCESSABLE_ENTITY,
-        );
-    }
-
-    public static function invalidCheckInStatus(): self
-    {
-        return new self(
-            __('events::exceptions.invalid_check_in_status'),
-            Response::HTTP_UNPROCESSABLE_ENTITY,
-        );
-    }
-
-    public static function checkInOutsideEventDateRange(): self
-    {
-        return new self(
-            __('events::exceptions.check_in_outside_event_date_range'),
-            Response::HTTP_UNPROCESSABLE_ENTITY,
-        );
-    }
-
-    public static function alreadyCheckedInForDate(): self
-    {
-        return new self(
-            __('events::exceptions.already_checked_in_for_date'),
-            Response::HTTP_CONFLICT,
-        );
-    }
-
-    public static function invalidCheckInActor(): self
-    {
-        return new self(
-            __('events::exceptions.invalid_check_in_actor'),
             Response::HTTP_UNPROCESSABLE_ENTITY,
         );
     }
