@@ -77,6 +77,11 @@ final class User extends Authenticatable implements FilamentUser, HasMedia, HasN
     public function registerMediaCollections(): void
     {
         $this->addMediaCollection('avatar')
+            ->singleFile()
+            ->useDisk('public');
+
+        $this->addMediaCollection('cover')
+            ->singleFile()
             ->useDisk('public');
     }
 
