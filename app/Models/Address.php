@@ -30,6 +30,15 @@ final class Address extends Model
     use HasFactory;
     use HasUuids;
 
+    protected $fillable = [
+        'addressable_type',
+        'addressable_id',
+        'country',
+        'state',
+        'city',
+        'zip_code',
+    ];
+
     /**
      * @return MorphTo<Model, $this>
      */
