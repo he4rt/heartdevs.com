@@ -126,3 +126,19 @@ jobs:
       PHP_EXTENSIONS: ${{ needs.setup.outputs.PHP_EXTENSIONS }}
       PHP_INI_PROPERTIES: ${{ needs.setup.outputs.PHP_INI_PROPERTIES }}
       PHP_VERSION: ${{ needs.setup.outputs.PHP_VERSION }}
+
+  pest-tia:
+    name: Pest TIA (PoC)
+    needs: [setup]
+    if: >-
+      !github.event.pull_request.draft &&
+      (vars.RUN_TIA == 'true' || contains(github.event.pull_request.labels.*.name, 'run-tia'))
+    permissions:
+      contents: read
+    uses: ./.github/workflows/_pest-tia.yml
+    with:
+      CACHE_KEY: ${{ needs.setup.outputs.CACHE_KEY }}
+      COMPOSER_FLAGS: ${{ needs.setup.outputs.COMPOSER_FLAGS }}
+      PHP_EXTENSIONS: ${{ needs.setup.outputs.PHP_EXTENSIONS }}
+      PHP_INI_PROPERTIES: ${{ needs.setup.outputs.PHP_INI_PROPERTIES }}
+      PHP_VERSION: ${{ needs.setup.outputs.PHP_VERSION }}
