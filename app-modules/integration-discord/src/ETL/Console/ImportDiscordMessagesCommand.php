@@ -15,6 +15,8 @@ use He4rt\IntegrationDiscord\ETL\DTOs\DiscordMessageDTO;
 use He4rt\IntegrationDiscord\ETL\DTOs\DiscordMessageReactionDTO;
 use He4rt\IntegrationDiscord\ETL\DTOs\DiscordModerationEventDTO;
 use He4rt\IntegrationDiscord\ETL\DTOs\DiscordVoiceLogDTO;
+use Illuminate\Console\Attributes\Description;
+use Illuminate\Console\Attributes\Signature;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -28,16 +30,14 @@ use function Laravel\Prompts\error;
 use function Laravel\Prompts\info;
 use function Laravel\Prompts\table;
 
-class ImportDiscordMessagesCommand extends Command
-{
-    protected $signature = 'discord:import-messages
+#[Description('Importa mensagens Discord de um dump completo (messages, reactions, voice, moderation)')]
+#[Signature('discord:import-messages
                             {path : Caminho da pasta discord-dump}
                             {--limit= : Para apos importar N mensagens (total)}
                             {--channels= : Lista de nomes (ou substrings) de canais separados por virgula}
-                            {--chunks= : Maximo de chunks por canal}';
-
-    protected $description = 'Importa mensagens Discord de um dump completo (messages, reactions, voice, moderation)';
-
+                            {--chunks= : Maximo de chunks por canal}')]
+class ImportDiscordMessagesCommand extends Command
+{
     public function handle(
         ImportDiscordMessageAction $messageAction,
         ImportDiscordReactionsAction $reactionsAction,

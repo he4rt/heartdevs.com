@@ -8,20 +8,20 @@ use He4rt\Identity\ExternalIdentity\Actions\CreateAccountByExternalIdentity;
 use He4rt\Identity\ExternalIdentity\Enums\IdentityProvider;
 use He4rt\Identity\ExternalIdentity\Models\ExternalIdentity;
 use He4rt\Identity\Tenant\Models\Tenant;
+use Illuminate\Console\Attributes\Description;
+use Illuminate\Console\Attributes\Signature;
 use Illuminate\Console\Command;
 use Illuminate\Contracts\Database\Query\Builder;
 use Illuminate\Support\Facades\Storage;
 
-class ImportDiscordMembers extends Command
-{
-    protected $signature = 'discord:import-members
+#[Description('Import Discord members and GitHub connections from JSON files into the database')]
+#[Signature('discord:import-members
         {--members-file=discord/members.json : Path to members JSON (relative to storage/app/private)}
         {--github-file=discord/github_connections.json : Path to GitHub connections JSON}
         {--dry-run : Show what would be imported without writing}
-        {--force : Overwrite existing github_url values}';
-
-    protected $description = 'Import Discord members and GitHub connections from JSON files into the database';
-
+        {--force : Overwrite existing github_url values}')]
+class ImportDiscordMembers extends Command
+{
     public function handle(CreateAccountByExternalIdentity $createAccount): void
     {
         $membersFile = $this->option('members-file');

@@ -6,6 +6,8 @@ namespace App\Console\Commands;
 
 use He4rt\Gamification\Character\Models\Character;
 use He4rt\Identity\User\Models\User;
+use Illuminate\Console\Attributes\Description;
+use Illuminate\Console\Attributes\Signature;
 use Illuminate\Console\Command;
 use Illuminate\Contracts\Database\Query\Builder;
 use Illuminate\Support\Facades\DB;
@@ -18,12 +20,10 @@ use function Laravel\Prompts\outro;
 use function Laravel\Prompts\table;
 use function Laravel\Prompts\warning;
 
+#[Description('Generate a comprehensive community analytics report')]
+#[Signature('discord:community-report')]
 class CommunityReport extends Command
 {
-    protected $signature = 'discord:community-report';
-
-    protected $description = 'Generate a comprehensive community analytics report';
-
     /** @var array<string, mixed> */
     private array $report = [];
 

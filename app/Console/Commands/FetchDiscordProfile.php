@@ -4,17 +4,17 @@ declare(strict_types=1);
 
 namespace App\Console\Commands;
 
+use Illuminate\Console\Attributes\Description;
+use Illuminate\Console\Attributes\Signature;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Http;
 
+#[Description('Fetch a Discord user profile including connected accounts using a user token')]
+#[Signature('discord:fetch-profile
+        {user_id : Discord user ID to fetch}
+        {--token= : Discord user token (or set DISCORD_USER_TOKEN in .env)}')]
 class FetchDiscordProfile extends Command
 {
-    protected $signature = 'discord:fetch-profile
-        {user_id : Discord user ID to fetch}
-        {--token= : Discord user token (or set DISCORD_USER_TOKEN in .env)}';
-
-    protected $description = 'Fetch a Discord user profile including connected accounts using a user token';
-
     public function handle(): void
     {
         $userId = $this->argument('user_id');

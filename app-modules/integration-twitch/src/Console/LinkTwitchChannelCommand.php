@@ -11,14 +11,14 @@ use He4rt\Identity\ExternalIdentity\Enums\IdentityType;
 use He4rt\Identity\Tenant\Models\Tenant;
 use He4rt\IntegrationTwitch\Transport\Requests\Users\GetUsers;
 use He4rt\IntegrationTwitch\Transport\TwitchHelixConnector;
+use Illuminate\Console\Attributes\Description;
+use Illuminate\Console\Attributes\Signature;
 use Illuminate\Console\Command;
 
+#[Description('Link a Twitch channel to a tenant via ExternalIdentity')]
+#[Signature('twitch:link-channel {login : Twitch channel login name} {--tenant= : Tenant slug or ID}')]
 final class LinkTwitchChannelCommand extends Command
 {
-    protected $signature = 'twitch:link-channel {login : Twitch channel login name} {--tenant= : Tenant slug or ID}';
-
-    protected $description = 'Link a Twitch channel to a tenant via ExternalIdentity';
-
     public function handle(TwitchHelixConnector $helix): int
     {
         $login = $this->argument('login');

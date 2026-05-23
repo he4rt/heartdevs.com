@@ -9,19 +9,19 @@ use He4rt\IntegrationTwitch\Transport\Requests\EventSub\CreateSubscription;
 use He4rt\IntegrationTwitch\Transport\Requests\EventSub\DeleteSubscription;
 use He4rt\IntegrationTwitch\Transport\Requests\EventSub\ListSubscriptions;
 use He4rt\IntegrationTwitch\Transport\TwitchHelixConnector;
+use Illuminate\Console\Attributes\Description;
+use Illuminate\Console\Attributes\Signature;
 use Illuminate\Console\Command;
 use Saloon\Exceptions\Request\RequestException;
 
-final class SubscribeTwitchEventsCommand extends Command
-{
-    protected $signature = 'twitch:subscribe
+#[Description('Manage Twitch EventSub webhook subscriptions for a broadcaster')]
+#[Signature('twitch:subscribe
         {broadcaster_user_id : The Twitch broadcaster user ID}
         {--type= : Subscribe to a specific event type}
         {--all : Subscribe to all available event types}
-        {--clear-all : Delete all existing subscriptions for this broadcaster}';
-
-    protected $description = 'Manage Twitch EventSub webhook subscriptions for a broadcaster';
-
+        {--clear-all : Delete all existing subscriptions for this broadcaster}')]
+final class SubscribeTwitchEventsCommand extends Command
+{
     public function handle(TwitchHelixConnector $helix): int
     {
         $broadcasterId = $this->argument('broadcaster_user_id');

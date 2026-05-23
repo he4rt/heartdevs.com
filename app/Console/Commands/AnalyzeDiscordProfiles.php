@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Console\Commands;
 
+use Illuminate\Console\Attributes\Description;
+use Illuminate\Console\Attributes\Signature;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Storage;
 
@@ -13,12 +15,10 @@ use function Laravel\Prompts\outro;
 use function Laravel\Prompts\table;
 use function Laravel\Prompts\warning;
 
+#[Description('Analyze scraped Discord profiles and count connected social accounts')]
+#[Signature('discord:analyze-profiles')]
 class AnalyzeDiscordProfiles extends Command
 {
-    protected $signature = 'discord:analyze-profiles';
-
-    protected $description = 'Analyze scraped Discord profiles and count connected social accounts';
-
     public function handle(): void
     {
         intro('Discord Profiles — Social Connections Report');

@@ -12,15 +12,15 @@ use He4rt\Activity\Tracking\Models\Interaction;
 use He4rt\Identity\ExternalIdentity\Enums\IdentityProvider;
 use He4rt\Identity\ExternalIdentity\Models\ExternalIdentity;
 use He4rt\Identity\User\Models\User;
+use Illuminate\Console\Attributes\Description;
+use Illuminate\Console\Attributes\Signature;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Log;
 
+#[Description('Sync articles from DevTo organization and track as interactions')]
+#[Signature('devto:sync-articles')]
 class SyncDevToArticles extends Command
 {
-    protected $signature = 'devto:sync-articles';
-
-    protected $description = 'Sync articles from DevTo organization and track as interactions';
-
     public function __construct(
         private readonly DevToApiClient $apiClient,
         private readonly TrackActivity $trackActivity,

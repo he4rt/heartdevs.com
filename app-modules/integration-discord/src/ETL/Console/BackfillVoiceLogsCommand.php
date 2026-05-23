@@ -12,6 +12,8 @@ use He4rt\IntegrationDiscord\ETL\DTOs\DiscordVoiceLogDTO;
 use He4rt\IntegrationDiscord\Transport\DiscordConnector;
 use He4rt\IntegrationDiscord\Transport\Requests\Channels\ListGuildChannels;
 use He4rt\IntegrationDiscord\Transport\Requests\Messages\ListChannelMessages;
+use Illuminate\Console\Attributes\Description;
+use Illuminate\Console\Attributes\Signature;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Sleep;
@@ -24,18 +26,16 @@ use function Laravel\Prompts\table;
 use function Laravel\Prompts\task;
 use function Laravel\Prompts\warning;
 
-final class BackfillVoiceLogsCommand extends Command
-{
-    protected $signature = 'discord:backfill-voice
+#[Description('Backfill voice logs by paginating a Discord channel where a bot logs voice join/left events')]
+#[Signature('discord:backfill-voice
         {channel_id : Discord channel ID where the bot posts voice join/left logs}
         {--since= : Start date (Y-m-d). Defaults to 2026-03-01}
         {--until= : End date (Y-m-d). Defaults to now}
         {--bot-id=621538099545112596 : Discord bot user ID that posts voice logs (Dyno)}
         {--tenant=he4rt : Tenant slug}
-        {--dry-run : Preview without saving}';
-
-    protected $description = 'Backfill voice logs by paginating a Discord channel where a bot logs voice join/left events';
-
+        {--dry-run : Preview without saving}')]
+final class BackfillVoiceLogsCommand extends Command
+{
     private int $voiceCount = 0;
 
     private int $joinCount = 0;
