@@ -36,7 +36,8 @@
         fn($item) => !empty($item['platform']) && !empty($item['handle']),
     );
 
-    $location = collect([$data['city'] ?? null, $data['state'] ?? null, $data['country'] ?? null])
+    $address = $data['address'] ?? [];
+    $location = collect([$address['city'] ?? null, $address['state'] ?? null, $address['country'] ?? null])
         ->filter()
         ->implode(', ');
 

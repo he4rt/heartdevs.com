@@ -90,11 +90,20 @@ class ProfileCommand extends AbstractSlashCommand
                 ->where('tenant_id', $this->memberProvider->tenant_id)
                 ->first();
 
+            if (!$profile) {
+                $this
+                    ->message()
+                    ->content($mentionedUser.' ainda não possui um perfil.')
+                    ->reply($interaction, true);
+
+                return;
+            }
+
             $this
                 ->message()
                 ->content('https://heartdevs.com/')
                 ->color('800080')
-                ->title('Perfil de '.($profile->nickname ?? $this->memberProvider->user->name ?? '-'))
+                ->title('Perfil de '.($profile->nickname ?? $this->memberProvider->user->name))
                 ->thumbnailUrl($mentionedUser->avatar)
                 ->fields([
                     'Nome/Nickname' => $profile->nickname ?? '-',

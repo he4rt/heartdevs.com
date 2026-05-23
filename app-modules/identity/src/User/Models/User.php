@@ -33,8 +33,10 @@ use Spatie\MediaLibrary\InteractsWithMedia;
  * @property string $username
  * @property string $email
  * @property bool $is_donator
- * @property Carbon $created_at
- * @property Carbon $updated_at
+ * @property Carbon|null $suspended_until
+ * @property Carbon|null $banned_at
+ * @property Carbon|null $created_at
+ * @property Carbon|null $updated_at
  */
 #[ObservedBy(UserObserver::class)]
 #[Table(name: 'users')]

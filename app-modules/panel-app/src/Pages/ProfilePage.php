@@ -31,6 +31,7 @@ use He4rt\Profile\Enums\StartAvailability;
 use He4rt\Profile\Models\Profile;
 use Illuminate\Support\Str;
 use Livewire\Attributes\Computed;
+use Livewire\Attributes\Validate;
 use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
 use Livewire\WithFileUploads;
 
@@ -45,9 +46,11 @@ class ProfilePage extends Page
     public ?array $data = [];
 
     /** @var TemporaryUploadedFile|null */
+    #[Validate('nullable|image|mimes:jpg,jpeg,png,webp|max:2048')]
     public $avatarUpload;
 
     /** @var TemporaryUploadedFile|null */
+    #[Validate('nullable|image|mimes:jpg,jpeg,png,webp|max:4096')]
     public $coverUpload;
 
     protected static string|null|BackedEnum $navigationIcon = 'heroicon-o-user-circle';
@@ -268,11 +271,14 @@ class ProfilePage extends Page
 
     public function getRecord(): Profile
     {
+        $tenantId = filament()->getTenant()?->getKey();
+        abort_unless($tenantId, 403);
+
         return Profile::query()
             ->firstOrCreate(
                 [
                     'user_id' => auth()->id(),
-                    'tenant_id' => filament()->getTenant()?->getKey(),
+                    'tenant_id' => $tenantId,
                 ],
             );
     }
@@ -337,7 +343,7 @@ class ProfilePage extends Page
         if ($this->avatarUpload instanceof TemporaryUploadedFile) {
             $user->clearMediaCollection('avatar');
             $user->addMedia($this->avatarUpload->getRealPath())
-                ->usingFileName($this->avatarUpload->getClientOriginalName())
+                ->usingFileName(Str::uuid()->toString().'.'.$this->avatarUpload->getClientOriginalExtension())
                 ->toMediaCollection('avatar');
             $this->avatarUpload = null;
         }
@@ -345,7 +351,7 @@ class ProfilePage extends Page
         if ($this->coverUpload instanceof TemporaryUploadedFile) {
             $user->clearMediaCollection('cover');
             $user->addMedia($this->coverUpload->getRealPath())
-                ->usingFileName($this->coverUpload->getClientOriginalName())
+                ->usingFileName(Str::uuid()->toString().'.'.$this->coverUpload->getClientOriginalExtension())
                 ->toMediaCollection('cover');
             $this->coverUpload = null;
         }
