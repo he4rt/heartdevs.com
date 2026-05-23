@@ -117,6 +117,64 @@ class ProfilePage extends Page
                             ]),
                         ]),
 
+                    Section::make(__('panel-app::profile.sections.address'))
+                        ->relationship('address')
+                        ->schema([
+                            Grid::make(3)->schema([
+                                Select::make('country')
+                                    ->label(__('panel-app::profile.fields.country'))
+                                    ->options([
+                                        'BRA' => '🇧🇷 Brasil',
+                                        'USA' => '🇺🇸 United States',
+                                        'PRT' => '🇵🇹 Portugal',
+                                        'ARG' => '🇦🇷 Argentina',
+                                        'DEU' => '🇩🇪 Deutschland',
+                                        'CAN' => '🇨🇦 Canada',
+                                        'GBR' => '🇬🇧 United Kingdom',
+                                        'FRA' => '🇫🇷 France',
+                                        'ESP' => '🇪🇸 España',
+                                        'ITA' => '🇮🇹 Italia',
+                                        'JPN' => '🇯🇵 Japan',
+                                        'AUS' => '🇦🇺 Australia',
+                                        'MEX' => '🇲🇽 México',
+                                        'COL' => '🇨🇴 Colombia',
+                                        'CHL' => '🇨🇱 Chile',
+                                        'URY' => '🇺🇾 Uruguay',
+                                        'IRL' => '🇮🇪 Ireland',
+                                        'NLD' => '🇳🇱 Nederland',
+                                    ])
+                                    ->default('BRA')
+                                    ->searchable()
+                                    ->live()
+                                    ->columnSpan(1),
+
+                                Select::make('state')
+                                    ->label(__('panel-app::profile.fields.state'))
+                                    ->options(fn (Get $get): array => ($get('country') ?? 'BRA') === 'BRA' ? [
+                                        'AC' => 'Acre', 'AL' => 'Alagoas', 'AP' => 'Amapá', 'AM' => 'Amazonas',
+                                        'BA' => 'Bahia', 'CE' => 'Ceará', 'DF' => 'Distrito Federal',
+                                        'ES' => 'Espírito Santo', 'GO' => 'Goiás', 'MA' => 'Maranhão',
+                                        'MT' => 'Mato Grosso', 'MS' => 'Mato Grosso do Sul', 'MG' => 'Minas Gerais',
+                                        'PA' => 'Pará', 'PB' => 'Paraíba', 'PR' => 'Paraná', 'PE' => 'Pernambuco',
+                                        'PI' => 'Piauí', 'RJ' => 'Rio de Janeiro', 'RN' => 'Rio Grande do Norte',
+                                        'RS' => 'Rio Grande do Sul', 'RO' => 'Rondônia', 'RR' => 'Roraima',
+                                        'SC' => 'Santa Catarina', 'SP' => 'São Paulo', 'SE' => 'Sergipe',
+                                        'TO' => 'Tocantins',
+                                    ] : [])
+                                    ->searchable()
+                                    ->allowHtml(false)
+                                    ->live()
+                                    ->columnSpan(1),
+
+                                TextInput::make('city')
+                                    ->label(__('panel-app::profile.fields.city'))
+                                    ->placeholder('São Paulo')
+                                    ->maxLength(100)
+                                    ->live(onBlur: true)
+                                    ->columnSpan(1),
+                            ]),
+                        ]),
+
                     Section::make(__('panel-app::profile.sections.social_links'))
                         ->schema([
                             Repeater::make('social_links')
@@ -165,6 +223,7 @@ class ProfilePage extends Page
                         ]),
                     ]),
             ])
+            ->record(auth()->user())
             ->statePath('data');
     }
 
@@ -199,6 +258,7 @@ class ProfilePage extends Page
         resolve(ToggleAvailability::class)->handle($profile, $available, $startAvailability);
 
         $this->saveMedia();
+        $this->form->saveRelationships();
 
         Notification::make()
             ->success()

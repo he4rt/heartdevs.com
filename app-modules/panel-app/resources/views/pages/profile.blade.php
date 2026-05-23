@@ -18,7 +18,7 @@
         </div>
 
         {{-- Preview card (right, 1/3, sticky) --}}
-        <div class="xl:sticky xl:top-4">
+        <div class="hidden xl:sticky xl:top-4 xl:block">
             @include ('panel-app::components.profile-preview-card',
                 [
                     'data' => $this->data,

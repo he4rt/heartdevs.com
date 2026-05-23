@@ -36,6 +36,10 @@
         fn($item) => !empty($item['platform']) && !empty($item['handle']),
     );
 
+    $location = collect([$data['city'] ?? null, $data['state'] ?? null, $data['country'] ?? null])
+        ->filter()
+        ->implode(', ');
+
     $level = $character?->level ?? 1;
     $experience = $character?->experience ?? 0;
     $nextThreshold = \He4rt\Gamification\Character\Models\Character::LEVEL_THRESHOLDS[$level + 1] ?? $experience;
@@ -97,6 +101,12 @@
                 @endif
             </div>
             <p class="text-sm text-gray-500 dark:text-gray-400">{{ '@' }}{{ $username }}</p>
+            @if ($location)
+                <p class="mt-0.5 flex items-center gap-1 text-xs text-gray-400 dark:text-gray-500">
+                    <x-heroicon-m-map-pin class="h-3 w-3" />
+                    {{ $location }}
+                </p>
+            @endif
         </div>
 
         {{-- Headline --}}
