@@ -15,6 +15,7 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use He4rt\Events\CheckIn\Actions\ManualCheckInAction;
+use He4rt\Events\CheckIn\DTOs\ManualCheckInDTO;
 use He4rt\Events\CheckIn\Models\CheckIn;
 use He4rt\Events\Enrollment\Enums\EnrollmentStatus;
 use He4rt\Events\Enrollment\Models\Enrollment;
@@ -154,9 +155,11 @@ final class EnrollmentsRelationManager extends RelationManager
     private function checkIn(Enrollment $enrollment, array $data): CheckIn
     {
         return resolve(ManualCheckInAction::class)->handle(
-            enrollment: $enrollment,
-            actorUserId: (string) auth()->id(),
-            eventDate: Date::parse($data['event_date']),
+            new ManualCheckInDTO(
+                enrollment: $enrollment,
+                actorUserId: (string) auth()->id(),
+                eventDate: Date::parse($data['event_date']),
+            ),
         );
     }
 }

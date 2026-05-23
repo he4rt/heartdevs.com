@@ -5,35 +5,26 @@ declare(strict_types=1);
 namespace He4rt\Events\CheckIn\Actions;
 
 use Carbon\CarbonInterface;
-use He4rt\Events\CheckIn\Enums\CheckInMethod;
+use He4rt\Events\CheckIn\DTOs\CheckInDTO;
 use He4rt\Events\CheckIn\Events\ParticipantCheckedIn;
 use He4rt\Events\CheckIn\Exceptions\CheckInException;
 use He4rt\Events\CheckIn\Models\CheckIn;
 use He4rt\Events\Enrollment\Actions\TransitionEnrollmentAction;
+use He4rt\Events\Enrollment\DTOs\TransitionEnrollmentDTO;
 use He4rt\Events\Enrollment\Enums\EnrollmentStatus;
-use He4rt\Events\Enrollment\Enums\TriggeredBy;
 use He4rt\Events\Enrollment\Models\Enrollment;
 use Illuminate\Database\UniqueConstraintViolationException;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\DB;
 
-final readonly class CheckInService
+final readonly class CheckInAction
 {
-    /**
-     * @param  array<string, mixed>  $payload
-     */
-    public function handle(
-        Enrollment $enrollment,
-        CheckInMethod $method,
-        array $payload,
-        CarbonInterface $eventDate,
-        string $actorUserId,
-        TriggeredBy $triggeredBy,
-    ): CheckIn {
-        return DB::transaction(function () use ($enrollment, $method, $payload, $eventDate, $actorUserId, $triggeredBy): CheckIn {
-            $enrollment = $this->loadLockedEnrollment($enrollment);
+    public function handle(CheckInDTO $dto): CheckIn
+    {
+        return DB::transaction(function () use ($dto): CheckIn {
+            $enrollment = $this->loadLockedEnrollment($dto->enrollment);
             $event = $enrollment->event;
-            $normalizedEventDate = Date::parse($eventDate->toDateString())->startOfDay();
+            $normalizedEventDate = Date::parse($dto->eventDate->toDateString())->startOfDay();
 
             $this->validateCommonRules($enrollment, $normalizedEventDate);
             $isFirstCheckIn = !CheckIn::query()
@@ -43,8 +34,8 @@ final readonly class CheckInService
             try {
                 $checkIn = CheckIn::query()->create([
                     'enrollment_id' => $enrollment->id,
-                    'method' => $method,
-                    'payload' => $payload,
+                    'method' => $dto->method,
+                    'payload' => $dto->payload,
                     'event_date' => $normalizedEventDate,
                     'checked_in_at' => now(),
                 ]);
@@ -54,11 +45,13 @@ final readonly class CheckInService
 
             if ($isFirstCheckIn && $enrollment->status === EnrollmentStatus::Confirmed) {
                 resolve(TransitionEnrollmentAction::class)->handle(
-                    enrollment: $enrollment,
-                    toStatus: EnrollmentStatus::CheckedIn,
-                    triggeredBy: $triggeredBy,
-                    actorId: $actorUserId,
-                    timestamp: $checkIn->checked_in_at,
+                    new TransitionEnrollmentDTO(
+                        enrollment: $enrollment,
+                        toStatus: EnrollmentStatus::CheckedIn,
+                        triggeredBy: $dto->triggeredBy,
+                        actorId: $dto->actorUserId,
+                        timestamp: $checkIn->checked_in_at,
+                    ),
                 );
             }
 

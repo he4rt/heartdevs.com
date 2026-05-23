@@ -65,6 +65,14 @@ enum EnrollmentStatus: string implements HasColor, HasIcon, HasLabel
         };
     }
 
+    public function timestampColumn(): ?string
+    {
+        return match ($this) {
+            self::Confirmed, self::CheckedIn, self::Attended, self::Cancelled => $this->value.'_at',
+            default => null,
+        };
+    }
+
     public function isTerminal(): bool
     {
         return in_array($this, [self::Attended, self::Cancelled, self::Rejected, self::NoShow], strict: true);
