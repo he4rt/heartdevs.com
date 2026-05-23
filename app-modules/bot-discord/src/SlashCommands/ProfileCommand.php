@@ -7,6 +7,7 @@ namespace He4rt\BotDiscord\SlashCommands;
 use Discord\Parts\Interactions\Command\Option;
 use Discord\Parts\Interactions\Interaction;
 use He4rt\Identity\ExternalIdentity\Models\ExternalIdentity;
+use He4rt\Profile\Models\Profile;
 use Illuminate\Support\Facades\Date;
 use Throwable;
 
@@ -75,31 +76,30 @@ class ProfileCommand extends AbstractSlashCommand
 
         try {
 
-            if (!$this->memberProvider instanceof ExternalIdentity || !$this->memberProvider->user->information) {
+            if (!$this->memberProvider instanceof ExternalIdentity) {
                 $this
                     ->message()
-                    ->content($mentionedUser.' ainda não se apresentou! Use o comando `/introduction` primeiro.')
+                    ->content($mentionedUser.' ainda não se apresentou! Use o comando `/apresentar` primeiro.')
                     ->reply($interaction, true);
 
                 return;
             }
 
-            $information = $this->memberProvider->user->information;
+            $profile = Profile::query()
+                ->where('user_id', $this->memberProvider->user->id)
+                ->where('tenant_id', $this->memberProvider->tenant_id)
+                ->first();
 
             $this
                 ->message()
                 ->content('https://heartdevs.com/')
                 ->color('800080')
-                ->title('Perfil de '.($information->nickname ?? '-'))
+                ->title('Perfil de '.($profile->nickname ?? $this->memberProvider->user->name ?? '-'))
                 ->thumbnailUrl($mentionedUser->avatar)
                 ->fields([
-                    'Nome/Nickname' => $information->nickname ?? '-',
-                    'Sobre' => $information->about ?? '-',
+                    'Nome/Nickname' => $profile->nickname ?? '-',
+                    'Sobre' => $profile->about ?? '-',
                 ])
-                ->fields([
-                    'Git/Github' => $information->github_url ?? '-',
-                    'Linkedin' => $information->linkedin_url ?? '-',
-                ], inline: false)
                 ->footerIcon($interaction->guild->icon)
                 ->footerText(Date::now()->format('Y').' © He4rt Developers')
                 ->timestamp(now())

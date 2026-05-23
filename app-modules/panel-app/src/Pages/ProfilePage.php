@@ -353,7 +353,7 @@ class ProfilePage extends Page
 
     /**
      * @param  array<string, string>|null  $socialLinks
-     * @return array<int, array{platform: string, handle: string}>
+     * @return list<array{platform: string, handle: string}>
      */
     private function socialLinksToRepeater(?array $socialLinks): array
     {
@@ -361,18 +361,17 @@ class ProfilePage extends Page
             return [];
         }
 
-        return array_values(array_map(
-            fn (string $handle, string $platform): array => [
-                'platform' => $platform,
-                'handle' => $handle,
-            ],
-            $socialLinks,
-            array_keys($socialLinks),
-        ));
+        $result = [];
+
+        foreach ($socialLinks as $platform => $handle) {
+            $result[] = ['platform' => $platform, 'handle' => $handle];
+        }
+
+        return $result;
     }
 
     /**
-     * @param  array<int|string, array{platform: string, handle: string}>  $repeaterData
+     * @param  array<int|string, array<string, mixed>>  $repeaterData
      * @return array<string, string>
      */
     private function repeaterToSocialLinks(array $repeaterData): array
@@ -380,11 +379,12 @@ class ProfilePage extends Page
         $links = [];
 
         foreach ($repeaterData as $item) {
-            if (filled($item['platform']) && (isset($item['handle']) && ($item['handle'] !== '' && $item['handle'] !== '0'))) {
-                $platform = $item['platform'] instanceof SocialPlatform
-                    ? $item['platform']->value
-                    : $item['platform'];
-                $links[$platform] = $item['handle'];
+            $platform = $item['platform'] ?? null;
+            $handle = $item['handle'] ?? null;
+
+            if (filled($platform) && filled($handle)) {
+                $key = $platform instanceof SocialPlatform ? $platform->value : (string) $platform;
+                $links[$key] = (string) $handle;
             }
         }
 

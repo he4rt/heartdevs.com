@@ -31,8 +31,6 @@ class CreateAccountByExternalIdentity
             'is_donator' => false,
         ]);
 
-        $user->address()->create();
-        $user->information()->create();
         $user->character()->create([
             'tenant_id' => $tenantId,
         ]);

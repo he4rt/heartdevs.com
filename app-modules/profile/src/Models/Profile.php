@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace He4rt\Profile\Models;
 
+use Carbon\Carbon;
 use He4rt\Identity\Tenant\Models\Tenant;
 use He4rt\Identity\User\Models\User;
 use He4rt\Profile\Database\Factories\ProfileFactory;
@@ -22,7 +23,17 @@ use InvalidArgumentException;
  * @property string $id
  * @property string $user_id
  * @property int $tenant_id
+ * @property string|null $nickname
+ * @property Carbon|null $birthdate
+ * @property string|null $about
+ * @property string|null $headline
+ * @property SeniorityLevel|null $seniority_level
+ * @property int|null $years_experience
  * @property array<string, string>|null $social_links
+ * @property bool $available_for_proposals
+ * @property StartAvailability|null $start_availability
+ * @property Carbon|null $created_at
+ * @property Carbon|null $updated_at
  */
 #[Table(name: 'user_profiles')]
 final class Profile extends Model
