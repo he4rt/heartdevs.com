@@ -31,7 +31,7 @@ jobs:
       contents: read
 
     concurrency:
-      group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}-tia
+      group: pest-tia-${{ github.event.pull_request.number || github.ref }}
       cancel-in-progress: true
 
     services:
@@ -99,7 +99,7 @@ jobs:
         uses: actions/cache@5a3ec84eff668545956fd18022155c47e93e2684 # v4.2.3
         with:
           path: ~/.pest
-          key: pest-tia-${{ runner.os }}-${{ github.ref_name }}-${{ github.run_id }}
+          key: pest-tia-${{ runner.os }}-${{ github.ref_name }}-${{ github.sha }}
           restore-keys: |
             pest-tia-${{ runner.os }}-${{ github.ref_name }}-
 
