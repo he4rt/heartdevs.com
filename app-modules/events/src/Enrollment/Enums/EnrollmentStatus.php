@@ -9,6 +9,7 @@ use Filament\Support\Contracts\HasColor;
 use Filament\Support\Contracts\HasIcon;
 use Filament\Support\Contracts\HasLabel;
 use Filament\Support\Icons\Heroicon;
+use He4rt\Events\Enrollment\Exceptions\EnrollmentException;
 
 enum EnrollmentStatus: string implements HasColor, HasIcon, HasLabel
 {
@@ -98,7 +99,7 @@ enum EnrollmentStatus: string implements HasColor, HasIcon, HasLabel
         return match ($this) {
             self::Confirmed => __('events::pages.confirm_presence_success'),
             self::Waitlisted => __('events::pages.waitlist_success'),
-            default => '',
+            default => throw EnrollmentException::responseMessageNotImplemented($this),
         };
     }
 }

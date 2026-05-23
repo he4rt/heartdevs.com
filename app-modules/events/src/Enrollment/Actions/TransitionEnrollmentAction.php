@@ -20,12 +20,15 @@ final readonly class TransitionEnrollmentAction
             EnrollmentException::invalidTransition($fromStatus, $toStatus),
         );
 
-        $timestampColumn = $toStatus->timestampColumn();
-
-        $dto->enrollment->forceFill([
+        $attributes = [
             'status' => $toStatus,
-            $timestampColumn => $dto->timestamp ?? now(),
-        ])->save();
+        ];
+
+        if ($timestampColumn = $toStatus->timestampColumn()) {
+            $attributes[$timestampColumn] = $dto->timestamp ?? now();
+        }
+
+        $dto->enrollment->update($attributes);
 
         return EnrollmentTransition::query()->create([
             'enrollment_id' => $dto->enrollment->id,

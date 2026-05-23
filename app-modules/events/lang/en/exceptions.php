@@ -9,4 +9,5 @@ return [
     'event_not_active' => 'This event is not available for enrollment.',
     'invalid_enrollment_method' => 'This event requires application enrollment, not RSVP.',
     'event_full' => 'This event has reached maximum capacity and does not have a waitlist.',
+    'response_message_not_implemented' => 'Response message is not implemented for enrollment status: :status.',
 ];

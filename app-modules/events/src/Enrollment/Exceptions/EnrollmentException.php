@@ -57,4 +57,12 @@ final class EnrollmentException extends Exception
             Response::HTTP_UNPROCESSABLE_ENTITY,
         );
     }
+
+    public static function responseMessageNotImplemented(EnrollmentStatus $status): self
+    {
+        return new self(
+            __('events::exceptions.response_message_not_implemented', ['status' => $status->value]),
+            Response::HTTP_INTERNAL_SERVER_ERROR,
+        );
+    }
 }
