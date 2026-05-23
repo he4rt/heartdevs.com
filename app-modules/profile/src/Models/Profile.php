@@ -10,6 +10,7 @@ use He4rt\Profile\Database\Factories\ProfileFactory;
 use He4rt\Profile\Enums\SeniorityLevel;
 use He4rt\Profile\Enums\SocialPlatform;
 use He4rt\Profile\Enums\StartAvailability;
+use Illuminate\Database\Eloquent\Attributes\Table;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -23,13 +24,12 @@ use InvalidArgumentException;
  * @property int $tenant_id
  * @property array<string, string>|null $social_links
  */
+#[Table(name: 'user_profiles')]
 final class Profile extends Model
 {
     /** @use HasFactory<ProfileFactory> */
     use HasFactory;
     use HasUuids;
-
-    protected $table = 'user_profiles';
 
     protected $fillable = [
         'user_id',
@@ -71,6 +71,7 @@ final class Profile extends Model
      */
     protected function socialLinks(): Attribute
     {
+        /** @phpstan-ignore return.type */
         return Attribute::set(function (?array $value): ?string {
             if ($value === null) {
                 return null;
