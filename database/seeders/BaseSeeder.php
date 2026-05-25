@@ -33,14 +33,7 @@ class BaseSeeder extends Seeder
             ->create([
                 'name' => 'He4rt Developers',
                 'slug' => 'he4rt',
-            ]);
-
-        Tenant::factory()
-            ->for($admin, 'owner')
-            ->afterCreating(fn (Tenant $tenant) => $tenant->members()->attach($admin))
-            ->create([
-                'name' => '3 Pontos',
-                'slug' => '3pontos',
+                'domain' => 'he4rtdevs.test',
             ]);
 
         Character::factory()
