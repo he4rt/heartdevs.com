@@ -44,7 +44,6 @@ return [
     'twitch' => [
         'client_id' => env('TWITCH_OAUTH_CLIENT_ID'),
         'client_secret' => env('TWITCH_OAUTH_CLIENT_SECRET'),
-        'redirect_uri' => env('TWITCH_OAUTH_REDIRECT_URI', 'https://localhost:8000/auth/oauth/twitch'),
         'scopes' => [
             'admin' => env('TWITCH_OAUTH_SCOPES_ADMIN', 'user:read:email moderator:read:followers channel:read:subscriptions bits:read moderation:read channel:read:redemptions channel:read:polls channel:read:predictions channel:read:hype_train channel:read:goals channel:read:ads channel:bot'),
             'app' => env('TWITCH_OAUTH_SCOPES_APP', 'user:read:email'),
@@ -60,6 +59,13 @@ return [
         'redirect_uri' => env('DEVTO_OAUTH_REDIRECT_URI', 'https://localhost:8000/auth/oauth/devto'),
         'scopes' => env('DEVTO_OAUTH_SCOPES', 'public'),
         'enabled' => env('DEVTO_OAUTH_ENABLED', false),
+    ],
+
+    'github' => [
+        'client_id' => env('GITHUB_OAUTH_CLIENT_ID'),
+        'client_secret' => env('GITHUB_OAUTH_CLIENT_SECRET'),
+        'scopes' => env('GITHUB_OAUTH_SCOPES', 'read:user user:email'),
+        'enabled' => env('GITHUB_OAUTH_ENABLED', true),
     ],
 
     'openai' => [
