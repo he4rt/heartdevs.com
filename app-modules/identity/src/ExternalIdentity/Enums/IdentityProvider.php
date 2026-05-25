@@ -14,6 +14,7 @@ use He4rt\Activity\Message\Contracts\MessageActivityAdapter;
 use He4rt\IntegrationDevTo\OAuth\DevToOAuthClient;
 use He4rt\IntegrationDiscord\ETL\Adapters\DiscordMessageAdapter;
 use He4rt\IntegrationDiscord\OAuth\DiscordOAuthClient;
+use He4rt\IntegrationGithub\OAuth\GitHubOAuthClient;
 use He4rt\IntegrationTwitch\OAuth\TwitchOAuthClient;
 
 enum IdentityProvider: string implements HasColor, HasDescription, HasIcon, HasLabel
@@ -61,6 +62,7 @@ enum IdentityProvider: string implements HasColor, HasDescription, HasIcon, HasL
         return match ($this) {
             self::Twitch => resolve(TwitchOAuthClient::class),
             self::Discord => resolve(DiscordOAuthClient::class),
+            self::GitHub => resolve(GitHubOAuthClient::class),
             self::DevTo => resolve(DevToOAuthClient::class),
             default => null,
         };
