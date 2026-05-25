@@ -286,7 +286,7 @@ class ImportDiscordMessagesCommand extends Command
         ImportDiscordReactionsAction $reactionsAction,
         ImportDiscordVoiceLogAction $voiceAction,
         ImportDiscordModerationEventAction $moderationAction,
-        int $tenantId,
+        string $tenantId,
         array $channelMap,
         array &$stats,
     ): void {
@@ -377,7 +377,7 @@ class ImportDiscordMessagesCommand extends Command
      * @param  list<array<string, mixed>>  $messages
      * @return list<array<string, mixed>>
      */
-    private function filterNewMessages(array $messages, int $tenantId): array
+    private function filterNewMessages(array $messages, string $tenantId): array
     {
         $unique = [];
         foreach ($messages as $m) {

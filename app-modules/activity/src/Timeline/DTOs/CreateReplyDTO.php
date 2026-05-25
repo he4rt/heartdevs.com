@@ -11,7 +11,7 @@ final readonly class CreateReplyDTO
      */
     public function __construct(
         public string $userId,
-        public int $tenantId,
+        public string $tenantId,
         public string $parentTimelineId,
         public string $content,
         public array $images = [],

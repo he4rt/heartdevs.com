@@ -20,7 +20,7 @@ use Illuminate\Support\Carbon;
 /**
  * @property string $id
  * @property string $user_id
- * @property int $tenant_id
+ * @property string $tenant_id
  * @property string $postable_type
  * @property string $postable_id
  * @property string|null $root_id

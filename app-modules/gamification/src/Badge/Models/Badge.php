@@ -20,7 +20,7 @@ use Spatie\MediaLibrary\InteractsWithMedia;
 
 /**
  * @property int $id
- * @property int $tenant_id
+ * @property string $tenant_id
  * @property IdentityProvider $provider
  * @property string $name
  * @property string $description

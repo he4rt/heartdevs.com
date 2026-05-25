@@ -13,7 +13,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 /**
  * @property int $id
  * @property string $external_identity_id
- * @property int $tenant_id
+ * @property string $tenant_id
  * @property string|null $provider_message_id
  * @property string $channel_name
  * @property string $state

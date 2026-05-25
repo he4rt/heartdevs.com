@@ -18,7 +18,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 /**
  * @property string $id
- * @property int $tenant_id
+ * @property string $tenant_id
  * @property string|null $external_identity_id
  * @property string|null $moderator_identity_id
  * @property ModerationType $type

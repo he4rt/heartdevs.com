@@ -21,7 +21,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property string|null $callback_url
  * @property int $cost
  * @property string $version
- * @property int $tenant_id
+ * @property string $tenant_id
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
  */

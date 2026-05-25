@@ -22,7 +22,7 @@ use Illuminate\Database\Eloquent\Relations\MorphTo;
 /**
  * @property string $id
  * @property string $character_id
- * @property int $tenant_id
+ * @property string $tenant_id
  * @property ActivityType $type
  * @property IdentityProvider $provider
  * @property ValueTier $value_tier

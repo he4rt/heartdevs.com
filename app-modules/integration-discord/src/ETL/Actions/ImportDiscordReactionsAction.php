@@ -14,7 +14,7 @@ final class ImportDiscordReactionsAction
     /**
      * @param  list<DiscordMessageReactionDTO>  $reactions
      */
-    public function handle(Message $message, array $reactions, int $tenantId): void
+    public function handle(Message $message, array $reactions, string $tenantId): void
     {
         if ($reactions === []) {
             return;

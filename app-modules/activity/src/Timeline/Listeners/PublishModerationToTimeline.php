@@ -54,7 +54,7 @@ final class PublishModerationToTimeline
         ]);
     }
 
-    private function resolveIdentity(?string $userId, int $tenantId): ?string
+    private function resolveIdentity(?string $userId, string $tenantId): ?string
     {
         if ($userId === null) {
             return null;

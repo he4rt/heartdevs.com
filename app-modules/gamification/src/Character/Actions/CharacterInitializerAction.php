@@ -9,7 +9,7 @@ use He4rt\Identity\User\Models\User;
 
 final class CharacterInitializerAction
 {
-    public function ensure(User $user, int $tenantId): Character
+    public function ensure(User $user, string $tenantId): Character
     {
         return Character::query()->firstOrCreate(
             [

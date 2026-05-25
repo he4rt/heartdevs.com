@@ -27,7 +27,7 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
  * @property string $content
  * @property int $obtained_experience
  * @property Carbon|null $sent_at
- * @property int $tenant_id
+ * @property string $tenant_id
  * @property array<string, mixed>|null $metadata
  * @property int $reactions_count
  * @property int $reactions_total

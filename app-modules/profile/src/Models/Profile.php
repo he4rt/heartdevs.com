@@ -22,7 +22,7 @@ use InvalidArgumentException;
 /**
  * @property string $id
  * @property string $user_id
- * @property int $tenant_id
+ * @property string $tenant_id
  * @property string|null $nickname
  * @property Carbon|null $birthdate
  * @property string|null $about
