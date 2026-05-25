@@ -18,8 +18,7 @@ class IntegrationTwitchServiceProvider extends ServiceProvider
     {
         $this->app->singleton(TwitchOAuthConnector::class, fn (): TwitchOAuthConnector => new TwitchOAuthConnector(
             clientId: config()->string('services.twitch.client_id'),
-            clientSecret: config()->string('services.twitch.client_secret'),
-            redirectUri: config()->string('services.twitch.redirect_uri'),
+            clientSecret: config()->string('services.twitch.client_secret')
         ));
 
         $this->app->singleton(TwitchAppTokenService::class);

@@ -23,7 +23,7 @@ class DiscordOAuthClient implements OAuthClientContract
         return 'https://discord.com/oauth2/authorize?'.http_build_query([
             'client_id' => $this->connector->clientId,
             'response_type' => 'code',
-            'redirect_uri' => $this->connector->redirectUri,
+            'redirect_uri' => $this->callbackUrl(),
             'scope' => config('services.discord.scopes'),
             'state' => (string) $state,
         ]);
@@ -35,7 +35,7 @@ class DiscordOAuthClient implements OAuthClientContract
             code: $code,
             clientId: $this->connector->clientId,
             clientSecret: $this->connector->clientSecret,
-            redirectUri: $this->connector->redirectUri,
+            redirectUri: $this->callbackUrl(),
         ));
 
         return DiscordOAuthAccessDTO::make($response->json());
@@ -48,5 +48,10 @@ class DiscordOAuthClient implements OAuthClientContract
         ));
 
         return DiscordOAuthUser::make($credentials, $response->json());
+    }
+
+    private function callbackUrl(): string
+    {
+        return mb_rtrim(config('app.url'), '/').'/auth/oauth/discord';
     }
 }

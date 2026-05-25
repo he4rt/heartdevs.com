@@ -26,9 +26,11 @@ final readonly class TwitchOAuthClient implements OAuthClientContract
         $panel = $state->panel ?? 'app';
         $scopes = config('services.twitch.scopes.'.$panel, config('services.twitch.scopes.app'));
 
+        $callbackUrl = $this->callbackUrl();
+
         return 'https://id.twitch.tv/oauth2/authorize?'.http_build_query([
             'client_id' => $this->oauthConnector->clientId,
-            'redirect_uri' => $this->oauthConnector->redirectUri,
+            'redirect_uri' => $callbackUrl,
             'response_type' => 'code',
             'scope' => $scopes,
             'state' => (string) $state,
@@ -41,7 +43,7 @@ final readonly class TwitchOAuthClient implements OAuthClientContract
             code: $code,
             clientId: $this->oauthConnector->clientId,
             clientSecret: $this->oauthConnector->getClientSecret(),
-            redirectUri: $this->oauthConnector->redirectUri,
+            redirectUri: $this->callbackUrl(),
         ));
 
         return TwitchOAuthAccessDTO::make($response->json());
@@ -54,5 +56,10 @@ final readonly class TwitchOAuthClient implements OAuthClientContract
         ));
 
         return TwitchOAuthDTO::make($credentials, $response->json());
+    }
+
+    private function callbackUrl(): string
+    {
+        return mb_rtrim(config('app.url'), '/').'/auth/oauth/twitch';
     }
 }

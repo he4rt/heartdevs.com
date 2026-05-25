@@ -18,7 +18,6 @@ final class TwitchOAuthConnector extends Connector
     public function __construct(
         public readonly string $clientId,
         private readonly string $clientSecret,
-        public readonly string $redirectUri,
     ) {}
 
     public function getClientSecret(): string
