@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Livewire;
 
 use Filament\Notifications\Notification;
-use He4rt\Identity\Auth\DTOs\OAuthStateDTO;
 use He4rt\Identity\ExternalIdentity\Enums\IdentityProvider;
 use He4rt\Identity\ExternalIdentity\Models\ExternalIdentity;
 use He4rt\Identity\Tenant\Models\Tenant;
@@ -17,12 +16,12 @@ class ConnectionHub extends Component
 {
     public string $panel = 'app';
 
-    public int $tenantId = 0;
+    public string $tenantId = '';
 
     public function mount(): void
     {
         $this->panel = filament()->getCurrentPanel()?->getId() ?? 'app';
-        $this->tenantId = filament()->getTenant()?->getKey() ?? 0;
+        $this->tenantId = filament()->getTenant()?->getKey() ?? '';
     }
 
     public function render(): View
@@ -48,11 +47,11 @@ class ConnectionHub extends Component
     {
         $tenant = Tenant::query()->find($this->tenantId);
 
-        session()->put('tenant', $tenant->slug);
-        $state = new OAuthStateDTO(panel: $this->panel, tenant: $tenant->slug);
-        $redirectUri = $provider->getClient()->redirectUrl($state);
-
-        $this->redirect($redirectUri);
+        $this->redirect(route('oauth.redirect', [
+            'tenant' => $tenant->domain ?? $tenant->slug,
+            'panel' => $this->panel,
+            'provider' => $provider->value,
+        ]));
     }
 
     public function disconnect(IdentityProvider $provider): void
@@ -119,9 +118,10 @@ class ConnectionHub extends Component
     {
         return ExternalIdentity::query()
             ->where('tenant_id', $this->tenantId)
+            ->where('model_type', 'tenant')
             ->whereNotNull('connected_at')
             ->whereNull('disconnected_at')
-            ->with('user')
+            ->with('connectedByUser')
             ->get();
     }
 }

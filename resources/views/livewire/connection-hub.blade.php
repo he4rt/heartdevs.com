@@ -6,7 +6,7 @@
     /** @var string $panel */
 @endphp
 
-<div class="space-y-3">
+<div class="space-y-2">
     @foreach ($supportedProviders as $provider)
         @php
             $connected = $userProviders
@@ -24,60 +24,71 @@
         @endphp
         <div
             wire:key="provider-{{ $provider->value }}"
-            class="relative overflow-hidden rounded-xl border transition-all duration-300"
+            class="relative overflow-hidden rounded-lg border transition-all duration-200"
             style="{{ $connected
-                ? "border-color: {$brandColor}30; box-shadow: 0 0 24px {$brandColor}08, inset 0 1px 0 {$brandColor}15;"
-                : 'border-color: rgb(55 65 81 / 0.5);' }}"
+                ? "border-color: {$brandColor}30;"
+                : 'border-color: rgb(55 65 81 / 0.4);' }}"
         >
-            {{-- Brand accent strip --}}
-            <div
-                class="absolute inset-y-0 left-0 w-1 rounded-l-xl transition-opacity duration-300 {{ $connected ? 'opacity-100' : 'opacity-30' }}"
-                style="background-color: {{ $brandColor }}"
-            ></div>
-
-            <div class="flex items-center gap-4 p-4 pl-5">
-                {{-- Provider icon with brand tint --}}
+            <div class="flex items-center gap-2.5 p-2.5">
+                {{-- Provider icon --}}
                 <div class="relative shrink-0">
                     <div
-                        class="flex h-11 w-11 items-center justify-center rounded-lg"
+                        class="flex h-8 w-8 items-center justify-center rounded-md"
                         style="background-color: {{ $brandColor }}15"
                     >
                         <x-filament::icon
                             :icon="$provider->getIcon()"
-                            class="h-6 w-6"
+                            class="h-4 w-4"
                             style="color: {{ $brandColor }}"
                         />
                     </div>
                     @if ($connected)
                         <div
-                            class="absolute -right-0.5 -bottom-0.5 flex h-3.5 w-3.5 items-center justify-center rounded-full ring-2 ring-gray-900"
-                            style="background-color: rgb(24 24 27)"
-                        >
-                            <div class="h-2 w-2 rounded-full bg-emerald-400"></div>
-                        </div>
+                            class="absolute -right-0.5 -bottom-0.5 h-2.5 w-2.5 rounded-full border-2 border-gray-900 bg-emerald-400"
+                        ></div>
                     @endif
                 </div>
 
                 {{-- Content --}}
                 <div class="min-w-0 flex-1">
-                    <h4 class="text-sm font-semibold text-white">{{ $provider->getLabel() }}</h4>
+                    <div class="flex items-center justify-between gap-2">
+                        <span class="truncate text-sm font-medium text-white">{{ $provider->getLabel() }}</span>
+
+                        @if ($connected)
+                            <button
+                                wire:click="disconnect('{{ $provider->value }}')"
+                                type="button"
+                                class="shrink-0 text-xs text-gray-500 transition-colors hover:text-red-400"
+                            >
+                                Disconnect
+                            </button>
+                        @else
+                            <x-filament::button
+                                wire:click="connect('{{ $provider->value }}')"
+                                size="sm"
+                                class="shrink-0"
+                            >
+                                Connect
+                            </x-filament::button>
+                        @endif
+                    </div>
 
                     @if ($connected)
-                        <div class="mt-1 flex items-center gap-2 text-sm">
+                        <div class="mt-0.5 flex items-center gap-1.5 text-xs">
                             @if ($connected->metadata['avatar'] ?? null)
                                 <img
                                     src="{{ $connected->metadata['avatar'] }}"
                                     alt=""
-                                    class="h-4 w-4 rounded-full"
+                                    class="h-3.5 w-3.5 rounded-full"
                                     loading="lazy"
                                 />
                             @endif
-                            <span class="text-gray-300">{{
+                            <span class="truncate text-gray-300">{{
                                 $connected->metadata['username'] ??
                                     $connected->external_account_id
                             }}</span>
                             <span class="text-gray-600">&middot;</span>
-                            <span class="text-xs text-gray-500">
+                            <span class="shrink-0 text-gray-500">
                                 {{
                                     $connected->connected_at
                                         ->timezone(config('app.display_timezone'))
@@ -85,40 +96,20 @@
                                 }}
                             </span>
                         </div>
-                    @else
-                        <p class="mt-0.5 text-xs leading-relaxed text-gray-500">{{ $provider->getDescription() }}</p>
-                    @endif
-                </div>
-
-                {{-- Action --}}
-                <div class="shrink-0">
-                    @if ($connected)
-                        <x-filament::button
-                            wire:click="disconnect('{{ $provider->value }}')"
-                            color="danger"
-                            size="sm"
-                            outlined
-                        >
-                            Disconnect
-                        </x-filament::button>
-                    @else
-                        <x-filament::button wire:click="connect('{{ $provider->value }}')" size="sm">
-                            Connect
-                        </x-filament::button>
                     @endif
                 </div>
             </div>
 
-            {{-- Expandable scopes --}}
+            {{-- Permissions --}}
             @if (!$connected && count($scopes) > 0)
-                <div x-data="{ open: false }" class="border-t border-gray-800/80">
+                <div x-data="{ open: false }" class="border-t border-gray-800/50">
                     <button
                         @click="open = !open"
                         type="button"
-                        class="flex w-full items-center gap-1.5 px-5 py-2 text-[11px] font-medium tracking-wider text-gray-500 uppercase transition-colors hover:text-gray-400"
+                        class="flex w-full items-center gap-1 px-2.5 py-1.5 text-[10px] font-medium tracking-wider text-gray-500 uppercase transition-colors hover:text-gray-400"
                     >
                         <span class="transition-transform duration-200" :class="open && 'rotate-90'">
-                            <x-filament::icon icon="heroicon-m-chevron-right" class="h-3 w-3" />
+                            <x-filament::icon icon="heroicon-m-chevron-right" class="h-2.5 w-2.5" />
                         </span>
                         <span>Permissions</span>
                         <span class="text-gray-600">({{ count($scopes) }})</span>
@@ -131,13 +122,13 @@
                         x-transition:leave="transition-all duration-150 ease-in"
                         x-transition:leave-start="opacity-100"
                         x-transition:leave-end="opacity-0"
-                        class="px-5 pb-3"
+                        class="px-2.5 pb-2"
                         style="display: none"
                     >
-                        <div class="flex flex-wrap gap-1.5">
+                        <div class="flex flex-wrap gap-1">
                             @foreach ($scopes as $scope)
                                 <code
-                                    class="rounded bg-gray-800 px-1.5 py-0.5 font-mono text-[10px] text-gray-400 ring-1 ring-gray-700/50"
+                                    class="rounded bg-gray-800/80 px-1 py-0.5 font-mono text-[9px] text-gray-400 ring-1 ring-gray-700/50"
                                 >
                                     {{ $scope }}
                                 </code>

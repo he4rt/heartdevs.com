@@ -93,9 +93,9 @@
                                                     $connection->external_account_id
                                             }}
                                         </span>
-                                        @if ($connection->user)
+                                        @if ($connection->connectedByUser)
                                             <span class="shrink-0 text-xs text-gray-500"
-                                                >&middot; {{ $connection->user->name }}</span
+                                                >&middot; {{ $connection->connectedByUser->name }}</span
                                             >
                                         @endif
                                     </div>
