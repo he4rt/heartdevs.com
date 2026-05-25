@@ -4,15 +4,20 @@ declare(strict_types=1);
 
 namespace He4rt\Identity\Auth\DTOs;
 
+use He4rt\Identity\Auth\Enums\OAuthIntent;
+use He4rt\Identity\ExternalIdentity\Enums\IdentityProvider;
 use Illuminate\Support\Facades\Crypt;
 use JsonSerializable;
 use Stringable;
 
-class OAuthStateDTO implements JsonSerializable, Stringable
+final readonly class OAuthStateDTO implements JsonSerializable, Stringable
 {
     public function __construct(
+        public OAuthIntent $intent,
+        public IdentityProvider $provider,
         public string $panel,
-        public ?string $tenant = null,
+        public string $tenant,
+        public ?string $returnUrl = null,
     ) {}
 
     public function __toString(): string
@@ -20,9 +25,17 @@ class OAuthStateDTO implements JsonSerializable, Stringable
         return Crypt::encryptString(json_encode($this));
     }
 
-    public static function fromHashedString(string $state): self
+    public static function fromEncryptedString(string $state): self
     {
-        return new self(...json_decode(Crypt::decryptString($state), true));
+        $data = json_decode(Crypt::decryptString($state), true);
+
+        return new self(
+            intent: OAuthIntent::from($data['intent']),
+            provider: IdentityProvider::from($data['provider']),
+            panel: $data['panel'],
+            tenant: $data['tenant'],
+            returnUrl: $data['return_url'] ?? null,
+        );
     }
 
     /**
@@ -30,10 +43,12 @@ class OAuthStateDTO implements JsonSerializable, Stringable
      */
     public function jsonSerialize(): array
     {
-
         return [
+            'intent' => $this->intent->value,
+            'provider' => $this->provider->value,
             'panel' => $this->panel,
-            'tenant' => $this->tenant ?? null,
+            'tenant' => $this->tenant,
+            'return_url' => $this->returnUrl,
         ];
     }
 }

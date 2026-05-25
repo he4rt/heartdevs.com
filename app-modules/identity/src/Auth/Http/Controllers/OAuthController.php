@@ -4,59 +4,55 @@ declare(strict_types=1);
 
 namespace He4rt\Identity\Auth\Http\Controllers;
 
+use App\Contracts\OAuthClientContract;
 use App\Http\Controllers\Controller;
-use He4rt\Identity\Auth\Actions\AuthenticateAction;
+use He4rt\Identity\Auth\Actions\HandleOAuthCallbackAction;
 use He4rt\Identity\Auth\DTOs\OAuthStateDTO;
+use He4rt\Identity\Auth\Enums\OAuthIntent;
 use He4rt\Identity\ExternalIdentity\Enums\IdentityProvider;
-use He4rt\Identity\Tenant\Models\Tenant;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Support\Facades\Auth;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 final class OAuthController extends Controller
 {
-    public function getRedirect(IdentityProvider $provider): RedirectResponse
+    public function getRedirect(string $tenant, string $panel, string $provider): RedirectResponse
     {
-        return redirect()->to($provider->getClient()->redirectUrl());
+        $identityProvider = IdentityProvider::tryFrom($provider);
+
+        throw_if($identityProvider === null, NotFoundHttpException::class);
+
+        $client = $identityProvider->getClient();
+
+        throw_unless($client instanceof OAuthClientContract, NotFoundHttpException::class);
+
+        $state = new OAuthStateDTO(
+            intent: Auth::check() ? OAuthIntent::Link : OAuthIntent::Login,
+            provider: $identityProvider,
+            panel: $panel,
+            tenant: $tenant,
+            returnUrl: Auth::check() ? url()->previous() : null,
+        );
+
+        return redirect()->to($client->redirectUrl($state));
     }
 
-    public function getAuthenticate(IdentityProvider $provider, AuthenticateAction $action): RedirectResponse
+    public function getAuthenticate(string $provider, HandleOAuthCallbackAction $action): RedirectResponse
     {
-        $state = OAuthStateDTO::fromHashedString(request()->input('state'));
+        $identityProvider = IdentityProvider::tryFrom($provider);
 
-        $action->withOAuth($state, $provider, request()->input('code'));
+        throw_if($identityProvider === null, NotFoundHttpException::class);
 
-        if ($state->tenant === null) {
-            return $this->basePanelRedirectResponse($state);
+        $state = OAuthStateDTO::fromEncryptedString(request()->input('state'));
+
+        $result = $action->execute($state, $identityProvider, request()->input('code'));
+
+        if ($result->intent === OAuthIntent::Login) {
+            Auth::login($result->user);
+            filament()->setCurrentPanel(filament()->getPanel($state->panel));
+            filament()->setTenant($result->tenant);
         }
 
-        if ($state->panel === 'event') {
-            return $this->eventRedirectResponse($state);
-        }
-
-        $redirectUri = filament()
-            ->getPanel($state->panel)
-            ->getUrl(Tenant::query()->where('slug', $state->tenant)->firstOrFail());
-
-        return redirect()->to($redirectUri);
-    }
-
-    private function eventRedirectResponse(OAuthStateDTO $state): RedirectResponse
-    {
-
-        $tenant = Tenant::query()->where('slug', $state->tenant)->firstOrFail();
-        $baseUri = app()->isProduction()
-            ? $tenant->domain
-            : $state->tenant;
-
-        return redirect()->intended(route('filament.event.pages.participant-dashboard', [
-            'tenant' => $baseUri,
-        ]));
-
-    }
-
-    private function basePanelRedirectResponse(OAuthStateDTO $state): RedirectResponse
-    {
-        $panel = filament()->getPanel($state->panel);
-
-        return redirect()->intended($panel->getUrl());
+        return redirect()->to($result->redirectUrl);
     }
 }
