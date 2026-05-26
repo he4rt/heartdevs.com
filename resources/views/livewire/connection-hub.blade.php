@@ -51,25 +51,16 @@
 
                 {{-- Content --}}
                 <div class="min-w-0 flex-1">
-                    <div class="flex items-center justify-between gap-2">
+                    <div class="flex items-baseline justify-between gap-2">
                         <span class="truncate text-sm font-medium text-white">{{ $provider->getLabel() }}</span>
-
                         @if ($connected)
-                            <button
-                                wire:click="disconnect('{{ $provider->value }}')"
-                                type="button"
-                                class="shrink-0 text-xs text-gray-500 transition-colors hover:text-red-400"
-                            >
-                                Disconnect
-                            </button>
-                        @else
-                            <x-filament::button
-                                wire:click="connect('{{ $provider->value }}')"
-                                size="sm"
-                                class="shrink-0"
-                            >
-                                Connect
-                            </x-filament::button>
+                            <span class="shrink-0 text-[10px] text-gray-500">
+                                {{
+                                    $connected->connected_at
+                                        ->timezone(config('app.display_timezone'))
+                                        ->diffForHumans()
+                                }}
+                            </span>
                         @endif
                     </div>
 
@@ -87,17 +78,24 @@
                                 $connected->metadata['username'] ??
                                     $connected->external_account_id
                             }}</span>
-                            <span class="text-gray-600">&middot;</span>
-                            <span class="shrink-0 text-gray-500">
-                                {{
-                                    $connected->connected_at
-                                        ->timezone(config('app.display_timezone'))
-                                        ->diffForHumans()
-                                }}
-                            </span>
                         </div>
                     @endif
                 </div>
+
+                {{-- Action --}}
+                @if ($connected)
+                    <button
+                        wire:click="disconnect('{{ $provider->value }}')"
+                        type="button"
+                        class="shrink-0 rounded-md px-2 py-0.5 text-[11px] font-medium text-gray-400 ring-1 ring-gray-700/60 transition-all hover:text-red-400 hover:ring-red-500/40"
+                    >
+                        Disconnect
+                    </button>
+                @else
+                    <x-filament::button wire:click="connect('{{ $provider->value }}')" size="sm" class="shrink-0">
+                        Connect
+                    </x-filament::button>
+                @endif
             </div>
 
             {{-- Permissions --}}
