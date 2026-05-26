@@ -121,7 +121,7 @@ class SyncDevToArticles extends Command
 
         $this->trackActivity->handle(new TrackActivityDTO(
             characterId: (string) $character->id,
-            tenantId: (int) $externalIdentity->tenant_id,
+            tenantId: (string) $externalIdentity->tenant_id,
             type: ActivityType::Article,
             provider: IdentityProvider::DevTo,
             occurredAt: new DateTimeImmutable($article['published_at'] ?? $article['created_at']),
