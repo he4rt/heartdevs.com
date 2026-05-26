@@ -8,6 +8,7 @@ use App\Contracts\OAuthClientContract;
 use He4rt\Identity\Auth\DTOs\OAuthAccessDTO;
 use He4rt\Identity\Auth\DTOs\OAuthStateDTO;
 use He4rt\Identity\Auth\DTOs\OAuthUserDTO;
+use He4rt\Identity\Auth\Exceptions\OAuthFlowException;
 use He4rt\IntegrationDiscord\Transport\DiscordOAuthConnector;
 use He4rt\IntegrationDiscord\Transport\Requests\OAuth\ExchangeCodeForToken;
 use He4rt\IntegrationDiscord\Transport\Requests\OAuth\GetCurrentUser;
@@ -38,7 +39,14 @@ class DiscordOAuthClient implements OAuthClientContract
             redirectUri: $this->callbackUrl(),
         ));
 
-        return DiscordOAuthAccessDTO::make($response->json());
+        $payload = $response->json();
+        $tokenExchangeFailed = !isset($payload['access_token']);
+
+        if ($tokenExchangeFailed) {
+            throw OAuthFlowException::tokenExchangeFailed('discord', $payload['error'] ?? 'unknown');
+        }
+
+        return DiscordOAuthAccessDTO::make($payload);
     }
 
     public function getAuthenticatedUser(OAuthAccessDTO $credentials): OAuthUserDTO

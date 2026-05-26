@@ -9,9 +9,12 @@ use App\Http\Controllers\Controller;
 use He4rt\Identity\Auth\Actions\HandleOAuthCallbackAction;
 use He4rt\Identity\Auth\DTOs\OAuthStateDTO;
 use He4rt\Identity\Auth\Enums\OAuthIntent;
+use He4rt\Identity\Auth\Exceptions\OAuthFlowException;
 use He4rt\Identity\ExternalIdentity\Enums\IdentityProvider;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
+use RuntimeException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 final class OAuthController extends Controller
@@ -22,7 +25,13 @@ final class OAuthController extends Controller
 
         throw_if($identityProvider === null, NotFoundHttpException::class);
 
-        $client = $identityProvider->getClient();
+        try {
+            $client = $identityProvider->getClient();
+        } catch (RuntimeException $runtimeException) {
+            Log::warning('OAuth client not configured', ['provider' => $provider, 'error' => $runtimeException->getMessage()]);
+
+            return redirect()->to('/');
+        }
 
         throw_unless($client instanceof OAuthClientContract, NotFoundHttpException::class);
 
@@ -45,7 +54,22 @@ final class OAuthController extends Controller
 
         $state = OAuthStateDTO::fromEncryptedString(request()->input('state'));
 
-        $result = $action->execute($state, $identityProvider, request()->input('code'));
+        $code = request()->input('code');
+        $oauthDenied = $code === null || request()->has('error');
+
+        if ($oauthDenied) {
+            $fallbackUrl = $state->returnUrl ?? '/';
+
+            return redirect()->to($fallbackUrl);
+        }
+
+        try {
+            $result = $action->execute($state, $identityProvider, $code);
+        } catch (OAuthFlowException $oAuthFlowException) {
+            Log::warning('OAuth flow failed', ['provider' => $provider, 'error' => $oAuthFlowException->getMessage()]);
+
+            return redirect()->to($state->returnUrl ?? '/');
+        }
 
         if ($result->hasMergeConflict()) {
             session()->put('oauth_merge_pending', $result->mergeConflict->toSession());

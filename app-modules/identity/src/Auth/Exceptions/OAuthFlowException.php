@@ -28,4 +28,9 @@ final class OAuthFlowException extends RuntimeException
     {
         return new self(sprintf('Tenant "%s" not found.', $identifier));
     }
+
+    public static function tokenExchangeFailed(string $provider, string $error): self
+    {
+        return new self(sprintf('Token exchange failed for "%s": %s', $provider, $error));
+    }
 }

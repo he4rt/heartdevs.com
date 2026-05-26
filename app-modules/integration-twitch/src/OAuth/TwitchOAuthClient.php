@@ -7,6 +7,7 @@ namespace He4rt\IntegrationTwitch\OAuth;
 use App\Contracts\OAuthClientContract;
 use He4rt\Identity\Auth\DTOs\OAuthAccessDTO;
 use He4rt\Identity\Auth\DTOs\OAuthStateDTO;
+use He4rt\Identity\Auth\Exceptions\OAuthFlowException;
 use He4rt\IntegrationTwitch\OAuth\DTO\TwitchOAuthAccessDTO;
 use He4rt\IntegrationTwitch\OAuth\DTO\TwitchOAuthDTO;
 use He4rt\IntegrationTwitch\Transport\Requests\OAuth\ExchangeCodeForToken;
@@ -46,7 +47,14 @@ final readonly class TwitchOAuthClient implements OAuthClientContract
             redirectUri: $this->callbackUrl(),
         ));
 
-        return TwitchOAuthAccessDTO::make($response->json());
+        $payload = $response->json();
+        $tokenExchangeFailed = !isset($payload['access_token']);
+
+        if ($tokenExchangeFailed) {
+            throw OAuthFlowException::tokenExchangeFailed('twitch', $payload['message'] ?? $payload['error'] ?? 'unknown');
+        }
+
+        return TwitchOAuthAccessDTO::make($payload);
     }
 
     public function getAuthenticatedUser(OAuthAccessDTO $credentials): TwitchOAuthDTO

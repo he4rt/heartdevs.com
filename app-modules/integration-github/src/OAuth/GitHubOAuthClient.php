@@ -7,6 +7,7 @@ namespace He4rt\IntegrationGithub\OAuth;
 use App\Contracts\OAuthClientContract;
 use He4rt\Identity\Auth\DTOs\OAuthAccessDTO;
 use He4rt\Identity\Auth\DTOs\OAuthStateDTO;
+use He4rt\Identity\Auth\Exceptions\OAuthFlowException;
 use He4rt\IntegrationGithub\OAuth\DTO\GitHubOAuthAccessDTO;
 use He4rt\IntegrationGithub\OAuth\DTO\GitHubOAuthUserDTO;
 use He4rt\IntegrationGithub\Transport\GitHubApiConnector;
@@ -40,7 +41,14 @@ final readonly class GitHubOAuthClient implements OAuthClientContract
             redirectUri: $this->callbackUrl(),
         ));
 
-        return GitHubOAuthAccessDTO::make($response->json());
+        $payload = $response->json();
+        $tokenExchangeFailed = !isset($payload['access_token']);
+
+        if ($tokenExchangeFailed) {
+            throw OAuthFlowException::tokenExchangeFailed('github', $payload['error_description'] ?? $payload['error'] ?? 'unknown');
+        }
+
+        return GitHubOAuthAccessDTO::make($payload);
     }
 
     public function getAuthenticatedUser(OAuthAccessDTO $credentials): GitHubOAuthUserDTO
