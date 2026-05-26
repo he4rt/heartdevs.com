@@ -19,15 +19,16 @@ final readonly class FindOrCreateUserByProvider
 
     public function execute(OAuthUserDTO $oauthUser, Tenant $tenant): User
     {
-        $user = $this->findExistingUser($oauthUser);
+        $existing = $this->findExistingUser($oauthUser);
 
-        if ($user instanceof User) {
-            $user = $this->enrichUser->execute($user, $oauthUser);
-        } else {
-            $user = $this->createUser($oauthUser);
-        }
+        $user = match ($existing instanceof User) {
+            true => $this->enrichUser->execute($existing, $oauthUser),
+            false => $this->createUser($oauthUser),
+        };
 
-        if (!$user->tenants()->where('tenants.id', $tenant->getKey())->exists()) {
+        $alreadyBelongsToTenant = $user->tenants()->where('tenants.id', $tenant->getKey())->exists();
+
+        if (!$alreadyBelongsToTenant) {
             $user->tenants()->attach($tenant);
         }
 
