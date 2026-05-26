@@ -15,7 +15,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 /**
  * @property int $id
- * @property int|null $tenant_id
+ * @property string|null $tenant_id
  * @property string $discord_guild_id
  * @property string $name
  * @property string|null $icon

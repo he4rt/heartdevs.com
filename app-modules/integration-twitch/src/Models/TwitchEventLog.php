@@ -11,7 +11,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 /**
  * @property int $id
- * @property int|null $tenant_id
+ * @property string|null $tenant_id
  * @property string $event_type
  * @property string|null $broadcaster_user_id
  * @property string|null $user_id

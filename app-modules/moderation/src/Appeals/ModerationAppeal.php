@@ -28,7 +28,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property string|null $reviewer_notes
  * @property Carbon|null $resolved_at
  * @property Carbon $sla_deadline
- * @property int|null $tenant_id
+ * @property string|null $tenant_id
  * @property Carbon $created_at
  */
 #[Table('moderation_appeals', timestamps: false)]

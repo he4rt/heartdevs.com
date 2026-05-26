@@ -31,7 +31,7 @@ use Illuminate\Support\Facades\Date;
  * @property int $level
  * @property float $percentage_experience
  * @property bool $can_claim_daily_bonus
- * @property int|null $tenant_id
+ * @property string|null $tenant_id
  */
 #[Appends([
     'ranking',
