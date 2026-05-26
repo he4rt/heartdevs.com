@@ -47,7 +47,7 @@ test('finds existing user by external identity cross-tenant', function (): void 
         'external_account_id' => '12345',
     ]);
 
-    $action = new FindOrCreateUserByProvider();
+    $action = resolve(FindOrCreateUserByProvider::class);
     $result = $action->execute(
         makeOAuthUser(providerId: '12345', provider: IdentityProvider::GitHub),
         $tenantB,
@@ -60,7 +60,7 @@ test('finds existing user by email', function (): void {
     $tenant = Tenant::factory()->create();
     $user = User::factory()->create(['email' => 'daniel@example.com']);
 
-    $action = new FindOrCreateUserByProvider();
+    $action = resolve(FindOrCreateUserByProvider::class);
     $result = $action->execute(
         makeOAuthUser(providerId: 'new-id', email: 'daniel@example.com'),
         $tenant,
@@ -75,7 +75,7 @@ test('does not search by email when email is null', function (): void {
 
     $userCountBefore = User::query()->count();
 
-    $action = new FindOrCreateUserByProvider();
+    $action = resolve(FindOrCreateUserByProvider::class);
     $result = $action->execute(
         makeOAuthUser(providerId: 'new-id', username: 'newuser', email: null),
         $tenant,
@@ -88,7 +88,7 @@ test('does not search by email when email is null', function (): void {
 test('creates new user when no match found', function (): void {
     $tenant = Tenant::factory()->create();
 
-    $action = new FindOrCreateUserByProvider();
+    $action = resolve(FindOrCreateUserByProvider::class);
     $result = $action->execute(
         makeOAuthUser(providerId: 'fresh-id', username: 'freshuser', name: 'Fresh User', email: 'fresh@example.com'),
         $tenant,
@@ -103,7 +103,7 @@ test('creates user with sequential suffix when username collides', function (): 
     $tenant = Tenant::factory()->create();
     User::factory()->create(['username' => 'danielhe4rt']);
 
-    $action = new FindOrCreateUserByProvider();
+    $action = resolve(FindOrCreateUserByProvider::class);
     $result = $action->execute(
         makeOAuthUser(providerId: 'new-id', username: 'danielhe4rt', email: 'new@example.com'),
         $tenant,
@@ -119,7 +119,7 @@ test('increments suffix when previous suffixed usernames exist', function (): vo
     User::factory()->create(['username' => 'danielhe4rt-2']);
     User::factory()->create(['username' => 'danielhe4rt-3']);
 
-    $action = new FindOrCreateUserByProvider();
+    $action = resolve(FindOrCreateUserByProvider::class);
     $result = $action->execute(
         makeOAuthUser(providerId: 'new-id', username: 'danielhe4rt', email: 'new@example.com'),
         $tenant,
@@ -131,7 +131,7 @@ test('increments suffix when previous suffixed usernames exist', function (): vo
 test('attaches user to tenant when not already attached', function (): void {
     $tenant = Tenant::factory()->create();
 
-    $action = new FindOrCreateUserByProvider();
+    $action = resolve(FindOrCreateUserByProvider::class);
     $result = $action->execute(
         makeOAuthUser(providerId: 'new-id', username: 'newuser'),
         $tenant,
@@ -153,7 +153,7 @@ test('does not duplicate tenant attachment when already attached', function (): 
         'external_account_id' => '12345',
     ]);
 
-    $action = new FindOrCreateUserByProvider();
+    $action = resolve(FindOrCreateUserByProvider::class);
     $action->execute(
         makeOAuthUser(providerId: '12345', provider: IdentityProvider::GitHub),
         $tenant,
@@ -173,7 +173,7 @@ test('ignores tenant-owned external identities during lookup', function (): void
         'external_account_id' => '204122995579551744',
     ]);
 
-    $action = new FindOrCreateUserByProvider();
+    $action = resolve(FindOrCreateUserByProvider::class);
     $result = $action->execute(
         makeOAuthUser(providerId: '204122995579551744', provider: IdentityProvider::Discord, username: 'newuser'),
         $tenant,

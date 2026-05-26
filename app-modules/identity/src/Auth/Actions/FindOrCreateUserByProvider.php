@@ -11,13 +11,19 @@ use He4rt\Identity\User\Models\User;
 use Illuminate\Database\UniqueConstraintViolationException;
 use Illuminate\Support\Facades\DB;
 
-final class FindOrCreateUserByProvider
+final readonly class FindOrCreateUserByProvider
 {
+    public function __construct(
+        private EnrichUserOnFirstLogin $enrichUser,
+    ) {}
+
     public function execute(OAuthUserDTO $oauthUser, Tenant $tenant): User
     {
         $user = $this->findExistingUser($oauthUser);
 
-        if (!$user instanceof User) {
+        if ($user instanceof User) {
+            $user = $this->enrichUser->execute($user, $oauthUser);
+        } else {
             $user = $this->createUser($oauthUser);
         }
 
