@@ -21,7 +21,7 @@ return new class extends Migration
             $table->string('callback_url')->nullable();
             $table->integer('cost')->default(0);
             $table->string('version')->default('1');
-            $table->foreignId('tenant_id')->constrained()->cascadeOnDelete();
+            $table->foreignUuid('tenant_id')->constrained()->cascadeOnDelete();
             $table->timestamps();
 
             $table->index('type');

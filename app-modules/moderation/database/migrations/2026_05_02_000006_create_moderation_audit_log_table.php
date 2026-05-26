@@ -18,7 +18,7 @@ return new class extends Migration
             $table->uuid('case_id')->nullable();
             $table->jsonb('details');
             $table->string('platform', 20)->nullable();
-            $table->unsignedBigInteger('tenant_id')->nullable();
+            $table->uuid('tenant_id')->nullable();
             $table->timestampTz('created_at')->useCurrent();
 
             $table->index(['tenant_id', 'created_at'], 'idx_audit_tenant_date');

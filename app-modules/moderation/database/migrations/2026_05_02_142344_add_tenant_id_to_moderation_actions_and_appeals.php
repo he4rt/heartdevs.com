@@ -12,11 +12,11 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('moderation_actions', function (Blueprint $table): void {
-            $table->foreignId('tenant_id')->nullable()->after('automated')->constrained('tenants')->nullOnDelete();
+            $table->foreignUuid('tenant_id')->nullable()->after('automated')->constrained('tenants')->nullOnDelete();
         });
 
         Schema::table('moderation_appeals', function (Blueprint $table): void {
-            $table->foreignId('tenant_id')->nullable()->after('sla_deadline')->constrained('tenants')->nullOnDelete();
+            $table->foreignUuid('tenant_id')->nullable()->after('sla_deadline')->constrained('tenants')->nullOnDelete();
         });
 
         DB::statement('

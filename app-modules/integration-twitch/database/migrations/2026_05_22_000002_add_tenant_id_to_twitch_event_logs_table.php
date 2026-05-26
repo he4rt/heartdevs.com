@@ -11,7 +11,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('twitch_event_logs', function (Blueprint $table): void {
-            $table->foreignId('tenant_id')->nullable()->after('id')->constrained()->nullOnDelete();
+            $table->foreignUuid('tenant_id')->nullable()->after('id')->constrained()->nullOnDelete();
         });
     }
 

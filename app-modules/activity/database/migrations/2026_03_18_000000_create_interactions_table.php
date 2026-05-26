@@ -13,7 +13,7 @@ return new class extends Migration
         Schema::create('interactions', function (Blueprint $table): void {
             $table->uuid('id')->primary();
             $table->foreignUuid('character_id')->constrained('characters');
-            $table->foreignId('tenant_id')->constrained('tenants');
+            $table->foreignUuid('tenant_id')->constrained('tenants');
             $table->string('type');
             $table->string('provider');
             $table->string('value_tier');

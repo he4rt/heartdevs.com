@@ -12,7 +12,7 @@ return new class extends Migration
     {
         Schema::create('moderation_events', function (Blueprint $table): void {
             $table->uuid('id')->primary();
-            $table->foreignId('tenant_id')->constrained('tenants');
+            $table->foreignUuid('tenant_id')->constrained('tenants');
             $table->foreignUuid('external_identity_id')->nullable()->constrained('external_identities');
             $table->foreignUuid('moderator_identity_id')->nullable()->constrained('external_identities');
             $table->string('type');

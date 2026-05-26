@@ -12,7 +12,7 @@ return new class extends Migration
     {
         Schema::create('message_mentions', function (Blueprint $table): void {
             $table->uuid('id')->primary();
-            $table->foreignId('tenant_id')->constrained('tenants');
+            $table->foreignUuid('tenant_id')->constrained('tenants');
             $table->foreignUuid('message_id')->constrained('messages')->cascadeOnDelete();
             $table->foreignUuid('mentioned_identity_id')->nullable()->constrained('external_identities');
             $table->string('mentioned_provider_account_id');
@@ -36,7 +36,7 @@ return new class extends Migration
 
         Schema::create('message_threads', function (Blueprint $table): void {
             $table->uuid('id')->primary();
-            $table->foreignId('tenant_id')->constrained('tenants');
+            $table->foreignUuid('tenant_id')->constrained('tenants');
             $table->foreignUuid('message_id')->constrained('messages')->cascadeOnDelete();
             $table->string('provider_thread_id');
             $table->string('name')->nullable();

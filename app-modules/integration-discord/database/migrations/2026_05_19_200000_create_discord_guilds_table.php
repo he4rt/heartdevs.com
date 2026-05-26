@@ -15,7 +15,7 @@ return new class extends Migration
     {
         Schema::create('discord_guilds', function (Blueprint $table): void {
             $table->id();
-            $table->foreignId('tenant_id')->nullable()->constrained('tenants')->nullOnDelete();
+            $table->foreignUuid('tenant_id')->nullable()->constrained('tenants')->nullOnDelete();
             $table->string('discord_guild_id')->unique();
             $table->string('name');
             $table->string('icon')->nullable();

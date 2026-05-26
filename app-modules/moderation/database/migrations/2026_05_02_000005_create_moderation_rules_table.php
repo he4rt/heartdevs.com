@@ -20,7 +20,7 @@ return new class extends Migration
             $table->string('severity', 20);
             $table->string('action_on_match', 30);
             $table->boolean('is_active')->default(true);
-            $table->foreignId('tenant_id')->nullable()->constrained('tenants')->nullOnDelete();
+            $table->foreignUuid('tenant_id')->nullable()->constrained('tenants')->nullOnDelete();
             $table->timestampsTz();
 
             $table->index(['is_active', 'tenant_id'], 'idx_rules_active');
