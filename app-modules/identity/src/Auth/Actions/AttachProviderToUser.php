@@ -32,6 +32,7 @@ final class AttachProviderToUser
                     'username' => $oauthUser->username,
                 ]),
                 'connected_at' => now(),
+                'disconnected_at' => null,
                 'connected_by' => auth()->id(),
             ]
         );
