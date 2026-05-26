@@ -94,7 +94,7 @@ class ConnectionHub extends Component
             ->success()
             ->send();
 
-        $this->redirect(request()->url());
+        $this->redirect(filament()->getCurrentPanel()->getUrl(filament()->getTenant()));
     }
 
     public function cancelMerge(): void
