@@ -64,9 +64,9 @@ class AppPanelProvider extends PanelProvider
                 Authenticate::class,
             ]);
 
-        app()->isLocal()
-            ? $panel->tenant(model: Tenant::class, slugAttribute: 'slug')
-            : $panel->tenantDomain('{tenant:domain}')->tenant(model: Tenant::class, slugAttribute: 'domain');
+        app()->isProduction()
+            ? $panel->tenantDomain('{tenant:domain}')->tenant(model: Tenant::class, slugAttribute: 'domain')
+            : $panel->tenant(model: Tenant::class, slugAttribute: 'slug');
 
         return $panel;
     }

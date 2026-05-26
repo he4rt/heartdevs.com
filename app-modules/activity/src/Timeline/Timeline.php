@@ -85,7 +85,7 @@ final class Timeline extends Model
     {
         return [
             'user_id' => 'string',
-            'tenant_id' => 'integer',
+            'tenant_id' => 'string',
             'root_id' => 'string',
             'parent_id' => 'string',
             'is_ignored' => 'boolean',

@@ -112,11 +112,12 @@ test('null tenantId falls back to request input', function (): void {
 });
 
 test('throws exception when identity not found', function (): void {
+    $tenant = Tenant::factory()->create();
     $action = new FindExternalIdentity();
 
     $action->handle(
         provider: IdentityProvider::Discord->value,
         providerId: 'nonexistent-id',
-        tenantId: '1',
+        tenantId: (string) $tenant->id,
     );
 })->throws(ExternalIdentityException::class);
