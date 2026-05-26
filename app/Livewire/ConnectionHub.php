@@ -5,11 +5,14 @@ declare(strict_types=1);
 namespace App\Livewire;
 
 use Filament\Notifications\Notification;
+use He4rt\Identity\Auth\Actions\MergeAccountsAction;
 use He4rt\Identity\ExternalIdentity\Enums\IdentityProvider;
 use He4rt\Identity\ExternalIdentity\Models\ExternalIdentity;
 use He4rt\Identity\Tenant\Models\Tenant;
+use He4rt\Identity\User\Models\User;
 use Illuminate\Contracts\View\View;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Support\Facades\Auth;
 use Livewire\Component;
 
 class ConnectionHub extends Component
@@ -18,10 +21,16 @@ class ConnectionHub extends Component
 
     public string $tenantId = '';
 
+    public bool $showMergeModal = false;
+
+    /** @var array<string, mixed>|null */
+    public ?array $mergeData = null;
+
     public function mount(): void
     {
         $this->panel = filament()->getCurrentPanel()?->getId() ?? 'app';
         $this->tenantId = filament()->getTenant()?->getKey() ?? '';
+        $this->checkPendingMerge();
     }
 
     public function render(): View
@@ -40,6 +49,7 @@ class ConnectionHub extends Component
             'userProviders' => $this->getUserProviders(),
             'supportedProviders' => $supportedProviders,
             'panel' => $this->panel,
+            'mergeTarget' => $this->getMergeTarget(),
         ]);
     }
 
@@ -52,6 +62,46 @@ class ConnectionHub extends Component
             'panel' => $this->panel,
             'provider' => $provider->value,
         ]));
+    }
+
+    public function confirmMerge(MergeAccountsAction $action): void
+    {
+        if ($this->mergeData === null) {
+            return;
+        }
+
+        $oldUser = User::query()->find($this->mergeData['conflicting_user_id']);
+
+        if (!$oldUser instanceof User) {
+            $this->cancelMerge();
+
+            return;
+        }
+
+        /** @var User $currentUser */
+        $currentUser = auth()->user();
+
+        $action->execute($currentUser, $oldUser);
+
+        session()->forget('oauth_merge_pending');
+        $this->showMergeModal = false;
+        $this->mergeData = null;
+
+        Auth::login($oldUser);
+
+        Notification::make()
+            ->title('Contas unificadas com sucesso')
+            ->success()
+            ->send();
+
+        $this->redirect(request()->url());
+    }
+
+    public function cancelMerge(): void
+    {
+        session()->forget('oauth_merge_pending');
+        $this->showMergeModal = false;
+        $this->mergeData = null;
     }
 
     public function disconnect(IdentityProvider $provider): void
@@ -105,6 +155,47 @@ class ConnectionHub extends Component
             ->title($identity->provider->getLabel().' disconnected successfully')
             ->success()
             ->send();
+    }
+
+    private function checkPendingMerge(): void
+    {
+        $pending = session()->get('oauth_merge_pending');
+
+        if ($pending === null) {
+            return;
+        }
+
+        $this->mergeData = $pending;
+        $this->showMergeModal = true;
+    }
+
+    /**
+     * @return array<string, mixed>|null
+     */
+    private function getMergeTarget(): ?array
+    {
+        if ($this->mergeData === null) {
+            return null;
+        }
+
+        $user = User::query()->find($this->mergeData['conflicting_user_id']);
+
+        if (!$user instanceof User) {
+            return null;
+        }
+
+        $messagesCount = ExternalIdentity::query()
+            ->where('model_type', (new User)->getMorphClass())
+            ->where('model_id', $user->id)
+            ->withCount('messages')
+            ->get()
+            ->sum('messages_count');
+
+        return [
+            'username' => $user->username,
+            'created_at' => $user->created_at?->format('d/m/Y'),
+            'messages_count' => $messagesCount,
+        ];
     }
 
     /** @return Collection<int, ExternalIdentity> */

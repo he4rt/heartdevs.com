@@ -4,6 +4,7 @@
     /** @var \He4rt\Identity\ExternalIdentity\Enums\IdentityProvider[] $supportedProviders */
     /** @var \Illuminate\Database\Eloquent\Collection<int, ExternalIdentity> $userProviders */
     /** @var string $panel */
+    /** @var array<string, mixed>|null $mergeTarget */
 @endphp
 
 <div class="space-y-2">
@@ -51,7 +52,7 @@
 
                 {{-- Content --}}
                 <div class="min-w-0 flex-1">
-                    <div class="flex items-baseline justify-between gap-2">
+                    <div class="flex items-baseline gap-2">
                         <span class="truncate text-sm font-medium text-white">{{ $provider->getLabel() }}</span>
                         @if ($connected)
                             <span class="shrink-0 text-[10px] text-gray-500">
@@ -137,4 +138,46 @@
             @endif
         </div>
     @endforeach
+
+    {{-- Merge Confirmation Modal --}}
+    @if ($showMergeModal && $mergeTarget)
+        <div
+            x-data="{ open: true }"
+            x-show="open"
+            x-transition
+            class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4"
+        >
+            <div class="w-full max-w-sm rounded-xl border border-gray-700 bg-gray-900 p-6 shadow-2xl">
+                <div class="mb-4 flex items-center gap-2">
+                    <x-filament::icon icon="heroicon-o-link" class="h-5 w-5 text-amber-400" />
+                    <h3 class="text-base font-semibold text-white">Conta existente encontrada</h3>
+                </div>
+
+                <p class="mb-4 text-sm text-gray-300">Já existe uma conta vinculada a esse provedor:</p>
+
+                <div class="mb-4 rounded-lg border border-gray-700/60 bg-gray-800/50 p-3">
+                    <div class="flex items-center justify-between">
+                        <span class="text-sm font-medium text-white">@ {{ $mergeTarget['username'] }}</span>
+                        <span class="text-xs text-gray-400">{{ $mergeTarget['created_at'] }}</span>
+                    </div>
+                    @if ($mergeTarget['messages_count'] > 0)
+                        <div class="mt-1 text-xs text-gray-400">
+                            {{ number_format($mergeTarget['messages_count']) }} mensagens
+                        </div>
+                    @endif
+                </div>
+
+                <p class="mb-5 text-xs text-gray-400">Ao unificar, sua conta atual será absorvida por essa conta e você será relogado automaticamente.</p>
+
+                <div class="flex gap-2">
+                    <x-filament::button wire:click="confirmMerge" color="warning" class="flex-1">
+                        Unificar
+                    </x-filament::button>
+                    <x-filament::button wire:click="cancelMerge" color="gray" class="flex-1">
+                        Cancelar
+                    </x-filament::button>
+                </div>
+            </div>
+        </div>
+    @endif
 </div>
