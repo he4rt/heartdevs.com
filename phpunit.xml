@@ -16,6 +16,14 @@
     <php>
         <ini name="memory_limit" value="2G"/>
         <env name="APP_ENV" value="testing"/>
+        <env name="APP_MAINTENANCE_DRIVER" value="file"/>
+        <env name="SESSION_DRIVER" value="array"/>
+        <env name="BCRYPT_ROUNDS" value="4"/>
+        <env name="MAIL_MAILER" value="array"/>
+        <env name="PULSE_ENABLED" value="false"/>
+        <env name="QUEUE_CONNECTION" value="sync"/>
+        <env name="LARAVEL_CLOUDFLARE_ENABLED" value="false"/>
+
     </php>
     <source>
         <include>
