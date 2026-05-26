@@ -14,8 +14,14 @@ final readonly class OAuthResultDTO
     public function __construct(
         public User $user,
         public Tenant $tenant,
-        public ExternalIdentity $identity,
+        public ?ExternalIdentity $identity,
         public OAuthIntent $intent,
         public string $redirectUrl,
+        public ?MergeConflictDTO $mergeConflict = null,
     ) {}
+
+    public function hasMergeConflict(): bool
+    {
+        return $this->mergeConflict instanceof MergeConflictDTO;
+    }
 }

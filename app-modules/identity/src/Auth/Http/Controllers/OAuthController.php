@@ -47,6 +47,12 @@ final class OAuthController extends Controller
 
         $result = $action->execute($state, $identityProvider, request()->input('code'));
 
+        if ($result->hasMergeConflict()) {
+            session()->put('oauth_merge_pending', $result->mergeConflict->toSession());
+
+            return redirect()->to($result->redirectUrl);
+        }
+
         if ($result->intent === OAuthIntent::Login) {
             Auth::login($result->user);
             filament()->setCurrentPanel(filament()->getPanel($state->panel));
