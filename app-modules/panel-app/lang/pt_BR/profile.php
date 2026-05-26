@@ -10,6 +10,7 @@ return [
         'address' => 'Localização',
         'social_links' => 'Links Sociais',
         'availability' => 'Disponibilidade',
+        'connections' => 'Conexões',
     ],
 
     'fields' => [

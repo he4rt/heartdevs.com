@@ -17,8 +17,8 @@
             {{ $this->form }}
         </div>
 
-        {{-- Preview card (right, 1/3, sticky) --}}
-        <div class="hidden xl:sticky xl:top-4 xl:block">
+        {{-- Preview card + connections (right, 1/3, sticky) --}}
+        <div class="hidden space-y-6 xl:sticky xl:top-4 xl:block">
             @include ('panel-app::components.profile-preview-card',
                 [
                     'data' => $this->data,
@@ -28,6 +28,13 @@
                     'avatarPreviewUrl' => $this->avatarPreviewUrl,
                     'coverPreviewUrl' => $this->coverPreviewUrl
                 ])
+
+            <div class="rounded-xl bg-gray-900 p-4">
+                <h3 class="mb-3 text-sm font-semibold text-white">
+                    {{ __('panel-app::profile.sections.connections') }}
+                </h3>
+                <livewire:connection-hub />
+            </div>
         </div>
     </div>
 </x-filament::page>

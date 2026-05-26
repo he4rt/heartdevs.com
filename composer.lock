@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "4e47b86d5b937f7c6f0c2389b843576f",
+    "content-hash": "6782a8a6a8107256add87f9f75234354",
     "packages": [
         {
             "name": "blade-ui-kit/blade-heroicons",
@@ -3445,6 +3445,42 @@
             "autoload-dev": {
                 "psr-4": {
                     "He4rt\\IntegrationDiscord\\Tests\\": "tests/"
+                }
+            },
+            "license": [
+                "proprietary"
+            ],
+            "transport-options": {
+                "symlink": true,
+                "relative": true
+            }
+        },
+        {
+            "name": "he4rt/integration-github",
+            "version": "1.0.0",
+            "dist": {
+                "type": "path",
+                "url": "app-modules/integration-github",
+                "reference": "51b547836d200a8c8150d5e51bdff565e1f90f8f"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "He4rt\\IntegrationGithub\\IntegrationGithubServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "He4rt\\IntegrationGithub\\": "src/",
+                    "He4rt\\IntegrationGithub\\Database\\Factories\\": "database/factories/",
+                    "He4rt\\IntegrationGithub\\Database\\Seeders\\": "database/seeders/"
+                }
+            },
+            "autoload-dev": {
+                "psr-4": {
+                    "He4rt\\IntegrationGithub\\Tests\\": "tests/"
                 }
             },
             "license": [
