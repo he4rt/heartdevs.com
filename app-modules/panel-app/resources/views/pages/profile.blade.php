@@ -29,8 +29,8 @@
                     'coverPreviewUrl' => $this->coverPreviewUrl
                 ])
 
-            <div class="rounded-xl bg-gray-900 p-4">
-                <h3 class="mb-3 text-sm font-semibold text-white">
+            <div class="rounded-xl bg-white p-4 ring-1 ring-gray-950/5 dark:bg-gray-900 dark:ring-white/10">
+                <h3 class="mb-3 text-sm font-semibold text-gray-900 dark:text-white">
                     {{ __('panel-app::profile.sections.connections') }}
                 </h3>
                 <livewire:connection-hub />

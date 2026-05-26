@@ -25,10 +25,11 @@
         @endphp
         <div
             wire:key="provider-{{ $provider->value }}"
-            class="relative overflow-hidden rounded-lg border transition-all duration-200"
-            style="{{ $connected
-                ? "border-color: {$brandColor}30;"
-                : 'border-color: rgb(55 65 81 / 0.4);' }}"
+            @class ([
+                'relative overflow-hidden rounded-lg border transition-all duration-200',
+                'border-gray-200 dark:border-gray-700/40' => !$connected
+            ])
+            @if ($connected) style="border-color: {{ $brandColor }}30;" @endif
         >
             <div class="flex items-center gap-2.5 p-2.5">
                 {{-- Provider icon --}}
@@ -45,7 +46,7 @@
                     </div>
                     @if ($connected)
                         <div
-                            class="absolute -right-0.5 -bottom-0.5 h-2.5 w-2.5 rounded-full border-2 border-gray-900 bg-emerald-400"
+                            class="absolute -right-0.5 -bottom-0.5 h-2.5 w-2.5 rounded-full border-2 border-white bg-emerald-400 dark:border-gray-900"
                         ></div>
                     @endif
                 </div>
@@ -53,9 +54,12 @@
                 {{-- Content --}}
                 <div class="min-w-0 flex-1">
                     <div class="flex items-baseline gap-2">
-                        <span class="truncate text-sm font-medium text-white">{{ $provider->getLabel() }}</span>
+                        <span
+                            class="truncate text-sm font-medium text-gray-900 dark:text-white"
+                            >{{ $provider->getLabel() }}</span
+                        >
                         @if ($connected)
-                            <span class="shrink-0 text-[10px] text-gray-500">
+                            <span class="shrink-0 text-[10px] text-gray-400 dark:text-gray-500">
                                 {{
                                     $connected->connected_at
                                         ->timezone(config('app.display_timezone'))
@@ -75,7 +79,7 @@
                                     loading="lazy"
                                 />
                             @endif
-                            <span class="truncate text-gray-300">{{
+                            <span class="truncate text-gray-500 dark:text-gray-300">{{
                                 $connected->metadata['username'] ??
                                     $connected->external_account_id
                             }}</span>
@@ -88,7 +92,7 @@
                     <button
                         wire:click="disconnect('{{ $provider->value }}')"
                         type="button"
-                        class="shrink-0 rounded-md px-2 py-0.5 text-[11px] font-medium text-gray-400 ring-1 ring-gray-700/60 transition-all hover:text-red-400 hover:ring-red-500/40"
+                        class="shrink-0 rounded-md px-2 py-0.5 text-[11px] font-medium text-gray-500 ring-1 ring-gray-300 transition-all hover:text-red-500 hover:ring-red-400/40 dark:text-gray-400 dark:ring-gray-700/60 dark:hover:text-red-400 dark:hover:ring-red-500/40"
                     >
                         Disconnect
                     </button>
@@ -101,17 +105,17 @@
 
             {{-- Permissions --}}
             @if (!$connected && count($scopes) > 0)
-                <div x-data="{ open: false }" class="border-t border-gray-800/50">
+                <div x-data="{ open: false }" class="border-t border-gray-200 dark:border-gray-800/50">
                     <button
                         @click="open = !open"
                         type="button"
-                        class="flex w-full items-center gap-1 px-2.5 py-1.5 text-[10px] font-medium tracking-wider text-gray-500 uppercase transition-colors hover:text-gray-400"
+                        class="flex w-full items-center gap-1 px-2.5 py-1.5 text-[10px] font-medium tracking-wider text-gray-400 uppercase transition-colors hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-400"
                     >
                         <span class="transition-transform duration-200" :class="open && 'rotate-90'">
                             <x-filament::icon icon="heroicon-m-chevron-right" class="h-2.5 w-2.5" />
                         </span>
                         <span>Permissions</span>
-                        <span class="text-gray-600">({{ count($scopes) }})</span>
+                        <span class="text-gray-300 dark:text-gray-600">({{ count($scopes) }})</span>
                     </button>
                     <div
                         x-show="open"
@@ -127,7 +131,7 @@
                         <div class="flex flex-wrap gap-1">
                             @foreach ($scopes as $scope)
                                 <code
-                                    class="rounded bg-gray-800/80 px-1 py-0.5 font-mono text-[9px] text-gray-400 ring-1 ring-gray-700/50"
+                                    class="rounded bg-gray-100 px-1 py-0.5 font-mono text-[9px] text-gray-500 ring-1 ring-gray-200 dark:bg-gray-800/80 dark:text-gray-400 dark:ring-gray-700/50"
                                 >
                                     {{ $scope }}
                                 </code>
@@ -147,27 +151,33 @@
             x-transition
             class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4"
         >
-            <div class="w-full max-w-sm rounded-xl border border-gray-700 bg-gray-900 p-6 shadow-2xl">
+            <div
+                class="w-full max-w-sm rounded-xl border border-gray-200 bg-white p-6 shadow-2xl dark:border-gray-700 dark:bg-gray-900"
+            >
                 <div class="mb-4 flex items-center gap-2">
                     <x-filament::icon icon="heroicon-o-link" class="h-5 w-5 text-amber-400" />
-                    <h3 class="text-base font-semibold text-white">Conta existente encontrada</h3>
+                    <h3 class="text-base font-semibold text-gray-900 dark:text-white">Conta existente encontrada</h3>
                 </div>
 
-                <p class="mb-4 text-sm text-gray-300">Já existe uma conta vinculada a esse provedor:</p>
+                <p class="mb-4 text-sm text-gray-600 dark:text-gray-300">Já existe uma conta vinculada a esse provedor:</p>
 
-                <div class="mb-4 rounded-lg border border-gray-700/60 bg-gray-800/50 p-3">
+                <div
+                    class="mb-4 rounded-lg border border-gray-200 bg-gray-50 p-3 dark:border-gray-700/60 dark:bg-gray-800/50"
+                >
                     <div class="flex items-center justify-between">
-                        <span class="text-sm font-medium text-white">@ {{ $mergeTarget['username'] }}</span>
-                        <span class="text-xs text-gray-400">{{ $mergeTarget['created_at'] }}</span>
+                        <span class="text-sm font-medium text-gray-900 dark:text-white"
+                            >@ {{ $mergeTarget['username'] }}</span
+                        >
+                        <span class="text-xs text-gray-500 dark:text-gray-400">{{ $mergeTarget['created_at'] }}</span>
                     </div>
                     @if ($mergeTarget['messages_count'] > 0)
-                        <div class="mt-1 text-xs text-gray-400">
+                        <div class="mt-1 text-xs text-gray-500 dark:text-gray-400">
                             {{ number_format($mergeTarget['messages_count']) }} mensagens
                         </div>
                     @endif
                 </div>
 
-                <p class="mb-5 text-xs text-gray-400">Ao unificar, sua conta atual será absorvida por essa conta e você será relogado automaticamente.</p>
+                <p class="mb-5 text-xs text-gray-500 dark:text-gray-400">Ao unificar, sua conta atual será absorvida por essa conta e você será relogado automaticamente.</p>
 
                 <div class="flex gap-2">
                     <x-filament::button wire:click="confirmMerge" color="warning" class="flex-1">
