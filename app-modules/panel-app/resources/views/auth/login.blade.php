@@ -96,6 +96,14 @@
                         @svg ('fab-github', 'h-5 w-5')
                         Continuar com GitHub
                     </a>
+
+                    <a
+                        href="{{ route('oauth.redirect', ['tenant' => request()->getHost(), 'panel' => 'app', 'provider' => 'twitch']) }}"
+                        class="flex items-center justify-center gap-2.5 rounded-lg bg-[#9146FF] px-4 py-2.5 text-sm font-medium text-white transition hover:bg-[#7B2FF0]"
+                    >
+                        @svg ('fab-twitch', 'h-5 w-5')
+                        Continuar com Twitch
+                    </a>
                 </div>
 
                 {{-- Divider --}}

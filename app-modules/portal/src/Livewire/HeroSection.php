@@ -84,7 +84,9 @@ final class HeroSection extends Component
             ->inRandomOrder()
             ->limit(10)
             ->pluck('metadata')
-            ->map(fn (array $metadata) => sprintf('https://github.com/%s.png', $metadata['name']))
+            ->filter(fn (array $metadata) => isset($metadata['username']))
+            ->map(fn (array $metadata) => sprintf('https://github.com/%s.png', $metadata['username']))
+            ->values()
             ->all();
     }
 
