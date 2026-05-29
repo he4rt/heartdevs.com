@@ -10,6 +10,7 @@ use He4rt\Events\Enrollment\Enums\EnrollmentMethod;
 use He4rt\Events\Enrollment\Enums\EnrollmentStatus;
 use He4rt\Events\Enrollment\Enums\TriggeredBy;
 use He4rt\Events\Enrollment\Events\EnrollmentConfirmed;
+use He4rt\Events\Enrollment\Events\EnrollmentWaitlisted;
 use He4rt\Events\Enrollment\Exceptions\EnrollmentException;
 use He4rt\Events\Enrollment\Models\Enrollment;
 use He4rt\Events\Enrollment\Models\EnrollmentPolicy;
@@ -54,6 +55,15 @@ final readonly class EnrollUserAction
                         eventId: $dto->eventId,
                         userId: $dto->userId,
                         xpRewardOnConfirmed: $policy->xp_on_confirmed ?? 0,
+                    ));
+                }
+
+                if ($initial['status']->isWaitlisted()) {
+                    event(new EnrollmentWaitlisted(
+                        enrollmentId: $enrollment->id,
+                        eventId: $dto->eventId,
+                        userId: $dto->userId,
+                        waitlistPosition: $initial['waitlistPosition'],
                     ));
                 }
 

@@ -8,6 +8,7 @@ use He4rt\Events\Enrollment\Enums\EnrollmentMethod;
 use He4rt\Events\Enrollment\Enums\EnrollmentStatus;
 use He4rt\Events\Enrollment\Enums\TriggeredBy;
 use He4rt\Events\Enrollment\Events\EnrollmentConfirmed;
+use He4rt\Events\Enrollment\Events\EnrollmentWaitlisted;
 use He4rt\Events\Enrollment\Exceptions\EnrollmentException;
 use He4rt\Events\Enrollment\Models\Enrollment;
 use He4rt\Events\Enrollment\Models\EnrollmentPolicy;
@@ -145,7 +146,7 @@ test('when an event uses application enrollment method, then rsvp enrollment is 
 })->throws(EnrollmentException::class);
 
 test('when event is at capacity with waitlist enabled, then enrollment is waitlisted', function (): void {
-    EventFacade::fake([EnrollmentConfirmed::class]);
+    EventFacade::fake([EnrollmentConfirmed::class, EnrollmentWaitlisted::class]);
 
     $user = User::factory()->create();
     $tenant = Tenant::factory()->create();
@@ -170,6 +171,11 @@ test('when event is at capacity with waitlist enabled, then enrollment is waitli
         ->and($enrollment->confirmed_at)->toBeNull();
 
     EventFacade::assertNotDispatched(EnrollmentConfirmed::class);
+
+    EventFacade::assertDispatched(fn (EnrollmentWaitlisted $event): bool => $event->enrollmentId === $enrollment->id
+        && $event->eventId === $enrollment->event_id
+        && $event->userId === $user->id
+        && $event->waitlistPosition === 1);
 });
 
 test('when event is at capacity without waitlist, then enrollment is rejected', function (): void {
