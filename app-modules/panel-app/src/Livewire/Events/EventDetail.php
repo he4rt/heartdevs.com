@@ -8,7 +8,6 @@ use Filament\Notifications\Notification;
 use He4rt\Events\Enrollment\Actions\EnrollUserAction;
 use He4rt\Events\Enrollment\DTOs\EnrollUserDTO;
 use He4rt\Events\Enrollment\Enums\EnrollmentMethod;
-use He4rt\Events\Enrollment\Enums\EnrollmentStatus;
 use He4rt\Events\Enrollment\Exceptions\EnrollmentException;
 use He4rt\Events\Enrollment\Models\Enrollment;
 use He4rt\Events\Event\Enums\EventStatus;
@@ -72,16 +71,37 @@ final class EventDetail extends Component
             return true;
         }
 
-        $confirmedCount = Enrollment::query()
+        $occupiedCount = Enrollment::query()
             ->where('event_id', $this->eventId)
-            ->where('status', EnrollmentStatus::Confirmed)
+            ->active()
             ->count();
 
-        if ($confirmedCount < $policy->capacity) {
+        if ($occupiedCount < $policy->capacity) {
             return true;
         }
 
         return $policy->has_waitlist;
+    }
+
+    #[Computed]
+    public function isEventFull(): bool
+    {
+        if ($this->enrollment !== null) {
+            return false;
+        }
+
+        $policy = $this->event->enrollmentPolicy;
+
+        if ($policy?->capacity === null || $policy->has_waitlist) {
+            return false;
+        }
+
+        $occupiedCount = Enrollment::query()
+            ->where('event_id', $this->eventId)
+            ->active()
+            ->count();
+
+        return $occupiedCount >= $policy->capacity;
     }
 
     public function confirmPresence(): void
@@ -94,11 +114,11 @@ final class EventDetail extends Component
                 EnrollUserDTO::fromModels($this->event, $user),
             );
 
-            unset($this->enrollment, $this->canConfirmPresence);
+            unset($this->enrollment, $this->canConfirmPresence, $this->isEventFull);
 
             Notification::make()
                 ->success()
-                ->title($enrollment->status->getResponseMessage())
+                ->title($enrollment->status->getResponseMessage($enrollment->waitlist_position))
                 ->send();
         } catch (EnrollmentException $enrollmentException) {
             Notification::make()
