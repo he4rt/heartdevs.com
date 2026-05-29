@@ -113,7 +113,7 @@ class PanelAdminServiceProvider extends ServiceProvider
             NavigationItem::make(__('panel-admin::moderation.navigation.back_to_admin'))
                 ->sort(0)
                 ->icon('heroicon-o-arrow-left')
-                ->url(Dashboard::getUrl()),
+                ->url(Dashboard::getUrl(['tenant' => filament()->getTenant()])),
 
         ])->groups(resolve(ModerationCluster::class)->getCachedSubNavigation());
     }
@@ -124,7 +124,7 @@ class PanelAdminServiceProvider extends ServiceProvider
             NavigationItem::make(__('panel-admin::marketing.navigation.back_to_admin'))
                 ->sort(0)
                 ->icon('heroicon-o-arrow-left')
-                ->url(Dashboard::getUrl()),
+                ->url(Dashboard::getUrl(['tenant' => filament()->getTenant()])),
 
         ])->groups(resolve(MarketingCluster::class)->getCachedSubNavigation());
     }
@@ -135,7 +135,7 @@ class PanelAdminServiceProvider extends ServiceProvider
             NavigationItem::make(__('panel-admin::twitch.navigation.back_to_admin'))
                 ->sort(0)
                 ->icon('heroicon-o-arrow-left')
-                ->url(Dashboard::getUrl()),
+                ->url(Dashboard::getUrl(['tenant' => filament()->getTenant()])),
 
         ])->groups(resolve(TwitchCluster::class)->getCachedSubNavigation());
     }

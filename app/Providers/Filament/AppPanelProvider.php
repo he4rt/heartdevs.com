@@ -31,10 +31,10 @@ class AppPanelProvider extends PanelProvider
     public function panel(Panel $panel): Panel
     {
         $panel
+            ->default()
             ->id($this->panelId->value)
             ->path($this->panelId->value)
             ->login(LoginPage::class)
-            ->topbar(false)
             ->colors([
                 'primary' => Color::Purple,
                 'gray' => Color::Zinc,

@@ -6,6 +6,64 @@
 @source '../../../../app-modules/**/resources/**/*';
 @source '../../../../app-modules/**/src/**/*';
 
+:root {
+    --sidebar-width: 280px;
+}
+
+/* Sidebar Modern Aesthetics */
 .fi-sidebar {
-    @apply bg-gray-100 dark:bg-gray-900;
+    @apply bg-white dark:bg-zinc-950 border-r border-zinc-200 dark:border-white/5 shadow-xl transition-all duration-300;
+}
+
+.fi-sidebar-header {
+    @apply py-6 border-b border-zinc-200 dark:border-white/5;
+}
+
+.fi-sidebar-nav {
+    @apply px-4 py-6;
+}
+
+.fi-sidebar-item-button {
+    @apply rounded-xl transition-all duration-200 py-2.5 px-4 !important;
+}
+
+.fi-sidebar-item-button:hover {
+    @apply bg-zinc-100 dark:bg-white/5 !important;
+}
+
+.fi-sidebar-item-active .fi-sidebar-item-button {
+    @apply bg-purple-500/10 text-purple-600 dark:text-purple-400 ring-1 ring-purple-500/20 shadow-lg shadow-purple-900/10 !important;
+}
+
+/* Topbar & Dropdowns */
+.fi-topbar {
+    @apply bg-white/80 dark:bg-zinc-950/80 backdrop-blur-xl border-b border-zinc-200 dark:border-white/5 sticky top-0 z-30 shadow-sm;
+}
+
+.fi-dropdown-panel {
+    @apply bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-white/10 shadow-2xl rounded-2xl backdrop-blur-xl z-50 !important;
+}
+
+/* Page Spacing */
+.fi-main {
+    @apply p-8 lg:p-12;
+}
+
+/* Animations from Login (reused) */
+@keyframes login-float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-12px); }
+}
+
+@keyframes heartbeat {
+    0% { transform: scale(1); }
+    10% { transform: scale(1.05); }
+    20% { transform: scale(1); }
+    30% { transform: scale(1.05); }
+    40% { transform: scale(1); }
+    100% { transform: scale(1); }
+}
+
+.animate-heartbeat {
+    animation: heartbeat 3s ease-in-out infinite;
 }

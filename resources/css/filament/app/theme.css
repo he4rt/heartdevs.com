@@ -1,32 +1,9 @@
 @import '../../../../vendor/filament/filament/resources/css/theme.css';
 
 @source '../../../../app/Filament/**/*';
-@source '../../../../app/Filament/**/*';
 @source '../../../../resources/views/**/*';
 @source '../../../../app-modules/**/src/Filament/**/*';
 @source '../../../../app-modules/**/resources/views/**/*';
-
-/* Login split layout — strip Filament's card wrapper */
-.fi-simple-layout:has(.fi-login-split) {
-    .fi-simple-main-ctn {
-        align-items: stretch;
-    }
-
-    .fi-simple-main {
-        margin: 0;
-        padding: 0;
-        max-width: none;
-        background: transparent;
-        box-shadow: none;
-        border-radius: 0;
-        --tw-ring-shadow: 0 0 #0000;
-    }
-
-    .fi-simple-page,
-    .fi-simple-page-content {
-        display: contents;
-    }
-}
 
 @keyframes login-float {
     0%,
@@ -46,4 +23,17 @@
     50% {
         opacity: 0.35;
     }
+}
+
+@keyframes heartbeat {
+    0% { transform: scale(1); }
+    10% { transform: scale(1.05); }
+    20% { transform: scale(1); }
+    30% { transform: scale(1.05); }
+    40% { transform: scale(1); }
+    100% { transform: scale(1); }
+}
+
+.animate-heartbeat {
+    animation: heartbeat 3s ease-in-out infinite;
 }

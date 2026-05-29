@@ -32,6 +32,9 @@ class AdminPanelProvider extends PanelProvider
             ->id('admin')
             ->path('admin')
             ->login(Login::class)
+            ->brandName('He4rt Admin')
+            ->brandLogo(fn () => view('he4rt::components.base.logo'))
+            ->brandLogoHeight('2.5rem')
             ->colors(function (): array {
                 $colors = Color::all();
 
@@ -44,6 +47,7 @@ class AdminPanelProvider extends PanelProvider
                 ];
             })
             ->sidebarCollapsibleOnDesktop()
+            ->tenantMenu(false)
             ->tenant(Tenant::class, slugAttribute: 'slug')
             ->tenantProfile(EditTenantProfilePage::class)
             ->viteTheme('resources/css/filament/admin/theme.css')
