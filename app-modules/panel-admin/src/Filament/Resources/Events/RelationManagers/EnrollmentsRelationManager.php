@@ -49,6 +49,12 @@ final class EnrollmentsRelationManager extends RelationManager
                     ->badge()
                     ->sortable(),
 
+                TextColumn::make('waitlist_position')
+                    ->label('Waitlist')
+                    ->sortable()
+                    ->placeholder('-')
+                    ->toggleable(),
+
                 TextColumn::make('enrolled_at')
                     ->label('Enrolled At')
                     ->dateTime()
