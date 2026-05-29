@@ -19,6 +19,7 @@ use He4rt\Identity\Tenant\Models\Tenant;
 use He4rt\Identity\User\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Event as EventFacade;
+use Symfony\Component\HttpFoundation\Response;
 
 uses(RefreshDatabase::class);
 
@@ -178,7 +179,7 @@ test('when event is at capacity with waitlist enabled, then enrollment is waitli
         && $event->waitlistPosition === 1);
 });
 
-test('when event is at capacity without waitlist, then enrollment is rejected', function (): void {
+test('when event is at capacity without waitlist, then enrollment is rejected with 422', function (): void {
     $user = User::factory()->create();
     $tenant = Tenant::factory()->create();
     $event = createRsvpEvent($tenant, [], [
@@ -195,8 +196,81 @@ test('when event is at capacity without waitlist, then enrollment is rejected', 
         'confirmed_at' => now(),
     ]);
 
-    resolve(EnrollUserAction::class)->handle(EnrollUserDTO::fromModels($event, $user));
-})->throws(EnrollmentException::class);
+    try {
+        resolve(EnrollUserAction::class)->handle(EnrollUserDTO::fromModels($event, $user));
+        expect(false)->toBeTrue('Expected EnrollmentException was not thrown');
+    } catch (EnrollmentException $enrollmentException) {
+        expect($enrollmentException->getCode())->toBe(Response::HTTP_UNPROCESSABLE_ENTITY);
+    }
+});
+
+test('when event has unlimited capacity, then all enrollments are confirmed', function (): void {
+    EventFacade::fake([EnrollmentConfirmed::class, EnrollmentWaitlisted::class]);
+
+    $tenant = Tenant::factory()->create();
+    $event = createRsvpEvent($tenant, [], [
+        'capacity' => null,
+        'has_waitlist' => true,
+    ]);
+
+    $users = User::factory()->count(3)->create();
+
+    foreach ($users as $user) {
+        $enrollment = resolve(EnrollUserAction::class)->handle(EnrollUserDTO::fromModels($event, $user));
+
+        expect($enrollment->status)->toBe(EnrollmentStatus::Confirmed);
+    }
+
+    expect(Enrollment::query()->where('event_id', $event->id)->active()->count())->toBe(3);
+
+    EventFacade::assertNotDispatched(EnrollmentWaitlisted::class);
+});
+
+test('when multiple users enroll beyond capacity with waitlist, then fifo waitlist positions are assigned', function (): void {
+    EventFacade::fake([EnrollmentConfirmed::class, EnrollmentWaitlisted::class]);
+
+    $tenant = Tenant::factory()->create();
+    $event = createRsvpEvent($tenant, [], [
+        'capacity' => 2,
+        'has_waitlist' => true,
+    ]);
+
+    $users = User::factory()->count(4)->create();
+    $results = [];
+
+    foreach ($users as $user) {
+        $results[] = resolve(EnrollUserAction::class)->handle(EnrollUserDTO::fromModels($event, $user));
+    }
+
+    expect(Enrollment::query()->where('event_id', $event->id)->active()->count())->toBe(2)
+        ->and($results[0]->status)->toBe(EnrollmentStatus::Confirmed)
+        ->and($results[1]->status)->toBe(EnrollmentStatus::Confirmed)
+        ->and($results[2]->status)->toBe(EnrollmentStatus::Waitlisted)
+        ->and($results[2]->waitlist_position)->toBe(1)
+        ->and($results[3]->status)->toBe(EnrollmentStatus::Waitlisted)
+        ->and($results[3]->waitlist_position)->toBe(2);
+});
+
+test('when enrollments are processed in rapid succession, then active count never exceeds capacity', function (): void {
+    EventFacade::fake([EnrollmentConfirmed::class, EnrollmentWaitlisted::class]);
+
+    $tenant = Tenant::factory()->create();
+    $event = createRsvpEvent($tenant, [], [
+        'capacity' => 2,
+        'has_waitlist' => true,
+    ]);
+
+    $users = User::factory()->count(5)->create();
+
+    foreach ($users as $user) {
+        resolve(EnrollUserAction::class)->handle(EnrollUserDTO::fromModels($event, $user));
+
+        expect(Enrollment::query()->where('event_id', $event->id)->active()->count())->toBeLessThanOrEqual(2);
+    }
+
+    expect(Enrollment::query()->where('event_id', $event->id)->active()->count())->toBe(2)
+        ->and(Enrollment::query()->where('event_id', $event->id)->waitlisted()->count())->toBe(3);
+});
 
 test('when checked-in enrollment occupies the last seat, then new enrollment is waitlisted', function (): void {
     EventFacade::fake([EnrollmentConfirmed::class]);
