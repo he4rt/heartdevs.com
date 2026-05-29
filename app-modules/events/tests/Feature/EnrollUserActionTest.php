@@ -192,6 +192,34 @@ test('when event is at capacity without waitlist, then enrollment is rejected', 
     resolve(EnrollUserAction::class)->handle(EnrollUserDTO::fromModels($event, $user));
 })->throws(EnrollmentException::class);
 
+test('when checked-in enrollment occupies the last seat, then new enrollment is waitlisted', function (): void {
+    EventFacade::fake([EnrollmentConfirmed::class]);
+
+    $user = User::factory()->create();
+    $tenant = Tenant::factory()->create();
+    $event = createRsvpEvent($tenant, [], [
+        'capacity' => 1,
+        'has_waitlist' => true,
+    ]);
+
+    $existingUser = User::factory()->create();
+    Enrollment::factory()->create([
+        'event_id' => $event->id,
+        'user_id' => $existingUser->id,
+        'status' => EnrollmentStatus::CheckedIn,
+        'enrolled_at' => now(),
+        'confirmed_at' => now(),
+        'checked_in_at' => now(),
+    ]);
+
+    $enrollment = resolve(EnrollUserAction::class)->handle(EnrollUserDTO::fromModels($event, $user));
+
+    expect($enrollment->status)->toBe(EnrollmentStatus::Waitlisted)
+        ->and($enrollment->waitlist_position)->toBe(1);
+
+    EventFacade::assertNotDispatched(EnrollmentConfirmed::class);
+});
+
 test('when event has available capacity, then enrollment is confirmed', function (): void {
     EventFacade::fake([EnrollmentConfirmed::class]);
 

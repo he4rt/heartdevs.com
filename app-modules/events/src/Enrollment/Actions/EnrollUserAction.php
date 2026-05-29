@@ -103,12 +103,12 @@ final readonly class EnrollUserAction
             ];
         }
 
-        $confirmedCount = Enrollment::query()
+        $occupiedCount = Enrollment::query()
             ->where('event_id', $eventId)
-            ->confirmed()
+            ->active()
             ->count();
 
-        if ($confirmedCount < $capacity) {
+        if ($occupiedCount < $capacity) {
             return [
                 'status' => EnrollmentStatus::Confirmed,
                 'waitlistPosition' => null,
