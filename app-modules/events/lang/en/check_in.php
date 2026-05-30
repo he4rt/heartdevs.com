@@ -7,4 +7,6 @@ return [
     'check_in_outside_event_date_range' => 'Check-in date must be within the event date range.',
     'already_checked_in_for_date' => 'This enrollment has already checked in for this date.',
     'invalid_check_in_actor' => 'Manual check-in requires the organizer user id.',
+    'qr_token_not_found' => 'QR token not found or does not belong to this event.',
+    'qr_token_expired' => 'This QR token has expired.',
 ];
