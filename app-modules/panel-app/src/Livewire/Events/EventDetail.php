@@ -4,7 +4,14 @@ declare(strict_types=1);
 
 namespace He4rt\PanelApp\Livewire\Events;
 
+use BaconQrCode\Renderer\Image\SvgImageBackEnd;
+use BaconQrCode\Renderer\ImageRenderer;
+use BaconQrCode\Renderer\RendererStyle\RendererStyle;
+use BaconQrCode\Writer;
 use Filament\Notifications\Notification;
+use He4rt\Events\CheckIn\Enums\CheckInMethod;
+use He4rt\Events\CheckIn\Models\CheckIn;
+use He4rt\Events\CheckIn\Models\QrToken;
 use He4rt\Events\Enrollment\Actions\EnrollUserAction;
 use He4rt\Events\Enrollment\DTOs\EnrollUserDTO;
 use He4rt\Events\Enrollment\Enums\EnrollmentMethod;
@@ -15,6 +22,7 @@ use He4rt\Events\Event\Enums\EventStatus;
 use He4rt\Events\Event\Models\Event;
 use He4rt\Identity\User\Models\User;
 use Illuminate\Contracts\View\View;
+use Illuminate\Support\Collection;
 use Livewire\Attributes\Computed;
 use Livewire\Component;
 
@@ -42,9 +50,62 @@ final class EventDetail extends Component
     public function enrollment(): ?Enrollment
     {
         return Enrollment::query()
+            ->with('qrToken')
             ->where('event_id', $this->eventId)
             ->where('user_id', auth()->id())
             ->first();
+    }
+
+    #[Computed]
+    public function qrToken(): ?QrToken
+    {
+        if ($this->enrollment === null) {
+            return null;
+        }
+
+        if (!in_array($this->enrollment->status, [EnrollmentStatus::Confirmed, EnrollmentStatus::CheckedIn], strict: true)) {
+            return null;
+        }
+
+        if ($this->event->enrollmentPolicy?->check_in_method !== CheckInMethod::QrCode) {
+            return null;
+        }
+
+        return $this->enrollment->qrToken;
+    }
+
+    #[Computed]
+    public function qrCodeSvg(): ?string
+    {
+        if ($this->qrToken === null) {
+            return null;
+        }
+
+        $writer = new Writer(new ImageRenderer(new RendererStyle(200), new SvgImageBackEnd()));
+
+        return $writer->writeString($this->qrToken->token);
+    }
+
+    /** @return Collection<int, CheckIn> */
+    #[Computed]
+    public function checkIns(): Collection
+    {
+        if ($this->enrollment === null) {
+            return collect();
+        }
+
+        return CheckIn::query()
+            ->where('enrollment_id', $this->enrollment->id)
+            ->oldest('event_date')
+            ->get();
+    }
+
+    #[Computed]
+    public function hasCheckedInToday(): bool
+    {
+        return $this->checkIns->contains(
+            fn (CheckIn $c): bool => $c->event_date->isToday(),
+        );
     }
 
     #[Computed]
