@@ -15,11 +15,18 @@ use He4rt\Events\CheckIn\DTOs\QrCheckInDTO;
 use He4rt\Events\CheckIn\Exceptions\CheckInException;
 use He4rt\Events\Event\Models\Event;
 use He4rt\PanelAdmin\Filament\Resources\Events\EventResource;
+use Livewire\Attributes\On;
 use Throwable;
 
 final class EditEvent extends EditRecord
 {
     protected static string $resource = EventResource::class;
+
+    #[On('reopen-scan-qr')]
+    public function reopenScanQrModal(): void
+    {
+        $this->mountAction('scanQr');
+    }
 
     protected function getHeaderActions(): array
     {
@@ -32,6 +39,7 @@ final class EditEvent extends EditRecord
                     TextInput::make('token')
                         ->label('QR Token')
                         ->required()
+                        ->autofocus()
                         ->placeholder('Scan or paste the participant token'),
                 ])
                 ->modalSubmitActionLabel('Check In')
@@ -71,9 +79,10 @@ final class EditEvent extends EditRecord
                             ->send();
 
                         report($e);
+                    } finally {
+                        $this->dispatch('reopen-scan-qr');
                     }
-                })
-                ->after(fn () => $this->mountAction('scanQr')),
+                }),
             DeleteAction::make(),
         ];
     }
