@@ -33,6 +33,7 @@ final class NumericCodeCheckIn extends Component
     public function enrollment(): ?Enrollment
     {
         return Enrollment::query()
+            ->with('event.enrollmentPolicy')
             ->where('event_id', $this->eventId)
             ->where('user_id', auth()->id())
             ->first();
@@ -45,7 +46,7 @@ final class NumericCodeCheckIn extends Component
             return false;
         }
 
-        if ($this->event->enrollmentPolicy?->check_in_method !== CheckInMethod::NumericCode) {
+        if ($this->enrollment->event->enrollmentPolicy?->check_in_method !== CheckInMethod::NumericCode) {
             return false;
         }
 
