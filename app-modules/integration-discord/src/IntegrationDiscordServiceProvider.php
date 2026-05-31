@@ -4,9 +4,13 @@ declare(strict_types=1);
 
 namespace He4rt\IntegrationDiscord;
 
+use He4rt\IntegrationDiscord\ETL\Console\BackfillVoiceLogsCommand;
 use He4rt\IntegrationDiscord\ETL\Console\ImportDiscordMessagesCommand;
 use He4rt\IntegrationDiscord\ETL\Console\ImportDiscordProfilesCommand;
 use He4rt\IntegrationDiscord\ETL\Console\MergeDuplicateDiscordProfilesCommand;
+use He4rt\IntegrationDiscord\Models\DiscordEventLog;
+use He4rt\IntegrationDiscord\Sync\Console\SyncDiscordGuildCommand;
+use He4rt\IntegrationDiscord\Sync\Observers\DiscordEventLogObserver;
 use He4rt\IntegrationDiscord\Transport\DiscordConnector;
 use He4rt\IntegrationDiscord\Transport\DiscordOAuthConnector;
 use Illuminate\Support\ServiceProvider;
@@ -28,11 +32,15 @@ class IntegrationDiscordServiceProvider extends ServiceProvider
 
     public function boot(): void
     {
+        DiscordEventLog::observe(DiscordEventLogObserver::class);
+
         if ($this->app->runningInConsole()) {
             $this->commands([
                 ImportDiscordProfilesCommand::class,
                 ImportDiscordMessagesCommand::class,
                 MergeDuplicateDiscordProfilesCommand::class,
+                SyncDiscordGuildCommand::class,
+                BackfillVoiceLogsCommand::class,
             ]);
         }
     }

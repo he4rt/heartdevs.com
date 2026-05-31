@@ -28,7 +28,7 @@ return new class extends Migration
             $table->timestampTz('assigned_at')->nullable();
             $table->timestampTz('resolved_at')->nullable();
             $table->foreignUuid('author_id')->nullable()->constrained('users')->nullOnDelete();
-            $table->foreignId('tenant_id')->nullable()->constrained('tenants')->nullOnDelete();
+            $table->foreignUuid('tenant_id')->nullable()->constrained('tenants')->nullOnDelete();
             $table->timestampsTz();
 
             $table->index(['tenant_id', 'status', 'priority', 'created_at'], 'idx_cases_queue');

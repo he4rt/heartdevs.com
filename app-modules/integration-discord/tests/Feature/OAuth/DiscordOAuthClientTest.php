@@ -66,16 +66,19 @@ it('gets authenticated user and returns DiscordOAuthUser', function (): void {
 
 it('generates correct redirect url', function (): void {
     config()->set('services.discord.scopes', 'identify email');
+    config()->set('app.url', 'http://localhost:8000');
 
     $connector = new DiscordOAuthConnector('my-client-id', 'client-secret', 'https://example.com/callback');
     $client = new DiscordOAuthClient($connector);
 
     $url = $client->redirectUrl();
 
+    $expectedCallback = urlencode('http://localhost:8000/auth/oauth/discord');
+
     expect($url)
         ->toContain('https://discord.com/oauth2/authorize')
         ->toContain('client_id=my-client-id')
         ->toContain('response_type=code')
-        ->toContain('redirect_uri='.urlencode('https://example.com/callback'))
+        ->toContain('redirect_uri='.$expectedCallback)
         ->toContain('scope=identify+email');
 });

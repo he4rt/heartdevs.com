@@ -12,7 +12,7 @@ final readonly class TrackActivityDTO
 {
     public function __construct(
         public string $characterId,
-        public int $tenantId,
+        public string $tenantId,
         public ActivityType $type,
         public IdentityProvider $provider,
         public DateTimeImmutable $occurredAt,

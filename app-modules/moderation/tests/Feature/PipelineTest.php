@@ -12,10 +12,7 @@ use He4rt\Moderation\Enums\CaseSource;
 use He4rt\Moderation\Enums\CaseStatus;
 use He4rt\Moderation\Enums\Platform;
 use He4rt\Moderation\Rules\ModerationRule;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Http;
-
-uses(RefreshDatabase::class);
 
 test('IngestContent creates a ModerationCase from DTO', function (): void {
     $dto = new ModerationContentDTO(

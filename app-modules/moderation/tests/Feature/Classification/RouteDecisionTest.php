@@ -10,9 +10,6 @@ use He4rt\Moderation\Enforcement\ModerationAction;
 use He4rt\Moderation\Enums\ActionType;
 use He4rt\Moderation\Enums\CaseStatus;
 use He4rt\Moderation\Enums\Platform;
-use Illuminate\Foundation\Testing\RefreshDatabase;
-
-uses(RefreshDatabase::class);
 
 test('dismisses case when max score below flag threshold', function (): void {
     $case = ModerationCase::factory()->create([

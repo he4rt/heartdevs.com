@@ -25,13 +25,6 @@ final class Wallet extends Model
     use HasFactory;
     use HasUuids;
 
-    protected $fillable = [
-        'owner_type',
-        'owner_id',
-        'currency',
-        'balance',
-    ];
-
     /**
      * @return MorphTo<Model, $this>
      */

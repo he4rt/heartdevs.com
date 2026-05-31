@@ -86,7 +86,11 @@
                     }}
                 </p>
                 <p class="mt-0.5 text-xs text-red-600/70 dark:text-red-400/60">
-                    {{ __('panel-admin::moderation.appeal_queue.detail.sla_deadline') }}: {{ $appeal->sla_deadline->format('M d, Y H:i') }}
+                    {{ __('panel-admin::moderation.appeal_queue.detail.sla_deadline') }}: {{
+                        $appeal->sla_deadline
+                            ->timezone(config('app.display_timezone'))
+                            ->format('M d, Y H:i')
+                    }}
                 </p>
             </div>
         </div>
@@ -381,7 +385,11 @@
                             'text-zinc-700 dark:text-zinc-300' => !$isOverdue
                         ])
                     >
-                        {{ $appeal->sla_deadline?->format('M d, Y H:i') ?? '—' }}
+                        {{
+                            $appeal->sla_deadline
+                                ?->timezone(config('app.display_timezone'))
+                                ->format('M d, Y H:i') ?? '—'
+                        }}
                     </div>
                     @if ($appeal->sla_deadline && !$appeal->status->isResolved())
                         <div

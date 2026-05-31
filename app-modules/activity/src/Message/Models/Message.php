@@ -11,6 +11,7 @@ use He4rt\Activity\Message\Enums\MessageSourceKind;
 use He4rt\Activity\Reaction\Concerns\HasReactions;
 use He4rt\Identity\ExternalIdentity\Models\ExternalIdentity;
 use He4rt\Identity\Tenant\Models\Tenant;
+use Illuminate\Database\Eloquent\Attributes\Table;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -26,7 +27,7 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
  * @property string $content
  * @property int $obtained_experience
  * @property Carbon|null $sent_at
- * @property int $tenant_id
+ * @property string $tenant_id
  * @property array<string, mixed>|null $metadata
  * @property int $reactions_count
  * @property int $reactions_total
@@ -42,37 +43,13 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
  */
+#[Table(name: 'messages')]
 final class Message extends Model
 {
     /** @use HasFactory<MessageFactory> */
     use HasFactory;
     use HasReactions;
     use HasUuids;
-
-    protected $table = 'messages';
-
-    protected $fillable = [
-        'id',
-        'tenant_id',
-        'external_identity_id',
-        'provider_message_id',
-        'channel_id',
-        'content',
-        'sent_at',
-        'obtained_experience',
-        'metadata',
-        'reactions_count',
-        'reactions_total',
-        'kind',
-        'raw_message_type',
-        'source_kind',
-        'is_pinned',
-        'mentions_everyone',
-        'mention_role_count',
-        'edited_at',
-        'reply_to_provider_message_id',
-        'reply_to_message_id',
-    ];
 
     /**
      * @return BelongsTo<ExternalIdentity, $this>

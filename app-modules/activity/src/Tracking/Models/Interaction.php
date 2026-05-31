@@ -12,6 +12,7 @@ use He4rt\Activity\Tracking\Enums\ValueTier;
 use He4rt\Gamification\Character\Models\Character;
 use He4rt\Identity\ExternalIdentity\Enums\IdentityProvider;
 use He4rt\Identity\Tenant\Models\Tenant;
+use Illuminate\Database\Eloquent\Attributes\Table;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -21,7 +22,7 @@ use Illuminate\Database\Eloquent\Relations\MorphTo;
 /**
  * @property string $id
  * @property string $character_id
- * @property int $tenant_id
+ * @property string $tenant_id
  * @property ActivityType $type
  * @property IdentityProvider $provider
  * @property ValueTier $value_tier
@@ -37,33 +38,12 @@ use Illuminate\Database\Eloquent\Relations\MorphTo;
  * @property Carbon $occurred_at
  * @property Carbon|null $reviewed_at
  */
+#[Table(name: 'interactions')]
 final class Interaction extends Model
 {
     /** @use HasFactory<InteractionFactory> */
     use HasFactory;
     use HasUuids;
-
-    protected $table = 'interactions';
-
-    protected $fillable = [
-        'id',
-        'character_id',
-        'tenant_id',
-        'type',
-        'provider',
-        'value_tier',
-        'coins_min',
-        'coins_max',
-        'coins_awarded',
-        'xp_awarded',
-        'status',
-        'source_type',
-        'source_id',
-        'external_ref',
-        'metadata',
-        'occurred_at',
-        'reviewed_at',
-    ];
 
     /**
      * @return BelongsTo<Character, $this>

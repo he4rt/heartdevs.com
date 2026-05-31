@@ -100,7 +100,11 @@ final class DiscordMessageAdapter implements MessageActivityAdapter
         $out = [];
         $position = 0;
         foreach ($mentions as $mention) {
-            if (!is_array($mention) || !isset($mention['id'])) {
+            if (!is_array($mention)) {
+                continue;
+            }
+
+            if (!isset($mention['id'])) {
                 continue;
             }
 
@@ -124,7 +128,11 @@ final class DiscordMessageAdapter implements MessageActivityAdapter
 
         $out = [];
         foreach ($attachments as $attachment) {
-            if (!is_array($attachment) || !isset($attachment['url'])) {
+            if (!is_array($attachment)) {
+                continue;
+            }
+
+            if (!isset($attachment['url'])) {
                 continue;
             }
 

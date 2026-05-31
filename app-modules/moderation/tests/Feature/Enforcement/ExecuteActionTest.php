@@ -9,10 +9,7 @@ use He4rt\Moderation\Enforcement\ExecuteAction;
 use He4rt\Moderation\Enforcement\ModerationAction;
 use He4rt\Moderation\Enums\CaseStatus;
 use He4rt\Moderation\Platform\PlatformRegistry;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Notification;
-
-uses(RefreshDatabase::class);
 
 beforeEach(function (): void {
     Notification::fake();

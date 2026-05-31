@@ -16,7 +16,7 @@ final class Feed extends Component
     use HasLoadMore;
 
     #[Locked]
-    public int $tenantId;
+    public string $tenantId;
 
     #[On('timeline.post-created')]
     #[On('timeline.reply-created')]

@@ -12,9 +12,6 @@ use He4rt\Moderation\Cases\Models\ModerationCase;
 use He4rt\Moderation\Enforcement\ActionExecuted;
 use He4rt\Moderation\Enforcement\ModerationAction;
 use He4rt\Moderation\Enums\CaseStatus;
-use Illuminate\Foundation\Testing\RefreshDatabase;
-
-uses(RefreshDatabase::class);
 
 test('records audit log on CaseCreated event', function (): void {
     $case = ModerationCase::factory()->create();
@@ -97,5 +94,5 @@ test('audit log stores tenant_id from case', function (): void {
     $listener->handleCaseCreated(new CaseCreated($case));
 
     $log = ModerationAuditLog::query()->where('event_type', 'case_created')->first();
-    expect((int) $log->tenant_id)->toBe($tenant->id);
+    expect($log->tenant_id)->toBe($tenant->id);
 });

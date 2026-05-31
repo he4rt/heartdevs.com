@@ -7,9 +7,6 @@ use He4rt\Moderation\Appeals\ModerationAppeal;
 use He4rt\Moderation\Appeals\ReviewAppeal;
 use He4rt\Moderation\Enforcement\ModerationAction;
 use He4rt\Moderation\Enums\AppealStatus;
-use Illuminate\Foundation\Testing\RefreshDatabase;
-
-uses(RefreshDatabase::class);
 
 test('upholds appeal and records reviewer', function (): void {
     $moderator = User::factory()->create();

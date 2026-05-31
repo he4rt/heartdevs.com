@@ -15,9 +15,10 @@ use Filament\Support\Colors\Color;
 use He4rt\Identity\Tenant\Models\Tenant;
 use He4rt\PanelAdmin\Http\Middleware\ApplyTenantScopes;
 use He4rt\PanelAdmin\Pages\Dashboard;
+use He4rt\PanelAdmin\Tenant\EditTenantProfilePage;
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
 use Illuminate\Cookie\Middleware\EncryptCookies;
-use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
+use Illuminate\Foundation\Http\Middleware\PreventRequestForgery;
 use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Session\Middleware\StartSession;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
@@ -31,12 +32,20 @@ class AdminPanelProvider extends PanelProvider
             ->id('admin')
             ->path('admin')
             ->login(Login::class)
-            ->colors([
-                'primary' => Color::Purple,
-                'gray' => Color::Zinc,
-            ])
+            ->colors(function (): array {
+                $colors = Color::all();
+
+                unset($colors['gray']);
+
+                return [
+                    'primary' => Color::Purple,
+                    'gray' => Color::Zinc,
+                    ...$colors,
+                ];
+            })
             ->sidebarCollapsibleOnDesktop()
             ->tenant(Tenant::class, slugAttribute: 'slug')
+            ->tenantProfile(EditTenantProfilePage::class)
             ->viteTheme('resources/css/filament/admin/theme.css')
             ->middleware([
                 EncryptCookies::class,
@@ -44,7 +53,7 @@ class AdminPanelProvider extends PanelProvider
                 StartSession::class,
                 AuthenticateSession::class,
                 ShareErrorsFromSession::class,
-                VerifyCsrfToken::class,
+                PreventRequestForgery::class,
                 SubstituteBindings::class,
                 DisableBladeIconComponents::class,
                 DispatchServingFilamentEvent::class,

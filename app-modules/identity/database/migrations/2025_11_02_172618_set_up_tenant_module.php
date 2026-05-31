@@ -26,7 +26,7 @@ return new class() extends Migration
 
         foreach ($tables as $table => $indexableColumns) {
             Schema::table($table, function (Blueprint $table) use ($indexableColumns): void {
-                $table->foreignId('tenant_id')
+                $table->foreignUuid('tenant_id')
                     ->after('id')
                     ->constrained('tenants')
                     ->nullOnDelete();
@@ -36,12 +36,7 @@ return new class() extends Migration
                 }
             });
         }
-
     }
 
-    public function down(): void
-    {
-        // Don't listen to the haters
-        // Schema::dropIfExists('tenant');
-    }
+    public function down(): void {}
 };

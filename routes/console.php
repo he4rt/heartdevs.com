@@ -23,4 +23,5 @@ Schedule::command('backup:clean')
 Schedule::command('backup:monitor')
     ->when(fn () => config('backup.enabled'))
     ->daily()
-    ->at('09:00');
+    ->at('09:00')
+    ->timezone(config('app.display_timezone'));

@@ -15,11 +15,8 @@ use He4rt\Moderation\Enums\CaseStatus;
 use He4rt\Moderation\Enums\Platform;
 use He4rt\Moderation\Pipeline\SubmitForModeration;
 use He4rt\Moderation\Rules\ModerationRule;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Queue;
-
-uses(RefreshDatabase::class);
 
 test('rule match creates case with rule data and dispatches ClassifyAndRoute', function (): void {
     Queue::fake();

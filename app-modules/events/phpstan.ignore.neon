@@ -1,6 +1,2 @@
 parameters:
-    ignoreErrors:
-        - message: '#^Call to an undefined method Filament\\Panel::currentPanel\(\)\.$#'
-          identifier: method.notFound
-          count: 1
-          path: src/Providers/EventsServiceProvider.php
+    ignoreErrors: []

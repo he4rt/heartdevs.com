@@ -1,0 +1,32 @@
+<?php
+
+declare(strict_types=1);
+
+namespace He4rt\IntegrationGithub;
+
+use He4rt\IntegrationGithub\Transport\GitHubApiConnector;
+use He4rt\IntegrationGithub\Transport\GitHubOAuthConnector;
+use Illuminate\Support\ServiceProvider;
+use RuntimeException;
+
+class IntegrationGithubServiceProvider extends ServiceProvider
+{
+    public function register(): void
+    {
+        $this->app->singleton(GitHubOAuthConnector::class, function (): GitHubOAuthConnector {
+            $clientId = config('services.github.client_id');
+            $clientSecret = config('services.github.client_secret');
+
+            throw_if($clientId === null || $clientSecret === null, RuntimeException::class, 'GitHub OAuth credentials are not configured (services.github.client_id / client_secret).');
+
+            return new GitHubOAuthConnector(
+                clientId: $clientId,
+                clientSecret: $clientSecret,
+            );
+        });
+
+        $this->app->singleton(GitHubApiConnector::class, fn () => new GitHubApiConnector());
+    }
+
+    public function boot(): void {}
+}

@@ -6,6 +6,7 @@ namespace He4rt\Community\Meeting\Models;
 
 use Carbon\Carbon;
 use He4rt\Community\Database\Factories\MeetingTypeFactory;
+use Illuminate\Database\Eloquent\Attributes\Table;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -16,18 +17,11 @@ use Illuminate\Database\Eloquent\Model;
  * @property Carbon $start_at
  * @property-read string $meeting_day_for_humans
  */
+#[Table(name: 'meeting_types')]
 final class MeetingType extends Model
 {
     /** @use HasFactory<MeetingTypeFactory> */
     use HasFactory;
-
-    protected $table = 'meeting_types';
-
-    protected $fillable = [
-        'name',
-        'week_day',
-        'start_at',
-    ];
 
     protected static function newFactory(): MeetingTypeFactory
     {

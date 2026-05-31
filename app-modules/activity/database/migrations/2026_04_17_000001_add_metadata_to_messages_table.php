@@ -12,13 +12,13 @@ return new class extends Migration
     {
         if (!Schema::hasColumn('messages', 'tenant_id')) {
             Schema::table('messages', function (Blueprint $table): void {
-                $table->foreignId('tenant_id')->nullable()->after('id')->constrained('tenants');
+                $table->foreignUuid('tenant_id')->nullable()->after('id')->constrained('tenants');
             });
         }
 
         if (!Schema::hasColumn('voice_messages', 'tenant_id')) {
             Schema::table('voice_messages', function (Blueprint $table): void {
-                $table->foreignId('tenant_id')->nullable()->after('id')->constrained('tenants');
+                $table->foreignUuid('tenant_id')->nullable()->after('id')->constrained('tenants');
             });
         }
 

@@ -10,10 +10,7 @@ use He4rt\Moderation\Enforcement\ExecuteAction;
 use He4rt\Moderation\Enforcement\ModerationAction;
 use He4rt\Moderation\Enums\ActionType;
 use He4rt\Moderation\Enums\Platform;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Bus;
-
-uses(RefreshDatabase::class);
 
 test('creates action and dispatches ExecuteAction for discord case', function (): void {
     Bus::fake([ExecuteAction::class]);

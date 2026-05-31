@@ -12,10 +12,7 @@ use He4rt\Moderation\Enums\CaseStatus;
 use He4rt\Moderation\Enums\Platform;
 use He4rt\Moderation\Enums\ViolationType;
 use He4rt\Moderation\Rules\ModerationRule;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Http;
-
-uses(RefreshDatabase::class);
 
 beforeEach(function (): void {
     Http::fake(['api.openai.com/*' => Http::response([

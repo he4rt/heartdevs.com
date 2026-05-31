@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace He4rt\Identity\User\Models;
 
+use App\Concerns\HasAddress;
 use Filament\Models\Contracts\FilamentUser;
 use Filament\Models\Contracts\HasName;
 use Filament\Models\Contracts\HasTenants;
@@ -14,6 +15,7 @@ use He4rt\Identity\ExternalIdentity\Models\ExternalIdentity;
 use He4rt\Identity\Tenant\Concerns\InteractsWithTenants;
 use He4rt\Identity\User\Observers\UserObserver;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
+use Illuminate\Database\Eloquent\Attributes\Table;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -29,14 +31,19 @@ use Spatie\MediaLibrary\InteractsWithMedia;
  * @property string $id
  * @property string $name
  * @property string $username
- * @property string $email
+ * @property string|null $email
  * @property bool $is_donator
- * @property Carbon $created_at
- * @property Carbon $updated_at
+ * @property Carbon|null $suspended_until
+ * @property Carbon|null $banned_at
+ * @property Carbon|null $first_login_at
+ * @property Carbon|null $created_at
+ * @property Carbon|null $updated_at
  */
 #[ObservedBy(UserObserver::class)]
+#[Table(name: 'users')]
 final class User extends Authenticatable implements FilamentUser, HasMedia, HasName, HasTenants
 {
+    use HasAddress;
     /** @use HasFactory<UserFactory> */
     use HasFactory;
     use HasUuids;
@@ -44,38 +51,9 @@ final class User extends Authenticatable implements FilamentUser, HasMedia, HasN
     use InteractsWithTenants;
     use Notifiable;
 
-    protected $table = 'users';
-
-    protected $fillable = [
-        'id',
-        'username',
-        'name',
-        'email',
-        'password',
-        'is_donator',
-        'suspended_until',
-        'banned_at',
-    ];
-
     public function isAdmin(): bool
     {
         return in_array($this->username, str(config('he4rt.admins'))->explode(',')->toArray(), true);
-    }
-
-    /**
-     * @return HasOne<Address, $this>
-     */
-    public function address(): HasOne
-    {
-        return $this->hasOne(Address::class);
-    }
-
-    /**
-     * @return HasOne<Information, $this>
-     */
-    public function information(): HasOne
-    {
-        return $this->hasOne(Information::class);
     }
 
     /**
@@ -102,6 +80,11 @@ final class User extends Authenticatable implements FilamentUser, HasMedia, HasN
     public function registerMediaCollections(): void
     {
         $this->addMediaCollection('avatar')
+            ->singleFile()
+            ->useDisk('public');
+
+        $this->addMediaCollection('cover')
+            ->singleFile()
             ->useDisk('public');
     }
 
@@ -150,6 +133,7 @@ final class User extends Authenticatable implements FilamentUser, HasMedia, HasN
             'password' => 'hashed',
             'suspended_until' => 'datetime',
             'banned_at' => 'datetime',
+            'first_login_at' => 'datetime',
         ];
     }
 }

@@ -18,6 +18,8 @@ use He4rt\Moderation\Enums\CaseSource;
 use He4rt\Moderation\Enums\CaseStatus;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Queue\Attributes\Backoff;
+use Illuminate\Queue\Attributes\Tries;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Support\Facades\Log;
 use Throwable;
@@ -35,15 +37,12 @@ use Throwable;
  * Note: Since classifier_version will always be 'aggregate'/'openai' here (never 'rules'),
  * CaseReadyForEnforcement is never emitted — AI-only results always go to human review.
  */
+#[Backoff([5, 15, 30])]
+#[Tries(3)]
 final class ScreenContent implements ShouldQueue
 {
     use InteractsWithQueue;
     use Queueable;
-
-    public int $tries = 3;
-
-    /** @var array<int, int> */
-    public array $backoff = [5, 15, 30];
 
     public function __construct(
         private readonly ModerationContentDTO $content,

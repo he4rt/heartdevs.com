@@ -36,8 +36,11 @@ final class ExecuteAction implements ShouldQueue
         // An action can target multiple platforms (e.g., Discord + Web ban simultaneously).
         foreach ($this->action->target_platforms as $platformValue) {
             $platform = Platform::tryFrom($platformValue);
+            if ($platform === null) {
+                continue;
+            }
 
-            if ($platform === null || !$registry->has($platform)) {
+            if (!$registry->has($platform)) {
                 continue;
             }
 

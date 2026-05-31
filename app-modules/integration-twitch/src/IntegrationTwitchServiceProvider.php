@@ -4,19 +4,40 @@ declare(strict_types=1);
 
 namespace He4rt\IntegrationTwitch;
 
-use He4rt\IntegrationTwitch\Client\TwitchBaseClient;
-use He4rt\IntegrationTwitch\Contracts\TwitchService;
-use He4rt\IntegrationTwitch\OAuth\Client\TwitchOAuthClient;
-use He4rt\IntegrationTwitch\OAuth\Contracts\TwitchOAuthService;
+use He4rt\IntegrationTwitch\Console\LinkTwitchChannelCommand;
+use He4rt\IntegrationTwitch\Console\SubscribeTwitchEventsCommand;
+use He4rt\IntegrationTwitch\OAuth\TwitchAppTokenService;
+use He4rt\IntegrationTwitch\OAuth\TwitchOAuthClient;
+use He4rt\IntegrationTwitch\Transport\TwitchHelixConnector;
+use He4rt\IntegrationTwitch\Transport\TwitchOAuthConnector;
 use Illuminate\Support\ServiceProvider;
 
 class IntegrationTwitchServiceProvider extends ServiceProvider
 {
     public function register(): void
     {
-        $this->app->bind(TwitchService::class, TwitchBaseClient::class);
-        $this->app->bind(TwitchOAuthService::class, TwitchOAuthClient::class);
+        $this->app->singleton(TwitchOAuthConnector::class, fn (): TwitchOAuthConnector => new TwitchOAuthConnector(
+            clientId: config()->string('services.twitch.client_id'),
+            clientSecret: config()->string('services.twitch.client_secret')
+        ));
+
+        $this->app->singleton(TwitchAppTokenService::class);
+
+        $this->app->singleton(TwitchHelixConnector::class, fn (): TwitchHelixConnector => new TwitchHelixConnector(
+            appToken: $this->app->make(TwitchAppTokenService::class)->getToken(),
+            clientId: config()->string('services.twitch.client_id'),
+        ));
+
+        $this->app->singleton(TwitchOAuthClient::class);
     }
 
-    public function boot(): void {}
+    public function boot(): void
+    {
+        if ($this->app->runningInConsole()) {
+            $this->commands([
+                LinkTwitchChannelCommand::class,
+                SubscribeTwitchEventsCommand::class,
+            ]);
+        }
+    }
 }

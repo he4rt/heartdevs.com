@@ -3,8 +3,6 @@ includes:
     - phpstan.ignore.neon
 
 parameters:
-    reportUnmatchedIgnoredErrors: false
-
     level: 6
 
     paths:

@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Http;
 
 final class DevToApiClient
 {
+    /** @return array<int, array<string, mixed>> */
     public function getArticlesByOrg(string $orgSlug, int $page = 1, int $perPage = 30): array
     {
         $baseUrl = config('integration-devto.api_base_url');
@@ -21,6 +22,7 @@ final class DevToApiClient
         return $response->json() ?? [];
     }
 
+    /** @return array<string, mixed> */
     public function getArticle(int $articleId): array
     {
         $baseUrl = config('integration-devto.api_base_url');

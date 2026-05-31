@@ -11,7 +11,12 @@ class UserObserver
     public function creating(User $user): void
     {
         if (blank($user->username)) {
-            $user->username = str($user->name)->snake();
+            $user->username = str($user->name)->snake()->toString();
         }
+    }
+
+    public function deleted(User $user): void
+    {
+        $user->address()->delete();
     }
 }

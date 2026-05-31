@@ -13,7 +13,7 @@ final class ImportDiscordModerationEventAction
 {
     public function handle(
         DiscordModerationEventDTO $dto,
-        int $tenantId,
+        string $tenantId,
         ?string $sourceMessageId = null,
     ): ModerationEvent {
         $subjectIdentity = $this->resolveSubject($dto, $tenantId);
@@ -51,7 +51,7 @@ final class ImportDiscordModerationEventAction
         return ModerationEvent::query()->create($attributes);
     }
 
-    private function resolveBot(DiscordModerationEventDTO $dto, int $tenantId): ?ExternalIdentity
+    private function resolveBot(DiscordModerationEventDTO $dto, string $tenantId): ?ExternalIdentity
     {
         return ExternalIdentity::query()
             ->where('provider', IdentityProvider::Discord)
@@ -60,7 +60,7 @@ final class ImportDiscordModerationEventAction
             ->first();
     }
 
-    private function resolveSubject(DiscordModerationEventDTO $dto, int $tenantId): ?ExternalIdentity
+    private function resolveSubject(DiscordModerationEventDTO $dto, string $tenantId): ?ExternalIdentity
     {
         if ($dto->subjectDiscordId) {
             return ExternalIdentity::query()
@@ -82,7 +82,7 @@ final class ImportDiscordModerationEventAction
         return null;
     }
 
-    private function resolveModerator(DiscordModerationEventDTO $dto, int $tenantId): ?ExternalIdentity
+    private function resolveModerator(DiscordModerationEventDTO $dto, string $tenantId): ?ExternalIdentity
     {
         if (!$dto->moderatorDiscordId) {
             return null;

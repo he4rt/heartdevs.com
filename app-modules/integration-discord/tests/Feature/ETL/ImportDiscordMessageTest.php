@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use Carbon\CarbonInterface;
 use He4rt\Activity\Message\Enums\MessageKind;
 use He4rt\Activity\Message\Enums\MessageSourceKind;
 use He4rt\Activity\Message\Models\MembershipEvent;
@@ -28,7 +29,6 @@ use He4rt\IntegrationDiscord\ETL\DTOs\DiscordMessageDTO;
 use He4rt\IntegrationDiscord\ETL\DTOs\DiscordMessageReactionDTO;
 use He4rt\IntegrationDiscord\ETL\DTOs\DiscordModerationEventDTO;
 use He4rt\IntegrationDiscord\ETL\DTOs\DiscordVoiceLogDTO;
-use Illuminate\Support\Carbon;
 use Ramsey\Uuid\Uuid;
 
 // ── Helpers ──────────────────────────────────────────────────────
@@ -169,7 +169,7 @@ test('DiscordMessageDTO::toDatabase maps fields and parses sent_at to Carbon', f
     expect($result['provider_message_id'])->toBe('541468820355940381')
         ->and($result['channel_id'])->toBe('541443469642563585')
         ->and($result['content'])->toBe('Olá, mundo!')
-        ->and($result['sent_at'])->toBeInstanceOf(Carbon::class)
+        ->and($result['sent_at'])->toBeInstanceOf(CarbonInterface::class)
         ->and($result['metadata'])->toBeArray()
         ->and($result['tenant_id'])->toBe(1)
         ->and($result['obtained_experience'])->toBe(0);
@@ -181,7 +181,7 @@ test('DiscordMessageReactionDTO returns empty array for message without reaction
     $raw = discordMessage(['reactions' => []]);
     $reactions = DiscordMessageReactionDTO::fromDumpMessage($raw);
 
-    expect($reactions)->toBe([]);
+    expect($reactions)->toBeEmpty();
 });
 
 test('DiscordMessageReactionDTO extracts unicode emoji with null emoji_id', function (): void {
@@ -364,7 +364,7 @@ test('DiscordModerationEventDTO::toDatabase exposes type and occurred_at without
     $result = $dto->toDatabase();
 
     expect($result['type'])->toBe(ModerationType::Ban)
-        ->and($result['occurred_at'])->toBeInstanceOf(Carbon::class)
+        ->and($result['occurred_at'])->toBeInstanceOf(CarbonInterface::class)
         ->and($result)->not->toHaveKey('source_bot');
 });
 
@@ -493,7 +493,7 @@ test('it parses sent_at from discord timestamp', function (): void {
     $action = resolve(ImportDiscordMessageAction::class);
     $message = $action->handle(DiscordMessageDTO::fromDump(discordMessage()), $tenant->getKey());
 
-    expect($message->sent_at)->toBeInstanceOf(Carbon::class)
+    expect($message->sent_at)->toBeInstanceOf(CarbonInterface::class)
         ->and($message->sent_at->year)->toBe(2019);
 });
 
@@ -709,7 +709,7 @@ test('it stores reason and occurred_at from embed', function (): void {
     $event = $action->handle($dto, $tenant->getKey());
 
     expect($event->reason)->toBe('comportamento inadequado')
-        ->and($event->occurred_at)->toBeInstanceOf(Carbon::class);
+        ->and($event->occurred_at)->toBeInstanceOf(CarbonInterface::class);
 });
 
 test('it links source_message_id when provided', function (): void {
@@ -822,7 +822,7 @@ test('it parses edited_at into a Carbon instance', function (): void {
     $action = resolve(ImportDiscordMessageAction::class);
     $message = $action->handle(DiscordMessageDTO::fromDump($raw), $tenant->getKey());
 
-    expect($message->edited_at)->toBeInstanceOf(Carbon::class)
+    expect($message->edited_at)->toBeInstanceOf(CarbonInterface::class)
         ->and($message->edited_at->year)->toBe(2024);
 });
 
@@ -883,7 +883,7 @@ test('it preserves the Dyno log timestamp in occurred_at', function (): void {
     $action = resolve(ImportDiscordVoiceLogAction::class);
     $voice = $action->handle($dto, $tenant->getKey(), []);
 
-    expect($voice->occurred_at)->toBeInstanceOf(Carbon::class)
+    expect($voice->occurred_at)->toBeInstanceOf(CarbonInterface::class)
         ->and($voice->occurred_at->toISOString())->toStartWith('2019-02-03');
 });
 

@@ -2,7 +2,7 @@
 
 FROM postgres:18-alpine
 
-ENV TZ=America/Sao_Paulo
+ENV TZ=Etc/UTC PGTZ=Etc/UTC
 
 RUN set -eux;\
     apk update;\

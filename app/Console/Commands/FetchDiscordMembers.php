@@ -4,17 +4,17 @@ declare(strict_types=1);
 
 namespace App\Console\Commands;
 
+use Illuminate\Console\Attributes\Description;
+use Illuminate\Console\Attributes\Signature;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Sleep;
 
+#[Description('Fetch all guild members from Discord API and save to JSON')]
+#[Signature('discord:fetch-members {--limit=0 : Max members to fetch (0 = all)}')]
 class FetchDiscordMembers extends Command
 {
-    protected $signature = 'discord:fetch-members {--limit=0 : Max members to fetch (0 = all)}';
-
-    protected $description = 'Fetch all guild members from Discord API and save to JSON';
-
     public function handle(): void
     {
         $token = config('he4rt.discord.token');

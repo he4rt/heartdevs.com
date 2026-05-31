@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Providers\Filament;
 
 use App\Enums\FilamentPanel;
-use App\Filament\Pages\Login;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
@@ -14,9 +13,10 @@ use Filament\Panel;
 use Filament\PanelProvider;
 use Filament\Support\Colors\Color;
 use He4rt\Identity\Tenant\Models\Tenant;
-use He4rt\PanelApp\Pages\EventPage;
 use He4rt\PanelApp\Pages\EventsPage;
 use He4rt\PanelApp\Pages\MyEventsPage;
+use He4rt\PanelApp\Pages\LoginPage;
+use He4rt\PanelApp\Pages\ProfilePage;
 use He4rt\PanelApp\Pages\ThreadPage;
 use He4rt\PanelApp\Pages\TimelinePage;
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
@@ -32,20 +32,16 @@ class AppPanelProvider extends PanelProvider
 
     public function panel(Panel $panel): Panel
     {
-        return $panel
+        $panel
             ->id($this->panelId->value)
             ->path($this->panelId->value)
-            ->login(Login::class)
-            ->tenant(
-                model: Tenant::class,
-                slugAttribute: 'slug'
-            )
+            ->login(LoginPage::class)
             ->topbar(false)
             ->colors([
                 'primary' => Color::Purple,
                 'gray' => Color::Zinc,
             ])
-            ->viteTheme('resources/css/filament/admin/theme.css')
+            ->viteTheme('resources/css/filament/app/theme.css')
             ->sidebarCollapsibleOnDesktop()
             ->discoverResources(in: app_path('Filament/App/Resources'), for: 'App\Filament\App\Resources')
             ->discoverPages(in: app_path('Filament/App/Pages'), for: 'App\Filament\App\Pages')
@@ -56,6 +52,7 @@ class AppPanelProvider extends PanelProvider
                 MyEventsPage::class,
                 EventPage::class,
                 ThreadPage::class,
+                ProfilePage::class,
             ])
             ->middleware([
                 EncryptCookies::class,
@@ -71,5 +68,11 @@ class AppPanelProvider extends PanelProvider
             ->authMiddleware([
                 Authenticate::class,
             ]);
+
+        app()->isProduction()
+            ? $panel->tenantDomain('{tenant:domain}')->tenant(model: Tenant::class, slugAttribute: 'domain')
+            : $panel->tenant(model: Tenant::class, slugAttribute: 'slug');
+
+        return $panel;
     }
 }

@@ -17,7 +17,7 @@ use Ramsey\Uuid\Uuid;
 
 final class ImportDiscordProfileAction
 {
-    public function handle(DiscordProfileDTO $dto, int $tenantId): ExternalIdentity
+    public function handle(DiscordProfileDTO $dto, string $tenantId): ExternalIdentity
     {
         $user = $this->resolveUser($dto, $tenantId);
         $user->tenants()->syncWithoutDetaching([$tenantId]);
@@ -46,7 +46,7 @@ final class ImportDiscordProfileAction
         return $discordIdentity;
     }
 
-    private function resolveUser(DiscordProfileDTO $dto, int $tenantId): User
+    private function resolveUser(DiscordProfileDTO $dto, string $tenantId): User
     {
         $identity = ExternalIdentity::query()
             ->where('provider', IdentityProvider::Discord)
@@ -106,7 +106,7 @@ final class ImportDiscordProfileAction
     private function upsertConnectedAccount(
         ConnectedAccountDTO $account,
         User $user,
-        int $tenantId,
+        string $tenantId,
         DiscordProfileDTO $dto,
     ): void {
         $existing = ExternalIdentity::query()

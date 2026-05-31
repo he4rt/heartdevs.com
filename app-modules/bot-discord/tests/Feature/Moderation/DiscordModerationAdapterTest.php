@@ -20,11 +20,8 @@ use He4rt\Moderation\DTOs\ModerationContentDTO;
 use He4rt\Moderation\Enforcement\ModerationAction;
 use He4rt\Moderation\Enums\ActionType;
 use He4rt\Moderation\Enums\Platform;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Saloon\Http\Faking\MockClient;
 use Saloon\Http\Faking\MockResponse;
-
-uses(RefreshDatabase::class);
 
 function makeUserWithDiscord(string $discordId = '999'): User
 {

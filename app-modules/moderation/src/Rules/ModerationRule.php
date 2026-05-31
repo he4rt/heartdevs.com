@@ -25,7 +25,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property Severity $severity
  * @property ActionType $action_on_match
  * @property bool $is_active
- * @property int|null $tenant_id
+ * @property string|null $tenant_id
  * @property Carbon $created_at
  * @property Carbon $updated_at
  */

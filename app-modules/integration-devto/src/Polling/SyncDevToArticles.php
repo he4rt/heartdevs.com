@@ -12,15 +12,15 @@ use He4rt\Activity\Tracking\Models\Interaction;
 use He4rt\Identity\ExternalIdentity\Enums\IdentityProvider;
 use He4rt\Identity\ExternalIdentity\Models\ExternalIdentity;
 use He4rt\Identity\User\Models\User;
+use Illuminate\Console\Attributes\Description;
+use Illuminate\Console\Attributes\Signature;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Log;
 
+#[Description('Sync articles from DevTo organization and track as interactions')]
+#[Signature('devto:sync-articles')]
 class SyncDevToArticles extends Command
 {
-    protected $signature = 'devto:sync-articles';
-
-    protected $description = 'Sync articles from DevTo organization and track as interactions';
-
     public function __construct(
         private readonly DevToApiClient $apiClient,
         private readonly TrackActivity $trackActivity,
@@ -47,7 +47,7 @@ class SyncDevToArticles extends Command
                 match ($result) {
                     'created' => $totalCreated++,
                     'updated' => $totalUpdated++,
-                    'skipped' => $totalSkipped++,
+                    default => $totalSkipped++,
                 };
             }
 
@@ -59,6 +59,7 @@ class SyncDevToArticles extends Command
         return self::SUCCESS;
     }
 
+    /** @param array<string, mixed> $article */
     private function processArticle(array $article): string
     {
         $devToUsername = $article['user']['username'] ?? null;
@@ -119,8 +120,8 @@ class SyncDevToArticles extends Command
         $articleDetails = $this->apiClient->getArticle($article['id']);
 
         $this->trackActivity->handle(new TrackActivityDTO(
-            characterId: $character->id,
-            tenantId: (int) $externalIdentity->tenant_id,
+            characterId: (string) $character->id,
+            tenantId: (string) $externalIdentity->tenant_id,
             type: ActivityType::Article,
             provider: IdentityProvider::DevTo,
             occurredAt: new DateTimeImmutable($article['published_at'] ?? $article['created_at']),

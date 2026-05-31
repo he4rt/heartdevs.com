@@ -8,6 +8,7 @@ use He4rt\Activity\Database\Factories\TimelineFactory;
 use He4rt\Activity\Reaction\Concerns\HasReactions;
 use He4rt\Identity\Tenant\Models\Tenant;
 use He4rt\Identity\User\Models\User;
+use Illuminate\Database\Eloquent\Attributes\Table;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -19,7 +20,7 @@ use Illuminate\Support\Carbon;
 /**
  * @property string $id
  * @property string $user_id
- * @property int $tenant_id
+ * @property string $tenant_id
  * @property string $postable_type
  * @property string $postable_id
  * @property string|null $root_id
@@ -30,26 +31,13 @@ use Illuminate\Support\Carbon;
  * @property Carbon $created_at
  * @property Carbon $updated_at
  */
+#[Table(name: 'activity_timeline')]
 final class Timeline extends Model
 {
     /** @use HasFactory<TimelineFactory> */
     use HasFactory;
     use HasReactions;
     use HasUuids;
-
-    protected $table = 'activity_timeline';
-
-    protected $fillable = [
-        'user_id',
-        'tenant_id',
-        'postable_type',
-        'postable_id',
-        'root_id',
-        'parent_id',
-        'is_ignored',
-        'pinned',
-        'views',
-    ];
 
     /** @return BelongsTo<User, $this> */
     public function user(): BelongsTo
@@ -97,7 +85,7 @@ final class Timeline extends Model
     {
         return [
             'user_id' => 'string',
-            'tenant_id' => 'integer',
+            'tenant_id' => 'string',
             'root_id' => 'string',
             'parent_id' => 'string',
             'is_ignored' => 'boolean',

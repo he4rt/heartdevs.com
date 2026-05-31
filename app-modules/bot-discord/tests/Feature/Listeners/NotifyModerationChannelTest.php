@@ -7,11 +7,8 @@ use He4rt\IntegrationDiscord\Transport\DiscordConnector;
 use He4rt\IntegrationDiscord\Transport\Requests\Messages\CreateMessage;
 use He4rt\Moderation\Cases\Events\CaseQueued;
 use He4rt\Moderation\Cases\Models\ModerationCase;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Saloon\Http\Faking\MockClient;
 use Saloon\Http\Faking\MockResponse;
-
-uses(RefreshDatabase::class);
 
 beforeEach(function (): void {
     config()->set('discord.token', 'bot-token');

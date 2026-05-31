@@ -8,13 +8,14 @@ use Carbon\Carbon;
 use He4rt\Activity\Message\Enums\MembershipEventKind;
 use He4rt\Identity\ExternalIdentity\Models\ExternalIdentity;
 use He4rt\Identity\Tenant\Models\Tenant;
+use Illuminate\Database\Eloquent\Attributes\Table;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 /**
  * @property string $id
- * @property int $tenant_id
+ * @property string $tenant_id
  * @property string $external_identity_id
  * @property string $kind
  * @property Carbon $occurred_at
@@ -23,21 +24,10 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
  */
+#[Table(name: 'membership_events')]
 final class MembershipEvent extends Model
 {
     use HasUuids;
-
-    protected $table = 'membership_events';
-
-    protected $fillable = [
-        'id',
-        'tenant_id',
-        'external_identity_id',
-        'kind',
-        'occurred_at',
-        'provider_message_id',
-        'metadata',
-    ];
 
     /**
      * @return BelongsTo<ExternalIdentity, $this>

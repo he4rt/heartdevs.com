@@ -14,11 +14,8 @@ use He4rt\Moderation\Classification\Jobs\ScreenContent;
 use He4rt\Moderation\DTOs\ModerationContentDTO;
 use He4rt\Moderation\Enums\CaseSource;
 use He4rt\Moderation\Enums\Platform;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Http;
-
-uses(RefreshDatabase::class);
 
 test('AI flags content above threshold and creates case', function (): void {
     Event::fake([CaseCreated::class, CaseQueued::class, CaseReadyForEnforcement::class]);

@@ -27,7 +27,7 @@ class GreetingsEvent extends Event
             return;
         }
 
-        $hour = now()->hour;
+        $hour = now()->timezone(config('app.display_timezone'))->hour;
         $payload = mb_strtolower($message->content);
 
         $response = match (true) {

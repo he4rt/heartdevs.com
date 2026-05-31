@@ -5,9 +5,25 @@ declare(strict_types=1);
 namespace App\Providers;
 
 use App\Enums\FilamentPanel;
+use Filament\Actions\Action;
+use Filament\Forms\Components\Builder;
+use Filament\Forms\Components\DateTimePicker;
+use Filament\Forms\Components\Field;
+use Filament\Forms\Components\Repeater;
+use Filament\Forms\Components\Select;
 use Filament\Panel;
-use Filament\Support\Colors\Color;
+use Filament\Support\Enums\Alignment;
+use Filament\Support\Enums\VerticalAlignment;
+use Filament\Support\Enums\Width;
 use Filament\Support\Facades\FilamentView;
+use Filament\Support\Icons\Heroicon;
+use Filament\Tables\Columns\CheckboxColumn;
+use Filament\Tables\Columns\Column;
+use Filament\Tables\Columns\IconColumn;
+use Filament\Tables\Columns\ImageColumn;
+use Filament\Tables\Enums\PaginationMode;
+use Filament\Tables\Filters\SelectFilter;
+use Filament\Tables\Table;
 use Filament\View\PanelsRenderHook;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\ServiceProvider;
@@ -17,76 +33,36 @@ class FilamentServiceProvider extends ServiceProvider
     public function boot(): void
     {
         $this->configureFlux();
+        $this->configureField();
+        $this->configureColumn();
+        $this->configureIconColumn();
+        $this->configureCheckboxColumn();
+        $this->configureImageColumn();
+        $this->configureSelect();
+        $this->configureDateTimePicker();
+        $this->configureRepeater();
+        $this->configureBuilder();
+        $this->configureSelectFilter();
+        $this->configureTable();
     }
 
     public function register(): void
     {
         $this->configureMacros();
-
-        $this->configureFlux();
     }
 
     private function configureMacros(): void
     {
-        Panel::macro('currentPanel', fn (): FilamentPanel => FilamentPanel::from($this->getId()));
+        Panel::macro('currentPanel', function (): FilamentPanel {
+            /** @var string $panelId */
+            $panelId = $this->getId();
 
-        Panel::macro('tenantViteTheme', function (): static {
-
-            $tenantSlug = app()->isLocal() ? request()->path() : request()->header('host');
-
-            $tenantSlug = match (true) {
-                str_contains($tenantSlug, '3pontos') => '3pontos',
-                default => 'he4rt'
-            };
-
-            $themeDirectory = sprintf('app-modules/he4rt/resources/css/themes/%s/theme.css', $tenantSlug);
-
-            if (!file_exists(base_path($themeDirectory))) {
-                $themeDirectory = 'app-modules/he4rt/resources/css/theme.css';
-            }
-
-            $color = match ($tenantSlug) {
-                '3pontos' => Color::Gray,
-                default => Color::Indigo
-            };
-
-            $this->colors([
-                'primary' => $color,
-            ]);
-
-            session()->put('tenant', $tenantSlug);
-            session()->put('panel', $this->getId());
-
-            $this->viteTheme($themeDirectory);
-
-            return $this;
-        });
-
-        Panel::macro('discoverResourcesForPanel', function (string $module, FilamentPanel $panel): void {
-            $studlyPanel = str($panel->name)->studly();
-
-            $filamentModulePath = module_path($module, sprintf('src/Filament/%s', $studlyPanel));
-            $filamentModuleNamespace = sprintf('He4rt\\%s\\Filament\\%s', str($module)->studly(), $studlyPanel);
-
-            $in = $filamentModulePath.'/Resources';
-            $for = $filamentModuleNamespace.'\\Resources';
-
-            $this
-                ->discoverResources(
-                    in: $in,
-                    for: $for,
-                )
-
-                ->discoverPages(
-                    in: $filamentModulePath.'/Pages',
-                    for: $filamentModuleNamespace.'\\Pages',
-                );
+            return FilamentPanel::from($panelId);
         });
     }
 
     private function configureFlux(): void
     {
-
         FilamentView::registerRenderHook(
             PanelsRenderHook::HEAD_END,
             fn (): View => view('flux.flux-styles'),
@@ -96,5 +72,89 @@ class FilamentServiceProvider extends ServiceProvider
             PanelsRenderHook::BODY_END,
             fn (): View => view('flux.flux-scripts'),
         );
+    }
+
+    private function configureField(): void
+    {
+        Field::configureUsing(fn (Field $field): Field => $field
+            ->translateLabel());
+    }
+
+    private function configureColumn(): void
+    {
+        Column::configureUsing(fn (Column $column): Column => $column
+            ->translateLabel());
+    }
+
+    private function configureIconColumn(): void
+    {
+        IconColumn::configureUsing(fn (IconColumn $iconColumn): IconColumn => $iconColumn
+            ->alignment(Alignment::Center)
+            ->verticalAlignment(VerticalAlignment::Center));
+    }
+
+    private function configureCheckboxColumn(): void
+    {
+        CheckboxColumn::configureUsing(fn (CheckboxColumn $checkboxColumn): CheckboxColumn => $checkboxColumn
+            ->alignment(Alignment::Center)
+            ->verticalAlignment(VerticalAlignment::Center));
+    }
+
+    private function configureImageColumn(): void
+    {
+        ImageColumn::configureUsing(fn (ImageColumn $imageColumn): ImageColumn => $imageColumn
+            ->extraImgAttributes(['loading' => 'lazy']));
+    }
+
+    private function configureSelectFilter(): void
+    {
+        SelectFilter::configureUsing(fn (SelectFilter $selectFilter): SelectFilter => $selectFilter
+            ->native(false));
+    }
+
+    private function configureTable(): void
+    {
+        Table::configureUsing(fn (Table $table): Table => $table
+            ->deferLoading()
+            ->persistSortInSession()
+            ->persistSearchInSession()
+            ->extremePaginationLinks()
+            ->paginationMode(PaginationMode::Cursor)
+            ->defaultPaginationPageOption(10)
+            ->filtersFormWidth(Width::Medium)
+            ->paginated([10, 25, 50])
+            ->emptyStateIcon(Heroicon::OutlinedExclamationTriangle));
+    }
+
+    private function configureSelect(): void
+    {
+        Select::configureUsing(fn (Select $select): Select => $select
+            ->native(false)
+            ->selectablePlaceholder(fn (Select $component) => !$component->isRequired())
+            ->searchable(fn (Select $component) => $component->hasRelationship())
+            ->preload(fn (Select $component): bool => $component->isSearchable() && !$component->hasRelationship())
+            ->translateLabel());
+    }
+
+    private function configureDateTimePicker(): void
+    {
+        DateTimePicker::configureUsing(fn (DateTimePicker $dateTimePicker): DateTimePicker => $dateTimePicker
+            ->native(false)
+            ->seconds(false)
+            ->minDate(now()->subYears(25))
+            ->maxDate(now()->addYears(25))
+            ->translateLabel());
+    }
+
+    private function configureRepeater(): void
+    {
+        Repeater::configureUsing(fn (Repeater $component): Repeater => $component
+            ->deleteAction(fn (Action $action): Action => $action->requiresConfirmation()));
+    }
+
+    private function configureBuilder(): void
+    {
+        Builder::configureUsing(fn (Builder $component): Builder => $component
+            ->deleteAction(fn (Action $action): Action => $action->requiresConfirmation()));
     }
 }

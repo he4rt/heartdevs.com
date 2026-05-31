@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('message_attachments', function (Blueprint $table): void {
             $table->uuid('id')->primary();
-            $table->foreignId('tenant_id')->constrained('tenants');
+            $table->foreignUuid('tenant_id')->constrained('tenants');
             $table->foreignUuid('message_id')->constrained('messages')->cascadeOnDelete();
             $table->string('provider_attachment_id')->nullable();
             $table->text('url');
@@ -29,7 +29,7 @@ return new class extends Migration
 
         Schema::create('message_embeds', function (Blueprint $table): void {
             $table->uuid('id')->primary();
-            $table->foreignId('tenant_id')->constrained('tenants');
+            $table->foreignUuid('tenant_id')->constrained('tenants');
             $table->foreignUuid('message_id')->constrained('messages')->cascadeOnDelete();
             $table->text('url')->nullable();
             $table->text('title')->nullable();
@@ -48,7 +48,7 @@ return new class extends Migration
 
         Schema::create('membership_events', function (Blueprint $table): void {
             $table->uuid('id')->primary();
-            $table->foreignId('tenant_id')->constrained('tenants');
+            $table->foreignUuid('tenant_id')->constrained('tenants');
             $table->foreignUuid('external_identity_id')->constrained('external_identities');
             $table->string('kind');
             $table->timestamp('occurred_at');

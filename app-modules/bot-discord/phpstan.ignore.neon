@@ -1,50 +1,62 @@
 parameters:
     ignoreErrors:
-        - message: '#^Access\ to\ an\ undefined\ property\ Discord\\Parts\\Guild\\Guild::\$icon\.$#'
-          identifier: property.notFound
-          count: 1
-          path: src/SlashCommands/DontAskCommand.php
-        - message: '#^Access\ to\ an\ undefined\ property\ Discord\\Parts\\Guild\\Guild::\$icon\.$#'
-          identifier: property.notFound
-          count: 1
-          path: src/SlashCommands/EditProfileCommand.php
-        - message: '#^Access\ to\ an\ undefined\ property\ Discord\\Parts\\Guild\\Guild::\$icon\.$#'
-          identifier: property.notFound
-          count: 1
-          path: src/SlashCommands/IntroductionCommand.php
-        - message: '#^Access\ to\ an\ undefined\ property\ Discord\\Parts\\Guild\\Guild::\$icon\.$#'
-          identifier: property.notFound
-          count: 1
-          path: src/SlashCommands/ProfileCommand.php
-        - message: '#^Access\ to\ an\ undefined\ property\ Discord\\Parts\\User\\Member::\$user\.$#'
-          identifier: property.notFound
-          count: 7
-          path: src/Events/WelcomeMember.php
-        - message: '#^Access\ to\ an\ undefined\ property\ Discord\\Parts\\User\\User::\$avatar\.$#'
-          identifier: property.notFound
-          count: 1
-          path: src/SlashCommands/EditProfileCommand.php
-        - message: '#^Access\ to\ an\ undefined\ property\ Discord\\Parts\\User\\User::\$avatar\.$#'
-          identifier: property.notFound
-          count: 2
-          path: src/SlashCommands/IntroductionCommand.php
-        - message: '#^Access\ to\ an\ undefined\ property\ Discord\\Parts\\WebSockets\\VoiceStateUpdate::\$channel_id\.$#'
-          identifier: property.notFound
-          count: 1
-          path: src/Events/DynamicVoiceEvent.php
-        - message: '#^Method\ He4rt\\BotDiscord\\Tasks\\RichPresence::makeActivities\(\)\ should\ return\ array<Discord\\Parts\\User\\Activity>\ but\ returns\ array<int,\ Discord\\Parts\\Part\|Discord\\Repository\\AbstractRepository>\.$#'
-          identifier: return.type
-          count: 1
-          path: src/Tasks/RichPresence.php
-        - message: '#^Parameter\ \#1\ \$guild\ of\ method\ Discord\\Repository\\Guild\\ChannelRepository::build\(\)\ expects\ Discord\\Repository\\Guild\\Guild\|string,\ Discord\\Parts\\Guild\\Guild\|null\ given\.$#'
-          identifier: argument.type
-          count: 1
-          path: src/SlashCommands/DynamicVoiceCommand.php
-        - message: '#^Unable\ to\ resolve\ the\ template\ type\ TKey\ in\ call\ to\ function\ collect$#'
-          identifier: argument.templateType
-          count: 1
-          path: src/SlashCommands/EditVoiceChannelLimitCommand.php
-        - message: '#^Unable\ to\ resolve\ the\ template\ type\ TValue\ in\ call\ to\ function\ collect$#'
-          identifier: argument.templateType
-          count: 1
-          path: src/SlashCommands/EditVoiceChannelLimitCommand.php
+        -
+            message: '#^Access to an undefined property Discord\\Parts\\Guild\\Guild::\$icon\.$#'
+            identifier: property.notFound
+            count: 1
+            path: src/SlashCommands/DontAskCommand.php
+        -
+            message: '#^Access to an undefined property Discord\\Parts\\Guild\\Guild::\$icon\.$#'
+            identifier: property.notFound
+            count: 1
+            path: src/SlashCommands/EditProfileCommand.php
+        -
+            message: '#^Access to an undefined property Discord\\Parts\\Guild\\Guild::\$icon\.$#'
+            identifier: property.notFound
+            count: 1
+            path: src/SlashCommands/IntroductionCommand.php
+        -
+            message: '#^Access to an undefined property Discord\\Parts\\Guild\\Guild::\$icon\.$#'
+            identifier: property.notFound
+            count: 1
+            path: src/SlashCommands/ProfileCommand.php
+        -
+            message: '#^Access to an undefined property Discord\\Parts\\User\\Member::\$user\.$#'
+            identifier: property.notFound
+            count: 7
+            path: src/Events/WelcomeMember.php
+        -
+            message: '#^Access to an undefined property Discord\\Parts\\User\\User::\$avatar\.$#'
+            identifier: property.notFound
+            count: 1
+            path: src/SlashCommands/EditProfileCommand.php
+        -
+            message: '#^Access to an undefined property Discord\\Parts\\User\\User::\$avatar\.$#'
+            identifier: property.notFound
+            count: 2
+            path: src/SlashCommands/IntroductionCommand.php
+        -
+            message: '#^Access to an undefined property Discord\\Parts\\WebSockets\\VoiceStateUpdate::\$channel_id\.$#'
+            identifier: property.notFound
+            count: 1
+            path: src/Events/DynamicVoiceEvent.php
+        -
+            message: '#^Method He4rt\\BotDiscord\\Tasks\\RichPresence::makeActivities\(\) should return array<Discord\\Parts\\User\\Activity> but returns array<int, Discord\\Parts\\Part\|Discord\\Repository\\AbstractRepository>\.$#'
+            identifier: return.type
+            count: 1
+            path: src/Tasks/RichPresence.php
+        -
+            message: '#^Parameter \#1 \$guild of method Discord\\Repository\\Guild\\ChannelRepository::build\(\) expects Discord\\Repository\\Guild\\Guild\|string, Discord\\Parts\\Guild\\Guild\|null given\.$#'
+            identifier: argument.type
+            count: 1
+            path: src/SlashCommands/DynamicVoiceCommand.php
+        -
+            message: '#^Unable to resolve the template type TKey in call to function collect$#'
+            identifier: argument.templateType
+            count: 1
+            path: src/SlashCommands/EditVoiceChannelLimitCommand.php
+        -
+            message: '#^Unable to resolve the template type TValue in call to function collect$#'
+            identifier: argument.templateType
+            count: 1
+            path: src/SlashCommands/EditVoiceChannelLimitCommand.php

@@ -9,9 +9,6 @@ use He4rt\Moderation\Enums\Platform;
 use He4rt\Moderation\Enums\Severity;
 use He4rt\Moderation\Enums\ViolationType;
 use He4rt\Moderation\Rules\ModerationRule;
-use Illuminate\Foundation\Testing\RefreshDatabase;
-
-uses(RefreshDatabase::class);
 
 function contentDTO(string $text, ?string $tenantId = null): ModerationContentDTO
 {
@@ -127,6 +124,7 @@ test('picks highest severity when multiple rules match', function (): void {
 
 test('tenant-scoped rules only match for correct tenant', function (): void {
     $tenant = Tenant::factory()->create();
+    $otherTenant = Tenant::factory()->create();
 
     ModerationRule::query()->create([
         'name' => 'Tenant rule', 'type' => 'keyword', 'pattern' => 'specific',
@@ -135,20 +133,22 @@ test('tenant-scoped rules only match for correct tenant', function (): void {
     ]);
 
     $matchResult = RuleBasedClassifier::make()->classify(contentDTO('something specific', (string) $tenant->id));
-    $noMatchResult = RuleBasedClassifier::make()->classify(contentDTO('something specific', '99999'));
+    $noMatchResult = RuleBasedClassifier::make()->classify(contentDTO('something specific', (string) $otherTenant->id));
 
     expect($matchResult->scores)->toHaveKey('spam')
         ->and($noMatchResult->scores)->toBeEmpty();
 });
 
 test('global rules (null tenant) match for any tenant', function (): void {
+    $anyTenant = Tenant::factory()->create();
+
     ModerationRule::query()->create([
         'name' => 'Global', 'type' => 'keyword', 'pattern' => 'universal',
         'violation_type' => 'harassment', 'severity' => 'high', 'action_on_match' => 'mute',
         'is_active' => true, 'tenant_id' => null,
     ]);
 
-    $result = RuleBasedClassifier::make()->classify(contentDTO('universal truth', '12345'));
+    $result = RuleBasedClassifier::make()->classify(contentDTO('universal truth', (string) $anyTenant->id));
 
     expect($result->primary)->toBe(ViolationType::Harassment);
 });

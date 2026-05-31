@@ -28,16 +28,6 @@ final class Transaction extends Model
     use HasFactory;
     use HasUuids;
 
-    protected $fillable = [
-        'wallet_id',
-        'type',
-        'amount',
-        'balance_after',
-        'reference_type',
-        'reference_id',
-        'description',
-    ];
-
     /**
      * @return BelongsTo<Wallet, $this>
      */

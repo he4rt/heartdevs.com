@@ -48,7 +48,7 @@ test('buildCaseEmbed truncates content to 1024 chars', function (): void {
 
     $contentField = collect($embed['fields'])->firstWhere('name', 'Content');
 
-    expect(mb_strlen((string) $contentField['value']))->toBe(1024);
+    expect((string) $contentField['value'])->toHaveLength(1024);
 });
 
 test('buildCaseEmbed handles null text gracefully', function (): void {
@@ -95,5 +95,5 @@ test('buildRoleMentions returns empty string when no roles configured', function
     $builder = new ModerationEmbedBuilder();
     $mentions = $builder->buildRoleMentions();
 
-    expect($mentions)->toBe('');
+    expect($mentions)->toBeEmpty();
 });

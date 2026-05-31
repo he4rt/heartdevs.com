@@ -6,13 +6,14 @@ namespace He4rt\Activity\Message\Models;
 
 use Carbon\Carbon;
 use He4rt\Identity\Tenant\Models\Tenant;
+use Illuminate\Database\Eloquent\Attributes\Table;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 /**
  * @property string $id
- * @property int $tenant_id
+ * @property string $tenant_id
  * @property string $message_id
  * @property string|null $url
  * @property string|null $title
@@ -25,25 +26,10 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
  */
+#[Table(name: 'message_embeds')]
 final class MessageEmbed extends Model
 {
     use HasUuids;
-
-    protected $table = 'message_embeds';
-
-    protected $fillable = [
-        'id',
-        'tenant_id',
-        'message_id',
-        'url',
-        'title',
-        'description',
-        'source_domain',
-        'kind',
-        'thumbnail_url',
-        'raw',
-        'position',
-    ];
 
     /**
      * @return BelongsTo<Message, $this>

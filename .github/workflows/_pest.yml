@@ -19,11 +19,15 @@ on:
         required: true
         type: string
 
+permissions: {}
+
 jobs:
   tests:
     name: Run
     runs-on: ubuntu-latest
     timeout-minutes: 5
+    permissions:
+      contents: read
     concurrency:
       group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}-tests
       cancel-in-progress: true
@@ -46,6 +50,9 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          fetch-depth: 0
+          persist-credentials: false
 
       - name: Setup PHP
         uses: shivammathur/setup-php@7c071dfe9dc99bdf297fa79cb49ea005b9fcadbc # v2.37.1

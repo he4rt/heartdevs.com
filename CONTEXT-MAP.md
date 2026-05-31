@@ -12,6 +12,8 @@ This is a modular monorepo (`internachi/modular`). Each bounded context lives un
 | Identity            | `app-modules/identity/`            | Users, tenants, external identities, authentication                           |
 | Events              | `app-modules/events/`              | Event participation lifecycle — enrollment, check-in, attendance, XP dispatch |
 | Gamification        | `app-modules/gamification/`        | Character progression — XP, levels, badges, seasons, daily bonuses            |
+| Panel Admin         | `app-modules/panel-admin/`         | Filament admin panel — dashboards, resources, moderation UI, marketing      |
+| Integration Twitch  | `app-modules/integration-twitch/`  | Twitch platform transport (Helix API via Saloon), OAuth, EventSub webhooks  |
 
 ## Relationships
 
@@ -43,10 +45,10 @@ This is a modular monorepo (`internachi/modular`). Each bounded context lives un
 └────────┬────────┘
          │ resolves identities
          ▼
-┌─────────────────┐
-│    Identity     │
-│ (users/tenants) │
-└─────────────────┘
+┌─────────────────┐         ┌──────────────────────┐
+│    Identity     │◀────────│ Integration Twitch   │
+│ (users/tenants) │         │ (transport/webhooks) │
+└─────────────────┘         └──────────────────────┘
 ```
 
 ### Dependency rules
@@ -54,6 +56,7 @@ This is a modular monorepo (`internachi/modular`). Each bounded context lives un
 - **Moderation** is platform-agnostic. It never imports from `bot-discord` or `integration-discord`.
 - **Bot Discord** depends on Moderation (listens to domain events), Integration Discord (uses transport), and Events (dispatches check-in domain events).
 - **Integration Discord** depends on Identity (OAuth user resolution). It never imports from Moderation.
+- **Integration Twitch** depends on Identity (OAuth user resolution, ExternalIdentity for tenant linking). It never imports from Moderation, Integration Discord, or Bot Discord.
 - **Identity** has no upstream dependencies on other contexts listed here.
 - **Events** depends on Identity (reads Users and Tenants). Publishes domain events consumed by Gamification.
 - **Gamification** depends on Identity (Character belongs to User). Listens to Events domain events for XP.

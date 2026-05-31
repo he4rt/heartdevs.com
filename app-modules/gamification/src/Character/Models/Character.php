@@ -11,6 +11,8 @@ use He4rt\Gamification\Badge\Models\Badge;
 use He4rt\Gamification\Database\Factories\CharacterFactory;
 use He4rt\Identity\Tenant\Models\Tenant;
 use He4rt\Identity\User\Models\User;
+use Illuminate\Database\Eloquent\Attributes\Appends;
+use Illuminate\Database\Eloquent\Attributes\Table;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -29,8 +31,13 @@ use Illuminate\Support\Facades\Date;
  * @property int $level
  * @property float $percentage_experience
  * @property bool $can_claim_daily_bonus
- * @property int|null $tenant_id
+ * @property string|null $tenant_id
  */
+#[Appends([
+    'ranking',
+    'level',
+])]
+#[Table(name: 'characters')]
 final class Character extends Model
 {
     /** @use HasFactory<CharacterFactory> */
@@ -50,22 +57,6 @@ final class Character extends Model
         36 => 128000, 37 => 141000, 38 => 155000, 39 => 170000, 40 => 190000,
         41 => 210000, 42 => 230000, 43 => 250000, 44 => 270000, 45 => 290000,
         46 => 310000, 47 => 330000, 48 => 350000, 49 => 370000, 50 => 400000,
-    ];
-
-    protected $table = 'characters';
-
-    protected $fillable = [
-        'id',
-        'tenant_id',
-        'user_id',
-        'reputation',
-        'experience',
-        'daily_bonus_claimed_at',
-    ];
-
-    protected $appends = [
-        'ranking',
-        'level',
     ];
 
     public static function generateTextExperience(string $message, int $level, bool $isSupporter): int

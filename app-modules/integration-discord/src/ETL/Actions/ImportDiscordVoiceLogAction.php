@@ -14,7 +14,7 @@ final class ImportDiscordVoiceLogAction
     /**
      * @param  array<string, string>  $channelMap
      */
-    public function handle(DiscordVoiceLogDTO $dto, int $tenantId, array $channelMap): ?Voice
+    public function handle(DiscordVoiceLogDTO $dto, string $tenantId, array $channelMap): ?Voice
     {
         $identity = ExternalIdentity::query()
             ->where('provider', IdentityProvider::Discord)

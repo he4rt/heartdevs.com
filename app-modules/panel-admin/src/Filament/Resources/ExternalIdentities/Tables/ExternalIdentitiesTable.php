@@ -36,9 +36,11 @@ class ExternalIdentitiesTable
                     })),
 
                 TextColumn::make('type')
+                    ->badge()
                     ->label('Type'),
 
                 TextColumn::make('provider')
+                    ->badge()
                     ->label('Provider'),
 
                 TextColumn::make('external_account_id')

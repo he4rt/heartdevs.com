@@ -9,9 +9,6 @@ use He4rt\Moderation\Appeals\ReviewAppeal;
 use He4rt\Moderation\Cases\Models\ModerationCase;
 use He4rt\Moderation\Enforcement\ModerationAction;
 use He4rt\Moderation\Enums\AppealStatus;
-use Illuminate\Foundation\Testing\RefreshDatabase;
-
-uses(RefreshDatabase::class);
 
 test('FileAppeal creates appeal with SLA deadline', function (): void {
     $user = User::factory()->create();

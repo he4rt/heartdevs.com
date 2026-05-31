@@ -10,10 +10,7 @@ use He4rt\Moderation\Enums\ActionType;
 use He4rt\Moderation\Enums\Platform;
 use He4rt\Moderation\Platform\Notifications\ModerationActionNotification;
 use He4rt\Moderation\Platform\WebModerationAdapter;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Notification;
-
-uses(RefreshDatabase::class);
 
 beforeEach(function (): void {
     Notification::fake();

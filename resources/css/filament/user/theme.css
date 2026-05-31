@@ -1,7 +1,0 @@
-@import '../../../../vendor/filament/filament/resources/css/theme.css';
-
-@source '../../../../app/Filament/**/*';
-@source '../../../../app/Filament/**/*';
-@source '../../../../resources/views/filament/**/*';
-@source '../../../../app-modules/**/src/Filament/**/*';
-@source '../../../../app-modules/**/resources/views/**/*';

@@ -13,6 +13,8 @@ use He4rt\Moderation\Classification\Actions\RouteCaseAction;
 use He4rt\Moderation\DTOs\ModerationContentDTO;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Queue\Attributes\Backoff;
+use Illuminate\Queue\Attributes\Tries;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Support\Facades\Log;
 use Throwable;
@@ -28,15 +30,12 @@ use Throwable;
  * CaseReadyForEnforcement if the auto-execution policy passes. Since the case was
  * created by rules (classifier_version='rules'), auto-execution IS allowed here.
  */
+#[Backoff([5, 15, 30])]
+#[Tries(3)]
 final class ClassifyAndRoute implements ShouldQueue
 {
     use InteractsWithQueue;
     use Queueable;
-
-    public int $tries = 3;
-
-    /** @var array<int, int> */
-    public array $backoff = [5, 15, 30];
 
     public function __construct(private readonly ModerationCase $case) {}
 

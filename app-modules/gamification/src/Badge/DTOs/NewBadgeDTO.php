@@ -14,7 +14,7 @@ final readonly class NewBadgeDTO implements JsonSerializable
         private string $description,
         private string $redeemCode,
         private bool $active,
-        private int $tenant_id
+        private string $tenant_id
     ) {}
 
     /**
