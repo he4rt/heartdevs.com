@@ -12,4 +12,6 @@ return [
     'enrolled_at' => 'Enrolled on :date',
     'no_enrollments' => 'You are not enrolled in any events yet.',
     'no_upcoming_events' => 'No upcoming events available.',
+    'enter_check_in_code_hint' => 'Enter the check-in code announced by the organizer.',
+    'check_in' => 'Check In',
 ];

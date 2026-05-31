@@ -46,4 +46,10 @@
             </x-filament::button>
         </div>
     @endif
+
+    <livewire:numeric-code-check-in
+        :event-id="$this->eventId"
+        :key="'numeric-code-' . $this->eventId"
+        wire:key="'numeric-code-check-in-' . $this->eventId"
+    />
 </div>

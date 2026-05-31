@@ -13,6 +13,7 @@ use He4rt\Events\Event\Models\Event;
 use He4rt\PanelAdmin\Filament\Resources\Events\Pages\CreateEvent;
 use He4rt\PanelAdmin\Filament\Resources\Events\Pages\EditEvent;
 use He4rt\PanelAdmin\Filament\Resources\Events\Pages\ListEvents;
+use He4rt\PanelAdmin\Filament\Resources\Events\RelationManagers\CheckInCodesRelationManager;
 use He4rt\PanelAdmin\Filament\Resources\Events\RelationManagers\EnrollmentsRelationManager;
 use He4rt\PanelAdmin\Filament\Resources\Events\Schemas\EventForm;
 use He4rt\PanelAdmin\Filament\Resources\Events\Schemas\EventInfolist;
@@ -47,6 +48,7 @@ final class EventResource extends Resource
     {
         return [
             EnrollmentsRelationManager::class,
+            CheckInCodesRelationManager::class,
         ];
     }
 

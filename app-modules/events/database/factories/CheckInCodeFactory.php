@@ -26,6 +26,7 @@ final class CheckInCodeFactory extends Factory
             'expires_at' => $startsAt->clone()->addHours(2),
             'max_uses' => null,
             'uses_count' => 0,
+            'revoked_at' => null,
         ];
     }
 }
