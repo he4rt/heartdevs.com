@@ -7,6 +7,7 @@ namespace He4rt\PanelApp\Livewire\Events;
 use Filament\Notifications\Notification;
 use He4rt\Events\CheckIn\Actions\NumericCodeCheckInAction;
 use He4rt\Events\CheckIn\DTOs\NumericCodeCheckInDTO;
+use He4rt\Events\CheckIn\Enums\CheckInMethod;
 use He4rt\Events\CheckIn\Exceptions\CheckInException;
 use He4rt\Events\Enrollment\Enums\EnrollmentStatus;
 use He4rt\Events\Enrollment\Models\Enrollment;
@@ -41,6 +42,10 @@ final class NumericCodeCheckIn extends Component
     public function canCheckIn(): bool
     {
         if ($this->enrollment === null) {
+            return false;
+        }
+
+        if ($this->event->enrollmentPolicy?->check_in_method !== CheckInMethod::NumericCode) {
             return false;
         }
 
