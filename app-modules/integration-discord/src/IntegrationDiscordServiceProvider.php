@@ -10,6 +10,7 @@ use He4rt\IntegrationDiscord\ETL\Console\ImportDiscordProfilesCommand;
 use He4rt\IntegrationDiscord\ETL\Console\MergeDuplicateDiscordProfilesCommand;
 use He4rt\IntegrationDiscord\Models\DiscordEventLog;
 use He4rt\IntegrationDiscord\Sync\Console\SyncDiscordGuildCommand;
+use He4rt\IntegrationDiscord\Sync\Console\SyncDiscordHistoryCommand;
 use He4rt\IntegrationDiscord\Sync\Observers\DiscordEventLogObserver;
 use He4rt\IntegrationDiscord\Transport\DiscordConnector;
 use He4rt\IntegrationDiscord\Transport\DiscordOAuthConnector;
@@ -40,6 +41,7 @@ class IntegrationDiscordServiceProvider extends ServiceProvider
                 ImportDiscordMessagesCommand::class,
                 MergeDuplicateDiscordProfilesCommand::class,
                 SyncDiscordGuildCommand::class,
+                SyncDiscordHistoryCommand::class,
                 BackfillVoiceLogsCommand::class,
             ]);
         }

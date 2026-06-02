@@ -18,6 +18,7 @@ final class NewMessageDTO
         public string $channelId,
         public string $content,
         public DateTimeImmutable $sentAt,
+        public ?string $avatar = null,
     ) {}
 
     /**
@@ -33,7 +34,8 @@ final class NewMessageDTO
             providerMessageId: $payload['provider_message_id'],
             channelId: $payload['channel_id'],
             content: $payload['content'],
-            sentAt: new DateTimeImmutable($payload['sent_at'])
+            sentAt: new DateTimeImmutable($payload['sent_at']),
+            avatar: $payload['avatar'] ?? null
         );
     }
 }

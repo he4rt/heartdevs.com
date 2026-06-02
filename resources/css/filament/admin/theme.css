@@ -8,53 +8,107 @@
 
 :root {
     --sidebar-width: 280px;
+    --topbar-height: 64px;
 }
 
-/* Sidebar Modern Aesthetics */
+/* 1. Sidebar Position & Style */
 .fi-sidebar {
-    @apply bg-white dark:bg-zinc-950 border-r border-zinc-200 dark:border-white/5 shadow-xl transition-all duration-300;
+    @apply bg-white dark:bg-zinc-950 !border-r !border-slate-200/70 dark:!border-white/5 !shadow-xl !transition-all !duration-300;
 }
 
 .fi-sidebar-header {
-    @apply py-6 border-b border-zinc-200 dark:border-white/5;
+    display: none !important; /* Hide native sidebar brand */
 }
 
-.fi-sidebar-nav {
-    @apply px-4 py-6;
+/* 2. Topbar Styling */
+.fi-topbar {
+    @apply !bg-white/80 dark:!bg-zinc-950/80 !backdrop-blur-xl !border-b !border-slate-200/70 dark:!border-white/5 !sticky !top-0 !z-30 !shadow-sm;
+    height: var(--topbar-height) !important;
 }
 
+.fi-topbar > div {
+    @apply !h-full !px-6;
+}
+
+/* Hide ALL native brand elements in topbar to avoid duplicate with custom block */
+.fi-topbar-brand,
+.fi-topbar-header-cell,
+.fi-topbar-brand-link,
+[class*="fi-topbar-brand"],
+.fi-topbar > div > a {
+    display: none !important;
+}
+
+/* Hide Sidebar Collapse Button (Arrow/Hamburger) */
+.fi-topbar button[aria-controls="sidebar"],
+.fi-topbar-collapse-btn,
+.fi-topbar button:has(.fi-icon.fi-size-lg) {
+    display: none !important;
+}
+
+/* 3. Global Search Customization */
+.fi-global-search {
+    @apply !block;
+}
+
+.fi-global-search-input-ctn {
+    position: relative !important;
+}
+
+.fi-global-search-input {
+    @apply !bg-slate-50 dark:!bg-white/5 !border-slate-200/70 dark:!border-white/10 !rounded-xl !text-[12px] !pl-9 !pr-10 !py-2 !transition-all !shadow-none !ring-0 !outline-none focus:!bg-white dark:focus:!bg-white/10 focus:!border-purple-300;
+}
+
+.fi-global-search-input-ctn::after {
+    content: '⌘K';
+    position: absolute !important;
+    right: 0.75rem !important;
+    top: 50% !important;
+    transform: translateY(-50%) !important;
+    font-size: 10px !important;
+    @apply text-slate-400 bg-white dark:bg-zinc-800 px-1.5 py-0.5 rounded border border-slate-200 dark:border-white/10 pointer-events-none hidden md:block;
+}
+
+/* 4. Dropdowns & Panels */
+.fi-dropdown-panel {
+    @apply !bg-white dark:!bg-zinc-900 !border !border-slate-200/70 dark:!border-white/10 !shadow-2xl !rounded-2xl !backdrop-blur-xl !z-50;
+    border-radius: 1rem !important;
+    backdrop-filter: blur(24px) !important;
+    padding: 0.375rem !important; /* This creates the safe area for hover */
+    overflow: hidden !important; /* This ensures nothing leaks out */
+}
+
+.fi-dropdown-list {
+    @apply !p-0; /* Reset internal list padding to let the panel padding rule */
+}
+
+.dark .fi-dropdown-panel {
+    background-color: var(--color-zinc-900) !important;
+    border-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+/* 5. Sidebar Item Adjustments */
 .fi-sidebar-item-button {
-    @apply rounded-xl transition-all duration-200 py-2.5 px-4 !important;
+    @apply !rounded-xl !transition-all !duration-200 !py-2.5 !px-4;
+    border-radius: 0.75rem !important;
 }
 
 .fi-sidebar-item-button:hover {
-    @apply bg-zinc-100 dark:bg-white/5 !important;
+    background-color: #f8fafc !important;
 }
 
 .fi-sidebar-item-active .fi-sidebar-item-button {
-    @apply bg-purple-500/10 text-purple-600 dark:text-purple-400 ring-1 ring-purple-500/20 shadow-lg shadow-purple-900/10 !important;
+    background-color: #f5f3ff !important;
+    color: #6d28d9 !important;
+    box-shadow: none !important;
 }
 
-/* Topbar & Dropdowns */
-.fi-topbar {
-    @apply bg-white/80 dark:bg-zinc-950/80 backdrop-blur-xl border-b border-zinc-200 dark:border-white/5 sticky top-0 z-30 shadow-sm;
-}
-
-.fi-dropdown-panel {
-    @apply bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-white/10 shadow-2xl rounded-2xl backdrop-blur-xl z-50 !important;
-}
-
-/* Page Spacing */
+/* 6. Page Spacing & Typography */
 .fi-main {
     @apply p-8 lg:p-12;
 }
 
-/* Animations from Login (reused) */
-@keyframes login-float {
-    0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(-12px); }
-}
-
+/* Animations */
 @keyframes heartbeat {
     0% { transform: scale(1); }
     10% { transform: scale(1.05); }

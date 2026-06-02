@@ -44,12 +44,13 @@ class MessageReceivedEvent extends Event
             resolve(NewMessage::class)->persist(new NewMessageDTO(
                 tenantId: $tenantProvider->tenant_id,
                 provider: IdentityProvider::Discord,
-                providerUsername: $message->author->username.'#'.$message->author->discriminator,
+                providerUsername: $message->author->username,
                 externalAccountId: $message->user_id,
                 providerMessageId: $message->id,
                 channelId: $message->channel_id,
                 content: $message->content,
-                sentAt: $message->timestamp->toDateTimeImmutable()
+                sentAt: $message->timestamp->toDateTimeImmutable(),
+                avatar: $message->author->avatar,
             ));
 
             // Moderation pipeline — SubmitForModeration handles pre-screen (sync) + async AI.

@@ -66,6 +66,10 @@ class ExternalIdentityResource extends Resource
             ->withoutGlobalScopes([
                 SoftDeletingScope::class,
             ])
+            ->when(
+                session('active_provider'),
+                fn (Builder $query, string $provider) => $query->where('provider', $provider)
+            )
             ->with(['model', 'connectedByUser']);
     }
 

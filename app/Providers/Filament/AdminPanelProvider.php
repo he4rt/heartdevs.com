@@ -12,8 +12,10 @@ use Filament\Http\Middleware\DispatchServingFilamentEvent;
 use Filament\Panel;
 use Filament\PanelProvider;
 use Filament\Support\Colors\Color;
+use Filament\View\PanelsRenderHook;
 use He4rt\Identity\Tenant\Models\Tenant;
 use He4rt\PanelAdmin\Http\Middleware\ApplyTenantScopes;
+use He4rt\PanelAdmin\Http\Middleware\SetProviderScope;
 use He4rt\PanelAdmin\Pages\Dashboard;
 use He4rt\PanelAdmin\Tenant\EditTenantProfilePage;
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
@@ -32,9 +34,7 @@ class AdminPanelProvider extends PanelProvider
             ->id('admin')
             ->path('admin')
             ->login(Login::class)
-            ->brandName('He4rt Admin')
-            ->brandLogo(fn () => view('he4rt::components.base.logo'))
-            ->brandLogoHeight('2.5rem')
+            ->brandName('')
             ->colors(function (): array {
                 $colors = Color::all();
 
@@ -49,6 +49,10 @@ class AdminPanelProvider extends PanelProvider
             ->sidebarCollapsibleOnDesktop()
             ->tenantMenu(false)
             ->tenant(Tenant::class, slugAttribute: 'slug')
+            ->renderHook(
+                PanelsRenderHook::TOPBAR_START,
+                fn () => view('filament.admin.components.topbar-content'),
+            )
             ->tenantProfile(EditTenantProfilePage::class)
             ->viteTheme('resources/css/filament/admin/theme.css')
             ->middleware([
@@ -70,6 +74,7 @@ class AdminPanelProvider extends PanelProvider
             ])
             ->tenantMiddleware([
                 ApplyTenantScopes::class,
+                SetProviderScope::class,
             ]);
 
         return $panel;

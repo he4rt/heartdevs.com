@@ -49,6 +49,17 @@ class MeetingShowcasePage extends Page
         return __('panel-admin::marketing.navigation.meeting_showcase');
     }
 
+    public function mount(): void
+    {
+        // Default to today's meeting time as a helpful preset
+        $tz = config('app.display_timezone', 'America/Sao_Paulo');
+        $this->startDate = now($tz)->setTime(22, 0)->format('Y-m-d\TH:i');
+        $this->endDate = now($tz)->setTime(23, 40)->format('Y-m-d\TH:i');
+        
+        // Default meeting channel
+        $this->channelId = '853401652471398400';
+    }
+
     public function loadParticipants(): void
     {
         if ($this->channelId === '' || $this->startDate === '' || $this->endDate === '') {
@@ -68,17 +79,20 @@ class MeetingShowcasePage extends Page
             ->orderByDesc('total_messages')
             ->get();
 
-        $identityIds = $messageStats->pluck('external_identity_id');
+        $identityIds = $messageStats->pluck('external_identity_id')->unique()->filter()->values()->all();
 
         $identities = ExternalIdentity::query()
+            ->withoutGlobalScopes()
+            ->withTrashed()
             ->whereIn('id', $identityIds)
             ->get()
             ->keyBy('id');
 
         $this->participants = $messageStats->map(function (Message $stat) use ($identities): array {
-            $identity = $identities->get($stat->external_identity_id);
+            $identityId = (string) $stat->external_identity_id;
+            $identity = $identities->get($identityId);
 
-            return $this->extractDiscordData($identity, (int) $stat->total_messages); // @phpstan-ignore property.notFound
+            return $this->extractDiscordData($identity, (int) $stat->total_messages);
         })->all();
 
         $this->loaded = true;

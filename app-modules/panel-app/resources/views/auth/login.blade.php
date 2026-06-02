@@ -55,12 +55,30 @@
 
         <div class="relative z-10 w-full max-w-sm">
             {{-- Mobile logo --}}
-            <div class="mb-10 flex items-center justify-center lg:hidden">
-                <img
-                    src="{{ asset('images/logo.svg') }}"
-                    alt="He4rt Developers"
-                    class="h-14 w-auto animate-pulse"
-                />
+            <div class="mb-10 flex flex-col items-center justify-center lg:hidden">
+                <div class="animate-heartbeat">
+                    <svg
+                        class="h-16 w-auto drop-shadow-[0_0_25px_rgba(120,43,241,0.4)]"
+                        viewBox="0 0 600 513"
+                        xmlns="http://www.w3.org/2000/svg"
+                    >
+                        <defs>
+                            <linearGradient id="mobileHeartGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                                <stop offset="0%" style="stop-color:#9b59f5;stop-opacity:1" />
+                                <stop offset="100%" style="stop-color:#782bf1;stop-opacity:1" />
+                            </linearGradient>
+                        </defs>
+                        <path
+                            d="M445.237 0.00033551C424.91 -0.0347431 404.777 3.89304 385.996 11.5576C367.216 19.2221 350.159 30.4719 335.808 44.6594L153.391 224.398L116.915 188.45C111.983 183.761 108.048 178.15 105.341 171.946C102.633 165.741 101.207 159.067 101.145 152.314C101.084 145.56 102.388 138.862 104.983 132.611C107.577 126.359 111.409 120.68 116.255 115.904C121.101 111.128 126.864 107.352 133.207 104.795C139.55 102.239 146.347 100.953 153.2 101.014C160.052 101.074 166.825 102.48 173.12 105.148C179.416 107.816 185.109 111.694 189.867 116.555L262.856 44.6594C233.71 16.6424 194.537 1.07109 153.824 1.31914C113.11 1.56719 74.1349 17.6146 45.3431 45.9846C16.5513 74.3546 0.261527 112.762 0.0031216 152.886C-0.255283 193.01 15.5385 231.618 43.9626 260.346L153.391 368.189L511.948 14.8274C491.12 5.01981 468.32 -0.0474973 445.237 0.00033551Z"
+                            fill="url(#mobileHeartGradient)"
+                        />
+                        <path
+                            d="M584.9 86.7579L445.237 224.433L408.76 188.45L335.808 260.345L372.284 296.293L226.379 440.084L299.332 512.015L554.665 260.381C577.296 238.07 592.355 209.395 597.769 178.303C603.183 147.21 598.687 115.228 584.9 86.7579Z"
+                            fill="url(#mobileHeartGradient)"
+                        />
+                    </svg>
+                </div>
+                <h1 class="mt-4 bg-gradient-to-r from-purple-400 to-purple-600 bg-clip-text text-xl font-bold tracking-tight text-transparent">He4rt Developers</h1>
             </div>
 
             <div class="mb-10">
@@ -69,29 +87,44 @@
             </div>
 
             {{-- OAuth --}}
-            <div class="grid gap-4">
+            <div class="grid gap-3">
                 <a
                     href="{{ route('oauth.redirect', ['tenant' => request()->getHost(), 'panel' => $panelId, 'provider' => 'discord']) }}"
-                    class="group flex items-center justify-center gap-3 rounded-xl bg-[#5865F2] px-4 py-3.5 text-sm font-bold text-white shadow-lg shadow-purple-900/10 transition-all hover:scale-[1.02] hover:bg-[#4752C4] active:scale-[0.98]"
+                    class="group flex items-center gap-3 rounded-xl bg-[#5865F2] pl-2 pr-4 py-1.5 text-sm font-bold text-white shadow-lg shadow-[#5865F2]/20 transition-all hover:scale-[1.02] active:scale-[0.98]"
                 >
-                    @svg ('fab-discord', 'h-5 w-5 transition-transform group-hover:rotate-12')
-                    Continuar com Discord
+                    <div class="flex h-9 w-9 items-center justify-center rounded-lg bg-white/20 backdrop-blur">
+                        @svg ('fab-discord', 'h-5 w-5')
+                    </div>
+                    <div class="text-left">
+                        <div class="text-[10px] font-semibold uppercase tracking-wider text-white/70">Discord</div>
+                        <div class="text-[12px] leading-none">Continuar com Discord</div>
+                    </div>
                 </a>
 
                 <a
                     href="{{ route('oauth.redirect', ['tenant' => request()->getHost(), 'panel' => $panelId, 'provider' => 'github']) }}"
-                    class="group flex items-center justify-center gap-3 rounded-xl bg-zinc-900 px-4 py-3.5 text-sm font-bold text-white shadow-lg ring-1 ring-zinc-800 transition-all hover:scale-[1.02] hover:bg-zinc-800 active:scale-[0.98]"
+                    class="group flex items-center gap-3 rounded-xl bg-[#181717] pl-2 pr-4 py-1.5 text-sm font-bold text-white shadow-lg shadow-black/20 transition-all hover:scale-[1.02] active:scale-[0.98]"
                 >
-                    @svg ('fab-github', 'h-5 w-5 transition-transform group-hover:scale-110')
-                    Continuar com GitHub
+                    <div class="flex h-9 w-9 items-center justify-center rounded-lg bg-white/20 backdrop-blur">
+                        @svg ('fab-github', 'h-5 w-5')
+                    </div>
+                    <div class="text-left">
+                        <div class="text-[10px] font-semibold uppercase tracking-wider text-white/70">GitHub</div>
+                        <div class="text-[12px] leading-none">Continuar com GitHub</div>
+                    </div>
                 </a>
 
                 <a
                     href="{{ route('oauth.redirect', ['tenant' => request()->getHost(), 'panel' => $panelId, 'provider' => 'twitch']) }}"
-                    class="group flex items-center justify-center gap-3 rounded-xl bg-[#9146FF] px-4 py-3.5 text-sm font-bold text-white shadow-lg shadow-purple-900/10 transition-all hover:scale-[1.02] hover:bg-[#7B2FF0] active:scale-[0.98]"
+                    class="group flex items-center gap-3 rounded-xl bg-[#9146FF] pl-2 pr-4 py-1.5 text-sm font-bold text-white shadow-lg shadow-[#9146FF]/20 transition-all hover:scale-[1.02] active:scale-[0.98]"
                 >
-                    @svg ('fab-twitch', 'h-5 w-5 transition-transform group-hover:-rotate-12')
-                    Continuar com Twitch
+                    <div class="flex h-9 w-9 items-center justify-center rounded-lg bg-white/20 backdrop-blur">
+                        @svg ('fab-twitch', 'h-5 w-5')
+                    </div>
+                    <div class="text-left">
+                        <div class="text-[10px] font-semibold uppercase tracking-wider text-white/70">Twitch</div>
+                        <div class="text-[12px] leading-none">Continuar com Twitch</div>
+                    </div>
                 </a>
             </div>
 
@@ -120,18 +153,17 @@
                         type="submit"
                         wire:click="authenticate"
                         wire:loading.attr="disabled"
-                        class="w-full rounded-xl bg-purple-600 px-4 py-3.5 text-sm font-bold text-white shadow-lg shadow-purple-900/20 transition-all hover:scale-[1.02] hover:bg-purple-500 active:scale-[0.98] disabled:opacity-70 disabled:cursor-not-allowed"
+                        class="relative flex h-[52px] w-full items-center justify-center rounded-xl bg-purple-600 px-4 text-sm font-bold text-white shadow-lg shadow-purple-900/20 transition-all hover:scale-[1.02] hover:bg-purple-500 active:scale-[0.98] disabled:opacity-70 disabled:cursor-not-allowed"
                     >
-                        <span wire:loading.remove wire:target="authenticate">
+                        <div wire:loading.remove wire:target="authenticate">
                             {{ $action->getLabel() }}
-                        </span>
-                        <span wire:loading wire:target="authenticate" class="flex items-center justify-center gap-2">
-                            <svg class="h-5 w-5 animate-spin text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        </div>
+                        <div wire:loading wire:target="authenticate">
+                            <svg class="h-6 w-6 animate-spin text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                                 <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                                 <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                             </svg>
-                            Entrando...
-                        </span>
+                        </div>
                     </button>
                 </div>
             </div>

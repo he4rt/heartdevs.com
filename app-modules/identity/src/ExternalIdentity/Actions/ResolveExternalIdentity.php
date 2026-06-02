@@ -13,7 +13,7 @@ final class ResolveExternalIdentity
 {
     public function handle(ResolveUserProviderDTO $dto): ExternalIdentity
     {
-        return ExternalIdentity::query()->firstOrCreate(
+        $identity = ExternalIdentity::query()->firstOrCreate(
             [
                 'provider' => $dto->provider,
                 'tenant_id' => $dto->tenantId,
@@ -24,13 +24,22 @@ final class ResolveExternalIdentity
                 'type' => $dto->provider->getType(),
                 'credentials_type' => CredentialsType::OAuth2,
                 'credentials' => ClientAccessManager::make(),
-                'metadata' => array_filter([
-                    'username' => $dto->username,
-                    'email' => $dto->email,
-                    'avatar' => $dto->avatar,
-                ]),
                 'connected_at' => now(),
             ]
         );
+
+        $metadata = array_filter([
+            'username' => $dto->username,
+            'email' => $dto->email,
+            'avatar' => $dto->avatar,
+        ]);
+
+        if ($metadata !== []) {
+            $identity->update([
+                'metadata' => array_merge($identity->metadata ?? [], $metadata),
+            ]);
+        }
+
+        return $identity;
     }
 }

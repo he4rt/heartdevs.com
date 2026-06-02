@@ -27,6 +27,7 @@ final readonly class NewMessage
                 'external_account_id' => $messageDTO->externalAccountId,
                 'model_type' => (new User)->getMorphClass(),
                 'username' => $messageDTO->providerUsername,
+                'avatar' => $messageDTO->avatar,
             ]);
 
             $userContext = resolve(ResolveUserContext::class)->handle($userDto);
