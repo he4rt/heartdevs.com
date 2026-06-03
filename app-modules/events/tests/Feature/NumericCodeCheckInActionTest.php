@@ -119,6 +119,21 @@ test('when code is expired, then expired error is thrown', function (): void {
     ))->toThrow(fn (CheckInException $e): bool => $e->getMessage() === __('events::check_in.check_in_code_expired'));
 });
 
+test('when code validity window has not started, then expired error is thrown', function (): void {
+    $scenario = createScenarioWithCode([
+        'starts_at' => now()->addHour(),
+        'expires_at' => now()->addHours(2),
+    ]);
+
+    expect(fn (): CheckIn => resolve(NumericCodeCheckInAction::class)->handle(
+        new NumericCodeCheckInDTO(
+            enrollment: $scenario['enrollment'],
+            code: '123456',
+            eventDate: now(),
+        ),
+    ))->toThrow(fn (CheckInException $e): bool => $e->getMessage() === __('events::check_in.check_in_code_expired'));
+});
+
 test('when code is revoked, then expired error is thrown', function (): void {
     $scenario = createScenarioWithCode([
         'revoked_at' => now(),
@@ -204,6 +219,54 @@ test('uses_count is atomically incremented on each successful check-in', functio
     );
 
     expect($code->fresh()->uses_count)->toBe(2);
+});
+
+test('when same numeric code exists for multiple event dates, then current date code is used', function (): void {
+    $tenant = Tenant::factory()->create();
+    $participant = User::factory()->create();
+    $startsAt = now()->setTime(9, 0);
+
+    $event = Event::factory()
+        ->for($tenant)
+        ->create([
+            'starts_at' => $startsAt,
+            'ends_at' => $startsAt->clone()->addDay()->setTime(18, 0),
+            'status' => EventStatus::Published,
+        ]);
+
+    $enrollment = Enrollment::factory()->create([
+        'event_id' => $event->id,
+        'user_id' => $participant->id,
+        'status' => EnrollmentStatus::Confirmed,
+        'confirmed_at' => now(),
+    ]);
+
+    $tomorrowCode = CheckInCode::factory()->create([
+        'event_id' => $event->id,
+        'event_date' => now()->addDay()->toDateString(),
+        'code' => '123456',
+        'starts_at' => now()->subHour(),
+        'expires_at' => now()->addHours(2),
+    ]);
+
+    $todayCode = CheckInCode::factory()->create([
+        'event_id' => $event->id,
+        'event_date' => now()->toDateString(),
+        'code' => '123456',
+        'starts_at' => now()->subHour(),
+        'expires_at' => now()->addHours(2),
+    ]);
+
+    resolve(NumericCodeCheckInAction::class)->handle(
+        new NumericCodeCheckInDTO(
+            enrollment: $enrollment,
+            code: '123456',
+            eventDate: now(),
+        ),
+    );
+
+    expect($todayCode->fresh()->uses_count)->toBe(1)
+        ->and($tomorrowCode->fresh()->uses_count)->toBe(0);
 });
 
 test('when check-in date is outside event date range, then check-in is rejected by core action', function (): void {

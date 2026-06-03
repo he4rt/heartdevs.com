@@ -13,6 +13,7 @@ use Filament\Forms\Components\TextInput;
 use Filament\Notifications\Notification;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Schemas\Components\Section;
+use Filament\Schemas\Components\Utilities\Set;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
@@ -85,12 +86,10 @@ final class CheckInCodesRelationManager extends RelationManager
             ->color('success')
             ->form(fn (): array => $this->generateFormSchema())
             ->using(function (array $data, self $livewire): CheckInCode {
-                $digits = (int) $data['digits'];
-
                 /** @var Event $event */
                 $event = $livewire->getOwnerRecord();
 
-                $code = $this->generateNumericCode($digits);
+                $code = (string) $data['code_preview'];
 
                 return CheckInCode::query()->create([
                     'event_id' => $event->id,
@@ -140,14 +139,19 @@ final class CheckInCodesRelationManager extends RelationManager
                             '6' => '6 digits',
                         ])
                         ->default('6')
+                        ->live()
+                        ->afterStateUpdated(function (Set $set, ?string $state): void {
+                            $set('code_preview', $this->generateNumericCode((int) ($state ?: 6)));
+                        })
                         ->selectablePlaceholder(false)
                         ->required(),
 
                     TextInput::make('code_preview')
                         ->label('Generated Code')
-                        ->disabled()
+                        ->readOnly()
                         ->default(fn (): string => $this->generateNumericCode(6))
-                        ->dehydrated(false),
+                        ->dehydrated()
+                        ->required(),
 
                     DatePicker::make('event_date')
                         ->label('Event Date')

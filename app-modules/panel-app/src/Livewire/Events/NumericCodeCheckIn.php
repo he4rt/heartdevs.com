@@ -13,6 +13,7 @@ use He4rt\Events\Enrollment\Enums\EnrollmentStatus;
 use He4rt\Events\Enrollment\Models\Enrollment;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Facades\Date;
+use Illuminate\Support\Facades\RateLimiter;
 use Livewire\Attributes\Computed;
 use Livewire\Component;
 
@@ -56,10 +57,30 @@ final class NumericCodeCheckIn extends Component
     public function checkIn(): void
     {
         $this->error = null;
+        $this->code = mb_trim($this->code);
 
         if ($this->enrollment === null || !$this->canCheckIn) {
             return;
         }
+
+        $this->validate([
+            'code' => ['required', 'string', 'regex:/^(?:\d{4}|\d{6})$/'],
+        ], [
+            'code.required' => CheckInException::invalidCheckInCodeFormat()->getMessage(),
+            'code.regex' => CheckInException::invalidCheckInCodeFormat()->getMessage(),
+        ]);
+
+        $rateLimitKey = $this->rateLimitKey();
+
+        if (RateLimiter::tooManyAttempts($rateLimitKey, 5)) {
+            $this->error = CheckInException::checkInCodeRateLimited(
+                RateLimiter::availableIn($rateLimitKey),
+            )->getMessage();
+
+            return;
+        }
+
+        RateLimiter::hit($rateLimitKey, 60);
 
         try {
             resolve(NumericCodeCheckInAction::class)->handle(
@@ -70,6 +91,7 @@ final class NumericCodeCheckIn extends Component
                 ),
             );
 
+            RateLimiter::clear($rateLimitKey);
             $this->code = '';
 
             Notification::make()
@@ -84,5 +106,15 @@ final class NumericCodeCheckIn extends Component
     public function render(): View
     {
         return view('panel-app::livewire.events.numeric-code-check-in');
+    }
+
+    private function rateLimitKey(): string
+    {
+        return sprintf(
+            'numeric-code-check-in:%s:%s:%s',
+            auth()->id() ?? 'guest',
+            $this->eventId,
+            request()->ip() ?? 'unknown',
+        );
     }
 }

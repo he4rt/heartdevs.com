@@ -21,18 +21,24 @@ final readonly class NumericCodeCheckInAction
             $codeRecord = CheckInCode::query()
                 ->where('code', $dto->code)
                 ->where('event_id', $dto->enrollment->event_id)
+                ->whereDate('event_date', $dto->eventDate->toDateString())
                 ->lockForUpdate()
                 ->first();
 
             if ($codeRecord === null) {
+                $codeExistsForAnotherDate = CheckInCode::query()
+                    ->where('code', $dto->code)
+                    ->where('event_id', $dto->enrollment->event_id)
+                    ->exists();
+
+                if ($codeExistsForAnotherDate) {
+                    throw CheckInException::checkInCodeWrongDate();
+                }
+
                 throw CheckInException::invalidCheckInCode();
             }
 
-            if (!$codeRecord->event_date->isSameDay($dto->eventDate)) {
-                throw CheckInException::checkInCodeWrongDate();
-            }
-
-            if ($codeRecord->expires_at->isPast() || $codeRecord->revoked_at !== null) {
+            if (now()->lt($codeRecord->starts_at) || $codeRecord->expires_at->isPast() || $codeRecord->revoked_at !== null) {
                 throw CheckInException::checkInCodeExpired();
             }
 

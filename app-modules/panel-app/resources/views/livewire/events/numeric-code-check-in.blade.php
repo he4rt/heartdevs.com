@@ -17,6 +17,10 @@
                         />
                     </x-filament::input.wrapper>
 
+                    @error ('code')
+                        <p class="text-danger-600 dark:text-danger-400 mt-2 text-sm">{{ $message }}</p>
+                    @enderror
+
                     @if ($error)
                         <p class="text-danger-600 dark:text-danger-400 mt-2 text-sm">{{ $error }}</p>
                     @endif
