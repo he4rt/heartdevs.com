@@ -130,6 +130,14 @@ return [
             'path' => storage_path('logs/laravel.log'),
         ],
 
+        'bot-discord' => [
+            'driver' => 'daily',
+            'path' => storage_path('logs/bot-discord.log'),
+            'level' => 'debug',
+            'days' => 30,
+            'replace_placeholders' => true,
+        ],
+
         'discord' => [
             'driver' => 'custom',
             'via' => Logger::class,

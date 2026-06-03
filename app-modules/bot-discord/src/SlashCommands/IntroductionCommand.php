@@ -17,6 +17,7 @@ use He4rt\Profile\Actions\UpsertProfile;
 use He4rt\Profile\DTOs\UpsertProfileDTO;
 use He4rt\Profile\Models\Profile;
 use Illuminate\Support\Facades\Date;
+use Illuminate\Support\Facades\Log;
 use Laracord\Commands\SlashCommand;
 use Throwable;
 
@@ -94,7 +95,20 @@ class IntroductionCommand extends SlashCommand
 
                     $interaction->respondWithMessage("Apresentação enviada com sucesso.\nhttps://heartdevs.com/", true);
 
-                } catch (Throwable) {
+                } catch (Throwable $throwable) {
+                    Log::channel('bot-discord')->error('IntroductionCommand: failed to process introduction', [
+                        'discord_user_id' => $interaction->user->id,
+                        'guild_id' => $interaction->guild_id,
+                        'fields' => [
+                            'name' => $components->get('custom_id', 'name')?->value,
+                            'nickname' => $components->get('custom_id', 'nickname')?->value,
+                            'about' => $components->get('custom_id', 'about')?->value,
+                        ],
+                        'exception' => $throwable,
+                    ]);
+
+                    report($throwable);
+
                     $interaction->respondWithMessage('Ocorreu um erro ao processar sua apresentação.', true);
                 }
             })
