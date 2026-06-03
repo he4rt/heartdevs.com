@@ -11,6 +11,6 @@ final class TenantUserObserver
 {
     public function created(TenantUser $pivot): void
     {
-        Profile::ensureExists($pivot->user_id, $pivot->tenant_id);
+        Profile::ensureExists((string) $pivot->user_id, (string) $pivot->tenant_id);
     }
 }
