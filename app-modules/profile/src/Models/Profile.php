@@ -56,6 +56,19 @@ final class Profile extends Model
         'start_availability',
     ];
 
+    public static function ensureExists(string $userId, string $tenantId): self
+    {
+        /** @var Profile $profile */
+        $profile = self::query()->firstOrCreate([
+            'user_id' => $userId,
+            'tenant_id' => $tenantId,
+        ], [
+            'available_for_proposals' => false,
+        ]);
+
+        return $profile;
+    }
+
     /**
      * @return BelongsTo<User, $this>
      */

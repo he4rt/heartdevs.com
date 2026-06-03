@@ -11,11 +11,10 @@ use Discord\Parts\Embed\Embed;
 use Discord\Parts\Interactions\Command\Option;
 use Discord\Parts\Interactions\Interaction;
 use He4rt\BotDiscord\DTO\VoiceChannelDTO;
-use Laracord\Commands\SlashCommand;
 
 use function React\Async\await;
 
-class DynamicVoiceCommand extends SlashCommand
+class DynamicVoiceCommand extends AbstractSlashCommand
 {
     /**
      * The command name.

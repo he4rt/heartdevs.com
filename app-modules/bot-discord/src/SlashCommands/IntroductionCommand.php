@@ -18,10 +18,9 @@ use He4rt\Profile\DTOs\UpsertProfileDTO;
 use He4rt\Profile\Models\Profile;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\Log;
-use Laracord\Commands\SlashCommand;
 use Throwable;
 
-class IntroductionCommand extends SlashCommand
+class IntroductionCommand extends AbstractSlashCommand
 {
     protected $name = 'apresentar';
 
@@ -142,10 +141,7 @@ class IntroductionCommand extends SlashCommand
 
         $userContext->user->update(['name' => $name]);
 
-        $profile = Profile::query()
-            ->where('user_id', $userContext->user->id)
-            ->where('tenant_id', $tenantProvider->tenant_id)
-            ->firstOrFail();
+        $profile = Profile::ensureExists($userContext->user->id, $tenantProvider->tenant_id);
 
         $dto = UpsertProfileDTO::fromArray([
             'nickname' => $nickname,

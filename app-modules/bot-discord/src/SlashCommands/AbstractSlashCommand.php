@@ -20,6 +20,20 @@ abstract class AbstractSlashCommand extends SlashCommand
 
     protected ?ExternalIdentity $tenantProvider = null;
 
+    public function maybeHandle(Interaction $interaction): void
+    {
+        if ($interaction->guild_id === null) {
+            $interaction->respondWithMessage(
+                'Este comando só pode ser usado em um servidor.',
+                true
+            );
+
+            return;
+        }
+
+        parent::maybeHandle($interaction);
+    }
+
     protected function processMiddleware(Interaction $interaction): mixed
     {
         $context = new Context(
