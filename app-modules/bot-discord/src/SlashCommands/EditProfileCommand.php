@@ -88,7 +88,7 @@ class EditProfileCommand extends AbstractSlashCommand
                     ->setMinLength(2)
                     ->setMaxLength(32)
                     ->setPlaceholder('Seu nome')
-                    ->setValue(mb_strlen((string) $name) >= 2 ? $name : null)
+                    ->setValue(filled($name) && mb_strlen((string) $name) >= 2 ? $name : null)
                     ->setRequired(true),
 
                 TextInput::new('Nickname', TextInput::STYLE_SHORT)
@@ -96,7 +96,7 @@ class EditProfileCommand extends AbstractSlashCommand
                     ->setMinLength(2)
                     ->setMaxLength(32)
                     ->setPlaceholder('Seu nickname')
-                    ->setValue($nickname !== null && mb_strlen($nickname) >= 2 ? $nickname : null)
+                    ->setValue(filled($nickname) && mb_strlen($nickname) >= 2 ? $nickname : null)
                     ->setRequired(true),
 
                 TextInput::new('Nos conte um pouco sobre você', TextInput::STYLE_PARAGRAPH)
@@ -104,7 +104,7 @@ class EditProfileCommand extends AbstractSlashCommand
                     ->setMinLength(5)
                     ->setMaxLength(500)
                     ->setPlaceholder('Fale mais sobre você...')
-                    ->setValue($about !== null && mb_strlen($about) >= 5 ? $about : null)
+                    ->setValue(filled($about) && mb_strlen($about) >= 5 ? $about : null)
                     ->setRequired(true),
 
             ])
