@@ -50,8 +50,6 @@ describe('persistence flow', function (): void {
 
         $userContext = resolve(ResolveUserContext::class)->handle($userDto);
 
-        $userContext->user->tenants()->syncWithoutDetaching([$data['tenant']->id]);
-
         $userContext->user->update(['name' => 'TestName']);
 
         $profile = Profile::query()
@@ -81,7 +79,7 @@ describe('persistence flow', function (): void {
             ->firstOrFail();
     })->throws(ModelNotFoundException::class);
 
-    test('profile not found when user is not attached to tenant', function (): void {
+    test('new user gets tenant pivot and profile via ResolveUserContext', function (): void {
         $data = createIntroductionScenario();
 
         $tenantProvider = ExternalIdentity::query()
@@ -100,9 +98,13 @@ describe('persistence flow', function (): void {
 
         $userContext = resolve(ResolveUserContext::class)->handle($userDto);
 
-        Profile::query()
+        expect($userContext->user->tenants()->where('tenants.id', $data['tenant']->id)->exists())->toBeTrue();
+
+        $profile = Profile::query()
             ->where('user_id', $userContext->user->id)
             ->where('tenant_id', $tenantProvider->tenant_id)
-            ->firstOrFail();
-    })->throws(ModelNotFoundException::class);
+            ->first();
+
+        expect($profile)->not->toBeNull();
+    });
 });
