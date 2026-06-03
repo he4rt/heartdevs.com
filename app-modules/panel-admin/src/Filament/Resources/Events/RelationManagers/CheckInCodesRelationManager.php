@@ -91,6 +91,10 @@ final class CheckInCodesRelationManager extends RelationManager
 
                 $code = (string) $data['code_preview'];
 
+                if (!preg_match('/^\d{4}$|^\d{6}$/', $code)) {
+                    $code = $this->generateNumericCode((int) ($data['digits'] ?? 6));
+                }
+
                 return CheckInCode::query()->create([
                     'event_id' => $event->id,
                     'event_date' => $data['event_date'],

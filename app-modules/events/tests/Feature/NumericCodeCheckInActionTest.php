@@ -15,7 +15,16 @@ use He4rt\Events\Event\Enums\EventStatus;
 use He4rt\Events\Event\Models\Event;
 use He4rt\Identity\Tenant\Models\Tenant;
 use He4rt\Identity\User\Models\User;
+use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\Event as EventFacade;
+
+beforeEach(function (): void {
+    Date::setTestNow(now()->setTime(12, 0));
+});
+
+afterEach(function (): void {
+    Date::setTestNow();
+});
 
 function createScenarioWithCode(array $codeOverrides = []): array
 {

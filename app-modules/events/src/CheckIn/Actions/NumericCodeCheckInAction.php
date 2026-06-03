@@ -38,7 +38,7 @@ final readonly class NumericCodeCheckInAction
                 throw CheckInException::invalidCheckInCode();
             }
 
-            if (now()->lt($codeRecord->starts_at) || $codeRecord->expires_at->isPast() || $codeRecord->revoked_at !== null) {
+            if ($codeRecord->starts_at->isFuture() || $codeRecord->expires_at->isPast() || $codeRecord->revoked_at !== null) {
                 throw CheckInException::checkInCodeExpired();
             }
 
