@@ -9,10 +9,10 @@ use He4rt\Gamification\Character\Models\Character;
 
 class IncrementExperience
 {
-    public function incrementByTextMessage(string $characterId, string $message): int
+    public function incrementByTextMessage(string $characterId, string $message, bool $isSupporter): int
     {
         $character = Character::query()->findOrFail($characterId);
-        $experience = Character::generateTextExperience($message, $character->level, false);
+        $experience = Character::generateTextExperience($message, $character->level, $isSupporter);
         $character->increment('experience', $experience);
 
         return $experience;

@@ -1,0 +1,63 @@
+<?php
+
+declare(strict_types=1);
+
+use He4rt\Gamification\Character\Actions\IncrementExperience;
+use He4rt\Gamification\Character\Enums\VoiceStatesEnum;
+use He4rt\Gamification\Character\Models\Character;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+
+uses(RefreshDatabase::class);
+
+test('voice state multipliers', function (VoiceStatesEnum $state, int $expected): void {
+    expect($state->getExperienceMultiplier())->toBe($expected);
+})->with([
+    'disabled gives 0' => [VoiceStatesEnum::Disabled, 0],
+    'muted gives 3' => [VoiceStatesEnum::Muted, 3],
+    'unmuted gives 5' => [VoiceStatesEnum::Unmuted, 5],
+]);
+
+test('voice xp increments by multiplier times level', function (): void {
+    $character = Character::factory()->create(['experience' => 4500]);
+    // level 10 at 4500 xp, unmuted = 5 * 10 = 50
+
+    $xp = resolve(IncrementExperience::class)
+        ->incrementByVoiceMessage($character->id, VoiceStatesEnum::Unmuted);
+
+    expect($xp)->toBe(50)
+        ->and($character->fresh()->experience)->toBe(4550);
+});
+
+test('disabled voice state gives zero xp', function (): void {
+    $character = Character::factory()->create(['experience' => 4500]);
+
+    $xp = resolve(IncrementExperience::class)
+        ->incrementByVoiceMessage($character->id, VoiceStatesEnum::Disabled);
+
+    expect($xp)->toBe(0)
+        ->and($character->fresh()->experience)->toBe(4500);
+});
+
+test('text message increment works through action', function (): void {
+    $character = Character::factory()->create(['experience' => 0]);
+    $message = str_repeat('a', 200);
+
+    $xp = resolve(IncrementExperience::class)
+        ->incrementByTextMessage($character->id, $message, false);
+
+    // (200 * 0.01) + (1 * 0.1) = 2.1 → (int) 2
+    expect($xp)->toBe(2)
+        ->and($character->fresh()->experience)->toBe(2);
+});
+
+test('text message increment passes supporter flag', function (): void {
+    $character = Character::factory()->create(['experience' => 0]);
+    $message = str_repeat('a', 200);
+
+    $xp = resolve(IncrementExperience::class)
+        ->incrementByTextMessage($character->id, $message, true);
+
+    // non-supporter would be 2, supporter = 4
+    expect($xp)->toBe(4)
+        ->and($character->fresh()->experience)->toBe(4);
+});
