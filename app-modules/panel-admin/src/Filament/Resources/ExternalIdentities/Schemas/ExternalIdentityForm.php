@@ -18,8 +18,7 @@ class ExternalIdentityForm
             ->components([
                 TextInput::make('tenant_id')
                     ->label('Tenant Id')
-                    ->required()
-                    ->integer(),
+                    ->required(),
 
                 TextInput::make('model_type')
                     ->label('Model Type')
