@@ -40,4 +40,52 @@ final class CheckInException extends Exception
             Response::HTTP_UNPROCESSABLE_ENTITY,
         );
     }
+
+    public static function invalidCheckInCode(): self
+    {
+        return new self(
+            __('events::check_in.invalid_check_in_code'),
+            Response::HTTP_UNPROCESSABLE_ENTITY,
+        );
+    }
+
+    public static function invalidCheckInCodeFormat(): self
+    {
+        return new self(
+            __('events::check_in.invalid_check_in_code_format'),
+            Response::HTTP_UNPROCESSABLE_ENTITY,
+        );
+    }
+
+    public static function checkInCodeExpired(): self
+    {
+        return new self(
+            __('events::check_in.check_in_code_expired'),
+            Response::HTTP_UNPROCESSABLE_ENTITY,
+        );
+    }
+
+    public static function checkInCodeExhausted(): self
+    {
+        return new self(
+            __('events::check_in.check_in_code_exhausted'),
+            Response::HTTP_UNPROCESSABLE_ENTITY,
+        );
+    }
+
+    public static function checkInCodeWrongDate(): self
+    {
+        return new self(
+            __('events::check_in.check_in_code_wrong_date'),
+            Response::HTTP_UNPROCESSABLE_ENTITY,
+        );
+    }
+
+    public static function checkInCodeRateLimited(int $seconds): self
+    {
+        return new self(
+            __('events::check_in.check_in_code_rate_limited', ['seconds' => $seconds]),
+            Response::HTTP_TOO_MANY_REQUESTS,
+        );
+    }
 }

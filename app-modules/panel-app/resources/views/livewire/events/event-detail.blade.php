@@ -60,4 +60,10 @@
             <p class="text-sm text-gray-600 dark:text-gray-300">{{ __('events::pages.event_full') }}</p>
         </div>
     @endif
+
+    <livewire:numeric-code-check-in
+        :event-id="$this->eventId"
+        :key="'numeric-code-' . $this->eventId"
+        wire:key="'numeric-code-check-in-' . $this->eventId"
+    />
 </div>

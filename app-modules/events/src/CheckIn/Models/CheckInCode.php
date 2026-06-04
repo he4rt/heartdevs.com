@@ -22,6 +22,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property Carbon $expires_at
  * @property int|null $max_uses
  * @property int $uses_count
+ * @property Carbon|null $revoked_at
  * @property Carbon $created_at
  * @property Carbon $updated_at
  */
@@ -40,6 +41,7 @@ final class CheckInCode extends Model
         'expires_at',
         'max_uses',
         'uses_count',
+        'revoked_at',
     ];
 
     /** @return BelongsTo<Event, $this> */
@@ -60,6 +62,7 @@ final class CheckInCode extends Model
             'event_date' => 'date',
             'starts_at' => 'datetime',
             'expires_at' => 'datetime',
+            'revoked_at' => 'datetime',
         ];
     }
 }
