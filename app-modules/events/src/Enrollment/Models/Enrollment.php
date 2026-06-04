@@ -112,10 +112,10 @@ final class Enrollment extends Model
     /** @param  Builder<Enrollment>  $query */
     protected function scopeActive(Builder $query): void
     {
-        $query->whereNotIn('status', [
-            EnrollmentStatus::Cancelled,
-            EnrollmentStatus::Rejected,
-            EnrollmentStatus::NoShow,
+        $query->whereIn('status', [
+            EnrollmentStatus::Confirmed,
+            EnrollmentStatus::CheckedIn,
+            EnrollmentStatus::Attended,
         ]);
     }
 

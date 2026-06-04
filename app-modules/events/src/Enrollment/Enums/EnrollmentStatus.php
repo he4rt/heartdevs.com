@@ -94,11 +94,13 @@ enum EnrollmentStatus: string implements HasColor, HasIcon, HasLabel
         return $this->is(self::Waitlisted);
     }
 
-    public function getResponseMessage(): string
+    public function getResponseMessage(?int $waitlistPosition = null): string
     {
         return match ($this) {
             self::Confirmed => __('events::pages.confirm_presence_success'),
-            self::Waitlisted => __('events::pages.waitlist_success'),
+            self::Waitlisted => __('events::pages.waitlist_success', [
+                'position' => $waitlistPosition,
+            ]),
             default => throw EnrollmentException::responseMessageNotImplemented($this),
         };
     }

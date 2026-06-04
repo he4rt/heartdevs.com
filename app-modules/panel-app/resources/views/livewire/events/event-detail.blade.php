@@ -36,6 +36,16 @@
                     {{ $this->enrollment->status->getLabel() }}
                 </x-filament::badge>
             </div>
+
+            @if ($this->enrollment->status->isWaitlisted() && $this->enrollment->waitlist_position)
+                <p class="mt-3 text-sm text-amber-700 dark:text-amber-400">
+                    {{
+                        __('events::pages.waitlist_status', [
+                            'position' => $this->enrollment->waitlist_position,
+                        ])
+                    }}
+                </p>
+            @endif
         </div>
     @elseif ($this->canConfirmPresence)
         <div class="rounded-xl border border-gray-200 p-5 dark:border-white/10">
@@ -44,6 +54,10 @@
             <x-filament::button wire:click="confirmPresence" wire:loading.attr="disabled">
                 {{ __('events::pages.confirm_presence') }}
             </x-filament::button>
+        </div>
+    @elseif ($this->isEventFull)
+        <div class="rounded-xl border border-gray-200 p-5 dark:border-white/10">
+            <p class="text-sm text-gray-600 dark:text-gray-300">{{ __('events::pages.event_full') }}</p>
         </div>
     @endif
 </div>
