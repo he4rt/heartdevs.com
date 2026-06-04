@@ -9,4 +9,10 @@ return [
     'invalid_check_in_actor' => 'Manual check-in requires the organizer user id.',
     'qr_token_not_found' => 'QR token not found or does not belong to this event.',
     'qr_token_expired' => 'This QR token has expired.',
+    'invalid_check_in_code' => 'Invalid check-in code.',
+    'invalid_check_in_code_format' => 'Enter a 4 or 6 digit check-in code.',
+    'check_in_code_expired' => 'Code has expired.',
+    'check_in_code_exhausted' => 'Code has reached maximum uses.',
+    'check_in_code_wrong_date' => 'Code is not valid for today.',
+    'check_in_code_rate_limited' => 'Too many attempts. Try again in :seconds seconds.',
 ];

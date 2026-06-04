@@ -7,6 +7,7 @@ namespace He4rt\PanelApp;
 use He4rt\PanelApp\Livewire\Events\EventDetail;
 use He4rt\PanelApp\Livewire\Events\EventsList;
 use He4rt\PanelApp\Livewire\Events\MyEventsList;
+use He4rt\PanelApp\Livewire\Events\NumericCodeCheckIn;
 use He4rt\PanelApp\Livewire\Timeline\Composer;
 use He4rt\PanelApp\Livewire\Timeline\Feed;
 use He4rt\PanelApp\Livewire\Timeline\PostShow;
@@ -27,6 +28,7 @@ class PanelAppServiceProvider extends ServiceProvider
         Livewire::component('events-list', EventsList::class);
         Livewire::component('my-events-list', MyEventsList::class);
         Livewire::component('event-detail', EventDetail::class);
+        Livewire::component('numeric-code-check-in', NumericCodeCheckIn::class);
 
         Livewire::component('timeline-composer', Composer::class);
         Livewire::component('timeline-feed', Feed::class);

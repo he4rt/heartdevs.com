@@ -10,7 +10,9 @@ return [
     'confirm_presence_yes' => 'Yes, enroll me',
     'confirm_presence_cancel' => 'Cancel',
     'confirm_presence_success' => 'Your presence has been confirmed!',
-    'waitlist_success' => 'You have been added to the waitlist for this event.',
+    'waitlist_success' => 'You are on the waitlist (position :position).',
+    'waitlist_status' => 'You are on the waitlist (position :position).',
+    'event_full' => 'This event is full.',
     'enrollment_status_label' => 'Your enrollment status',
     'enrolled_at' => 'Enrolled on :date',
     'no_enrollments' => 'You are not enrolled in any events yet.',
@@ -24,4 +26,6 @@ return [
     'check_in_history' => 'Check-in History',
     'check_in_history_date' => ':date',
     'no_check_ins_yet' => 'No check-ins recorded yet.',
+    'enter_check_in_code_hint' => 'Enter the check-in code announced by the organizer.',
+    'check_in' => 'Check In',
 ];

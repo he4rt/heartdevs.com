@@ -10,7 +10,9 @@ return [
     'confirm_presence_yes' => 'Sim, me inscrever',
     'confirm_presence_cancel' => 'Cancelar',
     'confirm_presence_success' => 'Sua presença foi confirmada!',
-    'waitlist_success' => 'Você entrou na lista de espera deste evento.',
+    'waitlist_success' => 'Você está na lista de espera (posição :position).',
+    'waitlist_status' => 'Você está na lista de espera (posição :position).',
+    'event_full' => 'Este evento está lotado.',
     'enrollment_status_label' => 'Status da sua inscrição',
     'enrolled_at' => 'Inscrito em :date',
     'no_enrollments' => 'Você ainda não está inscrito em nenhum evento.',
@@ -24,4 +26,6 @@ return [
     'check_in_history' => 'Histórico de Check-ins',
     'check_in_history_date' => ':date',
     'no_check_ins_yet' => 'Nenhum check-in registrado ainda.',
+    'enter_check_in_code_hint' => 'Insira o código de check-in informado pelo organizador.',
+    'check_in' => 'Fazer Check-in',
 ];

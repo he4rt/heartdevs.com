@@ -5,6 +5,7 @@ declare(strict_types=1);
 use Filament\Facades\Filament;
 use He4rt\Events\CheckIn\Enums\CheckInMethod;
 use He4rt\Events\CheckIn\Models\CheckIn;
+use He4rt\Events\CheckIn\Models\CheckInCode;
 use He4rt\Events\Enrollment\Enums\AttendanceRequirement;
 use He4rt\Events\Enrollment\Enums\EnrollmentMethod;
 use He4rt\Events\Enrollment\Enums\EnrollmentStatus;
@@ -18,6 +19,7 @@ use He4rt\PanelAdmin\Filament\Resources\Events\EventResource;
 use He4rt\PanelAdmin\Filament\Resources\Events\Pages\CreateEvent;
 use He4rt\PanelAdmin\Filament\Resources\Events\Pages\EditEvent;
 use He4rt\PanelAdmin\Filament\Resources\Events\Pages\ListEvents;
+use He4rt\PanelAdmin\Filament\Resources\Events\RelationManagers\CheckInCodesRelationManager;
 use He4rt\PanelAdmin\Filament\Resources\Events\RelationManagers\EnrollmentsRelationManager;
 
 use function Pest\Livewire\livewire;
@@ -139,6 +141,30 @@ test('when visiting the enrollments relation manager, then it renders successful
         'pageClass' => EditEvent::class,
     ])
         ->assertSuccessful();
+});
+
+test('when admin generates a check-in code, then persisted code matches preview value', function (): void {
+    $startsAt = now()->setTime(9, 0);
+    $event = Event::factory()->create([
+        'starts_at' => $startsAt,
+        'ends_at' => $startsAt->clone()->setTime(18, 0),
+    ]);
+
+    livewire(CheckInCodesRelationManager::class, [
+        'ownerRecord' => $event,
+        'pageClass' => EditEvent::class,
+    ])
+        ->callTableAction('generateCode', data: [
+            'digits' => '4',
+            'code_preview' => '1234',
+            'event_date' => now()->toDateString(),
+            'starts_at' => now(),
+            'expires_at' => now()->addHours(2),
+            'max_uses' => '',
+        ])
+        ->assertHasNoTableActionErrors();
+
+    expect(CheckInCode::query()->where('event_id', $event->id)->sole()->code)->toBe('1234');
 });
 
 test('when admin checks in an enrollment from relation manager, then participant is checked in', function (): void {

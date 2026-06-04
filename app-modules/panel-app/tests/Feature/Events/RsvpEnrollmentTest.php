@@ -92,7 +92,7 @@ test('event page returns 404 for event from another tenant', function (): void {
         ->assertNotFound();
 });
 
-test('when event is at capacity without waitlist, then confirm presence button is hidden', function (): void {
+test('when event is at capacity without waitlist, then event full message is shown', function (): void {
     $this->event->enrollmentPolicy->update([
         'capacity' => 1,
         'has_waitlist' => false,
@@ -109,7 +109,30 @@ test('when event is at capacity without waitlist, then confirm presence button i
 
     livewire(EventDetail::class, ['eventId' => $this->event->id])
         ->assertSet('canConfirmPresence', false)
+        ->assertSet('isEventFull', true)
+        ->assertSee(__('events::pages.event_full'))
         ->assertDontSee(__('events::pages.confirm_presence'));
+});
+
+test('when user is waitlisted, then waitlist position is shown on event page', function (): void {
+    $this->event->enrollmentPolicy->update([
+        'capacity' => 1,
+        'has_waitlist' => true,
+    ]);
+
+    $otherUser = User::factory()->create();
+    Enrollment::factory()->create([
+        'event_id' => $this->event->id,
+        'user_id' => $otherUser->id,
+        'status' => EnrollmentStatus::Confirmed,
+        'enrolled_at' => now(),
+        'confirmed_at' => now(),
+    ]);
+
+    livewire(EventDetail::class, ['eventId' => $this->event->id])
+        ->call('confirmPresence')
+        ->assertHasNoErrors()
+        ->assertSee(__('events::pages.waitlist_status', ['position' => 1]));
 });
 
 test('when event is at capacity with waitlist, then confirm presence button is still shown', function (): void {
