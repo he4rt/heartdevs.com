@@ -9,6 +9,7 @@ use He4rt\Events\CheckIn\Actions\NumericCodeCheckInAction;
 use He4rt\Events\CheckIn\DTOs\NumericCodeCheckInDTO;
 use He4rt\Events\CheckIn\Enums\CheckInMethod;
 use He4rt\Events\CheckIn\Exceptions\CheckInException;
+use He4rt\Events\CheckIn\Rules\CheckInCodeRule;
 use He4rt\Events\Enrollment\Enums\EnrollmentStatus;
 use He4rt\Events\Enrollment\Models\Enrollment;
 use Illuminate\Contracts\View\View;
@@ -64,23 +65,14 @@ final class NumericCodeCheckIn extends Component
         }
 
         $this->validate([
-            'code' => ['required', 'string', 'regex:/^(?:\d{4}|\d{6})$/'],
+            'code' => ['required', 'string', new CheckInCodeRule()],
         ], [
             'code.required' => CheckInException::invalidCheckInCodeFormat()->getMessage(),
-            'code.regex' => CheckInException::invalidCheckInCodeFormat()->getMessage(),
         ]);
 
-        $rateLimitKey = $this->rateLimitKey();
-
-        if (RateLimiter::tooManyAttempts($rateLimitKey, 5)) {
-            $this->error = CheckInException::checkInCodeRateLimited(
-                RateLimiter::availableIn($rateLimitKey),
-            )->getMessage();
-
+        if (!$this->ensureNotRateLimited()) {
             return;
         }
-
-        RateLimiter::hit($rateLimitKey, 60);
 
         try {
             resolve(NumericCodeCheckInAction::class)->handle(
@@ -91,7 +83,7 @@ final class NumericCodeCheckIn extends Component
                 ),
             );
 
-            RateLimiter::clear($rateLimitKey);
+            RateLimiter::clear($this->getRateLimitKey());
             $this->code = '';
 
             Notification::make()
@@ -108,13 +100,30 @@ final class NumericCodeCheckIn extends Component
         return view('panel-app::livewire.events.numeric-code-check-in');
     }
 
-    private function rateLimitKey(): string
+    private function ensureNotRateLimited(): bool
+    {
+        $rateLimitKey = $this->getRateLimitKey();
+
+        if (RateLimiter::tooManyAttempts($rateLimitKey, 5)) {
+            $this->error = CheckInException::checkInCodeRateLimited(
+                RateLimiter::availableIn($rateLimitKey)
+            )->getMessage();
+
+            return false;
+        }
+
+        RateLimiter::hit($rateLimitKey, 60);
+
+        return true;
+    }
+
+    private function getRateLimitKey(): string
     {
         return sprintf(
             'numeric-code-check-in:%s:%s:%s',
             auth()->id() ?? 'guest',
             $this->eventId,
-            request()->ip() ?? 'unknown',
+            md5((string) (request()->ip() ?? 'unknown')),
         );
     }
 }

@@ -41,14 +41,14 @@ beforeEach(function (): void {
         'confirmed_at' => now(),
     ]);
 
-    RateLimiter::clear(sprintf('numeric-code-check-in:%s:%s:%s', $this->user->id, $this->event->id, '127.0.0.1'));
+    RateLimiter::clear(sprintf('numeric-code-check-in:%s:%s:%s', $this->user->id, $this->event->id, md5('127.0.0.1')));
 });
 
 test('when check-in code format is invalid, then component rejects it before action', function (): void {
     livewire(NumericCodeCheckIn::class, ['eventId' => $this->event->id])
         ->set('code', 'abc123')
         ->call('checkIn')
-        ->assertHasErrors(['code' => 'regex']);
+        ->assertHasErrors(['code']);
 });
 
 test('when participant repeats invalid numeric codes, then component rate limits attempts', function (): void {
