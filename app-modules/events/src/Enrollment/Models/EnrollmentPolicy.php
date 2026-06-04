@@ -9,6 +9,7 @@ use He4rt\Events\CheckIn\Enums\CheckInMethod;
 use He4rt\Events\Database\Factories\EnrollmentPolicyFactory;
 use He4rt\Events\Enrollment\Enums\AttendanceRequirement;
 use He4rt\Events\Enrollment\Enums\EnrollmentMethod;
+use He4rt\Events\Enrollment\Enums\EnrollmentStatus;
 use He4rt\Events\Event\Models\Event;
 use Illuminate\Database\Eloquent\Attributes\Table;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
@@ -67,6 +68,19 @@ final class EnrollmentPolicy extends Model
     public function event(): BelongsTo
     {
         return $this->belongsTo(Event::class);
+    }
+
+    public function resolveAttendance(Enrollment $enrollment): EnrollmentStatus
+    {
+        $checkInDays = $enrollment->checkIns()->count();
+
+        $meets = match ($this->attendance_requirement) {
+            AttendanceRequirement::AllDays => $checkInDays === $enrollment->event->totalDays(),
+            AttendanceRequirement::AnyDay => $checkInDays >= 1,
+            AttendanceRequirement::MinimumDays => $checkInDays >= ($this->minimum_days ?? 0),
+        };
+
+        return $meets ? EnrollmentStatus::Attended : EnrollmentStatus::NoShow;
     }
 
     protected static function newFactory(): EnrollmentPolicyFactory
