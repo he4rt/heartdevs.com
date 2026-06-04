@@ -20,6 +20,7 @@ use He4rt\Events\Event\Models\Event;
 use He4rt\Identity\Tenant\Models\Tenant;
 use He4rt\Identity\User\Models\User;
 use Illuminate\Support\Facades\Event as EventFacade;
+use Illuminate\Support\Str;
 
 function createEnrollmentWithQrToken(array $eventAttributes = [], array $enrollmentAttributes = []): array
 {
@@ -57,7 +58,7 @@ test('when enrollment is confirmed, generate qr token action creates a unique to
 
     expect($qrToken)->toBeInstanceOf(QrToken::class)
         ->and($qrToken->enrollment_id)->toBe($enrollment->id)
-        ->and($qrToken->token)->toHaveLength(64)
+        ->and(Str::isUuid($qrToken->token))->toBeTrue()
         ->and($qrToken->expires_at)->toBeNull();
 });
 

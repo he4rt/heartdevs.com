@@ -15,6 +15,7 @@ use He4rt\Events\CheckIn\Models\QrToken;
 use He4rt\Events\Enrollment\Actions\EnrollUserAction;
 use He4rt\Events\Enrollment\DTOs\EnrollUserDTO;
 use He4rt\Events\Enrollment\Enums\EnrollmentMethod;
+use He4rt\Events\Enrollment\Enums\EnrollmentStatus;
 use He4rt\Events\Enrollment\Exceptions\EnrollmentException;
 use He4rt\Events\Enrollment\Models\Enrollment;
 use He4rt\Events\Event\Enums\EventStatus;

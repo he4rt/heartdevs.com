@@ -70,7 +70,9 @@ test('when enrollment status helpers are evaluated, then is and named checks wor
 });
 
 test('when rsvp enrollment status is evaluated, then response message matches status', function (EnrollmentStatus $status, string $expectedKey): void {
-    expect($status->getResponseMessage())->toBe(__($expectedKey));
+    $position = 5;
+
+    expect($status->getResponseMessage($position))->toBe(__($expectedKey, ['position' => $position]));
 })->with([
     [EnrollmentStatus::Confirmed, 'events::pages.confirm_presence_success'],
     [EnrollmentStatus::Waitlisted, 'events::pages.waitlist_success'],

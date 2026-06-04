@@ -7,6 +7,8 @@ namespace He4rt\PanelAdmin\Filament\Resources\Events\RelationManagers;
 use Filament\Actions\Action;
 use Filament\Actions\BulkAction;
 use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteAction;
+use Filament\Actions\DeleteBulkAction;
 use Filament\Forms\Components\DatePicker;
 use Filament\Notifications\Notification;
 use Filament\Resources\RelationManagers\RelationManager;
@@ -27,11 +29,6 @@ use Illuminate\Support\Facades\Date;
 final class EnrollmentsRelationManager extends RelationManager
 {
     protected static string $relationship = 'enrollments';
-
-    public function isReadOnly(): bool
-    {
-        return true;
-    }
 
     public function table(Table $table): Table
     {
@@ -87,10 +84,12 @@ final class EnrollmentsRelationManager extends RelationManager
             ])
             ->recordActions([
                 $this->checkInAction(),
+                DeleteAction::make(),
             ])
             ->toolbarActions([
                 BulkActionGroup::make([
                     $this->bulkCheckInAction(),
+                    DeleteBulkAction::make(),
                 ]),
             ]);
     }
