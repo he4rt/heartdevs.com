@@ -10,4 +10,6 @@ return [
     'invalid_enrollment_method' => 'This event requires application enrollment, not RSVP.',
     'event_full' => 'This event has reached maximum capacity and does not have a waitlist.',
     'response_message_not_implemented' => 'Response message is not implemented for enrollment status: :status.',
+    'override_reason_required' => 'A reason is required when overriding an enrollment status.',
+    'override_not_allowed' => 'Override from :from to :to is not allowed.',
 ];
