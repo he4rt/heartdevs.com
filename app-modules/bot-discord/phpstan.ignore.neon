@@ -60,3 +60,13 @@ parameters:
             identifier: argument.templateType
             count: 1
             path: src/SlashCommands/EditVoiceChannelLimitCommand.php
+        -
+            message: '#^Access to an undefined property Discord\\Parts\\WebSockets\\VoiceStateUpdate::\$channel_id\.$#'
+            identifier: property.notFound
+            count: 1
+            path: src/Tasks/VoiceExperienceTask.php
+        -
+            message: '#^Access to an undefined property Discord\\Parts\\WebSockets\\VoiceStateUpdate::\$member\.$#'
+            identifier: property.notFound
+            count: 1
+            path: src/Tasks/VoiceExperienceTask.php

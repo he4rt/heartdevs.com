@@ -7,43 +7,52 @@ namespace He4rt\Activity\Voice\Actions;
 use He4rt\Activity\Voice\DTOs\NewVoiceMessageDTO;
 use He4rt\Activity\Voice\Models\Voice;
 use He4rt\Gamification\Character\Actions\IncrementExperience;
-use He4rt\Gamification\Character\Models\Character;
-use He4rt\Identity\ExternalIdentity\Actions\FindExternalIdentity;
+use He4rt\Identity\ExternalIdentity\DTOs\ResolveUserProviderDTO;
+use He4rt\Identity\User\Actions\ResolveUserContext;
+use He4rt\Identity\User\Models\User;
+use Illuminate\Support\Facades\Log;
+use Throwable;
 
 final readonly class NewVoiceMessage
 {
     public function __construct(
-        private FindExternalIdentity $findExternalIdentity,
-        private IncrementExperience $characterExperience,
+        private IncrementExperience $incrementExperience,
     ) {}
 
-    /**
-     * @param  array<string, mixed>  $payload
-     */
-    public function persist(array $payload): void
+    public function persist(NewVoiceMessageDTO $voiceDTO): void
     {
-        $voiceDTO = NewVoiceMessageDTO::make($payload);
-        $externalIdentity = $this->findExternalIdentity->handle(
-            $voiceDTO->provider->value,
-            $voiceDTO->externalAccountId
-        );
+        try {
+            $userDto = ResolveUserProviderDTO::make([
+                'tenant_id' => $voiceDTO->tenantId,
+                'provider' => $voiceDTO->provider,
+                'external_account_id' => $voiceDTO->externalAccountId,
+                'model_type' => (new User)->getMorphClass(),
+                'username' => $voiceDTO->username,
+            ]);
 
-        $characterId = Character::query()
-            ->where('tenant_id', request()->tenant_id)
-            ->where('user_id', $externalIdentity->model_id)
-            ->value('id');
+            $userContext = resolve(ResolveUserContext::class)->handle($userDto);
 
-        $obtainedExperience = $this->characterExperience->incrementByVoiceMessage(
-            $characterId,
-            $voiceDTO->voiceState
-        );
+            $obtainedExperience = $this->incrementExperience->incrementByVoiceMessage(
+                $userContext->character->id,
+                $voiceDTO->voiceState,
+            );
 
-        Voice::query()->create([
-            'tenant_id' => request()->tenant_id,
-            'external_identity_id' => $externalIdentity->id,
-            'channel_name' => $voiceDTO->channelName,
-            'state' => $voiceDTO->voiceState->value,
-            'obtained_experience' => $obtainedExperience,
-        ]);
+            Voice::query()->create([
+                'tenant_id' => $voiceDTO->tenantId,
+                'external_identity_id' => $userContext->provider->id,
+                'channel_name' => $voiceDTO->channelName,
+                'channel_id' => $voiceDTO->channelId,
+                'state' => $voiceDTO->voiceState->value,
+                'obtained_experience' => $obtainedExperience,
+                'occurred_at' => now()->utc(),
+            ]);
+        } catch (Throwable $throwable) {
+            Log::error('NewVoiceMessage failed', [
+                'external_account_id' => $voiceDTO->externalAccountId,
+                'tenant_id' => $voiceDTO->tenantId,
+                'error' => $throwable->getMessage(),
+                'trace' => $throwable->getTraceAsString(),
+            ]);
+        }
     }
 }

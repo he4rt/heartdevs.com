@@ -14,8 +14,8 @@ enum VoiceStatesEnum: string
     {
         return match ($this) {
             self::Disabled => 0,
-            self::Muted => 3,
-            self::Unmuted => 5,
+            self::Muted => 1,
+            self::Unmuted => 3,
         };
     }
 }
