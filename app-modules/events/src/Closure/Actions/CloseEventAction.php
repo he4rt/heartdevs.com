@@ -22,7 +22,7 @@ final readonly class CloseEventAction
 
         $event->enrollments()
             ->whereIn('status', [EnrollmentStatus::Confirmed, EnrollmentStatus::CheckedIn])
-            ->each(function (Enrollment $enrollment) use (&$attendances): void {
+            ->eachById(function (Enrollment $enrollment) use (&$attendances): void {
                 $attendances += $this->closeOne($enrollment);
             });
 

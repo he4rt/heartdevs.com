@@ -16,6 +16,7 @@ use He4rt\Events\Event\Enums\EventStatus;
 use He4rt\Events\Event\Models\Event;
 use He4rt\Identity\Tenant\Models\Tenant;
 use He4rt\Identity\User\Models\User;
+use Illuminate\Contracts\Database\Query\Builder;
 use Illuminate\Support\Facades\Event as EventFacade;
 
 function createEventForClosure(array $eventAttributes = [], array $policyAttributes = []): Event
@@ -214,4 +215,33 @@ test('when action processes multiple enrollments, then each is closed independen
         expect($transition)->not->toBeNull()
             ->and($transition->triggered_by)->toBe(TriggeredBy::System);
     }
+});
+
+test('when action processes more than one chunk of eligible enrollments, then all are closed in one run', function (): void {
+    EventFacade::fake([ParticipantAttended::class]);
+
+    $event = createEventForClosure();
+
+    Enrollment::factory()
+        ->count(1001)
+        ->create([
+            'event_id' => $event->id,
+            'status' => EnrollmentStatus::Confirmed,
+            'confirmed_at' => now()->subDay(),
+        ]);
+
+    resolve(CloseEventAction::class)->handle($event);
+
+    $remainingEligible = Enrollment::query()
+        ->where('event_id', $event->id)
+        ->whereIn('status', [EnrollmentStatus::Confirmed, EnrollmentStatus::CheckedIn])
+        ->count();
+
+    $noShowTransitions = EnrollmentTransition::query()
+        ->whereHas('enrollment', fn (Builder $query) => $query->where('event_id', $event->id))
+        ->where('to_status', EnrollmentStatus::NoShow)
+        ->count();
+
+    expect($remainingEligible)->toBe(0)
+        ->and($noShowTransitions)->toBe(1001);
 });
