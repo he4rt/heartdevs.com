@@ -175,17 +175,13 @@ final class EventForm
             AttendanceRequirement::MinimumDays->value => __('events::enums.attendance_requirement.minimum_days'),
         ];
 
-        $startsAt = $get('starts_at');
-        $endsAt = $get('ends_at');
+        $eventDays = self::eventDays($get);
 
-        if ($startsAt === null || $endsAt === null) {
+        if ($eventDays === null) {
             return $all;
         }
 
-        $startsDay = Date::parse($startsAt)->startOfDay();
-        $endsDay = Date::parse($endsAt)->startOfDay();
-
-        if ($startsDay->equalTo($endsDay)) {
+        if ($eventDays === 1) {
             return [AttendanceRequirement::AnyDay->value => $all[AttendanceRequirement::AnyDay->value]];
         }
 
@@ -194,8 +190,13 @@ final class EventForm
 
     private static function minimumDaysMaxValue(Get $get): ?int
     {
-        $startsAt = $get('starts_at');
-        $endsAt = $get('ends_at');
+        return self::eventDays($get);
+    }
+
+    private static function eventDays(Get $get): ?int
+    {
+        $startsAt = $get('../starts_at');
+        $endsAt = $get('../ends_at');
 
         if ($startsAt === null || $endsAt === null) {
             return null;

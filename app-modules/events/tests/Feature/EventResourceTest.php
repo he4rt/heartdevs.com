@@ -3,6 +3,8 @@
 declare(strict_types=1);
 
 use Filament\Facades\Filament;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\TextInput;
 use He4rt\Events\CheckIn\Enums\CheckInMethod;
 use He4rt\Events\CheckIn\Models\CheckIn;
 use He4rt\Events\CheckIn\Models\CheckInCode;
@@ -80,7 +82,7 @@ test('when submitting the create form with valid data, then event and enrollment
             'enrollmentPolicy' => [
                 'enrollment_method' => EnrollmentMethod::Rsvp,
                 'check_in_method' => CheckInMethod::Manual,
-                'attendance_requirement' => AttendanceRequirement::AllDays,
+                'attendance_requirement' => AttendanceRequirement::AnyDay,
                 'xp_on_confirmed' => 0,
                 'xp_on_checked_in' => 0,
                 'xp_on_attended' => 0,
@@ -94,6 +96,37 @@ test('when submitting the create form with valid data, then event and enrollment
         ->and($event->title)->toBe('He4rt Meetup #42')
         ->and($event->enrollmentPolicy)->not->toBeNull()
         ->and($event->enrollmentPolicy->enrollment_method)->toBe(EnrollmentMethod::Rsvp);
+});
+
+test('when creating a same-day event, then attendance requirement options only allow any day', function (): void {
+    $startsAt = now()->addDay()->setTime(9, 0);
+
+    livewire(CreateEvent::class)
+        ->fillForm([
+            'starts_at' => $startsAt,
+            'ends_at' => $startsAt->clone()->setTime(18, 0),
+        ])
+        ->assertFormFieldExists(
+            'enrollmentPolicy.attendance_requirement',
+            fn (Select $field): bool => array_keys($field->getOptions()) === [AttendanceRequirement::AnyDay->value],
+        );
+});
+
+test('when creating a multi-day event, then minimum days cannot exceed event days', function (): void {
+    $startsAt = now()->addDay()->setTime(9, 0);
+
+    livewire(CreateEvent::class)
+        ->fillForm([
+            'starts_at' => $startsAt,
+            'ends_at' => $startsAt->clone()->addDays(2)->setTime(18, 0),
+            'enrollmentPolicy' => [
+                'attendance_requirement' => AttendanceRequirement::MinimumDays,
+            ],
+        ])
+        ->assertFormFieldExists(
+            'enrollmentPolicy.minimum_days',
+            fn (TextInput $field): bool => $field->getMaxValue() === 3,
+        );
 });
 
 test('when submitting the create form with a duplicate slug for the same tenant, then validation fails', function (): void {
@@ -113,7 +146,7 @@ test('when submitting the create form with a duplicate slug for the same tenant,
             'enrollmentPolicy' => [
                 'enrollment_method' => EnrollmentMethod::Rsvp,
                 'check_in_method' => CheckInMethod::Manual,
-                'attendance_requirement' => AttendanceRequirement::AllDays,
+                'attendance_requirement' => AttendanceRequirement::AnyDay,
                 'xp_on_confirmed' => 0,
                 'xp_on_checked_in' => 0,
                 'xp_on_attended' => 0,
@@ -125,7 +158,10 @@ test('when submitting the create form with a duplicate slug for the same tenant,
 
 test('when submitting the edit form with a new title, then it is updated in the database', function (): void {
     $event = Event::factory()
-        ->has(EnrollmentPolicy::factory(), 'enrollmentPolicy')
+        ->has(EnrollmentPolicy::factory()->state([
+            'attendance_requirement' => AttendanceRequirement::AnyDay,
+            'minimum_days' => null,
+        ]), 'enrollmentPolicy')
         ->create(['title' => 'Old Title']);
 
     livewire(EditEvent::class, ['record' => $event->getRouteKey()])
