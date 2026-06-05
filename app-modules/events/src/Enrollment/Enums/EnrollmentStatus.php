@@ -6,12 +6,10 @@ namespace He4rt\Events\Enrollment\Enums;
 
 use Filament\Support\Colors\Color;
 use Filament\Support\Contracts\HasColor;
-use Filament\Support\Contracts\HasIcon;
 use Filament\Support\Contracts\HasLabel;
-use Filament\Support\Icons\Heroicon;
 use He4rt\Events\Enrollment\Exceptions\EnrollmentException;
 
-enum EnrollmentStatus: string implements HasColor, HasIcon, HasLabel
+enum EnrollmentStatus: string implements HasColor, HasLabel
 {
     case Pending = 'pending';
     case Confirmed = 'confirmed';
@@ -38,20 +36,6 @@ enum EnrollmentStatus: string implements HasColor, HasIcon, HasLabel
             self::Cancelled => Color::Gray,
             self::Rejected => Color::Red,
             self::NoShow => Color::Orange,
-        };
-    }
-
-    public function getIcon(): Heroicon
-    {
-        return match ($this) {
-            self::Pending => Heroicon::Clock,
-            self::Confirmed => Heroicon::CheckCircle,
-            self::Waitlisted => Heroicon::OutlinedQueueList,
-            self::CheckedIn => Heroicon::Flag,
-            self::Attended => Heroicon::Bolt,
-            self::Cancelled => Heroicon::XCircle,
-            self::Rejected => Heroicon::NoSymbol,
-            self::NoShow => Heroicon::ExclamationCircle,
         };
     }
 
