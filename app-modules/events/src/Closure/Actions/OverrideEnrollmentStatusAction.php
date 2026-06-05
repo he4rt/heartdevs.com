@@ -8,6 +8,7 @@ use He4rt\Events\Closure\DTOs\OverrideEnrollmentStatusDTO;
 use He4rt\Events\Closure\Exceptions\OverrideEnrollmentStatusException;
 use He4rt\Events\Enrollment\Enums\EnrollmentStatus;
 use He4rt\Events\Enrollment\Enums\TriggeredBy;
+use He4rt\Events\Enrollment\Models\Enrollment;
 use He4rt\Events\Enrollment\Models\EnrollmentTransition;
 use Illuminate\Support\Facades\DB;
 use Throwable;
@@ -38,24 +39,29 @@ final readonly class OverrideEnrollmentStatusAction
             throw OverrideEnrollmentStatusException::reasonRequired();
         }
 
-        $fromStatus = $dto->enrollment->status;
+        return DB::transaction(function () use ($dto): EnrollmentTransition {
+            $enrollment = Enrollment::query()
+                ->whereKey($dto->enrollment->id)
+                ->lockForUpdate()
+                ->firstOrFail();
 
-        throw_unless(
-            $this->isAllowed($fromStatus, $dto->toStatus),
-            OverrideEnrollmentStatusException::overrideNotAllowed($fromStatus, $dto->toStatus),
-        );
+            $fromStatus = $enrollment->status;
 
-        return DB::transaction(static function () use ($dto, $fromStatus): EnrollmentTransition {
+            throw_unless(
+                $this->isAllowed($fromStatus, $dto->toStatus),
+                OverrideEnrollmentStatusException::overrideNotAllowed($fromStatus, $dto->toStatus),
+            );
+
             $attributes = ['status' => $dto->toStatus];
 
             if ($timestampColumn = $dto->toStatus->timestampColumn()) {
                 $attributes[$timestampColumn] = now();
             }
 
-            $dto->enrollment->update($attributes);
+            $enrollment->update($attributes);
 
             return EnrollmentTransition::query()->create([
-                'enrollment_id' => $dto->enrollment->id,
+                'enrollment_id' => $enrollment->id,
                 'from_status' => $fromStatus,
                 'to_status' => $dto->toStatus,
                 'actor_id' => $dto->actorId,

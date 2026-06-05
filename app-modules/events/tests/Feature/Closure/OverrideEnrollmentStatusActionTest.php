@@ -5,6 +5,8 @@ declare(strict_types=1);
 use He4rt\Events\Closure\Actions\OverrideEnrollmentStatusAction;
 use He4rt\Events\Closure\DTOs\OverrideEnrollmentStatusDTO;
 use He4rt\Events\Closure\Exceptions\OverrideEnrollmentStatusException;
+use He4rt\Events\Enrollment\Actions\TransitionEnrollmentAction;
+use He4rt\Events\Enrollment\DTOs\TransitionEnrollmentDTO;
 use He4rt\Events\Enrollment\Enums\EnrollmentStatus;
 use He4rt\Events\Enrollment\Enums\TriggeredBy;
 use He4rt\Events\Enrollment\Models\Enrollment;
@@ -161,4 +163,33 @@ test('when admin tries to override from no_show to confirmed, then override not 
             reason: 'Should not work',
         ),
     ))->toThrow(OverrideEnrollmentStatusException::class);
+});
+
+test('when admin overrides a stale confirmed enrollment that is already no_show, then current status is enforced', function (): void {
+    $event = createPastEvent();
+    $enrollment = Enrollment::factory()->create([
+        'event_id' => $event->id,
+        'user_id' => User::factory()->create()->id,
+        'status' => EnrollmentStatus::Confirmed,
+        'confirmed_at' => now()->subDay(),
+    ]);
+
+    resolve(TransitionEnrollmentAction::class)->handle(
+        new TransitionEnrollmentDTO(
+            enrollment: $enrollment->fresh(),
+            toStatus: EnrollmentStatus::NoShow,
+            triggeredBy: TriggeredBy::System,
+        ),
+    );
+
+    expect(fn (): EnrollmentTransition => resolve(OverrideEnrollmentStatusAction::class)->handle(
+        new OverrideEnrollmentStatusDTO(
+            enrollment: $enrollment,
+            toStatus: EnrollmentStatus::CheckedIn,
+            actorId: User::factory()->create()->id,
+            reason: 'Late arrival',
+        ),
+    ))->toThrow(OverrideEnrollmentStatusException::class);
+
+    expect($enrollment->fresh()->status)->toBe(EnrollmentStatus::NoShow);
 });
