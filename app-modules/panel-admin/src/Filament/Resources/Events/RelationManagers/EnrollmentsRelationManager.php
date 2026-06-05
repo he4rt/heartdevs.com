@@ -179,15 +179,13 @@ final class EnrollmentsRelationManager extends RelationManager
             ->label('Override Status')
             ->icon(Heroicon::OutlinedPencilSquare)
             ->color('warning')
-            ->visible(fn (Enrollment $record): bool => in_array($record->status, [EnrollmentStatus::NoShow, EnrollmentStatus::Confirmed], strict: true))
+            ->visible(fn (Enrollment $record): bool => OverrideEnrollmentStatusAction::allowedTargetsFor($record->status) !== [])
             ->schema([
                 Select::make('to_status')
                     ->label('New Status')
-                    ->options(fn (Enrollment $record): array => match ($record->status) {
-                        EnrollmentStatus::NoShow => [EnrollmentStatus::Attended->value => 'Attended'],
-                        EnrollmentStatus::Confirmed => [EnrollmentStatus::CheckedIn->value => 'Checked In'],
-                        default => [],
-                    })
+                    ->options(fn (Enrollment $record): array => collect(OverrideEnrollmentStatusAction::allowedTargetsFor($record->status))
+                        ->mapWithKeys(fn (EnrollmentStatus $s): array => [$s->value => $s->getLabel()])
+                        ->all())
                     ->required(),
                 Textarea::make('reason')
                     ->label('Reason')

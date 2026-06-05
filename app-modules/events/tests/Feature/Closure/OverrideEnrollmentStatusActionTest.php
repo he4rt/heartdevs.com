@@ -126,6 +126,25 @@ test('when admin tries to override from cancelled to attended, then override not
     ))->toThrow(OverrideEnrollmentStatusException::class);
 });
 
+test('when allowedTargetsFor is queried for NoShow, then it returns only Attended', function (): void {
+    $targets = OverrideEnrollmentStatusAction::allowedTargetsFor(EnrollmentStatus::NoShow);
+
+    expect($targets)->toBe([EnrollmentStatus::Attended]);
+});
+
+test('when allowedTargetsFor is queried for Confirmed, then it returns only CheckedIn', function (): void {
+    $targets = OverrideEnrollmentStatusAction::allowedTargetsFor(EnrollmentStatus::Confirmed);
+
+    expect($targets)->toBe([EnrollmentStatus::CheckedIn]);
+});
+
+test('when allowedTargetsFor is queried for a terminal or unrelated status, then it returns an empty array', function (): void {
+    expect(OverrideEnrollmentStatusAction::allowedTargetsFor(EnrollmentStatus::Attended))->toBeEmpty()
+        ->and(OverrideEnrollmentStatusAction::allowedTargetsFor(EnrollmentStatus::Cancelled))->toBeEmpty()
+        ->and(OverrideEnrollmentStatusAction::allowedTargetsFor(EnrollmentStatus::Rejected))->toBeEmpty()
+        ->and(OverrideEnrollmentStatusAction::allowedTargetsFor(EnrollmentStatus::NoShow))->not->toBeEmpty();
+});
+
 test('when admin tries to override from no_show to confirmed, then override not allowed exception is thrown', function (): void {
     $event = createPastEvent();
     $enrollment = Enrollment::factory()->create([

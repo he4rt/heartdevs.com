@@ -19,6 +19,15 @@ final readonly class OverrideEnrollmentStatusAction
         ['from' => EnrollmentStatus::Confirmed, 'to' => EnrollmentStatus::CheckedIn],
     ];
 
+    /** @return list<EnrollmentStatus> */
+    public static function allowedTargetsFor(EnrollmentStatus $from): array
+    {
+        return array_values(array_map(
+            static fn (array $pair): EnrollmentStatus => $pair['to'],
+            array_filter(self::ALLOWED_OVERRIDES, static fn (array $pair): bool => $pair['from'] === $from),
+        ));
+    }
+
     /**
      * @throws OverrideEnrollmentStatusException
      * @throws Throwable
