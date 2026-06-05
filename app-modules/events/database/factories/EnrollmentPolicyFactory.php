@@ -18,14 +18,16 @@ final class EnrollmentPolicyFactory extends Factory
 
     public function definition(): array
     {
+        $requirement = fake()->randomElement(AttendanceRequirement::cases());
+
         return [
             'event_id' => Event::factory(),
             'enrollment_method' => fake()->randomElement(EnrollmentMethod::cases()),
             'check_in_method' => fake()->randomElement(CheckInMethod::cases()),
             'capacity' => fake()->optional()->numberBetween(10, 200),
             'has_waitlist' => false,
-            'attendance_requirement' => AttendanceRequirement::AllDays,
-            'minimum_days' => null,
+            'attendance_requirement' => $requirement,
+            'minimum_days' => $requirement === AttendanceRequirement::MinimumDays ? 1 : null,
             'cancellation_deadline_hours' => null,
             'xp_on_confirmed' => 0,
             'xp_on_checked_in' => 0,
