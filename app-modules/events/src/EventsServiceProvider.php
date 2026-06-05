@@ -5,12 +5,18 @@ declare(strict_types=1);
 namespace He4rt\Events;
 
 use He4rt\Events\CheckIn\Listeners\GenerateQrTokenOnConfirmed;
+use He4rt\Events\Console\Commands\ClosePendingEventsCommand;
 use He4rt\Events\Enrollment\Events\EnrollmentConfirmed;
+use Illuminate\Console\Scheduling\Schedule;
+use Illuminate\Contracts\Container\BindingResolutionException;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\ServiceProvider;
 
 class EventsServiceProvider extends ServiceProvider
 {
+    /**
+     * @throws BindingResolutionException
+     */
     public function boot(): void
     {
         $this->loadMigrationsFrom(__DIR__.'/../database/migrations');
@@ -18,5 +24,12 @@ class EventsServiceProvider extends ServiceProvider
         $this->loadTranslationsFrom(__DIR__.'/../lang', 'events');
 
         Event::listen(EnrollmentConfirmed::class, GenerateQrTokenOnConfirmed::class);
+
+        if ($this->app->runningInConsole()) {
+            $this->app->make(Schedule::class)
+                ->command(ClosePendingEventsCommand::class)
+                ->everyFifteenMinutes()
+                ->withoutOverlapping();
+        }
     }
 }
