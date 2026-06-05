@@ -15,6 +15,9 @@ use He4rt\Events\Event\Enums\EventStatus;
 use He4rt\Events\Event\Models\Event;
 use He4rt\Identity\Tenant\Models\Tenant;
 use He4rt\Identity\User\Models\User;
+use Illuminate\Queue\Attributes\Backoff;
+use Illuminate\Queue\Attributes\Tries;
+use Illuminate\Queue\Attributes\UniqueFor;
 use Illuminate\Support\Facades\Event as EventFacade;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
@@ -87,9 +90,13 @@ test('when job fails, then it logs the event id and error', function (): void {
 });
 
 test('when job is configured, then it has correct backoff, tries, and unique ttl', function (): void {
-    $job = new ProcessEventClosureJob('event-1');
+    $ref = new ReflectionClass(ProcessEventClosureJob::class);
 
-    expect($job->tries)->toBe(4)
-        ->and($job->backoff)->toBe([1, 5, 10])
-        ->and($job->uniqueFor)->toBe(1800);
+    $tries = $ref->getAttributes(Tries::class)[0]->newInstance()->tries;
+    $backoff = $ref->getAttributes(Backoff::class)[0]->newInstance()->backoff;
+    $uniqueFor = $ref->getAttributes(UniqueFor::class)[0]->newInstance()->uniqueFor;
+
+    expect($tries)->toBe(4)
+        ->and($backoff)->toBe([1, 5, 10])
+        ->and($uniqueFor)->toBe(1800);
 });
