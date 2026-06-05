@@ -1,0 +1,63 @@
+<?php
+
+declare(strict_types=1);
+
+namespace He4rt\Events\Closure\Actions;
+
+use He4rt\Events\Closure\DTOs\OverrideEnrollmentStatusDTO;
+use He4rt\Events\Closure\Exceptions\OverrideEnrollmentStatusException;
+use He4rt\Events\Enrollment\Enums\EnrollmentStatus;
+use He4rt\Events\Enrollment\Enums\TriggeredBy;
+use He4rt\Events\Enrollment\Models\EnrollmentTransition;
+use Illuminate\Support\Facades\DB;
+use Throwable;
+
+final readonly class OverrideEnrollmentStatusAction
+{
+    private const array ALLOWED_OVERRIDES = [
+        ['from' => EnrollmentStatus::NoShow, 'to' => EnrollmentStatus::Attended],
+        ['from' => EnrollmentStatus::Confirmed, 'to' => EnrollmentStatus::CheckedIn],
+    ];
+
+    /**
+     * @throws OverrideEnrollmentStatusException
+     * @throws Throwable
+     */
+    public function handle(OverrideEnrollmentStatusDTO $dto): EnrollmentTransition
+    {
+        if (mb_trim($dto->reason) === '') {
+            throw OverrideEnrollmentStatusException::reasonRequired();
+        }
+
+        $fromStatus = $dto->enrollment->status;
+
+        throw_unless(
+            $this->isAllowed($fromStatus, $dto->toStatus),
+            OverrideEnrollmentStatusException::overrideNotAllowed($fromStatus, $dto->toStatus),
+        );
+
+        return DB::transaction(static function () use ($dto, $fromStatus): EnrollmentTransition {
+            $attributes = ['status' => $dto->toStatus];
+
+            if ($timestampColumn = $dto->toStatus->timestampColumn()) {
+                $attributes[$timestampColumn] = now();
+            }
+
+            $dto->enrollment->update($attributes);
+
+            return EnrollmentTransition::query()->create([
+                'enrollment_id' => $dto->enrollment->id,
+                'from_status' => $fromStatus,
+                'to_status' => $dto->toStatus,
+                'actor_id' => $dto->actorId,
+                'triggered_by' => TriggeredBy::Admin,
+                'reason' => $dto->reason,
+            ]);
+        });
+    }
+
+    private function isAllowed(EnrollmentStatus $from, EnrollmentStatus $to): bool
+    {
+        return array_any(self::ALLOWED_OVERRIDES, fn ($pair) => $pair['from'] === $from && $pair['to'] === $to);
+    }
+}
