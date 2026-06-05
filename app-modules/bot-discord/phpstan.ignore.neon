@@ -70,3 +70,8 @@ parameters:
             identifier: property.notFound
             count: 1
             path: src/Tasks/VoiceExperienceTask.php
+        -
+            message: '#^Using nullsafe property access "\?->user" on left side of \?\? is unnecessary. Use -> instead\.$#'
+            identifier: nullsafe.neverNull
+            count: 1
+            path: src/Tasks/VoiceExperienceTask.php

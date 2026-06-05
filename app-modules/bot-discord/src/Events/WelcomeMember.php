@@ -23,9 +23,11 @@ class WelcomeMember extends Event
     {
         $channelId = config('bot-discord.channels.auto-report');
 
-        $tenantProvider = resolve(ResolveDiscordTenant::class)->handle((string) $member->guild_id);
+        $tenantProvider = null;
 
         try {
+            $tenantProvider = resolve(ResolveDiscordTenant::class)->handle((string) $member->guild_id);
+
             $userDto = ResolveUserProviderDTO::make([
                 'tenant_id' => $tenantProvider->tenant_id,
                 'provider' => $tenantProvider->provider,
@@ -38,8 +40,8 @@ class WelcomeMember extends Event
             resolve(ResolveUserContext::class)->handle($userDto);
         } catch (Throwable $throwable) {
             Log::channel('bot-discord')->error('WelcomeMember: failed to resolve user', [
-                'tenant_id' => $tenantProvider->tenant_id ?? null,
-                'provider' => $tenantProvider->provider ?? null,
+                'tenant_id' => $tenantProvider?->tenant_id,
+                'provider' => $tenantProvider?->provider,
                 'external_account_id' => $member->user->id ?? null,
                 'exception' => $throwable,
             ]);

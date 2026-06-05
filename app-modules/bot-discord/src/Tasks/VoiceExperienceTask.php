@@ -110,7 +110,7 @@ class VoiceExperienceTask extends Task
 
     private function isBot(VoiceStateUpdate $voiceState): bool
     {
-        $user = $voiceState->member->user ?? $voiceState->user;
+        $user = $voiceState->member?->user ?? $voiceState->user;
 
         if ($user === null) {
             return true;
