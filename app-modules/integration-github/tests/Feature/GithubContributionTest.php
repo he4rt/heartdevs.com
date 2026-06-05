@@ -1,0 +1,47 @@
+<?php
+
+declare(strict_types=1);
+
+use He4rt\IntegrationGithub\Enums\ContributionType;
+use He4rt\IntegrationGithub\Models\GithubContribution;
+use Illuminate\Database\QueryException;
+use Illuminate\Support\Carbon;
+
+it('persiste uma contribuição com casts de enum, data e metadata', function (): void {
+    $contribution = GithubContribution::factory()->create([
+        'repo' => 'he4rt/heartdevs.com',
+        'type' => ContributionType::Pr,
+        'external_ref' => 'pr:1',
+        'occurred_at' => '2026-06-01T12:00:00Z',
+        'metadata' => ['title' => 'feat: x', 'additions' => 10],
+    ]);
+
+    expect($contribution->type)->toBe(ContributionType::Pr)
+        ->and($contribution->occurred_at)->toBeInstanceOf(Carbon::class)
+        ->and($contribution->metadata['additions'])->toBe(10)
+        ->and($contribution->id)->toBeString();
+});
+
+it('impede contribuição duplicada por (repo, type, external_ref)', function (): void {
+    GithubContribution::factory()->create([
+        'repo' => 'he4rt/heartdevs.com', 'type' => ContributionType::Pr, 'external_ref' => 'pr:1',
+    ]);
+
+    GithubContribution::factory()->create([
+        'repo' => 'he4rt/heartdevs.com', 'type' => ContributionType::Pr, 'external_ref' => 'pr:1',
+    ]);
+})->throws(QueryException::class);
+
+it('permite o mesmo external_ref em repos ou tipos diferentes', function (): void {
+    GithubContribution::factory()->create([
+        'repo' => 'he4rt/heartdevs.com', 'type' => ContributionType::Pr, 'external_ref' => 'pr:1',
+    ]);
+    GithubContribution::factory()->create([
+        'repo' => 'he4rt/4noobs', 'type' => ContributionType::Pr, 'external_ref' => 'pr:1',
+    ]);
+    GithubContribution::factory()->create([
+        'repo' => 'he4rt/heartdevs.com', 'type' => ContributionType::Issue, 'external_ref' => 'pr:1',
+    ]);
+
+    expect(GithubContribution::query()->count())->toBe(3);
+});

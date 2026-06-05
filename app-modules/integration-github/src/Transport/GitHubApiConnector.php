@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace He4rt\IntegrationGithub\Transport;
 
+use Saloon\Http\Auth\TokenAuthenticator;
 use Saloon\Http\Connector;
 use Saloon\Traits\Plugins\HasTimeout;
 
@@ -18,6 +19,13 @@ final class GitHubApiConnector extends Connector
     public function resolveBaseUrl(): string
     {
         return 'https://api.github.com';
+    }
+
+    protected function defaultAuth(): ?TokenAuthenticator
+    {
+        $token = config('services.github.api_token');
+
+        return is_string($token) && $token !== '' ? new TokenAuthenticator($token) : null;
     }
 
     /**

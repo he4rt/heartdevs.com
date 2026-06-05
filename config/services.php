@@ -66,6 +66,8 @@ return [
         'client_secret' => env('GITHUB_OAUTH_CLIENT_SECRET'),
         'scopes' => env('GITHUB_OAUTH_SCOPES', 'read:user user:email'),
         'enabled' => env('GITHUB_OAUTH_ENABLED', true),
+        'api_token' => env('GITHUB_API_TOKEN'),
+        'webhook_secret' => env('GITHUB_WEBHOOK_SECRET'),
     ],
 
     'openai' => [
