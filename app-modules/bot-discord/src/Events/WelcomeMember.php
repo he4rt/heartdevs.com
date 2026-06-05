@@ -7,9 +7,8 @@ namespace He4rt\BotDiscord\Events;
 use Discord\Discord;
 use Discord\Parts\User\Member;
 use Discord\WebSockets\Event as Events;
+use He4rt\BotDiscord\Actions\ResolveDiscordTenant;
 use He4rt\Identity\ExternalIdentity\DTOs\ResolveUserProviderDTO;
-use He4rt\Identity\ExternalIdentity\Models\ExternalIdentity;
-use He4rt\Identity\Tenant\Models\Tenant;
 use He4rt\Identity\User\Actions\ResolveUserContext;
 use He4rt\Identity\User\Models\User;
 use Illuminate\Support\Facades\Log;
@@ -24,10 +23,7 @@ class WelcomeMember extends Event
     {
         $channelId = config('bot-discord.channels.auto-report');
 
-        $tenantProvider = ExternalIdentity::query()
-            ->where('model_type', (new Tenant)->getMorphClass())
-            ->where('external_account_id', (string) $member->guild_id)
-            ->firstOrFail();
+        $tenantProvider = resolve(ResolveDiscordTenant::class)->handle((string) $member->guild_id);
 
         try {
             $userDto = ResolveUserProviderDTO::make([
