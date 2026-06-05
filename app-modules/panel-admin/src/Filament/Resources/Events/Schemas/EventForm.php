@@ -19,6 +19,7 @@ use He4rt\Events\Enrollment\Enums\EnrollmentMethod;
 use He4rt\Events\Event\Enums\EventStatus;
 use He4rt\Events\Event\Enums\EventType;
 use He4rt\Events\Event\Models\Event;
+use Illuminate\Support\Facades\Date;
 use Illuminate\Validation\Rules\Unique;
 
 final class EventForm
@@ -114,14 +115,19 @@ final class EventForm
 
                         Select::make('attendance_requirement')
                             ->label('Attendance Requirement')
-                            ->options(AttendanceRequirement::class)
+                            ->options(fn (Get $get): array => self::attendanceRequirementOptions($get))
+                            ->live()
                             ->required(),
 
                         TextInput::make('minimum_days')
                             ->label('Minimum Days')
+                            ->helperText('Required when attendance requirement is "Minimum Days". Default 1, max = event days.')
                             ->integer()
                             ->minValue(1)
-                            ->nullable(),
+                            ->maxValue(fn (Get $get): ?int => self::minimumDaysMaxValue($get))
+                            ->default(1)
+                            ->required(fn (Get $get): bool => $get('attendance_requirement') === AttendanceRequirement::MinimumDays->value)
+                            ->visible(fn (Get $get): bool => $get('attendance_requirement') === AttendanceRequirement::MinimumDays->value),
 
                         TextInput::make('cancellation_deadline_hours')
                             ->label('Cancellation Deadline (hours before event)')
@@ -156,5 +162,48 @@ final class EventForm
                             ->visible(fn (Get $get): bool => $get('enrollment_method') === EnrollmentMethod::Application->value),
                     ]),
             ]);
+    }
+
+    /**
+     * @return array<string, string>
+     */
+    private static function attendanceRequirementOptions(Get $get): array
+    {
+        $all = [
+            AttendanceRequirement::AllDays->value => __('events::enums.attendance_requirement.all_days'),
+            AttendanceRequirement::AnyDay->value => __('events::enums.attendance_requirement.any_day'),
+            AttendanceRequirement::MinimumDays->value => __('events::enums.attendance_requirement.minimum_days'),
+        ];
+
+        $startsAt = $get('starts_at');
+        $endsAt = $get('ends_at');
+
+        if ($startsAt === null || $endsAt === null) {
+            return $all;
+        }
+
+        $startsDay = Date::parse($startsAt)->startOfDay();
+        $endsDay = Date::parse($endsAt)->startOfDay();
+
+        if ($startsDay->equalTo($endsDay)) {
+            return [AttendanceRequirement::AnyDay->value => $all[AttendanceRequirement::AnyDay->value]];
+        }
+
+        return $all;
+    }
+
+    private static function minimumDaysMaxValue(Get $get): ?int
+    {
+        $startsAt = $get('starts_at');
+        $endsAt = $get('ends_at');
+
+        if ($startsAt === null || $endsAt === null) {
+            return null;
+        }
+
+        $startsDay = Date::parse($startsAt)->startOfDay();
+        $endsDay = Date::parse($endsAt)->startOfDay();
+
+        return (int) $startsDay->diffInDays($endsDay) + 1;
     }
 }
