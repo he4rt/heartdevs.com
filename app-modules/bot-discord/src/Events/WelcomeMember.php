@@ -37,7 +37,7 @@ class WelcomeMember extends Event
 
             resolve(ResolveUserContext::class)->handle($userDto);
         } catch (Throwable $throwable) {
-            Log::error('Falha ao resolver usuário no evento WelcomeMember', [
+            Log::channel('bot-discord')->error('WelcomeMember: failed to resolve user', [
                 'tenant_id' => $tenantProvider->tenant_id ?? null,
                 'provider' => $tenantProvider->provider ?? null,
                 'external_account_id' => $member->user->id ?? null,

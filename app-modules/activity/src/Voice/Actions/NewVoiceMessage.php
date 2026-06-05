@@ -47,11 +47,10 @@ final readonly class NewVoiceMessage
                 'occurred_at' => now()->utc(),
             ]);
         } catch (Throwable $throwable) {
-            Log::error('NewVoiceMessage failed', [
+            Log::channel('bot-discord')->error('NewVoiceMessage failed', [
                 'external_account_id' => $voiceDTO->externalAccountId,
                 'tenant_id' => $voiceDTO->tenantId,
-                'error' => $throwable->getMessage(),
-                'trace' => $throwable->getTraceAsString(),
+                'exception' => $throwable,
             ]);
         }
     }

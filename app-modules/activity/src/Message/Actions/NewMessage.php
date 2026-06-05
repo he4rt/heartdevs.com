@@ -45,11 +45,10 @@ final readonly class NewMessage
             );
 
         } catch (Throwable $throwable) {
-            Log::error('NewMessage failed', [
+            Log::channel('bot-discord')->error('NewMessage failed', [
                 'external_account_id' => $messageDTO->externalAccountId,
                 'tenant_id' => $messageDTO->tenantId,
-                'error' => $throwable->getMessage(),
-                'trace' => $throwable->getTraceAsString(),
+                'exception' => $throwable,
             ]);
         }
     }
