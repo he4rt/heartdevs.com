@@ -60,6 +60,9 @@ final readonly class CommunityRetrospective
                 'issues' => $this->countType($contributions, ContributionType::Issue),
                 'comments' => $this->countType($contributions, ContributionType::Comment),
                 'commits' => $this->countType($contributions, ContributionType::Commit),
+                'additions' => $this->sumMeta($contributions, 'additions'),
+                'deletions' => $this->sumMeta($contributions, 'deletions'),
+                'changed_files' => $this->sumMeta($contributions, 'changed_files'),
                 'total' => $contributions->count(),
             ],
             'people' => $people,
@@ -87,6 +90,8 @@ final readonly class CommunityRetrospective
             'issues' => $this->countType($items, ContributionType::Issue),
             'comments' => $this->countType($items, ContributionType::Comment),
             'commits' => $this->countType($items, ContributionType::Commit),
+            'additions' => $this->sumMeta($items, 'additions'),
+            'deletions' => $this->sumMeta($items, 'deletions'),
             'total' => $items->count(),
         ];
     }
@@ -97,6 +102,18 @@ final readonly class CommunityRetrospective
     private function countType(Collection $items, ContributionType $type): int
     {
         return $items->filter(fn (GithubContribution $contribution): bool => $contribution->type === $type)->count();
+    }
+
+    /**
+     * @param  Collection<int, GithubContribution>  $items
+     */
+    private function sumMeta(Collection $items, string $key): int
+    {
+        return (int) $items->sum(function (GithubContribution $contribution) use ($key): int {
+            $metadata = $contribution->metadata ?? [];
+
+            return (int) ($metadata[$key] ?? 0);
+        });
     }
 
     private function isBot(GithubContribution $contribution): bool

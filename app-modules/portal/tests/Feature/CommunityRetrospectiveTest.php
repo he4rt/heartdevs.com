@@ -90,3 +90,18 @@ it('respeita a janela de período pelo occurred_at', function (): void {
     expect($data['meta']['total'])->toBe(1)
         ->and($data['meta']['issues'])->toBe(1);
 });
+
+it('soma additions/deletions/changed_files de PRs em meta e por pessoa', function (): void {
+    contribution($this->tenant, ['actor_login' => 'maria', 'type' => ContributionType::Pr, 'external_ref' => 'pr:1', 'occurred_at' => '2026-06-02', 'metadata' => ['state' => 'merged', 'merged' => true, 'additions' => 100, 'deletions' => 20, 'changed_files' => 5]]);
+    contribution($this->tenant, ['actor_login' => 'maria', 'type' => ContributionType::Pr, 'external_ref' => 'pr:2', 'occurred_at' => '2026-06-02', 'metadata' => ['state' => 'open', 'merged' => false, 'additions' => 30, 'deletions' => 4, 'changed_files' => 2]]);
+    contribution($this->tenant, ['actor_login' => 'maria', 'type' => ContributionType::Review, 'external_ref' => 'review:1', 'occurred_at' => '2026-06-02']);
+
+    $data = ($this->build)();
+    $maria = collect($data['people'])->firstWhere('login', 'maria');
+
+    expect($data['meta']['additions'])->toBe(130)
+        ->and($data['meta']['deletions'])->toBe(24)
+        ->and($data['meta']['changed_files'])->toBe(7)
+        ->and($maria['additions'])->toBe(130)
+        ->and($maria['deletions'])->toBe(24);
+});
