@@ -7,6 +7,7 @@ namespace He4rt\PanelAdmin\Github\Resources;
 use BackedEnum;
 use Filament\Actions\Action;
 use Filament\Actions\EditAction;
+use Filament\Facades\Filament;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Notifications\Notification;
@@ -24,6 +25,7 @@ use He4rt\PanelAdmin\Github\Resources\GithubRepositoryResource\Pages\CreateGithu
 use He4rt\PanelAdmin\Github\Resources\GithubRepositoryResource\Pages\EditGithubRepository;
 use He4rt\PanelAdmin\Github\Resources\GithubRepositoryResource\Pages\ListGithubRepositories;
 use Illuminate\Support\Facades\Date;
+use Illuminate\Validation\Rules\Unique;
 use Saloon\Exceptions\Request\RequestException;
 
 class GithubRepositoryResource extends Resource
@@ -62,7 +64,9 @@ class GithubRepositoryResource extends Resource
                 ->required()
                 ->maxLength(255)
                 ->rule('regex:/^[\w.-]+\/[\w.-]+$/')
-                ->unique(ignoreRecord: true),
+                // Unicidade é por tenant: o mesmo repo pode ser acompanhado por
+                // mais de uma comunidade, então a validação respeita o tenant atual.
+                ->unique(ignoreRecord: true, modifyRuleUsing: fn (Unique $rule): Unique => $rule->where('tenant_id', Filament::getTenant()?->getKey())),
             Toggle::make('enabled')
                 ->label('Habilitado')
                 ->default(true),
@@ -104,7 +108,7 @@ class GithubRepositoryResource extends Resource
             ->requiresConfirmation()
             ->action(function (GithubRepository $record): void {
                 try {
-                    resolve(BackfillRepository::class)->execute($record->full_name);
+                    resolve(BackfillRepository::class)->execute($record);
                 } catch (RequestException $requestException) {
                     if (RateLimit::matches($requestException)) {
                         Notification::make()

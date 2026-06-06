@@ -15,14 +15,6 @@ use Saloon\Http\Faking\MockResponse;
 
 use function Pest\Livewire\livewire;
 
-function mockGithubConnector(MockResponse $response): void
-{
-    app()->instance(GitHubApiConnector::class, tap(
-        new GitHubApiConnector(),
-        fn (GitHubApiConnector $connector) => $connector->withMockClient(new MockClient(['*' => $response])),
-    ));
-}
-
 beforeEach(function (): void {
     $user = User::factory()->create(['username' => 'danielhe4rt']);
     $tenant = Tenant::factory()->create(['slug' => 'he4rt-dev']);
@@ -34,15 +26,30 @@ beforeEach(function (): void {
 
     Filament::setCurrentPanel(Filament::getPanel('admin'));
     Filament::setTenant($tenant);
+    // Boota o painel para registrar o global scope + o observer de tenancy
+    // (em testes Livewire o painel não passa pelo middleware que faz isso no HTTP).
+    Filament::getPanel('admin')->boot();
+
+    $this->tenant = $tenant;
 });
 
-test('admin cria um repositório da allowlist', function (): void {
+function mockGithubConnector(MockResponse $response): void
+{
+    app()->instance(GitHubApiConnector::class, tap(
+        new GitHubApiConnector(),
+        fn (GitHubApiConnector $connector) => $connector->withMockClient(new MockClient(['*' => $response])),
+    ));
+}
+
+test('admin cria um repositório associando ao tenant atual', function (): void {
     livewire(CreateGithubRepository::class)
         ->fillForm(['full_name' => 'he4rt/heartdevs.com', 'enabled' => true])
         ->call('create')
         ->assertHasNoFormErrors();
 
-    expect(GithubRepository::query()->where('full_name', 'he4rt/heartdevs.com')->exists())->toBeTrue();
+    $repo = GithubRepository::query()->where('full_name', 'he4rt/heartdevs.com')->sole();
+
+    expect($repo->tenant_id)->toBe($this->tenant->id);
 });
 
 test('rejeita full_name sem owner/repo', function (): void {
@@ -52,13 +59,27 @@ test('rejeita full_name sem owner/repo', function (): void {
         ->assertHasFormErrors(['full_name']);
 });
 
-test('rejeita full_name duplicado', function (): void {
+test('rejeita full_name duplicado no mesmo tenant', function (): void {
     GithubRepository::factory()->create(['full_name' => 'he4rt/4noobs']);
 
     livewire(CreateGithubRepository::class)
         ->fillForm(['full_name' => 'he4rt/4noobs'])
         ->call('create')
         ->assertHasFormErrors(['full_name']);
+});
+
+test('lista apenas os repositórios do tenant atual', function (): void {
+    $mine = GithubRepository::factory()->create(['full_name' => 'he4rt/mine']);
+
+    $other = Tenant::factory()->create(['slug' => 'outra']);
+    Filament::setTenant($other);
+    $theirs = GithubRepository::factory()->create(['full_name' => 'he4rt/theirs']);
+    Filament::setTenant($this->tenant);
+
+    livewire(ListGithubRepositories::class)
+        ->loadTable()
+        ->assertCanSeeTableRecords([$mine])
+        ->assertCanNotSeeTableRecords([$theirs]);
 });
 
 test('backfill pelo painel avisa de forma amigável ao bater rate limit, sem marcar last_backfilled_at', function (): void {

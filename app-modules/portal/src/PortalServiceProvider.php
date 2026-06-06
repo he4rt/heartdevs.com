@@ -19,6 +19,7 @@ class PortalServiceProvider extends ServiceProvider
     {
         Route::get('/', Homepage::class);
         Route::get('/comunidade/retrospectiva', CommunityRetrospectivePage::class)->name('community.retrospective');
+        Route::get('/comunidade/{tenantSlug}/retrospectiva', CommunityRetrospectivePage::class)->name('community.retrospective.tenant');
 
         Livewire::component('hero-section', HeroSection::class);
     }

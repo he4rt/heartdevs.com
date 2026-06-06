@@ -23,7 +23,7 @@ Build the ingestion in `integration-github` (transport), mirroring the Discord d
 
 ### 1. Own contribution model, not `Interaction`
 
-A normalized `github_contributions` table keyed by GitHub login/id (member-or-not), with `unique(repo, type, external_ref)` for idempotency. Gamification is left as a **seam**: this module emits `GithubContributionRecorded` and does not depend on `activity`/`economy`.
+A normalized `github_contributions` table keyed by GitHub login/id (member-or-not), with `unique(tenant_id, repo, type, external_ref)` for idempotency. Gamification is left as a **seam**: this module emits `GithubContributionRecorded` and does not depend on `activity`/`economy`.
 
 ### 2. Normalized read model + raw lake
 
@@ -31,12 +31,16 @@ A normalized `github_contributions` table keyed by GitHub login/id (member-or-no
 
 ### 3. Split ingestion paths
 
-- **Webhook (live):** org webhook → signature-verified → raw payload into the lake → `ProjectGithubEvent` projects into contributions.
-- **Backfill (history):** paginated REST list requests upsert contributions directly. Resumable via `last_backfilled_at`. The `unique(repo, type, external_ref)` key makes both paths converge without duplicates.
+- **Webhook (live):** org webhook → signature-verified → raw payload into the lake → `ProjectGithubEvent` **fans out**, projecting one contribution per tenant whose allowlist enables the repo.
+- **Backfill (history):** paginated REST list requests upsert contributions directly, stamping the source repo's `tenant_id`. Resumable via `last_backfilled_at`. The `unique(tenant_id, repo, type, external_ref)` key makes both paths converge without duplicates.
 
-### 4. Panel-managed allowlist
+### 4. Panel-managed allowlist, scoped per tenant
 
-`github_repositories` (managed in `panel-admin`) is the source of truth for which repos count. The org webhook delivers everything; ingestion filters by the allowlist.
+`github_repositories` (managed in `panel-admin`) is the source of truth for which repos count. **Each repo belongs to a tenant** (`unique(tenant_id, full_name)`): the allowlist is per community, and the same public repo may be tracked by more than one tenant. The org webhook delivers everything; ingestion filters by the allowlist and fans out to every tenant tracking the repo.
+
+### 4b. Tenant isolation
+
+Both `github_repositories` and `github_contributions` carry `tenant_id`; the presentation, the panel resource and the live/backfill writers are all scoped by it. The raw lake (`github_event_logs`) stays **global** — one delivery is stored once and projected to N tenants. Because public GitHub data is identical across communities, a shared repo's contributions are deliberately **duplicated per tenant** (one row each) to keep every community's read model fully isolated and independently queryable. The public retrospective resolves the tenant from a route slug (`/comunidade/{tenant}/retrospectiva`), defaulting to `config('he4rt.main_tenant')` when none is given.
 
 ### 5. Store everything, filter on read
 
@@ -48,7 +52,7 @@ A fine-grained PAT (`services.github.api_token`) authenticates the REST connecto
 
 ## Consequences
 
-- **Positive:** the presentation is fast and queryable by period/person/type; history and live converge idempotently; gamification can be wired later without re-modeling; adding a repo is a panel action.
-- **Negative:** PR size enrichment costs one extra request per PR (the dominant cost — ~2 requests/PR); reactions are out of scope; the org webhook delivers traffic for non-allowlisted repos (stored in the lake for audit, then ignored).
+- **Positive:** the presentation is fast and queryable by period/person/type; history and live converge idempotently; gamification can be wired later without re-modeling; adding a repo is a panel action; each community's data is fully isolated and consistent with the rest of the multi-tenant panel.
+- **Negative:** PR size enrichment costs one extra request per PR (the dominant cost — ~2 requests/PR); reactions are out of scope; the org webhook delivers traffic for non-allowlisted repos (stored in the lake for audit, then ignored); a repo shared by N tenants stores its contributions N times (accepted: public data is small and isolation is worth more than the dedup).
 - **Backfill scale & resilience:** the backfill is **synchronous and rate-limit-aware** — every request uses Saloon `->throw()`, so a 403/5xx fails loudly (no silent corruption); on a rate-limit 403 both backfill transports (the `github:backfill` console command and the panel's "Backfill agora" action) surface a clear, actionable message and is safely resumable (idempotent upsert means a re-run after the reset costs nothing extra and never duplicates). The rate-limit interpretation lives in a single shared `Backfill\RateLimit` helper so the two transports cannot drift. At current scale this is enough: the main repo (~230 PRs) is ~500 requests, ~10% of the 5,000/hour budget. A **queue** (job-per-repo with release-on-limit) and a true **incremental** refresh (using `last_backfilled_at` as `since` — today it is recorded but each run still does full history) are deliberately deferred as YAGNI; revisit if many large repos are added.
 - **Follow-up:** revisit a lake retention/TTL policy; decide whether commits without a linked GitHub user enter the per-person ranking; implement the gamification bridge via the seam event.

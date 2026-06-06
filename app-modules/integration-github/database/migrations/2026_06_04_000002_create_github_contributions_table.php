@@ -12,6 +12,7 @@ return new class extends Migration
     {
         Schema::create('github_contributions', function (Blueprint $table): void {
             $table->uuid('id')->primary();
+            $table->foreignUuid('tenant_id')->constrained('tenants');
             $table->string('repo');
             $table->string('actor_login');
             $table->unsignedBigInteger('actor_id')->nullable();
@@ -22,10 +23,12 @@ return new class extends Migration
             $table->jsonb('metadata')->nullable();
             $table->timestamps();
 
-            $table->unique(['repo', 'type', 'external_ref'], 'uniq_github_contributions_ref');
-            $table->index(['repo', 'occurred_at'], 'idx_github_contributions_repo_time');
+            // Isolamento por tenant: a mesma contribuição de um repo compartilhado
+            // é gravada uma vez por comunidade que acompanha o repo.
+            $table->unique(['tenant_id', 'repo', 'type', 'external_ref'], 'uniq_github_contributions_ref');
+            $table->index(['tenant_id', 'occurred_at'], 'idx_github_contributions_tenant_time');
             $table->index('actor_id', 'idx_github_contributions_actor');
-            $table->index(['type', 'occurred_at'], 'idx_github_contributions_type_time');
+            $table->index(['tenant_id', 'type', 'occurred_at'], 'idx_github_contributions_type_time');
         });
     }
 

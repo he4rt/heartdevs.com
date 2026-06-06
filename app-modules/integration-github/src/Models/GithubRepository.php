@@ -5,15 +5,18 @@ declare(strict_types=1);
 namespace He4rt\IntegrationGithub\Models;
 
 use Carbon\Carbon;
+use He4rt\Identity\Tenant\Models\Tenant;
 use He4rt\IntegrationGithub\Database\Factories\GithubRepositoryFactory;
 use Illuminate\Database\Eloquent\Attributes\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 /**
  * @property string $id
+ * @property string $tenant_id
  * @property string $full_name
  * @property bool $enabled
  * @property Carbon|null $last_backfilled_at
@@ -26,6 +29,14 @@ final class GithubRepository extends Model
     /** @use HasFactory<GithubRepositoryFactory> */
     use HasFactory;
     use HasUuids;
+
+    /**
+     * @return BelongsTo<Tenant, $this>
+     */
+    public function tenant(): BelongsTo
+    {
+        return $this->belongsTo(Tenant::class);
+    }
 
     protected static function newFactory(): GithubRepositoryFactory
     {

@@ -11,7 +11,7 @@ use He4rt\IntegrationGithub\Models\GithubContribution;
 /**
  * Idempotent writer for contributions, shared by backfill (bulk, silent) and
  * webhook ingestion (live, emits the seam event). Convergence is guaranteed by
- * the unique (repo, type, external_ref) key.
+ * the unique (tenant_id, repo, type, external_ref) key.
  */
 final class RecordContribution
 {
@@ -19,6 +19,7 @@ final class RecordContribution
      * @param  array<string, mixed>  $metadata
      */
     public function execute(
+        string $tenantId,
         string $repo,
         ContributionType $type,
         string $externalRef,
@@ -30,7 +31,7 @@ final class RecordContribution
         bool $emit = false,
     ): GithubContribution {
         $contribution = GithubContribution::query()->updateOrCreate(
-            ['repo' => $repo, 'type' => $type, 'external_ref' => $externalRef],
+            ['tenant_id' => $tenantId, 'repo' => $repo, 'type' => $type, 'external_ref' => $externalRef],
             [
                 'actor_login' => $actorLogin,
                 'actor_id' => $actorId,

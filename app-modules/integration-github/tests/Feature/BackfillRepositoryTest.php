@@ -5,6 +5,7 @@ declare(strict_types=1);
 use He4rt\IntegrationGithub\Backfill\BackfillRepository;
 use He4rt\IntegrationGithub\Enums\ContributionType;
 use He4rt\IntegrationGithub\Models\GithubContribution;
+use He4rt\IntegrationGithub\Models\GithubRepository;
 use He4rt\IntegrationGithub\Transport\GitHubApiConnector;
 use He4rt\IntegrationGithub\Transport\Requests\Contributions\GetPullRequest;
 use He4rt\IntegrationGithub\Transport\Requests\Contributions\ListCommits;
@@ -16,6 +17,10 @@ use He4rt\IntegrationGithub\Transport\Requests\Contributions\ListPullRequests;
 use Saloon\Exceptions\Request\RequestException;
 use Saloon\Http\Faking\MockClient;
 use Saloon\Http\Faking\MockResponse;
+
+beforeEach(function (): void {
+    $this->repo = GithubRepository::factory()->create(['full_name' => 'he4rt/heartdevs.com']);
+});
 
 /**
  * Mocks every GitHub endpoint the backfill touches with an empty page by default,
@@ -57,22 +62,23 @@ function prPayload(int $number, string $login, int $id, ?string $merged = null):
     ];
 }
 
-function backfill(): void
+function backfill(GithubRepository $repo): void
 {
-    resolve(BackfillRepository::class)->execute('he4rt/heartdevs.com');
+    resolve(BackfillRepository::class)->execute($repo);
 }
 
-it('faz backfill de PRs upsertando contributions com tamanho e autor', function (): void {
+it('faz backfill de PRs upsertando contributions com tamanho, autor e tenant', function (): void {
     mockGithub([
         ListPullRequests::class => MockResponse::make([prPayload(1, 'maria', 42)]),
         GetPullRequest::class => MockResponse::make(['additions' => 10, 'deletions' => 2, 'changed_files' => 3]),
     ]);
 
-    backfill();
+    backfill($this->repo);
 
     $contribution = GithubContribution::query()->where('external_ref', 'pr:1')->sole();
 
     expect($contribution->type)->toBe(ContributionType::Pr)
+        ->and($contribution->tenant_id)->toBe($this->repo->tenant_id)
         ->and($contribution->actor_login)->toBe('maria')
         ->and($contribution->actor_id)->toBe(42)
         ->and($contribution->repo)->toBe('he4rt/heartdevs.com')
@@ -88,8 +94,8 @@ it('é idempotente: re-rodar o backfill não duplica', function (): void {
         GetPullRequest::class => MockResponse::make(['additions' => 10, 'deletions' => 2, 'changed_files' => 3]),
     ]);
 
-    backfill();
-    backfill();
+    backfill($this->repo);
+    backfill($this->repo);
 
     expect(GithubContribution::query()->where('external_ref', 'pr:1')->count())->toBe(1);
 });
@@ -100,7 +106,7 @@ it('marca is_bot para autores [bot]', function (): void {
         GetPullRequest::class => MockResponse::make(['additions' => 1, 'deletions' => 0, 'changed_files' => 1]),
     ]);
 
-    backfill();
+    backfill($this->repo);
 
     expect(GithubContribution::query()->where('external_ref', 'pr:7')->sole()->metadata['is_bot'])->toBeTrue();
 });
@@ -114,7 +120,7 @@ it('faz backfill das reviews de um PR com target_ref para o PR', function (): vo
         ]),
     ]);
 
-    backfill();
+    backfill($this->repo);
 
     $review = GithubContribution::query()->where('type', ContributionType::Review)->sole();
 
@@ -132,7 +138,7 @@ it('faz backfill de issues ignorando os PRs retornados pelo endpoint de issues',
         ]),
     ]);
 
-    backfill();
+    backfill($this->repo);
 
     expect(GithubContribution::query()->where('type', ContributionType::Issue)->pluck('external_ref')->all())
         ->toBe(['issue:10']);
@@ -145,7 +151,7 @@ it('faz backfill de comentários de issue com target_ref derivado da issue_url',
         ]),
     ]);
 
-    backfill();
+    backfill($this->repo);
 
     $comment = GithubContribution::query()->where('type', ContributionType::Comment)->sole();
 
@@ -161,7 +167,7 @@ it('faz backfill de comentários de review de PR com target_ref para o PR', func
         ]),
     ]);
 
-    backfill();
+    backfill($this->repo);
 
     $comment = GithubContribution::query()->where('external_ref', 'review_comment:1200')->sole();
 
@@ -174,7 +180,7 @@ it('propaga o erro do GitHub em vez de processar a resposta de falha como dados'
         ListPullRequests::class => MockResponse::make(['message' => 'Internal Server Error'], 500),
     ]);
 
-    expect(fn (): mixed => resolve(BackfillRepository::class)->execute('he4rt/heartdevs.com'))
+    expect(fn (): mixed => resolve(BackfillRepository::class)->execute($this->repo))
         ->toThrow(RequestException::class);
 });
 
@@ -186,7 +192,7 @@ it('faz backfill de commits dedup por sha, com fallback de autor', function (): 
         ]),
     ]);
 
-    backfill();
+    backfill($this->repo);
 
     $linked = GithubContribution::query()->where('external_ref', 'commit:abc123')->sole();
     $unlinked = GithubContribution::query()->where('external_ref', 'commit:def456')->sole();

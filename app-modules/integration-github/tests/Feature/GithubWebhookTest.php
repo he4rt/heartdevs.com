@@ -60,7 +60,7 @@ it('rejeita assinatura inválida com 403 e não grava nada', function (): void {
 
 it('grava no lake e projeta a contribuição para repo na allowlist, emitindo o evento', function (): void {
     Event::fake([GithubContributionRecorded::class]);
-    GithubRepository::factory()->create(['full_name' => 'he4rt/heartdevs.com']);
+    $repo = GithubRepository::factory()->create(['full_name' => 'he4rt/heartdevs.com']);
 
     postGithubWebhook('pull_request', prWebhookPayload())->assertSuccessful();
 
@@ -69,10 +69,23 @@ it('grava no lake e projeta a contribuição para repo na allowlist, emitindo o 
     $contribution = GithubContribution::query()->where('external_ref', 'pr:1')->sole();
 
     expect($contribution->type)->toBe(ContributionType::Pr)
+        ->and($contribution->tenant_id)->toBe($repo->tenant_id)
         ->and($contribution->actor_login)->toBe('maria')
         ->and($contribution->metadata['additions'])->toBe(5);
 
     Event::assertDispatched(GithubContributionRecorded::class);
+});
+
+it('faz fan-out: projeta uma contribuição por tenant que acompanha o repo', function (): void {
+    $a = GithubRepository::factory()->create(['full_name' => 'he4rt/heartdevs.com']);
+    $b = GithubRepository::factory()->create(['full_name' => 'he4rt/heartdevs.com']);
+    GithubRepository::factory()->disabled()->create(['full_name' => 'he4rt/heartdevs.com']);
+
+    postGithubWebhook('pull_request', prWebhookPayload())->assertSuccessful();
+
+    expect(GithubEventLog::query()->count())->toBe(1)
+        ->and(GithubContribution::query()->where('external_ref', 'pr:1')->pluck('tenant_id')->sort()->values()->all())
+        ->toBe(collect([$a->tenant_id, $b->tenant_id])->sort()->values()->all());
 });
 
 it('deduplica entregas repetidas pelo delivery id', function (): void {

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace He4rt\IntegrationGithub\Database\Factories;
 
+use He4rt\Identity\Tenant\Models\Tenant;
 use He4rt\IntegrationGithub\Enums\ContributionType;
 use He4rt\IntegrationGithub\Models\GithubContribution;
 use Illuminate\Database\Eloquent\Factories\Factory;
@@ -23,6 +24,7 @@ final class GithubContributionFactory extends Factory
         $number = fake()->unique()->numberBetween(1, 1_000_000);
 
         return [
+            'tenant_id' => Tenant::factory(),
             'repo' => 'he4rt/heartdevs.com',
             'actor_login' => fake()->userName(),
             'actor_id' => fake()->numberBetween(1, 9_999_999),

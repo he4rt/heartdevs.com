@@ -37,7 +37,7 @@ final class BackfillGithubCommand extends Command
             $this->info(sprintf('Backfilling %s...', $repository->full_name));
 
             try {
-                $backfill->execute($repository->full_name);
+                $backfill->execute($repository);
             } catch (RequestException $exception) {
                 if (RateLimit::matches($exception)) {
                     $this->warn(sprintf(
