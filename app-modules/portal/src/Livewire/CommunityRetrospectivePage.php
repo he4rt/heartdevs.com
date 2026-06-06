@@ -7,6 +7,7 @@ namespace He4rt\Portal\Livewire;
 use Carbon\CarbonImmutable;
 use Carbon\CarbonInterface;
 use He4rt\Identity\Tenant\Models\Tenant;
+use He4rt\IntegrationGithub\Models\GithubContribution;
 use He4rt\Portal\Retrospective\CommunityRetrospective;
 use He4rt\Portal\Retrospective\RetrospectiveFilters;
 use Illuminate\Contracts\View\View;
@@ -15,19 +16,45 @@ use Livewire\Attributes\Title;
 use Livewire\Attributes\Url;
 use Livewire\Component;
 
-#[Layout('portal::components.layouts.app')]
+#[Layout('portal::components.layouts.deck')]
 #[Title('Quem fez a He4rt bater')]
 final class CommunityRetrospectivePage extends Component
 {
-    public string $tenantId;
+    private const array ALL_TYPES = ['pr', 'review', 'issue', 'comment', 'commit'];
 
-    public string $tenantName;
+    public string $tenantId;
 
     #[Url]
     public ?string $since = null;
 
     #[Url]
     public ?string $until = null;
+
+    /** @var list<string> */
+    #[Url]
+    public array $repos = [];
+
+    /** @var list<string> */
+    #[Url]
+    public array $types = [];
+
+    #[Url]
+    public ?string $outcome = null;
+
+    #[Url]
+    public ?string $person = null;
+
+    #[Url]
+    public bool $hideBots = true;
+
+    #[Url]
+    public string $sort = 'total';
+
+    #[Url]
+    public bool $byRepo = true;
+
+    #[Url]
+    public bool $showHighlights = true;
 
     public function mount(?string $tenantSlug = null): void
     {
@@ -37,7 +64,27 @@ final class CommunityRetrospectivePage extends Component
         $tenant = Tenant::query()->where('slug', $slug)->firstOrFail();
 
         $this->tenantId = $tenant->id;
-        $this->tenantName = $tenant->name;
+    }
+
+    public function toggleType(string $type): void
+    {
+        $this->types = $this->toggleAware($this->types, self::ALL_TYPES, $type);
+    }
+
+    public function toggleRepo(string $repo): void
+    {
+        $this->repos = $this->toggleAware($this->repos, $this->allRepos(), $repo);
+    }
+
+    public function setPreset(string $preset): void
+    {
+        $this->since = match ($preset) {
+            'mes' => CarbonImmutable::now()->subMonth()->toDateString(),
+            'tudo' => null,
+            default => CarbonImmutable::now()->startOfWeek(CarbonInterface::MONDAY)->subWeek()->toDateString(),
+        };
+
+        $this->until = $preset === 'tudo' ? null : CarbonImmutable::now()->toDateString();
     }
 
     public function render(): View
@@ -50,10 +97,55 @@ final class CommunityRetrospectivePage extends Component
             ? CarbonImmutable::parse($this->until)->endOfDay()
             : CarbonImmutable::now();
 
+        $filters = RetrospectiveFilters::make($since, $until, $this->repos, $this->types, $this->outcome, $this->person, $this->hideBots, $this->sort);
+        $data = new CommunityRetrospective($this->tenantId, $filters)->build();
+
+        $repoOptions = collect($this->allRepos())
+            ->mapWithKeys(fn (string $repo): array => [$repo => (string) str($repo)->afterLast('/')])
+            ->all();
+
         return view('portal::community-retrospective', [
-            'data' => new CommunityRetrospective($this->tenantId, RetrospectiveFilters::period($since, $until))->build(),
-            'sinceValue' => $since->toDateString(),
-            'untilValue' => $until->toDateString(),
+            'data' => $data,
+            'repoOptions' => $repoOptions,
+            'stateKey' => md5((string) json_encode([
+                $this->since, $this->until, $this->repos, $this->types, $this->outcome,
+                $this->person, $this->hideBots, $this->sort, $this->byRepo, $this->showHighlights,
+            ])),
         ]);
+    }
+
+    /**
+     * Toggle "ciente de todos": com a lista vazia (= todos), clicar desliga apenas
+     * aquele item; voltar a ter todos selecionados normaliza de volta para vazio.
+     *
+     * @param  list<string>  $selected
+     * @param  list<string>  $all
+     * @return list<string>
+     */
+    private function toggleAware(array $selected, array $all, string $value): array
+    {
+        $current = $selected === [] ? $all : $selected;
+
+        $next = in_array($value, $current, true)
+            ? array_values(array_diff($current, [$value]))
+            : array_values(array_unique([...$current, $value]));
+
+        return count($next) === count($all) ? [] : $next;
+    }
+
+    /**
+     * @return list<string>
+     */
+    private function allRepos(): array
+    {
+        /** @var list<string> $repos */
+        $repos = GithubContribution::query()
+            ->where('tenant_id', $this->tenantId)
+            ->distinct()
+            ->orderBy('repo')
+            ->pluck('repo')
+            ->all();
+
+        return $repos;
     }
 }

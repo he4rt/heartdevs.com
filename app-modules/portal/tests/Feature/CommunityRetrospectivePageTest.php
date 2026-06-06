@@ -56,5 +56,30 @@ it('inclui e marca contribuidor cujo único PR foi fechado sem merge', function 
     livewire(CommunityRetrospectivePage::class, ['since' => '2026-06-01', 'until' => '2026-06-07'])
         ->assertOk()
         ->assertSee('rejeitada')
-        ->assertSee('não mergeado');
+        ->assertSee('fechados');
+});
+
+it('não renderiza o chrome do portal (sem navbar)', function (): void {
+    test()->get('/comunidade/retrospectiva')
+        ->assertOk()
+        ->assertDontSee('Área do Usuário')
+        ->assertSee('Quem fez a He4rt');
+});
+
+it('filtra por tipo ao alternar um tipo de contribuição', function (): void {
+    GithubContribution::factory()->for($this->tenant)->create([
+        'actor_login' => 'soreview', 'type' => ContributionType::Review,
+        'external_ref' => 'review:1', 'occurred_at' => '2026-06-02',
+    ]);
+
+    livewire(CommunityRetrospectivePage::class, ['since' => '2026-06-01', 'until' => '2026-06-07'])
+        ->assertSee('soreview')
+        ->call('toggleType', 'review')
+        ->assertDontSee('soreview');
+});
+
+it('mantém o estado dos filtros (toggle de bots)', function (): void {
+    livewire(CommunityRetrospectivePage::class)
+        ->set('hideBots', false)
+        ->assertSet('hideBots', false);
 });
