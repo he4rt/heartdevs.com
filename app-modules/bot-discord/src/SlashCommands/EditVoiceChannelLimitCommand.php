@@ -7,11 +7,10 @@ namespace He4rt\BotDiscord\SlashCommands;
 use Discord\Parts\Interactions\Command\Option;
 use Discord\Parts\Interactions\Interaction;
 use Exception;
-use Laracord\Commands\SlashCommand;
 
 use function React\Async\await;
 
-class EditVoiceChannelLimitCommand extends SlashCommand
+class EditVoiceChannelLimitCommand extends AbstractSlashCommand
 {
     protected $name = 'sala-limite';
 

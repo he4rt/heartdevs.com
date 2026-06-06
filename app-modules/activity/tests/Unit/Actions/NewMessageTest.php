@@ -2,90 +2,127 @@
 
 declare(strict_types=1);
 
+use Carbon\CarbonImmutable;
 use He4rt\Activity\Message\Actions\NewMessage;
-use He4rt\Activity\Message\Actions\PersistMessage;
 use He4rt\Activity\Message\DTOs\NewMessageDTO;
-use He4rt\Community\Meeting\Actions\AttendMeeting;
-use He4rt\Identity\ExternalIdentity\Actions\FindExternalIdentity;
-use He4rt\Identity\ExternalIdentity\Actions\LinkExternalIdentity as NewAccountByProvider;
-use Illuminate\Support\Facades\Cache;
+use He4rt\Activity\Message\Models\Message;
+use He4rt\Gamification\Character\Models\Character;
+use He4rt\Identity\ExternalIdentity\Enums\IdentityProvider;
+use He4rt\Identity\ExternalIdentity\Models\ExternalIdentity;
+use He4rt\Identity\Tenant\Models\Tenant;
+use He4rt\Identity\User\Models\User;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 
-test('new message', function (string $provider, array $payload): void {
-    Cache::shouldReceive('tags->has')
-        ->once()
-        ->with('current-meeting')
-        ->andReturn(true);
+uses(RefreshDatabase::class);
 
-    Cache::shouldReceive('tags->has')
-        ->once()
-        ->with('meeting-id-user-foda-attended')
-        ->andReturn(false);
+test('persist delegates to IncrementExperience and stores message', function (): void {
+    $tenant = Tenant::factory()->create();
+    $user = User::factory()->create(['is_donator' => false]);
+    $character = Character::factory()
+        ->recycle($user)
+        ->recycle($tenant)
+        ->create(['experience' => 0]);
 
-    $findProviderStub = Mockery::mock(FindExternalIdentity::class);
-    $findCharacterStub = Mockery::mock(FindCharacterIdByUserId::class);
-    $characterExperienceStub = Mockery::mock(IncrementExperience::class);
-    $persistMessageStub = Mockery::mock(PersistMessage::class);
-    $attendMeetingStub = Mockery::mock(AttendMeeting::class);
-    $newUserStub = Mockery::mock(NewAccountByProvider::class);
+    $provider = ExternalIdentity::factory()
+        ->recycle($tenant)
+        ->create([
+            'model_type' => (new User)->getMorphClass(),
+            'model_id' => $user->id,
+            'provider' => IdentityProvider::Discord,
+            'external_account_id' => '123456',
+        ]);
 
-    $obtainedExperience = 1;
-    $providerEntityMock = (object) [
-        'id' => '1',
-        'model_id' => 'id-user-foda',
-        'provider' => 'twitch',
-        'external_account_id' => '12312312',
-    ];
-
-    $findProviderStub
-        ->shouldReceive('handle')
-        ->with($provider, $payload['external_account_id'])
-        ->andReturn($providerEntityMock);
-
-    $findCharacterStub
-        ->shouldReceive('handle')
-        ->once()
-        ->with($providerEntityMock->model_id)
-        ->andReturn('id-character-foda');
-
-    $characterExperienceStub
-        ->shouldReceive('incrementByTextMessage')
-        ->once()
-        ->with('id-character-foda', $payload['content'])
-        ->andReturn($obtainedExperience);
-
-    $persistMessageStub
-        ->shouldReceive('handle')
-        ->once()
-        ->with(Mockery::type(NewMessageDTO::class), $obtainedExperience, $providerEntityMock->id);
-
-    $attendMeetingStub
-        ->shouldReceive('handle')
-        ->once()
-        ->with($providerEntityMock->model_id);
-
-    $action = new NewMessage(
-        $persistMessageStub,
-        $findProviderStub,
-        $findCharacterStub,
-        $characterExperienceStub,
-        $attendMeetingStub,
-        $newUserStub
+    $content = str_repeat('a', 200);
+    $dto = new NewMessageDTO(
+        tenantId: $tenant->id,
+        provider: IdentityProvider::Discord,
+        providerUsername: 'testuser',
+        externalAccountId: '123456',
+        providerMessageId: 'msg-001',
+        channelId: 'ch-001',
+        content: $content,
+        sentAt: CarbonImmutable::parse('2025-01-01 12:00:00'),
     );
 
-    $action->persist($payload);
-})->with('data provider')->skip();
+    resolve(NewMessage::class)->persist($dto);
 
-dataset('data provider', fn () => [
-    'twitch #1' => [
-        'provider' => 'twitch',
-        'payload' => [
-            'provider' => 'twitch',
-            'tenant_id' => 1,
-            'external_account_id' => '1234',
-            'provider_message_id' => '78781237',
-            'channel_id' => '31231267312',
-            'content' => 'deixa o sub',
-            'sent_at' => '2023-01-18 22:36:32',
-        ],
-    ],
-]);
+    // (200 * 0.01) + (1 * 0.1) = 2.1 → (int) 2
+    expect($character->fresh()->experience)->toBe(2);
+
+    $message = Message::query()->where('provider_message_id', 'msg-001')->first();
+    expect($message)->not->toBeNull()
+        ->and($message->obtained_experience)->toBe(2)
+        ->and($message->content)->toBe($content)
+        ->and($message->external_identity_id)->toBe($provider->id);
+});
+
+test('supporter gets double xp on message', function (): void {
+    $tenant = Tenant::factory()->create();
+    $user = User::factory()->create(['is_donator' => true]);
+    $character = Character::factory()
+        ->recycle($user)
+        ->recycle($tenant)
+        ->create(['experience' => 0]);
+
+    ExternalIdentity::factory()
+        ->recycle($tenant)
+        ->create([
+            'model_type' => (new User)->getMorphClass(),
+            'model_id' => $user->id,
+            'provider' => IdentityProvider::Discord,
+            'external_account_id' => '789',
+        ]);
+
+    $dto = new NewMessageDTO(
+        tenantId: $tenant->id,
+        provider: IdentityProvider::Discord,
+        providerUsername: 'supporter',
+        externalAccountId: '789',
+        providerMessageId: 'msg-002',
+        channelId: 'ch-001',
+        content: str_repeat('a', 200),
+        sentAt: CarbonImmutable::parse('2025-01-01 12:00:00'),
+    );
+
+    resolve(NewMessage::class)->persist($dto);
+
+    // non-supporter: (200 * 0.01) + (1 * 0.1) = 2 → supporter: 2 * 2 = 4
+    expect($character->fresh()->experience)->toBe(4);
+});
+
+test('short message gives minimum 1 xp at level 1', function (): void {
+    $tenant = Tenant::factory()->create();
+    $user = User::factory()->create(['is_donator' => false]);
+    $character = Character::factory()
+        ->recycle($user)
+        ->recycle($tenant)
+        ->create(['experience' => 0]);
+
+    ExternalIdentity::factory()
+        ->recycle($tenant)
+        ->create([
+            'model_type' => (new User)->getMorphClass(),
+            'model_id' => $user->id,
+            'provider' => IdentityProvider::Discord,
+            'external_account_id' => '456',
+        ]);
+
+    $dto = new NewMessageDTO(
+        tenantId: $tenant->id,
+        provider: IdentityProvider::Discord,
+        providerUsername: 'newbie',
+        externalAccountId: '456',
+        providerMessageId: 'msg-003',
+        channelId: 'ch-001',
+        content: 'hello world',
+        sentAt: CarbonImmutable::parse('2025-01-01 12:00:00'),
+    );
+
+    resolve(NewMessage::class)->persist($dto);
+
+    expect($character->fresh()->experience)->toBe(1);
+
+    $message = Message::query()->where('provider_message_id', 'msg-003')->first();
+    expect($message)->not->toBeNull()
+        ->and($message->obtained_experience)->toBe(1);
+});

@@ -8,10 +8,9 @@ use Discord\Parts\Channel\Message;
 use Discord\WebSockets\Event as Events;
 use He4rt\Activity\Message\Actions\NewMessage;
 use He4rt\Activity\Message\DTOs\NewMessageDTO;
+use He4rt\BotDiscord\Actions\ResolveDiscordTenant;
 use He4rt\BotDiscord\Moderation\DiscordModerationAdapter;
 use He4rt\Identity\ExternalIdentity\Enums\IdentityProvider;
-use He4rt\Identity\ExternalIdentity\Models\ExternalIdentity;
-use He4rt\Identity\Tenant\Models\Tenant;
 use He4rt\Moderation\Enums\CaseSource;
 use He4rt\Moderation\Pipeline\SubmitForModeration;
 use Laracord\Events\Event;
@@ -34,11 +33,7 @@ class MessageReceivedEvent extends Event
         }
 
         try {
-            // Resolve which tenant (Discord guild) this message belongs to.
-            $tenantProvider = ExternalIdentity::query()
-                ->where('model_type', (new Tenant)->getMorphClass())
-                ->where('external_account_id', (string) $message->guild_id)
-                ->firstOrFail();
+            $tenantProvider = resolve(ResolveDiscordTenant::class)->handle((string) $message->guild_id);
 
             // Activity tracking — records message for XP/gamification regardless of moderation outcome.
             resolve(NewMessage::class)->persist(new NewMessageDTO(

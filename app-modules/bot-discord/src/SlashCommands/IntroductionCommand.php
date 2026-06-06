@@ -8,19 +8,20 @@ use Discord\Builders\Components\TextInput;
 use Discord\Helpers\Collection;
 use Discord\Parts\Guild\Role;
 use Discord\Parts\Interactions\Interaction;
+use He4rt\BotDiscord\Actions\ResolveDiscordTenant;
 use He4rt\Identity\ExternalIdentity\DTOs\ResolveUserProviderDTO;
-use He4rt\Identity\ExternalIdentity\Models\ExternalIdentity;
-use He4rt\Identity\Tenant\Models\Tenant;
 use He4rt\Identity\User\Actions\ResolveUserContext;
 use He4rt\Identity\User\Models\User;
 use He4rt\Profile\Actions\UpsertProfile;
 use He4rt\Profile\DTOs\UpsertProfileDTO;
 use He4rt\Profile\Models\Profile;
 use Illuminate\Support\Facades\Date;
-use Laracord\Commands\SlashCommand;
+use Illuminate\Support\Facades\Log;
 use Throwable;
 
-class IntroductionCommand extends SlashCommand
+use function React\Async\await;
+
+class IntroductionCommand extends AbstractSlashCommand
 {
     protected $name = 'apresentar';
 
@@ -94,7 +95,20 @@ class IntroductionCommand extends SlashCommand
 
                     $interaction->respondWithMessage("Apresentação enviada com sucesso.\nhttps://heartdevs.com/", true);
 
-                } catch (Throwable) {
+                } catch (Throwable $throwable) {
+                    Log::channel('bot-discord')->error('IntroductionCommand: failed to process introduction', [
+                        'discord_user_id' => $interaction->user->id,
+                        'guild_id' => $interaction->guild_id,
+                        'fields' => [
+                            'name' => $components->get('custom_id', 'name')?->value,
+                            'nickname' => $components->get('custom_id', 'nickname')?->value,
+                            'about' => $components->get('custom_id', 'about')?->value,
+                        ],
+                        'exception' => $throwable,
+                    ]);
+
+                    report($throwable);
+
                     $interaction->respondWithMessage('Ocorreu um erro ao processar sua apresentação.', true);
                 }
             })
@@ -103,13 +117,12 @@ class IntroductionCommand extends SlashCommand
 
     /**
      * @param  Collection<mixed, mixed>  $components
+     *
+     * @throws Throwable
      */
     private function persistData(Interaction $interaction, Collection $components): void
     {
-        $tenantProvider = ExternalIdentity::query()
-            ->where('model_type', (new Tenant)->getMorphClass())
-            ->where('external_account_id', (string) $interaction->guild_id)
-            ->firstOrFail();
+        $tenantProvider = resolve(ResolveDiscordTenant::class)->handle((string) $interaction->guild_id);
 
         $userDto = ResolveUserProviderDTO::make([
             'tenant_id' => $tenantProvider->tenant_id,
@@ -128,10 +141,7 @@ class IntroductionCommand extends SlashCommand
 
         $userContext->user->update(['name' => $name]);
 
-        $profile = Profile::query()
-            ->where('user_id', $userContext->user->id)
-            ->where('tenant_id', $tenantProvider->tenant_id)
-            ->firstOrFail();
+        $profile = Profile::ensureExists($userContext->user->id, $tenantProvider->tenant_id);
 
         $dto = UpsertProfileDTO::fromArray([
             'nickname' => $nickname,
@@ -167,6 +177,6 @@ class IntroductionCommand extends SlashCommand
 
         $roles[] = $this->roleId;
 
-        $interaction->member->setRoles($roles);
+        await($interaction->member->setRoles($roles));
     }
 }

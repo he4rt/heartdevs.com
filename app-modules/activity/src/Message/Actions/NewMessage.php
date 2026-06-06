@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace He4rt\Activity\Message\Actions;
 
 use He4rt\Activity\Message\DTOs\NewMessageDTO;
-use He4rt\Gamification\Character\Models\Character;
+use He4rt\Gamification\Character\Actions\IncrementExperience;
 use He4rt\Identity\ExternalIdentity\DTOs\ResolveUserProviderDTO;
 use He4rt\Identity\User\Actions\ResolveUserContext;
 use He4rt\Identity\User\Models\User;
@@ -16,6 +16,7 @@ final readonly class NewMessage
 {
     public function __construct(
         private PersistMessage $persistMessage,
+        private IncrementExperience $incrementExperience,
     ) {}
 
     public function persist(NewMessageDTO $messageDTO): void
@@ -32,15 +33,11 @@ final readonly class NewMessage
 
             $userContext = resolve(ResolveUserContext::class)->handle($userDto);
 
-            $userContext->character->refresh();
-
-            $obtainedExperience = Character::generateTextExperience(
+            $obtainedExperience = $this->incrementExperience->incrementByTextMessage(
+                $userContext->character->id,
                 $messageDTO->content,
-                $userContext->character->level,
                 $userContext->user->is_donator,
             );
-
-            $userContext->character->increment('experience', $obtainedExperience);
 
             $this->persistMessage->handle(
                 $messageDTO,
@@ -49,11 +46,10 @@ final readonly class NewMessage
             );
 
         } catch (Throwable $throwable) {
-            Log::error('NewMessage failed', [
+            Log::channel('bot-discord')->error('NewMessage failed', [
                 'external_account_id' => $messageDTO->externalAccountId,
                 'tenant_id' => $messageDTO->tenantId,
-                'error' => $throwable->getMessage(),
-                'trace' => $throwable->getTraceAsString(),
+                'exception' => $throwable,
             ]);
         }
     }

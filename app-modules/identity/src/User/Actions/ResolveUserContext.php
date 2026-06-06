@@ -22,6 +22,7 @@ readonly class ResolveUserContext
     {
         $provider = $this->providerResolver->handle($dto);
         $user = $this->userResolver->handle($provider);
+        $user->tenants()->syncWithoutDetaching([$dto->tenantId]);
         $character = $this->characterInitializer->ensure($user, $dto->tenantId);
 
         return UserContext::make(user: $user, character: $character, provider: $provider);

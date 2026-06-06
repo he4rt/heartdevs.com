@@ -10,22 +10,12 @@ use He4rt\Identity\ExternalIdentity\Enums\IdentityProvider;
 final readonly class NewVoiceMessageDTO
 {
     public function __construct(
+        public string $tenantId,
         public IdentityProvider $provider,
         public string $externalAccountId,
         public VoiceStatesEnum $voiceState,
         public string $channelName,
+        public ?string $channelId = null,
+        public ?string $username = null,
     ) {}
-
-    /**
-     * @param  array<string, mixed>  $payload
-     */
-    public static function make(array $payload): self
-    {
-        return new self(
-            provider: IdentityProvider::from($payload['provider']),
-            externalAccountId: $payload['external_account_id'],
-            voiceState: VoiceStatesEnum::from($payload['state']),
-            channelName: $payload['channel_name']
-        );
-    }
 }

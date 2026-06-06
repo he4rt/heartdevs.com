@@ -11,11 +11,6 @@ final class TenantUserObserver
 {
     public function created(TenantUser $pivot): void
     {
-        Profile::query()->firstOrCreate([
-            'user_id' => $pivot->user_id,
-            'tenant_id' => $pivot->tenant_id,
-        ], [
-            'available_for_proposals' => false,
-        ]);
+        Profile::ensureExists((string) $pivot->user_id, (string) $pivot->tenant_id);
     }
 }

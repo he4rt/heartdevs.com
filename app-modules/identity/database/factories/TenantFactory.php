@@ -29,6 +29,11 @@ final class TenantFactory extends Factory
         ];
     }
 
+    public function withOwnerAsMember(): self
+    {
+        return $this->afterCreating(fn (Tenant $tenant) => $tenant->members()->attach($tenant->owner_id));
+    }
+
     public function withDiscordProvider(string $providerId = '123'): self
     {
         return $this->withProvider(IdentityProvider::Discord, $providerId);
@@ -44,6 +49,9 @@ final class TenantFactory extends Factory
         return $this->afterCreating(function (Tenant $tenant) use ($provider, $providerId): void {
             ExternalIdentity::factory()->create([
                 'tenant_id' => $tenant->getKey(),
+                'model_type' => (new Tenant)->getMorphClass(),
+                'model_id' => $tenant->getKey(),
+                'connected_by' => $tenant->owner_id,
                 'provider' => $provider,
                 'external_account_id' => $providerId,
             ]);

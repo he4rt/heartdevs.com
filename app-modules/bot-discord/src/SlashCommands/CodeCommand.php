@@ -5,9 +5,8 @@ declare(strict_types=1);
 namespace He4rt\BotDiscord\SlashCommands;
 
 use Discord\Parts\Interactions\Interaction;
-use Laracord\Commands\SlashCommand;
 
-class CodeCommand extends SlashCommand
+class CodeCommand extends AbstractSlashCommand
 {
     /**
      * The command name.

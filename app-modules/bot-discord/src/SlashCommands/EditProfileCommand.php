@@ -11,6 +11,7 @@ use He4rt\Profile\Actions\UpsertProfile;
 use He4rt\Profile\DTOs\UpsertProfileDTO;
 use He4rt\Profile\Models\Profile;
 use Illuminate\Support\Facades\Date;
+use Illuminate\Support\Facades\Log;
 use Throwable;
 
 class EditProfileCommand extends AbstractSlashCommand
@@ -76,6 +77,10 @@ class EditProfileCommand extends AbstractSlashCommand
             return;
         }
 
+        $name = $this->memberProvider->user->name;
+        $nickname = $profile->nickname;
+        $about = $profile->about;
+
         $this->modal('Editar Perfil')
             ->components([
                 TextInput::new('Nome', TextInput::STYLE_SHORT)
@@ -83,7 +88,7 @@ class EditProfileCommand extends AbstractSlashCommand
                     ->setMinLength(2)
                     ->setMaxLength(32)
                     ->setPlaceholder('Seu nome')
-                    ->setValue($this->memberProvider->user->name ?? '')
+                    ->setValue(filled($name) && mb_strlen((string) $name) >= 2 ? $name : null)
                     ->setRequired(true),
 
                 TextInput::new('Nickname', TextInput::STYLE_SHORT)
@@ -91,7 +96,7 @@ class EditProfileCommand extends AbstractSlashCommand
                     ->setMinLength(2)
                     ->setMaxLength(32)
                     ->setPlaceholder('Seu nickname')
-                    ->setValue($profile->nickname ?? '')
+                    ->setValue(filled($nickname) && mb_strlen($nickname) >= 2 ? $nickname : null)
                     ->setRequired(true),
 
                 TextInput::new('Nos conte um pouco sobre você', TextInput::STYLE_PARAGRAPH)
@@ -99,7 +104,7 @@ class EditProfileCommand extends AbstractSlashCommand
                     ->setMinLength(5)
                     ->setMaxLength(500)
                     ->setPlaceholder('Fale mais sobre você...')
-                    ->setValue($profile->about ?? '')
+                    ->setValue(filled($about) && mb_strlen($about) >= 5 ? $about : null)
                     ->setRequired(true),
 
             ])
@@ -117,11 +122,11 @@ class EditProfileCommand extends AbstractSlashCommand
         Interaction $interaction,
         Collection $components
     ): void {
-        try {
-            $name = $components->get('custom_id', 'name')?->value;
-            $nickname = $components->get('custom_id', 'nickname')?->value;
-            $about = $components->get('custom_id', 'about')?->value;
+        $name = $components->get('custom_id', 'name')?->value;
+        $nickname = $components->get('custom_id', 'nickname')?->value;
+        $about = $components->get('custom_id', 'about')?->value;
 
+        try {
             $this->memberProvider->user->update(['name' => $name]);
 
             $profile = Profile::query()
@@ -152,7 +157,16 @@ class EditProfileCommand extends AbstractSlashCommand
                 ->reply($interaction, true);
 
         } catch (Throwable $throwable) {
-            $this->logger()->error('Error EditProfileCommand:', [$throwable->getMessage()]);
+            Log::channel('bot-discord')->error('EditProfileCommand: failed to persist profile data', [
+                'discord_user_id' => $interaction->user->id,
+                'guild_id' => $interaction->guild_id,
+                'user_id' => $this->memberProvider?->user?->id,
+                'tenant_id' => $this->memberProvider?->tenant_id,
+                'fields' => ['name' => $name, 'nickname' => $nickname, 'about' => $about],
+                'exception' => $throwable,
+            ]);
+
+            report($throwable);
 
             $interaction->respondWithMessage('Erro ao persistir dados', true);
         }
