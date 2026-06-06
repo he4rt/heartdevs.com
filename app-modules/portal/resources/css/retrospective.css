@@ -303,6 +303,35 @@
     color: var(--brand-soft);
 }
 
+/* CTA (estado vazio: convite pra reunião) */
+.retro .cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 30px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.92rem;
+    font-weight: 700;
+    text-decoration: none;
+    color: #fff;
+    background: linear-gradient(105deg, var(--brand), var(--brand-2));
+    border-radius: 999px;
+    padding: 13px 24px;
+    box-shadow: 0 16px 40px -16px rgba(120, 43, 241, 0.85);
+    transition:
+        transform 0.2s ease,
+        box-shadow 0.2s ease;
+}
+.retro .cta:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 22px 50px -14px rgba(196, 75, 255, 0.9);
+}
+.retro .cta svg {
+    width: 19px;
+    height: 19px;
+    flex: none;
+}
+
 .retro .sec-tag {
     font-family: 'JetBrains Mono', monospace;
     font-size: 0.72rem;

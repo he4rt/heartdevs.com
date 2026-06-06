@@ -61,10 +61,26 @@ it('inclui e marca contribuidor cujo único PR foi fechado sem merge', function 
 });
 
 it('não renderiza o chrome do portal (sem navbar)', function (): void {
+    GithubContribution::factory()->for($this->tenant)->create([
+        'actor_login' => 'alguem', 'type' => ContributionType::Pr,
+        'external_ref' => 'pr:1', 'occurred_at' => '2026-06-02', 'metadata' => ['state' => 'open', 'merged' => false],
+    ]);
+
     test()->get('/comunidade/retrospectiva')
         ->assertOk()
         ->assertDontSee('Área do Usuário')
         ->assertSee('Quem fez a He4rt');
+});
+
+it('mostra o convite pra reunião quando não há nenhuma contribuição', function (): void {
+    // banco zerado: nenhum repositório/estatística → estado vazio com CTA, sem o deck normal
+    test()->get('/comunidade/retrospectiva')
+        ->assertOk()
+        ->assertSee('Métricas')
+        ->assertSee('reunião')
+        ->assertSee('discord.gg/he4rt')
+        ->assertDontSee('O panorama')
+        ->assertDontSee('Filtros');
 });
 
 it('filtra por tipo ao alternar um tipo de contribuição', function (): void {
