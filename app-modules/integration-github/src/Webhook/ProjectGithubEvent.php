@@ -96,6 +96,13 @@ final readonly class ProjectGithubEvent
     private function review(string $tenantId, string $repo, array $payload): void
     {
         $review = $this->arrayFrom($payload, 'review');
+        $submittedAt = $this->stringFrom($review, 'submitted_at');
+
+        // Reviews PENDING (rascunho) não têm submitted_at e não são contribuição.
+        if ($submittedAt === '') {
+            return;
+        }
+
         $login = $this->stringFrom($review, 'user.login', 'ghost');
 
         $this->recorder->execute(new NewContributionDTO(
@@ -105,7 +112,7 @@ final readonly class ProjectGithubEvent
             externalRef: ContributionType::Review->ref($this->stringFrom($review, 'id')),
             actorLogin: $login,
             actorId: $this->intFrom($review, 'user.id'),
-            occurredAt: $this->stringFrom($review, 'submitted_at'),
+            occurredAt: $submittedAt,
             targetRef: ContributionType::Pr->ref($this->stringFrom($payload, 'pull_request.number')),
             metadata: [
                 'state' => data_get($review, 'state'),

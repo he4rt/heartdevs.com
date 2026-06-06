@@ -88,6 +88,22 @@ it('faz backfill de PRs upsertando contributions com tamanho, autor e tenant', f
         ->and($contribution->metadata['is_bot'])->toBeFalse();
 });
 
+it('ignora reviews PENDING (sem submitted_at) sem quebrar o backfill', function (): void {
+    mockGithub([
+        ListPullRequests::class => MockResponse::make([prPayload(61, 'maria', 42)]),
+        GetPullRequest::class => MockResponse::make(['additions' => 1, 'deletions' => 0, 'changed_files' => 1]),
+        ListPullRequestReviews::class => MockResponse::make([
+            ['id' => 1597160462, 'state' => 'PENDING', 'submitted_at' => null, 'user' => ['login' => 'danielhe4rt', 'id' => 6912596]],
+            ['id' => 1597160999, 'state' => 'APPROVED', 'submitted_at' => '2026-06-02T10:00:00Z', 'user' => ['login' => 'maria', 'id' => 42]],
+        ]),
+    ]);
+
+    backfill($this->repo);
+
+    expect(GithubContribution::query()->where('type', ContributionType::Review)->pluck('external_ref')->all())
+        ->toBe(['review:1597160999']);
+});
+
 it('é idempotente: re-rodar o backfill não duplica', function (): void {
     mockGithub([
         ListPullRequests::class => MockResponse::make([prPayload(1, 'maria', 42)]),

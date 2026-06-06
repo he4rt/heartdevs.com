@@ -81,6 +81,14 @@ final readonly class BackfillRepository
         $this->paginate(
             fn (int $page): Request => new ListPullRequestReviews($repo, $number, $page, self::PER_PAGE),
             function (array $review) use ($tenantId, $repo, $number): void {
+                $submittedAt = $this->stringFrom($review, 'submitted_at');
+
+                // Reviews PENDING (rascunho não enviado) não têm submitted_at — a API
+                // lista o rascunho do próprio usuário do token. Não é contribuição.
+                if ($submittedAt === '') {
+                    return;
+                }
+
                 $login = $this->actorLogin($review);
 
                 $this->recorder->execute(new NewContributionDTO(
@@ -90,7 +98,7 @@ final readonly class BackfillRepository
                     externalRef: ContributionType::Review->ref($this->stringFrom($review, 'id')),
                     actorLogin: $login,
                     actorId: $this->actorId($review),
-                    occurredAt: $this->stringFrom($review, 'submitted_at'),
+                    occurredAt: $submittedAt,
                     targetRef: ContributionType::Pr->ref($number),
                     metadata: [
                         'state' => data_get($review, 'state'),
