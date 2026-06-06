@@ -13,6 +13,7 @@ export default defineConfig({
                 'app-modules/he4rt/resources/css/theme.css',
                 'app-modules/he4rt/resources/css/themes/3pontos/theme.css',
                 'app-modules/docs/resources/css/theme.css',
+                'app-modules/portal/resources/css/retrospective.css',
             ],
             refresh: true,
         }),
