@@ -82,6 +82,50 @@
     mix-blend-mode: overlay;
 }
 
+/* logo He4rt ao fundo, com um LED percorrendo as linhas (efeito circuito) */
+.retro .logo-bg {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    pointer-events: none;
+    overflow: hidden;
+}
+.retro .logo-bg svg {
+    width: min(78vh, 64vw);
+    height: auto;
+    transform: translateY(-2%);
+}
+/* traço de base — circuito apagado */
+.retro .logo-bg .trace {
+    fill: none;
+    stroke: rgba(120, 43, 241, 0.13);
+    stroke-width: 1.6;
+}
+/* LED que percorre o caminho (pathLength normalizado para 100) */
+.retro .logo-bg .led {
+    fill: none;
+    stroke: var(--brand-soft);
+    stroke-width: 3.2;
+    stroke-linecap: round;
+    stroke-dasharray: 8 92;
+    stroke-dashoffset: 100;
+    filter: drop-shadow(0 0 5px var(--brand-2)) drop-shadow(0 0 13px rgba(120, 43, 241, 0.9));
+    animation: retro-led 5.4s linear infinite;
+}
+.retro .logo-bg .led.b {
+    stroke: var(--brand-2);
+    animation-duration: 7.2s;
+    animation-delay: -3s;
+}
+@keyframes retro-led {
+    to {
+        stroke-dashoffset: 0;
+    }
+}
+
 /* progress bar */
 .retro .progress {
     position: absolute;
@@ -214,6 +258,34 @@
 @keyframes retro-draw {
     to {
         stroke-dashoffset: 0;
+    }
+}
+.retro .cover-heart {
+    display: block;
+    width: 86px;
+    height: 86px;
+    margin: 0 auto;
+    object-fit: contain;
+    filter: drop-shadow(0 0 22px rgba(120, 43, 241, 0.7));
+    transform-origin: center 62%;
+}
+.retro .slide.active .cover-heart {
+    animation: retro-beat 2s 0.7s ease-in-out infinite;
+}
+@keyframes retro-beat {
+    0%,
+    36%,
+    100% {
+        transform: scale(1);
+    }
+    12% {
+        transform: scale(1.13);
+    }
+    24% {
+        transform: scale(1.04);
+    }
+    30% {
+        transform: scale(1.08);
     }
 }
 .retro .hint {
