@@ -35,4 +35,19 @@ final class RateLimit
             ? sprintf(' (reset ~%s)', Date::createFromTimestamp((int) $reset)->format('H:i'))
             : '';
     }
+
+    /**
+     * Segundos até o reset do rate limit (cap 1h), para re-agendar um job.
+     * Fallback de 60s quando o GitHub não informa o horário.
+     */
+    public static function secondsUntilReset(RequestException $exception): int
+    {
+        $reset = $exception->getResponse()->header('X-RateLimit-Reset');
+
+        if (!is_numeric($reset)) {
+            return 60;
+        }
+
+        return max(1, min((int) $reset - Date::now()->getTimestamp(), 3600));
+    }
 }

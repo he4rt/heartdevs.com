@@ -17,16 +17,13 @@ use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Columns\ToggleColumn;
 use Filament\Tables\Table;
-use He4rt\IntegrationGithub\Backfill\BackfillRepository;
-use He4rt\IntegrationGithub\Backfill\RateLimit;
+use He4rt\IntegrationGithub\Backfill\Jobs\BackfillGithubRepository;
 use He4rt\IntegrationGithub\Models\GithubRepository;
 use He4rt\PanelAdmin\Github\GithubCluster;
 use He4rt\PanelAdmin\Github\Resources\GithubRepositoryResource\Pages\CreateGithubRepository;
 use He4rt\PanelAdmin\Github\Resources\GithubRepositoryResource\Pages\EditGithubRepository;
 use He4rt\PanelAdmin\Github\Resources\GithubRepositoryResource\Pages\ListGithubRepositories;
-use Illuminate\Support\Facades\Date;
 use Illuminate\Validation\Rules\Unique;
-use Saloon\Exceptions\Request\RequestException;
 
 class GithubRepositoryResource extends Resource
 {
@@ -106,34 +103,14 @@ class GithubRepositoryResource extends Resource
             ->icon(Heroicon::OutlinedArrowPath)
             ->color('gray')
             ->requiresConfirmation()
+            ->modalDescription('O histórico é coletado em segundo plano (centenas de chamadas ao GitHub). Você pode continuar usando o painel.')
             ->action(function (GithubRepository $record): void {
-                try {
-                    resolve(BackfillRepository::class)->execute($record);
-                } catch (RequestException $requestException) {
-                    if (RateLimit::matches($requestException)) {
-                        Notification::make()
-                            ->danger()
-                            ->title('Rate limit do GitHub atingido')
-                            ->body('Os dados já coletados foram salvos; rode novamente após o reset'.RateLimit::resetHint($requestException).'.')
-                            ->send();
-
-                        return;
-                    }
-
-                    Notification::make()
-                        ->danger()
-                        ->title('Falha no backfill')
-                        ->body($requestException->getMessage())
-                        ->send();
-
-                    return;
-                }
-
-                $record->update(['last_backfilled_at' => Date::now()]);
+                dispatch(new BackfillGithubRepository($record));
 
                 Notification::make()
                     ->success()
-                    ->title('Backfill concluído para '.$record->full_name)
+                    ->title('Backfill enfileirado')
+                    ->body('O histórico de '.$record->full_name.' será coletado em segundo plano. O "Último backfill" é atualizado ao concluir.')
                     ->send();
             });
     }

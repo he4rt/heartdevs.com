@@ -6,12 +6,11 @@ use Filament\Actions\Testing\TestAction;
 use Filament\Facades\Filament;
 use He4rt\Identity\Tenant\Models\Tenant;
 use He4rt\Identity\User\Models\User;
+use He4rt\IntegrationGithub\Backfill\Jobs\BackfillGithubRepository;
 use He4rt\IntegrationGithub\Models\GithubRepository;
-use He4rt\IntegrationGithub\Transport\GitHubApiConnector;
 use He4rt\PanelAdmin\Github\Resources\GithubRepositoryResource\Pages\CreateGithubRepository;
 use He4rt\PanelAdmin\Github\Resources\GithubRepositoryResource\Pages\ListGithubRepositories;
-use Saloon\Http\Faking\MockClient;
-use Saloon\Http\Faking\MockResponse;
+use Illuminate\Support\Facades\Queue;
 
 use function Pest\Livewire\livewire;
 
@@ -32,14 +31,6 @@ beforeEach(function (): void {
 
     $this->tenant = $tenant;
 });
-
-function mockGithubConnector(MockResponse $response): void
-{
-    app()->instance(GitHubApiConnector::class, tap(
-        new GitHubApiConnector(),
-        fn (GitHubApiConnector $connector) => $connector->withMockClient(new MockClient(['*' => $response])),
-    ));
-}
 
 test('admin cria um repositório associando ao tenant atual', function (): void {
     livewire(CreateGithubRepository::class)
@@ -82,30 +73,17 @@ test('lista apenas os repositórios do tenant atual', function (): void {
         ->assertCanNotSeeTableRecords([$theirs]);
 });
 
-test('backfill pelo painel avisa de forma amigável ao bater rate limit, sem marcar last_backfilled_at', function (): void {
-    mockGithubConnector(MockResponse::make(
-        ['message' => 'API rate limit exceeded'],
-        403,
-        ['X-RateLimit-Remaining' => '0', 'X-RateLimit-Reset' => '1900000000'],
-    ));
+test('backfill pelo painel enfileira o job em segundo plano', function (): void {
+    Queue::fake();
 
     $repo = GithubRepository::factory()->create(['full_name' => 'he4rt/a']);
 
     livewire(ListGithubRepositories::class)
         ->callAction(TestAction::make('backfill')->table($repo))
-        ->assertNotified('Rate limit do GitHub atingido');
+        ->assertNotified('Backfill enfileirado');
 
-    expect($repo->fresh()->last_backfilled_at)->toBeNull();
-});
-
-test('backfill pelo painel avisa de falha genérica sem marcar last_backfilled_at', function (): void {
-    mockGithubConnector(MockResponse::make(['message' => 'Internal Server Error'], 500));
-
-    $repo = GithubRepository::factory()->create(['full_name' => 'he4rt/a']);
-
-    livewire(ListGithubRepositories::class)
-        ->callAction(TestAction::make('backfill')->table($repo))
-        ->assertNotified('Falha no backfill');
-
-    expect($repo->fresh()->last_backfilled_at)->toBeNull();
+    Queue::assertPushed(
+        BackfillGithubRepository::class,
+        fn (BackfillGithubRepository $job): bool => $job->repository->is($repo),
+    );
 });
