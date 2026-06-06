@@ -133,3 +133,27 @@ it('agrupa PRs por repositório e lista destaques por linhas mudadas', function 
         ->and($data['highlights'][0]['additions'])->toBe(500)
         ->and($data['highlights'][0]['repo'])->toBe('he4rt/heartdevs.com');
 });
+
+it('aplica filtros de tipo, repo, desfecho e pessoa', function (): void {
+    contribution($this->tenant, ['actor_login' => 'maria', 'repo' => 'he4rt/a', 'type' => ContributionType::Pr, 'external_ref' => 'pr:1', 'occurred_at' => '2026-06-02', 'metadata' => ['state' => 'merged', 'merged' => true]]);
+    contribution($this->tenant, ['actor_login' => 'maria', 'repo' => 'he4rt/a', 'type' => ContributionType::Pr, 'external_ref' => 'pr:2', 'occurred_at' => '2026-06-02', 'metadata' => ['state' => 'open', 'merged' => false]]);
+    contribution($this->tenant, ['actor_login' => 'joao', 'repo' => 'he4rt/b', 'type' => ContributionType::Review, 'external_ref' => 'review:1', 'occurred_at' => '2026-06-02']);
+
+    $filters = RetrospectiveFilters::make($this->since, $this->until, repos: ['he4rt/a'], types: ['pr'], outcome: 'merged', person: 'maria');
+    $data = ($this->build)($filters);
+
+    expect($data['meta']['total'])->toBe(1)
+        ->and($data['meta']['people'])->toBe(1)
+        ->and($data['people'][0]['login'])->toBe('maria')
+        ->and($data['people'][0]['prs'])->toBe(1);
+});
+
+it('ordena o ranking por linhas quando sort=lines', function (): void {
+    contribution($this->tenant, ['actor_login' => 'poucas', 'type' => ContributionType::Pr, 'external_ref' => 'pr:1', 'occurred_at' => '2026-06-02', 'metadata' => ['state' => 'open', 'merged' => false, 'additions' => 10, 'deletions' => 0]]);
+    contribution($this->tenant, ['actor_login' => 'muitas', 'type' => ContributionType::Pr, 'external_ref' => 'pr:2', 'occurred_at' => '2026-06-02', 'metadata' => ['state' => 'open', 'merged' => false, 'additions' => 900, 'deletions' => 50]]);
+
+    $filters = RetrospectiveFilters::make($this->since, $this->until, sort: 'lines');
+    $data = ($this->build)($filters);
+
+    expect($data['people'][0]['login'])->toBe('muitas');
+});

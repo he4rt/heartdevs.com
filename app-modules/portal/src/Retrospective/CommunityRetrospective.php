@@ -41,13 +41,27 @@ final readonly class CommunityRetrospective
                 $this->filters->hideBots,
                 fn (Collection $items): Collection => $items->reject(fn (GithubContribution $contribution): bool => $this->isBot($contribution)),
             )
+            ->when(
+                $this->filters->repos !== [],
+                fn (Collection $items): Collection => $items->filter(fn (GithubContribution $contribution): bool => in_array($contribution->repo, $this->filters->repos, true)),
+            )
+            ->filter(fn (GithubContribution $contribution): bool => in_array($contribution->type, $this->filters->types, true))
+            ->reject(fn (GithubContribution $contribution): bool => $this->filteredOutByOutcome($contribution))
+            ->when(
+                $this->filters->person !== null,
+                fn (Collection $items): Collection => $items->filter(fn (GithubContribution $contribution): bool => $contribution->actor_login === $this->filters->person),
+            )
             ->values();
 
         /** @var list<array<string, mixed>> $people */
         $people = $contributions
             ->groupBy('actor_login')
             ->map(fn (Collection $items, string $login): array => $this->person($login, $items))
-            ->sortByDesc('total')
+            ->sortByDesc(fn (array $person): int => match ($this->filters->sort) {
+                'prs' => (int) $person['prs'] * 1000 + (int) $person['total'],
+                'lines' => (int) $person['additions'] + (int) $person['deletions'],
+                default => (int) $person['total'],
+            })
             ->values()
             ->all();
 
@@ -178,6 +192,23 @@ final readonly class CommunityRetrospective
         return $actorId !== null
             ? 'https://avatars.githubusercontent.com/u/'.$actorId.'?v=4'
             : 'https://github.com/'.$login.'.png';
+    }
+
+    private function filteredOutByOutcome(GithubContribution $contribution): bool
+    {
+        if ($this->filters->outcome === null || $contribution->type !== ContributionType::Pr) {
+            return false;
+        }
+
+        $metadata = $contribution->metadata ?? [];
+        $merged = ($metadata['merged'] ?? false) === true;
+        $state = $metadata['state'] ?? null;
+
+        return match ($this->filters->outcome) {
+            'merged' => !$merged,
+            'open' => $state !== 'open',
+            'closed' => !($state === 'closed' && !$merged),
+        };
     }
 
     /**
