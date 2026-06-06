@@ -197,6 +197,7 @@ final class EnrollmentsRelationManager extends RelationManager
                 resolve(OverrideEnrollmentStatusAction::class)->handle(
                     new OverrideEnrollmentStatusDTO(
                         enrollment: $record,
+                        fromStatus: $record->status,
                         toStatus: EnrollmentStatus::from($data['to_status']),
                         actorId: (string) auth()->id(),
                         reason: $data['reason'],

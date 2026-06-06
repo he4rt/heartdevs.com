@@ -43,6 +43,7 @@ test('when admin overrides no_show enrollment to attended with reason, then tran
     $transition = resolve(OverrideEnrollmentStatusAction::class)->handle(
         new OverrideEnrollmentStatusDTO(
             enrollment: $enrollment,
+            fromStatus: EnrollmentStatus::NoShow,
             toStatus: EnrollmentStatus::Attended,
             actorId: $organizer->id,
             reason: 'Participant was actually present',
@@ -71,6 +72,7 @@ test('when admin overrides confirmed enrollment to checked_in with reason, then 
     resolve(OverrideEnrollmentStatusAction::class)->handle(
         new OverrideEnrollmentStatusDTO(
             enrollment: $enrollment,
+            fromStatus: EnrollmentStatus::Confirmed,
             toStatus: EnrollmentStatus::CheckedIn,
             actorId: $organizer->id,
             reason: 'Late arrival',
@@ -103,6 +105,7 @@ test('when admin tries to override without reason, then reason required exceptio
     expect(fn (): EnrollmentTransition => resolve(OverrideEnrollmentStatusAction::class)->handle(
         new OverrideEnrollmentStatusDTO(
             enrollment: $enrollment,
+            fromStatus: EnrollmentStatus::NoShow,
             toStatus: EnrollmentStatus::Attended,
             actorId: User::factory()->create()->id,
             reason: '   ',
@@ -121,6 +124,7 @@ test('when admin tries to override from cancelled to attended, then override not
     expect(fn (): EnrollmentTransition => resolve(OverrideEnrollmentStatusAction::class)->handle(
         new OverrideEnrollmentStatusDTO(
             enrollment: $enrollment,
+            fromStatus: EnrollmentStatus::Cancelled,
             toStatus: EnrollmentStatus::Attended,
             actorId: User::factory()->create()->id,
             reason: 'Should not work',
@@ -158,6 +162,7 @@ test('when admin tries to override from no_show to confirmed, then override not 
     expect(fn (): EnrollmentTransition => resolve(OverrideEnrollmentStatusAction::class)->handle(
         new OverrideEnrollmentStatusDTO(
             enrollment: $enrollment,
+            fromStatus: EnrollmentStatus::NoShow,
             toStatus: EnrollmentStatus::Confirmed,
             actorId: User::factory()->create()->id,
             reason: 'Should not work',
@@ -185,11 +190,14 @@ test('when admin overrides a stale confirmed enrollment that is already no_show,
     expect(fn (): EnrollmentTransition => resolve(OverrideEnrollmentStatusAction::class)->handle(
         new OverrideEnrollmentStatusDTO(
             enrollment: $enrollment,
+            fromStatus: EnrollmentStatus::Confirmed,
             toStatus: EnrollmentStatus::CheckedIn,
             actorId: User::factory()->create()->id,
             reason: 'Late arrival',
         ),
-    ))->toThrow(OverrideEnrollmentStatusException::class);
+    ))->toThrow(function (OverrideEnrollmentStatusException $exception): void {
+        expect($exception->getCode())->toBe(409);
+    });
 
     expect($enrollment->fresh()->status)->toBe(EnrollmentStatus::NoShow);
 });

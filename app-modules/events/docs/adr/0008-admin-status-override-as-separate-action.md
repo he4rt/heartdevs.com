@@ -32,7 +32,16 @@ Any other pair — including `attended → no_show`, `cancelled → attended`, o
 
 ### Reason is required and recorded
 
-`OverrideEnrollmentStatusDTO` takes a non-empty `reason` string. The Action throws `OverrideEnrollmentStatusException::reasonRequired()` on empty input. The reason is written to `EnrollmentTransition::$reason` for accountability, alongside `triggered_by = admin` and `actor_id = $organizer->id`.
+`OverrideEnrollmentStatusDTO` takes a non-empty `reason` string and rejects empty input with `OverrideEnrollmentStatusException::reasonRequired()`. The reason is written to `EnrollmentTransition::$reason` for accountability, alongside `triggered_by = admin` and `actor_id = $organizer->id`.
+
+### Stale status is a conflict, not a generic invalid override
+
+The DTO carries the enrollment status observed by the admin UI. The Action still re-loads the enrollment inside a transaction with a row lock before applying the correction. If the current status no longer matches the observed status, it throws `OverrideEnrollmentStatusException::statusChanged(expected, actual)` instead of `overrideNotAllowed(from, to)`.
+
+This separates two cases:
+
+- `overrideNotAllowed` — the requested pair is not part of the correction allowlist.
+- `statusChanged` — the requested pair may have been valid when the admin opened the modal, but another process changed the enrollment before save.
 
 ### Override does not re-dispatch domain events
 

@@ -12,4 +12,5 @@ return [
     'response_message_not_implemented' => 'Mensagem de resposta não implementada para o status de inscrição: :status.',
     'override_reason_required' => 'É obrigatório informar um motivo ao sobrescrever o status de uma inscrição.',
     'override_not_allowed' => 'Sobrescrita de :from para :to não é permitida.',
+    'override_status_changed' => 'O status da inscrição mudou de :expected para :actual antes da sobrescrita ser salva. Revise o status atual e tente novamente.',
 ];

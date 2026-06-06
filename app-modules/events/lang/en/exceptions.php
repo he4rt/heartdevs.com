@@ -12,4 +12,5 @@ return [
     'response_message_not_implemented' => 'Response message is not implemented for enrollment status: :status.',
     'override_reason_required' => 'A reason is required when overriding an enrollment status.',
     'override_not_allowed' => 'Override from :from to :to is not allowed.',
+    'override_status_changed' => 'Enrollment status changed from :expected to :actual before the override was saved. Review the current status and try again.',
 ];

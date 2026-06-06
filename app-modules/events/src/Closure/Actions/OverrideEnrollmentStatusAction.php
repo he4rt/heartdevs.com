@@ -35,10 +35,6 @@ final readonly class OverrideEnrollmentStatusAction
      */
     public function handle(OverrideEnrollmentStatusDTO $dto): EnrollmentTransition
     {
-        if (mb_trim($dto->reason) === '') {
-            throw OverrideEnrollmentStatusException::reasonRequired();
-        }
-
         return DB::transaction(function () use ($dto): EnrollmentTransition {
             $enrollment = Enrollment::query()
                 ->whereKey($dto->enrollment->id)
@@ -46,6 +42,11 @@ final readonly class OverrideEnrollmentStatusAction
                 ->firstOrFail();
 
             $fromStatus = $enrollment->status;
+
+            throw_unless(
+                $fromStatus === $dto->fromStatus,
+                OverrideEnrollmentStatusException::statusChanged($dto->fromStatus, $fromStatus),
+            );
 
             throw_unless(
                 $this->isAllowed($fromStatus, $dto->toStatus),

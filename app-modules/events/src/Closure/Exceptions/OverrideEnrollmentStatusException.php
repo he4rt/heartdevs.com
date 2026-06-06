@@ -25,4 +25,15 @@ final class OverrideEnrollmentStatusException extends Exception
             Response::HTTP_UNPROCESSABLE_ENTITY,
         );
     }
+
+    public static function statusChanged(EnrollmentStatus $expected, EnrollmentStatus $actual): self
+    {
+        return new self(
+            __('events::exceptions.override_status_changed', [
+                'expected' => $expected->value,
+                'actual' => $actual->value,
+            ]),
+            Response::HTTP_CONFLICT,
+        );
+    }
 }
