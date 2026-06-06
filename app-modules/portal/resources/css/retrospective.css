@@ -434,6 +434,22 @@
     background: var(--del);
 }
 
+/* barra de composição (DNA da pessoa) */
+.retro .compbar {
+    display: flex;
+    height: 8px;
+    margin-top: 14px;
+    border-radius: 999px;
+    overflow: hidden;
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+}
+.retro .compbar .seg {
+    height: 100%;
+    min-width: 3px;
+    transition: width 0.4s cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+
 /* pr row */
 .retro .tpr {
     display: flex;
@@ -570,7 +586,7 @@
     flex: none;
     width: 118px;
     display: inline-flex;
-    align-items: center;
+    align-items: flex-start;
     gap: 7px;
     padding-top: 3px;
     font-family: 'JetBrains Mono', monospace;
@@ -578,6 +594,13 @@
     letter-spacing: 0.03em;
     text-transform: uppercase;
     color: color-mix(in srgb, var(--c) 80%, white);
+}
+.retro .act-ic {
+    flex: none;
+    width: 14px;
+    height: 14px;
+    margin-top: 1px;
+    color: var(--c);
 }
 .retro .act-items {
     display: flex;

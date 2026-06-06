@@ -28,5 +28,6 @@
             <span class="total-pill">#{{ $rank }}</span>
         @endif
     </div>
+    <x-portal::retro.composition-bar :person="$person" />
     <x-portal::retro.activity-chips :person="$person" />
 </div>

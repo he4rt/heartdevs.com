@@ -23,7 +23,8 @@ it('mostra os contribuidores do período informado', function (): void {
 
     livewire(CommunityRetrospectivePage::class, ['since' => '2026-06-01', 'until' => '2026-06-07'])
         ->assertOk()
-        ->assertSee('maria');
+        ->assertSee('maria')
+        ->assertSee('compbar');
 });
 
 it('usa a janela padrão (segunda passada → hoje) quando sem parâmetros', function (): void {
