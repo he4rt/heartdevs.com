@@ -8,6 +8,7 @@ use Carbon\CarbonImmutable;
 use Carbon\CarbonInterface;
 use He4rt\Identity\Tenant\Models\Tenant;
 use He4rt\Portal\Retrospective\CommunityRetrospective;
+use He4rt\Portal\Retrospective\RetrospectiveFilters;
 use Illuminate\Contracts\View\View;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
@@ -50,7 +51,7 @@ final class CommunityRetrospectivePage extends Component
             : CarbonImmutable::now();
 
         return view('portal::community-retrospective', [
-            'data' => new CommunityRetrospective($this->tenantId, $since, $until)->build(),
+            'data' => new CommunityRetrospective($this->tenantId, RetrospectiveFilters::period($since, $until))->build(),
             'sinceValue' => $since->toDateString(),
             'untilValue' => $until->toDateString(),
         ]);
