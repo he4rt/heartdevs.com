@@ -92,6 +92,8 @@ final readonly class CommunityRetrospective
             'commits' => $this->countType($items, ContributionType::Commit),
             'additions' => $this->sumMeta($items, 'additions'),
             'deletions' => $this->sumMeta($items, 'deletions'),
+            'pr_refs' => $this->prRefs($items),
+            'issue_refs' => $this->issueRefs($items),
             'total' => $items->count(),
         ];
     }
@@ -114,6 +116,59 @@ final readonly class CommunityRetrospective
 
             return (int) ($metadata[$key] ?? 0);
         });
+    }
+
+    /**
+     * @param  Collection<int, GithubContribution>  $items
+     * @return list<array{num: int, title: string, url: string|null, state: string|null}>
+     */
+    private function prRefs(Collection $items): array
+    {
+        return $items
+            ->filter(fn (GithubContribution $contribution): bool => $contribution->type === ContributionType::Pr)
+            ->map(function (GithubContribution $contribution): array {
+                $metadata = $contribution->metadata ?? [];
+                $url = $metadata['url'] ?? null;
+                $state = $metadata['state'] ?? null;
+
+                return [
+                    'num' => $this->refNumber($contribution->external_ref),
+                    'title' => (string) ($metadata['title'] ?? ''),
+                    'url' => is_string($url) ? $url : null,
+                    'state' => is_string($state) ? $state : null,
+                ];
+            })
+            ->values()
+            ->all();
+    }
+
+    /**
+     * @param  Collection<int, GithubContribution>  $items
+     * @return list<array{num: int, title: string, url: string|null}>
+     */
+    private function issueRefs(Collection $items): array
+    {
+        return $items
+            ->filter(fn (GithubContribution $contribution): bool => $contribution->type === ContributionType::Issue)
+            ->map(function (GithubContribution $contribution): array {
+                $metadata = $contribution->metadata ?? [];
+                $url = $metadata['url'] ?? null;
+
+                return [
+                    'num' => $this->refNumber($contribution->external_ref),
+                    'title' => (string) ($metadata['title'] ?? ''),
+                    'url' => is_string($url) ? $url : null,
+                ];
+            })
+            ->values()
+            ->all();
+    }
+
+    private function refNumber(string $externalRef): int
+    {
+        $parts = explode(':', $externalRef);
+
+        return (int) ($parts[1] ?? 0);
     }
 
     private function isBot(GithubContribution $contribution): bool

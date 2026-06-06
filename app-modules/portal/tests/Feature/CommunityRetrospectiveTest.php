@@ -105,3 +105,17 @@ it('soma additions/deletions/changed_files de PRs em meta e por pessoa', functio
         ->and($maria['additions'])->toBe(130)
         ->and($maria['deletions'])->toBe(24);
 });
+
+it('expõe refs de PR e issue por pessoa para os chips de atividade', function (): void {
+    contribution($this->tenant, ['actor_login' => 'maria', 'type' => ContributionType::Pr, 'external_ref' => 'pr:290', 'occurred_at' => '2026-06-02', 'metadata' => ['state' => 'merged', 'merged' => true, 'title' => 'feat: x', 'url' => 'https://github.com/he4rt/heartdevs.com/pull/290']]);
+    contribution($this->tenant, ['actor_login' => 'maria', 'type' => ContributionType::Issue, 'external_ref' => 'issue:12', 'occurred_at' => '2026-06-03', 'metadata' => ['title' => 'bug: y', 'url' => 'https://github.com/he4rt/heartdevs.com/issues/12']]);
+
+    $data = ($this->build)();
+    $maria = collect($data['people'])->firstWhere('login', 'maria');
+
+    expect($maria['pr_refs'])->toHaveCount(1)
+        ->and($maria['pr_refs'][0])->toMatchArray(['num' => 290, 'title' => 'feat: x', 'state' => 'merged'])
+        ->and($maria['pr_refs'][0]['url'])->toContain('/pull/290')
+        ->and($maria['issue_refs'])->toHaveCount(1)
+        ->and($maria['issue_refs'][0])->toMatchArray(['num' => 12, 'title' => 'bug: y']);
+});
