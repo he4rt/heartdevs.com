@@ -119,3 +119,17 @@ it('expõe refs de PR e issue por pessoa para os chips de atividade', function (
         ->and($maria['issue_refs'])->toHaveCount(1)
         ->and($maria['issue_refs'][0])->toMatchArray(['num' => 12, 'title' => 'bug: y']);
 });
+
+it('agrupa PRs por repositório e lista destaques por linhas mudadas', function (): void {
+    contribution($this->tenant, ['actor_login' => 'maria', 'repo' => 'he4rt/heartdevs.com', 'type' => ContributionType::Pr, 'external_ref' => 'pr:1', 'occurred_at' => '2026-06-02', 'metadata' => ['state' => 'merged', 'merged' => true, 'title' => 'grande', 'url' => 'u1', 'additions' => 500, 'deletions' => 100, 'changed_files' => 10]]);
+    contribution($this->tenant, ['actor_login' => 'joao', 'repo' => 'he4rt/bot', 'type' => ContributionType::Pr, 'external_ref' => 'pr:2', 'occurred_at' => '2026-06-02', 'metadata' => ['state' => 'open', 'merged' => false, 'title' => 'pequeno', 'url' => 'u2', 'additions' => 10, 'deletions' => 2, 'changed_files' => 1]]);
+
+    $data = ($this->build)();
+
+    expect($data['repos'])->toHaveCount(2)
+        ->and(collect($data['repos'])->firstWhere('full_name', 'he4rt/heartdevs.com')['name'])->toBe('heartdevs.com')
+        ->and(collect($data['repos'])->firstWhere('full_name', 'he4rt/heartdevs.com')['prs'])->toHaveCount(1)
+        ->and($data['highlights'][0]['num'])->toBe(1)
+        ->and($data['highlights'][0]['additions'])->toBe(500)
+        ->and($data['highlights'][0]['repo'])->toBe('he4rt/heartdevs.com');
+});

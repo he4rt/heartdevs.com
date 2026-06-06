@@ -26,6 +26,8 @@ final readonly class CommunityRetrospective
      *     period: array{since: string, until: string},
      *     meta: array<string, int>,
      *     people: list<array<string, mixed>>,
+     *     repos: list<array<string, mixed>>,
+     *     highlights: list<array<string, mixed>>,
      * }
      */
     public function build(): array
@@ -66,6 +68,8 @@ final readonly class CommunityRetrospective
                 'total' => $contributions->count(),
             ],
             'people' => $people,
+            'repos' => $this->repos($contributions),
+            'highlights' => $this->highlights($contributions),
         ];
     }
 
@@ -79,9 +83,7 @@ final readonly class CommunityRetrospective
 
         return [
             'login' => $login,
-            'avatar' => $actorId !== null
-                ? 'https://avatars.githubusercontent.com/u/'.$actorId.'?v=4'
-                : 'https://github.com/'.$login.'.png',
+            'avatar' => $this->avatar($login, $actorId),
             'url' => 'https://github.com/'.$login,
             'prs' => $this->countType($items, ContributionType::Pr),
             'prs_merged' => $this->countMergedPrs($items),
@@ -169,6 +171,88 @@ final readonly class CommunityRetrospective
         $parts = explode(':', $externalRef);
 
         return (int) ($parts[1] ?? 0);
+    }
+
+    private function avatar(string $login, ?int $actorId): string
+    {
+        return $actorId !== null
+            ? 'https://avatars.githubusercontent.com/u/'.$actorId.'?v=4'
+            : 'https://github.com/'.$login.'.png';
+    }
+
+    /**
+     * @return array{num: int, title: string, url: string|null, state: string|null, author_login: string, additions: int, deletions: int, changed_files: int}
+     */
+    private function prRow(GithubContribution $contribution): array
+    {
+        $metadata = $contribution->metadata ?? [];
+        $url = $metadata['url'] ?? null;
+        $state = $metadata['state'] ?? null;
+
+        return [
+            'num' => $this->refNumber($contribution->external_ref),
+            'title' => (string) ($metadata['title'] ?? ''),
+            'url' => is_string($url) ? $url : null,
+            'state' => is_string($state) ? $state : null,
+            'author_login' => $contribution->actor_login,
+            'additions' => (int) ($metadata['additions'] ?? 0),
+            'deletions' => (int) ($metadata['deletions'] ?? 0),
+            'changed_files' => (int) ($metadata['changed_files'] ?? 0),
+        ];
+    }
+
+    /**
+     * @param  Collection<int, GithubContribution>  $contributions
+     * @return list<array<string, mixed>>
+     */
+    private function repos(Collection $contributions): array
+    {
+        return $contributions
+            ->groupBy('repo')
+            ->map(function (Collection $items, string $repo): array {
+                $prs = $items->filter(fn (GithubContribution $contribution): bool => $contribution->type === ContributionType::Pr);
+
+                return [
+                    'full_name' => $repo,
+                    'name' => explode('/', $repo)[1] ?? $repo,
+                    'prs' => $prs
+                        ->map(fn (GithubContribution $contribution): array => $this->prRow($contribution))
+                        ->sortByDesc(fn (array $pr): int => $pr['additions'] + $pr['deletions'])
+                        ->values()
+                        ->all(),
+                    'people' => $items
+                        ->groupBy('actor_login')
+                        ->map(fn (Collection $group, string $login): array => [
+                            'login' => $login,
+                            'avatar' => $this->avatar($login, $group->first()?->actor_id),
+                        ])
+                        ->values()
+                        ->all(),
+                    'metrics' => [
+                        'prs' => $prs->count(),
+                        'additions' => $this->sumMeta($prs, 'additions'),
+                        'deletions' => $this->sumMeta($prs, 'deletions'),
+                        'changed_files' => $this->sumMeta($prs, 'changed_files'),
+                    ],
+                ];
+            })
+            ->values()
+            ->all();
+    }
+
+    /**
+     * @param  Collection<int, GithubContribution>  $contributions
+     * @return list<array<string, mixed>>
+     */
+    private function highlights(Collection $contributions): array
+    {
+        return $contributions
+            ->filter(fn (GithubContribution $contribution): bool => $contribution->type === ContributionType::Pr)
+            ->map(fn (GithubContribution $contribution): array => [...$this->prRow($contribution), 'repo' => $contribution->repo])
+            ->sortByDesc(fn (array $pr): int => $pr['additions'] + $pr['deletions'])
+            ->take(4)
+            ->values()
+            ->all();
     }
 
     private function isBot(GithubContribution $contribution): bool
