@@ -57,3 +57,9 @@ it('para com mensagem clara ao bater rate limit, sem marcar last_backfilled_at',
 
     expect($repo->fresh()->last_backfilled_at)->toBeNull();
 });
+
+it('aceita a flag --full', function (): void {
+    mockEmptyGithub();
+
+    test()->artisan('github:backfill', ['repo' => 'he4rt/inexistente', '--full' => true])->assertSuccessful();
+});

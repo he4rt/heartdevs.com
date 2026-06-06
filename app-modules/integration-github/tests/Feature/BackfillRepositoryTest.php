@@ -127,6 +127,63 @@ it('reporta o progresso por contribuição via callback (na ordem de ingestão)'
     expect($reported)->toBe(['pr', 'review', 'issue']);
 });
 
+it('incremental: para nos PRs anteriores ao corte (updated < since)', function (): void {
+    $repo = GithubRepository::factory()->create([
+        'full_name' => 'he4rt/inc',
+        'last_backfilled_at' => '2026-06-05 00:00:00',
+    ]);
+
+    // PRs vêm por updated desc; since = last_backfilled_at - 1d = 2026-06-04.
+    mockGithub([
+        ListPullRequests::class => MockResponse::make([
+            ['number' => 10, 'updated_at' => '2026-06-06T10:00:00Z', 'created_at' => '2026-06-06T09:00:00Z', 'state' => 'open', 'merged_at' => null, 'user' => ['login' => 'recente', 'id' => 1]],
+            ['number' => 2, 'updated_at' => '2026-06-01T10:00:00Z', 'created_at' => '2026-06-01T09:00:00Z', 'state' => 'open', 'merged_at' => null, 'user' => ['login' => 'antigo', 'id' => 2]],
+        ]),
+        GetPullRequest::class => MockResponse::make(['additions' => 1, 'deletions' => 0, 'changed_files' => 1]),
+    ]);
+
+    backfill($repo);
+
+    expect(GithubContribution::query()->where('repo', 'he4rt/inc')->where('type', ContributionType::Pr)->pluck('external_ref')->all())
+        ->toBe(['pr:10']);
+});
+
+it('varredura completa (sem last_backfilled_at) pega todos os PRs, ignorando updated_at', function (): void {
+    $repo = GithubRepository::factory()->create(['full_name' => 'he4rt/full']);
+
+    mockGithub([
+        ListPullRequests::class => MockResponse::make([
+            ['number' => 10, 'updated_at' => '2026-06-06T10:00:00Z', 'created_at' => '2026-06-06T09:00:00Z', 'state' => 'open', 'merged_at' => null, 'user' => ['login' => 'a', 'id' => 1]],
+            ['number' => 2, 'updated_at' => '2018-01-01T10:00:00Z', 'created_at' => '2018-01-01T09:00:00Z', 'state' => 'open', 'merged_at' => null, 'user' => ['login' => 'b', 'id' => 2]],
+        ]),
+        GetPullRequest::class => MockResponse::make(['additions' => 1, 'deletions' => 0, 'changed_files' => 1]),
+    ]);
+
+    backfill($repo);
+
+    expect(GithubContribution::query()->where('repo', 'he4rt/full')->where('type', ContributionType::Pr)->pluck('external_ref')->sort()->values()->all())
+        ->toBe(['pr:10', 'pr:2']);
+});
+
+it('full=true ignora o last_backfilled_at e varre tudo', function (): void {
+    $repo = GithubRepository::factory()->create([
+        'full_name' => 'he4rt/forced',
+        'last_backfilled_at' => '2026-06-05 00:00:00',
+    ]);
+
+    mockGithub([
+        ListPullRequests::class => MockResponse::make([
+            ['number' => 2, 'updated_at' => '2018-01-01T10:00:00Z', 'created_at' => '2018-01-01T09:00:00Z', 'state' => 'open', 'merged_at' => null, 'user' => ['login' => 'antigo', 'id' => 2]],
+        ]),
+        GetPullRequest::class => MockResponse::make(['additions' => 1, 'deletions' => 0, 'changed_files' => 1]),
+    ]);
+
+    resolve(BackfillRepository::class)->execute($repo, full: true);
+
+    expect(GithubContribution::query()->where('repo', 'he4rt/forced')->where('type', ContributionType::Pr)->pluck('external_ref')->all())
+        ->toBe(['pr:2']);
+});
+
 it('é idempotente: re-rodar o backfill não duplica', function (): void {
     mockGithub([
         ListPullRequests::class => MockResponse::make([prPayload(1, 'maria', 42)]),

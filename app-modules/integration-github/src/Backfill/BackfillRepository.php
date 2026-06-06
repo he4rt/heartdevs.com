@@ -29,24 +29,32 @@ final readonly class BackfillRepository
     ) {}
 
     /**
-     * @param  (callable(ContributionType): void)|null  $onProgress  Chamado a cada contribuição gravada (para feedback de progresso).
+     * Por padrão é incremental: se o repositório já tem last_backfilled_at, só busca o
+     * que mudou desde (last_backfilled_at − 1 dia) — a margem D-1 evita perder algo na
+     * borda. Sem last_backfilled_at (ou com $full), varre o histórico inteiro.
+     *
+     * @param  (callable(ContributionType): void)|null  $onProgress  Chamado a cada contribuição gravada (feedback de progresso).
      */
-    public function execute(GithubRepository $repository, ?callable $onProgress = null): void
+    public function execute(GithubRepository $repository, ?callable $onProgress = null, bool $full = false): void
     {
         $tenantId = $repository->tenant_id;
         $repo = $repository->full_name;
 
-        $this->backfillPullRequests($tenantId, $repo, $onProgress);
-        $this->backfillIssues($tenantId, $repo, $onProgress);
-        $this->backfillIssueComments($tenantId, $repo, $onProgress);
-        $this->backfillReviewComments($tenantId, $repo, $onProgress);
-        $this->backfillCommits($tenantId, $repo, $onProgress);
+        $since = $full || $repository->last_backfilled_at === null
+            ? null
+            : $repository->last_backfilled_at->subDay()->utc()->format('Y-m-d\TH:i:s\Z');
+
+        $this->backfillPullRequests($tenantId, $repo, $since, $onProgress);
+        $this->backfillIssues($tenantId, $repo, $since, $onProgress);
+        $this->backfillIssueComments($tenantId, $repo, $since, $onProgress);
+        $this->backfillReviewComments($tenantId, $repo, $since, $onProgress);
+        $this->backfillCommits($tenantId, $repo, $since, $onProgress);
     }
 
     /**
      * @param  (callable(ContributionType): void)|null  $onProgress
      */
-    private function backfillPullRequests(string $tenantId, string $repo, ?callable $onProgress): void
+    private function backfillPullRequests(string $tenantId, string $repo, ?string $since, ?callable $onProgress): void
     {
         $this->paginate(
             fn (int $page): Request => new ListPullRequests($repo, $page, self::PER_PAGE),
@@ -78,6 +86,13 @@ final readonly class BackfillRepository
                 ), $onProgress);
 
                 $this->backfillReviews($tenantId, $repo, $number, $onProgress);
+            },
+            // PRs vêm ordenados por updated desc: ao cruzar o corte, todo o resto é mais
+            // antigo — paramos de paginar (mata o N+1 de GetPullRequest + reviews).
+            reachedEnd: $since === null ? null : function (array $pr) use ($since): bool {
+                $updatedAt = $this->stringFrom($pr, 'updated_at');
+
+                return $updatedAt !== '' && $updatedAt < $since;
             },
         );
     }
@@ -121,10 +136,10 @@ final readonly class BackfillRepository
     /**
      * @param  (callable(ContributionType): void)|null  $onProgress
      */
-    private function backfillIssues(string $tenantId, string $repo, ?callable $onProgress): void
+    private function backfillIssues(string $tenantId, string $repo, ?string $since, ?callable $onProgress): void
     {
         $this->paginate(
-            fn (int $page): Request => new ListIssues($repo, $page, self::PER_PAGE),
+            fn (int $page): Request => new ListIssues($repo, $page, self::PER_PAGE, $since),
             function (array $issue) use ($tenantId, $repo, $onProgress): void {
                 if (isset($issue['pull_request'])) {
                     return; // o endpoint de issues também devolve PRs; estes já entram via backfillPullRequests
@@ -155,10 +170,10 @@ final readonly class BackfillRepository
     /**
      * @param  (callable(ContributionType): void)|null  $onProgress
      */
-    private function backfillIssueComments(string $tenantId, string $repo, ?callable $onProgress): void
+    private function backfillIssueComments(string $tenantId, string $repo, ?string $since, ?callable $onProgress): void
     {
         $this->paginate(
-            fn (int $page): Request => new ListIssueComments($repo, $page, self::PER_PAGE),
+            fn (int $page): Request => new ListIssueComments($repo, $page, self::PER_PAGE, $since),
             function (array $comment) use ($tenantId, $repo, $onProgress): void {
                 $login = $this->actorLogin($comment);
 
@@ -184,10 +199,10 @@ final readonly class BackfillRepository
     /**
      * @param  (callable(ContributionType): void)|null  $onProgress
      */
-    private function backfillReviewComments(string $tenantId, string $repo, ?callable $onProgress): void
+    private function backfillReviewComments(string $tenantId, string $repo, ?string $since, ?callable $onProgress): void
     {
         $this->paginate(
-            fn (int $page): Request => new ListPullRequestReviewComments($repo, $page, self::PER_PAGE),
+            fn (int $page): Request => new ListPullRequestReviewComments($repo, $page, self::PER_PAGE, $since),
             function (array $comment) use ($tenantId, $repo, $onProgress): void {
                 $login = $this->actorLogin($comment);
 
@@ -213,10 +228,10 @@ final readonly class BackfillRepository
     /**
      * @param  (callable(ContributionType): void)|null  $onProgress
      */
-    private function backfillCommits(string $tenantId, string $repo, ?callable $onProgress): void
+    private function backfillCommits(string $tenantId, string $repo, ?string $since, ?callable $onProgress): void
     {
         $this->paginate(
-            fn (int $page): Request => new ListCommits($repo, $page, self::PER_PAGE),
+            fn (int $page): Request => new ListCommits($repo, $page, self::PER_PAGE, $since),
             function (array $commit) use ($tenantId, $repo, $onProgress): void {
                 $login = $this->stringFrom($commit, 'author.login')
                     ?: $this->stringFrom($commit, 'commit.author.name', 'ghost');
@@ -256,8 +271,9 @@ final readonly class BackfillRepository
     /**
      * @param  callable(int): Request  $requestFor
      * @param  callable(array<string, mixed>): void  $onEach
+     * @param  (callable(array<string, mixed>): bool)|null  $reachedEnd  Para a paginação ao retornar true (itens ordenados).
      */
-    private function paginate(callable $requestFor, callable $onEach): void
+    private function paginate(callable $requestFor, callable $onEach, ?callable $reachedEnd = null): void
     {
         $page = 1;
 
@@ -266,6 +282,10 @@ final readonly class BackfillRepository
             $items = (array) $this->github->send($requestFor($page))->throw()->json();
 
             foreach ($items as $item) {
+                if ($reachedEnd !== null && $reachedEnd($item)) {
+                    return;
+                }
+
                 $onEach($item);
             }
 

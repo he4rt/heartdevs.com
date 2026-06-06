@@ -27,10 +27,12 @@ final class ListPullRequests extends Request
      */
     protected function defaultQuery(): array
     {
+        // O endpoint /pulls não aceita `since`; ordenamos por updated desc para que o
+        // backfill incremental possa parar de paginar ao passar do corte (D-1).
         return [
             'state' => 'all',
-            'sort' => 'created',
-            'direction' => 'asc',
+            'sort' => 'updated',
+            'direction' => 'desc',
             'per_page' => $this->perPage,
             'page' => $this->page,
         ];

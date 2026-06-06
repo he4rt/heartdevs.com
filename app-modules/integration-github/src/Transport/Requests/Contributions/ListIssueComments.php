@@ -15,6 +15,7 @@ final class ListIssueComments extends Request
         private readonly string $repo,
         private readonly int $page = 1,
         private readonly int $perPage = 100,
+        private readonly ?string $since = null,
     ) {}
 
     public function resolveEndpoint(): string
@@ -27,11 +28,12 @@ final class ListIssueComments extends Request
      */
     protected function defaultQuery(): array
     {
-        return [
+        return array_filter([
             'sort' => 'created',
             'direction' => 'asc',
             'per_page' => $this->perPage,
             'page' => $this->page,
-        ];
+            'since' => $this->since,
+        ], fn (mixed $value): bool => $value !== null);
     }
 }

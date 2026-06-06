@@ -22,7 +22,8 @@ use function Laravel\Prompts\warning;
 
 #[Description('Faz backfill do histórico de contribuições dos repositórios da allowlist')]
 #[Signature('github:backfill
-    {repo? : owner/repo específico. Default: todos os repositórios habilitados}')]
+    {repo? : owner/repo específico. Default: todos os repositórios habilitados}
+    {--full : Ignora o last_backfilled_at e varre o histórico inteiro}')]
 final class BackfillGithubCommand extends Command
 {
     /**
@@ -40,6 +41,7 @@ final class BackfillGithubCommand extends Command
     public function handle(BackfillRepository $backfill): int
     {
         $repo = $this->argument('repo');
+        $full = (bool) $this->option('full');
 
         $repositories = is_string($repo)
             ? GithubRepository::query()->where('full_name', $repo)->get()
@@ -80,7 +82,7 @@ final class BackfillGithubCommand extends Command
                     $counts[$type->value] = ($counts[$type->value] ?? 0) + 1;
                     $bar->setMessage($this->tally($counts));
                     $bar->advance();
-                });
+                }, $full);
             } catch (RequestException $exception) {
                 $bar->finish();
                 $this->newLine(2);
