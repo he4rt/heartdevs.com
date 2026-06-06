@@ -697,7 +697,7 @@
 .retro .panel-head h3 {
     font-family: 'Fraunces', serif;
     font-weight: 600;
-    font-size: 1.3rem;
+    font-size: 1.05rem;
     margin: 0;
 }
 .retro .panel-head .x {
@@ -722,7 +722,7 @@
     flex: 1;
 }
 .retro .fgroup {
-    padding: 16px 0;
+    padding: 14px 0;
     border-top: 1px solid var(--border);
 }
 .retro .fgroup:first-child {
@@ -730,48 +730,77 @@
 }
 .retro .flabel {
     font-family: 'JetBrains Mono', monospace;
-    font-size: 0.66rem;
+    font-size: 0.62rem;
     letter-spacing: 0.16em;
     text-transform: uppercase;
     color: var(--faint);
-    margin-bottom: 11px;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 7px;
+}
+.retro .flabel svg {
+    width: 13px;
+    height: 13px;
+    flex: none;
+    stroke: var(--brand-soft);
+    fill: none;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
 }
 .retro .chips {
     display: flex;
     flex-wrap: wrap;
-    gap: 7px;
+    gap: 6px;
 }
 .retro .chip {
     font-family: 'JetBrains Mono', monospace;
-    font-size: 0.74rem;
+    font-size: 0.68rem;
     color: var(--muted);
     cursor: pointer;
     background: var(--surface);
     border: 1px solid var(--border);
     border-radius: 999px;
-    padding: 6px 12px;
+    padding: 5px 11px;
     transition: 0.18s;
     user-select: none;
+    display: inline-flex;
+    align-items: center;
 }
 .retro .chip:hover {
     border-color: var(--brand-soft);
     color: var(--text);
 }
+.retro .chip .d {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    display: inline-block;
+    margin-right: 6px;
+    background: var(--ck, var(--brand-soft));
+}
 .retro .chip.on {
     color: #fff;
-    background: rgba(120, 43, 241, 0.22);
-    border-color: rgba(120, 43, 241, 0.6);
+    background: color-mix(in srgb, var(--ck, var(--brand)) 22%, transparent);
+    border-color: color-mix(in srgb, var(--ck, var(--brand)) 55%, transparent);
 }
 .retro .frow {
     display: flex;
     align-items: center;
     justify-content: space-between;
     gap: 10px;
-    padding: 8px 0;
+    padding: 7px 0;
 }
 .retro .frow .t {
-    font-size: 0.92rem;
+    font-size: 0.82rem;
     color: var(--text);
+}
+.retro .frow .s {
+    font-size: 0.68rem;
+    color: var(--faint);
+    margin-top: 2px;
+    line-height: 1.4;
 }
 .retro .dates {
     display: flex;
@@ -781,7 +810,7 @@
     flex: 1;
     min-width: 0;
     font-family: 'JetBrains Mono', monospace;
-    font-size: 0.82rem;
+    font-size: 0.78rem;
     color: var(--text);
     background: var(--surface);
     border: 1px solid var(--border);
@@ -792,7 +821,7 @@
 .retro .fsel {
     width: 100%;
     font-family: 'JetBrains Mono', monospace;
-    font-size: 0.82rem;
+    font-size: 0.78rem;
     color: var(--text);
     background: var(--surface);
     border: 1px solid var(--border);
