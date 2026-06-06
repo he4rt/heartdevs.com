@@ -83,3 +83,22 @@ it('mantém o estado dos filtros (toggle de bots)', function (): void {
         ->set('hideBots', false)
         ->assertSet('hideBots', false);
 });
+
+it('preset "tudo" ancora o período na primeira contribuição e traz o histórico inteiro', function (): void {
+    $this->travelTo(CarbonImmutable::parse('2026-06-04 10:00:00'));
+
+    GithubContribution::factory()->for($this->tenant)->create([
+        'actor_login' => 'pioneira', 'actor_id' => 1, 'type' => ContributionType::Commit,
+        'external_ref' => 'commit:abc', 'occurred_at' => '2020-03-30 02:13:45',
+    ]);
+    GithubContribution::factory()->for($this->tenant)->create([
+        'actor_login' => 'recente', 'actor_id' => 2, 'type' => ContributionType::Issue,
+        'external_ref' => 'issue:1', 'occurred_at' => '2026-06-02',
+    ]);
+
+    livewire(CommunityRetrospectivePage::class)
+        ->call('setPreset', 'tudo')
+        ->assertSet('since', '2020-03-30')
+        ->assertSee('pioneira')
+        ->assertSee('recente');
+});

@@ -80,11 +80,11 @@ final class CommunityRetrospectivePage extends Component
     {
         $this->since = match ($preset) {
             'mes' => CarbonImmutable::now()->subMonth()->toDateString(),
-            'tudo' => null,
+            'tudo' => $this->firstContributionDate(),
             default => CarbonImmutable::now()->startOfWeek(CarbonInterface::MONDAY)->subWeek()->toDateString(),
         };
 
-        $this->until = $preset === 'tudo' ? null : CarbonImmutable::now()->toDateString();
+        $this->until = CarbonImmutable::now()->toDateString();
     }
 
     public function render(): View
@@ -131,6 +131,21 @@ final class CommunityRetrospectivePage extends Component
             : array_values(array_unique([...$current, $value]));
 
         return count($next) === count($all) ? [] : $next;
+    }
+
+    /**
+     * Data da contribuição mais antiga do tenant, para o preset "tudo" cobrir o
+     * histórico real. Sem registros, cai no mesmo default semanal do render().
+     */
+    private function firstContributionDate(): string
+    {
+        $first = GithubContribution::query()
+            ->where('tenant_id', $this->tenantId)
+            ->min('occurred_at');
+
+        return is_string($first) && $first !== ''
+            ? CarbonImmutable::parse($first)->toDateString()
+            : CarbonImmutable::now()->startOfWeek(CarbonInterface::MONDAY)->subWeek()->toDateString();
     }
 
     /**
