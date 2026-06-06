@@ -52,9 +52,9 @@ No `ParticipantAttended` or `ParticipantCheckedIn` is dispatched on override. Th
 
 If retroactive XP is ever needed, it is a separate decision (likely a `ParticipantManuallyAttended` event, with its own audience in Gamification).
 
-### Filament UI is inline in the EnrollmentsRelationManager
+### Filament UI is a dedicated Action class
 
-An `overrideStatusAction()` method is added to `EnrollmentsRelationManager` next to the existing `checkInAction()` method (same private-method pattern, same Action delegation style). It opens a modal with a reason textarea and a status select pre-populated with the allowed targets. The action is visible only when the current status is in the allowlist source set (`no_show`, `confirmed`) — anything else hides the action entirely.
+`OverrideEnrollmentStatusAction` lives under the Event relation manager `Actions/` directory, matching the existing `GenerateCheckInCodeAction` / `RevokeCheckInCodeAction` pattern. It opens a modal with a reason textarea and a status select pre-populated with the allowed targets. The action is visible only when the current status is in the allowlist source set (`no_show`, `confirmed`) — anything else hides the action entirely.
 
 ### No runtime inconsistency checks
 
@@ -66,4 +66,4 @@ The form and factory enforce that `minimum_days` is set when `attendance_require
 - **Tightly scoped bypass** — the state machine is still the gatekeeper for all non-override transitions. The override path is the _only_ way to leave a terminal state, and it is one line in one Action.
 - **No XP duplication risk** — by not re-dispatching domain events, an admin override cannot grant XP twice for the same participant-event pair.
 - **Trade-off** — overriding a status that has downstream side effects beyond XP (e.g. waitlist promotion triggered by `confirmed → cancelled`) does not replay those side effects. Acceptable for the current scope; flag if a new side-effect is added.
-- **Trade-off** — the inline `overrideStatusAction()` method grows `EnrollmentsRelationManager` by ~30 lines. If a third enrollment-related action lands, extract them into a `Actions/` directory inside the relation manager (matching the `GenerateCheckInCodeAction` / `RevokeCheckInCodeAction` pattern already used by `CheckInCodesRelationManager`).
+- **Trade-off** — the Filament action is now another class to navigate, but `EnrollmentsRelationManager` stays focused on table composition while action-specific form and callback wiring live next to the other Event relation manager actions.

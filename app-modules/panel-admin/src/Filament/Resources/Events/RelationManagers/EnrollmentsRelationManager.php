@@ -10,8 +10,6 @@ use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Forms\Components\DatePicker;
-use Filament\Forms\Components\Select;
-use Filament\Forms\Components\Textarea;
 use Filament\Notifications\Notification;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Support\Icons\Heroicon;
@@ -21,11 +19,10 @@ use Filament\Tables\Table;
 use He4rt\Events\CheckIn\Actions\ManualCheckInAction;
 use He4rt\Events\CheckIn\DTOs\ManualCheckInDTO;
 use He4rt\Events\CheckIn\Models\CheckIn;
-use He4rt\Events\Closure\Actions\OverrideEnrollmentStatusAction;
-use He4rt\Events\Closure\DTOs\OverrideEnrollmentStatusDTO;
 use He4rt\Events\Enrollment\Enums\EnrollmentStatus;
 use He4rt\Events\Enrollment\Models\Enrollment;
 use He4rt\Events\Event\Models\Event;
+use He4rt\PanelAdmin\Filament\Resources\Events\RelationManagers\Actions\OverrideEnrollmentStatusAction;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\Date;
@@ -88,7 +85,7 @@ final class EnrollmentsRelationManager extends RelationManager
             ])
             ->recordActions([
                 $this->checkInAction(),
-                $this->overrideStatusAction(),
+                OverrideEnrollmentStatusAction::make(),
                 DeleteAction::make(),
             ])
             ->toolbarActions([
@@ -171,43 +168,5 @@ final class EnrollmentsRelationManager extends RelationManager
                 eventDate: Date::parse($data['event_date']),
             ),
         );
-    }
-
-    private function overrideStatusAction(): Action
-    {
-        return Action::make('overrideStatus')
-            ->label('Override Status')
-            ->icon(Heroicon::OutlinedPencilSquare)
-            ->color('warning')
-            ->visible(fn (Enrollment $record): bool => OverrideEnrollmentStatusAction::allowedTargetsFor($record->status) !== [])
-            ->schema([
-                Select::make('to_status')
-                    ->label('New Status')
-                    ->options(fn (Enrollment $record): array => collect(OverrideEnrollmentStatusAction::allowedTargetsFor($record->status))
-                        ->mapWithKeys(fn (EnrollmentStatus $s): array => [$s->value => $s->getLabel()])
-                        ->all())
-                    ->required(),
-                Textarea::make('reason')
-                    ->label('Reason')
-                    ->required()
-                    ->minLength(3)
-                    ->rows(3),
-            ])
-            ->action(function (Enrollment $record, array $data): void {
-                resolve(OverrideEnrollmentStatusAction::class)->handle(
-                    new OverrideEnrollmentStatusDTO(
-                        enrollment: $record,
-                        fromStatus: $record->status,
-                        toStatus: EnrollmentStatus::from($data['to_status']),
-                        actorId: (string) auth()->id(),
-                        reason: $data['reason'],
-                    ),
-                );
-
-                Notification::make()
-                    ->success()
-                    ->title('Enrollment status overridden.')
-                    ->send();
-            });
     }
 }

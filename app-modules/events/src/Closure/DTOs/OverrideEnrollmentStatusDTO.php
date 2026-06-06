@@ -10,6 +10,9 @@ use He4rt\Events\Enrollment\Models\Enrollment;
 
 final readonly class OverrideEnrollmentStatusDTO
 {
+    /**
+     * @throws OverrideEnrollmentStatusException
+     */
     public function __construct(
         public Enrollment $enrollment,
         public EnrollmentStatus $fromStatus,
@@ -17,7 +20,7 @@ final readonly class OverrideEnrollmentStatusDTO
         public string $actorId,
         public string $reason,
     ) {
-        if (mb_trim($this->reason) === '') {
+        if (blank($this->reason)) {
             throw OverrideEnrollmentStatusException::reasonRequired();
         }
     }
