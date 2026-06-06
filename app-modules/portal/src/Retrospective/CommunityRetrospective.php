@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace He4rt\Portal\Retrospective;
 
-use Carbon\CarbonInterface;
 use He4rt\IntegrationGithub\Enums\ContributionType;
 use He4rt\IntegrationGithub\Models\GithubContribution;
 use Illuminate\Support\Collection;
@@ -19,8 +18,7 @@ final readonly class CommunityRetrospective
 {
     public function __construct(
         private string $tenantId,
-        private CarbonInterface $since,
-        private CarbonInterface $until,
+        private RetrospectiveFilters $filters,
     ) {}
 
     /**
@@ -35,9 +33,12 @@ final readonly class CommunityRetrospective
         /** @var Collection<int, GithubContribution> $contributions */
         $contributions = GithubContribution::query()
             ->where('tenant_id', $this->tenantId)
-            ->whereBetween('occurred_at', [$this->since, $this->until])
+            ->whereBetween('occurred_at', [$this->filters->since, $this->filters->until])
             ->get()
-            ->reject(fn (GithubContribution $contribution): bool => $this->isBot($contribution))
+            ->when(
+                $this->filters->hideBots,
+                fn (Collection $items): Collection => $items->reject(fn (GithubContribution $contribution): bool => $this->isBot($contribution)),
+            )
             ->values();
 
         /** @var list<array<string, mixed>> $people */
@@ -49,7 +50,7 @@ final readonly class CommunityRetrospective
             ->all();
 
         return [
-            'period' => ['since' => $this->since->toDateString(), 'until' => $this->until->toDateString()],
+            'period' => ['since' => $this->filters->since->toDateString(), 'until' => $this->filters->until->toDateString()],
             'meta' => [
                 'people' => count($people),
                 'prs' => $this->countType($contributions, ContributionType::Pr),
