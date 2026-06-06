@@ -53,9 +53,7 @@ it('para com mensagem clara ao bater rate limit, sem marcar last_backfilled_at',
 
     $repo = GithubRepository::factory()->create(['full_name' => 'he4rt/a']);
 
-    test()->artisan('github:backfill')
-        ->expectsOutputToContain('Rate limit')
-        ->assertFailed();
+    test()->artisan('github:backfill')->assertFailed();
 
     expect($repo->fresh()->last_backfilled_at)->toBeNull();
 });

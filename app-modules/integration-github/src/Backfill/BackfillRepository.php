@@ -28,29 +28,35 @@ final readonly class BackfillRepository
         private RecordContribution $recorder,
     ) {}
 
-    public function execute(GithubRepository $repository): void
+    /**
+     * @param  (callable(ContributionType): void)|null  $onProgress  Chamado a cada contribuição gravada (para feedback de progresso).
+     */
+    public function execute(GithubRepository $repository, ?callable $onProgress = null): void
     {
         $tenantId = $repository->tenant_id;
         $repo = $repository->full_name;
 
-        $this->backfillPullRequests($tenantId, $repo);
-        $this->backfillIssues($tenantId, $repo);
-        $this->backfillIssueComments($tenantId, $repo);
-        $this->backfillReviewComments($tenantId, $repo);
-        $this->backfillCommits($tenantId, $repo);
+        $this->backfillPullRequests($tenantId, $repo, $onProgress);
+        $this->backfillIssues($tenantId, $repo, $onProgress);
+        $this->backfillIssueComments($tenantId, $repo, $onProgress);
+        $this->backfillReviewComments($tenantId, $repo, $onProgress);
+        $this->backfillCommits($tenantId, $repo, $onProgress);
     }
 
-    private function backfillPullRequests(string $tenantId, string $repo): void
+    /**
+     * @param  (callable(ContributionType): void)|null  $onProgress
+     */
+    private function backfillPullRequests(string $tenantId, string $repo, ?callable $onProgress): void
     {
         $this->paginate(
             fn (int $page): Request => new ListPullRequests($repo, $page, self::PER_PAGE),
-            function (array $pr) use ($tenantId, $repo): void {
+            function (array $pr) use ($tenantId, $repo, $onProgress): void {
                 $number = $this->intFrom($pr, 'number') ?? 0;
                 /** @var array<string, mixed> $prSize */
                 $prSize = (array) $this->github->send(new GetPullRequest($repo, $number))->throw()->json();
                 $login = $this->actorLogin($pr);
 
-                $this->recorder->execute(new NewContributionDTO(
+                $this->record(new NewContributionDTO(
                     tenantId: $tenantId,
                     repo: $repo,
                     type: ContributionType::Pr,
@@ -69,18 +75,21 @@ final readonly class BackfillRepository
                         'changed_files' => $this->intFrom($prSize, 'changed_files') ?? 0,
                         'is_bot' => $this->isBot($login),
                     ],
-                ));
+                ), $onProgress);
 
-                $this->backfillReviews($tenantId, $repo, $number);
+                $this->backfillReviews($tenantId, $repo, $number, $onProgress);
             },
         );
     }
 
-    private function backfillReviews(string $tenantId, string $repo, int $number): void
+    /**
+     * @param  (callable(ContributionType): void)|null  $onProgress
+     */
+    private function backfillReviews(string $tenantId, string $repo, int $number, ?callable $onProgress): void
     {
         $this->paginate(
             fn (int $page): Request => new ListPullRequestReviews($repo, $number, $page, self::PER_PAGE),
-            function (array $review) use ($tenantId, $repo, $number): void {
+            function (array $review) use ($tenantId, $repo, $number, $onProgress): void {
                 $submittedAt = $this->stringFrom($review, 'submitted_at');
 
                 // Reviews PENDING (rascunho não enviado) não têm submitted_at — a API
@@ -91,7 +100,7 @@ final readonly class BackfillRepository
 
                 $login = $this->actorLogin($review);
 
-                $this->recorder->execute(new NewContributionDTO(
+                $this->record(new NewContributionDTO(
                     tenantId: $tenantId,
                     repo: $repo,
                     type: ContributionType::Review,
@@ -104,23 +113,26 @@ final readonly class BackfillRepository
                         'state' => data_get($review, 'state'),
                         'is_bot' => $this->isBot($login),
                     ],
-                ));
+                ), $onProgress);
             },
         );
     }
 
-    private function backfillIssues(string $tenantId, string $repo): void
+    /**
+     * @param  (callable(ContributionType): void)|null  $onProgress
+     */
+    private function backfillIssues(string $tenantId, string $repo, ?callable $onProgress): void
     {
         $this->paginate(
             fn (int $page): Request => new ListIssues($repo, $page, self::PER_PAGE),
-            function (array $issue) use ($tenantId, $repo): void {
+            function (array $issue) use ($tenantId, $repo, $onProgress): void {
                 if (isset($issue['pull_request'])) {
                     return; // o endpoint de issues também devolve PRs; estes já entram via backfillPullRequests
                 }
 
                 $login = $this->actorLogin($issue);
 
-                $this->recorder->execute(new NewContributionDTO(
+                $this->record(new NewContributionDTO(
                     tenantId: $tenantId,
                     repo: $repo,
                     type: ContributionType::Issue,
@@ -135,19 +147,22 @@ final readonly class BackfillRepository
                         'url' => data_get($issue, 'html_url'),
                         'is_bot' => $this->isBot($login),
                     ],
-                ));
+                ), $onProgress);
             },
         );
     }
 
-    private function backfillIssueComments(string $tenantId, string $repo): void
+    /**
+     * @param  (callable(ContributionType): void)|null  $onProgress
+     */
+    private function backfillIssueComments(string $tenantId, string $repo, ?callable $onProgress): void
     {
         $this->paginate(
             fn (int $page): Request => new ListIssueComments($repo, $page, self::PER_PAGE),
-            function (array $comment) use ($tenantId, $repo): void {
+            function (array $comment) use ($tenantId, $repo, $onProgress): void {
                 $login = $this->actorLogin($comment);
 
-                $this->recorder->execute(new NewContributionDTO(
+                $this->record(new NewContributionDTO(
                     tenantId: $tenantId,
                     repo: $repo,
                     type: ContributionType::Comment,
@@ -161,19 +176,22 @@ final readonly class BackfillRepository
                         'kind' => 'issue',
                         'is_bot' => $this->isBot($login),
                     ],
-                ));
+                ), $onProgress);
             },
         );
     }
 
-    private function backfillReviewComments(string $tenantId, string $repo): void
+    /**
+     * @param  (callable(ContributionType): void)|null  $onProgress
+     */
+    private function backfillReviewComments(string $tenantId, string $repo, ?callable $onProgress): void
     {
         $this->paginate(
             fn (int $page): Request => new ListPullRequestReviewComments($repo, $page, self::PER_PAGE),
-            function (array $comment) use ($tenantId, $repo): void {
+            function (array $comment) use ($tenantId, $repo, $onProgress): void {
                 $login = $this->actorLogin($comment);
 
-                $this->recorder->execute(new NewContributionDTO(
+                $this->record(new NewContributionDTO(
                     tenantId: $tenantId,
                     repo: $repo,
                     type: ContributionType::ReviewComment,
@@ -187,20 +205,23 @@ final readonly class BackfillRepository
                         'kind' => 'pr',
                         'is_bot' => $this->isBot($login),
                     ],
-                ));
+                ), $onProgress);
             },
         );
     }
 
-    private function backfillCommits(string $tenantId, string $repo): void
+    /**
+     * @param  (callable(ContributionType): void)|null  $onProgress
+     */
+    private function backfillCommits(string $tenantId, string $repo, ?callable $onProgress): void
     {
         $this->paginate(
             fn (int $page): Request => new ListCommits($repo, $page, self::PER_PAGE),
-            function (array $commit) use ($tenantId, $repo): void {
+            function (array $commit) use ($tenantId, $repo, $onProgress): void {
                 $login = $this->stringFrom($commit, 'author.login')
                     ?: $this->stringFrom($commit, 'commit.author.name', 'ghost');
 
-                $this->recorder->execute(new NewContributionDTO(
+                $this->record(new NewContributionDTO(
                     tenantId: $tenantId,
                     repo: $repo,
                     type: ContributionType::Commit,
@@ -213,9 +234,23 @@ final readonly class BackfillRepository
                         'url' => data_get($commit, 'html_url'),
                         'is_bot' => $this->isBot($login),
                     ],
-                ));
+                ), $onProgress);
             },
         );
+    }
+
+    /**
+     * Único ponto de escrita: grava a contribuição e reporta o tipo ao callback de progresso.
+     *
+     * @param  (callable(ContributionType): void)|null  $onProgress
+     */
+    private function record(NewContributionDTO $contribution, ?callable $onProgress): void
+    {
+        $this->recorder->execute($contribution);
+
+        if ($onProgress !== null) {
+            $onProgress($contribution->type);
+        }
     }
 
     /**

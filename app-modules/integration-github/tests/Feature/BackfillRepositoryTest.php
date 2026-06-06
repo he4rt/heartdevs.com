@@ -104,6 +104,29 @@ it('ignora reviews PENDING (sem submitted_at) sem quebrar o backfill', function 
         ->toBe(['review:1597160999']);
 });
 
+it('reporta o progresso por contribuição via callback (na ordem de ingestão)', function (): void {
+    mockGithub([
+        ListPullRequests::class => MockResponse::make([prPayload(1, 'maria', 42)]),
+        GetPullRequest::class => MockResponse::make(['additions' => 1, 'deletions' => 0, 'changed_files' => 1]),
+        ListPullRequestReviews::class => MockResponse::make([
+            ['id' => 10, 'state' => 'APPROVED', 'submitted_at' => '2026-06-02T10:00:00Z', 'user' => ['login' => 'joao', 'id' => 7]],
+        ]),
+        ListIssues::class => MockResponse::make([
+            ['number' => 5, 'created_at' => '2026-06-01T00:00:00Z', 'user' => ['login' => 'ana', 'id' => 3]],
+        ]),
+    ]);
+
+    $reported = [];
+    resolve(BackfillRepository::class)->execute(
+        $this->repo,
+        function (ContributionType $type) use (&$reported): void {
+            $reported[] = $type->value;
+        },
+    );
+
+    expect($reported)->toBe(['pr', 'review', 'issue']);
+});
+
 it('é idempotente: re-rodar o backfill não duplica', function (): void {
     mockGithub([
         ListPullRequests::class => MockResponse::make([prPayload(1, 'maria', 42)]),
