@@ -134,13 +134,15 @@ final class CommunityRetrospectivePage extends Component
     }
 
     /**
-     * Data da contribuição mais antiga do tenant, para o preset "tudo" cobrir o
-     * histórico real. Sem registros, cai no mesmo default semanal do render().
+     * Data da contribuição mais antiga dentro do escopo atual (tenant + repos
+     * selecionados), para o preset "tudo" cobrir o histórico real do que está
+     * sendo apresentado. Sem registros, cai no mesmo default semanal do render().
      */
     private function firstContributionDate(): string
     {
         $first = GithubContribution::query()
             ->where('tenant_id', $this->tenantId)
+            ->when($this->repos !== [], fn ($query) => $query->whereIn('repo', $this->repos))
             ->min('occurred_at');
 
         return is_string($first) && $first !== ''

@@ -102,3 +102,23 @@ it('preset "tudo" ancora o período na primeira contribuição e traz o históri
         ->assertSee('pioneira')
         ->assertSee('recente');
 });
+
+it('preset "tudo" com repos filtrados ancora na 1ª contribuição daqueles repos', function (): void {
+    $this->travelTo(CarbonImmutable::parse('2026-06-04 10:00:00'));
+
+    GithubContribution::factory()->for($this->tenant)->create([
+        'repo' => 'he4rt/antigo', 'actor_login' => 'veterano', 'actor_id' => 1, 'type' => ContributionType::Commit,
+        'external_ref' => 'commit:old', 'occurred_at' => '2018-01-01 00:00:00',
+    ]);
+    GithubContribution::factory()->for($this->tenant)->create([
+        'repo' => 'he4rt/4noobs', 'actor_login' => 'pioneira', 'actor_id' => 2, 'type' => ContributionType::Commit,
+        'external_ref' => 'commit:abc', 'occurred_at' => '2020-03-30 02:13:45',
+    ]);
+
+    livewire(CommunityRetrospectivePage::class)
+        ->set('repos', ['he4rt/4noobs'])
+        ->call('setPreset', 'tudo')
+        ->assertSet('since', '2020-03-30')
+        ->assertSee('pioneira')
+        ->assertDontSee('veterano');
+});
