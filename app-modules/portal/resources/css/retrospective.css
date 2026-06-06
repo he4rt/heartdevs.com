@@ -244,40 +244,18 @@
 }
 .retro .ecg path {
     fill: none;
-    stroke-linecap: round;
-    stroke-linejoin: round;
-}
-/* linha de base — desenha na entrada e permanece visível */
-.retro .ecg .trace {
     stroke: var(--brand);
     stroke-width: 2.4;
+    stroke-linecap: round;
+    stroke-linejoin: round;
     filter: drop-shadow(0 0 7px rgba(120, 43, 241, 0.85));
     stroke-dasharray: 1500;
     stroke-dashoffset: 1500;
 }
-.retro .slide.active .ecg .trace {
+.retro .slide.active .ecg path {
     animation: retro-draw 1.8s 0.5s ease-out forwards;
 }
-/* pulso que percorre o traçado para sempre (estilo monitor cardíaco) */
-.retro .ecg .pulse {
-    stroke: #ffffff;
-    stroke-width: 3;
-    filter: drop-shadow(0 0 4px var(--brand-2)) drop-shadow(0 0 11px rgba(120, 43, 241, 0.95));
-    stroke-dasharray: 10 90;
-    stroke-dashoffset: 100;
-}
-.retro .slide.active .ecg .pulse {
-    animation: retro-ecg-sweep 2.4s 0.6s linear infinite;
-}
 @keyframes retro-draw {
-    to {
-        stroke-dashoffset: 0;
-    }
-}
-@keyframes retro-ecg-sweep {
-    from {
-        stroke-dashoffset: 100;
-    }
     to {
         stroke-dashoffset: 0;
     }
@@ -291,33 +269,23 @@
     filter: drop-shadow(0 0 22px rgba(120, 43, 241, 0.7));
     transform-origin: center 62%;
 }
-/* a duração/delay batem com o pulso do ECG (.ecg .pulse) → ficam em fase.
-   os thumps em 40% e 69% coincidem com o comet cruzando os dois picos do traçado */
 .retro .slide.active .cover-heart {
-    animation: retro-beat 2.4s 0.6s ease-in-out infinite;
+    animation: retro-beat 2s 0.7s ease-in-out infinite;
 }
 @keyframes retro-beat {
     0%,
-    32% {
-        transform: scale(1);
-    }
-    40% {
-        transform: scale(1.13);
-    }
-    48% {
-        transform: scale(1);
-    }
-    61% {
-        transform: scale(1);
-    }
-    69% {
-        transform: scale(1.09);
-    }
-    77% {
-        transform: scale(1);
-    }
+    36%,
     100% {
         transform: scale(1);
+    }
+    12% {
+        transform: scale(1.13);
+    }
+    24% {
+        transform: scale(1.04);
+    }
+    30% {
+        transform: scale(1.08);
     }
 }
 .retro .hint {
@@ -991,12 +959,5 @@
     .retro *::after {
         animation: none !important;
         transition: none !important;
-    }
-    /* sem animação, a linha do batimento precisa aparecer inteira (não em dashoffset) */
-    .retro .ecg .trace {
-        stroke-dashoffset: 0;
-    }
-    .retro .ecg .pulse {
-        display: none;
     }
 }
