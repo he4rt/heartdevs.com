@@ -25,6 +25,7 @@ final class ClosePendingEventsCommand extends Command
             ->whereHas('enrollments', function (Builder $query): void {
                 $query->whereIn('status', [EnrollmentStatus::Confirmed, EnrollmentStatus::CheckedIn]);
             })
+            ->select('id')
             ->each(function (Event $event) use (&$count): void {
                 dispatch(new ProcessEventClosureJob($event->id));
                 $count++;
