@@ -41,7 +41,10 @@ final class RecordContribution
             ],
         );
 
-        if ($emit) {
+        // Só emite na criação. Webhooks de edição/replay reprocessam a mesma
+        // contribuição (updateOrCreate atualiza a linha) e não devem re-disparar a
+        // seam — evita recompensas duplicadas em listeners downstream.
+        if ($emit && $contribution->wasRecentlyCreated) {
             event(new GithubContributionRecorded($contribution));
         }
 

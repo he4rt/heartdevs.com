@@ -23,7 +23,9 @@ final readonly class ProjectGithubEvent
      */
     public function execute(string $event, array $payload): void
     {
-        $repo = $this->str($payload, 'repository.full_name');
+        // Canonicaliza para minúsculas (igual ao cadastro) — sem isso, um repo com
+        // case diferente no payload não casaria a allowlist e o evento seria perdido.
+        $repo = mb_strtolower($this->str($payload, 'repository.full_name'));
 
         if ($repo === '') {
             return;

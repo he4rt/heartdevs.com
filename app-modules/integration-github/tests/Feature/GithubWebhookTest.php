@@ -58,6 +58,38 @@ it('rejeita assinatura inválida com 403 e não grava nada', function (): void {
         ->and(GithubContribution::query()->count())->toBe(0);
 });
 
+it('rejeita o webhook quando o secret não está configurado (fail-safe)', function (): void {
+    config(['services.github.webhook_secret' => '']);
+    GithubRepository::factory()->create(['full_name' => 'he4rt/heartdevs.com']);
+
+    postGithubWebhook('pull_request', prWebhookPayload(), secret: '')
+        ->assertServerError();
+
+    expect(GithubEventLog::query()->count())->toBe(0)
+        ->and(GithubContribution::query()->count())->toBe(0);
+});
+
+it('projeta a contribuição mesmo quando o case do repo no payload difere do cadastro', function (): void {
+    GithubRepository::factory()->create(['full_name' => 'he4rt/heartdevs.com']);
+
+    postGithubWebhook('pull_request', prWebhookPayload('He4rt/HeartDevs.com'))->assertSuccessful();
+
+    $contribution = GithubContribution::query()->where('external_ref', 'pr:1')->sole();
+
+    expect($contribution->repo)->toBe('he4rt/heartdevs.com');
+});
+
+it('emite o evento apenas na criação, não em reprocessamentos da mesma contribuição', function (): void {
+    Event::fake([GithubContributionRecorded::class]);
+    GithubRepository::factory()->create(['full_name' => 'he4rt/heartdevs.com']);
+
+    postGithubWebhook('pull_request', prWebhookPayload(), delivery: 'delivery-1')->assertSuccessful();
+    postGithubWebhook('pull_request', prWebhookPayload(), delivery: 'delivery-2')->assertSuccessful();
+
+    expect(GithubContribution::query()->where('external_ref', 'pr:1')->count())->toBe(1);
+    Event::assertDispatchedTimes(GithubContributionRecorded::class, 1);
+});
+
 it('grava no lake e projeta a contribuição para repo na allowlist, emitindo o evento', function (): void {
     Event::fake([GithubContributionRecorded::class]);
     $repo = GithubRepository::factory()->create(['full_name' => 'he4rt/heartdevs.com']);

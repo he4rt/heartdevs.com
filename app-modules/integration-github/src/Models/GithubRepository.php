@@ -9,6 +9,7 @@ use He4rt\Identity\Tenant\Models\Tenant;
 use He4rt\IntegrationGithub\Database\Factories\GithubRepositoryFactory;
 use Illuminate\Database\Eloquent\Attributes\Table;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -41,6 +42,19 @@ final class GithubRepository extends Model
     protected static function newFactory(): GithubRepositoryFactory
     {
         return GithubRepositoryFactory::new();
+    }
+
+    /**
+     * GitHub trata owner/repo como case-insensitive; guardamos sempre em minúsculas
+     * (e sem espaços) para o matching com o payload do webhook e a retrospectiva.
+     *
+     * @return Attribute<string, string>
+     */
+    protected function fullName(): Attribute
+    {
+        return Attribute::make(
+            set: fn (string $value): string => mb_strtolower(mb_trim($value)),
+        );
     }
 
     /**

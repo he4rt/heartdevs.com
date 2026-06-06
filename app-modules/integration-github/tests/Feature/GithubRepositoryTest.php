@@ -36,3 +36,9 @@ it('o scope enabled retorna somente os repositórios habilitados', function (): 
 
     expect(GithubRepository::query()->enabled()->count())->toBe(2);
 });
+
+it('canonicaliza full_name para minúsculas e sem espaços ao salvar', function (): void {
+    $repo = GithubRepository::factory()->create(['full_name' => '  He4rt/HeartDevs.com  ']);
+
+    expect($repo->refresh()->full_name)->toBe('he4rt/heartdevs.com');
+});
