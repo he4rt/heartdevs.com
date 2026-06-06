@@ -10,5 +10,15 @@ enum ContributionType: string
     case Review = 'review';
     case Issue = 'issue';
     case Comment = 'comment';
+    case ReviewComment = 'review_comment';
     case Commit = 'commit';
+
+    /**
+     * Constrói o ref namespaced da contribuição (ex.: "pr:123", "review_comment:42").
+     * O valor do enum é o próprio prefixo, então cada tipo conhece o seu.
+     */
+    public function ref(int|string $id): string
+    {
+        return $this->value.':'.$id;
+    }
 }

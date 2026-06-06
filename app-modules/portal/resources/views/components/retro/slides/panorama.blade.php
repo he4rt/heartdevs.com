@@ -26,7 +26,7 @@
                 <div class="l">Issues</div>
             </div>
             <div class="stat">
-                <div class="v">{{ $meta['comments'] }}</div>
+                <div class="v">{{ $meta['comments'] + $meta['review_comments'] }}</div>
                 <div class="l">Comentários</div>
             </div>
             <div class="stat">

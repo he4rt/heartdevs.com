@@ -50,6 +50,14 @@
             >
         </div>
     @endif
+    @if ($person['review_comments'] > 0)
+        <div class="act act-review-comment" style="--c: var(--t-review-comment)">
+            <span class="act-h">Comentou em review</span
+            ><span class="act-items"
+                ><span class="ref"><span class="rn">{{ $person['review_comments'] }}</span> em reviews</span></span
+            >
+        </div>
+    @endif
     @if ($person['commits'] > 0)
         <div class="act act-commit" style="--c: var(--t-commit)">
             <span class="act-h">Commitou</span

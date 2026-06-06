@@ -7,6 +7,7 @@ namespace He4rt\Portal\Livewire;
 use Carbon\CarbonImmutable;
 use Carbon\CarbonInterface;
 use He4rt\Identity\Tenant\Models\Tenant;
+use He4rt\IntegrationGithub\Enums\ContributionType;
 use He4rt\IntegrationGithub\Models\GithubContribution;
 use He4rt\Portal\Retrospective\CommunityRetrospective;
 use He4rt\Portal\Retrospective\RetrospectiveFilters;
@@ -20,8 +21,6 @@ use Livewire\Component;
 #[Title('Quem fez a He4rt bater')]
 final class CommunityRetrospectivePage extends Component
 {
-    private const array ALL_TYPES = ['pr', 'review', 'issue', 'comment', 'commit'];
-
     public string $tenantId;
 
     #[Url]
@@ -68,7 +67,7 @@ final class CommunityRetrospectivePage extends Component
 
     public function toggleType(string $type): void
     {
-        $this->types = $this->toggleAware($this->types, self::ALL_TYPES, $type);
+        $this->types = $this->toggleAware($this->types, $this->allTypes(), $type);
     }
 
     public function toggleRepo(string $repo): void
@@ -112,6 +111,14 @@ final class CommunityRetrospectivePage extends Component
                 $this->person, $this->hideBots, $this->sort, $this->byRepo, $this->showHighlights,
             ])),
         ]);
+    }
+
+    /**
+     * @return list<string>
+     */
+    private function allTypes(): array
+    {
+        return array_map(fn (ContributionType $type): string => $type->value, ContributionType::cases());
     }
 
     /**

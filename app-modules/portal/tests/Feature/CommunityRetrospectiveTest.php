@@ -81,6 +81,20 @@ it('inclui PRs fechados sem merge no total, distinguindo por desfecho', function
         ->and($person['total'])->toBe(3);
 });
 
+it('conta comentários de issue e de review separadamente', function (): void {
+    contribution($this->tenant, ['actor_login' => 'maria', 'type' => ContributionType::Comment, 'external_ref' => 'comment:1', 'occurred_at' => '2026-06-02']);
+    contribution($this->tenant, ['actor_login' => 'maria', 'type' => ContributionType::ReviewComment, 'external_ref' => 'review_comment:1', 'occurred_at' => '2026-06-02']);
+
+    $data = ($this->build)();
+    $maria = collect($data['people'])->firstWhere('login', 'maria');
+
+    expect($data['meta']['comments'])->toBe(1)
+        ->and($data['meta']['review_comments'])->toBe(1)
+        ->and($maria['comments'])->toBe(1)
+        ->and($maria['review_comments'])->toBe(1)
+        ->and($maria['total'])->toBe(2);
+});
+
 it('respeita a janela de período pelo occurred_at', function (): void {
     contribution($this->tenant, ['actor_login' => 'maria', 'type' => ContributionType::Issue, 'external_ref' => 'issue:1', 'occurred_at' => '2026-05-30']);
     contribution($this->tenant, ['actor_login' => 'maria', 'type' => ContributionType::Issue, 'external_ref' => 'issue:2', 'occurred_at' => '2026-06-03']);

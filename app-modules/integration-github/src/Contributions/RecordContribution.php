@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace He4rt\IntegrationGithub\Contributions;
 
-use He4rt\IntegrationGithub\Enums\ContributionType;
+use He4rt\IntegrationGithub\Contributions\DTOs\NewContributionDTO;
 use He4rt\IntegrationGithub\Events\GithubContributionRecorded;
 use He4rt\IntegrationGithub\Models\GithubContribution;
 
@@ -15,39 +15,31 @@ use He4rt\IntegrationGithub\Models\GithubContribution;
  */
 final class RecordContribution
 {
-    /**
-     * @param  array<string, mixed>  $metadata
-     */
-    public function execute(
-        string $tenantId,
-        string $repo,
-        ContributionType $type,
-        string $externalRef,
-        string $actorLogin,
-        ?int $actorId,
-        string $occurredAt,
-        ?string $targetRef,
-        array $metadata,
-        bool $emit = false,
-    ): GithubContribution {
-        $contribution = GithubContribution::query()->updateOrCreate(
-            ['tenant_id' => $tenantId, 'repo' => $repo, 'type' => $type, 'external_ref' => $externalRef],
+    public function execute(NewContributionDTO $contribution, bool $emit = false): GithubContribution
+    {
+        $recorded = GithubContribution::query()->updateOrCreate(
             [
-                'actor_login' => $actorLogin,
-                'actor_id' => $actorId,
-                'target_ref' => $targetRef,
-                'occurred_at' => $occurredAt,
-                'metadata' => $metadata,
+                'tenant_id' => $contribution->tenantId,
+                'repo' => $contribution->repo,
+                'type' => $contribution->type,
+                'external_ref' => $contribution->externalRef,
+            ],
+            [
+                'actor_login' => $contribution->actorLogin,
+                'actor_id' => $contribution->actorId,
+                'target_ref' => $contribution->targetRef,
+                'occurred_at' => $contribution->occurredAt,
+                'metadata' => $contribution->metadata,
             ],
         );
 
         // Só emite na criação. Webhooks de edição/replay reprocessam a mesma
         // contribuição (updateOrCreate atualiza a linha) e não devem re-disparar a
         // seam — evita recompensas duplicadas em listeners downstream.
-        if ($emit && $contribution->wasRecentlyCreated) {
-            event(new GithubContributionRecorded($contribution));
+        if ($emit && $recorded->wasRecentlyCreated) {
+            event(new GithubContributionRecorded($recorded));
         }
 
-        return $contribution;
+        return $recorded;
     }
 }

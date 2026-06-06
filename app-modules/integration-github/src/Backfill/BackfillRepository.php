@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace He4rt\IntegrationGithub\Backfill;
 
+use He4rt\IntegrationGithub\Contributions\DTOs\NewContributionDTO;
 use He4rt\IntegrationGithub\Contributions\RecordContribution;
 use He4rt\IntegrationGithub\Enums\ContributionType;
 use He4rt\IntegrationGithub\Models\GithubRepository;
@@ -15,6 +16,7 @@ use He4rt\IntegrationGithub\Transport\Requests\Contributions\ListIssues;
 use He4rt\IntegrationGithub\Transport\Requests\Contributions\ListPullRequestReviewComments;
 use He4rt\IntegrationGithub\Transport\Requests\Contributions\ListPullRequestReviews;
 use He4rt\IntegrationGithub\Transport\Requests\Contributions\ListPullRequests;
+use Illuminate\Support\Str;
 use Saloon\Http\Request;
 
 final readonly class BackfillRepository
@@ -43,21 +45,31 @@ final readonly class BackfillRepository
         $this->paginate(
             fn (int $page): Request => new ListPullRequests($repo, $page, self::PER_PAGE),
             function (array $pr) use ($tenantId, $repo): void {
-                $number = (int) ($pr['number'] ?? 0);
-                /** @var array<string, mixed> $detail */
-                $detail = (array) $this->github->send(new GetPullRequest($repo, $number))->throw()->json();
-                $login = $this->login($pr);
+                $number = $this->intFrom($pr, 'number') ?? 0;
+                /** @var array<string, mixed> $prSize */
+                $prSize = (array) $this->github->send(new GetPullRequest($repo, $number))->throw()->json();
+                $login = $this->actorLogin($pr);
 
-                $this->upsert($tenantId, $repo, ContributionType::Pr, 'pr:'.$number, $login, $this->userId($pr), $this->strv($pr, 'created_at'), null, [
-                    'title' => $pr['title'] ?? null,
-                    'state' => $pr['state'] ?? null,
-                    'merged' => ($pr['merged_at'] ?? null) !== null,
-                    'url' => $pr['html_url'] ?? null,
-                    'additions' => (int) ($detail['additions'] ?? 0),
-                    'deletions' => (int) ($detail['deletions'] ?? 0),
-                    'changed_files' => (int) ($detail['changed_files'] ?? 0),
-                    'is_bot' => $this->isBot($login),
-                ]);
+                $this->recorder->execute(new NewContributionDTO(
+                    tenantId: $tenantId,
+                    repo: $repo,
+                    type: ContributionType::Pr,
+                    externalRef: ContributionType::Pr->ref($number),
+                    actorLogin: $login,
+                    actorId: $this->actorId($pr),
+                    occurredAt: $this->stringFrom($pr, 'created_at'),
+                    targetRef: null,
+                    metadata: [
+                        'title' => data_get($pr, 'title'),
+                        'state' => data_get($pr, 'state'),
+                        'merged' => data_get($pr, 'merged_at') !== null,
+                        'url' => data_get($pr, 'html_url'),
+                        'additions' => $this->intFrom($prSize, 'additions') ?? 0,
+                        'deletions' => $this->intFrom($prSize, 'deletions') ?? 0,
+                        'changed_files' => $this->intFrom($prSize, 'changed_files') ?? 0,
+                        'is_bot' => $this->isBot($login),
+                    ],
+                ));
 
                 $this->backfillReviews($tenantId, $repo, $number);
             },
@@ -69,12 +81,22 @@ final readonly class BackfillRepository
         $this->paginate(
             fn (int $page): Request => new ListPullRequestReviews($repo, $number, $page, self::PER_PAGE),
             function (array $review) use ($tenantId, $repo, $number): void {
-                $login = $this->login($review);
+                $login = $this->actorLogin($review);
 
-                $this->upsert($tenantId, $repo, ContributionType::Review, 'review:'.($review['id'] ?? ''), $login, $this->userId($review), $this->strv($review, 'submitted_at'), 'pr:'.$number, [
-                    'state' => $review['state'] ?? null,
-                    'is_bot' => $this->isBot($login),
-                ]);
+                $this->recorder->execute(new NewContributionDTO(
+                    tenantId: $tenantId,
+                    repo: $repo,
+                    type: ContributionType::Review,
+                    externalRef: ContributionType::Review->ref($this->stringFrom($review, 'id')),
+                    actorLogin: $login,
+                    actorId: $this->actorId($review),
+                    occurredAt: $this->stringFrom($review, 'submitted_at'),
+                    targetRef: ContributionType::Pr->ref($number),
+                    metadata: [
+                        'state' => data_get($review, 'state'),
+                        'is_bot' => $this->isBot($login),
+                    ],
+                ));
             },
         );
     }
@@ -88,14 +110,24 @@ final readonly class BackfillRepository
                     return; // o endpoint de issues também devolve PRs; estes já entram via backfillPullRequests
                 }
 
-                $login = $this->login($issue);
+                $login = $this->actorLogin($issue);
 
-                $this->upsert($tenantId, $repo, ContributionType::Issue, 'issue:'.($issue['number'] ?? ''), $login, $this->userId($issue), $this->strv($issue, 'created_at'), null, [
-                    'title' => $issue['title'] ?? null,
-                    'state' => $issue['state'] ?? null,
-                    'url' => $issue['html_url'] ?? null,
-                    'is_bot' => $this->isBot($login),
-                ]);
+                $this->recorder->execute(new NewContributionDTO(
+                    tenantId: $tenantId,
+                    repo: $repo,
+                    type: ContributionType::Issue,
+                    externalRef: ContributionType::Issue->ref($this->stringFrom($issue, 'number')),
+                    actorLogin: $login,
+                    actorId: $this->actorId($issue),
+                    occurredAt: $this->stringFrom($issue, 'created_at'),
+                    targetRef: null,
+                    metadata: [
+                        'title' => data_get($issue, 'title'),
+                        'state' => data_get($issue, 'state'),
+                        'url' => data_get($issue, 'html_url'),
+                        'is_bot' => $this->isBot($login),
+                    ],
+                ));
             },
         );
     }
@@ -105,13 +137,23 @@ final readonly class BackfillRepository
         $this->paginate(
             fn (int $page): Request => new ListIssueComments($repo, $page, self::PER_PAGE),
             function (array $comment) use ($tenantId, $repo): void {
-                $login = $this->login($comment);
+                $login = $this->actorLogin($comment);
 
-                $this->upsert($tenantId, $repo, ContributionType::Comment, 'comment:'.($comment['id'] ?? ''), $login, $this->userId($comment), $this->strv($comment, 'created_at'), $this->refFromUrl($this->strv($comment, 'issue_url'), 'issue'), [
-                    'url' => $comment['html_url'] ?? null,
-                    'kind' => 'issue',
-                    'is_bot' => $this->isBot($login),
-                ]);
+                $this->recorder->execute(new NewContributionDTO(
+                    tenantId: $tenantId,
+                    repo: $repo,
+                    type: ContributionType::Comment,
+                    externalRef: ContributionType::Comment->ref($this->stringFrom($comment, 'id')),
+                    actorLogin: $login,
+                    actorId: $this->actorId($comment),
+                    occurredAt: $this->stringFrom($comment, 'created_at'),
+                    targetRef: $this->targetRefFromUrl($this->stringFrom($comment, 'issue_url'), ContributionType::Issue),
+                    metadata: [
+                        'url' => data_get($comment, 'html_url'),
+                        'kind' => 'issue',
+                        'is_bot' => $this->isBot($login),
+                    ],
+                ));
             },
         );
     }
@@ -121,13 +163,23 @@ final readonly class BackfillRepository
         $this->paginate(
             fn (int $page): Request => new ListPullRequestReviewComments($repo, $page, self::PER_PAGE),
             function (array $comment) use ($tenantId, $repo): void {
-                $login = $this->login($comment);
+                $login = $this->actorLogin($comment);
 
-                $this->upsert($tenantId, $repo, ContributionType::Comment, 'review_comment:'.($comment['id'] ?? ''), $login, $this->userId($comment), $this->strv($comment, 'created_at'), $this->refFromUrl($this->strv($comment, 'pull_request_url'), 'pr'), [
-                    'url' => $comment['html_url'] ?? null,
-                    'kind' => 'pr',
-                    'is_bot' => $this->isBot($login),
-                ]);
+                $this->recorder->execute(new NewContributionDTO(
+                    tenantId: $tenantId,
+                    repo: $repo,
+                    type: ContributionType::ReviewComment,
+                    externalRef: ContributionType::ReviewComment->ref($this->stringFrom($comment, 'id')),
+                    actorLogin: $login,
+                    actorId: $this->actorId($comment),
+                    occurredAt: $this->stringFrom($comment, 'created_at'),
+                    targetRef: $this->targetRefFromUrl($this->stringFrom($comment, 'pull_request_url'), ContributionType::Pr),
+                    metadata: [
+                        'url' => data_get($comment, 'html_url'),
+                        'kind' => 'pr',
+                        'is_bot' => $this->isBot($login),
+                    ],
+                ));
             },
         );
     }
@@ -137,39 +189,41 @@ final readonly class BackfillRepository
         $this->paginate(
             fn (int $page): Request => new ListCommits($repo, $page, self::PER_PAGE),
             function (array $commit) use ($tenantId, $repo): void {
-                $author = is_array($commit['author'] ?? null) ? $commit['author'] : [];
-                $commitMeta = is_array($commit['commit'] ?? null) ? $commit['commit'] : [];
-                $commitAuthor = is_array($commitMeta['author'] ?? null) ? $commitMeta['author'] : [];
+                $login = $this->stringFrom($commit, 'author.login')
+                    ?: $this->stringFrom($commit, 'commit.author.name', 'ghost');
 
-                $login = isset($author['login']) && is_string($author['login'])
-                    ? $author['login']
-                    : (isset($commitAuthor['name']) && is_string($commitAuthor['name']) ? $commitAuthor['name'] : 'ghost');
-
-                $actorId = isset($author['id']) && is_numeric($author['id']) ? (int) $author['id'] : null;
-                $date = isset($commitAuthor['date']) && is_string($commitAuthor['date']) ? $commitAuthor['date'] : '';
-
-                $this->upsert($tenantId, $repo, ContributionType::Commit, 'commit:'.($commit['sha'] ?? ''), $login, $actorId, $date, null, [
-                    'url' => $commit['html_url'] ?? null,
-                    'is_bot' => $this->isBot($login),
-                ]);
+                $this->recorder->execute(new NewContributionDTO(
+                    tenantId: $tenantId,
+                    repo: $repo,
+                    type: ContributionType::Commit,
+                    externalRef: ContributionType::Commit->ref($this->stringFrom($commit, 'sha')),
+                    actorLogin: $login,
+                    actorId: $this->intFrom($commit, 'author.id'),
+                    occurredAt: $this->stringFrom($commit, 'commit.author.date'),
+                    targetRef: null,
+                    metadata: [
+                        'url' => data_get($commit, 'html_url'),
+                        'is_bot' => $this->isBot($login),
+                    ],
+                ));
             },
         );
     }
 
     /**
-     * @param  callable(int): Request  $request
-     * @param  callable(array<string, mixed>): void  $handle
+     * @param  callable(int): Request  $requestFor
+     * @param  callable(array<string, mixed>): void  $onEach
      */
-    private function paginate(callable $request, callable $handle): void
+    private function paginate(callable $requestFor, callable $onEach): void
     {
         $page = 1;
 
         do {
             /** @var list<array<string, mixed>> $items */
-            $items = (array) $this->github->send($request($page))->throw()->json();
+            $items = (array) $this->github->send($requestFor($page))->throw()->json();
 
             foreach ($items as $item) {
-                $handle($item);
+                $onEach($item);
             }
 
             $page++;
@@ -177,59 +231,50 @@ final readonly class BackfillRepository
     }
 
     /**
-     * @param  array<string, mixed>  $metadata
+     * @param  array<string, mixed>  $data
      */
-    private function upsert(
-        string $tenantId,
-        string $repo,
-        ContributionType $type,
-        string $externalRef,
-        string $actorLogin,
-        ?int $actorId,
-        string $occurredAt,
-        ?string $targetRef,
-        array $metadata,
-    ): void {
-        $this->recorder->execute($tenantId, $repo, $type, $externalRef, $actorLogin, $actorId, $occurredAt, $targetRef, $metadata);
+    private function stringFrom(array $data, string $key, string $default = ''): string
+    {
+        $value = data_get($data, $key);
+
+        return is_scalar($value) ? (string) $value : $default;
+    }
+
+    /**
+     * @param  array<string, mixed>  $data
+     */
+    private function intFrom(array $data, string $key): ?int
+    {
+        $value = data_get($data, $key);
+
+        return is_numeric($value) ? (int) $value : null;
     }
 
     /**
      * @param  array<string, mixed>  $payload
      */
-    private function login(array $payload): string
+    private function actorLogin(array $payload): string
     {
-        $user = $payload['user'] ?? null;
-
-        return is_array($user) && isset($user['login']) && is_string($user['login']) ? $user['login'] : 'ghost';
+        return $this->stringFrom($payload, 'user.login', 'ghost');
     }
 
     /**
      * @param  array<string, mixed>  $payload
      */
-    private function userId(array $payload): ?int
+    private function actorId(array $payload): ?int
     {
-        $user = $payload['user'] ?? null;
-
-        return is_array($user) && isset($user['id']) && is_numeric($user['id']) ? (int) $user['id'] : null;
+        return $this->intFrom($payload, 'user.id');
     }
 
-    /**
-     * @param  array<string, mixed>  $payload
-     */
-    private function strv(array $payload, string $key): string
+    private function targetRefFromUrl(string $url, ContributionType $kind): ?string
     {
-        $value = $payload[$key] ?? null;
+        $number = Str::match('~/(\d+)$~', $url);
 
-        return is_scalar($value) ? (string) $value : '';
-    }
-
-    private function refFromUrl(string $url, string $prefix): ?string
-    {
-        return preg_match('~/(\d+)$~', $url, $matches) === 1 ? $prefix.':'.$matches[1] : null;
+        return $number === '' ? null : $kind->ref($number);
     }
 
     private function isBot(string $login): bool
     {
-        return str_ends_with($login, '[bot]');
+        return Str::endsWith($login, '[bot]');
     }
 }

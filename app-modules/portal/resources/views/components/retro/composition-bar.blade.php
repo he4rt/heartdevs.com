@@ -7,6 +7,11 @@
                 ['color' => 'var(--t-review)', 'count' => $person['reviews'], 'label' => 'reviews'],
                 ['color' => 'var(--t-issue)', 'count' => $person['issues'], 'label' => 'issues'],
                 ['color' => 'var(--t-comment)', 'count' => $person['comments'], 'label' => 'comentários'],
+                [
+                    'color' => 'var(--t-review-comment)',
+                    'count' => $person['review_comments'],
+                    'label' => 'comentários de review',
+                ],
                 ['color' => 'var(--t-commit)', 'count' => $person['commits'], 'label' => 'commits'],
             ],
             fn(array $segment): bool => $segment['count'] > 0,

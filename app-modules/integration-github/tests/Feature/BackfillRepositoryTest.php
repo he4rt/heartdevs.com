@@ -171,7 +171,7 @@ it('faz backfill de comentários de review de PR com target_ref para o PR', func
 
     $comment = GithubContribution::query()->where('external_ref', 'review_comment:1200')->sole();
 
-    expect($comment->type)->toBe(ContributionType::Comment)
+    expect($comment->type)->toBe(ContributionType::ReviewComment)
         ->and($comment->target_ref)->toBe('pr:12');
 });
 

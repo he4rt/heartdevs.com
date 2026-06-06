@@ -12,6 +12,7 @@
         'review' => ['Reviews', '--t-review'],
         'issue' => ['Issues', '--t-issue'],
         'comment' => ['Comentários', '--t-comment'],
+        'review_comment' => ['Coment. de review', '--t-review-comment'],
         'commit' => ['Commits', '--t-commit'],
     ];
 @endphp

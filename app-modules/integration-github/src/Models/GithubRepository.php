@@ -14,6 +14,7 @@ use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Support\Str;
 
 /**
  * @property string $id
@@ -53,7 +54,7 @@ final class GithubRepository extends Model
     protected function fullName(): Attribute
     {
         return Attribute::make(
-            set: fn (string $value): string => mb_strtolower(mb_trim($value)),
+            set: fn (string $value): string => Str::lower(Str::trim($value)),
         );
     }
 
