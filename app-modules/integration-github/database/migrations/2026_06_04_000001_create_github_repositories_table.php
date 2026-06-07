@@ -15,8 +15,8 @@ return new class extends Migration
             $table->foreignUuid('tenant_id')->constrained('tenants');
             $table->string('full_name');   // owner/repo
             $table->boolean('enabled')->default(true);
-            $table->timestamp('last_backfilled_at')->nullable();
-            $table->timestamps();
+            $table->timestampTz('last_backfilled_at')->nullable();
+            $table->timestampsTz();
 
             // A allowlist é por tenant: cada comunidade mantém a sua, e o mesmo
             // repo público pode ser acompanhado por mais de uma comunidade.

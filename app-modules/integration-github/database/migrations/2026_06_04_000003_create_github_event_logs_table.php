@@ -17,7 +17,7 @@ return new class extends Migration
             $table->string('actor_login')->nullable();
             $table->string('delivery_id')->nullable()->unique();
             $table->jsonb('payload');
-            $table->timestamps();
+            $table->timestampsTz();
         });
     }
 

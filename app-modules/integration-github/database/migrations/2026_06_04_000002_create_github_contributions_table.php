@@ -19,9 +19,9 @@ return new class extends Migration
             $table->string('type');
             $table->string('external_ref');
             $table->string('target_ref')->nullable();
-            $table->timestamp('occurred_at');
+            $table->timestampTz('occurred_at');
             $table->jsonb('metadata')->nullable();
-            $table->timestamps();
+            $table->timestampsTz();
 
             // Isolamento por tenant: a mesma contribuição de um repo compartilhado
             // é gravada uma vez por comunidade que acompanha o repo.
