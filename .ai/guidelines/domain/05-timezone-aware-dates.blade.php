@@ -38,7 +38,7 @@ When creating or altering any database column that stores a date, time, or datet
 | `$table->timestamps()` | `$table->timestampsTz()` |
 | `$table->softDeletes()` | `$table->softDeletesTz()` |
 | `$table->dateTime('col')` | `$table->dateTimeTz('col')` |
-| `$table->nullableTimestamps()` | `$table->timestampsTz()` with `->nullable()` |
+| `$table->nullableTimestamps()` | `$table->timestampsTz()` |
 
 ### Context
 

@@ -198,10 +198,11 @@ final class FixPostSwitchTimestampsCommand extends Command
     {
         $start = microtime(true);
         $whereCol = $fixScope === 'row' ? 'created_at' : sprintf('"%s"', $column);
+        $nullGuard = $fixScope === 'row' ? sprintf(' AND "%s" IS NOT NULL', $column) : '';
 
         if ($this->option('dry-run')) {
             $count = (int) DB::scalar(
-                sprintf('SELECT count(*) FROM %s WHERE %s >= ?', $table, $whereCol),
+                sprintf('SELECT count(*) FROM %s WHERE %s >= ?%s', $table, $whereCol, $nullGuard),
                 [self::CUTOFF],
             );
 
@@ -209,7 +210,7 @@ final class FixPostSwitchTimestampsCommand extends Command
         }
 
         $rowsFixed = DB::affectingStatement(
-            sprintf("UPDATE %s SET \"%s\" = \"%s\" - interval '3 hours' WHERE %s >= ?", $table, $column, $column, $whereCol),
+            sprintf("UPDATE %s SET \"%s\" = \"%s\" - interval '3 hours' WHERE %s >= ?%s", $table, $column, $column, $whereCol, $nullGuard),
             [self::CUTOFF],
         );
 
