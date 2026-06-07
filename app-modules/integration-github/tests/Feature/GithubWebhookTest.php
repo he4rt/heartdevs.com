@@ -12,7 +12,7 @@ use Illuminate\Support\Str;
 use Illuminate\Testing\TestResponse;
 
 beforeEach(function (): void {
-    config(['services.github.webhook_secret' => 'test-secret']);
+    config(['integration-github.webhook_secret' => 'test-secret']);
 });
 
 /**
@@ -59,7 +59,7 @@ it('rejeita assinatura inválida com 403 e não grava nada', function (): void {
 });
 
 it('rejeita o webhook quando o secret não está configurado (fail-safe)', function (): void {
-    config(['services.github.webhook_secret' => '']);
+    config(['integration-github.webhook_secret' => '']);
     GithubRepository::factory()->create(['full_name' => 'he4rt/heartdevs.com']);
 
     postGithubWebhook('pull_request', prWebhookPayload(), secret: '')

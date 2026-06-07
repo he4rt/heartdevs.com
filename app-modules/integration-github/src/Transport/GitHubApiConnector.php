@@ -23,7 +23,7 @@ final class GitHubApiConnector extends Connector
 
     protected function defaultAuth(): ?TokenAuthenticator
     {
-        $token = config('services.github.api_token');
+        $token = config('integration-github.api_token');
 
         return is_string($token) && $token !== '' ? new TokenAuthenticator($token) : null;
     }

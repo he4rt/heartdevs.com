@@ -17,7 +17,7 @@ Transport and integration layer for the GitHub platform. Owns all HTTP communica
 ```
 src/
 ├── Transport/
-│   ├── GitHubApiConnector.php        ← REST base URL + PAT auth (services.github.api_token)
+│   ├── GitHubApiConnector.php        ← REST base URL + PAT auth (integration-github.api_token)
 │   ├── GitHubOAuthConnector.php      ← OAuth client credentials
 │   └── Requests/
 │       ├── Users/                    ← GetCurrentUser, GetUser

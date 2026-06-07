@@ -253,7 +253,7 @@ final class GitHubApiConnector extends Connector
 
     protected function defaultAuth(): ?TokenAuthenticator
     {
-        $token = config('services.github.api_token');
+        $token = config('integration-github.api_token');
         return $token ? new TokenAuthenticator($token) : null;
     }
 }
@@ -350,7 +350,7 @@ abort_unless(hash_equals($expectedSignature, $signature), 403, 'Invalid signatur
 ```php
 $signature = $request->header('X-Hub-Signature-256');
 abort_if(!$signature, 403, 'Missing X-Hub-Signature-256');
-$secret = config()->string('services.github.webhook_secret');
+$secret = config()->string('integration-github.webhook_secret');
 $expected = 'sha256=' . hash_hmac('sha256', $request->getContent(), $secret);
 abort_unless(hash_equals($expected, $signature), 403, 'Invalid signature');
 ```

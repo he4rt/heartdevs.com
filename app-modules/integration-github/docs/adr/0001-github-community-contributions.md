@@ -48,7 +48,7 @@ Everything is stored raw. The presentation excludes only **bots** at read time. 
 
 ### 6. Auth and scope
 
-A fine-grained PAT (`services.github.api_token`) authenticates the REST connector for backfill; a manually-registered org webhook with a shared secret (`services.github.webhook_secret`) feeds the live stream. Contribution types in scope: PR, review, issue, comment, commit (no reactions — GitHub has no reaction webhook).
+A fine-grained PAT (`integration-github.api_token`) authenticates the REST connector for backfill; a manually-registered org webhook with a shared secret (`integration-github.webhook_secret`) feeds the live stream. Contribution types in scope: PR, review, issue, comment, commit (no reactions — GitHub has no reaction webhook).
 
 ## Consequences
 

@@ -14,6 +14,8 @@ class IntegrationGithubServiceProvider extends ServiceProvider
 {
     public function register(): void
     {
+        $this->mergeConfigFrom(__DIR__.'/../config/integration-github.php', 'integration-github');
+
         $this->app->singleton(GitHubOAuthConnector::class, function (): GitHubOAuthConnector {
             $clientId = config('services.github.client_id');
             $clientSecret = config('services.github.client_secret');

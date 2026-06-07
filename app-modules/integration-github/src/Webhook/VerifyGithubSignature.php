@@ -12,7 +12,7 @@ final class VerifyGithubSignature
 {
     public function handle(Request $request, Closure $next): Response
     {
-        $secret = config()->string('services.github.webhook_secret');
+        $secret = config()->string('integration-github.webhook_secret');
 
         // Fail-safe: sem secret configurado, um HMAC de chave vazia seria forjável
         // por qualquer um. Recusa em vez de aceitar silenciosamente.
