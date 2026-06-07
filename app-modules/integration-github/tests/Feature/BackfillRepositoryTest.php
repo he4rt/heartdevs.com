@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use He4rt\IntegrationGithub\Backfill\BackfillRepository;
+use He4rt\IntegrationGithub\Contributions\DTOs\NewContributionDTO;
 use He4rt\IntegrationGithub\Enums\ContributionType;
 use He4rt\IntegrationGithub\Models\GithubContribution;
 use He4rt\IntegrationGithub\Models\GithubRepository;
@@ -104,7 +105,7 @@ it('ignora reviews PENDING (sem submitted_at) sem quebrar o backfill', function 
         ->toBe(['review:1597160999']);
 });
 
-it('reporta o progresso por contribuição via callback (na ordem de ingestão)', function (): void {
+it('reporta o progresso por contribuição via callback (tipo + isNew, na ordem de ingestão)', function (): void {
     mockGithub([
         ListPullRequests::class => MockResponse::make([prPayload(1, 'maria', 42)]),
         GetPullRequest::class => MockResponse::make(['additions' => 1, 'deletions' => 0, 'changed_files' => 1]),
@@ -119,12 +120,32 @@ it('reporta o progresso por contribuição via callback (na ordem de ingestão)'
     $reported = [];
     resolve(BackfillRepository::class)->execute(
         $this->repo,
-        function (ContributionType $type) use (&$reported): void {
-            $reported[] = $type->value;
+        function (NewContributionDTO $contribution, bool $isNew) use (&$reported): void {
+            $reported[] = [$contribution->type->value, $isNew];
         },
     );
 
-    expect($reported)->toBe(['pr', 'review', 'issue']);
+    expect($reported)->toBe([['pr', true], ['review', true], ['issue', true]]);
+});
+
+it('sinaliza isNew=false ao reprocessar contribuições que já existem', function (): void {
+    mockGithub([
+        ListPullRequests::class => MockResponse::make([prPayload(1, 'maria', 42)]),
+        GetPullRequest::class => MockResponse::make(['additions' => 1, 'deletions' => 0, 'changed_files' => 1]),
+    ]);
+
+    backfill($this->repo); // 1ª passada: cria pr:1
+
+    $reported = [];
+    resolve(BackfillRepository::class)->execute(
+        $this->repo,
+        function (NewContributionDTO $contribution, bool $isNew) use (&$reported): void {
+            $reported[] = $isNew;
+        },
+    );
+
+    // pr:1 já existia: updateOrCreate reatualiza a linha, não cria — logo isNew=false.
+    expect($reported)->toBe([false]);
 });
 
 it('incremental: para nos PRs anteriores ao corte (updated < since)', function (): void {

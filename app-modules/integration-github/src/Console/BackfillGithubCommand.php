@@ -6,13 +6,18 @@ namespace He4rt\IntegrationGithub\Console;
 
 use He4rt\IntegrationGithub\Backfill\BackfillRepository;
 use He4rt\IntegrationGithub\Backfill\RateLimit;
+use He4rt\IntegrationGithub\Contributions\DTOs\NewContributionDTO;
 use He4rt\IntegrationGithub\Enums\ContributionType;
 use He4rt\IntegrationGithub\Models\GithubRepository;
 use Illuminate\Console\Attributes\Description;
 use Illuminate\Console\Attributes\Signature;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Date;
+use Illuminate\Support\Str;
 use Saloon\Exceptions\Request\RequestException;
+use Symfony\Component\Console\Helper\ProgressBar;
+use Symfony\Component\Console\Output\ConsoleOutputInterface;
+use Symfony\Component\Console\Output\ConsoleSectionOutput;
 use Throwable;
 
 use function Laravel\Prompts\intro;
@@ -27,16 +32,13 @@ use function Laravel\Prompts\warning;
 final class BackfillGithubCommand extends Command
 {
     /**
-     * Rótulos curtos por tipo, na ordem em que aparecem no contador ao vivo.
+     * Larguras das colunas da tabela de itens (Item · Autor · Quando · Status).
      */
-    private const array LABELS = [
-        'pr' => 'PRs',
-        'review' => 'reviews',
-        'issue' => 'issues',
-        'comment' => 'coment.',
-        'review_comment' => 'coment.review',
-        'commit' => 'commits',
-    ];
+    private const int COL_ITEM = 42;
+
+    private const int COL_AUTHOR = 22;
+
+    private const int COL_WHEN = 20;
 
     public function handle(BackfillRepository $backfill): int
     {
@@ -68,24 +70,27 @@ final class BackfillGithubCommand extends Command
         $rateLimited = false;
 
         foreach ($repositories as $repository) {
-            /** @var array<string, int> $counts */
-            $counts = [];
+            $new = 0;
+            $updated = 0;
 
+            $this->newLine();
             $this->line('  <info>'.$repository->full_name.'</info>');
-            $bar = $this->output->createProgressBar();
-            $bar->setFormat(' %current% ingeridas  %message%');
-            $bar->setMessage('');
-            $bar->start();
+
+            // Linhas (em cima) e barra (fixa embaixo) em seções independentes: cada
+            // item ingerido vira uma linha que rola acima da barra de progresso.
+            [$rows, $bar] = $this->liveOutput();
+            $rows?->writeln($this->header());
 
             try {
-                $backfill->execute($repository, function (ContributionType $type) use ($bar, &$counts): void {
-                    $counts[$type->value] = ($counts[$type->value] ?? 0) + 1;
-                    $bar->setMessage($this->tally($counts));
-                    $bar->advance();
+                $backfill->execute($repository, function (NewContributionDTO $contribution, bool $isNew) use ($rows, $bar, &$new, &$updated): void {
+                    $isNew ? $new++ : $updated++;
+                    $rows?->writeln($this->row($contribution, $isNew));
+                    $bar?->setMessage(sprintf('%d novas · %d atualizadas', $new, $updated));
+                    $bar?->advance();
                 }, $full);
             } catch (RequestException $exception) {
-                $bar->finish();
-                $this->newLine(2);
+                $bar?->finish();
+                $this->newLine();
 
                 if (RateLimit::matches($exception)) {
                     $results[] = [$repository->full_name, '⏳ rate limit'.RateLimit::resetHint($exception)];
@@ -98,18 +103,18 @@ final class BackfillGithubCommand extends Command
 
                 continue;
             } catch (Throwable $throwable) {
-                $bar->finish();
-                $this->newLine(2);
+                $bar?->finish();
+                $this->newLine();
                 $results[] = [$repository->full_name, '✗ '.$throwable->getMessage()];
 
                 continue;
             }
 
-            $bar->finish();
-            $this->newLine(2);
+            $bar?->finish();
+            $this->newLine();
 
             $repository->update(['last_backfilled_at' => Date::now()]);
-            $results[] = [$repository->full_name, '✓ '.array_sum($counts).' contribuições'];
+            $results[] = [$repository->full_name, sprintf('✓ %d novas · %d atualizadas', $new, $updated)];
         }
 
         table(['Repositório', 'Resultado'], $results);
@@ -126,20 +131,106 @@ final class BackfillGithubCommand extends Command
     }
 
     /**
-     * Contador por tipo, ex.: "PRs 61 · reviews 980 · issues 44".
+     * Monta as duas seções de saída ao vivo: linhas dos itens (em cima) e a barra
+     * de progresso (fixa embaixo). Em saída não-TTY (testes, pipes) não há seções —
+     * devolve [null, null] e o backfill roda sem feedback visual.
      *
-     * @param  array<string, int>  $counts
+     * @return array{0: ConsoleSectionOutput|null, 1: ProgressBar|null}
      */
-    private function tally(array $counts): string
+    private function liveOutput(): array
     {
-        $parts = [];
+        $output = $this->output->getOutput();
 
-        foreach (self::LABELS as $key => $label) {
-            if (($counts[$key] ?? 0) > 0) {
-                $parts[] = $label.' '.$counts[$key];
-            }
+        if (!$output instanceof ConsoleOutputInterface) {
+            return [null, null];
         }
 
-        return implode(' · ', $parts);
+        $rows = $output->section();
+        $bar = new ProgressBar($output->section());
+        $bar->setFormat(' %current% processadas  %message%');
+        $bar->setMessage('iniciando…');
+        $bar->start();
+
+        return [$rows, $bar];
+    }
+
+    /**
+     * Cabeçalho da tabela de itens, alinhado com as larguras das colunas.
+     */
+    private function header(): string
+    {
+        return sprintf(
+            '  <fg=gray>%s%s%s%s</>',
+            Str::padRight('Item', self::COL_ITEM),
+            Str::padRight('Autor', self::COL_AUTHOR),
+            Str::padRight('Quando', self::COL_WHEN),
+            'Status',
+        );
+    }
+
+    /**
+     * Uma linha da tabela de itens: "Item · Autor · Quando · Status", com o status
+     * colorido (verde = nova, amarelo = atualizada) sempre na última coluna para não
+     * desalinhar o padding das anteriores.
+     */
+    private function row(NewContributionDTO $contribution, bool $isNew): string
+    {
+        $status = $isNew ? '<fg=green>nova</>' : '<fg=yellow>atualizada</>';
+
+        return sprintf(
+            '  %s%s%s%s',
+            Str::padRight(Str::limit($this->describe($contribution), self::COL_ITEM - 2, '…'), self::COL_ITEM),
+            Str::padRight(Str::limit($contribution->actorLogin, self::COL_AUTHOR - 2, '…'), self::COL_AUTHOR),
+            Str::padRight($this->humanTime($contribution->occurredAt), self::COL_WHEN),
+            $status,
+        );
+    }
+
+    /**
+     * Descrição humana do item, ex.: "PR #42", "issue #10", "commit a1b2c3d",
+     * "coment. de review → PR #304". O alvo (target_ref) dá o contexto de PR/issue
+     * que o número cru do comentário/review não revela.
+     */
+    private function describe(NewContributionDTO $contribution): string
+    {
+        $id = Str::after($contribution->externalRef, ':');
+        $target = $this->targetLabel($contribution->targetRef);
+        $suffix = $target === '' ? '' : ' → '.$target;
+
+        return match ($contribution->type) {
+            ContributionType::Pr => 'PR #'.$id,
+            ContributionType::Issue => 'issue #'.$id,
+            ContributionType::Commit => 'commit '.Str::limit($id, 7, ''),
+            ContributionType::Review => 'review'.$suffix,
+            ContributionType::Comment => 'coment.'.$suffix,
+            ContributionType::ReviewComment => 'coment. de review'.$suffix,
+        };
+    }
+
+    /**
+     * Traduz um target_ref ("pr:304" / "issue:10") para "PR #304" / "issue #10".
+     */
+    private function targetLabel(?string $ref): string
+    {
+        if ($ref === null) {
+            return '';
+        }
+
+        $id = Str::after($ref, ':');
+
+        return Str::startsWith($ref, 'pr:') ? 'PR #'.$id : 'issue #'.$id;
+    }
+
+    /**
+     * Tempo relativo do item ("há 3 horas", "há 2 dias") para dar noção de quão
+     * recente o backfill alcançou. Datas vêm em ISO-8601 da API do GitHub.
+     */
+    private function humanTime(string $iso): string
+    {
+        if ($iso === '') {
+            return 'data desconhecida';
+        }
+
+        return Date::parse($iso)->locale('pt_BR')->diffForHumans();
     }
 }

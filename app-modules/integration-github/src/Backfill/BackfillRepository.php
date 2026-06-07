@@ -33,7 +33,7 @@ final readonly class BackfillRepository
      * que mudou desde (last_backfilled_at − 1 dia) — a margem D-1 evita perder algo na
      * borda. Sem last_backfilled_at (ou com $full), varre o histórico inteiro.
      *
-     * @param  (callable(ContributionType): void)|null  $onProgress  Chamado a cada contribuição gravada (feedback de progresso).
+     * @param  (callable(NewContributionDTO, bool): void)|null  $onProgress  Chamado a cada contribuição gravada (feedback de progresso).
      */
     public function execute(GithubRepository $repository, ?callable $onProgress = null, bool $full = false): void
     {
@@ -52,7 +52,7 @@ final readonly class BackfillRepository
     }
 
     /**
-     * @param  (callable(ContributionType): void)|null  $onProgress
+     * @param  (callable(NewContributionDTO, bool): void)|null  $onProgress
      */
     private function backfillPullRequests(string $tenantId, string $repo, ?string $since, ?callable $onProgress): void
     {
@@ -98,7 +98,7 @@ final readonly class BackfillRepository
     }
 
     /**
-     * @param  (callable(ContributionType): void)|null  $onProgress
+     * @param  (callable(NewContributionDTO, bool): void)|null  $onProgress
      */
     private function backfillReviews(string $tenantId, string $repo, int $number, ?callable $onProgress): void
     {
@@ -134,7 +134,7 @@ final readonly class BackfillRepository
     }
 
     /**
-     * @param  (callable(ContributionType): void)|null  $onProgress
+     * @param  (callable(NewContributionDTO, bool): void)|null  $onProgress
      */
     private function backfillIssues(string $tenantId, string $repo, ?string $since, ?callable $onProgress): void
     {
@@ -168,7 +168,7 @@ final readonly class BackfillRepository
     }
 
     /**
-     * @param  (callable(ContributionType): void)|null  $onProgress
+     * @param  (callable(NewContributionDTO, bool): void)|null  $onProgress
      */
     private function backfillIssueComments(string $tenantId, string $repo, ?string $since, ?callable $onProgress): void
     {
@@ -197,7 +197,7 @@ final readonly class BackfillRepository
     }
 
     /**
-     * @param  (callable(ContributionType): void)|null  $onProgress
+     * @param  (callable(NewContributionDTO, bool): void)|null  $onProgress
      */
     private function backfillReviewComments(string $tenantId, string $repo, ?string $since, ?callable $onProgress): void
     {
@@ -226,7 +226,7 @@ final readonly class BackfillRepository
     }
 
     /**
-     * @param  (callable(ContributionType): void)|null  $onProgress
+     * @param  (callable(NewContributionDTO, bool): void)|null  $onProgress
      */
     private function backfillCommits(string $tenantId, string $repo, ?string $since, ?callable $onProgress): void
     {
@@ -255,16 +255,18 @@ final readonly class BackfillRepository
     }
 
     /**
-     * Único ponto de escrita: grava a contribuição e reporta o tipo ao callback de progresso.
+     * Único ponto de escrita: grava a contribuição e reporta ao callback de progresso,
+     * sinalizando se a linha foi criada agora (true) ou apenas reatualizada (false) —
+     * é esse flag que separa "novas" de "já existentes" no feedback do CLI.
      *
-     * @param  (callable(ContributionType): void)|null  $onProgress
+     * @param  (callable(NewContributionDTO, bool): void)|null  $onProgress
      */
     private function record(NewContributionDTO $contribution, ?callable $onProgress): void
     {
-        $this->recorder->execute($contribution);
+        $recorded = $this->recorder->execute($contribution);
 
         if ($onProgress !== null) {
-            $onProgress($contribution->type);
+            $onProgress($contribution, $recorded->wasRecentlyCreated);
         }
     }
 
