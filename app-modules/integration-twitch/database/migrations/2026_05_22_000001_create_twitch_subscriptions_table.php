@@ -22,7 +22,7 @@ return new class extends Migration
             $table->integer('cost')->default(0);
             $table->string('version')->default('1');
             $table->foreignUuid('tenant_id')->constrained()->cascadeOnDelete();
-            $table->timestamps();
+            $table->timestampsTz();
 
             $table->index('type');
             $table->index('broadcaster_user_id');

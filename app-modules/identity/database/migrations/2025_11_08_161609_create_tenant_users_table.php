@@ -16,7 +16,7 @@ return new class extends Migration
         Schema::create('tenant_users', function (Blueprint $table): void {
             $table->foreignUuid('tenant_id')->constrained('tenants')->cascadeOnDelete();
             $table->foreignUuid('user_id')->constrained('users')->cascadeOnDelete();
-            $table->timestamps();
+            $table->timestampsTz();
         });
     }
 

@@ -19,7 +19,7 @@ return new class extends Migration
             $table->foreignUuid('target_id')->constrained('users')->cascadeOnDelete();
             $table->string('type');
             $table->text('message');
-            $table->timestamps();
+            $table->timestampsTz();
         });
     }
 

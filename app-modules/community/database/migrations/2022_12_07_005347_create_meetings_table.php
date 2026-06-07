@@ -19,9 +19,9 @@ return new class extends Migration
                 $table->foreignUuid('admin_id')->constrained('users')->cascadeOnDelete();
                 $table->text('content')->nullable();
                 $table->foreignId('meeting_type_id')->constrained('meeting_types')->cascadeOnDelete();
-                $table->dateTime('starts_at');
-                $table->dateTime('ends_at')->nullable();
-                $table->timestamps();
+                $table->dateTimeTz('starts_at');
+                $table->dateTimeTz('ends_at')->nullable();
+                $table->timestampsTz();
             });
         }
     }

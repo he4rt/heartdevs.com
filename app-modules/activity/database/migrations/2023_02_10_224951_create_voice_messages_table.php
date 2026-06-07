@@ -17,7 +17,7 @@ return new class extends Migration
                 $table->string('channel_name');
                 $table->string('state');
                 $table->integer('obtained_experience');
-                $table->timestamps();
+                $table->timestampsTz();
             });
         }
     }

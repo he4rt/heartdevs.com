@@ -18,7 +18,7 @@ return new class extends Migration
             $table->string('mentioned_provider_account_id');
             $table->string('mentioned_username')->nullable();
             $table->unsignedSmallInteger('position')->default(0);
-            $table->timestamps();
+            $table->timestampsTz();
 
             $table->unique(
                 ['message_id', 'mentioned_provider_account_id'],
@@ -42,7 +42,7 @@ return new class extends Migration
             $table->string('name')->nullable();
             $table->boolean('archived')->nullable();
             $table->unsignedInteger('auto_archive_duration')->nullable();
-            $table->timestamps();
+            $table->timestampsTz();
 
             $table->unique(
                 ['tenant_id', 'provider_thread_id'],

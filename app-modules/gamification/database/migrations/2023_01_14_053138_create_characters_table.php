@@ -19,8 +19,8 @@ return new class extends Migration
                 $table->foreignUuid('user_id')->constrained('users')->cascadeOnDelete();
                 $table->integer('experience')->default(0);
                 $table->integer('reputation')->default(0);
-                $table->timestamp('daily_bonus_claimed_at')->nullable();
-                $table->timestamps();
+                $table->timestampTz('daily_bonus_claimed_at')->nullable();
+                $table->timestampsTz();
             });
         }
     }

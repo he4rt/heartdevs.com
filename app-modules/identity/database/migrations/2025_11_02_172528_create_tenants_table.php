@@ -16,8 +16,8 @@ return new class extends Migration
             $table->string('slug');
             $table->foreignUuid('owner_id')->constrained('users');
             $table->boolean('active');
-            $table->timestamps();
-            $table->softDeletes();
+            $table->timestampsTz();
+            $table->softDeletesTz();
         });
     }
 

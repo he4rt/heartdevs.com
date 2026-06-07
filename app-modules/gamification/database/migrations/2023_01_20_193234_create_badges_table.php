@@ -21,7 +21,7 @@ return new class extends Migration
                 $table->text('description');
                 $table->string('redeem_code');
                 $table->boolean('active');
-                $table->timestamps();
+                $table->timestampsTz();
             });
         }
     }

@@ -18,13 +18,13 @@ return new class extends Migration
                 $table->uuid('id');
                 $table->string('name');
                 $table->text('description');
-                $table->timestamp('started_at')->nullable();
-                $table->timestamp('ended_at')->nullable();
+                $table->timestampTz('started_at')->nullable();
+                $table->timestampTz('ended_at')->nullable();
                 $table->integer('messages_count')->default(0);
                 $table->integer('participants_count')->default(0);
                 $table->integer('meeting_count')->default(0);
                 $table->integer('badges_count')->default(0);
-                $table->timestamps();
+                $table->timestampsTz();
             });
         }
     }

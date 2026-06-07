@@ -15,9 +15,9 @@ return new class extends Migration
             $table->foreignId('discord_member_id')->constrained('discord_members')->cascadeOnDelete();
             $table->foreignId('discord_role_id')->constrained('discord_roles')->cascadeOnDelete();
             $table->string('action');
-            $table->timestamp('occurred_at');
+            $table->timestampTz('occurred_at');
             $table->foreignId('source_event_log_id')->nullable()->constrained('discord_event_logs')->nullOnDelete();
-            $table->timestamps();
+            $table->timestampsTz();
 
             $table->index('discord_member_id');
             $table->index('discord_role_id');

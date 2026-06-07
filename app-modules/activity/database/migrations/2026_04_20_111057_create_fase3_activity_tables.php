@@ -22,7 +22,7 @@ return new class extends Migration
             $table->unsignedBigInteger('size')->nullable();
             $table->unsignedInteger('width')->nullable();
             $table->unsignedInteger('height')->nullable();
-            $table->timestamps();
+            $table->timestampsTz();
 
             $table->index('message_id', 'message_attachments_message_idx');
         });
@@ -39,7 +39,7 @@ return new class extends Migration
             $table->text('thumbnail_url')->nullable();
             $table->jsonb('raw')->nullable();
             $table->unsignedSmallInteger('position')->default(0);
-            $table->timestamps();
+            $table->timestampsTz();
 
             $table->index('message_id', 'message_embeds_message_idx');
             $table->index(['tenant_id', 'source_domain'], 'message_embeds_tenant_domain_idx');
@@ -51,10 +51,10 @@ return new class extends Migration
             $table->foreignUuid('tenant_id')->constrained('tenants');
             $table->foreignUuid('external_identity_id')->constrained('external_identities');
             $table->string('kind');
-            $table->timestamp('occurred_at');
+            $table->timestampTz('occurred_at');
             $table->string('provider_message_id')->nullable();
             $table->jsonb('metadata')->nullable();
-            $table->timestamps();
+            $table->timestampsTz();
 
             $table->index(['tenant_id', 'kind', 'occurred_at'], 'membership_events_tenant_kind_time_idx');
             $table->index(['external_identity_id', 'kind'], 'membership_events_identity_kind_idx');

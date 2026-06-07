@@ -18,7 +18,7 @@ return new class extends Migration
             $table->integer('balance_after');
             $table->nullableUuidMorphs('reference');
             $table->string('description')->nullable();
-            $table->timestamps();
+            $table->timestampsTz();
         });
     }
 

@@ -21,7 +21,7 @@ return new class extends Migration
                 $table->string('email')->nullable();
                 $table->string('password')->nullable();
                 $table->boolean('is_donator')->default(false);
-                $table->timestamps();
+                $table->timestampsTz();
             });
         }
     }

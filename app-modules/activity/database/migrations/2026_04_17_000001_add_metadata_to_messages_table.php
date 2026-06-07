@@ -33,7 +33,7 @@ return new class extends Migration
             $table->boolean('is_pinned')->default(false)->after('source_kind');
             $table->boolean('mentions_everyone')->default(false)->after('is_pinned');
             $table->smallInteger('mention_role_count')->default(0)->after('mentions_everyone');
-            $table->timestamp('edited_at')->nullable()->after('mention_role_count');
+            $table->timestampTz('edited_at')->nullable()->after('mention_role_count');
             $table->string('reply_to_provider_message_id')->nullable()->after('edited_at');
 
             $table->index(['tenant_id', 'sent_at'], 'messages_tenant_sent_at_idx');
