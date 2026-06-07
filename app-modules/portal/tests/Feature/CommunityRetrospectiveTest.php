@@ -8,6 +8,7 @@ use He4rt\IntegrationGithub\Enums\ContributionType;
 use He4rt\IntegrationGithub\Models\GithubContribution;
 use He4rt\Portal\Retrospective\CommunityRetrospective;
 use He4rt\Portal\Retrospective\RetrospectiveFilters;
+use Illuminate\Support\Facades\Blade;
 
 beforeEach(function (): void {
     $this->tenant = Tenant::factory()->create();
@@ -132,6 +133,62 @@ it('expõe refs de PR e issue por pessoa para os chips de atividade', function (
         ->and($maria['pr_refs'][0]['url'])->toContain('/pull/290')
         ->and($maria['issue_refs'])->toHaveCount(1)
         ->and($maria['issue_refs'][0])->toMatchArray(['num' => 12, 'title' => 'bug: y']);
+});
+
+it('ordena os refs de PR do mais recente para o mais antigo (para o "últimos N")', function (): void {
+    contribution($this->tenant, ['actor_login' => 'maria', 'type' => ContributionType::Pr, 'external_ref' => 'pr:1', 'occurred_at' => '2026-06-01', 'metadata' => ['title' => 'antigo', 'url' => 'u1', 'state' => 'merged']]);
+    contribution($this->tenant, ['actor_login' => 'maria', 'type' => ContributionType::Pr, 'external_ref' => 'pr:2', 'occurred_at' => '2026-06-05', 'metadata' => ['title' => 'recente', 'url' => 'u2', 'state' => 'open']]);
+    contribution($this->tenant, ['actor_login' => 'maria', 'type' => ContributionType::Pr, 'external_ref' => 'pr:3', 'occurred_at' => '2026-06-03', 'metadata' => ['title' => 'meio', 'url' => 'u3', 'state' => 'open']]);
+
+    $maria = collect(($this->build)()['people'])->firstWhere('login', 'maria');
+
+    expect(array_column($maria['pr_refs'], 'num'))->toBe([2, 3, 1]);
+});
+
+it('na view, mostra só os 3 primeiros refs e um chip "mais X…"', function (): void {
+    $person = [
+        'pr_refs' => array_map(
+            fn (int $n): array => ['num' => $n, 'title' => 'pr '.$n, 'url' => null, 'state' => 'open'],
+            [10, 9, 8, 7, 6],
+        ),
+        'issue_refs' => [],
+        'reviews' => 0,
+        'comments' => 0,
+        'review_comments' => 0,
+        'commits' => 0,
+    ];
+
+    $html = Blade::render('<x-portal::retro.activity-chips :person="$person" />', ['person' => $person]);
+
+    expect($html)->toContain('#10')
+        ->and($html)->toContain('#9')
+        ->and($html)->toContain('#8')
+        ->and($html)->not->toContain('#7')
+        ->and($html)->not->toContain('#6')
+        ->and($html)->toContain('mais 2…');
+});
+
+it('o card compacto da comunidade mostra só ícone + somatória dos tipos com contribuição', function (): void {
+    $person = [
+        'pr_refs' => [
+            ['num' => 1, 'title' => 'feat: a', 'url' => null, 'state' => 'open'],
+            ['num' => 2, 'title' => 'feat: b', 'url' => null, 'state' => 'merged'],
+        ],
+        'issue_refs' => [],
+        'reviews' => 5,
+        'comments' => 0,
+        'review_comments' => 3,
+        'commits' => 0,
+    ];
+
+    $html = Blade::render('<x-portal::retro.activity-icons :person="$person" />', ['person' => $person]);
+
+    // 3 tipos com n>0: PR(2), review(5), review_comment(3) → 3 pills, sem zeros
+    expect(mb_substr_count($html, 'class="cstat '))->toBe(3)
+        ->and($html)->toContain('<span class="cstat-n">2</span>')
+        ->and($html)->toContain('<span class="cstat-n">5</span>')
+        ->and($html)->toContain('<span class="cstat-n">3</span>')
+        ->and($html)->not->toContain('feat:'); // sem títulos de PR
 });
 
 it('agrupa PRs por repositório e lista destaques por linhas mudadas', function (): void {

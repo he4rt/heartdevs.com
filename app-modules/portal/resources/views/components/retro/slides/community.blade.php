@@ -5,16 +5,9 @@
         <span class="sec-tag" data-anim>A cauda que sustenta</span>
         <h2 class="sec" data-anim>E toda a comunidade</h2>
         <p class="sec-sub" data-anim>Mais {{ count($tail) }} {{ count($tail) === 1 ? 'pessoa entrou' : 'pessoas entraram' }} com reviews, issues, comentários e commits. Cada toque conta.</p>
-        <div
-            style="
-                display: grid;
-                grid-template-columns: repeat(auto-fill, minmax(330px, 1fr));
-                gap: 14px;
-                margin-top: 22px;
-            "
-        >
+        <div class="pgrid" style="margin-top: 22px">
             @foreach ($tail as $person)
-                <div data-anim><x-portal::retro.person-card :person="$person" :size="44" /></div>
+                <div data-anim><x-portal::retro.person-card :person="$person" :size="44" :compact="true" /></div>
             @endforeach
         </div>
     </div>

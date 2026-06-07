@@ -144,6 +144,7 @@ final readonly class CommunityRetrospective
     {
         return $items
             ->filter(fn (GithubContribution $contribution): bool => $contribution->type === ContributionType::Pr)
+            ->sortByDesc(fn (GithubContribution $contribution): mixed => $contribution->occurred_at)
             ->map(function (GithubContribution $contribution): array {
                 $metadata = $contribution->metadata ?? [];
                 $url = $metadata['url'] ?? null;
@@ -168,6 +169,7 @@ final readonly class CommunityRetrospective
     {
         return $items
             ->filter(fn (GithubContribution $contribution): bool => $contribution->type === ContributionType::Issue)
+            ->sortByDesc(fn (GithubContribution $contribution): mixed => $contribution->occurred_at)
             ->map(function (GithubContribution $contribution): array {
                 $metadata = $contribution->metadata ?? [];
                 $url = $metadata['url'] ?? null;

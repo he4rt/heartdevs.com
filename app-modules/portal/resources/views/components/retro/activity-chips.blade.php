@@ -2,10 +2,12 @@
 @php ($stateColor = fn($state) => [ 'merged' => 'var(--st-merged)', 'open' => 'var(--st-open)', 'closed' => 'var(--st-closed)' ][$state ?? ''] ?? 'var(--st-open)')
 <div class="acts">
     @if (count($person['pr_refs']))
+        @php ($prShown = array_slice($person['pr_refs'], 0, 3))
+        @php ($prMore = count($person['pr_refs']) - count($prShown))
         <div class="act act-pr" style="--c: var(--t-pr)">
             <span class="act-h">Abriu PR</span>
             <span class="act-items">
-                @foreach ($person['pr_refs'] as $ref)
+                @foreach ($prShown as $ref)
                     <a
                         class="ref"
                         @if ($ref['url']) href="{{ $ref['url'] }}" target="_blank" rel="noopener" @endif
@@ -15,6 +17,9 @@
                         ><span class="rn">#{{ $ref['num'] }}</span><span class="rt">{{ $ref['title'] }}</span></a
                     >
                 @endforeach
+                @if ($prMore > 0)
+                    <span class="ref more">mais {{ $prMore }}…</span>
+                @endif
             </span>
         </div>
     @endif
@@ -27,10 +32,12 @@
         </div>
     @endif
     @if (count($person['issue_refs']))
+        @php ($issueShown = array_slice($person['issue_refs'], 0, 3))
+        @php ($issueMore = count($person['issue_refs']) - count($issueShown))
         <div class="act act-issue" style="--c: var(--t-issue)">
             <span class="act-h">Abriu issue</span>
             <span class="act-items">
-                @foreach ($person['issue_refs'] as $ref)
+                @foreach ($issueShown as $ref)
                     <a
                         class="ref"
                         @if ($ref['url']) href="{{ $ref['url'] }}" target="_blank" rel="noopener" @endif
@@ -39,6 +46,9 @@
                         <span class="rn">#{{ $ref['num'] }}</span><span class="rt">{{ $ref['title'] }}</span></a
                     >
                 @endforeach
+                @if ($issueMore > 0)
+                    <span class="ref more">mais {{ $issueMore }}…</span>
+                @endif
             </span>
         </div>
     @endif

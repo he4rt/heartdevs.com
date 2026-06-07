@@ -1,4 +1,4 @@
-@props (['person', 'rank' => null, 'size' => 44])
+@props (['person', 'rank' => null, 'size' => 44, 'compact' => false])
 @php ($ns = $size >= 80 ? '1.7rem' : '1.18rem')
 <div class="card">
     <div class="phead">
@@ -29,5 +29,9 @@
         @endif
     </div>
     <x-portal::retro.composition-bar :person="$person" />
-    <x-portal::retro.activity-chips :person="$person" />
+    @if ($compact)
+        <x-portal::retro.activity-icons :person="$person" />
+    @else
+        <x-portal::retro.activity-chips :person="$person" />
+    @endif
 </div>

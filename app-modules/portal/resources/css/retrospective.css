@@ -414,6 +414,114 @@
     box-shadow: 0 16px 38px -22px rgba(120, 43, 241, 0.55);
 }
 
+/* carrossel de pessoas — trilho horizontal com scroll-snap.
+   Resolve a variância de altura dos cards: em vez de um grid 2-col que deixa
+   gaps quando uma pessoa tem mais contribuições que a outra, os cards ficam num
+   trilho que rola na horizontal (1+ por vez), cada um com sua altura natural. */
+.retro .pcarousel {
+    position: relative;
+    /* sai da caixa de 1120px do slide-inner pra usar a largura da tela;
+       o cabeçalho continua estreito, só o trilho de cards "vaza" pras bordas */
+    width: min(96vw, 1480px);
+    margin-left: 50%;
+    transform: translateX(-50%);
+}
+.retro .pcar-track {
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+    overflow-x: auto;
+    scroll-snap-type: x proximity;
+    scroll-padding-inline: 4px;
+    overscroll-behavior-x: contain;
+    /* o html tem scroll-behavior:smooth global, que deixa o arrasto borrachudo
+       (cada scrollLeft viraria animação); o arrasto precisa ser 1:1 */
+    scroll-behavior: auto;
+    /* arrastar não deve selecionar o texto dos cards */
+    user-select: none;
+    /* respiro pro translateY(-3px) e pra sombra do hover não serem cortados */
+    padding: 6px 4px 18px;
+    scrollbar-width: none;
+    cursor: grab;
+}
+.retro .pcar-track::-webkit-scrollbar {
+    display: none;
+}
+/* enquanto arrasta: vira "mão fechada", desliga o snap (que brigaria com o
+   arrasto manual) e evita seleção de texto / drag nativo de imagem */
+.retro .pcar-track.dragging {
+    cursor: grabbing;
+    scroll-snap-type: none;
+}
+.retro .pcar-track a,
+.retro .pcar-track img {
+    -webkit-user-drag: none;
+}
+.retro .pcar-track.scrollable {
+    -webkit-mask: linear-gradient(90deg, transparent 0, #000 30px, #000 calc(100% - 30px), transparent 100%);
+    mask: linear-gradient(90deg, transparent 0, #000 30px, #000 calc(100% - 30px), transparent 100%);
+}
+.retro .pslide {
+    flex: 0 0 clamp(300px, 30%, 460px);
+    scroll-snap-align: start;
+}
+.retro .pcar-arrow {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 3;
+    display: grid;
+    place-items: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 999px;
+    border: 1px solid var(--border);
+    background: color-mix(in srgb, var(--surface) 88%, transparent);
+    backdrop-filter: blur(6px);
+    color: var(--text);
+    cursor: pointer;
+    transition:
+        opacity 0.25s,
+        border-color 0.25s,
+        background 0.25s,
+        transform 0.25s;
+}
+.retro .pcar-arrow svg {
+    width: 18px;
+    height: 18px;
+}
+.retro .pcar-arrow:hover {
+    border-color: var(--brand);
+    background: var(--surface);
+    color: var(--brand-soft);
+}
+.retro .pcar-arrow.prev {
+    left: -8px;
+}
+.retro .pcar-arrow.next {
+    right: -8px;
+}
+.retro .pcar-arrow.hide {
+    opacity: 0;
+    pointer-events: none;
+    transform: translateY(-50%) scale(0.85);
+}
+
+/* grid da comunidade (cauda) — cards compactos e uniformes empilhados em 3–4
+   colunas. Como todo card aqui tem a mesma estrutura (header + barra + ícones),
+   eles ficam uniformes e dispensam o carrossel horizontal. */
+.retro .pgrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 14px;
+    /* start (não stretch): o card abraça o conteúdo em vez de esticar até a
+       altura do mais alto da linha — sem "vazião" embaixo dos cards leves */
+    align-items: start;
+}
+.retro .pgrid .card {
+    padding: 16px 17px 17px;
+}
+
 /* badges */
 .retro .bdg {
     display: inline-flex;
@@ -690,6 +798,52 @@
     white-space: nowrap;
     max-width: 240px;
     font-family: 'Hanken Grotesk', sans-serif;
+}
+/* chip "mais X…" — indica os itens ocultos além dos 3 primeiros (não é link) */
+.retro .ref.more {
+    background: transparent;
+    border-style: dashed;
+    color: var(--muted);
+    font-style: italic;
+    cursor: default;
+}
+.retro .ref.more:hover {
+    border-color: var(--border);
+    background: transparent;
+    color: var(--muted);
+}
+
+/* stats compactos (cards da comunidade): ícone do tipo + somatória, sem títulos */
+.retro .cstats {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 7px;
+    margin-top: 13px;
+}
+.retro .cstat {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 4px 9px 4px 7px;
+    border-radius: 8px;
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: color-mix(in srgb, var(--c) 80%, white);
+}
+.retro .cstat::before {
+    content: '';
+    flex: none;
+    width: 13px;
+    height: 13px;
+    background-color: var(--c);
+    -webkit-mask: var(--icon) center / contain no-repeat;
+    mask: var(--icon) center / contain no-repeat;
+}
+.retro .cstat-n {
+    color: var(--text);
 }
 
 /* navbar do deck */
