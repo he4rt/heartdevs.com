@@ -23,8 +23,8 @@ return new class extends Migration
             $table->integer('member_count')->nullable();
             $table->smallInteger('premium_tier')->default(0);
             $table->jsonb('features')->default('[]');
-            $table->timestamp('synced_at')->nullable();
-            $table->timestamps();
+            $table->timestampTz('synced_at')->nullable();
+            $table->timestampsTz();
         });
     }
 

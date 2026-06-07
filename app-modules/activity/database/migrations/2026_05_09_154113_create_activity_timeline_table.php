@@ -20,7 +20,7 @@ return new class extends Migration
             $table->boolean('is_ignored')->default(false);
             $table->boolean('pinned')->default(false);
             $table->integer('views')->default(0);
-            $table->timestamps();
+            $table->timestampsTz();
 
             $table->index(['tenant_id', 'created_at'], 'activity_timeline_tenant_feed_index');
             $table->index(['tenant_id', 'parent_id', 'is_ignored', 'created_at'], 'activity_timeline_feed_composite_index');

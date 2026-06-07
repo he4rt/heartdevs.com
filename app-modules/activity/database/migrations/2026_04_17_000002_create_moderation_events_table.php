@@ -20,8 +20,8 @@ return new class extends Migration
             $table->foreignUuid('source_identity_id')->nullable()->constrained('external_identities');
             $table->uuid('source_message_id')->nullable();
             $table->jsonb('metadata')->nullable();
-            $table->timestamp('occurred_at');
-            $table->timestamps();
+            $table->timestampTz('occurred_at');
+            $table->timestampsTz();
 
             $table->foreign('source_message_id')->references('id')->on('messages');
             $table->index(['tenant_id', 'type', 'occurred_at']);

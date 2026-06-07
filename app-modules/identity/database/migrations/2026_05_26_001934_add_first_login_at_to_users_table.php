@@ -11,7 +11,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('users', function (Blueprint $table): void {
-            $table->timestamp('first_login_at')->nullable()->after('banned_at');
+            $table->timestampTz('first_login_at')->nullable()->after('banned_at');
         });
     }
 };

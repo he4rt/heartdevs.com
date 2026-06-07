@@ -25,9 +25,9 @@ return new class extends Migration
             $table->nullableUuidMorphs('source');
             $table->string('external_ref')->nullable();
             $table->jsonb('metadata')->nullable();
-            $table->timestamp('occurred_at');
-            $table->timestamp('reviewed_at')->nullable();
-            $table->timestamps();
+            $table->timestampTz('occurred_at');
+            $table->timestampTz('reviewed_at')->nullable();
+            $table->timestampsTz();
 
             $table->index(['character_id', 'type', 'created_at'], 'idx_interactions_character_type');
             $table->index(['status', 'value_tier'], 'idx_interactions_status_tier');

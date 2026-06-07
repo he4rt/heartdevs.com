@@ -17,7 +17,7 @@ return new class extends Migration
             $table->string('user_id')->nullable();
             $table->string('twitch_message_id')->unique();
             $table->jsonb('payload');
-            $table->timestamps();
+            $table->timestampsTz();
         });
     }
 

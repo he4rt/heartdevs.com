@@ -24,7 +24,7 @@ return new class extends Migration
             $table->jsonb('social_links')->nullable();
             $table->boolean('available_for_proposals')->default(false);
             $table->string('start_availability', 30)->nullable();
-            $table->timestamps();
+            $table->timestampsTz();
 
             $table->unique(['user_id', 'tenant_id']);
         });

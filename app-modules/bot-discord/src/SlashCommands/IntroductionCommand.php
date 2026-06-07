@@ -8,9 +8,8 @@ use Discord\Builders\Components\TextInput;
 use Discord\Helpers\Collection;
 use Discord\Parts\Guild\Role;
 use Discord\Parts\Interactions\Interaction;
+use He4rt\BotDiscord\Actions\ResolveDiscordTenant;
 use He4rt\Identity\ExternalIdentity\DTOs\ResolveUserProviderDTO;
-use He4rt\Identity\ExternalIdentity\Models\ExternalIdentity;
-use He4rt\Identity\Tenant\Models\Tenant;
 use He4rt\Identity\User\Actions\ResolveUserContext;
 use He4rt\Identity\User\Models\User;
 use He4rt\Profile\Actions\UpsertProfile;
@@ -19,6 +18,8 @@ use He4rt\Profile\Models\Profile;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\Log;
 use Throwable;
+
+use function React\Async\await;
 
 class IntroductionCommand extends AbstractSlashCommand
 {
@@ -116,13 +117,12 @@ class IntroductionCommand extends AbstractSlashCommand
 
     /**
      * @param  Collection<mixed, mixed>  $components
+     *
+     * @throws Throwable
      */
     private function persistData(Interaction $interaction, Collection $components): void
     {
-        $tenantProvider = ExternalIdentity::query()
-            ->where('model_type', (new Tenant)->getMorphClass())
-            ->where('external_account_id', (string) $interaction->guild_id)
-            ->firstOrFail();
+        $tenantProvider = resolve(ResolveDiscordTenant::class)->handle((string) $interaction->guild_id);
 
         $userDto = ResolveUserProviderDTO::make([
             'tenant_id' => $tenantProvider->tenant_id,
@@ -177,6 +177,6 @@ class IntroductionCommand extends AbstractSlashCommand
 
         $roles[] = $this->roleId;
 
-        $interaction->member->setRoles($roles);
+        await($interaction->member->setRoles($roles));
     }
 }

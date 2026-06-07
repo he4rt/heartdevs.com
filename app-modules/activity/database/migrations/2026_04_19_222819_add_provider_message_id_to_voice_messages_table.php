@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::table('voice_messages', function (Blueprint $table): void {
             $table->string('provider_message_id')->nullable()->after('external_identity_id');
-            $table->timestamp('occurred_at')->nullable()->after('state');
+            $table->timestampTz('occurred_at')->nullable()->after('state');
         });
 
         // Partial unique index — only enforced when we have a provider_message_id

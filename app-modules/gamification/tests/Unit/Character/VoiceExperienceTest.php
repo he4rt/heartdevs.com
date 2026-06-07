@@ -13,19 +13,19 @@ test('voice state multipliers', function (VoiceStatesEnum $state, int $expected)
     expect($state->getExperienceMultiplier())->toBe($expected);
 })->with([
     'disabled gives 0' => [VoiceStatesEnum::Disabled, 0],
-    'muted gives 3' => [VoiceStatesEnum::Muted, 3],
-    'unmuted gives 5' => [VoiceStatesEnum::Unmuted, 5],
+    'muted gives 1' => [VoiceStatesEnum::Muted, 1],
+    'unmuted gives 3' => [VoiceStatesEnum::Unmuted, 3],
 ]);
 
 test('voice xp increments by multiplier times level', function (): void {
     $character = Character::factory()->create(['experience' => 4500]);
-    // level 10 at 4500 xp, unmuted = 5 * 10 = 50
+    // level 10 at 4500 xp, unmuted = 3 * 10 = 30
 
     $xp = resolve(IncrementExperience::class)
         ->incrementByVoiceMessage($character->id, VoiceStatesEnum::Unmuted);
 
-    expect($xp)->toBe(50)
-        ->and($character->fresh()->experience)->toBe(4550);
+    expect($xp)->toBe(30)
+        ->and($character->fresh()->experience)->toBe(4530);
 });
 
 test('disabled voice state gives zero xp', function (): void {

@@ -35,10 +35,10 @@ return new class extends Migration
             $table->string('credentials_type')->default('oauth2')->after('provider');
             $table->text('credentials')->nullable()->after('credentials_type');
             $table->uuid('connected_by')->nullable()->after('provider_id');
-            $table->timestamp('connected_at')->nullable()->after('connected_by');
-            $table->timestamp('disconnected_at')->nullable()->after('connected_at');
+            $table->timestampTz('connected_at')->nullable()->after('connected_by');
+            $table->timestampTz('disconnected_at')->nullable()->after('connected_at');
             $table->json('metadata')->nullable()->after('disconnected_at');
-            $table->softDeletes();
+            $table->softDeletesTz();
         });
 
         // ──────────────────────────────────────────────

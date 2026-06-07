@@ -21,8 +21,8 @@ return new class extends Migration
                 $table->string('channel_id')->nullable();
                 $table->text('content');
                 $table->integer('obtained_experience');
-                $table->timestamp('sent_at')->nullable();
-                $table->timestamps();
+                $table->timestampTz('sent_at')->nullable();
+                $table->timestampsTz();
             });
         }
     }

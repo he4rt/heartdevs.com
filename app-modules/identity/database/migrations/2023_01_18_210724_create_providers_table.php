@@ -22,7 +22,7 @@ return new class extends Migration
                 $table->string('email')->nullable();
                 $table->string('avatar')->nullable();
                 $table->string('username')->nullable();
-                $table->timestamps();
+                $table->timestampsTz();
             });
         }
     }

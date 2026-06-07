@@ -15,7 +15,7 @@ return new class extends Migration
             $table->uuidMorphs('owner');
             $table->string('currency');
             $table->integer('balance')->default(0);
-            $table->timestamps();
+            $table->timestampsTz();
 
             $table->unique(['owner_type', 'owner_id', 'currency']);
         });

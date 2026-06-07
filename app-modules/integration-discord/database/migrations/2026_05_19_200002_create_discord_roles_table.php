@@ -25,7 +25,7 @@ return new class extends Migration
             $table->boolean('is_mentionable')->default(false);
             $table->boolean('is_managed')->default(false);
             $table->string('icon')->nullable();
-            $table->timestamps();
+            $table->timestampsTz();
 
             $table->index('discord_guild_id');
         });

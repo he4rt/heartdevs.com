@@ -19,8 +19,8 @@ return new class extends Migration
             $table->foreignUuid('staff_id')->constrained('users')->cascadeOnDelete();
             $table->string('status');
             $table->text('reason')->nullable();
-            $table->timestamp('received_at');
-            $table->timestamps();
+            $table->timestampTz('received_at');
+            $table->timestampsTz();
         });
     }
 

@@ -25,7 +25,7 @@ return new class extends Migration
             $table->boolean('nsfw')->default(false);
             $table->integer('bitrate')->nullable();
             $table->integer('user_limit')->nullable();
-            $table->timestamps();
+            $table->timestampsTz();
 
             $table->index('discord_guild_id');
         });
