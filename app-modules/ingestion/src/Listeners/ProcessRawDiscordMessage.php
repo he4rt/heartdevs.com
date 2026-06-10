@@ -7,6 +7,8 @@ namespace He4rt\Ingestion\Listeners;
 use He4rt\Ingestion\Actions\TransformDiscordMessage;
 use He4rt\Ingestion\Models\RawPayload;
 use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Support\Facades\Log;
+use Throwable;
 
 class ProcessRawDiscordMessage implements ShouldQueue
 {
@@ -20,14 +22,19 @@ class ProcessRawDiscordMessage implements ShouldQueue
             return;
         }
 
-        // Save in raw_landing
         $record = RawPayload::query()->create([
             'provider' => 'discord',
             'event_type' => 'message_create',
             'payload' => $rawPayload,
         ]);
 
-        // ETL: Transform the raw payload into a Message in the Hypertable
-        new TransformDiscordMessage()->execute($record);
+        try {
+            (new TransformDiscordMessage)->execute($record);
+        } catch (Throwable $throwable) {
+            Log::error('[Ingestion] Failed to transform Discord message', [
+                'raw_payload_id' => $record->id,
+                'error' => $throwable->getMessage(),
+            ]);
+        }
     }
 }

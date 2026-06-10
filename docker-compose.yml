@@ -40,7 +40,7 @@ services:
     ports:
       - '5436:5432'
     volumes:
-      - he4rtbot-timescaledb:/var/lib/postgresql
+      - he4rtbot-timescaledb:/home/postgres/pgdata/data
     networks:
       - dev-he4rtbot
     healthcheck:

@@ -9,7 +9,6 @@ use He4rt\Ingestion\Models\RawPayload;
 use He4rt\IntegrationDiscord\ETL\DTOs\DiscordMessageDTO;
 use He4rt\IntegrationDiscord\Models\DiscordGuild;
 use Illuminate\Support\Facades\Date;
-use Illuminate\Support\Str;
 
 class TransformDiscordMessage
 {
@@ -17,7 +16,7 @@ class TransformDiscordMessage
     {
         $data = $rawPayload->payload;
 
-        if (blank($data['id']) || blank($data['author']['id'])) {
+        if (blank($data['id'] ?? null) || blank(data_get($data, 'author.id'))) {
             return null;
         }
 
@@ -29,7 +28,6 @@ class TransformDiscordMessage
         }
 
         $extraColumns = [
-            'id' => Str::uuid()->toString(),
             'tenant_id' => $tenantId,
             'external_identity_id' => $dto->authorDiscordId,
             'raw_message_type' => $data['type'] ?? null,
