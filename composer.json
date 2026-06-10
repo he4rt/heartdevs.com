@@ -23,6 +23,7 @@
         "he4rt/gamification": ">=1",
         "he4rt/he4rt-core": ">=1",
         "he4rt/identity": ">=1",
+        "he4rt/ingestion": ">=1",
         "he4rt/integration-devto": ">=1",
         "he4rt/integration-discord": ">=1",
         "he4rt/integration-github": ">=1",

@@ -101,6 +101,21 @@ return [
             'sslmode' => 'prefer',
         ],
 
+        'timescaledb' => [
+            'driver' => 'pgsql',
+            'url' => env('DB_TIMESCALEDB_URL'),
+            'host' => env('DB_TIMESCALEDB_HOST', '127.0.0.1'),
+            'port' => env('DB_TIMESCALEDB_PORT', '5436'),
+            'database' => env('DB_TIMESCALEDB_DATABASE', 'ingestion_he4rtbot'),
+            'username' => env('DB_TIMESCALEDB_USERNAME', 'postgres'),
+            'password' => env('DB_TIMESCALEDB_PASSWORD', 'postgres'),
+            'charset' => env('DB_CHARSET', 'utf8'),
+            'prefix' => '',
+            'prefix_indexes' => true,
+            'search_path' => 'public',
+            'sslmode' => 'prefer',
+        ],
+
         'sqlsrv' => [
             'driver' => 'sqlsrv',
             'url' => env('DB_URL'),

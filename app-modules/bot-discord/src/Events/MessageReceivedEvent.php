@@ -33,6 +33,14 @@ class MessageReceivedEvent extends Event
         }
 
         try {
+            /**
+             * Dispatches the raw message payload to the ingestion queue for
+             * asynchronous processing (activity tracking, telemetry, moderation).
+             */
+            event('discord.message.received', [
+                'raw_payload' => $message->getRawAttributes(),
+            ]);
+
             $tenantProvider = resolve(ResolveDiscordTenant::class)->handle((string) $message->guild_id);
 
             // Activity tracking — records message for XP/gamification regardless of moderation outcome.

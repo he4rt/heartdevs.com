@@ -1,0 +1,27 @@
+{
+    "name": "he4rt/ingestion",
+    "description": "",
+    "type": "library",
+    "version": "1.0.0",
+    "license": "proprietary",
+    "autoload": {
+        "psr-4": {
+            "He4rt\\Ingestion\\": "src/",
+            "He4rt\\Ingestion\\Database\\Factories\\": "database/factories/",
+            "He4rt\\Ingestion\\Database\\Seeders\\": "database/seeders/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "He4rt\\Ingestion\\Tests\\": "tests/"
+        }
+    },
+    "minimum-stability": "stable",
+    "extra": {
+        "laravel": {
+            "providers": [
+                "He4rt\\Ingestion\\Providers\\IngestionServiceProvider"
+            ]
+        }
+    }
+}

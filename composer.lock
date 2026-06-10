@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "36167e0f649a4d5090ff6da3d5f7b4de",
+    "content-hash": "139c8d2fe1db356d5ce34b48b8969fd3",
     "packages": [
         {
             "name": "blade-ui-kit/blade-heroicons",
@@ -3080,7 +3080,7 @@
             "dist": {
                 "type": "path",
                 "url": "app-modules/activity",
-                "reference": "6f47fbd1735df0c7a357fcbbaeb62f75d4f87359"
+                "reference": "42abc699c506e672586e8b1f589d9f366b883737"
             },
             "type": "library",
             "extra": {
@@ -3116,7 +3116,7 @@
             "dist": {
                 "type": "path",
                 "url": "app-modules/bot-discord",
-                "reference": "f0b37c36ff96f09d11efda00562148765c9e0844"
+                "reference": "6004355cb035839417a729d5e05d981f6fa29532"
             },
             "type": "library",
             "extra": {
@@ -3150,7 +3150,7 @@
             "dist": {
                 "type": "path",
                 "url": "app-modules/community",
-                "reference": "fbfe830d8ba4cabdad48a59ab2c15770d097cdac"
+                "reference": "b3d3ec923c22eaf47e286985044f2daf2d318b39"
             },
             "type": "library",
             "extra": {
@@ -3186,7 +3186,7 @@
             "dist": {
                 "type": "path",
                 "url": "app-modules/docs",
-                "reference": "65edac1e1f224a7e36a0f50104dbaa01dd55c909"
+                "reference": "e3f89b40bb03981923d0461c1b440b252820398d"
             },
             "type": "library",
             "extra": {
@@ -3220,7 +3220,7 @@
             "dist": {
                 "type": "path",
                 "url": "app-modules/economy",
-                "reference": "42527108c63f20a2f26123e0159763d0be5df87b"
+                "reference": "f0ba33cf4c0343e55d8a64d6c69beceb69d8f768"
             },
             "type": "library",
             "extra": {
@@ -3256,7 +3256,7 @@
             "dist": {
                 "type": "path",
                 "url": "app-modules/events",
-                "reference": "781fb24cba4bff8eed15b26d2964adf4f625a0a8"
+                "reference": "89dd2d40fa8d9ae6dee9e0b30ec67fa1f6f8f22c"
             },
             "type": "library",
             "extra": {
@@ -3292,7 +3292,7 @@
             "dist": {
                 "type": "path",
                 "url": "app-modules/gamification",
-                "reference": "7ad03c485e9ebc39779174a027498bbff456f6ec"
+                "reference": "57af96e1d88a6bc9c5da9103cff1a242dcda6708"
             },
             "type": "library",
             "extra": {
@@ -3328,7 +3328,7 @@
             "dist": {
                 "type": "path",
                 "url": "app-modules/he4rt",
-                "reference": "57b337ad69c6f649e1bb3b353e3037fd4459f617"
+                "reference": "291d9e96ad57589390c8fff90e14fa190f832434"
             },
             "type": "library",
             "extra": {
@@ -3357,7 +3357,7 @@
             "dist": {
                 "type": "path",
                 "url": "app-modules/identity",
-                "reference": "649c67dbdd559cc5ab1a462ffe36cf25b8f0de9b"
+                "reference": "f3c2eee93f069fc96caa67d1584b3b2db6be9315"
             },
             "type": "library",
             "extra": {
@@ -3388,12 +3388,48 @@
             }
         },
         {
+            "name": "he4rt/ingestion",
+            "version": "1.0.0",
+            "dist": {
+                "type": "path",
+                "url": "app-modules/ingestion",
+                "reference": "0f8a59bd3ab155de1453e1b7ce600efca4ba506a"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "He4rt\\Ingestion\\Providers\\IngestionServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "He4rt\\Ingestion\\": "src/",
+                    "He4rt\\Ingestion\\Database\\Factories\\": "database/factories/",
+                    "He4rt\\Ingestion\\Database\\Seeders\\": "database/seeders/"
+                }
+            },
+            "autoload-dev": {
+                "psr-4": {
+                    "He4rt\\Ingestion\\Tests\\": "tests/"
+                }
+            },
+            "license": [
+                "proprietary"
+            ],
+            "transport-options": {
+                "symlink": true,
+                "relative": true
+            }
+        },
+        {
             "name": "he4rt/integration-devto",
             "version": "1.0",
             "dist": {
                 "type": "path",
                 "url": "app-modules/integration-devto",
-                "reference": "b8c3771cfd5bd698ff7030a92090fa005403fda8"
+                "reference": "fdb4fb1cb5a5bb50423bd94310c907225001b3ec"
             },
             "type": "library",
             "extra": {
@@ -3429,7 +3465,7 @@
             "dist": {
                 "type": "path",
                 "url": "app-modules/integration-discord",
-                "reference": "fa4e0c456d4ecfcd298bc70cdc7b98cd6fbaaa67"
+                "reference": "2c4764f485cd7051c853bc8830de3ad6c8c51585"
             },
             "type": "library",
             "extra": {
@@ -3465,7 +3501,7 @@
             "dist": {
                 "type": "path",
                 "url": "app-modules/integration-github",
-                "reference": "37bb90924f560b468383db2a52b1b0017be05b22"
+                "reference": "d5811904452ce75a02d228e5de75f5b03e84f089"
             },
             "type": "library",
             "extra": {
@@ -3501,7 +3537,7 @@
             "dist": {
                 "type": "path",
                 "url": "app-modules/integration-twitch",
-                "reference": "d84675d9e5ef87842e819789e9b8a3b9780bc651"
+                "reference": "bee16880c187fd3188837368aff33567e96494d2"
             },
             "type": "library",
             "extra": {
@@ -3537,7 +3573,7 @@
             "dist": {
                 "type": "path",
                 "url": "app-modules/moderation",
-                "reference": "fd1acef105618c98bb5271f60fc94b4653f6e0a6"
+                "reference": "b635db1e9c9629b041cb3f69bb26140a67906d8a"
             },
             "type": "library",
             "extra": {
@@ -3574,7 +3610,7 @@
             "dist": {
                 "type": "path",
                 "url": "app-modules/panel-admin",
-                "reference": "24bad248d7ef6e839a58fbc1cb4d64dee2200f9f"
+                "reference": "1ba694deda9c5175df8b8846079a186339cd5818"
             },
             "type": "library",
             "extra": {
@@ -3610,7 +3646,7 @@
             "dist": {
                 "type": "path",
                 "url": "app-modules/panel-app",
-                "reference": "02eeddd07e58ed1e1524ca1c83dc5b0955205c57"
+                "reference": "67a01a3fc1531c0a6cc37bdfb527c3a3af3de29f"
             },
             "require": {
                 "filament/filament": "^5.6",
@@ -3651,7 +3687,7 @@
             "dist": {
                 "type": "path",
                 "url": "app-modules/portal",
-                "reference": "289230f39053d3339ee643d7b32cf3be89f6d94e"
+                "reference": "d040051bf854b93165122628c8c11267d4dd8c05"
             },
             "type": "library",
             "extra": {
@@ -3687,7 +3723,7 @@
             "dist": {
                 "type": "path",
                 "url": "app-modules/profile",
-                "reference": "5de02564b117b5734231584cdf338c7cefa6fc9b"
+                "reference": "b4b6bf011a401021942cb44791f6bef6d1caac34"
             },
             "type": "library",
             "extra": {
