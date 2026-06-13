@@ -20,7 +20,7 @@ function runAction(array $overrides = []): WhatsAppEventLog
 
     $data = array_merge($defaults, $overrides);
 
-    return resolve(StoreWhatsAppEventAction::class)(
+    return resolve(StoreWhatsAppEventAction::class)->execute(
         eventId: $data['eventId'],
         type: $data['type'],
         chatJid: $data['chatJid'],
