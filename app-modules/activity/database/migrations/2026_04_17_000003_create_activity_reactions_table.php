@@ -12,7 +12,7 @@ return new class extends Migration
     {
         Schema::create('activity_reactions', function (Blueprint $table): void {
             $table->uuid('id')->primary();
-            $table->foreignId('tenant_id')->constrained('tenants');
+            $table->foreignUuid('tenant_id')->constrained('tenants');
             $table->uuidMorphs('reactable');
 
             $table->string('emoji_key', 128);
@@ -22,7 +22,7 @@ return new class extends Migration
             $table->unsignedInteger('count')->default(0);
             $table->unsignedInteger('count_burst')->default(0);
             $table->unsignedInteger('count_normal')->default(0);
-            $table->timestamps();
+            $table->timestampsTz();
 
             $table->unique(
                 ['reactable_type', 'reactable_id', 'emoji_key'],

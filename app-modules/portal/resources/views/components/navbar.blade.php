@@ -23,21 +23,27 @@
             @endforeach
         </div>
 
-        <x-he4rt::button
-            href="https://discord.gg/he4rt"
-            size="xs"
-            icon="fab-discord"
-            iconPosition="leading"
-            iconOnly
-            class="w-auto! md:hidden"
-        >
-            Discord
-        </x-he4rt::button>
+        <div class="flex items-center gap-4">
+            <x-he4rt::button href="/app" size="sm" variant="outline" class="hidden md:inline-flex">
+                Área do Usuário
+            </x-he4rt::button>
 
-        <div class="hidden md:block">
-            <x-he4rt::button href="https://discord.gg/he4rt" size="sm" icon="fab-discord" iconPosition="leading">
+            <x-he4rt::button
+                href="https://discord.gg/he4rt"
+                size="xs"
+                icon="fab-discord"
+                iconPosition="leading"
+                iconOnly
+                class="w-auto! md:hidden"
+            >
                 Discord
             </x-he4rt::button>
+
+            <div class="hidden md:block">
+                <x-he4rt::button href="https://discord.gg/he4rt" size="sm" icon="fab-discord" iconPosition="leading">
+                    Discord
+                </x-he4rt::button>
+            </div>
         </div>
     </div>
 </nav>

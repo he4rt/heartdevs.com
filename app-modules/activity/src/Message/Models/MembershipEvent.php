@@ -15,7 +15,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 /**
  * @property string $id
- * @property int $tenant_id
+ * @property string $tenant_id
  * @property string $external_identity_id
  * @property string $kind
  * @property Carbon $occurred_at

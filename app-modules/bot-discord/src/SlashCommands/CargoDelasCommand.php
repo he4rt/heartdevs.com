@@ -8,9 +8,8 @@ use Discord\Parts\Guild\Role;
 use Discord\Parts\Interactions\Command\Option;
 use Discord\Parts\Interactions\Interaction;
 use Discord\Parts\User\Member;
-use Laracord\Commands\SlashCommand;
 
-class CargoDelasCommand extends SlashCommand
+class CargoDelasCommand extends AbstractSlashCommand
 {
     /**
      * The command name.

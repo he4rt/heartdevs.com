@@ -10,8 +10,6 @@ use He4rt\Gamification\Character\Models\Character;
 use He4rt\Gamification\Season\Models\Season;
 use He4rt\Identity\ExternalIdentity\Models\ExternalIdentity;
 use He4rt\Identity\Tenant\Models\Tenant;
-use He4rt\Identity\User\Models\Address;
-use He4rt\Identity\User\Models\Information;
 use He4rt\Identity\User\Models\User;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
@@ -28,9 +26,6 @@ class BaseSeeder extends Seeder
                 'password' => Hash::make('admin'),
             ]);
 
-        Information::factory()->recycle($admin)->create();
-        Address::factory()->recycle($admin)->create();
-
         $he4rt = Tenant::factory()
             ->for($admin, 'owner')
             ->afterCreating(fn (Tenant $tenant) => $tenant->members()->attach($admin))
@@ -38,14 +33,7 @@ class BaseSeeder extends Seeder
             ->create([
                 'name' => 'He4rt Developers',
                 'slug' => 'he4rt',
-            ]);
-
-        Tenant::factory()
-            ->for($admin, 'owner')
-            ->afterCreating(fn (Tenant $tenant) => $tenant->members()->attach($admin))
-            ->create([
-                'name' => '3 Pontos',
-                'slug' => '3pontos',
+                'domain' => 'he4rtdevs.test',
             ]);
 
         Character::factory()

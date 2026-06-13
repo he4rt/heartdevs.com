@@ -5,14 +5,14 @@ declare(strict_types=1);
 namespace He4rt\IntegrationDiscord\Sync\Console;
 
 use He4rt\IntegrationDiscord\Sync\Actions\SyncDiscordGuildAction;
+use Illuminate\Console\Attributes\Description;
+use Illuminate\Console\Attributes\Signature;
 use Illuminate\Console\Command;
 
+#[Description('Sync Discord guild data (channels, roles, members) from the Discord API')]
+#[Signature('discord:sync {guild_id?} {--fresh : Truncate guild data before re-importing}')]
 final class SyncDiscordGuildCommand extends Command
 {
-    protected $signature = 'discord:sync {guild_id?} {--fresh : Truncate guild data before re-importing}';
-
-    protected $description = 'Sync Discord guild data (channels, roles, members) from the Discord API';
-
     public function handle(SyncDiscordGuildAction $action): int
     {
         $guildId = $this->argument('guild_id') ?? config('he4rt.discord.guild_id');

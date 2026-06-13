@@ -12,8 +12,10 @@ Route::prefix('auth')
         Route::post('/{tenant}/logout', TenantLogoutController::class)->name('tenant.logout');
 
         Route::prefix('oauth')->group(function (): void {
-            Route::get('/{provider}', [OAuthController::class, 'getAuthenticate']);
-            Route::get('/{panel}/{provider}/redirect', [OAuthController::class, 'getRedirect'])->name('oauth.single.redirect');
-            Route::get('/{tenant}/{panel}/{provider}/redirect', [OAuthController::class, 'getRedirect'])->name('oauth.tenant.redirect');
+            Route::get('/{provider}', [OAuthController::class, 'getAuthenticate'])
+                ->name('oauth.authenticate');
+
+            Route::get('/{tenant}/{panel}/{provider}/redirect', [OAuthController::class, 'getRedirect'])
+                ->name('oauth.redirect');
         });
     });

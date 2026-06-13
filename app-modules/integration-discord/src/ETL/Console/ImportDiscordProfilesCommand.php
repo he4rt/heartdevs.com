@@ -7,6 +7,8 @@ namespace He4rt\IntegrationDiscord\ETL\Console;
 use He4rt\Identity\Tenant\Models\Tenant;
 use He4rt\IntegrationDiscord\ETL\Actions\ImportDiscordProfileAction;
 use He4rt\IntegrationDiscord\ETL\DTOs\DiscordProfileDTO;
+use Illuminate\Console\Attributes\Description;
+use Illuminate\Console\Attributes\Signature;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -20,14 +22,12 @@ use function Laravel\Prompts\error;
 use function Laravel\Prompts\info;
 use function Laravel\Prompts\table;
 
+#[Description('Importa perfis Discord de todos os chunks JSON para Users e ExternalIdentities')]
+#[Signature('discord:import-profiles
+                            {path : Caminho do diretorio com os chunks JSON}
+                            {--from=0 : Numero do chunk inicial (ex: 5 para comecar do chunk_5)}')]
 class ImportDiscordProfilesCommand extends Command
 {
-    protected $signature = 'discord:import-profiles
-                            {path : Caminho do diretorio com os chunks JSON}
-                            {--from=0 : Numero do chunk inicial (ex: 5 para comecar do chunk_5)}';
-
-    protected $description = 'Importa perfis Discord de todos os chunks JSON para Users e ExternalIdentities';
-
     public function handle(ImportDiscordProfileAction $action): int
     {
         DB::disableQueryLog();

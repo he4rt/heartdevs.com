@@ -12,13 +12,13 @@ return new class extends Migration
     {
         if (!Schema::hasColumn('messages', 'tenant_id')) {
             Schema::table('messages', function (Blueprint $table): void {
-                $table->foreignId('tenant_id')->nullable()->after('id')->constrained('tenants');
+                $table->foreignUuid('tenant_id')->nullable()->after('id')->constrained('tenants');
             });
         }
 
         if (!Schema::hasColumn('voice_messages', 'tenant_id')) {
             Schema::table('voice_messages', function (Blueprint $table): void {
-                $table->foreignId('tenant_id')->nullable()->after('id')->constrained('tenants');
+                $table->foreignUuid('tenant_id')->nullable()->after('id')->constrained('tenants');
             });
         }
 
@@ -33,7 +33,7 @@ return new class extends Migration
             $table->boolean('is_pinned')->default(false)->after('source_kind');
             $table->boolean('mentions_everyone')->default(false)->after('is_pinned');
             $table->smallInteger('mention_role_count')->default(0)->after('mentions_everyone');
-            $table->timestamp('edited_at')->nullable()->after('mention_role_count');
+            $table->timestampTz('edited_at')->nullable()->after('mention_role_count');
             $table->string('reply_to_provider_message_id')->nullable()->after('edited_at');
 
             $table->index(['tenant_id', 'sent_at'], 'messages_tenant_sent_at_idx');

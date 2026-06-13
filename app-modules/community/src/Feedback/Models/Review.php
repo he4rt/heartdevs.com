@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace He4rt\Community\Feedback\Models;
 
-use Carbon\Carbon;
+use Carbon\CarbonInterface;
 use He4rt\Community\Database\Factories\ReviewFactory;
 use He4rt\Community\Feedback\Enums\ReviewTypeEnum;
 use He4rt\Identity\User\Models\User;
@@ -16,14 +16,14 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 /**
  * @property string $id
- * @property int $tenant_id
+ * @property string $tenant_id
  * @property string $feedback_id
  * @property string $staff_id
  * @property ReviewTypeEnum $status
  * @property string|null $reason
- * @property int $received_at
- * @property Carbon|null $created_at
- * @property Carbon|null $updated_at
+ * @property CarbonInterface|null $received_at
+ * @property CarbonInterface|null $created_at
+ * @property CarbonInterface|null $updated_at
  */
 #[Table(name: 'feedback_reviews')]
 final class Review extends Model
@@ -57,7 +57,7 @@ final class Review extends Model
     {
         return [
             'status' => ReviewTypeEnum::class,
-            'received_at' => 'timestamp',
+            'received_at' => 'datetime',
         ];
     }
 }

@@ -17,7 +17,7 @@ return new class extends Migration
             $table->uuid('id')->primary();
             $table->foreignUuid('character_id')->constrained('characters');
             $table->integer('level');
-            $table->timestamps();
+            $table->timestampsTz();
         });
     }
 

@@ -26,7 +26,7 @@ use Illuminate\Support\Carbon;
 
 /**
  * @property string $id
- * @property int $tenant_id
+ * @property string $tenant_id
  * @property string $model_type
  * @property string $model_id
  * @property IdentityType $type

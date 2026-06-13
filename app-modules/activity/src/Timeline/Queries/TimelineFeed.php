@@ -10,7 +10,7 @@ use Illuminate\Database\Eloquent\Builder;
 final readonly class TimelineFeed
 {
     public function __construct(
-        private int $tenantId,
+        private string $tenantId,
     ) {}
 
     /** @return Builder<Timeline> */

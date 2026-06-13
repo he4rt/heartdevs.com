@@ -17,7 +17,7 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
 
 /**
  * @property string $id
- * @property int $tenant_id
+ * @property string $tenant_id
  * @property string $sender_id
  * @property string $target_id
  * @property string $type

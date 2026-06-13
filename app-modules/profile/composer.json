@@ -1,0 +1,28 @@
+{
+    "name": "he4rt/profile",
+    "description": "Tenant-scoped member profile module",
+    "type": "library",
+    "version": "1.0",
+    "license": "proprietary",
+    "require": {},
+    "autoload": {
+        "psr-4": {
+            "He4rt\\Profile\\": "src/",
+            "He4rt\\Profile\\Database\\Factories\\": "database/factories/",
+            "He4rt\\Profile\\Database\\Seeders\\": "database/seeders/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "He4rt\\Profile\\Tests\\": "tests/"
+        }
+    },
+    "minimum-stability": "stable",
+    "extra": {
+        "laravel": {
+            "providers": [
+                "He4rt\\Profile\\ProfileServiceProvider"
+            ]
+        }
+    }
+}

@@ -10,7 +10,7 @@ use He4rt\Identity\ExternalIdentity\Enums\IdentityProvider;
 final class NewMessageDTO
 {
     public function __construct(
-        public int $tenantId,
+        public string $tenantId,
         public IdentityProvider $provider,
         public string $providerUsername,
         public string $externalAccountId,

@@ -1,0 +1,27 @@
+{
+    "name": "he4rt/integration-github",
+    "description": "",
+    "type": "library",
+    "version": "1.0.0",
+    "license": "proprietary",
+    "autoload": {
+        "psr-4": {
+            "He4rt\\IntegrationGithub\\": "src/",
+            "He4rt\\IntegrationGithub\\Database\\Factories\\": "database/factories/",
+            "He4rt\\IntegrationGithub\\Database\\Seeders\\": "database/seeders/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "He4rt\\IntegrationGithub\\Tests\\": "tests/"
+        }
+    },
+    "minimum-stability": "stable",
+    "extra": {
+        "laravel": {
+            "providers": [
+                "He4rt\\IntegrationGithub\\IntegrationGithubServiceProvider"
+            ]
+        }
+    }
+}

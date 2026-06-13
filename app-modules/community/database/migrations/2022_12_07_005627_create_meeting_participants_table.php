@@ -17,8 +17,8 @@ return new class extends Migration
             Schema::create('meeting_participants', function (Blueprint $table): void {
                 $table->foreignUuid('meeting_id')->constrained('meetings')->cascadeOnDelete();
                 $table->foreignUuid('user_id')->constrained('users')->cascadeOnDelete();
-                $table->dateTime('attend_at');
-                $table->timestamps();
+                $table->dateTimeTz('attend_at');
+                $table->timestampsTz();
             });
         }
     }

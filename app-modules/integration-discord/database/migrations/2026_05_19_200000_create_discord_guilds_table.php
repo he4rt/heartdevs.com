@@ -15,7 +15,7 @@ return new class extends Migration
     {
         Schema::create('discord_guilds', function (Blueprint $table): void {
             $table->id();
-            $table->foreignId('tenant_id')->nullable()->constrained('tenants')->nullOnDelete();
+            $table->foreignUuid('tenant_id')->nullable()->constrained('tenants')->nullOnDelete();
             $table->string('discord_guild_id')->unique();
             $table->string('name');
             $table->string('icon')->nullable();
@@ -23,8 +23,8 @@ return new class extends Migration
             $table->integer('member_count')->nullable();
             $table->smallInteger('premium_tier')->default(0);
             $table->jsonb('features')->default('[]');
-            $table->timestamp('synced_at')->nullable();
-            $table->timestamps();
+            $table->timestampTz('synced_at')->nullable();
+            $table->timestampsTz();
         });
     }
 

@@ -8,12 +8,14 @@ use Filament\Navigation\NavigationBuilder;
 use Filament\Navigation\NavigationItem;
 use Filament\Panel;
 use He4rt\PanelAdmin\Filament\Resources\ExternalIdentities\ExternalIdentityResource;
+use He4rt\PanelAdmin\Github\GithubCluster;
 use He4rt\PanelAdmin\Marketing\MarketingCluster;
 use He4rt\PanelAdmin\Moderation\Livewire\AppealQueue;
 use He4rt\PanelAdmin\Moderation\Livewire\ModerationDashboardLivewire;
 use He4rt\PanelAdmin\Moderation\Livewire\ModerationQueue;
 use He4rt\PanelAdmin\Moderation\ModerationCluster;
 use He4rt\PanelAdmin\Pages\Dashboard;
+use He4rt\PanelAdmin\Twitch\TwitchCluster;
 use Illuminate\Support\ServiceProvider;
 use Livewire\Livewire;
 
@@ -29,7 +31,7 @@ class PanelAdminServiceProvider extends ServiceProvider
             }
 
             $panel
-                ->pages([ModerationCluster::class, MarketingCluster::class])
+                ->pages([ModerationCluster::class, MarketingCluster::class, TwitchCluster::class, GithubCluster::class])
                 ->navigation($this->buildNavigation(...))
                 ->resources([
                     ExternalIdentityResource::class,
@@ -45,6 +47,18 @@ class PanelAdminServiceProvider extends ServiceProvider
                 ->discoverPages(
                     in: __DIR__.'/Marketing/Pages',
                     for: 'He4rt\\PanelAdmin\\Marketing\\Pages',
+                )
+                ->discoverResources(
+                    in: __DIR__.'/Twitch/Resources',
+                    for: 'He4rt\\PanelAdmin\\Twitch\\Resources',
+                )
+                ->discoverPages(
+                    in: __DIR__.'/Twitch/Pages',
+                    for: 'He4rt\\PanelAdmin\\Twitch\\Pages',
+                )
+                ->discoverResources(
+                    in: __DIR__.'/Github/Resources',
+                    for: 'He4rt\\PanelAdmin\\Github\\Resources',
                 );
         });
     }
@@ -81,6 +95,7 @@ class PanelAdminServiceProvider extends ServiceProvider
         return match (true) {
             $requestPath->contains('mod/') => $this->moderationNavigation($builder),
             $requestPath->contains('marketing/') => $this->marketingNavigation($builder),
+            $requestPath->contains('twitch/') => $this->twitchNavigation($builder),
             default => $this->defaultNavigation($builder),
         };
 
@@ -92,6 +107,8 @@ class PanelAdminServiceProvider extends ServiceProvider
             ...Dashboard::getNavigationItems(),
             ...ModerationCluster::getNavigationItems(),
             ...MarketingCluster::getNavigationItems(),
+            ...TwitchCluster::getNavigationItems(),
+            ...GithubCluster::getNavigationItems(),
             ...ExternalIdentityResource::getNavigationItems(),
         ]);
     }
@@ -116,5 +133,16 @@ class PanelAdminServiceProvider extends ServiceProvider
                 ->url(Dashboard::getUrl()),
 
         ])->groups(resolve(MarketingCluster::class)->getCachedSubNavigation());
+    }
+
+    private function twitchNavigation(NavigationBuilder $builder): NavigationBuilder
+    {
+        return $builder->items([
+            NavigationItem::make(__('panel-admin::twitch.navigation.back_to_admin'))
+                ->sort(0)
+                ->icon('heroicon-o-arrow-left')
+                ->url(Dashboard::getUrl()),
+
+        ])->groups(resolve(TwitchCluster::class)->getCachedSubNavigation());
     }
 }

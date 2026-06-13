@@ -30,7 +30,7 @@ return new class extends Migration
             $table->unsignedInteger('order_column')->nullable()->index();
 
             $table->index(['model_type', 'model_id'], 'media_model_idx');
-            $table->nullableTimestamps();
+            $table->timestampsTz();
         });
     }
 };

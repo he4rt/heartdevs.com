@@ -18,7 +18,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Facades\Date;
 
 /**
- * @property int $tenant_id
+ * @property string $tenant_id
  * @property string $name
  * @property string $description
  * @property int $messages_count

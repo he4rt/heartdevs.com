@@ -22,7 +22,7 @@ return new class extends Migration
             $table->string('github_url')->nullable();
             $table->date('birthdate')->nullable();
             $table->text('about')->nullable();
-            $table->timestamps();
+            $table->timestampsTz();
         });
     }
 

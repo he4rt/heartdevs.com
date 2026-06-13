@@ -9,6 +9,8 @@ use He4rt\Identity\ExternalIdentity\Models\ExternalIdentity;
 use He4rt\Identity\Tenant\Models\Tenant;
 use He4rt\Identity\User\Models\User;
 use He4rt\IntegrationDiscord\ETL\Actions\MergeDuplicateDiscordUserAction;
+use Illuminate\Console\Attributes\Description;
+use Illuminate\Console\Attributes\Signature;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -19,18 +21,16 @@ use function Laravel\Prompts\info;
 use function Laravel\Prompts\table;
 use function Laravel\Prompts\warning;
 
-class MergeDuplicateDiscordProfilesCommand extends Command
-{
-    protected $signature = 'discord:merge-duplicate-profiles
+#[Description('Reverte users duplicados criados pelo bug do discord:import-profiles (re-aponta FKs e identities, deleta dups)')]
+#[Signature('discord:merge-duplicate-profiles
                             {--tenant=he4rt : Slug do tenant alvo (ignorado se --pairs-file for usado)}
                             {--from-date=2026-05-01 : Cutoff: users criados a partir desta data sao candidatos (ignorado se --pairs-file for usado)}
                             {--pairs-file= : Caminho de JSONL pre-gerado por discord:export-merge-pairs (fonte de verdade)}
                             {--dry-run : Nao executa, so reporta plano}
                             {--limit= : Para apos N pares processados}
-                            {--batch=1000 : Tamanho do batch para progress reporting}';
-
-    protected $description = 'Reverte users duplicados criados pelo bug do discord:import-profiles (re-aponta FKs e identities, deleta dups)';
-
+                            {--batch=1000 : Tamanho do batch para progress reporting}')]
+class MergeDuplicateDiscordProfilesCommand extends Command
+{
     public function handle(MergeDuplicateDiscordUserAction $merge): int
     {
         $pairsFile = $this->option('pairs-file');

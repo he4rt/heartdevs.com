@@ -12,13 +12,13 @@ return new class extends Migration
     {
         Schema::create('message_mentions', function (Blueprint $table): void {
             $table->uuid('id')->primary();
-            $table->foreignId('tenant_id')->constrained('tenants');
+            $table->foreignUuid('tenant_id')->constrained('tenants');
             $table->foreignUuid('message_id')->constrained('messages')->cascadeOnDelete();
             $table->foreignUuid('mentioned_identity_id')->nullable()->constrained('external_identities');
             $table->string('mentioned_provider_account_id');
             $table->string('mentioned_username')->nullable();
             $table->unsignedSmallInteger('position')->default(0);
-            $table->timestamps();
+            $table->timestampsTz();
 
             $table->unique(
                 ['message_id', 'mentioned_provider_account_id'],
@@ -36,13 +36,13 @@ return new class extends Migration
 
         Schema::create('message_threads', function (Blueprint $table): void {
             $table->uuid('id')->primary();
-            $table->foreignId('tenant_id')->constrained('tenants');
+            $table->foreignUuid('tenant_id')->constrained('tenants');
             $table->foreignUuid('message_id')->constrained('messages')->cascadeOnDelete();
             $table->string('provider_thread_id');
             $table->string('name')->nullable();
             $table->boolean('archived')->nullable();
             $table->unsignedInteger('auto_archive_duration')->nullable();
-            $table->timestamps();
+            $table->timestampsTz();
 
             $table->unique(
                 ['tenant_id', 'provider_thread_id'],

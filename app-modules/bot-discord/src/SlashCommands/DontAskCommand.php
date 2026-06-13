@@ -7,9 +7,8 @@ namespace He4rt\BotDiscord\SlashCommands;
 use Discord\Parts\Interactions\Command\Option;
 use Discord\Parts\Interactions\Interaction;
 use Illuminate\Support\Facades\Date;
-use Laracord\Commands\SlashCommand;
 
-class DontAskCommand extends SlashCommand
+class DontAskCommand extends AbstractSlashCommand
 {
     /**
      * The command name.

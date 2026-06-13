@@ -9,7 +9,7 @@ use He4rt\Identity\ExternalIdentity\Enums\IdentityProvider;
 class ResolveUserProviderDTO
 {
     public function __construct(
-        public int $tenantId,
+        public string $tenantId,
         public IdentityProvider $provider,
         public string $externalAccountId,
         public string $modelType,

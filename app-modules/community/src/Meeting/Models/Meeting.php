@@ -18,7 +18,7 @@ use Illuminate\Database\Eloquent\Relations\Pivot;
 
 /**
  * @property string $id
- * @property int $tenant_id
+ * @property string $tenant_id
  * @property string $admin_id
  * @property string|null $content
  * @property int $meeting_type_id

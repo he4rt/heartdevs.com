@@ -1,0 +1,1197 @@
+/*
+ | Design system do deck da retrospectiva — escopado sob `.retro` para não vazar
+ | para o resto do portal. Estética: roxo cósmico He4rt, Fraunces/Hanken/JetBrains.
+ */
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,500;1,9..144,600&family=Hanken+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap');
+
+.retro {
+    --bg: #0b0a10;
+    --surface: #15131c;
+    --surface-2: #1c1926;
+    --border: #2c2838;
+    --text: #f4f2f8;
+    --muted: #9c95ab;
+    --faint: #6b6379;
+    --brand: #782bf1;
+    --brand-soft: #b69bff;
+    --brand-2: #c44bff;
+    --t-pr: #ff5d8f;
+    --t-issue: #f6b73c;
+    --t-commit: #b39bff;
+    --t-review: #2dd4bf;
+    --t-comment: #62a6ff;
+    --t-review-comment: #7c83ff;
+    --st-merged: #a06bff;
+    --st-open: #34d399;
+    --st-closed: #f87171;
+    --add: #4ade80;
+    --del: #f87171;
+
+    position: fixed;
+    inset: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Hanken Grotesk', sans-serif;
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+    overflow: hidden;
+}
+
+.retro *,
+.retro *::before,
+.retro *::after {
+    box-sizing: border-box;
+}
+
+.retro .mono {
+    font-family: 'JetBrains Mono', monospace;
+}
+.retro .display {
+    font-family: 'Fraunces', serif;
+    font-optical-sizing: auto;
+}
+
+/* atmosfera */
+.retro .atmo {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+}
+.retro .atmo::before {
+    content: '';
+    position: absolute;
+    top: -22%;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 120vw;
+    height: 80vh;
+    background: radial-gradient(
+        ellipse at center,
+        rgba(120, 43, 241, 0.2),
+        rgba(196, 75, 255, 0.05) 42%,
+        transparent 72%
+    );
+    filter: blur(10px);
+}
+.retro .grain {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    pointer-events: none;
+    opacity: 0.05;
+    mix-blend-mode: overlay;
+}
+
+/* logo He4rt ao fundo, com um LED percorrendo as linhas (efeito circuito) */
+.retro .logo-bg {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    pointer-events: none;
+    overflow: hidden;
+}
+.retro .logo-bg svg {
+    width: min(78vh, 64vw);
+    height: auto;
+    transform: translateY(-2%);
+}
+/* traço de base — circuito apagado */
+.retro .logo-bg .trace {
+    fill: none;
+    stroke: rgba(120, 43, 241, 0.13);
+    stroke-width: 1.6;
+}
+/* LED que percorre o caminho (pathLength normalizado para 100) */
+.retro .logo-bg .led {
+    fill: none;
+    stroke: var(--brand-soft);
+    stroke-width: 3.2;
+    stroke-linecap: round;
+    stroke-dasharray: 8 92;
+    stroke-dashoffset: 100;
+    filter: drop-shadow(0 0 5px var(--brand-2)) drop-shadow(0 0 13px rgba(120, 43, 241, 0.9));
+    animation: retro-led 5.4s linear infinite;
+}
+.retro .logo-bg .led.b {
+    stroke: var(--brand-2);
+    animation-duration: 7.2s;
+    animation-delay: -3s;
+}
+@keyframes retro-led {
+    to {
+        stroke-dashoffset: 0;
+    }
+}
+
+/* progress bar */
+.retro .progress {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: var(--border);
+    z-index: 6;
+}
+.retro .bar {
+    height: 100%;
+    width: 0;
+    background: linear-gradient(90deg, var(--brand), var(--brand-2));
+    transition: width 0.5s ease;
+    box-shadow: 0 0 10px rgba(120, 43, 241, 0.6);
+}
+
+/* deck + slides */
+.retro .deck {
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    overflow: hidden;
+}
+.retro .slide {
+    position: absolute;
+    inset: 0;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateX(38px) scale(0.99);
+    transition:
+        opacity 0.55s ease,
+        transform 0.6s cubic-bezier(0.2, 0.7, 0.2, 1),
+        visibility 0.55s;
+}
+.retro .slide.active {
+    opacity: 1;
+    visibility: visible;
+    transform: none;
+}
+.retro .slide.past {
+    transform: translateX(-38px) scale(0.99);
+}
+.retro .slide-inner {
+    margin: auto;
+    width: 100%;
+    max-width: 1120px;
+    padding: 84px 34px 116px;
+}
+.retro .slide [data-anim] {
+    opacity: 0;
+}
+.retro .slide.active [data-anim] {
+    animation: retro-rise 0.62s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+}
+@keyframes retro-rise {
+    from {
+        opacity: 0;
+        transform: translateY(26px);
+    }
+    to {
+        opacity: 1;
+        transform: none;
+    }
+}
+
+/* tipografia de slide */
+.retro .kicker {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.74rem;
+    letter-spacing: 0.26em;
+    text-transform: uppercase;
+    color: var(--brand-soft);
+}
+.retro .hero {
+    font-family: 'Fraunces', serif;
+    font-weight: 600;
+    line-height: 0.96;
+    font-size: clamp(2.6rem, 7.5vw, 5.4rem);
+    letter-spacing: -0.02em;
+    margin: 0.2em 0 0;
+}
+.retro .hero em {
+    font-style: italic;
+    font-weight: 500;
+    background: linear-gradient(105deg, var(--brand-soft), var(--brand-2));
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    padding-right: 0.05em;
+}
+.retro .lead {
+    font-size: clamp(1.02rem, 1.6vw, 1.26rem);
+    color: var(--muted);
+    max-width: 60ch;
+}
+.retro .lead b {
+    color: var(--text);
+    font-weight: 600;
+}
+.retro .num {
+    color: var(--brand-soft);
+    font-weight: 600;
+    font-family: 'JetBrains Mono', monospace;
+}
+.retro .ecg {
+    width: 100%;
+    max-width: 560px;
+    height: 60px;
+    display: block;
+    margin: 14px auto 6px;
+}
+.retro .ecg path {
+    fill: none;
+    stroke: var(--brand);
+    stroke-width: 2.4;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    filter: drop-shadow(0 0 7px rgba(120, 43, 241, 0.85));
+    stroke-dasharray: 1500;
+    stroke-dashoffset: 1500;
+}
+.retro .slide.active .ecg path {
+    animation: retro-draw 1.8s 0.5s ease-out forwards;
+}
+@keyframes retro-draw {
+    to {
+        stroke-dashoffset: 0;
+    }
+}
+.retro .cover-heart {
+    display: block;
+    width: 86px;
+    height: 86px;
+    margin: 0 auto;
+    object-fit: contain;
+    filter: drop-shadow(0 0 22px rgba(120, 43, 241, 0.7));
+    transform-origin: center 62%;
+}
+.retro .slide.active .cover-heart {
+    animation: retro-beat 2s 0.7s ease-in-out infinite;
+}
+@keyframes retro-beat {
+    0%,
+    36%,
+    100% {
+        transform: scale(1);
+    }
+    12% {
+        transform: scale(1.13);
+    }
+    24% {
+        transform: scale(1.04);
+    }
+    30% {
+        transform: scale(1.08);
+    }
+}
+.retro .hint {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.78rem;
+    color: var(--faint);
+    margin-top: 28px;
+}
+.retro .hint kbd {
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: 5px;
+    padding: 1px 7px;
+    color: var(--brand-soft);
+}
+
+/* CTA (estado vazio: convite pra reunião) */
+.retro .cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 30px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.92rem;
+    font-weight: 700;
+    text-decoration: none;
+    color: #fff;
+    background: linear-gradient(105deg, var(--brand), var(--brand-2));
+    border-radius: 999px;
+    padding: 13px 24px;
+    box-shadow: 0 16px 40px -16px rgba(120, 43, 241, 0.85);
+    transition:
+        transform 0.2s ease,
+        box-shadow 0.2s ease;
+}
+.retro .cta:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 22px 50px -14px rgba(196, 75, 255, 0.9);
+}
+.retro .cta svg {
+    width: 19px;
+    height: 19px;
+    flex: none;
+}
+
+.retro .sec-tag {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.72rem;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--brand-soft);
+    display: inline-flex;
+    align-items: center;
+    gap: 9px;
+}
+.retro .sec-tag::before {
+    content: '';
+    width: 26px;
+    height: 1px;
+    background: var(--brand);
+    display: inline-block;
+}
+.retro .sec {
+    font-family: 'Fraunces', serif;
+    font-weight: 600;
+    font-size: clamp(1.9rem, 4vw, 2.8rem);
+    letter-spacing: -0.01em;
+    margin: 0.3em 0 0.2em;
+    line-height: 1.04;
+}
+.retro .sec-sub {
+    color: var(--muted);
+    max-width: 68ch;
+    font-size: 1.04rem;
+}
+
+/* stats */
+.retro .stats {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 1px;
+    background: var(--border);
+    border: 1px solid var(--border);
+    border-radius: 18px;
+    overflow: hidden;
+}
+.retro .stat {
+    background: var(--surface);
+    padding: 22px 12px;
+    text-align: center;
+}
+.retro .stat .v {
+    font-family: 'Fraunces', serif;
+    font-weight: 600;
+    font-size: clamp(1.8rem, 3.4vw, 2.7rem);
+    line-height: 1;
+    color: var(--text);
+}
+.retro .stat .v.accent {
+    color: var(--brand-soft);
+}
+.retro .stat .l {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.64rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-top: 9px;
+}
+
+/* card */
+.retro .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 18px;
+    padding: 20px;
+    transition:
+        transform 0.35s cubic-bezier(0.2, 0.7, 0.2, 1),
+        border-color 0.35s,
+        box-shadow 0.35s;
+}
+.retro .card:hover {
+    transform: translateY(-3px);
+    border-color: rgba(120, 43, 241, 0.45);
+    box-shadow: 0 16px 38px -22px rgba(120, 43, 241, 0.55);
+}
+
+/* carrossel de pessoas — trilho horizontal com scroll-snap.
+   Resolve a variância de altura dos cards: em vez de um grid 2-col que deixa
+   gaps quando uma pessoa tem mais contribuições que a outra, os cards ficam num
+   trilho que rola na horizontal (1+ por vez), cada um com sua altura natural. */
+.retro .pcarousel {
+    position: relative;
+    /* sai da caixa de 1120px do slide-inner pra usar a largura da tela;
+       o cabeçalho continua estreito, só o trilho de cards "vaza" pras bordas */
+    width: min(96vw, 1480px);
+    margin-left: 50%;
+    transform: translateX(-50%);
+}
+.retro .pcar-track {
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+    overflow-x: auto;
+    scroll-snap-type: x proximity;
+    scroll-padding-inline: 4px;
+    overscroll-behavior-x: contain;
+    /* o html tem scroll-behavior:smooth global, que deixa o arrasto borrachudo
+       (cada scrollLeft viraria animação); o arrasto precisa ser 1:1 */
+    scroll-behavior: auto;
+    /* arrastar não deve selecionar o texto dos cards */
+    user-select: none;
+    /* respiro pro translateY(-3px) e pra sombra do hover não serem cortados */
+    padding: 6px 4px 18px;
+    scrollbar-width: none;
+    cursor: grab;
+}
+.retro .pcar-track::-webkit-scrollbar {
+    display: none;
+}
+/* enquanto arrasta: vira "mão fechada", desliga o snap (que brigaria com o
+   arrasto manual) e evita seleção de texto / drag nativo de imagem */
+.retro .pcar-track.dragging {
+    cursor: grabbing;
+    scroll-snap-type: none;
+}
+.retro .pcar-track a,
+.retro .pcar-track img {
+    -webkit-user-drag: none;
+}
+.retro .pcar-track.scrollable {
+    -webkit-mask: linear-gradient(90deg, transparent 0, #000 30px, #000 calc(100% - 30px), transparent 100%);
+    mask: linear-gradient(90deg, transparent 0, #000 30px, #000 calc(100% - 30px), transparent 100%);
+}
+.retro .pslide {
+    flex: 0 0 clamp(300px, 30%, 460px);
+    scroll-snap-align: start;
+}
+.retro .pcar-arrow {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 3;
+    display: grid;
+    place-items: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 999px;
+    border: 1px solid var(--border);
+    background: color-mix(in srgb, var(--surface) 88%, transparent);
+    backdrop-filter: blur(6px);
+    color: var(--text);
+    cursor: pointer;
+    transition:
+        opacity 0.25s,
+        border-color 0.25s,
+        background 0.25s,
+        transform 0.25s;
+}
+.retro .pcar-arrow svg {
+    width: 18px;
+    height: 18px;
+}
+.retro .pcar-arrow:hover {
+    border-color: var(--brand);
+    background: var(--surface);
+    color: var(--brand-soft);
+}
+.retro .pcar-arrow.prev {
+    left: -8px;
+}
+.retro .pcar-arrow.next {
+    right: -8px;
+}
+.retro .pcar-arrow.hide {
+    opacity: 0;
+    pointer-events: none;
+    transform: translateY(-50%) scale(0.85);
+}
+
+/* grid da comunidade (cauda) — cards compactos e uniformes empilhados em 3–4
+   colunas. Como todo card aqui tem a mesma estrutura (header + barra + ícones),
+   eles ficam uniformes e dispensam o carrossel horizontal. */
+.retro .pgrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 14px;
+    /* start (não stretch): o card abraça o conteúdo em vez de esticar até a
+       altura do mais alto da linha — sem "vazião" embaixo dos cards leves */
+    align-items: start;
+}
+.retro .pgrid .card {
+    padding: 16px 17px 17px;
+}
+
+/* badges */
+.retro .bdg {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.82rem;
+    font-weight: 700;
+    border-radius: 8px;
+    padding: 4px 10px;
+    white-space: nowrap;
+}
+.retro .bdg.add {
+    color: #7ef0a3;
+    background: rgba(74, 222, 128, 0.12);
+    border: 1px solid rgba(74, 222, 128, 0.34);
+}
+.retro .bdg.del {
+    color: #ff9a9a;
+    background: rgba(248, 113, 113, 0.12);
+    border: 1px solid rgba(248, 113, 113, 0.34);
+}
+.retro .bdg.neu {
+    color: var(--brand-soft);
+    background: rgba(120, 43, 241, 0.12);
+    border: 1px solid rgba(120, 43, 241, 0.32);
+}
+
+.retro .szbar {
+    height: 7px;
+    border-radius: 999px;
+    overflow: hidden;
+    display: inline-flex;
+    background: var(--surface-2);
+    width: 120px;
+    flex: none;
+    border: 1px solid var(--border);
+    vertical-align: middle;
+}
+.retro .szbar span {
+    height: 100%;
+    display: block;
+}
+.retro .szbar .a {
+    background: var(--add);
+}
+.retro .szbar .d {
+    background: var(--del);
+}
+
+/* barra de composição (DNA da pessoa) */
+.retro .compbar {
+    display: flex;
+    height: 8px;
+    margin-top: 14px;
+    border-radius: 999px;
+    overflow: hidden;
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+}
+.retro .compbar .seg {
+    height: 100%;
+    min-width: 3px;
+    transition: width 0.4s cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+
+/* pr row */
+.retro .tpr {
+    display: flex;
+    gap: 13px;
+    align-items: flex-start;
+    padding: 13px 15px;
+    border-radius: 13px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    text-decoration: none;
+    transition: 0.2s;
+}
+.retro .tpr:hover {
+    border-color: var(--brand);
+    background: rgba(120, 43, 241, 0.06);
+    transform: translateX(3px);
+}
+.retro .tpr .rn {
+    color: var(--brand-soft);
+    font-weight: 700;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.9rem;
+    flex: none;
+    padding-top: 1px;
+}
+.retro .tpr .d {
+    color: var(--text);
+    font-size: 0.98rem;
+    line-height: 1.4;
+}
+.retro .tpr .by {
+    color: var(--faint);
+    font-size: 0.8rem;
+    font-family: 'JetBrains Mono', monospace;
+}
+.retro .stdot {
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    flex: none;
+    margin-top: 6px;
+    display: inline-block;
+}
+
+/* repo */
+.retro .repo-ic {
+    width: 54px;
+    height: 54px;
+    flex: none;
+    border-radius: 15px;
+    display: grid;
+    place-items: center;
+    background: rgba(120, 43, 241, 0.13);
+    border: 1px solid rgba(120, 43, 241, 0.32);
+}
+.retro .repo-ic svg {
+    width: 27px;
+    height: 27px;
+}
+.retro .repo-name {
+    font-family: 'Fraunces', serif;
+    font-weight: 600;
+    font-size: clamp(1.6rem, 3.2vw, 2.3rem);
+    line-height: 1.05;
+}
+
+/* avatares */
+.retro .mini {
+    border-radius: 50%;
+    border: 2px solid var(--surface);
+    object-fit: cover;
+    background: var(--surface-2);
+    display: block;
+}
+.retro .avstack {
+    display: flex;
+}
+.retro .avstack .mini {
+    margin-left: -12px;
+}
+.retro .avstack .mini:first-child {
+    margin-left: 0;
+}
+
+/* pessoa */
+.retro .phead {
+    display: flex;
+    align-items: center;
+    gap: 13px;
+}
+.retro .pavatar {
+    flex: none;
+    text-decoration: none;
+}
+.retro .name {
+    font-family: 'Fraunces', serif;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    line-height: 1.12;
+    color: var(--text);
+    text-decoration: none;
+}
+.retro .name:hover {
+    color: var(--brand-soft);
+}
+.retro .handle {
+    font-family: 'JetBrains Mono', monospace;
+    color: var(--faint);
+    font-size: 0.84rem;
+    text-decoration: none;
+}
+.retro .total-pill {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.84rem;
+    font-weight: 700;
+    color: var(--brand-soft);
+    background: rgba(120, 43, 241, 0.13);
+    border: 1px solid rgba(120, 43, 241, 0.35);
+    border-radius: 999px;
+    padding: 3px 10px;
+    white-space: nowrap;
+}
+.retro .acts {
+    margin-top: 14px;
+}
+.retro .act {
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+    padding: 8px 0;
+    border-top: 1px solid var(--border);
+}
+.retro .act-h {
+    flex: none;
+    width: 118px;
+    display: inline-flex;
+    align-items: flex-start;
+    gap: 7px;
+    padding-top: 3px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.72rem;
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+    color: color-mix(in srgb, var(--c) 80%, white);
+}
+.retro .act-h::before {
+    content: '';
+    flex: none;
+    width: 14px;
+    height: 14px;
+    margin-top: 1px;
+    background-color: var(--c);
+    -webkit-mask: var(--icon) center / contain no-repeat;
+    mask: var(--icon) center / contain no-repeat;
+}
+.retro .act-pr {
+    --icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M1.5 3.25a2.25 2.25 0 1 1 3 2.122v5.256a2.251 2.251 0 1 1-1.5 0V5.372A2.25 2.25 0 0 1 1.5 3.25Zm5.677-.177L9.573.677A.25.25 0 0 1 10 .854V2.5h1A2.5 2.5 0 0 1 13.5 5v5.628a2.251 2.251 0 1 1-1.5 0V5a1 1 0 0 0-1-1h-1v1.646a.25.25 0 0 1-.427.177L7.177 3.427a.25.25 0 0 1 0-.354ZM3.75 2.5a.75.75 0 1 0 0 1.5.75.75 0 0 0 0-1.5Zm0 9.5a.75.75 0 1 0 0 1.5.75.75 0 0 0 0-1.5Zm8.25.75a.75.75 0 1 0 1.5 0 .75.75 0 0 0-1.5 0Z'/%3E%3C/svg%3E");
+}
+.retro .act-review {
+    --icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M8 2c1.981 0 3.671.992 4.933 2.078 1.27 1.091 2.187 2.345 2.637 3.023a1.62 1.62 0 0 1 0 1.798c-.45.678-1.367 1.932-2.637 3.023C11.671 13.008 9.981 14 8 14c-1.981 0-3.671-.992-4.933-2.078C1.797 10.831.88 9.577.43 8.899a1.62 1.62 0 0 1 0-1.798c.45-.677 1.367-1.931 2.637-3.023C4.329 2.992 6.019 2 8 2ZM1.679 7.932a.12.12 0 0 0 0 .136c.411.622 1.241 1.75 2.366 2.717C5.176 11.758 6.527 12.5 8 12.5c1.473 0 2.825-.742 3.955-1.715 1.124-.967 1.954-2.096 2.366-2.717a.12.12 0 0 0 0-.136c-.412-.621-1.242-1.75-2.366-2.717C10.824 4.242 9.473 3.5 8 3.5c-1.473 0-2.825.742-3.955 1.715-1.124.967-1.954 2.096-2.366 2.717ZM8 10a2 2 0 1 1-.001-3.999A2 2 0 0 1 8 10Z'/%3E%3C/svg%3E");
+}
+.retro .act-issue {
+    --icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M8 9.5a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3Z'/%3E%3Cpath d='M8 0a8 8 0 1 1 0 16A8 8 0 0 1 8 0ZM1.5 8a6.5 6.5 0 1 0 13 0 6.5 6.5 0 0 0-13 0Z'/%3E%3C/svg%3E");
+}
+.retro .act-comment {
+    --icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M1 2.75C1 1.784 1.784 1 2.75 1h10.5c.966 0 1.75.784 1.75 1.75v7.5A1.75 1.75 0 0 1 13.25 12H9.06l-2.573 2.573A1.458 1.458 0 0 1 4 13.543V12H2.75A1.75 1.75 0 0 1 1 10.25Zm1.75-.25a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h2a.75.75 0 0 1 .75.75v2.19l2.72-2.72a.749.749 0 0 1 .53-.22h4.5a.25.25 0 0 0 .25-.25v-7.5a.25.25 0 0 0-.25-.25Z'/%3E%3C/svg%3E");
+}
+.retro .act-review-comment {
+    --icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M1.5 2.75a.25.25 0 0 1 .25-.25h8.5a.25.25 0 0 1 .25.25v5.5a.25.25 0 0 1-.25.25h-3.5a.75.75 0 0 0-.53.22L3.5 11.44V9.25a.75.75 0 0 0-.75-.75h-1a.25.25 0 0 1-.25-.25Zm.25-1.75A1.75 1.75 0 0 0 0 2.75v5.5C0 9.216.784 10 1.75 10H2v1.543a1.457 1.457 0 0 0 2.487 1.03L7.061 10h3.189A1.75 1.75 0 0 0 12 8.25v-5.5A1.75 1.75 0 0 0 10.25 1h-8.5ZM14.5 4.75a.25.25 0 0 0-.25-.25h-.5a.75.75 0 0 1 0-1.5h.5c.966 0 1.75.784 1.75 1.75v5.5A1.75 1.75 0 0 1 14.25 12H14v1.543a1.457 1.457 0 0 1-2.487 1.03L9.22 12.28a.75.75 0 1 1 1.06-1.06l2.22 2.22v-2.19a.75.75 0 0 1 .75-.75h1a.25.25 0 0 0 .25-.25v-5.5Z'/%3E%3C/svg%3E");
+}
+.retro .act-commit {
+    --icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M11.93 8.5a4.002 4.002 0 0 1-7.86 0H.75a.75.75 0 0 1 0-1.5h3.32a4.002 4.002 0 0 1 7.86 0h3.32a.75.75 0 0 1 0 1.5Zm-1.43-.75a2.5 2.5 0 1 0-5 0 2.5 2.5 0 0 0 5 0Z'/%3E%3C/svg%3E");
+}
+.retro .act-items {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    flex: 1;
+    min-width: 0;
+}
+.retro .ref {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    max-width: 100%;
+    text-decoration: none;
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 3px 10px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.82rem;
+    color: var(--muted);
+    transition: 0.18s;
+}
+.retro .ref:hover {
+    border-color: var(--brand);
+    color: var(--text);
+    background: rgba(120, 43, 241, 0.1);
+}
+.retro .ref .rn {
+    color: var(--brand-soft);
+    font-weight: 700;
+}
+.retro .ref .rt {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 240px;
+    font-family: 'Hanken Grotesk', sans-serif;
+}
+/* chip "mais X…" — indica os itens ocultos além dos 3 primeiros (não é link) */
+.retro .ref.more {
+    background: transparent;
+    border-style: dashed;
+    color: var(--muted);
+    font-style: italic;
+    cursor: default;
+}
+.retro .ref.more:hover {
+    border-color: var(--border);
+    background: transparent;
+    color: var(--muted);
+}
+
+/* stats compactos (cards da comunidade): ícone do tipo + somatória, sem títulos */
+.retro .cstats {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 7px;
+    margin-top: 13px;
+}
+.retro .cstat {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 4px 9px 4px 7px;
+    border-radius: 8px;
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: color-mix(in srgb, var(--c) 80%, white);
+}
+.retro .cstat::before {
+    content: '';
+    flex: none;
+    width: 13px;
+    height: 13px;
+    background-color: var(--c);
+    -webkit-mask: var(--icon) center / contain no-repeat;
+    mask: var(--icon) center / contain no-repeat;
+}
+.retro .cstat-n {
+    color: var(--text);
+}
+
+/* navbar do deck */
+.retro .navbar {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 6;
+    display: grid;
+    grid-template-columns: 1fr minmax(0, auto) 1fr;
+    align-items: center;
+    gap: 16px;
+    padding: 13px 22px;
+    backdrop-filter: blur(14px);
+    background: linear-gradient(0deg, rgba(11, 10, 16, 0.94), rgba(11, 10, 16, 0.35));
+    border-top: 1px solid var(--border);
+}
+.retro .counter {
+    justify-self: start;
+    min-width: 0;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.8rem;
+    color: var(--muted);
+    white-space: nowrap;
+}
+.retro .counter b {
+    color: var(--brand-soft);
+}
+.retro .counter .slabel {
+    color: var(--text);
+}
+.retro .dots {
+    justify-self: center;
+    display: flex;
+    gap: 9px;
+    flex-wrap: wrap;
+    justify-content: center;
+    max-width: 100%;
+}
+.retro .dot {
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    background: var(--border);
+    cursor: pointer;
+    transition: 0.25s;
+    border: none;
+    padding: 0;
+}
+.retro .dot:hover {
+    background: var(--brand-soft);
+}
+.retro .dot.on {
+    background: var(--brand);
+    transform: scale(1.3);
+    box-shadow: 0 0 10px var(--brand);
+}
+.retro .navactions {
+    justify-self: end;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+.retro .navbtn {
+    width: 42px;
+    height: 42px;
+    flex: none;
+    border-radius: 50%;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    color: var(--text);
+    cursor: pointer;
+    transition: 0.2s;
+    display: grid;
+    place-items: center;
+}
+.retro .navbtn svg {
+    width: 18px;
+    height: 18px;
+}
+.retro .navbtn:hover {
+    border-color: var(--brand);
+    background: rgba(120, 43, 241, 0.14);
+    color: var(--brand-soft);
+}
+.retro .navbtn:disabled {
+    opacity: 0.28;
+    cursor: default;
+}
+
+/* filter trigger */
+.retro .filter-fab {
+    position: absolute;
+    top: 14px;
+    right: 18px;
+    z-index: 7;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.76rem;
+    color: var(--text);
+    cursor: pointer;
+    background: rgba(21, 19, 28, 0.82);
+    backdrop-filter: blur(16px);
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    padding: 9px 15px;
+    transition: 0.2s;
+}
+.retro .filter-fab:hover {
+    border-color: var(--brand);
+    color: var(--brand-soft);
+}
+.retro .filter-fab svg {
+    width: 15px;
+    height: 15px;
+}
+
+/* painel de filtros (slide-over) */
+.retro .scrim {
+    position: absolute;
+    inset: 0;
+    z-index: 9;
+    background: rgba(5, 4, 9, 0.6);
+    opacity: 0;
+    visibility: hidden;
+    transition: 0.3s;
+}
+.retro .scrim.open {
+    opacity: 1;
+    visibility: visible;
+}
+.retro .panel {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    width: 360px;
+    max-width: 88vw;
+    z-index: 10;
+    background: linear-gradient(180deg, #161320, #100e17);
+    border-left: 1px solid var(--border);
+    transform: translateX(100%);
+    transition: transform 0.38s cubic-bezier(0.2, 0.7, 0.2, 1);
+    display: flex;
+    flex-direction: column;
+    box-shadow: -30px 0 70px -30px rgba(0, 0, 0, 0.8);
+}
+.retro .panel.open {
+    transform: none;
+}
+.retro .panel-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px 22px 14px;
+}
+.retro .panel-head h3 {
+    font-family: 'Fraunces', serif;
+    font-weight: 600;
+    font-size: 1.05rem;
+    margin: 0;
+}
+.retro .panel-head .x {
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    color: var(--muted);
+    cursor: pointer;
+    display: grid;
+    place-items: center;
+    font-size: 1.1rem;
+}
+.retro .panel-head .x:hover {
+    border-color: var(--brand);
+    color: var(--text);
+}
+.retro .panel-body {
+    overflow-y: auto;
+    padding: 6px 22px 26px;
+    flex: 1;
+}
+.retro .fgroup {
+    padding: 14px 0;
+    border-top: 1px solid var(--border);
+}
+.retro .fgroup:first-child {
+    border-top: none;
+}
+.retro .flabel {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.62rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--faint);
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 7px;
+}
+.retro .flabel svg {
+    width: 13px;
+    height: 13px;
+    flex: none;
+    stroke: var(--brand-soft);
+    fill: none;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+.retro .chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+.retro .chip {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.68rem;
+    color: var(--muted);
+    cursor: pointer;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    padding: 5px 11px;
+    transition: 0.18s;
+    user-select: none;
+    display: inline-flex;
+    align-items: center;
+}
+.retro .chip:hover {
+    border-color: var(--brand-soft);
+    color: var(--text);
+}
+.retro .chip .d {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    display: inline-block;
+    margin-right: 6px;
+    background: var(--ck, var(--brand-soft));
+}
+.retro .chip.on {
+    color: #fff;
+    background: color-mix(in srgb, var(--ck, var(--brand)) 22%, transparent);
+    border-color: color-mix(in srgb, var(--ck, var(--brand)) 55%, transparent);
+}
+.retro .frow {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 7px 0;
+}
+.retro .frow .t {
+    font-size: 0.82rem;
+    color: var(--text);
+}
+.retro .frow .s {
+    font-size: 0.68rem;
+    color: var(--faint);
+    margin-top: 2px;
+    line-height: 1.4;
+}
+.retro .dates {
+    display: flex;
+    gap: 8px;
+}
+.retro .dates input {
+    flex: 1;
+    min-width: 0;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.78rem;
+    color: var(--text);
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 8px 10px;
+    color-scheme: dark;
+}
+.retro .fsel {
+    width: 100%;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.78rem;
+    color: var(--text);
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 9px 10px;
+    color-scheme: dark;
+}
+.retro .toggle {
+    width: 40px;
+    height: 23px;
+    border-radius: 999px;
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    position: relative;
+    cursor: pointer;
+    flex: none;
+    transition: 0.2s;
+}
+.retro .toggle::after {
+    content: '';
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    width: 17px;
+    height: 17px;
+    border-radius: 50%;
+    background: var(--faint);
+    transition: 0.22s;
+}
+.retro .toggle.on {
+    background: rgba(120, 43, 241, 0.4);
+    border-color: var(--brand);
+}
+.retro .toggle.on::after {
+    left: 19px;
+    background: var(--brand-soft);
+}
+
+@media (max-width: 880px) {
+    .retro .stats {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+@media (max-width: 680px) {
+    .retro .slide-inner {
+        padding: 70px 18px 116px;
+    }
+    .retro .counter .slabel {
+        display: none;
+    }
+}
+@media (max-width: 520px) {
+    .retro .stats {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+@media (prefers-reduced-motion: reduce) {
+    .retro *,
+    .retro *::before,
+    .retro *::after {
+        animation: none !important;
+        transition: none !important;
+    }
+}

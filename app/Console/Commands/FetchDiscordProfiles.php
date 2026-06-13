@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Console\Commands;
 
+use Illuminate\Console\Attributes\Description;
+use Illuminate\Console\Attributes\Signature;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Storage;
@@ -18,6 +20,12 @@ use function Laravel\Prompts\table;
 use function Laravel\Prompts\task;
 use function Laravel\Prompts\warning;
 
+#[Description('Fetch full Discord profiles for all members, tracking progress across runs')]
+#[Signature('discord:fetch-profiles
+        {--token= : Discord user token (or set DISCORD_USER_TOKEN in .env)}
+        {--members-file=discord/members.json : Path to members JSON}
+        {--limit=0 : Max profiles to fetch this run (0 = all remaining)}
+        {--retry-failed : Also retry previously failed IDs}')]
 class FetchDiscordProfiles extends Command
 {
     private const string STATUS_DIR = 'discord';
@@ -25,14 +33,6 @@ class FetchDiscordProfiles extends Command
     private const string STATUS_FILE = 'discord/profiles_status.csv';
 
     private const int CHUNK_SIZE = 1000;
-
-    protected $signature = 'discord:fetch-profiles
-        {--token= : Discord user token (or set DISCORD_USER_TOKEN in .env)}
-        {--members-file=discord/members.json : Path to members JSON}
-        {--limit=0 : Max profiles to fetch this run (0 = all remaining)}
-        {--retry-failed : Also retry previously failed IDs}';
-
-    protected $description = 'Fetch full Discord profiles for all members, tracking progress across runs';
 
     private int $successCount = 0;
 

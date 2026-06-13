@@ -8,20 +8,20 @@ use He4rt\Identity\ExternalIdentity\Actions\CreateAccountByExternalIdentity;
 use He4rt\Identity\ExternalIdentity\Enums\IdentityProvider;
 use He4rt\Identity\ExternalIdentity\Models\ExternalIdentity;
 use He4rt\Identity\Tenant\Models\Tenant;
+use Illuminate\Console\Attributes\Description;
+use Illuminate\Console\Attributes\Signature;
 use Illuminate\Console\Command;
 use Illuminate\Contracts\Database\Query\Builder;
 use Illuminate\Support\Facades\Storage;
 
-class ImportDiscordMembers extends Command
-{
-    protected $signature = 'discord:import-members
+#[Description('Import Discord members and GitHub connections from JSON files into the database')]
+#[Signature('discord:import-members
         {--members-file=discord/members.json : Path to members JSON (relative to storage/app/private)}
         {--github-file=discord/github_connections.json : Path to GitHub connections JSON}
         {--dry-run : Show what would be imported without writing}
-        {--force : Overwrite existing github_url values}';
-
-    protected $description = 'Import Discord members and GitHub connections from JSON files into the database';
-
+        {--force : Overwrite existing github_url values}')]
+class ImportDiscordMembers extends Command
+{
     public function handle(CreateAccountByExternalIdentity $createAccount): void
     {
         $membersFile = $this->option('members-file');
@@ -73,7 +73,7 @@ class ImportDiscordMembers extends Command
         $stats = ['created' => 0, 'existing' => 0, 'github_set' => 0, 'github_skipped' => 0, 'tenant_attached' => 0];
         $csvRows = [];
         $isDryRun = $this->option('dry-run');
-        $force = $this->option('force');
+        $this->option('force');
 
         $bar = $this->output->createProgressBar(count($members));
         $bar->start();
@@ -121,31 +121,15 @@ class ImportDiscordMembers extends Command
                 $stats['tenant_attached']++;
             }
 
-            // Set GitHub URL if available
-            $githubUsername = $githubMap[$discordId] ?? null;
-
-            if ($githubUsername && $user) {
-                $info = $user->information;
-                $currentGithub = $info?->github_url;
-
-                if (!$currentGithub || $force) {
-                    $githubUrl = 'https://github.com/'.$githubUsername;
-                    $stats['github_set']++;
-
-                    if (!$isDryRun && $info) {
-                        $info->update(['github_url' => $githubUrl]);
-                    }
-                } else {
-                    $stats['github_skipped']++;
-                }
-            }
+            // GitHub URL import removed — legacy information() model no longer exists.
+            // GitHub is now derived from ExternalIdentity (OAuth) connections.
 
             $csvRows[] = [
                 'discord_id' => $discordId,
                 'username' => $member['username'],
                 'global_name' => $member['global_name'] ?? '',
                 'status' => $existing ? 'existing' : 'created',
-                'github_username' => $githubUsername ?? '',
+                'github_username' => $githubMap[$discordId] ?? '',
                 'joined_at' => $member['joined_at'],
             ];
 

@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('message_attachments', function (Blueprint $table): void {
             $table->uuid('id')->primary();
-            $table->foreignId('tenant_id')->constrained('tenants');
+            $table->foreignUuid('tenant_id')->constrained('tenants');
             $table->foreignUuid('message_id')->constrained('messages')->cascadeOnDelete();
             $table->string('provider_attachment_id')->nullable();
             $table->text('url');
@@ -22,14 +22,14 @@ return new class extends Migration
             $table->unsignedBigInteger('size')->nullable();
             $table->unsignedInteger('width')->nullable();
             $table->unsignedInteger('height')->nullable();
-            $table->timestamps();
+            $table->timestampsTz();
 
             $table->index('message_id', 'message_attachments_message_idx');
         });
 
         Schema::create('message_embeds', function (Blueprint $table): void {
             $table->uuid('id')->primary();
-            $table->foreignId('tenant_id')->constrained('tenants');
+            $table->foreignUuid('tenant_id')->constrained('tenants');
             $table->foreignUuid('message_id')->constrained('messages')->cascadeOnDelete();
             $table->text('url')->nullable();
             $table->text('title')->nullable();
@@ -39,7 +39,7 @@ return new class extends Migration
             $table->text('thumbnail_url')->nullable();
             $table->jsonb('raw')->nullable();
             $table->unsignedSmallInteger('position')->default(0);
-            $table->timestamps();
+            $table->timestampsTz();
 
             $table->index('message_id', 'message_embeds_message_idx');
             $table->index(['tenant_id', 'source_domain'], 'message_embeds_tenant_domain_idx');
@@ -48,13 +48,13 @@ return new class extends Migration
 
         Schema::create('membership_events', function (Blueprint $table): void {
             $table->uuid('id')->primary();
-            $table->foreignId('tenant_id')->constrained('tenants');
+            $table->foreignUuid('tenant_id')->constrained('tenants');
             $table->foreignUuid('external_identity_id')->constrained('external_identities');
             $table->string('kind');
-            $table->timestamp('occurred_at');
+            $table->timestampTz('occurred_at');
             $table->string('provider_message_id')->nullable();
             $table->jsonb('metadata')->nullable();
-            $table->timestamps();
+            $table->timestampsTz();
 
             $table->index(['tenant_id', 'kind', 'occurred_at'], 'membership_events_tenant_kind_time_idx');
             $table->index(['external_identity_id', 'kind'], 'membership_events_identity_kind_idx');

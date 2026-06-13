@@ -14,4 +14,9 @@ class UserObserver
             $user->username = str($user->name)->snake()->toString();
         }
     }
+
+    public function deleted(User $user): void
+    {
+        $user->address()->delete();
+    }
 }

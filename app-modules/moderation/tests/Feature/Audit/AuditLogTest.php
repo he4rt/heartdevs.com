@@ -94,5 +94,5 @@ test('audit log stores tenant_id from case', function (): void {
     $listener->handleCaseCreated(new CaseCreated($case));
 
     $log = ModerationAuditLog::query()->where('event_type', 'case_created')->first();
-    expect((int) $log->tenant_id)->toBe($tenant->id);
+    expect($log->tenant_id)->toBe($tenant->id);
 });

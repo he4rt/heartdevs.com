@@ -8,18 +8,20 @@ use Discord\Builders\Components\TextInput;
 use Discord\Helpers\Collection;
 use Discord\Parts\Guild\Role;
 use Discord\Parts\Interactions\Interaction;
+use He4rt\BotDiscord\Actions\ResolveDiscordTenant;
 use He4rt\Identity\ExternalIdentity\DTOs\ResolveUserProviderDTO;
-use He4rt\Identity\ExternalIdentity\Models\ExternalIdentity;
-use He4rt\Identity\Tenant\Models\Tenant;
-use He4rt\Identity\User\Actions\InformationUserAction;
 use He4rt\Identity\User\Actions\ResolveUserContext;
-use He4rt\Identity\User\DTOs\UpsertInformationDTO;
 use He4rt\Identity\User\Models\User;
+use He4rt\Profile\Actions\UpsertProfile;
+use He4rt\Profile\DTOs\UpsertProfileDTO;
+use He4rt\Profile\Models\Profile;
 use Illuminate\Support\Facades\Date;
-use Laracord\Commands\SlashCommand;
+use Illuminate\Support\Facades\Log;
 use Throwable;
 
-class IntroductionCommand extends SlashCommand
+use function React\Async\await;
+
+class IntroductionCommand extends AbstractSlashCommand
 {
     protected $name = 'apresentar';
 
@@ -75,24 +77,10 @@ class IntroductionCommand extends SlashCommand
                     ->setPlaceholder('Fulano123')
                     ->setRequired(true),
 
-                TextInput::new('Git/Github (Opcional)', TextInput::STYLE_SHORT)
-                    ->setCustomId('github_url')
-                    ->setMinLength(0)
-                    ->setMaxLength(60)
-                    ->setPlaceholder('https://github.com/YOUR_USERNAME')
-                    ->setRequired(false),
-
-                TextInput::new('LinkedIn (Opcional)', TextInput::STYLE_SHORT)
-                    ->setCustomId('linkedin_url')
-                    ->setMinLength(0)
-                    ->setMaxLength(60)
-                    ->setPlaceholder('https://linkedin.com/in/YOUR_USERNAME')
-                    ->setRequired(false),
-
                 TextInput::new('Nos conte um pouco sobre você', TextInput::STYLE_PARAGRAPH)
                     ->setCustomId('about')
                     ->setMinLength(5)
-                    ->setMaxLength(1000)
+                    ->setMaxLength(500)
                     ->setPlaceholder('Entrei de curioso e acabei gostando do servidor!')
                     ->setRequired(true),
 
@@ -107,7 +95,20 @@ class IntroductionCommand extends SlashCommand
 
                     $interaction->respondWithMessage("Apresentação enviada com sucesso.\nhttps://heartdevs.com/", true);
 
-                } catch (Throwable) {
+                } catch (Throwable $throwable) {
+                    Log::channel('bot-discord')->error('IntroductionCommand: failed to process introduction', [
+                        'discord_user_id' => $interaction->user->id,
+                        'guild_id' => $interaction->guild_id,
+                        'fields' => [
+                            'name' => $components->get('custom_id', 'name')?->value,
+                            'nickname' => $components->get('custom_id', 'nickname')?->value,
+                            'about' => $components->get('custom_id', 'about')?->value,
+                        ],
+                        'exception' => $throwable,
+                    ]);
+
+                    report($throwable);
+
                     $interaction->respondWithMessage('Ocorreu um erro ao processar sua apresentação.', true);
                 }
             })
@@ -116,13 +117,12 @@ class IntroductionCommand extends SlashCommand
 
     /**
      * @param  Collection<mixed, mixed>  $components
+     *
+     * @throws Throwable
      */
     private function persistData(Interaction $interaction, Collection $components): void
     {
-        $tenantProvider = ExternalIdentity::query()
-            ->where('model_type', (new Tenant)->getMorphClass())
-            ->where('external_account_id', (string) $interaction->guild_id)
-            ->firstOrFail();
+        $tenantProvider = resolve(ResolveDiscordTenant::class)->handle((string) $interaction->guild_id);
 
         $userDto = ResolveUserProviderDTO::make([
             'tenant_id' => $tenantProvider->tenant_id,
@@ -135,35 +135,34 @@ class IntroductionCommand extends SlashCommand
 
         $userContext = resolve(ResolveUserContext::class)->handle($userDto);
 
-        $informationDto = UpsertInformationDTO::make([
-            'user' => $userContext->user,
-            'name' => $components->get('custom_id', 'name')->value,
-            'nickname' => $components->get('custom_id', 'nickname')->value,
-            'about' => $components->get('custom_id', 'about')->value,
-            'linkedin_url' => $components->get('custom_id', 'linkedin_url')?->value,
-            'github_url' => $components->get('custom_id', 'github_url')?->value,
-            'birthdate' => null,
+        $name = $components->get('custom_id', 'name')->value;
+        $nickname = $components->get('custom_id', 'nickname')->value;
+        $about = $components->get('custom_id', 'about')->value;
+
+        $userContext->user->update(['name' => $name]);
+
+        $profile = Profile::ensureExists($userContext->user->id, $tenantProvider->tenant_id);
+
+        $dto = UpsertProfileDTO::fromArray([
+            'nickname' => $nickname,
+            'about' => $about,
         ]);
 
-        $userInformation = resolve(InformationUserAction::class)->handle($informationDto);
+        resolve(UpsertProfile::class)->handle($profile, $dto);
 
         $this
             ->message('Nova apresentação')
-            ->title('Apresentação de '.$userInformation->nickname)
+            ->title('Apresentação de '.$nickname)
             ->thumbnailUrl($interaction->user->avatar)
             ->content(sprintf(
                 '<@%s> acabou de se apresentar na comunidade.',
                 $interaction->user->id
             ))
             ->fields([
-                'Nome' => $userInformation->name,
-                'Nickname' => $userInformation->nickname,
+                'Nome' => $name,
+                'Nickname' => $nickname,
             ])
-            ->fields(['Sobre' => $userInformation->about], inline: false)
-            ->fields([
-                'GitHub' => $userInformation->github_url ?? '-',
-                'LinkedIn' => $userInformation->linkedin_url ?? '-',
-            ])
+            ->fields(['Sobre' => $about], inline: false)
             ->footerIcon($interaction->guild->icon)
             ->footerText(Date::now()->format('Y').' © He4rt Developers')
             ->timestamp(now())
@@ -178,6 +177,6 @@ class IntroductionCommand extends SlashCommand
 
         $roles[] = $this->roleId;
 
-        $interaction->member->setRoles($roles);
+        await($interaction->member->setRoles($roles));
     }
 }

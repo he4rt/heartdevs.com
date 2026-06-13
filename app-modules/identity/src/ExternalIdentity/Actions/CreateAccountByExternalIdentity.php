@@ -13,7 +13,7 @@ use Ramsey\Uuid\Uuid;
 
 class CreateAccountByExternalIdentity
 {
-    public function handle(int $tenantId, IdentityProvider $provider, string $providerId, string $username): ExternalIdentity
+    public function handle(string $tenantId, IdentityProvider $provider, string $providerId, string $username): ExternalIdentity
     {
         $existing = ExternalIdentity::query()
             ->where('provider', $provider->value)
@@ -31,8 +31,6 @@ class CreateAccountByExternalIdentity
             'is_donator' => false,
         ]);
 
-        $user->address()->create();
-        $user->information()->create();
         $user->character()->create([
             'tenant_id' => $tenantId,
         ]);

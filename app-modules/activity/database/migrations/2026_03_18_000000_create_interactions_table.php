@@ -13,7 +13,7 @@ return new class extends Migration
         Schema::create('interactions', function (Blueprint $table): void {
             $table->uuid('id')->primary();
             $table->foreignUuid('character_id')->constrained('characters');
-            $table->foreignId('tenant_id')->constrained('tenants');
+            $table->foreignUuid('tenant_id')->constrained('tenants');
             $table->string('type');
             $table->string('provider');
             $table->string('value_tier');
@@ -25,9 +25,9 @@ return new class extends Migration
             $table->nullableUuidMorphs('source');
             $table->string('external_ref')->nullable();
             $table->jsonb('metadata')->nullable();
-            $table->timestamp('occurred_at');
-            $table->timestamp('reviewed_at')->nullable();
-            $table->timestamps();
+            $table->timestampTz('occurred_at');
+            $table->timestampTz('reviewed_at')->nullable();
+            $table->timestampsTz();
 
             $table->index(['character_id', 'type', 'created_at'], 'idx_interactions_character_type');
             $table->index(['status', 'value_tier'], 'idx_interactions_status_tier');

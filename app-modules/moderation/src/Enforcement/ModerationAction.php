@@ -30,7 +30,7 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
  * @property array<string, mixed>|null $metadata
  * @property array<string, mixed>|null $execution_results
  * @property bool $automated
- * @property int|null $tenant_id
+ * @property string|null $tenant_id
  * @property Carbon $created_at
  */
 #[Table('moderation_actions', timestamps: false)]

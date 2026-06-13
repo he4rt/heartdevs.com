@@ -24,6 +24,7 @@ use Illuminate\Database\Eloquent\Relations\Pivot;
 use Illuminate\Support\Facades\Date;
 
 /**
+ * @property string $id
  * @property int $user_id
  * @property int $reputation
  * @property int $experience
@@ -31,7 +32,7 @@ use Illuminate\Support\Facades\Date;
  * @property int $level
  * @property float $percentage_experience
  * @property bool $can_claim_daily_bonus
- * @property int|null $tenant_id
+ * @property string|null $tenant_id
  */
 #[Appends([
     'ranking',
@@ -61,7 +62,7 @@ final class Character extends Model
 
     public static function generateTextExperience(string $message, int $level, bool $isSupporter): int
     {
-        $experience = (int) ((mb_strlen($message) * 0.01) + ($level * 0.1));
+        $experience = max(1, (int) ((mb_strlen($message) * 0.01) + ($level * 0.1)));
 
         return $isSupporter ? $experience * 2 : $experience;
     }

@@ -16,8 +16,8 @@ return new class extends Migration
         Schema::create('discord_member_roles', function (Blueprint $table): void {
             $table->foreignId('discord_member_id')->constrained('discord_members')->cascadeOnDelete();
             $table->foreignId('discord_role_id')->constrained('discord_roles')->cascadeOnDelete();
-            $table->timestamp('assigned_at')->nullable();
-            $table->timestamps();
+            $table->timestampTz('assigned_at')->nullable();
+            $table->timestampsTz();
 
             $table->primary(['discord_member_id', 'discord_role_id']);
         });
