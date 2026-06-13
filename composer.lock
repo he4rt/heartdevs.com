@@ -3492,6 +3492,42 @@
             }
         },
         {
+            "name": "he4rt/integration-whatsapp",
+            "version": "1.0",
+            "dist": {
+                "type": "path",
+                "url": "app-modules/integration-whatsapp",
+                "reference": "6165e9aaca275dc1cb7ea94bb46f4e1bc0eac4f6"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "He4rt\\IntegrationWhatsapp\\IntegrationWhatsappServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "He4rt\\IntegrationWhatsapp\\": "src/",
+                    "He4rt\\IntegrationWhatsapp\\Database\\Factories\\": "database/factories/",
+                    "He4rt\\IntegrationWhatsapp\\Database\\Seeders\\": "database/seeders/"
+                }
+            },
+            "autoload-dev": {
+                "psr-4": {
+                    "He4rt\\IntegrationWhatsapp\\Tests\\": "tests/"
+                }
+            },
+            "license": [
+                "proprietary"
+            ],
+            "transport-options": {
+                "symlink": true,
+                "relative": true
+            }
+        },
+        {
             "name": "he4rt/moderation",
             "version": "1.0",
             "dist": {
@@ -18340,5 +18376,5 @@
         "php": "^8.4"
     },
     "platform-dev": {},
-    "plugin-api-version": "2.9.0"
+    "plugin-api-version": "2.6.0"
 }

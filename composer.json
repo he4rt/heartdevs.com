@@ -26,6 +26,7 @@
         "he4rt/integration-devto": ">=1",
         "he4rt/integration-discord": ">=1",
         "he4rt/integration-twitch": ">=1",
+        "he4rt/integration-whatsapp": ">=1",
         "he4rt/moderation": "^1.0",
         "he4rt/panel-admin": ">=1",
         "he4rt/panel-app": ">=1",
