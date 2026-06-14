@@ -70,3 +70,13 @@ input:focus-visible,
     outline-offset: 2px;
     border-radius: 0.25rem;
 }
+
+/* ---- Parágrafo-lead: o primeiro parágrafo do conteúdo, maior e mais respirado ---- */
+.prose > p:first-of-type {
+    font-size: 1.0625rem;
+    line-height: 1.7;
+    color: var(--gray-600);
+}
+:root.dark .prose > p:first-of-type {
+    color: var(--gray-300);
+}

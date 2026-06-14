@@ -1,5 +1,6 @@
 @use (He4rt\Docs\Discovery\DTOs\AdrMetadata)
 @use (He4rt\Docs\Discovery\DTOs\PlanMetadata)
+@use (He4rt\Docs\Discovery\Enums\DocumentTier)
 @use (He4rt\Docs\Discovery\ModuleColor)
 @use (Illuminate\Support\Str)
 
@@ -136,17 +137,40 @@
         <article class="prose dark:prose-invert mx-auto max-w-[72ch]! p-8">
             @php ($meta = $document->metadata)
             @php ($moduleColor = $document->moduleName ? ModuleColor::for($document->moduleName) : null)
+            @php ($tier = DocumentTier::for($document))
 
             <header class="not-prose mb-8 border-b border-zinc-100 pb-6 dark:border-zinc-800">
-                <div class="mb-3 text-xs text-zinc-400 dark:text-zinc-500">
+                <nav
+                    aria-label="Trilha de navegação"
+                    class="mb-3 flex flex-wrap items-center gap-1.5 text-xs text-zinc-400 dark:text-zinc-500"
+                >
+                    <span>{{ $tier->label() }}</span>
                     @if ($document->moduleName)
-                        Engenharia / {{ Str::headline($document->moduleName) }}
-                    @else
-                        {{ $document->type->label() }}
+                        <flux:icon.chevron-right class="size-3" />
+                        <span>{{ Str::headline($document->moduleName) }}</span>
                     @endif
-                </div>
+                    <flux:icon.chevron-right class="size-3" />
+                    <span class="text-zinc-600 dark:text-zinc-300" aria-current="page">{{ $document->title }}</span>
+                </nav>
 
                 <div class="flex flex-wrap items-center gap-2">
+                    <span
+                        class="inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-xs font-semibold"
+                        style="background: color-mix(in srgb, #782bf1 12%, transparent); color: #782bf1"
+                    >
+                        <span class="size-1.5 rounded-full" style="background: #782bf1"></span>
+                        {{ $tier->label() }}
+                    </span>
+
+                    @if ($document->readingMinutes > 0)
+                        <span
+                            class="inline-flex items-center gap-1 rounded-full bg-zinc-100 px-2.5 py-0.5 text-xs font-medium text-zinc-500 dark:bg-zinc-800 dark:text-zinc-400"
+                        >
+                            <flux:icon.clock class="size-3.5" />
+                            Leitura · {{ $document->readingMinutes }} min
+                        </span>
+                    @endif
+
                     @if ($document->moduleName)
                         <span
                             class="inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-xs font-semibold"
@@ -232,7 +256,15 @@
                 </div>
             @endif
 
-            {!! $content !!}
+            {{-- O título já é exibido no header; remove o primeiro H1 do corpo para não duplicar (e manter um único h1 na página). --}}
+            {!!
+                preg_replace(
+                    '/<h1\b[^>]*>.*?<\/h1>/is',
+                    '',
+                    $content,
+                    1,
+                )
+            !!}
         </article>
 
         @if (count($toc) > 0)
