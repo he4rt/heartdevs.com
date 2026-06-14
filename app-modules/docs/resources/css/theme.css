@@ -4,6 +4,9 @@
 @plugin '@tailwindcss/typography';
 @source '../../../../app-modules/**/resources/views/**/*.blade.php';
 
+/* Dark mode é controlado pela CLASSE .dark (Flux/toggle), não pelo prefers-color-scheme do SO. */
+@custom-variant dark (&:where(.dark, .dark *));
+
 :root {
     --gray-50: oklch(0.989 0.005 286.303) !important;
     --gray-100: oklch(0.978 0.005 274.967) !important;
