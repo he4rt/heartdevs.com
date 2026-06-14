@@ -14,6 +14,7 @@ use He4rt\Identity\Database\Factories\UserFactory;
 use He4rt\Identity\ExternalIdentity\Models\ExternalIdentity;
 use He4rt\Identity\Tenant\Concerns\InteractsWithTenants;
 use He4rt\Identity\User\Observers\UserObserver;
+use Illuminate\Database\Eloquent\Attributes\Hidden;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Attributes\Table;
 use Illuminate\Database\Eloquent\Casts\Attribute;
@@ -36,11 +37,13 @@ use Spatie\MediaLibrary\InteractsWithMedia;
  * @property Carbon|null $suspended_until
  * @property Carbon|null $banned_at
  * @property Carbon|null $first_login_at
+ * @property string|null $remember_token
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
  */
 #[ObservedBy(UserObserver::class)]
 #[Table(name: 'users')]
+#[Hidden('password', 'remember_token', 'email_verified_at')]
 final class User extends Authenticatable implements FilamentUser, HasMedia, HasName, HasTenants
 {
     use HasAddress;
