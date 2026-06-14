@@ -8,17 +8,17 @@
 @custom-variant dark (&:where(.dark, .dark *));
 
 :root {
-    --gray-50: oklch(0.989 0.005 286.303) !important;
-    --gray-100: oklch(0.978 0.005 274.967) !important;
-    --gray-200: oklch(0.9673 0.0083 271.33) !important;
-    --gray-300: oklch(0.88 0.01 273.342) !important;
-    --gray-400: oklch(0.805 0.009 271.307) !important;
-    --gray-500: oklch(0.728 0.008 268.525) !important;
-    --gray-600: oklch(0.57 0.006 274.9) !important;
-    --gray-700: oklch(0.486 0.005 271.313) !important;
-    --gray-800: oklch(0.399 0.005 286.172) !important;
-    --gray-900: oklch(0.306 0.004 286.188) !important;
-    --gray-950: oklch(0.205 0.002 286.226) !important;
+    --gray-50: oklch(0.985 0.002 286.3) !important;
+    --gray-100: oklch(0.967 0.003 286.3) !important;
+    --gray-200: oklch(0.92 0.004 286.32) !important;
+    --gray-300: oklch(0.871 0.006 286.29) !important;
+    --gray-400: oklch(0.705 0.015 286.07) !important;
+    --gray-500: oklch(0.552 0.016 285.94) !important;
+    --gray-600: oklch(0.442 0.017 285.79) !important;
+    --gray-700: oklch(0.37 0.012 285.8) !important;
+    --gray-800: oklch(0.274 0.006 286.03) !important;
+    --gray-900: oklch(0.21 0.006 285.9) !important;
+    --gray-950: oklch(0.141 0.005 285.8) !important;
 }
 
 :root.dark {
@@ -33,6 +33,8 @@
     --gray-800: oklch(0.187 0.002 286.205) !important;
     --gray-900: oklch(0.169 0.002 286.177) !important;
     --gray-950: oklch(0.14 0.002 286.109) !important;
+    /* Texto roxo legível sobre fundo escuro (item ativo em dark). */
+    --color-accent-content: #a78bfa !important;
 }
 
 @theme {
@@ -47,6 +49,23 @@
     --color-zinc-800: var(--gray-800);
     --color-zinc-900: var(--gray-900);
     --color-zinc-950: var(--gray-950);
+
+    /* Roxo da marca He4rt — accent do Flux (item ativo da sidebar, controles) + escala primary. */
+    --color-accent: #782bf1;
+    --color-accent-content: #6d28d9;
+    --color-accent-foreground: #ffffff;
+
+    --color-primary-50: #f3f0fe;
+    --color-primary-100: #e9e3fd;
+    --color-primary-200: #d6ccfb;
+    --color-primary-300: #bba6f7;
+    --color-primary-400: #9b76f1;
+    --color-primary-500: #8149ea;
+    --color-primary-600: #782bf1;
+    --color-primary-700: #6420c8;
+    --color-primary-800: #531ca3;
+    --color-primary-900: #451a82;
+    --color-primary-950: #2b0e58;
 }
 
 /* ---- Acessibilidade base (WCAG 2.2 AA) ---- */
