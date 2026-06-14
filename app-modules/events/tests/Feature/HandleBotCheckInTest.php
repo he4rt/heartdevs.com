@@ -186,11 +186,54 @@ test('bot check-in is rejected when the enrollment event is not happening today'
         && $event->message === __('events::check_in.bot_no_active_enrollment'));
 });
 
-test('bot check-in with multiple active events today asks for an explicit event', function (): void {
+test('bot check-in with multiple events today checks into the one matching the typed code', function (): void {
     EventFacade::fake([CheckInProcessed::class]);
     $scenario = createBotCheckInScenario();
-    $startsAt = now()->setTime(9, 0);
 
+    $afternoonStart = now()->setTime(14, 0);
+    $afternoonEvent = Event::factory()
+        ->for($scenario['tenant'])
+        ->create([
+            'starts_at' => $afternoonStart,
+            'ends_at' => $afternoonStart->clone()->setTime(20, 0),
+            'status' => EventStatus::Published,
+        ]);
+
+    $afternoonEnrollment = Enrollment::factory()->create([
+        'event_id' => $afternoonEvent->id,
+        'user_id' => $scenario['participant']->id,
+        'status' => EnrollmentStatus::Confirmed,
+        'confirmed_at' => now(),
+    ]);
+
+    CheckInCode::factory()->create([
+        'event_id' => $afternoonEvent->id,
+        'event_date' => now()->toDateString(),
+        'code' => '654321',
+        'starts_at' => now()->subHour(),
+        'expires_at' => now()->addHours(8),
+    ]);
+
+    // User types the MORNING code — only that event owns it.
+    resolve(HandleBotCheckIn::class)->handle(new CheckInRequested(
+        provider: IdentityProvider::Discord,
+        externalUserId: $scenario['externalId'],
+        code: '123456',
+        tenantId: $scenario['tenant']->id,
+    ));
+
+    expect($scenario['enrollment']->fresh()->status)->toBe(EnrollmentStatus::CheckedIn)
+        ->and($afternoonEnrollment->fresh()->status)->toBe(EnrollmentStatus::Confirmed);
+
+    EventFacade::assertDispatched(fn (CheckInProcessed $event): bool => $event->status === BotCheckInStatus::Success
+        && $event->enrollmentId === $scenario['enrollment']->id);
+});
+
+test('bot check-in with multiple events today and a non-matching code errors as invalid', function (): void {
+    EventFacade::fake([CheckInProcessed::class]);
+    $scenario = createBotCheckInScenario();
+
+    $startsAt = now()->setTime(9, 0);
     $secondEvent = Event::factory()
         ->for($scenario['tenant'])
         ->create([
@@ -204,6 +247,55 @@ test('bot check-in with multiple active events today asks for an explicit event'
         'user_id' => $scenario['participant']->id,
         'status' => EnrollmentStatus::Confirmed,
         'confirmed_at' => now(),
+    ]);
+
+    CheckInCode::factory()->create([
+        'event_id' => $secondEvent->id,
+        'event_date' => now()->toDateString(),
+        'code' => '654321',
+        'starts_at' => now()->subHour(),
+        'expires_at' => now()->addHours(2),
+    ]);
+
+    resolve(HandleBotCheckIn::class)->handle(new CheckInRequested(
+        provider: IdentityProvider::Discord,
+        externalUserId: $scenario['externalId'],
+        code: '999999',
+        tenantId: $scenario['tenant']->id,
+    ));
+
+    expect($scenario['enrollment']->fresh()->status)->toBe(EnrollmentStatus::Confirmed);
+
+    EventFacade::assertDispatched(fn (CheckInProcessed $event): bool => $event->status === BotCheckInStatus::Error
+        && $event->message === __('events::check_in.invalid_check_in_code'));
+});
+
+test('bot check-in errors when the same code exists on multiple events today', function (): void {
+    EventFacade::fake([CheckInProcessed::class]);
+    $scenario = createBotCheckInScenario();
+
+    $startsAt = now()->setTime(9, 0);
+    $secondEvent = Event::factory()
+        ->for($scenario['tenant'])
+        ->create([
+            'starts_at' => $startsAt,
+            'ends_at' => $startsAt->clone()->setTime(18, 0),
+            'status' => EventStatus::Published,
+        ]);
+
+    Enrollment::factory()->create([
+        'event_id' => $secondEvent->id,
+        'user_id' => $scenario['participant']->id,
+        'status' => EnrollmentStatus::Confirmed,
+        'confirmed_at' => now(),
+    ]);
+
+    CheckInCode::factory()->create([
+        'event_id' => $secondEvent->id,
+        'event_date' => now()->toDateString(),
+        'code' => '123456',
+        'starts_at' => now()->subHour(),
+        'expires_at' => now()->addHours(2),
     ]);
 
     resolve(HandleBotCheckIn::class)->handle(new CheckInRequested(

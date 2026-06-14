@@ -10,6 +10,7 @@ use He4rt\Events\CheckIn\Enums\BotCheckInStatus;
 use He4rt\Events\CheckIn\Events\CheckInProcessed;
 use He4rt\Events\CheckIn\Events\CheckInRequested;
 use He4rt\Events\CheckIn\Exceptions\CheckInException;
+use He4rt\Events\CheckIn\Models\CheckInCode;
 use He4rt\Events\Enrollment\Enums\EnrollmentStatus;
 use He4rt\Events\Enrollment\Models\Enrollment;
 use He4rt\Events\Event\Enums\EventStatus;
@@ -71,11 +72,25 @@ final readonly class HandleBotCheckIn
             ->get();
 
         $enrollment = $enrollments->first();
-
         throw_unless($enrollment, CheckInException::botNoActiveEnrollment());
-        throw_if($enrollments->count() > 1, CheckInException::botMultipleActiveEvents());
 
-        return $enrollment;
+        if ($enrollments->count() === 1) {
+            return $enrollment;
+        }
+
+        $matchingEventIds = CheckInCode::query()
+            ->whereIn('event_id', $enrollments->pluck('event_id'))
+            ->where('code', $event->code)
+            ->whereDate('event_date', $today)
+            ->pluck('event_id');
+
+        $matching = $enrollments->whereIn('event_id', $matchingEventIds);
+
+        $matched = $matching->first();
+        throw_unless($matched, CheckInException::invalidCheckInCode());
+        throw_if($matching->count() > 1, CheckInException::botMultipleActiveEvents());
+
+        return $matched;
     }
 
     private function dispatchSuccess(CheckInRequested $event, string $enrollmentId): void

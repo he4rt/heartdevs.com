@@ -17,6 +17,6 @@ return [
     'check_in_code_rate_limited' => 'Muitas tentativas. Tente novamente em :seconds segundos.',
     'bot_user_not_linked' => 'Sua conta não está vinculada a esta plataforma.',
     'bot_no_active_enrollment' => 'Nenhuma inscrição ativa encontrada para um evento de hoje.',
-    'bot_multiple_active_events' => 'Você tem múltiplos eventos ativos hoje. Especifique em qual fazer check-in.',
+    'bot_multiple_active_events' => 'Mais de um evento usa esse código hoje. Faça o check-in pelo painel.',
     'bot_check_in_success' => 'Check-in confirmado. Até lá!',
 ];
