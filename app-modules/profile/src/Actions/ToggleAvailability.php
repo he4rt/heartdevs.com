@@ -24,7 +24,7 @@ final class ToggleAvailability
 
         $attributes = ['available_for_proposals' => $available];
 
-        if ($available && $startAvailability instanceof StartAvailability) {
+        if ($available) {
             $attributes['start_availability'] = $startAvailability;
         }
 
