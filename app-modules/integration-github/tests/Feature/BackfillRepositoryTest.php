@@ -83,7 +83,7 @@ it('faz backfill de PRs upsertando contributions com tamanho, autor e tenant', f
         ->and($contribution->actor_login)->toBe('maria')
         ->and($contribution->actor_id)->toBe(42)
         ->and($contribution->repo)->toBe('he4rt/heartdevs.com')
-        ->and($contribution->occurred_at->toIso8601String())->toBe('2026-06-01T12:00:00+00:00')
+        ->and($contribution->occurred_at->utc()->toIso8601String())->toBe('2026-06-01T12:00:00+00:00')
         ->and($contribution->metadata['additions'])->toBe(10)
         ->and($contribution->metadata['deletions'])->toBe(2)
         ->and($contribution->metadata['is_bot'])->toBeFalse();
@@ -244,7 +244,7 @@ it('faz backfill das reviews de um PR com target_ref para o PR', function (): vo
     expect($review->external_ref)->toBe('review:555')
         ->and($review->target_ref)->toBe('pr:1')
         ->and($review->actor_login)->toBe('joao')
-        ->and($review->occurred_at->toIso8601String())->toBe('2026-06-02T09:00:00+00:00');
+        ->and($review->occurred_at->utc()->toIso8601String())->toBe('2026-06-02T09:00:00+00:00');
 });
 
 it('faz backfill de issues ignorando os PRs retornados pelo endpoint de issues', function (): void {
@@ -317,7 +317,7 @@ it('faz backfill de commits dedup por sha, com fallback de autor', function (): 
     expect($linked->type)->toBe(ContributionType::Commit)
         ->and($linked->actor_login)->toBe('maria')
         ->and($linked->actor_id)->toBe(42)
-        ->and($linked->occurred_at->toIso8601String())->toBe('2026-06-04T08:00:00+00:00')
+        ->and($linked->occurred_at->utc()->toIso8601String())->toBe('2026-06-04T08:00:00+00:00')
         ->and($unlinked->actor_login)->toBe('Sem Conta')
         ->and($unlinked->actor_id)->toBeNull();
 });

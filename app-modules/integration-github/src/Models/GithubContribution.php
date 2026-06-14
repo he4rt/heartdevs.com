@@ -8,6 +8,7 @@ use Carbon\Carbon;
 use He4rt\Identity\Tenant\Models\Tenant;
 use He4rt\IntegrationGithub\Database\Factories\GithubContributionFactory;
 use He4rt\IntegrationGithub\Enums\ContributionType;
+use Illuminate\Database\Eloquent\Attributes\DateFormat;
 use Illuminate\Database\Eloquent\Attributes\Table;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -28,6 +29,11 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
  */
+// Persist datetimes with their timezone offset (the trailing P) so PostgreSQL
+// stores the absolute instant on `timestamptz` columns regardless of the
+// database server's session timezone. Without the offset, an offset-less
+// literal is interpreted in the session timezone and shifts the stored instant.
+#[DateFormat('Y-m-d H:i:sP')]
 #[Table(name: 'github_contributions')]
 final class GithubContribution extends Model
 {
