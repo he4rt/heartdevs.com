@@ -82,8 +82,8 @@
         <flux:button x-data="" x-on:click="$flux.dark = !$flux.dark" icon="moon" variant="subtle" />
     </flux:header>
 
-    <flux:main class="flex justify-between p-0!">
-        <article class="prose dark:prose-invert mx-auto max-w-[100ch]! p-8">
+    <flux:main id="conteudo" tabindex="-1" class="flex justify-between p-0!">
+        <article class="prose dark:prose-invert mx-auto max-w-[72ch]! p-8">
             @php ($meta = $document->metadata)
             @php ($moduleColor = $document->moduleName ? ModuleColor::for($document->moduleName) : null)
 

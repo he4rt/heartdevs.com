@@ -6,7 +6,7 @@
 
 :root {
     --gray-50: oklch(0.989 0.005 286.303) !important;
-    --gray-100: oklch(50.98 0.005 274.967) !important;
+    --gray-100: oklch(0.978 0.005 274.967) !important;
     --gray-200: oklch(0.9673 0.0083 271.33) !important;
     --gray-300: oklch(0.88 0.01 273.342) !important;
     --gray-400: oklch(0.805 0.009 271.307) !important;
@@ -44,4 +44,26 @@
     --color-zinc-800: var(--gray-800);
     --color-zinc-900: var(--gray-900);
     --color-zinc-950: var(--gray-950);
+}
+
+/* ---- Acessibilidade base (WCAG 2.2 AA) ---- */
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+    }
+}
+
+a:focus-visible,
+button:focus-visible,
+summary:focus-visible,
+input:focus-visible,
+[tabindex]:focus-visible {
+    outline: 2px solid var(--color-primary-600, #782bf1);
+    outline-offset: 2px;
+    border-radius: 0.25rem;
 }
