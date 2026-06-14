@@ -42,7 +42,7 @@
                                 noindex
                             </span>
                         </div>
-                        <p class="mt-1.5 text-[0.7rem] text-zinc-400 dark:text-zinc-500">Referência técnica — acessível, mas fora dos buscadores.</p>
+                        <p class="mt-1.5 text-[0.7rem] text-zinc-500 dark:text-zinc-400">Referência técnica — acessível, mas fora dos buscadores.</p>
                     </div>
                 </div>
             @endif
@@ -142,7 +142,7 @@
             <header class="not-prose mb-8 border-b border-zinc-100 pb-6 dark:border-zinc-800">
                 <nav
                     aria-label="Trilha de navegação"
-                    class="mb-3 flex flex-wrap items-center gap-1.5 text-xs text-zinc-400 dark:text-zinc-500"
+                    class="mb-3 flex flex-wrap items-center gap-1.5 text-xs text-zinc-500 dark:text-zinc-400"
                 >
                     <span>{{ $tier->label() }}</span>
                     @if ($document->moduleName)
