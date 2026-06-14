@@ -1,3 +1,8 @@
+---
+title: Mapa do Sistema
+order: 5
+---
+
 # Context Map
 
 This is a modular monorepo (`internachi/modular`). Each bounded context lives under `app-modules/` with its own `CONTEXT.md` and optional `docs/adr/`.

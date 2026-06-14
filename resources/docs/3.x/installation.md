@@ -1,3 +1,8 @@
+---
+title: Instalação
+order: 1
+---
+
 # Installation
 
 - [Versioning Scheme](#versioning-scheme)

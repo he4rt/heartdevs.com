@@ -1,3 +1,8 @@
+---
+title: Release Notes
+order: 6
+---
+
 # Release Notes
 
 - [Versioning Scheme](#versioning-scheme)

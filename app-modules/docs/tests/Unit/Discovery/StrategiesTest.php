@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use He4rt\Docs\Discovery\Actions\ParseDocumentMetadataAction;
 use He4rt\Docs\Discovery\DTOs\AdrMetadata;
+use He4rt\Docs\Discovery\DTOs\DocumentMetadata;
 use He4rt\Docs\Discovery\DTOs\PlanMetadata;
 use He4rt\Docs\Discovery\Enums\AdrStatus;
 use He4rt\Docs\Discovery\Enums\DocumentType;
@@ -109,5 +110,30 @@ describe('ReadmeStrategy parse', function (): void {
         expect($doc->type)->toBe(DocumentType::Module)
             ->and($doc->title)->toBe('Sample Module')
             ->and($doc->url)->toBe('/docs/modules/sample');
+    });
+});
+
+describe('GuideStrategy parse', function (): void {
+    it('reads order from front-matter and computes reading time', function (): void {
+        $doc = new GuideStrategy(strategyParser())->parse(fixtureFile('resources/docs/3.x/guide-order.md'), null);
+
+        expect($doc->title)->toBe('Guide With Order')
+            ->and($doc->order)->toBe(4)
+            ->and($doc->readingMinutes)->toBe(1);
+    });
+});
+
+describe('DocumentMetadata int', function (): void {
+    it('reads integers and numeric strings, null otherwise', function (): void {
+        $meta = new DocumentMetadata(
+            frontMatter: ['order' => 3, 'numeric' => '7', 'text' => 'abc'],
+            title: 'T',
+            body: 'b',
+        );
+
+        expect($meta->int('order'))->toBe(3)
+            ->and($meta->int('numeric'))->toBe(7)
+            ->and($meta->int('text'))->toBeNull()
+            ->and($meta->int('missing'))->toBeNull();
     });
 });

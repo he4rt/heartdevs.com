@@ -30,6 +30,24 @@ final readonly class DocumentMetadata
     }
 
     /**
+     * Read an integer value from the front-matter (accepts int or numeric string), or null.
+     */
+    public function int(string $key): ?int
+    {
+        $value = $this->frontMatter[$key] ?? null;
+
+        if (is_int($value)) {
+            return $value;
+        }
+
+        if (is_string($value) && is_numeric(mb_trim($value))) {
+            return (int) mb_trim($value);
+        }
+
+        return null;
+    }
+
+    /**
      * Read a list of strings from the front-matter (accepts a scalar or a list).
      *
      * @return list<string>

@@ -25,6 +25,7 @@ final readonly class DiscoveredDocument
         public bool $hidden = false,
         public ?string $author = null,
         public AdrMetadata|PlanMetadata|null $metadata = null,
+        public int $readingMinutes = 0,
     ) {}
 
     /**

@@ -103,7 +103,7 @@ final readonly class BuildDocumentTreeAction
      */
     private function flatTier(DocumentTier $tier, array $documents): NavigationGroup
     {
-        $this->sortDocuments($documents);
+        $this->sortByOrder($documents);
 
         return new NavigationGroup($tier->label(), $tier->icon(), $tier->order(), $documents, tier: $tier);
     }
@@ -129,13 +129,13 @@ final readonly class BuildDocumentTreeAction
             $byModule[$document->moduleName][] = $document;
         }
 
-        $this->sortDocuments($direct);
+        $this->sortByReadingOrder($direct);
         ksort($byModule);
 
         $subgroups = [];
 
         foreach ($byModule as $module => $list) {
-            $this->sortDocuments($list);
+            $this->sortByReadingOrder($list);
             $subgroups[] = new NavigationGroup(Str::headline((string) $module), null, 0, $list, moduleName: (string) $module);
         }
 
@@ -143,11 +143,27 @@ final readonly class BuildDocumentTreeAction
     }
 
     /**
-     * Sort by reading order (type, then per-document order), then title.
+     * Flat tiers (Introdução, Getting Started): the curated front-matter `order`
+     * is the primary key — types are mixed and reading-order must not override it.
      *
      * @param  list<DiscoveredDocument>  $documents
      */
-    private function sortDocuments(array &$documents): void
+    private function sortByOrder(array &$documents): void
+    {
+        usort(
+            $documents,
+            static fn (DiscoveredDocument $a, DiscoveredDocument $b): int => [$a->order, $a->title]
+                <=> [$b->order, $b->title],
+        );
+    }
+
+    /**
+     * Engineering: reading order (by type), then per-document order, then title,
+     * so a module reads Context → Decisões → Specs → Plans.
+     *
+     * @param  list<DiscoveredDocument>  $documents
+     */
+    private function sortByReadingOrder(array &$documents): void
     {
         usort(
             $documents,

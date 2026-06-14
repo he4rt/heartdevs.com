@@ -47,6 +47,7 @@ abstract readonly class AbstractDocumentStrategy implements DocumentTypeStrategy
             hidden: ($meta->frontMatter['hidden'] ?? false) === true,
             author: $meta->string('author'),
             metadata: $this->metadata($content, $meta),
+            readingMinutes: $this->readingMinutes($meta),
         );
     }
 
@@ -93,7 +94,18 @@ abstract readonly class AbstractDocumentStrategy implements DocumentTypeStrategy
 
     protected function order(SplFileInfo $file, DocumentMetadata $meta): int
     {
-        return 0;
+        return $meta->int('order') ?? 0;
+    }
+
+    /**
+     * Estimated reading time in whole minutes (~200 words/min). Zero for an
+     * empty body, so the view can hide the badge.
+     */
+    protected function readingMinutes(DocumentMetadata $meta): int
+    {
+        $words = (int) preg_match_all('/[\p{L}\p{N}]+/u', $meta->body);
+
+        return $words > 0 ? max(1, (int) ceil($words / 200)) : 0;
     }
 
     protected function metadata(string $content, DocumentMetadata $meta): AdrMetadata|PlanMetadata|null

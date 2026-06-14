@@ -37,9 +37,4 @@ final readonly class ContextMapStrategy extends AbstractDocumentStrategy
     {
         return null;
     }
-
-    protected function order(SplFileInfo $file, DocumentMetadata $meta): int
-    {
-        return 0;
-    }
 }
