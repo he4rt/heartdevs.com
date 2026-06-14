@@ -13,6 +13,7 @@ use He4rt\Docs\Discovery\Strategies\AdrStrategy;
 use He4rt\Docs\Discovery\Strategies\ContextMapStrategy;
 use He4rt\Docs\Discovery\Strategies\ContextStrategy;
 use He4rt\Docs\Discovery\Strategies\GuideStrategy;
+use He4rt\Docs\Discovery\Strategies\IntroductionStrategy;
 use He4rt\Docs\Discovery\Strategies\PlanStrategy;
 use He4rt\Docs\Discovery\Strategies\PrdStrategy;
 use He4rt\Docs\Discovery\Strategies\ReadmeStrategy;
@@ -30,6 +31,7 @@ class DocsServiceProvider extends ServiceProvider
         $this->app->tag([
             ContextMapStrategy::class,
             ContextStrategy::class,
+            IntroductionStrategy::class,
             AdrStrategy::class,
             SpecStrategy::class,
             PlanStrategy::class,

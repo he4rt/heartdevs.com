@@ -9,7 +9,7 @@ use He4rt\Docs\Discovery\DTOs\DiscoveredDocument;
 use He4rt\Docs\Discovery\DTOs\DocumentSource;
 use He4rt\Docs\Discovery\DTOs\DocumentTree;
 use He4rt\Docs\Discovery\DTOs\NavigationGroup;
-use He4rt\Docs\Discovery\Enums\DocumentType;
+use He4rt\Docs\Discovery\Enums\DocumentTier;
 use Illuminate\Support\Str;
 use SplFileInfo;
 
@@ -72,27 +72,25 @@ final readonly class BuildDocumentTreeAction
     private function buildTree(array $documents): DocumentTree
     {
         $byUrl = [];
-        $byType = [];
+        $byTier = [];
 
         foreach ($documents as $document) {
             $byUrl[$document->url] = $document;
-            $byType[$document->type->value][] = $document;
+            $byTier[DocumentTier::for($document)->value][] = $document;
         }
 
         $groups = [];
 
-        foreach (DocumentType::cases() as $type) {
-            $typed = $byType[$type->value] ?? [];
+        foreach (DocumentTier::cases() as $tier) {
+            $tiered = $byTier[$tier->value] ?? [];
 
-            if ($typed === []) {
+            if ($tiered === []) {
                 continue;
             }
 
-            $this->sortDocuments($typed);
-
-            $groups[] = $type->isModuleScoped()
-                ? $this->moduleScopedGroup($type, $typed)
-                : new NavigationGroup($type->label(), $type->icon(), $type->order(), $typed);
+            $groups[] = $tier->groupsByModule()
+                ? $this->moduleScopedTier($tier, $tiered)
+                : $this->flatTier($tier, $tiered);
         }
 
         usort($groups, static fn (NavigationGroup $a, NavigationGroup $b): int => $a->order <=> $b->order);
@@ -103,7 +101,20 @@ final readonly class BuildDocumentTreeAction
     /**
      * @param  list<DiscoveredDocument>  $documents
      */
-    private function moduleScopedGroup(DocumentType $type, array $documents): NavigationGroup
+    private function flatTier(DocumentTier $tier, array $documents): NavigationGroup
+    {
+        $this->sortDocuments($documents);
+
+        return new NavigationGroup($tier->label(), $tier->icon(), $tier->order(), $documents, tier: $tier);
+    }
+
+    /**
+     * Engineering tier: docs without a module render directly at the top of the
+     * tier, module-scoped docs are sub-grouped alphabetically by module.
+     *
+     * @param  list<DiscoveredDocument>  $documents
+     */
+    private function moduleScopedTier(DocumentTier $tier, array $documents): NavigationGroup
     {
         $direct = [];
         $byModule = [];
@@ -118,23 +129,30 @@ final readonly class BuildDocumentTreeAction
             $byModule[$document->moduleName][] = $document;
         }
 
+        $this->sortDocuments($direct);
         ksort($byModule);
 
         $subgroups = [];
 
         foreach ($byModule as $module => $list) {
             $this->sortDocuments($list);
-            $subgroups[] = new NavigationGroup(Str::headline((string) $module), null, 0, $list);
+            $subgroups[] = new NavigationGroup(Str::headline((string) $module), null, 0, $list, moduleName: (string) $module);
         }
 
-        return new NavigationGroup($type->label(), $type->icon(), $type->order(), $direct, $subgroups);
+        return new NavigationGroup($tier->label(), $tier->icon(), $tier->order(), $direct, $subgroups, tier: $tier);
     }
 
     /**
+     * Sort by reading order (type, then per-document order), then title.
+     *
      * @param  list<DiscoveredDocument>  $documents
      */
     private function sortDocuments(array &$documents): void
     {
-        usort($documents, static fn (DiscoveredDocument $a, DiscoveredDocument $b): int => [$a->order, $a->title] <=> [$b->order, $b->title]);
+        usort(
+            $documents,
+            static fn (DiscoveredDocument $a, DiscoveredDocument $b): int => [$a->type->readingOrder(), $a->order, $a->title]
+                <=> [$b->type->readingOrder(), $b->order, $b->title],
+        );
     }
 }

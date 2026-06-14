@@ -1,8 +1,9 @@
 @use (He4rt\Docs\Discovery\DTOs\AdrMetadata)
 @use (He4rt\Docs\Discovery\DTOs\PlanMetadata)
+@use (He4rt\Docs\Discovery\ModuleColor)
 @use (Illuminate\Support\Str)
 
-<x-docs::layout.guest :title="$title">
+<x-docs::layout.guest :title="$title" :noindex="$noindex">
     <flux:sidebar
         :sticky="true"
         collapsible="mobile"
@@ -20,9 +21,33 @@
             <flux:sidebar.collapse class="lg:hidden" />
         </flux:sidebar.header>
 
+        @php ($boundaryShown = false)
+
         @foreach ($sidebar as $group)
+            {{-- Visibility boundary: drawn once, right before the first noindex tier. --}}
+            @if (!$group['indexable'] && !$boundaryShown)
+                @php ($boundaryShown = true)
+                <div class="not-prose mt-5 mb-2 px-3">
+                    <div
+                        class="flex items-center justify-between border-t border-dashed border-amber-300/70 pt-4 dark:border-amber-700/50"
+                    >
+                        <span
+                            class="inline-flex items-center gap-1.5 text-[0.66rem] font-bold tracking-wide text-amber-700 uppercase dark:text-amber-500"
+                        >
+                            <flux:icon.lock-closed class="size-3" />
+                            Interno
+                        </span>
+                        <span
+                            class="inline-flex items-center rounded-full border border-amber-200 bg-amber-100 px-2 py-px text-[0.6rem] font-bold text-amber-700 dark:border-amber-700/50 dark:bg-amber-900/30 dark:text-amber-400"
+                        >
+                            noindex
+                        </span>
+                    </div>
+                    <p class="mt-1.5 text-[0.7rem] text-zinc-400 dark:text-zinc-500">Referência de engenharia — acessível, mas fora dos buscadores.</p>
+                </div>
+            @endif
             <flux:sidebar.nav>
-                <flux:sidebar.group :expandable="true" :heading="$group['title']">
+                <flux:sidebar.group :expandable="true" :heading="$group['title']" :icon="$group['icon']">
                     @foreach ($group['pages'] as $page)
                         <flux:sidebar.item :href="$page['url']" :current="$page['url'] === $currentUrl">
                             {{ $page['title'] }}
@@ -30,7 +55,15 @@
                     @endforeach
 
                     @foreach ($group['subgroups'] as $subgroup)
+                        @php ($dotColor = ModuleColor::for($subgroup['moduleName']))
                         <flux:sidebar.group :expandable="true" :heading="$subgroup['title']">
+                            <x-slot:icon>
+                                <span
+                                    class="block size-2.5 rounded-full ring-3 ring-black/[0.03] dark:ring-white/[0.06]"
+                                    style="background: {{ $dotColor }}"
+                                ></span>
+                            </x-slot:icon>
+
                             @foreach ($subgroup['pages'] as $page)
                                 <flux:sidebar.item :href="$page['url']" :current="$page['url'] === $currentUrl">
                                     {{ $page['title'] }}
@@ -52,9 +85,28 @@
     <flux:main class="flex justify-between p-0!">
         <article class="prose dark:prose-invert mx-auto max-w-[100ch]! p-8">
             @php ($meta = $document->metadata)
+            @php ($moduleColor = $document->moduleName ? ModuleColor::for($document->moduleName) : null)
 
             <header class="not-prose mb-8 border-b border-zinc-100 pb-6 dark:border-zinc-800">
+                <div class="mb-3 text-xs text-zinc-400 dark:text-zinc-500">
+                    @if ($document->moduleName)
+                        Engenharia / {{ Str::headline($document->moduleName) }}
+                    @else
+                        {{ $document->type->label() }}
+                    @endif
+                </div>
+
                 <div class="flex flex-wrap items-center gap-2">
+                    @if ($document->moduleName)
+                        <span
+                            class="inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-xs font-semibold"
+                            style="background: color-mix(in srgb, {{ $moduleColor }} 14%, transparent); color: {{ $moduleColor }}"
+                        >
+                            <span class="size-1.5 rounded-full" style="background: {{ $moduleColor }}"></span>
+                            {{ Str::headline($document->moduleName) }}
+                        </span>
+                    @endif
+
                     @if ($meta instanceof AdrMetadata)
                         <flux:badge :color="$meta->status->color()" size="sm">{{ $meta->status->label() }}</flux:badge>
                     @elseif ($meta instanceof PlanMetadata)
@@ -63,15 +115,21 @@
                         </flux:badge>
                     @endif
 
-                    @if ($document->moduleName)
-                        <flux:badge color="zinc" size="sm">{{ Str::headline($document->moduleName) }}</flux:badge>
-                    @endif
-
                     @if ($document->date)
                         <span
                             class="text-sm text-zinc-500 dark:text-zinc-400"
                             >{{ $document->date->format('d/m/Y') }}</span
                         >
+                    @endif
+
+                    @if ($noindex)
+                        <span
+                            class="inline-flex items-center gap-1 rounded-full border border-amber-200 bg-amber-100 px-2 py-0.5 text-xs font-medium text-amber-700 dark:border-amber-700/50 dark:bg-amber-900/30 dark:text-amber-400"
+                            title="Material de engenharia, não indexado por buscadores"
+                        >
+                            <flux:icon.eye-slash class="size-3.5" />
+                            documento interno · noindex
+                        </span>
                     @endif
                 </div>
 

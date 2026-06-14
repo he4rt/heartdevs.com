@@ -8,8 +8,10 @@ use He4rt\Docs\Discovery\DTOs\DocumentTree;
 use He4rt\Docs\Discovery\DTOs\NavigationGroup;
 use He4rt\Docs\Discovery\DTOs\PlanMetadata;
 use He4rt\Docs\Discovery\Enums\AdrStatus;
+use He4rt\Docs\Discovery\Enums\DocumentTier;
 use He4rt\Docs\Discovery\Enums\DocumentType;
 use He4rt\Docs\Discovery\Enums\PlanStatus;
+use He4rt\Docs\Discovery\ModuleColor;
 
 function docsDtoFixture(string $url = '/docs/decisions/x', string $title = 'X'): DiscoveredDocument
 {
@@ -29,25 +31,28 @@ describe('DocumentType', function (): void {
             ->and(DocumentType::tryFrom('3.x'))->toBeNull();
     });
 
-    it('sub-groups only decisions by module', function (): void {
-        expect(DocumentType::Adr->isModuleScoped())->toBeTrue()
-            ->and(DocumentType::Glossary->isModuleScoped())->toBeFalse()
-            ->and(DocumentType::Module->isModuleScoped())->toBeFalse()
-            ->and(DocumentType::Spec->isModuleScoped())->toBeFalse();
-    });
-
     it('flags dated artifacts', function (): void {
         expect(DocumentType::Spec->isDatedArtifact())->toBeTrue()
             ->and(DocumentType::Plan->isDatedArtifact())->toBeTrue()
             ->and(DocumentType::Adr->isDatedArtifact())->toBeFalse();
     });
 
-    it('exposes label, icon and order for every case', function (): void {
+    it('exposes label, icon and reading order for every case', function (): void {
         foreach (DocumentType::cases() as $type) {
             expect($type->label())->not->toBeEmpty()
                 ->and($type->icon())->not->toBeEmpty()
-                ->and($type->order())->toBeGreaterThan(0);
+                ->and($type->readingOrder())->toBeGreaterThanOrEqual(0);
         }
+    });
+
+    it('orders types for reading within a module', function (): void {
+        expect(DocumentType::Module->readingOrder())->toBe(0)
+            ->and(DocumentType::Glossary->readingOrder())->toBe(1)
+            ->and(DocumentType::Adr->readingOrder())->toBe(2)
+            ->and(DocumentType::Spec->readingOrder())->toBe(3)
+            ->and(DocumentType::Plan->readingOrder())->toBe(4)
+            ->and(DocumentType::Prd->readingOrder())->toBe(5)
+            ->and(DocumentType::Guide->readingOrder())->toBe(6);
     });
 });
 
@@ -114,7 +119,7 @@ describe('NavigationGroup', function (): void {
             title: 'Decisões',
             icon: 'scale',
             documents: [docsDtoFixture('/docs/decisions/x', 'X')],
-            subgroups: [new NavigationGroup('Moderation', documents: [docsDtoFixture('/docs/decisions/moderation/0001', 'ADR 1')])],
+            subgroups: [new NavigationGroup('Moderation', documents: [docsDtoFixture('/docs/decisions/moderation/0001', 'ADR 1')], moduleName: 'moderation')],
         );
 
         $array = $group->toArray();
@@ -122,7 +127,43 @@ describe('NavigationGroup', function (): void {
         expect($array['title'])->toBe('Decisões')
             ->and($array['icon'])->toBe('scale')
             ->and($array['pages'])->toBe([['title' => 'X', 'url' => '/docs/decisions/x']])
-            ->and($array['subgroups'][0]['pages'][0]['url'])->toBe('/docs/decisions/moderation/0001');
+            ->and($array['subgroups'][0]['pages'][0]['url'])->toBe('/docs/decisions/moderation/0001')
+            ->and($array['subgroups'][0]['moduleName'])->toBe('moderation');
+    });
+
+    it('carries tier metadata and indexability into the sidebar shape', function (): void {
+        $engineering = new NavigationGroup('Engenharia', 'wrench-screwdriver', tier: DocumentTier::Engineering)->toArray();
+        $gettingStarted = new NavigationGroup('Getting Started', 'rocket-launch', tier: DocumentTier::GettingStarted)->toArray();
+        $untyped = new NavigationGroup('Moderation', moduleName: 'moderation')->toArray();
+
+        expect($engineering['tier'])->toBe('engineering')
+            ->and($engineering['indexable'])->toBeFalse()
+            ->and($gettingStarted['tier'])->toBe('getting-started')
+            ->and($gettingStarted['indexable'])->toBeTrue()
+            ->and($untyped['tier'])->toBeNull()
+            ->and($untyped['indexable'])->toBeTrue();
+    });
+});
+
+describe('ModuleColor', function (): void {
+    it('returns curated colors for known modules', function (): void {
+        expect(ModuleColor::for('moderation'))->toBe('#782bf1')
+            ->and(ModuleColor::for('Moderation'))->toBe('#782bf1')
+            ->and(ModuleColor::for('identity'))->toBe('#0284c7');
+    });
+
+    it('falls back to the brand color for empty names', function (): void {
+        expect(ModuleColor::for(null))->toBe('#782bf1')
+            ->and(ModuleColor::for(''))->toBe('#782bf1');
+    });
+
+    it('derives a stable, valid hex for unknown modules', function (): void {
+        $first = ModuleColor::for('some-unknown-module');
+        $second = ModuleColor::for('some-unknown-module');
+
+        expect($first)->toBe($second)
+            ->and($first)->toMatch('/^#[0-9a-f]{6}$/')
+            ->and(ModuleColor::for('another-module'))->not->toBe($first);
     });
 });
 

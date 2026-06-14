@@ -7,6 +7,7 @@ namespace He4rt\Docs;
 use App\Http\Controllers\Controller;
 use He4rt\Docs\Discovery\DocumentRegistry;
 use He4rt\Docs\Discovery\DTOs\DiscoveredDocument;
+use He4rt\Docs\Discovery\Enums\DocumentTier;
 use He4rt\Docs\Discovery\Enums\DocumentType;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
@@ -40,6 +41,8 @@ final class DocsController extends Controller
 
         $rendered = $this->registry->render($document);
 
+        $noindex = !DocumentTier::for($document)->isIndexable();
+
         return view('docs::home', [
             'document' => $document,
             'title' => $document->title,
@@ -47,6 +50,7 @@ final class DocsController extends Controller
             'toc' => $rendered->toc,
             'sidebar' => $this->registry->tree()->toSidebar(),
             'currentUrl' => $document->url,
+            'noindex' => $noindex,
         ]);
     }
 }

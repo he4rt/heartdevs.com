@@ -11,6 +11,7 @@ use He4rt\Docs\Discovery\Strategies\AdrStrategy;
 use He4rt\Docs\Discovery\Strategies\ContextMapStrategy;
 use He4rt\Docs\Discovery\Strategies\ContextStrategy;
 use He4rt\Docs\Discovery\Strategies\GuideStrategy;
+use He4rt\Docs\Discovery\Strategies\IntroductionStrategy;
 use He4rt\Docs\Discovery\Strategies\PlanStrategy;
 use He4rt\Docs\Discovery\Strategies\PrdStrategy;
 use He4rt\Docs\Discovery\Strategies\ReadmeStrategy;
@@ -25,6 +26,7 @@ function buildTreeAction(): BuildDocumentTreeAction
         [
             new ContextMapStrategy($parser),
             new ContextStrategy($parser),
+            new IntroductionStrategy($parser),
             new AdrStrategy($parser),
             new SpecStrategy($parser),
             new PlanStrategy($parser),
@@ -53,27 +55,85 @@ function sampleTree(): DocumentTree
     ]);
 }
 
-it('groups types in order and omits the hidden-only spec group', function (): void {
+it('groups documents into tiers in order, omitting empty tiers', function (): void {
     $titles = array_map(static fn (array $group): string => $group['title'], sampleTree()->toSidebar());
 
-    expect($titles)->toBe(['Glossário', 'Decisões', 'Plans', 'Módulos']);
+    // No Introduction-tier docs in the fixtures, so that tier is omitted.
+    expect($titles)->toBe(['Getting Started', 'Engenharia']);
 });
 
-it('lists the glossary flat with the context map first', function (): void {
-    $glossary = sampleTree()->toSidebar()[0];
+it('places the context map (module-less glossary) directly under getting started', function (): void {
+    $gettingStarted = sampleTree()->toSidebar()[0];
 
-    expect($glossary['subgroups'])->toBeEmpty()
-        ->and($glossary['pages'][0]['url'])->toBe('/docs/glossary/context-map')
-        ->and($glossary['pages'][1]['url'])->toBe('/docs/glossary/sample');
+    expect($gettingStarted['title'])->toBe('Getting Started')
+        ->and($gettingStarted['subgroups'])->toBeEmpty()
+        ->and($gettingStarted['pages'][0]['url'])->toBe('/docs/glossary/context-map');
 });
 
-it('sub-groups decisions by module ordered by adr number', function (): void {
-    $decisions = sampleTree()->toSidebar()[1];
+it('sub-groups engineering docs by module alphabetically', function (): void {
+    $engineering = sampleTree()->toSidebar()[1];
 
-    expect($decisions['pages'])->toBeEmpty()
-        ->and($decisions['subgroups'][0]['title'])->toBe('Sample')
-        ->and($decisions['subgroups'][0]['pages'][0]['url'])->toBe('/docs/decisions/sample/0001-sample-decision')
-        ->and($decisions['subgroups'][0]['pages'][1]['url'])->toBe('/docs/decisions/sample/0002-frontmatter-decision');
+    expect($engineering['title'])->toBe('Engenharia')
+        ->and($engineering['pages'])->toBeEmpty()
+        ->and($engineering['subgroups'][0]['title'])->toBe('Sample');
+});
+
+it('orders each module by reading order: module, glossary, decisions, plan', function (): void {
+    $module = sampleTree()->toSidebar()[1]['subgroups'][0];
+
+    $urls = array_map(static fn (array $page): string => $page['url'], $module['pages']);
+
+    expect($urls)->toBe([
+        '/docs/modules/sample',
+        '/docs/glossary/sample',
+        '/docs/decisions/sample/0001-sample-decision',
+        '/docs/decisions/sample/0002-frontmatter-decision',
+        '/docs/plans/sample/2026-05-02-sample',
+    ]);
+});
+
+function multiModuleTree(): DocumentTree
+{
+    return buildTreeAction()->execute([
+        sourceFixture('CONTEXT-MAP.md', null),
+        sourceFixture('docs/specs/2026-03-01-transversal.md', null),
+        sourceFixture('modules/sample/README.md', 'sample'),
+        sourceFixture('modules/alpha/README.md', 'alpha'),
+    ]);
+}
+
+it('orders engineering subgroups alphabetically by module', function (): void {
+    $engineering = multiModuleTree()->toSidebar()[1];
+
+    $modules = array_map(static fn (array $group): string => $group['title'], $engineering['subgroups']);
+
+    expect($engineering['title'])->toBe('Engenharia')
+        ->and($modules)->toBe(['Alpha', 'Sample']);
+});
+
+it('renders module-less engineering docs directly above the subgroups', function (): void {
+    $engineering = multiModuleTree()->toSidebar()[1];
+
+    expect($engineering['pages'][0]['url'])->toBe('/docs/specs/2026-03-01-transversal')
+        ->and($engineering['subgroups'][0]['title'])->toBe('Alpha');
+});
+
+it('keeps the curated tier before engineering even with many modules', function (): void {
+    $titles = array_map(static fn (array $group): string => $group['title'], multiModuleTree()->toSidebar());
+
+    expect($titles)->toBe(['Getting Started', 'Engenharia']);
+});
+
+it('omits a tier whose only documents are hidden', function (): void {
+    $tree = buildTreeAction()->execute([
+        sourceFixture('CONTEXT-MAP.md', null),
+        sourceFixture('modules/sample/docs/specs/2026-01-01-hidden-spec.md', 'sample'),
+    ]);
+
+    $titles = array_map(static fn (array $group): string => $group['title'], $tree->toSidebar());
+
+    // The hidden spec is the only Engineering candidate, so that tier is gone.
+    expect($titles)->toBe(['Getting Started']);
 });
 
 it('excludes hidden documents from the lookup index', function (): void {

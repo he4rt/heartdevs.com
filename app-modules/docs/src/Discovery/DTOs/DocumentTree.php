@@ -45,7 +45,7 @@ final readonly class DocumentTree
     /**
      * The sidebar shape consumed by the Blade view.
      *
-     * @return list<array{title: string, icon: ?string, pages: list<array{title: string, url: string}>, subgroups: list<mixed>}>
+     * @return list<array{title: string, icon: ?string, tier: ?string, indexable: bool, moduleName: ?string, pages: list<array{title: string, url: string}>, subgroups: list<mixed>}>
      */
     public function toSidebar(): array
     {

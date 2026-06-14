@@ -12,6 +12,7 @@ namespace He4rt\Docs\Discovery\Enums;
  */
 enum DocumentType: string
 {
+    case Introduction = 'introduction';
     case Glossary = 'glossary';
     case Adr = 'decisions';
     case Spec = 'specs';
@@ -26,6 +27,7 @@ enum DocumentType: string
     public function label(): string
     {
         return match ($this) {
+            self::Introduction => 'Introdução',
             self::Glossary => 'Glossário',
             self::Adr => 'Decisões',
             self::Spec => 'Specs',
@@ -42,6 +44,7 @@ enum DocumentType: string
     public function icon(): string
     {
         return match ($this) {
+            self::Introduction => 'sparkles',
             self::Glossary => 'book-open',
             self::Adr => 'scale',
             self::Spec => 'document-text',
@@ -50,16 +53,6 @@ enum DocumentType: string
             self::Module => 'cube',
             self::Guide => 'academic-cap',
         };
-    }
-
-    /**
-     * Whether the sidebar should sub-group documents of this type by module.
-     * Only decisions accumulate several entries per module, so only they are
-     * sub-grouped; other types render as a flat list.
-     */
-    public function isModuleScoped(): bool
-    {
-        return $this === self::Adr;
     }
 
     /**
@@ -75,18 +68,33 @@ enum DocumentType: string
     }
 
     /**
-     * Display order of the group in the sidebar.
+     * The reading tier this type maps to. Note the CONTEXT-MAP exception lives
+     * in DocumentTier::for(), since it depends on the document's module.
      */
-    public function order(): int
+    public function tier(): DocumentTier
     {
         return match ($this) {
+            self::Introduction => DocumentTier::Introduction,
+            self::Guide => DocumentTier::GettingStarted,
+            self::Glossary, self::Adr, self::Spec, self::Plan, self::Prd, self::Module => DocumentTier::Engineering,
+        };
+    }
+
+    /**
+     * Order in which a type is read inside a module, lowest first. Drives the
+     * per-module ordering of the Engineering tier in the sidebar.
+     */
+    public function readingOrder(): int
+    {
+        return match ($this) {
+            self::Introduction => 0,
+            self::Module => 0,
             self::Glossary => 1,
             self::Adr => 2,
             self::Spec => 3,
             self::Plan => 4,
             self::Prd => 5,
-            self::Module => 6,
-            self::Guide => 7,
+            self::Guide => 6,
         };
     }
 }

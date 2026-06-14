@@ -17,13 +17,27 @@ it('serves an ADR page publicly with status badge and stripped title', function 
         ->assertSee('Hybrid Pipeline with Event-Driven Enforcement')
         ->assertSee('Aceito')
         ->assertSee('danielhe4rt')
-        ->assertSee('Decisões');
+        ->assertSee('Engenharia');
 });
 
 it('renders a module glossary page', function (): void {
     $this->get('/docs/glossary/moderation')
         ->assertOk()
         ->assertSee('Moderation Context');
+});
+
+it('marks an engineering document as noindex', function (): void {
+    $this->get('/docs/decisions/moderation/0001-hybrid-pipeline-with-event-driven-enforcement')
+        ->assertOk()
+        ->assertSee('<meta name="robots" content="noindex, nofollow" />', false)
+        ->assertSee('documento interno · noindex');
+});
+
+it('does not mark a guide document as noindex', function (): void {
+    $this->get('/docs/guides/installation')
+        ->assertOk()
+        ->assertDontSee('content="noindex, nofollow"', false)
+        ->assertDontSee('documento interno · noindex');
 });
 
 it('redirects the docs index to the first document', function (): void {

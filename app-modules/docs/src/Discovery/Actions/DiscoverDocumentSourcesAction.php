@@ -77,7 +77,7 @@ final readonly class DiscoverDocumentSourcesAction
 
         if (is_dir($docsPath)) {
             $finder = new Finder()->files()->in($docsPath)->name('*.md')
-                ->path(['adr', 'specs', 'plans', 'prd', 'superpowers']);
+                ->path(['introduction', 'adr', 'specs', 'plans', 'prd', 'superpowers']);
 
             foreach ($finder as $file) {
                 $sources[] = new DocumentSource($file, null);

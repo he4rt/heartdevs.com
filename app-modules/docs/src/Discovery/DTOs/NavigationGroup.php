@@ -4,9 +4,14 @@ declare(strict_types=1);
 
 namespace He4rt\Docs\Discovery\DTOs;
 
+use He4rt\Docs\Discovery\Enums\DocumentTier;
+
 /**
  * A node in the sidebar navigation tree (Composite). A group holds direct
  * documents and/or nested subgroups (e.g. a type grouped by module).
+ *
+ * A tier group (top-level) carries its `tier`; a module subgroup carries the
+ * `moduleName` so the view can color its dot deterministically.
  */
 final readonly class NavigationGroup
 {
@@ -20,6 +25,8 @@ final readonly class NavigationGroup
         public int $order = 0,
         public array $documents = [],
         public array $subgroups = [],
+        public ?DocumentTier $tier = null,
+        public ?string $moduleName = null,
     ) {}
 
     public function isEmpty(): bool
@@ -34,13 +41,16 @@ final readonly class NavigationGroup
     /**
      * Flatten this group into the array shape the sidebar view consumes.
      *
-     * @return array{title: string, icon: ?string, pages: list<array{title: string, url: string}>, subgroups: list<array{title: string, icon: ?string, pages: list<array{title: string, url: string}>, subgroups: list<mixed>}>}
+     * @return array{title: string, icon: ?string, tier: ?string, indexable: bool, moduleName: ?string, pages: list<array{title: string, url: string}>, subgroups: list<array{title: string, icon: ?string, tier: ?string, indexable: bool, moduleName: ?string, pages: list<array{title: string, url: string}>, subgroups: list<mixed>}>}
      */
     public function toArray(): array
     {
         return [
             'title' => $this->title,
             'icon' => $this->icon,
+            'tier' => $this->tier?->value,
+            'indexable' => $this->tier?->isIndexable() ?? true,
+            'moduleName' => $this->moduleName,
             'pages' => array_map(
                 static fn (DiscoveredDocument $doc): array => ['title' => $doc->title, 'url' => $doc->url],
                 $this->documents,
