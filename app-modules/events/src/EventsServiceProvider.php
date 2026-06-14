@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace He4rt\Events;
 
+use He4rt\Events\CheckIn\Events\CheckInRequested;
 use He4rt\Events\CheckIn\Listeners\GenerateQrTokenOnConfirmed;
+use He4rt\Events\CheckIn\Listeners\HandleBotCheckIn;
 use He4rt\Events\Console\Commands\ClosePendingEventsCommand;
 use He4rt\Events\Enrollment\Events\EnrollmentConfirmed;
 use Illuminate\Console\Scheduling\Schedule;
@@ -24,6 +26,7 @@ class EventsServiceProvider extends ServiceProvider
         $this->loadTranslationsFrom(__DIR__.'/../lang', 'events');
 
         Event::listen(EnrollmentConfirmed::class, GenerateQrTokenOnConfirmed::class);
+        Event::listen(CheckInRequested::class, HandleBotCheckIn::class);
 
         if ($this->app->runningInConsole()) {
             $this->app->make(Schedule::class)

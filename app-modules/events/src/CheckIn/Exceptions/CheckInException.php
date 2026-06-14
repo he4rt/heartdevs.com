@@ -104,4 +104,20 @@ final class CheckInException extends Exception
             Response::HTTP_TOO_MANY_REQUESTS,
         );
     }
+
+    public static function botNoActiveEnrollment(): self
+    {
+        return new self(
+            __('events::check_in.bot_no_active_enrollment'),
+            Response::HTTP_NOT_FOUND,
+        );
+    }
+
+    public static function botMultipleActiveEvents(): self
+    {
+        return new self(
+            __('events::check_in.bot_multiple_active_events'),
+            Response::HTTP_UNPROCESSABLE_ENTITY,
+        );
+    }
 }

@@ -15,4 +15,8 @@ return [
     'check_in_code_exhausted' => 'O código atingiu o limite máximo de usos.',
     'check_in_code_wrong_date' => 'O código não é válido para hoje.',
     'check_in_code_rate_limited' => 'Muitas tentativas. Tente novamente em :seconds segundos.',
+    'bot_user_not_linked' => 'Sua conta não está vinculada a esta plataforma.',
+    'bot_no_active_enrollment' => 'Nenhuma inscrição ativa encontrada para um evento de hoje.',
+    'bot_multiple_active_events' => 'Você tem múltiplos eventos ativos hoje. Especifique em qual fazer check-in.',
+    'bot_check_in_success' => 'Check-in confirmado. Até lá!',
 ];
