@@ -12,10 +12,9 @@
         <flux:sidebar.header>
             <flux:sidebar.brand href="/docs" :logo="asset('images/logo.png')">
                 <x-slot name="name">
-                    <div class="flex flex-col">
-                        <span class="text-primary">{{ config('app.name') }}</span>
-                        <span class="text-xs">Docs</span>
-                    </div>
+                    <span class="font-semibold text-zinc-900 dark:text-white">
+                        He4rt <span class="font-normal text-zinc-400 dark:text-zinc-500">/ Docs</span>
+                    </span>
                 </x-slot>
             </flux:sidebar.brand>
             <flux:sidebar.collapse class="lg:hidden" />
@@ -27,23 +26,23 @@
             {{-- Visibility boundary: drawn once, right before the first noindex tier. --}}
             @if (!$group['indexable'] && !$boundaryShown)
                 @php ($boundaryShown = true)
-                <div class="not-prose mt-5 mb-2 px-3">
-                    <div
-                        class="flex items-center justify-between border-t border-dashed border-amber-300/70 pt-4 dark:border-amber-700/50"
-                    >
-                        <span
-                            class="inline-flex items-center gap-1.5 text-[0.66rem] font-bold tracking-wide text-amber-700 uppercase dark:text-amber-500"
-                        >
-                            <flux:icon.lock-closed class="size-3" />
-                            Interno
-                        </span>
-                        <span
-                            class="inline-flex items-center rounded-full border border-amber-200 bg-amber-100 px-2 py-px text-[0.6rem] font-bold text-amber-700 dark:border-amber-700/50 dark:bg-amber-900/30 dark:text-amber-400"
-                        >
-                            noindex
-                        </span>
+                <div class="not-prose mt-6 mb-2 px-3">
+                    <div class="border-t border-zinc-200 pt-4 dark:border-zinc-700">
+                        <div class="flex items-center justify-between">
+                            <span
+                                class="inline-flex items-center gap-1.5 text-[0.66rem] font-bold tracking-wide text-zinc-500 uppercase dark:text-zinc-400"
+                            >
+                                <flux:icon.lock-closed class="size-3 text-amber-500" />
+                                Interno
+                            </span>
+                            <span
+                                class="inline-flex items-center rounded-full bg-amber-100 px-2 py-px text-[0.6rem] font-bold text-amber-700 dark:bg-amber-900/30 dark:text-amber-400"
+                            >
+                                noindex
+                            </span>
+                        </div>
+                        <p class="mt-1.5 text-[0.7rem] text-zinc-400 dark:text-zinc-500">Referência técnica — acessível, mas fora dos buscadores.</p>
                     </div>
-                    <p class="mt-1.5 text-[0.7rem] text-zinc-400 dark:text-zinc-500">Referência de engenharia — acessível, mas fora dos buscadores.</p>
                 </div>
             @endif
             <flux:sidebar.nav>
