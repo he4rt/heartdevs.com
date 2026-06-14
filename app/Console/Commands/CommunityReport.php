@@ -220,31 +220,37 @@ class CommunityReport extends Command
 
         $zeroXp = DB::table('characters')->where('experience', 0)->count();
 
-        // Build CASE expression from Character::LEVEL_THRESHOLDS
-        $thresholds = Character::LEVEL_THRESHOLDS;
-        $caseParts = [];
+        // Bucket characters into level ranges in PHP instead of building dynamic
+        // SQL. Each range maps to a half-open [lowerXp, upperXp) experience window
+        // derived from the level => XP threshold table, so the queries stay static.
+        $levelRanges = [
+            '1-5' => [1, 5],
+            '6-10' => [6, 10],
+            '11-20' => [11, 20],
+            '21-30' => [21, 30],
+            '31-40' => [31, 40],
+            '41-50' => [41, 50],
+        ];
 
-        foreach (array_reverse($thresholds, true) as $level => $xp) {
-            $caseParts[] = sprintf('WHEN experience >= %s THEN %s', $xp, $level);
+        /** @var array<string, int> $levelDistribution */
+        $levelDistribution = [];
+
+        foreach ($levelRanges as $label => [$minLevel, $maxLevel]) {
+            $lowerXp = Character::LEVEL_THRESHOLDS[$minLevel];
+            $upperXp = Character::LEVEL_THRESHOLDS[$maxLevel + 1] ?? null;
+
+            $rangeQuery = DB::table('characters')->where('experience', '>=', $lowerXp);
+
+            if ($upperXp !== null) {
+                $rangeQuery->where('experience', '<', $upperXp);
+            }
+
+            $count = $rangeQuery->count();
+
+            if ($count > 0) {
+                $levelDistribution[$label] = $count;
+            }
         }
-
-        $levelCase = 'CASE '.implode(' ', $caseParts).' ELSE 1 END';
-
-        $levelDistribution = DB::table('characters')
-            ->selectRaw("
-                CASE
-                    WHEN ({$levelCase}) BETWEEN 1 AND 5 THEN '1-5'
-                    WHEN ({$levelCase}) BETWEEN 6 AND 10 THEN '6-10'
-                    WHEN ({$levelCase}) BETWEEN 11 AND 20 THEN '11-20'
-                    WHEN ({$levelCase}) BETWEEN 21 AND 30 THEN '21-30'
-                    WHEN ({$levelCase}) BETWEEN 31 AND 40 THEN '31-40'
-                    WHEN ({$levelCase}) BETWEEN 41 AND 50 THEN '41-50'
-                END as level_range,
-                COUNT(*) as cnt
-            ")
-            ->groupBy('level_range')
-            ->orderByRaw(sprintf('MIN(%s)', $levelCase))
-            ->get();
 
         $percentiles = DB::selectOne('
             SELECT
@@ -270,14 +276,19 @@ class CommunityReport extends Command
             ],
         );
 
+        $distributionRows = [];
+        foreach ($levelDistribution as $range => $cnt) {
+            $distributionRows[] = [
+                $range,
+                number_format($cnt),
+                round($cnt / $totalCharacters * 100, 1).'%',
+            ];
+        }
+
         info('Level Distribution');
         table(
             headers: ['Level Range', 'Characters', '% of Total'],
-            rows: $levelDistribution->map(fn ($r) => [
-                $r->level_range,
-                number_format($r->cnt),
-                round($r->cnt / $totalCharacters * 100, 1).'%',
-            ])->all(),
+            rows: $distributionRows,
         );
 
         info('XP Percentiles');
@@ -304,7 +315,7 @@ class CommunityReport extends Command
                 'p90' => (int) $percentiles->p90,
                 'p99' => (int) $percentiles->p99,
             ],
-            'level_distribution' => $levelDistribution->pluck('cnt', 'level_range')->toArray(),
+            'level_distribution' => $levelDistribution,
         ];
     }
 
@@ -950,7 +961,7 @@ class CommunityReport extends Command
 
         Storage::disk('local')->put(
             'discord/community_report.json',
-            json_encode($this->report, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE),
+            json_encode($this->report, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR),
         );
 
         info('Full report saved to storage/app/private/discord/community_report.json');

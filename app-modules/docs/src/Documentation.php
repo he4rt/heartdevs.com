@@ -117,7 +117,7 @@ class Documentation
 
                         return [
                             (string) Str::of($path)->afterLast('/')->before('.md') => [
-                                'title' => $page['title'],
+                                'title' => $page['title'] ?? '',
                                 'sections' => collect($section['fragments'])
                                     ->combine($section['titles'])
                                     ->map(fn ($title) => ['title' => $title]),

@@ -22,7 +22,7 @@ final readonly class OAuthStateDTO implements JsonSerializable, Stringable
 
     public function __toString(): string
     {
-        return Crypt::encryptString(json_encode($this));
+        return Crypt::encryptString(json_encode($this, JSON_THROW_ON_ERROR));
     }
 
     public static function fromEncryptedString(string $state): self

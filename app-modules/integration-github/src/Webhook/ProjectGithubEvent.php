@@ -53,11 +53,12 @@ final readonly class ProjectGithubEvent
      */
     private function tenantsTracking(string $repo): array
     {
-        return GithubRepository::query()
+        return array_values(GithubRepository::query()
             ->enabled()
             ->where('full_name', $repo)
             ->pluck('tenant_id')
-            ->all();
+            ->map(static fn (mixed $tenantId): string => (string) $tenantId)
+            ->all());
     }
 
     /**

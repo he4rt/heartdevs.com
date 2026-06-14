@@ -55,7 +55,7 @@ final class ScreenContent implements ShouldQueue
             ->addClassifier(OpenAiClassifier::make())
             ->classify($this->content);
 
-        $maxScore = blank($result->scores) ? 0 : max($result->scores);
+        $maxScore = $result->scores === [] ? 0 : max($result->scores);
         $flagThreshold = config('moderation.thresholds.flag', 0.7);
 
         // Below threshold = content is safe. No case created, no DB noise.

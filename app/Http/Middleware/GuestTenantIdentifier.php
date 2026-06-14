@@ -28,7 +28,13 @@ class GuestTenantIdentifier
             return $next($request);
         }
 
-        $tenant = $panel->getTenant($request->route()->parameter('tenant'));
+        $tenantSlug = $request->route()->parameter('tenant');
+
+        if (!is_string($tenantSlug)) {
+            return $next($request);
+        }
+
+        $tenant = $panel->getTenant($tenantSlug);
         Filament::setTenant($tenant, true);
 
         return $next($request);

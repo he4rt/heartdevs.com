@@ -69,9 +69,12 @@ final readonly class AdrStrategy extends AbstractDocumentStrategy
             $inline = $this->inline($content, 'Deciders');
 
             if ($inline !== null) {
+                $segments = preg_split('/[,;]/', $inline);
+                $segments = is_array($segments) ? $segments : [];
+
                 $deciders = array_values(array_filter(array_map(
                     mb_trim(...),
-                    (array) preg_split('/[,;]/', $inline),
+                    $segments,
                 ), static fn (string $name): bool => $name !== ''));
             }
         }

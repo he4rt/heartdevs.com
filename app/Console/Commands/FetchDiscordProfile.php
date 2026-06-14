@@ -70,6 +70,6 @@ class FetchDiscordProfile extends Command
 
         $this->newLine();
         $this->info('Full response:');
-        $this->line(json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
+        $this->line(json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR));
     }
 }

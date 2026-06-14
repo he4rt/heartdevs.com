@@ -143,7 +143,7 @@ class AnalyzeDiscordProfiles extends Command
                 'total_profiles' => $totalProfiles,
                 'total_with_github' => count($githubUsers),
                 'connections' => $githubUsers,
-            ], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE),
+            ], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR),
         );
 
         info('GitHub connections saved to storage/app/private/discord/github_connections.json');
@@ -157,7 +157,7 @@ class AnalyzeDiscordProfiles extends Command
                 'with_connections' => $withConnections,
                 'platforms' => $socialCounts,
                 'github_users' => count($githubUsers),
-            ], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE),
+            ], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR),
         );
 
         outro(sprintf('Report complete — %d profiles analyzed', $totalProfiles));

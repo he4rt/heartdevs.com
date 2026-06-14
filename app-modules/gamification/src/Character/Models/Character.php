@@ -111,12 +111,14 @@ final class Character extends Model
 
     protected function getRankingAttribute(): int
     {
-        return $this->newQuery()
+        $position = $this->newQuery()
             ->orderByDesc('experience')
             ->pluck('id')
             ->filter(fn ($id) => $id === $this->getKey())
             ->keys()
-            ->first() + 1;
+            ->first();
+
+        return (int) $position + 1;
     }
 
     /**

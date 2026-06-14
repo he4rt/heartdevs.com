@@ -22,7 +22,7 @@ final class RouteDecision implements ShouldQueue
     public function handle(): void
     {
         $scores = $this->case->ai_scores ?? [];
-        $maxScore = blank($scores) ? 0 : max($scores);
+        $maxScore = $scores === [] ? 0 : max($scores);
 
         $flagThreshold = config('moderation.thresholds.flag', 0.7);
         $highPriorityThreshold = config('moderation.thresholds.high_priority', 0.9);

@@ -3,7 +3,7 @@ includes:
     - phpstan.ignore.neon
 
 parameters:
-    level: 6
+    level: 7
 
     paths:
         - app/

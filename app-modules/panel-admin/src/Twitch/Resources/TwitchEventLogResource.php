@@ -120,7 +120,7 @@ class TwitchEventLogResource extends Resource
                     ->schema([
                         CodeEntry::make('payload')
                             ->extraAttributes(['class' => 'overflow-auto max-h-128'])
-                            ->formatStateUsing(fn (array $state): string => json_encode($state, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES))
+                            ->formatStateUsing(fn (array $state): string => json_encode($state, JSON_THROW_ON_ERROR | JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES))
                             ->columnSpanFull(),
                     ]),
             ]);

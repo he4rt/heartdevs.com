@@ -157,6 +157,7 @@ final class FixPostSwitchTimestampsCommand extends Command
 
                     foreach ($columns as $colDef) {
                         $column = $colDef[0];
+                        /** @var 'column'|'row' $fixScope */
                         $fixScope = $colDef[1] ?? 'column';
                         $moduleStats['columns']++;
 

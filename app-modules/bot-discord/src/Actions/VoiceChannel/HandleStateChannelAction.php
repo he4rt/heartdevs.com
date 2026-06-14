@@ -8,6 +8,7 @@ final class HandleStateChannelAction
 {
     public function execute(int|string $userId, ?string $channelId): void
     {
+        $userId = (string) $userId;
         $activeChannels = cache()->tags(['voice_channels'])->get('active_voice_channels_keys', []);
         $oldChannelId = $this->getUserLastChannel($userId);
 

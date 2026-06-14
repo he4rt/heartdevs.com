@@ -31,6 +31,6 @@ class AsCredentials implements CastsAttributes
             'username' => $value->username,
             'password' => $value->password,
             'api_key' => $value->apiKey,
-        ]);
+        ], JSON_THROW_ON_ERROR);
     }
 }

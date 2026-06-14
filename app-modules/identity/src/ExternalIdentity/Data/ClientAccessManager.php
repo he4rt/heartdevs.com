@@ -82,7 +82,7 @@ final class ClientAccessManager implements Wireable
 
     public function getExpiresIn(): ?int
     {
-        return $this->expiresIn !== null ? (int) Crypt::decrypt($this->expiresIn) : null;
+        return $this->expiresIn !== null ? (int) Crypt::decrypt((string) $this->expiresIn) : null;
     }
 
     public function getClientSecret(): ?string

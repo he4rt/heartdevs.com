@@ -89,91 +89,101 @@ final readonly class PeriodStats
     }
 
     /**
-     * Fetches message counts and unique users for all subdivisions in a single query
-     * using conditional aggregates (CASE WHEN) instead of N separate queries.
+     * Fetches message counts and unique users for all subdivisions in a single
+     * query. The subdivision windows are expanded into a derived table via
+     * PostgreSQL `unnest(...) WITH ORDINALITY`, keeping the SQL a static literal
+     * while the boundaries travel as array bindings.
      *
      * @param  array<int, array{start: Carbon, end: Carbon, label: string}>  $subdivisions
      * @return array<int, array{msgs: int, users: int}>
      */
     private function queryMessageStats(array $subdivisions): array
     {
-        $query = DB::table('messages')->whereNotNull('sent_at');
+        [$startsLiteral, $endsLiteral] = $this->boundaryArrayLiterals($subdivisions);
 
-        $selects = [];
-        $bindings = [];
+        $rows = DB::select(<<<'SQL'
+            SELECT p.idx,
+                   COUNT(m.sent_at) AS msgs,
+                   COUNT(DISTINCT m.external_identity_id) AS users
+            FROM unnest(?::timestamptz[], ?::timestamptz[]) WITH ORDINALITY AS p(start_at, end_at, idx)
+            LEFT JOIN messages m
+                ON m.sent_at >= p.start_at
+               AND m.sent_at < p.end_at
+            GROUP BY p.idx
+            ORDER BY p.idx
+            SQL, [$startsLiteral, $endsLiteral]);
 
-        foreach ($subdivisions as $i => $sub) {
-            $startUtc = $sub['start']->copy()->utc();
-            $endUtc = $sub['end']->copy()->utc();
-
-            $selects[] = 'COUNT(CASE WHEN sent_at >= ? AND sent_at < ? THEN 1 END) AS msgs_'.$i;
-            $selects[] = 'COUNT(DISTINCT CASE WHEN sent_at >= ? AND sent_at < ? THEN external_identity_id END) AS users_'.$i;
-
-            $bindings[] = $startUtc;
-            $bindings[] = $endUtc;
-            $bindings[] = $startUtc;
-            $bindings[] = $endUtc;
+        $byOrdinal = [];
+        foreach ($rows as $row) {
+            $byOrdinal[(int) $row->idx] = [
+                'msgs' => (int) $row->msgs,
+                'users' => (int) $row->users,
+            ];
         }
-
-        $firstStart = $subdivisions[0]['start']->copy()->utc();
-        $lastEnd = end($subdivisions)['end']->copy()->utc();
-
-        $row = $query
-            ->where('sent_at', '>=', $firstStart)
-            ->where('sent_at', '<', $lastEnd)
-            ->selectRaw(implode(', ', $selects), $bindings)
-            ->first();
 
         $result = [];
         foreach (array_keys($subdivisions) as $i) {
-            $result[$i] = [
-                'msgs' => (int) ($row->{'msgs_'.$i} ?? 0),
-                'users' => (int) ($row->{'users_'.$i} ?? 0),
-            ];
+            // `WITH ORDINALITY` is 1-based; subdivision keys are 0-based.
+            $result[$i] = $byOrdinal[$i + 1] ?? ['msgs' => 0, 'users' => 0];
         }
 
         return $result;
     }
 
     /**
-     * Fetches voice join counts for all subdivisions in a single query.
+     * Fetches voice join counts for all subdivisions in a single query, using the
+     * same `unnest(...) WITH ORDINALITY` window expansion as message stats.
      *
      * @param  array<int, array{start: Carbon, end: Carbon, label: string}>  $subdivisions
      * @return array<int, int>
      */
     private function queryVoiceStats(array $subdivisions): array
     {
-        $query = DB::table('voice_messages')
-            ->whereNotNull('occurred_at')
-            ->where('state', 'joined');
+        [$startsLiteral, $endsLiteral] = $this->boundaryArrayLiterals($subdivisions);
 
-        $selects = [];
-        $bindings = [];
+        $rows = DB::select(<<<'SQL'
+            SELECT p.idx, COUNT(v.occurred_at) AS joins
+            FROM unnest(?::timestamptz[], ?::timestamptz[]) WITH ORDINALITY AS p(start_at, end_at, idx)
+            LEFT JOIN voice_messages v
+                ON v.occurred_at >= p.start_at
+               AND v.occurred_at < p.end_at
+               AND v.state = 'joined'
+            GROUP BY p.idx
+            ORDER BY p.idx
+            SQL, [$startsLiteral, $endsLiteral]);
 
-        foreach ($subdivisions as $i => $sub) {
-            $startUtc = $sub['start']->copy()->utc();
-            $endUtc = $sub['end']->copy()->utc();
-
-            $selects[] = 'COUNT(CASE WHEN occurred_at >= ? AND occurred_at < ? THEN 1 END) AS joins_'.$i;
-            $bindings[] = $startUtc;
-            $bindings[] = $endUtc;
+        $byOrdinal = [];
+        foreach ($rows as $row) {
+            $byOrdinal[(int) $row->idx] = (int) $row->joins;
         }
-
-        $firstStart = $subdivisions[0]['start']->copy()->utc();
-        $lastEnd = end($subdivisions)['end']->copy()->utc();
-
-        $row = $query
-            ->where('occurred_at', '>=', $firstStart)
-            ->where('occurred_at', '<', $lastEnd)
-            ->selectRaw(implode(', ', $selects), $bindings)
-            ->first();
 
         $result = [];
         foreach (array_keys($subdivisions) as $i) {
-            $result[$i] = (int) ($row->{'joins_'.$i} ?? 0);
+            $result[$i] = $byOrdinal[$i + 1] ?? 0;
         }
 
         return $result;
+    }
+
+    /**
+     * Builds PostgreSQL `timestamptz[]` array literals for the subdivision start
+     * and end boundaries (in UTC), bound as static parameters to the `unnest`
+     * queries above.
+     *
+     * @param  array<int, array{start: Carbon, end: Carbon, label: string}>  $subdivisions
+     * @return array{0: string, 1: string}
+     */
+    private function boundaryArrayLiterals(array $subdivisions): array
+    {
+        $starts = [];
+        $ends = [];
+
+        foreach ($subdivisions as $sub) {
+            $starts[] = '"'.$sub['start']->copy()->utc()->format('Y-m-d H:i:sP').'"';
+            $ends[] = '"'.$sub['end']->copy()->utc()->format('Y-m-d H:i:sP').'"';
+        }
+
+        return ['{'.implode(',', $starts).'}', '{'.implode(',', $ends).'}'];
     }
 
     /**

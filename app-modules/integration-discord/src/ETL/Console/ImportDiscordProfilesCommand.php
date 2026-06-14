@@ -13,6 +13,7 @@ use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Schema;
+use RuntimeException;
 use Symfony\Component\Console\Output\ConsoleOutputInterface;
 use Symfony\Component\Console\Output\ConsoleSectionOutput;
 use Symfony\Component\Console\Terminal;
@@ -98,7 +99,10 @@ class ImportDiscordProfilesCommand extends Command
 
         foreach ($chunks as $chunkFile) {
             $chunkName = basename($chunkFile);
-            $profiles = json_decode(file_get_contents($chunkFile), true);
+            $chunkContents = file_get_contents($chunkFile);
+            throw_if($chunkContents === false, RuntimeException::class, 'Falha ao ler chunk: '.$chunkFile);
+
+            $profiles = json_decode($chunkContents, true);
 
             if (!is_array($profiles) || $profiles === []) {
                 $chunkCurrent++;

@@ -11,6 +11,7 @@ use Filament\Schemas\Contracts\HasSchemas;
 use Filament\Schemas\Schema;
 use He4rt\Activity\Timeline\Actions\CreateReply;
 use He4rt\Activity\Timeline\DTOs\CreateReplyDTO;
+use He4rt\Identity\User\Models\User;
 use Illuminate\View\View;
 use Livewire\Attributes\Locked;
 use Livewire\Component;
@@ -62,8 +63,11 @@ final class ReplyComposer extends Component implements HasSchemas
     {
         $state = $this->form->getState();
 
+        /** @var User $user */
+        $user = auth()->user();
+
         resolve(CreateReply::class)->handle(new CreateReplyDTO(
-            userId: auth()->id(),
+            userId: $user->id,
             tenantId: filament()->getTenant()->getKey(),
             parentTimelineId: $this->timelineId,
             content: $state['content'],

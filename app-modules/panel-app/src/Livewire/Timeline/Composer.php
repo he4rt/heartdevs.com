@@ -12,6 +12,7 @@ use Filament\Schemas\Contracts\HasSchemas;
 use Filament\Schemas\Schema;
 use He4rt\Activity\Timeline\Actions\CreatePost;
 use He4rt\Activity\Timeline\DTOs\CreatePostDTO;
+use He4rt\Identity\User\Models\User;
 use Illuminate\View\View;
 use Livewire\Component;
 
@@ -60,8 +61,11 @@ final class Composer extends Component implements HasSchemas
 
         $tenant = Filament::getTenant();
 
+        /** @var User $user */
+        $user = auth()->user();
+
         resolve(CreatePost::class)->handle(new CreatePostDTO(
-            userId: auth()->id(),
+            userId: $user->id,
             tenantId: $tenant->id,
             content: $state['content'],
             images: $state['images'] ?? [],

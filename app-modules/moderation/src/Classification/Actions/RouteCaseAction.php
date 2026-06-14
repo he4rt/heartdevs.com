@@ -25,7 +25,7 @@ final readonly class RouteCaseAction
     public function execute(ModerationCase $case): void
     {
         $scores = $case->ai_scores ?? [];
-        $maxScore = blank($scores) ? 0 : max($scores);
+        $maxScore = $scores === [] ? 0 : max($scores);
 
         $highPriorityThreshold = config('moderation.thresholds.high_priority', 0.9);
 

@@ -34,6 +34,25 @@ parameters:
     - The error comes from a third-party or generated code.
     - The false positive is a known PHPStan/Larastan limitation (e.g. Livewire `$form`).
 
+## Third-party stubs
+
+Some vendor libraries ship imprecise stubs that report types wider than the
+runtime guarantees. The canonical example is the Discord library
+(`team-reflex/discord-php`), which types repository collections as
+`array<T>|(Discord\Helpers\ExCollectionInterface&iterable<T>)` even though the
+runtime value is always the collection. Calling `->find()` / `->get()` on it is
+valid at runtime but PHPStan flags `method.nonObject` because the `array<T>`
+branch has no such method.
+
+Policy for these:
+
+- Do **not** rewrite working runtime code to satisfy a wrong stub.
+- Suppress the error in the **module-scoped** `phpstan.ignore.neon`
+  (e.g. `app-modules/bot-discord/phpstan.ignore.neon`), never in the root config,
+  so the suppression stays close to the affected module.
+- Use the indented block style, scope to the `path`, pin the `count`, and include
+  the `identifier` — exactly as for any other entry above.
+
 ## Baseline
 
 Prefer running `{{ $assist->binCommand('phpstan analyse --generate-baseline') }}` for bulk

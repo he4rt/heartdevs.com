@@ -272,7 +272,7 @@ class FetchDiscordProfiles extends Command
 
         Storage::disk('local')->put(
             $chunkFile,
-            json_encode($existing, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE)
+            json_encode($existing, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR)
         );
     }
 

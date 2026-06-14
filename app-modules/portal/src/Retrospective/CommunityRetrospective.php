@@ -142,7 +142,7 @@ final readonly class CommunityRetrospective
      */
     private function prRefs(Collection $items): array
     {
-        return $items
+        return array_values($items
             ->filter(fn (GithubContribution $contribution): bool => $contribution->type === ContributionType::Pr)
             ->sortByDesc(fn (GithubContribution $contribution): mixed => $contribution->occurred_at)
             ->map(function (GithubContribution $contribution): array {
@@ -158,7 +158,7 @@ final readonly class CommunityRetrospective
                 ];
             })
             ->values()
-            ->all();
+            ->all());
     }
 
     /**
@@ -167,7 +167,7 @@ final readonly class CommunityRetrospective
      */
     private function issueRefs(Collection $items): array
     {
-        return $items
+        return array_values($items
             ->filter(fn (GithubContribution $contribution): bool => $contribution->type === ContributionType::Issue)
             ->sortByDesc(fn (GithubContribution $contribution): mixed => $contribution->occurred_at)
             ->map(function (GithubContribution $contribution): array {
@@ -181,7 +181,7 @@ final readonly class CommunityRetrospective
                 ];
             })
             ->values()
-            ->all();
+            ->all());
     }
 
     private function refNumber(string $externalRef): int
@@ -242,7 +242,7 @@ final readonly class CommunityRetrospective
      */
     private function repos(Collection $contributions): array
     {
-        return $contributions
+        return array_values($contributions
             ->groupBy('repo')
             ->map(function (Collection $items, string $repo): array {
                 $prs = $items->filter(fn (GithubContribution $contribution): bool => $contribution->type === ContributionType::Pr);
@@ -272,7 +272,7 @@ final readonly class CommunityRetrospective
                 ];
             })
             ->values()
-            ->all();
+            ->all());
     }
 
     /**
@@ -281,13 +281,13 @@ final readonly class CommunityRetrospective
      */
     private function highlights(Collection $contributions): array
     {
-        return $contributions
+        return array_values($contributions
             ->filter(fn (GithubContribution $contribution): bool => $contribution->type === ContributionType::Pr)
             ->map(fn (GithubContribution $contribution): array => [...$this->prRow($contribution), 'repo' => $contribution->repo])
             ->sortByDesc(fn (array $pr): int => $pr['additions'] + $pr['deletions'])
             ->take(4)
             ->values()
-            ->all();
+            ->all());
     }
 
     private function isBot(GithubContribution $contribution): bool
