@@ -5,117 +5,48 @@ declare(strict_types=1);
 namespace He4rt\Docs;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\JsonResponse;
+use He4rt\Docs\Discovery\DocumentRegistry;
+use He4rt\Docs\Discovery\DTOs\DiscoveredDocument;
+use He4rt\Docs\Discovery\Enums\DocumentType;
+use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Http\Response;
-use Illuminate\Routing\Redirector;
-use Illuminate\View\View;
-use Symfony\Component\DomCrawler\Crawler;
 
-class DocsController extends Controller
+final class DocsController extends Controller
 {
-    public function __construct(protected Documentation $docs) {}
+    public function __construct(
+        private readonly DocumentRegistry $registry,
+    ) {}
 
     /**
-     * Show the root documentation page (/docs).
-     *
-     * @return RedirectResponse
+     * No landing page: redirect to the first document in the tree.
      */
-    public function showRootPage(): Redirector|RedirectResponse
+    public function index(): RedirectResponse
     {
-        return redirect('docs/'.config('docs.default_version'));
+        $first = $this->registry->tree()->first();
+
+        abort_unless($first instanceof DiscoveredDocument, 404);
+
+        return redirect($first->url);
     }
 
-    /**
-     * Show the documentation index JSON representation.
-     *
-     * @param  string  $version
-     * @return RedirectResponse|JsonResponse
-     */
-    public function index($version, Documentation $docs)
+    public function show(string $section, ?string $path = null): View
     {
+        abort_unless(DocumentType::tryFrom($section) instanceof DocumentType, 404);
 
-        if (!$this->isVersion($version)) {
-            return redirect('docs/'.DEFAULT_VERSION.'/index.json', 301);
-        }
+        $url = '/docs/'.$section.($path !== null ? '/'.$path : '');
+        $document = $this->registry->find($url);
 
-        return response()->json($docs->indexArray($version));
-    }
+        abort_unless($document instanceof DiscoveredDocument, 404);
 
-    /**
-     * Show the documentation sidebar JSON representation.
-     *
-     * @param  string  $version
-     * @return RedirectResponse|JsonResponse
-     */
-    public function sidebar($version, Documentation $docs)
-    {
-        if (!$this->isVersion($version)) {
-            return redirect('docs/'.DEFAULT_VERSION.'/sidebar.json', 301);
-        }
+        $rendered = $this->registry->render($document);
 
-        return response()->json($docs->getPages($version));
-    }
-
-    /**
-     * Show a documentation page.
-     */
-    public function show(string $version, ?string $page = null): RedirectResponse|View|Response
-    {
-        if (!$this->isVersion($version)) {
-            return redirect('docs/'.DEFAULT_VERSION.'/'.$version, 301);
-        }
-
-        if (!defined('CURRENT_VERSION')) {
-            define('CURRENT_VERSION', $version);
-        }
-
-        $sectionPage = $page ?: 'installation';
-        $payload = $this->docs->get($version, $sectionPage);
-
-        if (is_null($payload)) {
-            $otherVersions = $this->docs->versionsContainingPage($page);
-
-            abort(404, 'Page not found. Tried versions: '.$otherVersions->implode(', '));
-        }
-
-        $title = new Crawler($payload['content'])->filterXPath('//h1');
-
-        $section = '';
-
-        if ($this->docs->sectionExists($version, $page)) {
-            $section .= '/'.$page;
-        } elseif (!is_null($page)) {
-            return redirect('/docs/'.$version);
-        }
-
-        $canonical = null;
-
-        if ($this->docs->sectionExists(DEFAULT_VERSION, $sectionPage)) {
-            $canonical = 'docs/'.DEFAULT_VERSION.'/'.$sectionPage;
-        }
-
-        $payload = [
-            'title' => count($title) > 0 ? $title->text() : null,
-            'sidebar' => $this->docs->getPages($version),
-            'content' => $payload['content'],
-            'toc' => $payload['toc'],
-            'currentVersion' => $version,
-            'versions' => Documentation::getDocVersions(),
-            'currentSection' => $section,
-            'canonical' => $canonical,
-        ];
-
-        return view('docs::home', $payload);
-    }
-
-    /**
-     * Determine if the given URL segment is a valid version.
-     *
-     * @param  string  $version
-     */
-    protected function isVersion($version): bool
-    {
-        return array_key_exists($version, Documentation::getDocVersions());
+        return view('docs::home', [
+            'document' => $document,
+            'title' => $document->title,
+            'content' => $rendered->html,
+            'toc' => $rendered->toc,
+            'sidebar' => $this->registry->tree()->toSidebar(),
+            'currentUrl' => $document->url,
+        ]);
     }
 }

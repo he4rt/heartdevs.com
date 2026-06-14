@@ -5,15 +5,50 @@ declare(strict_types=1);
 namespace He4rt\Docs;
 
 use Dedoc\Scramble\Scramble;
+use He4rt\Docs\Console\Commands\CacheDocsCommand;
+use He4rt\Docs\Discovery\Actions\BuildDocumentTreeAction;
+use He4rt\Docs\Discovery\Actions\DiscoverDocumentSourcesAction;
+use He4rt\Docs\Discovery\DocumentRegistry;
+use He4rt\Docs\Discovery\Strategies\AdrStrategy;
+use He4rt\Docs\Discovery\Strategies\ContextMapStrategy;
+use He4rt\Docs\Discovery\Strategies\ContextStrategy;
+use He4rt\Docs\Discovery\Strategies\GuideStrategy;
+use He4rt\Docs\Discovery\Strategies\PlanStrategy;
+use He4rt\Docs\Discovery\Strategies\PrdStrategy;
+use He4rt\Docs\Discovery\Strategies\ReadmeStrategy;
+use He4rt\Docs\Discovery\Strategies\SpecStrategy;
+use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Support\ServiceProvider;
 
 class DocsServiceProvider extends ServiceProvider
 {
-    public function register(): void {}
+    public function register(): void
+    {
+        $this->mergeConfigFrom(__DIR__.'/../config/docs.php', 'docs');
+
+        // Order matters: the first strategy whose matches() is true owns the file.
+        $this->app->tag([
+            ContextMapStrategy::class,
+            ContextStrategy::class,
+            AdrStrategy::class,
+            SpecStrategy::class,
+            PlanStrategy::class,
+            PrdStrategy::class,
+            ReadmeStrategy::class,
+            GuideStrategy::class,
+        ], 'docs.strategies');
+
+        $this->app->bind(BuildDocumentTreeAction::class, static fn (Application $app): BuildDocumentTreeAction => new BuildDocumentTreeAction(
+            $app->make(DiscoverDocumentSourcesAction::class),
+            $app->tagged('docs.strategies'),
+        ));
+
+        $this->app->singleton(DocumentRegistry::class);
+    }
 
     public function boot(): void
     {
-        $this->mergeConfigFrom(__DIR__.'/../config/docs.php', 'docs');
+        $this->commands([CacheDocsCommand::class]);
 
         Scramble::registerApi('3.x');
 

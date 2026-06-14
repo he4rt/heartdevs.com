@@ -2,14 +2,20 @@
 
 declare(strict_types=1);
 
+use He4rt\Docs\Discovery\Enums\DocumentType;
 use He4rt\Docs\DocsController;
 use Illuminate\Support\Facades\Route;
 
-if (!defined('DEFAULT_VERSION')) {
-    define('DEFAULT_VERSION', '3.x');
-}
+$sections = implode('|', array_map(
+    static fn (DocumentType $type): string => $type->value,
+    DocumentType::cases(),
+));
 
-Route::get('docs', [DocsController::class, 'showRootPage']);
-Route::get('docs/{version}/index.json', [DocsController::class, 'index']);
-Route::get('docs/{version}/sidebar.json', [DocsController::class, 'sidebar']);
-Route::get('docs/{version}/{page?}', [DocsController::class, 'show'])->name('docs.version');
+Route::get('docs', [DocsController::class, 'index'])->name('docs.index');
+
+// The section is constrained to known document types so Scramble's
+// `docs/3.x/api` (and any other prefix) falls through to its own route.
+Route::get('docs/{section}/{path?}', [DocsController::class, 'show'])
+    ->where('section', $sections)
+    ->where('path', '.*')
+    ->name('docs.show');
