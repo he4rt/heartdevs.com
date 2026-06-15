@@ -12,6 +12,7 @@ use He4rt\Identity\User\Models\User;
 use He4rt\Moderation\Appeals\ModerationAppeal;
 use He4rt\Moderation\Enforcement\ModerationAction;
 use He4rt\PanelAdmin\Moderation\Widgets\Concerns\ResolvesFilterPeriod;
+use Illuminate\Database\Query\Builder;
 
 class ModeratorPerformanceWidget extends TableWidget
 {
@@ -32,7 +33,7 @@ class ModeratorPerformanceWidget extends TableWidget
         return $table
             ->query(
                 User::query()
-                    ->whereIn('id', static function ($query) use ($start): void {
+                    ->whereIn('id', static function (Builder $query) use ($start): void {
                         $query->select('moderator_id')
                             ->from('moderation_actions')
                             ->where('created_at', '>=', $start)

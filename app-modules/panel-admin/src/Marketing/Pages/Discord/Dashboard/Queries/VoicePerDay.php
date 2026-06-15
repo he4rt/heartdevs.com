@@ -20,7 +20,8 @@ final readonly class VoicePerDay
         $tz = config('app.display_timezone');
         $start = Date::now($tz)->subDays($this->rangeDays)->startOfDay()->utc();
 
-        return DB::table('voice_messages')
+        /** @var Collection<int, object{day: string, total_joins: int}> $rows */
+        $rows = DB::table('voice_messages')
             ->selectRaw('(occurred_at AT TIME ZONE ?)::date AS day', [$tz])
             ->selectRaw('COUNT(*) AS total_joins')
             ->where('occurred_at', '>=', $start)
@@ -28,11 +29,12 @@ final readonly class VoicePerDay
             ->where('state', 'joined')
             ->groupBy('day')
             ->orderBy('day')
-            ->get()
-            ->map(fn (object $row): array => [
-                'day' => (string) $row->day,
-                'joins' => (int) $row->total_joins,
-                'hours' => round((int) $row->total_joins * 0.75, 2),
-            ]);
+            ->get();
+
+        return $rows->map(fn (object $row): array => [
+            'day' => (string) $row->day,
+            'joins' => (int) $row->total_joins,
+            'hours' => round((int) $row->total_joins * 0.75, 2),
+        ]);
     }
 }

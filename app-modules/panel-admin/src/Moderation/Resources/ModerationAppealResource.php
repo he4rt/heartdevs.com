@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace He4rt\PanelAdmin\Moderation\Resources;
 
 use BackedEnum;
+use DateTimeInterface;
 use Filament\Resources\Resource;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Columns\TextColumn;
@@ -64,7 +65,7 @@ class ModerationAppealResource extends Resource
                     ->label('Reviewer'),
                 TextColumn::make('sla_deadline')
                     ->dateTime()
-                    ->color(fn ($state) => $state && now()->gt($state) ? 'danger' : null),
+                    ->color(fn (DateTimeInterface|string|null $state) => $state && now()->gt($state) ? 'danger' : null),
                 TextColumn::make('created_at')
                     ->dateTime(),
             ])

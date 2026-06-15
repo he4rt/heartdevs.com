@@ -20,7 +20,8 @@ final readonly class TopChannels
         $tz = config('app.display_timezone');
         $start = Date::now($tz)->subDays($this->rangeDays)->startOfDay()->utc();
 
-        return DB::table('messages')
+        /** @var Collection<int, object{channel_id: string, total_messages: int, unique_users: int}> $rows */
+        $rows = DB::table('messages')
             ->select('channel_id')
             ->selectRaw('COUNT(*) AS total_messages')
             ->selectRaw('COUNT(DISTINCT external_identity_id) AS unique_users')
@@ -29,11 +30,12 @@ final readonly class TopChannels
             ->groupBy('channel_id')
             ->orderByDesc('total_messages')
             ->limit(10)
-            ->get()
-            ->map(fn (object $row): array => [
-                'channel_id' => (string) $row->channel_id,
-                'total_messages' => (int) $row->total_messages,
-                'unique_users' => (int) $row->unique_users,
-            ]);
+            ->get();
+
+        return $rows->map(fn (object $row): array => [
+            'channel_id' => (string) $row->channel_id,
+            'total_messages' => (int) $row->total_messages,
+            'unique_users' => (int) $row->unique_users,
+        ]);
     }
 }

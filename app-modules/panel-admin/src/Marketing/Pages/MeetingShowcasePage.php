@@ -78,7 +78,10 @@ class MeetingShowcasePage extends Page
         $this->participants = $messageStats->map(function (Message $stat) use ($identities): array {
             $identity = $identities->get($stat->external_identity_id);
 
-            return $this->extractDiscordData($identity, (int) $stat->total_messages); // @phpstan-ignore property.notFound
+            /** @var int $totalMessages */
+            $totalMessages = $stat->total_messages; // @phpstan-ignore property.notFound
+
+            return $this->extractDiscordData($identity, $totalMessages);
         })->all();
 
         $this->loaded = true;

@@ -115,7 +115,10 @@ class ModerationRuleResource extends Resource
                     ->rows(4),
             ])
             ->action(static function (array $data, ModerationRule $record): void {
-                if ($record->matches($data['test_input'])) {
+                /** @var string $testInput */
+                $testInput = $data['test_input'];
+
+                if ($record->matches($testInput)) {
                     Notification::make()
                         ->success()
                         ->title(__('panel-admin::moderation.rules.actions.test_match', [

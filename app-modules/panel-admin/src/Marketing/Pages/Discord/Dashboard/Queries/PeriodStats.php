@@ -114,6 +114,7 @@ final readonly class PeriodStats
             SQL, [$startsLiteral, $endsLiteral]);
 
         $byOrdinal = [];
+        /** @var object{idx: int, msgs: int, users: int} $row */
         foreach ($rows as $row) {
             $byOrdinal[(int) $row->idx] = [
                 'msgs' => (int) $row->msgs,
@@ -153,6 +154,7 @@ final readonly class PeriodStats
             SQL, [$startsLiteral, $endsLiteral]);
 
         $byOrdinal = [];
+        /** @var object{idx: int, joins: int} $row */
         foreach ($rows as $row) {
             $byOrdinal[(int) $row->idx] = (int) $row->joins;
         }

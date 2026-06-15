@@ -220,7 +220,8 @@ class ModerationDashboardLivewire extends Component
     {
         $start = $this->periodStart;
 
-        return DB::table('moderation_actions')
+        /** @var Collection<int, stdClass> $rows */
+        $rows = DB::table('moderation_actions')
             ->join('users', 'moderation_actions.moderator_id', '=', 'users.id')
             ->join('moderation_cases', 'moderation_actions.case_id', '=', 'moderation_cases.id')
             ->where('moderation_actions.created_at', '>=', $start)
@@ -231,22 +232,26 @@ class ModerationDashboardLivewire extends Component
             ->groupBy('users.id', 'users.username')
             ->orderByDesc('total_cases')
             ->limit(10)
-            ->get()
-            ->map(static function (object $row) use ($start): object {
-                $actionIds = ModerationAction::query()
-                    ->where('moderator_id', $row->id)
-                    ->where('created_at', '>=', $start)
-                    ->pluck('id');
+            ->get();
 
-                $overturned = ModerationAppeal::query()
-                    ->whereIn('action_id', $actionIds)
-                    ->where('status', 'overturned')
-                    ->count();
+        return $rows->map(static function (stdClass $row) use ($start): stdClass {
+            /** @var int $totalCases */
+            $totalCases = $row->total_cases;
 
-                $row->overturn_rate = $row->total_cases > 0 ? (int) round(($overturned / $row->total_cases) * 100) : 0;
+            $actionIds = ModerationAction::query()
+                ->where('moderator_id', $row->id)
+                ->where('created_at', '>=', $start)
+                ->pluck('id');
 
-                return $row;
-            });
+            $overturned = ModerationAppeal::query()
+                ->whereIn('action_id', $actionIds)
+                ->where('status', 'overturned')
+                ->count();
+
+            $row->overturn_rate = $totalCases > 0 ? (int) round(($overturned / $totalCases) * 100) : 0;
+
+            return $row;
+        });
     }
 
     #[Computed]
@@ -334,7 +339,8 @@ class ModerationDashboardLivewire extends Component
             ->orderByDesc('offense_count')
             ->limit(5)
             ->get()
-            ->map(static function (object $row): object {
+            ->map(/** @param object{author_id: int, offense_count: int} $row */ static function (object $row): object {
+                /** @var object{username: string}|null $user */
                 $user = DB::table('users')->where('id', $row->author_id)->first(['username']);
                 $row->username = $user->username ?? 'unknown';
 
@@ -358,6 +364,7 @@ class ModerationDashboardLivewire extends Component
 
         $grid = array_fill(0, 7, array_fill(0, 24, 0));
 
+        /** @var object{dow: int, hour: int, total: int} $row */
         foreach ($dbData as $row) {
             $grid[(int) $row->dow][(int) $row->hour] = (int) $row->total;
         }

@@ -20,7 +20,8 @@ final readonly class ActivityPerDay
         $tz = config('app.display_timezone');
         $start = Date::now($tz)->subDays($this->rangeDays)->startOfDay()->utc();
 
-        return DB::table('messages')
+        /** @var Collection<int, object{day: string, total_messages: int, unique_users: int}> $rows */
+        $rows = DB::table('messages')
             ->selectRaw('(sent_at AT TIME ZONE ?)::date AS day', [$tz])
             ->selectRaw('COUNT(*) AS total_messages')
             ->selectRaw('COUNT(DISTINCT external_identity_id) AS unique_users')
@@ -28,11 +29,12 @@ final readonly class ActivityPerDay
             ->whereNotNull('sent_at')
             ->groupBy('day')
             ->orderBy('day')
-            ->get()
-            ->map(fn (object $row): array => [
-                'day' => (string) $row->day,
-                'msgs' => (int) $row->total_messages,
-                'users' => (int) $row->unique_users,
-            ]);
+            ->get();
+
+        return $rows->map(fn (object $row): array => [
+            'day' => (string) $row->day,
+            'msgs' => (int) $row->total_messages,
+            'users' => (int) $row->unique_users,
+        ]);
     }
 }

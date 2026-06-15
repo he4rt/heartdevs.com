@@ -19,6 +19,7 @@ use He4rt\Moderation\Appeals\ReviewAppeal;
 use He4rt\Moderation\Enums\AppealStatus;
 use Illuminate\Contracts\View\Factory;
 use Illuminate\Contracts\View\View;
+use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\Collection;
 use Livewire\Attributes\Computed;
 use Livewire\Component;
@@ -60,12 +61,13 @@ class AppealQueue extends Component implements HasActions, HasForms
             return null;
         }
 
+        /** @var ModerationAppeal|null */
         return ModerationAppeal::query()
             ->with([
                 'appellant',
                 'reviewer',
                 'action.moderator',
-                'action.case' => fn ($q) => $q->with(['author', 'reports.reporter']),
+                'action.case' => fn (Relation $q) => $q->with(['author', 'reports.reporter']),
             ])
             ->find($this->selectedAppealId);
     }
@@ -102,11 +104,14 @@ class AppealQueue extends Component implements HasActions, HasForms
                 }
 
                 try {
+                    /** @var string $reviewerNotes */
+                    $reviewerNotes = $data['reviewer_notes'];
+
                     resolve(ReviewAppeal::class)->handle(
                         $appeal,
                         auth()->user(),
                         AppealStatus::Upheld,
-                        $data['reviewer_notes'],
+                        $reviewerNotes,
                     );
 
                     Notification::make()
@@ -145,11 +150,14 @@ class AppealQueue extends Component implements HasActions, HasForms
                 }
 
                 try {
+                    /** @var string $reviewerNotes */
+                    $reviewerNotes = $data['reviewer_notes'];
+
                     resolve(ReviewAppeal::class)->handle(
                         $appeal,
                         auth()->user(),
                         AppealStatus::Overturned,
-                        $data['reviewer_notes'],
+                        $reviewerNotes,
                     );
 
                     Notification::make()

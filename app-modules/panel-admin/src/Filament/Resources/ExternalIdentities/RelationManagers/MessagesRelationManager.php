@@ -278,11 +278,17 @@ class MessagesRelationManager extends RelationManager
                             ],
                         ]);
 
+                        /** @var ViolationType $reason */
+                        $reason = $data['reason'];
+
+                        /** @var string|null $details */
+                        $details = $data['details'] ?? null;
+
                         resolve(SubmitReport::class)->handle(
                             reporter: auth()->user(),
                             contentDTO: $contentDTO,
-                            reason: $data['reason'],
-                            details: $data['details'] ?? null,
+                            reason: $reason,
+                            details: $details,
                             platform: Platform::Web,
                         );
                     })
