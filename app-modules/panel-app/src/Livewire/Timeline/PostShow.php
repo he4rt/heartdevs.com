@@ -8,6 +8,7 @@ use He4rt\Activity\Timeline\Actions\TogglePinPost;
 use He4rt\Activity\Timeline\Timeline;
 use He4rt\Identity\User\Models\User;
 use Illuminate\Container\Attributes\CurrentUser;
+use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\View\View;
 use Livewire\Attributes\Locked;
 use Livewire\Attributes\On;
@@ -48,7 +49,7 @@ final class PostShow extends Component
                 'user',
                 'postable',
                 'reactions',
-                'children' => fn ($q) => $q->with('user', 'postable')->latest(),
+                'children' => fn (Relation $q) => $q->with('user', 'postable')->latest(),
             ])
             ->withCount('children', 'reactions')
             ->firstOrFail();

@@ -16,6 +16,9 @@ use He4rt\Identity\User\Models\User;
 use Illuminate\View\View;
 use Livewire\Component;
 
+/**
+ * @property-read Schema $form
+ */
 final class Composer extends Component implements HasSchemas
 {
     use InteractsWithSchemas;
@@ -57,16 +60,18 @@ final class Composer extends Component implements HasSchemas
 
     public function post(): void
     {
+        /** @var array{content: string, images?: list<string>} $state */
         $state = $this->form->getState();
 
-        $tenant = Filament::getTenant();
+        /** @var string $tenantId */
+        $tenantId = Filament::getTenant()->getKey();
 
         /** @var User $user */
         $user = auth()->user();
 
         resolve(CreatePost::class)->handle(new CreatePostDTO(
             userId: $user->id,
-            tenantId: $tenant->id,
+            tenantId: $tenantId,
             content: $state['content'],
             images: $state['images'] ?? [],
         ));

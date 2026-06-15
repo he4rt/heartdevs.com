@@ -1,17 +1,2 @@
 parameters:
-    ignoreErrors:
-        -
-            message: '#^Access to an undefined property He4rt\\PanelApp\\Livewire\\Timeline\\Composer::\$form\.$#'
-            identifier: property.notFound
-            count: 3
-            path: src/Livewire/Timeline/Composer.php
-        -
-            message: '#^Access to an undefined property Illuminate\\Database\\Eloquent\\Model::\$id\.$#'
-            identifier: property.notFound
-            count: 1
-            path: src/Livewire/Timeline/Composer.php
-        -
-            message: '#^Access to an undefined property He4rt\\PanelApp\\Livewire\\Timeline\\ReplyComposer::\$form\.$#'
-            identifier: property.notFound
-            count: 3
-            path: src/Livewire/Timeline/ReplyComposer.php
+    ignoreErrors: []

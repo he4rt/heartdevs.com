@@ -16,6 +16,9 @@ use Illuminate\View\View;
 use Livewire\Attributes\Locked;
 use Livewire\Component;
 
+/**
+ * @property-read Schema $form
+ */
 final class ReplyComposer extends Component implements HasSchemas
 {
     use InteractsWithSchemas;
@@ -61,14 +64,18 @@ final class ReplyComposer extends Component implements HasSchemas
 
     public function reply(): void
     {
+        /** @var array{content: string, images?: list<string>} $state */
         $state = $this->form->getState();
 
         /** @var User $user */
         $user = auth()->user();
 
+        /** @var string $tenantId */
+        $tenantId = filament()->getTenant()->getKey();
+
         resolve(CreateReply::class)->handle(new CreateReplyDTO(
             userId: $user->id,
-            tenantId: filament()->getTenant()->getKey(),
+            tenantId: $tenantId,
             parentTimelineId: $this->timelineId,
             content: $state['content'],
             images: $state['images'] ?? [],
