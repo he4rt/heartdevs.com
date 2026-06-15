@@ -19,6 +19,12 @@ final readonly class UpsertProfileDTO
         public ?int $yearsExperience = null,
         /** @var array<string, string>|null */
         public ?array $socialLinks = null,
+        /** @var array<int, string>|null */
+        public ?array $workTypes = null,
+        /** @var array<int, array{name: string, level: string}>|null */
+        public ?array $languages = null,
+        /** @var array<int, array{name: string, category: string}>|null */
+        public ?array $skills = null,
     ) {}
 
     /**
@@ -36,6 +42,9 @@ final readonly class UpsertProfileDTO
                 : null,
             yearsExperience: isset($data['years_experience']) ? (int) $data['years_experience'] : null,
             socialLinks: $data['social_links'] ?? null,
+            workTypes: $data['work_types'] ?? null,
+            languages: $data['languages'] ?? null,
+            skills: $data['skills'] ?? null,
         );
     }
 }

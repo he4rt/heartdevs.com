@@ -22,10 +22,23 @@ final class ProfileController
         'devto' => 'https://dev.to/%s',
     ];
 
+    private const array SOCIAL_ICONS = [
+        'whatsapp' => 'fa-brands fa-whatsapp',
+        'linkedin' => 'fa-brands fa-linkedin-in',
+        'github' => 'fa-brands fa-github',
+        'devto' => 'fa-brands fa-dev',
+        'instagram' => 'fa-brands fa-instagram',
+        'twitter' => 'fa-brands fa-twitter',
+        'youtube' => 'fa-brands fa-youtube',
+        'website' => 'fas fa-globe',
+        'bluesky' => 'fa-brands fa-bluesky',
+    ];
+
     public function show(Request $request, string $username): Factory|View
     {
         $tenant = Tenant::query()
             ->where('domain', $request->getHost())
+            ->where('active', true)
             ->firstOrFail();
 
         $user = User::query()
@@ -41,21 +54,36 @@ final class ProfileController
 
         abort_if($profile === null, 404);
 
-        $user->load(['character.badges', 'providers', 'address']);
+        $user->load([
+            'character.badges',
+            'providers' => fn ($query) => $query->where('tenant_id', $tenant->id),
+            'address',
+        ]);
 
         $connectedAccounts = $this->buildConnectedAccounts($profile, $user);
+
+        $resumeUrl = $profile->getFirstMediaUrl('resume') ?: null;
+
+        $projects = $profile->projects()->orderBy('sort_order')->get();
+
+        $pullRequests = $profile->pullRequests()->latest()->get();
 
         return view('profile::public-profile', [
             'user' => $user,
             'profile' => $profile,
             'tenant' => $tenant,
             'connectedAccounts' => $connectedAccounts,
+            'socialIcons' => self::SOCIAL_ICONS,
+            'projects' => $projects,
+            'pullRequests' => $pullRequests,
+            'resumeUrl' => $resumeUrl,
         ]);
     }
 
     private function buildConnectedAccounts(Profile $profile, User $user): Collection
     {
         $accounts = collect();
+        $seen = [];
 
         if ($profile->social_links) {
             foreach ($profile->social_links as $platform => $url) {
@@ -64,6 +92,7 @@ final class ProfileController
                     'label' => $platform,
                     'url' => $url,
                 ]);
+                $seen[] = $platform;
             }
         }
 
@@ -72,14 +101,19 @@ final class ProfileController
                 ? $provider->provider->value
                 : $provider->provider;
 
+            if (in_array($name, $seen, true)) {
+                continue;
+            }
+
             $template = self::PROVIDER_URLS[$name] ?? null;
 
-            if ($template) {
+            if ($template && $provider->external_account_id) {
                 $accounts->push([
                     'provider' => $name,
                     'label' => $name,
                     'url' => sprintf($template, $provider->external_account_id),
                 ]);
+                $seen[] = $name;
             }
         }
 

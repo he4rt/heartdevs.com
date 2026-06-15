@@ -16,10 +16,8 @@ test('seniority level implements filament enum interfaces', function (): void {
         ->toBeInstanceOf(HasIcon::class);
 
     expect(SeniorityLevel::Junior->getLabel())->toBeString()->not->toBeEmpty()
-        ->and(SeniorityLevel::Mid->getLabel())->toBeString()->not->toBeEmpty()
-        ->and(SeniorityLevel::Senior->getLabel())->toBeString()->not->toBeEmpty()
-        ->and(SeniorityLevel::Specialist->getLabel())->toBeString()->not->toBeEmpty()
-        ->and(SeniorityLevel::Lead->getLabel())->toBeString()->not->toBeEmpty();
+        ->and(SeniorityLevel::Pleno->getLabel())->toBeString()->not->toBeEmpty()
+        ->and(SeniorityLevel::Senior->getLabel())->toBeString()->not->toBeEmpty();
 });
 
 test('social platform implements filament enum interfaces', function (): void {
@@ -49,6 +47,6 @@ test('all seniority level cases have distinct colors and icons', function (): vo
     $colors = array_map(fn (SeniorityLevel $level) => $level->getColor(), SeniorityLevel::cases());
     $icons = array_map(fn (SeniorityLevel $level) => $level->getIcon(), SeniorityLevel::cases());
 
-    expect($colors)->toHaveCount(5)
-        ->and($icons)->toHaveCount(5);
+    expect($colors)->toHaveCount(3)
+        ->and($icons)->toHaveCount(3);
 });

@@ -1,0 +1,409 @@
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap');
+
+:root {
+    --primary: #9b5de5;
+    --primary2: #782bf1;
+    /* Light mode (default) */
+    --bg: #f5f5f7;
+    --card: #ffffff;
+    --e2: #ede8f5;
+    --ol: rgba(124, 58, 237, 0.18);
+    --tm: #3d3654;
+    --tl: #706888;
+    --text-main: #1e1833;
+    --text-heading: #130f24;
+    --chip-purple-bg: rgba(124, 58, 237, 0.14);
+    --chip-purple-border: rgba(124, 58, 237, 0.35);
+    --chip-purple-text: #6d28d9;
+    --chip-cyan-bg: rgba(6, 182, 212, 0.12);
+    --chip-cyan-border: rgba(6, 182, 212, 0.35);
+    --chip-cyan-text: #0891b2;
+    --chip-gray-bg: #ede8f5;
+    --chip-gray-border: rgba(124, 58, 237, 0.2);
+    --chip-gray-text: #3d3654;
+    --badge-bg: rgba(124, 58, 237, 0.1);
+    --icon-hover-bg: rgba(124, 58, 237, 0.12);
+    --divider: rgba(124, 58, 237, 0.14);
+    --status-green-bg: rgba(34, 197, 94, 0.12);
+    --status-green-border: rgba(34, 197, 94, 0.35);
+    --status-green-text: #16a34a;
+    --skill-chip-hover-border: #7c3aed;
+    --overlay: rgba(255, 255, 255, 0.85);
+}
+
+:root.dark {
+    --bg: #000000;
+    --card: #0a0a0a;
+    --e2: #111111;
+    --ol: rgba(155, 93, 229, 0.16);
+    --tm: #a8a0c0;
+    --tl: #6e6590;
+    --text-main: #e8e4f0;
+    --text-heading: #f0ecf8;
+    --chip-purple-bg: rgba(120, 43, 241, 0.12);
+    --chip-purple-border: rgba(120, 43, 241, 0.25);
+    --chip-purple-text: #c4a3f0;
+    --chip-cyan-bg: rgba(6, 182, 212, 0.12);
+    --chip-cyan-border: rgba(6, 182, 212, 0.25);
+    --chip-cyan-text: #67d8ef;
+    --chip-gray-bg: #111111;
+    --chip-gray-border: rgba(155, 93, 229, 0.16);
+    --chip-gray-text: #a8a0c0;
+    --badge-bg: rgba(155, 93, 229, 0.1);
+    --icon-hover-bg: rgba(155, 93, 229, 0.12);
+    --divider: rgba(155, 93, 229, 0.16);
+    --status-green-bg: rgba(34, 197, 94, 0.1);
+    --status-green-border: rgba(34, 197, 94, 0.3);
+    --status-green-text: #86efac;
+    --skill-chip-hover-border: #9b5de5;
+    --overlay: rgba(0, 0, 0, 0.6);
+}
+
+/* Light body — default */
+body:has(.profile-page) {
+    background: #f5f5f7 !important;
+    color: var(--text-main) !important;
+}
+
+/* Dark body via .dark class (Flux sets this based on OS) */
+.dark body:has(.profile-page) {
+    background:
+        radial-gradient(ellipse at 15% 0%, rgba(120, 43, 241, 0.08), transparent 50%),
+        radial-gradient(ellipse at 85% 20%, rgba(88, 28, 180, 0.05), transparent 45%), #000000 !important;
+    color: var(--text-main) !important;
+}
+
+/* Dark body via prefers-color-scheme (native OS detection) */
+@media (prefers-color-scheme: dark) {
+    :root {
+        --bg: #000000;
+        --card: #0a0a0a;
+        --e2: #111111;
+        --ol: rgba(155, 93, 229, 0.16);
+        --tm: #a8a0c0;
+        --tl: #6e6590;
+        --text-main: #e8e4f0;
+        --text-heading: #f0ecf8;
+        --chip-purple-bg: rgba(120, 43, 241, 0.12);
+        --chip-purple-border: rgba(120, 43, 241, 0.25);
+        --chip-purple-text: #c4a3f0;
+        --chip-cyan-bg: rgba(6, 182, 212, 0.12);
+        --chip-cyan-border: rgba(6, 182, 212, 0.25);
+        --chip-cyan-text: #67d8ef;
+        --chip-gray-bg: #111111;
+        --chip-gray-border: rgba(155, 93, 229, 0.16);
+        --chip-gray-text: #a8a0c0;
+        --badge-bg: rgba(155, 93, 229, 0.1);
+        --icon-hover-bg: rgba(155, 93, 229, 0.12);
+        --divider: rgba(155, 93, 229, 0.16);
+        --status-green-bg: rgba(34, 197, 94, 0.1);
+        --status-green-border: rgba(34, 197, 94, 0.3);
+        --status-green-text: #86efac;
+        --skill-chip-hover-border: #9b5de5;
+        --overlay: rgba(0, 0, 0, 0.6);
+    }
+
+    body:has(.profile-page) {
+        background:
+            radial-gradient(ellipse at 15% 0%, rgba(120, 43, 241, 0.08), transparent 50%),
+            radial-gradient(ellipse at 85% 20%, rgba(88, 28, 180, 0.05), transparent 45%), #000000 !important;
+        color: var(--text-main) !important;
+    }
+}
+
+.profile-page {
+    min-height: 100vh;
+    color: var(--text-main);
+}
+
+/* ============================================
+   TAILWIND UTILITY CLASSES (CSS var driven)
+   ============================================ */
+
+.font-display {
+    font-family: 'Outfit', sans-serif;
+}
+
+.bg-bg {
+    background-color: var(--bg);
+}
+.bg-card {
+    background-color: var(--card);
+}
+.bg-e2 {
+    background-color: var(--e2);
+}
+.bg-primary\/10 {
+    background-color: var(--badge-bg);
+}
+.bg-primary\/20 {
+    background-color: var(--icon-hover-bg);
+}
+.bg-primary2 {
+    background-color: var(--primary2);
+}
+
+.text-primary {
+    color: var(--primary);
+}
+.text-tm {
+    color: var(--tm);
+}
+.text-tl {
+    color: var(--tl);
+}
+
+.border-ol {
+    border-color: var(--ol);
+}
+
+/* ============================================
+   OVERRIDES
+   ============================================ */
+
+body:has(.profile-page) .hp-button-outline {
+    color: var(--tm) !important;
+    border-color: var(--ol) !important;
+}
+
+body:has(.profile-page) .hp-button-outline:hover {
+    color: var(--primary) !important;
+    border-color: var(--primary2) !important;
+    background: var(--icon-hover-bg) !important;
+}
+
+body:has(.profile-page) .hp-button-solid {
+    color: #fff !important;
+}
+
+/* ============================================
+   AVATAR NEON RING
+   ============================================ */
+
+.avatar-wrap {
+    position: relative;
+    width: 11rem;
+    height: 11rem;
+}
+
+.avatar-wrap::before {
+    content: '';
+    position: absolute;
+    inset: -10px;
+    border-radius: 9999px;
+    background: conic-gradient(
+        from 0deg,
+        transparent 0deg,
+        #8b5cf6 8deg,
+        #8b5cf6 58deg,
+        #5b3a8c 108deg,
+        transparent 113deg,
+        transparent 117deg,
+        transparent 117deg,
+        #8b5cf6 125deg,
+        #8b5cf6 178deg,
+        #5b3a8c 228deg,
+        transparent 233deg,
+        transparent 237deg,
+        transparent 237deg,
+        #8b5cf6 245deg,
+        #8b5cf6 298deg,
+        #5b3a8c 348deg,
+        transparent 353deg,
+        transparent 357deg
+    );
+    animation: spin 18s linear infinite;
+    z-index: 0;
+    -webkit-mask: radial-gradient(
+        farthest-side,
+        transparent calc(100% - 1px),
+        #000 calc(100% - 1px),
+        #000 100%,
+        transparent 100%
+    );
+    mask: radial-gradient(
+        farthest-side,
+        transparent calc(100% - 1px),
+        #000 calc(100% - 1px),
+        #000 100%,
+        transparent 100%
+    );
+}
+
+.avatar-wrap::after {
+    content: '';
+    position: absolute;
+    inset: -10px;
+    border-radius: 9999px;
+    background: conic-gradient(
+        from 0deg,
+        transparent 0deg,
+        #8b5cf6 8deg,
+        #8b5cf6 58deg,
+        #5b3a8c 108deg,
+        transparent 113deg,
+        transparent 117deg,
+        transparent 117deg,
+        #8b5cf6 125deg,
+        #8b5cf6 178deg,
+        #5b3a8c 228deg,
+        transparent 233deg,
+        transparent 237deg,
+        transparent 237deg,
+        #8b5cf6 245deg,
+        #8b5cf6 298deg,
+        #5b3a8c 348deg,
+        transparent 353deg,
+        transparent 357deg
+    );
+    filter: blur(3px);
+    opacity: 0.6;
+    animation: spin 18s linear infinite;
+    z-index: 0;
+    -webkit-mask: radial-gradient(farthest-side, transparent calc(100% - 4px), #000 calc(100% - 1px), transparent 100%);
+    mask: radial-gradient(farthest-side, transparent calc(100% - 4px), #000 calc(100% - 1px), transparent 100%);
+}
+
+.avatar-ring-glow {
+    position: absolute;
+    inset: -10px;
+    border-radius: 9999px;
+    background: conic-gradient(
+        from 0deg,
+        transparent 0deg,
+        #8b5cf6 8deg,
+        #8b5cf6 58deg,
+        #5b3a8c 108deg,
+        transparent 113deg,
+        transparent 117deg,
+        transparent 117deg,
+        #8b5cf6 125deg,
+        #8b5cf6 178deg,
+        #5b3a8c 228deg,
+        transparent 233deg,
+        transparent 237deg,
+        transparent 237deg,
+        #8b5cf6 245deg,
+        #8b5cf6 298deg,
+        #5b3a8c 348deg,
+        transparent 353deg,
+        transparent 357deg
+    );
+    filter: blur(9px);
+    opacity: 0.35;
+    animation: spin 18s linear infinite;
+    z-index: 0;
+    -webkit-mask: radial-gradient(farthest-side, transparent calc(100% - 6px), #000 calc(100% - 1px), transparent 100%);
+    mask: radial-gradient(farthest-side, transparent calc(100% - 6px), #000 calc(100% - 1px), transparent 100%);
+}
+
+.avatar-core {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    height: 100%;
+    border-radius: 9999px;
+    background: linear-gradient(135deg, #782bf1, #9b5de5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Outfit', sans-serif;
+    font-weight: 700;
+    font-size: 3rem;
+    color: #fff;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .avatar-wrap::before,
+    .avatar-wrap::after,
+    .avatar-ring-glow {
+        animation: none;
+    }
+}
+
+/* ============================================
+   GLOW RULE (underline under name)
+   ============================================ */
+
+.glow-rule {
+    height: 2px;
+    width: 48px;
+    background: linear-gradient(90deg, #782bf1, #00f0ff);
+    border-radius: 2px;
+}
+
+/* ============================================
+   SKILL DIVIDER
+   ============================================ */
+
+.skill-divider {
+    height: 1px;
+    width: 100%;
+    background: var(--divider);
+    border-radius: 1px;
+}
+
+/* ============================================
+   SKILL CHIP HOVER
+   ============================================ */
+
+.skill-chip {
+    transition:
+        transform 0.15s ease,
+        border-color 0.15s ease;
+}
+
+.skill-chip:hover {
+    transform: translateY(-2px);
+    border-color: var(--skill-chip-hover-border);
+}
+
+.skill-chip-lang {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 14px;
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: 500;
+    background: var(--chip-gray-bg);
+    border: 1px solid var(--chip-gray-border);
+    color: var(--chip-gray-text);
+}
+
+/* ============================================
+   CARD
+   ============================================ */
+
+.card {
+    background: var(--card);
+    border: 1px solid var(--ol);
+    border-radius: 0.9rem;
+}
+
+/* ============================================
+   XP PROGRESS BAR
+   ============================================ */
+
+.xp-track {
+    background: var(--ol);
+}
+
+.xp-bar {
+    background: linear-gradient(90deg, #782bf1, #9b5de5);
+    transition: width 0.6s ease;
+}
+
+/* ============================================
+   STATUS DOT
+   ============================================ */
+
+.status-dot {
+    box-shadow: 0 0 0 4px rgba(74, 222, 128, 0.15);
+}

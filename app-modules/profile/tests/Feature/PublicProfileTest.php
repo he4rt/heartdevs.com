@@ -7,8 +7,7 @@ use He4rt\Identity\User\Models\User;
 use He4rt\Profile\Models\Profile;
 
 it('returns 200 for existing user with complete profile', function (): void {
-    $tenant = Tenant::factory()->create();
-    $tenant->update(['domain' => 'test.he4rtdevs.com']);
+    $tenant = Tenant::factory()->create(['active' => true, 'domain' => 'test.he4rtdevs.com']);
 
     $user = User::factory()->create(['username' => 'janedoe']);
     Profile::factory()->create([
@@ -24,13 +23,18 @@ it('returns 200 for existing user with complete profile', function (): void {
 });
 
 it('renders minimal profile without crashing', function (): void {
-    $tenant = Tenant::factory()->create();
-    $tenant->update(['domain' => 'test.he4rtdevs.com']);
+    $tenant = Tenant::factory()->create(['active' => true, 'domain' => 'test.he4rtdevs.com']);
 
     $user = User::factory()->create(['username' => 'novato']);
     Profile::factory()->create([
         'user_id' => $user->id,
         'tenant_id' => $tenant->id,
+        'headline' => null,
+        'about' => null,
+        'skills' => null,
+        'work_types' => null,
+        'languages' => null,
+        'social_links' => null,
     ]);
 
     $response = $this->get('http://test.he4rtdevs.com/@novato');
@@ -42,8 +46,7 @@ it('renders minimal profile without crashing', function (): void {
 });
 
 it('returns 404 for non-existent user', function (): void {
-    $tenant = Tenant::factory()->create();
-    $tenant->update(['domain' => 'test.he4rtdevs.com']);
+    Tenant::factory()->create(['active' => true, 'domain' => 'test.he4rtdevs.com']);
 
     $response = $this->get('http://test.he4rtdevs.com/@fantasma');
 
@@ -51,8 +54,7 @@ it('returns 404 for non-existent user', function (): void {
 });
 
 it('returns 404 for user without profile in tenant', function (): void {
-    $tenant = Tenant::factory()->create();
-    $tenant->update(['domain' => 'test.he4rtdevs.com']);
+    Tenant::factory()->create(['active' => true, 'domain' => 'test.he4rtdevs.com']);
     User::factory()->create(['username' => 'semprofile']);
 
     $response = $this->get('http://test.he4rtdevs.com/@semprofile');
@@ -60,20 +62,95 @@ it('returns 404 for user without profile in tenant', function (): void {
     $response->assertNotFound();
 });
 
-it('does not show available badge when available_for_proposals is false', function (): void {
-    $tenant = Tenant::factory()->create();
-    $tenant->update(['domain' => 'test.he4rtdevs.com']);
+it('does not show work type tags when work_types is empty', function (): void {
+    $tenant = Tenant::factory()->create(['active' => true, 'domain' => 'test.he4rtdevs.com']);
 
     $user = User::factory()->create(['username' => 'indisponivel']);
     Profile::factory()->create([
         'user_id' => $user->id,
         'tenant_id' => $tenant->id,
-        'available_for_proposals' => false,
+        'work_types' => null,
     ]);
 
     $response = $this->get('http://test.he4rtdevs.com/@indisponivel');
 
     $response->assertOk();
-    $response->assertDontSee('Disponível');
-    $response->assertDontSee('Indisponível');
+    $response->assertDontSee('Início imediato');
+});
+
+it('renders work type tags when work_types are present', function (): void {
+    $tenant = Tenant::factory()->create(['active' => true, 'domain' => 'test.he4rtdevs.com']);
+
+    $user = User::factory()->create(['username' => 'disponivel']);
+    Profile::factory()->create([
+        'user_id' => $user->id,
+        'tenant_id' => $tenant->id,
+        'work_types' => ['immediate', 'remote'],
+    ]);
+
+    $response = $this->get('http://test.he4rtdevs.com/@disponivel');
+
+    $response->assertOk();
+    $response->assertSee('Início imediato');
+    $response->assertSee('Remoto');
+});
+
+it('renders skills section when skills are present', function (): void {
+    $tenant = Tenant::factory()->create(['active' => true, 'domain' => 'test.he4rtdevs.com']);
+
+    $user = User::factory()->create(['username' => 'devskill']);
+    Profile::factory()->create([
+        'user_id' => $user->id,
+        'tenant_id' => $tenant->id,
+        'skills' => [
+            ['name' => 'PHP', 'category' => 'languages_frameworks'],
+            ['name' => 'Laravel', 'category' => 'languages_frameworks'],
+            ['name' => 'PostgreSQL', 'category' => 'infra_databases'],
+        ],
+    ]);
+
+    $response = $this->get('http://test.he4rtdevs.com/@devskill');
+
+    $response->assertOk();
+    $response->assertSee('Stack & Skills', false);
+    $response->assertSee('PHP');
+    $response->assertSee('Laravel');
+    $response->assertSee('PostgreSQL');
+});
+
+it('does not render skills section when skills are null', function (): void {
+    $tenant = Tenant::factory()->create(['active' => true, 'domain' => 'test.he4rtdevs.com']);
+
+    $user = User::factory()->create(['username' => 'noskills']);
+    Profile::factory()->create([
+        'user_id' => $user->id,
+        'tenant_id' => $tenant->id,
+        'skills' => null,
+    ]);
+
+    $response = $this->get('http://test.he4rtdevs.com/@noskills');
+
+    $response->assertOk();
+    $response->assertDontSee('Stack');
+});
+
+it('renders languages when present', function (): void {
+    $tenant = Tenant::factory()->create(['active' => true, 'domain' => 'test.he4rtdevs.com']);
+
+    $user = User::factory()->create(['username' => 'polyglot']);
+    Profile::factory()->create([
+        'user_id' => $user->id,
+        'tenant_id' => $tenant->id,
+        'languages' => [
+            ['name' => 'Português', 'level' => 'Nativo'],
+            ['name' => 'Inglês', 'level' => 'Intermediário'],
+        ],
+    ]);
+
+    $response = $this->get('http://test.he4rtdevs.com/@polyglot');
+
+    $response->assertOk();
+    $response->assertSee('Português');
+    $response->assertSee('Nativo');
+    $response->assertSee('Inglês');
 });

@@ -33,6 +33,9 @@ final class ProfileFactory extends Factory
             'social_links' => null,
             'available_for_proposals' => false,
             'start_availability' => null,
+            'skills' => null,
+            'work_types' => null,
+            'languages' => null,
         ];
     }
 
@@ -51,6 +54,16 @@ final class ProfileFactory extends Factory
             ],
             'available_for_proposals' => true,
             'start_availability' => fake()->randomElement(StartAvailability::cases()),
+            'skills' => [
+                ['name' => 'PHP', 'category' => 'languages_frameworks'],
+                ['name' => 'Laravel', 'category' => 'languages_frameworks'],
+                ['name' => 'PostgreSQL', 'category' => 'infra_databases'],
+                ['name' => 'Docker', 'category' => 'infra_databases'],
+            ],
+            'work_types' => ['immediate', 'remote'],
+            'languages' => [
+                ['name' => 'Português', 'level' => 'Nativo'],
+            ],
         ]);
     }
 }

@@ -125,13 +125,9 @@
                             'bg-green-50 text-green-700 dark:bg-green-500/10 dark:text-green-400' =>
                                 $seniority === \He4rt\Profile\Enums\SeniorityLevel::Junior,
                             'bg-blue-50 text-blue-700 dark:bg-blue-500/10 dark:text-blue-400' =>
-                                $seniority === \He4rt\Profile\Enums\SeniorityLevel::Mid,
+                                $seniority === \He4rt\Profile\Enums\SeniorityLevel::Pleno,
                             'bg-purple-50 text-purple-700 dark:bg-purple-500/10 dark:text-purple-400' =>
-                                $seniority === \He4rt\Profile\Enums\SeniorityLevel::Senior,
-                            'bg-amber-50 text-amber-700 dark:bg-amber-500/10 dark:text-amber-400' =>
-                                $seniority === \He4rt\Profile\Enums\SeniorityLevel::Specialist,
-                            'bg-red-50 text-red-700 dark:bg-red-500/10 dark:text-red-400' =>
-                                $seniority === \He4rt\Profile\Enums\SeniorityLevel::Lead
+                                $seniority === \He4rt\Profile\Enums\SeniorityLevel::Senior
                         ])
                     >
                         {{ $seniority->getLabel() }}

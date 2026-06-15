@@ -15,7 +15,7 @@ test('upsert profile updates all fields', function (): void {
         'birthdate' => '1995-03-15',
         'about' => 'Dev PHP apaixonado por Laravel',
         'headline' => 'Backend Developer',
-        'seniority_level' => 'mid',
+        'seniority_level' => 'pleno',
         'years_experience' => 5,
         'social_links' => [
             'instagram' => '@danielhe4rt',
@@ -29,7 +29,7 @@ test('upsert profile updates all fields', function (): void {
         ->and($result->birthdate->format('Y-m-d'))->toBe('1995-03-15')
         ->and($result->about)->toBe('Dev PHP apaixonado por Laravel')
         ->and($result->headline)->toBe('Backend Developer')
-        ->and($result->seniority_level)->toBe(SeniorityLevel::Mid)
+        ->and($result->seniority_level)->toBe(SeniorityLevel::Pleno)
         ->and($result->years_experience)->toBe(5)
         ->and($result->social_links)->toMatchArray([
             'instagram' => '@danielhe4rt',

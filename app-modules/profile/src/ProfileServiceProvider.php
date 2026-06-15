@@ -22,7 +22,8 @@ final class ProfileServiceProvider extends ServiceProvider
             'profile' => Profile::class,
         ]);
 
-        Route::get('/@{username}', [ProfileController::class, 'show'])
+        Route::middleware('web')
+            ->get('/@{username}', [ProfileController::class, 'show'])
             ->name('profile.public');
     }
 }

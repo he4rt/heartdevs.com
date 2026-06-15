@@ -36,14 +36,14 @@ test('profile page renders successfully', function (): void {
 test('profile page loads existing profile data', function (): void {
     $this->profile->update([
         'headline' => 'Backend Developer',
-        'seniority_level' => SeniorityLevel::Mid,
+        'seniority_level' => SeniorityLevel::Pleno,
     ]);
 
     livewire(ProfilePage::class)
         ->assertOk()
         ->assertSchemaStateSet([
             'headline' => 'Backend Developer',
-            'seniority_level' => SeniorityLevel::Mid,
+            'seniority_level' => SeniorityLevel::Pleno,
         ]);
 });
 
@@ -52,7 +52,7 @@ test('profile page saves all fields', function (): void {
         ->set('data.nickname', 'Dan')
         ->fillForm([
             'headline' => 'Backend Developer',
-            'seniority_level' => 'mid',
+            'seniority_level' => 'pleno',
             'years_experience' => 5,
             'about' => 'Dev PHP apaixonado por Laravel',
         ])
@@ -63,7 +63,7 @@ test('profile page saves all fields', function (): void {
 
     expect($this->profile->nickname)->toBe('Dan')
         ->and($this->profile->headline)->toBe('Backend Developer')
-        ->and($this->profile->seniority_level)->toBe(SeniorityLevel::Mid)
+        ->and($this->profile->seniority_level)->toBe(SeniorityLevel::Pleno)
         ->and($this->profile->years_experience)->toBe(5)
         ->and($this->profile->about)->toBe('Dev PHP apaixonado por Laravel');
 });

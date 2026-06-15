@@ -15,6 +15,10 @@ enum SocialPlatform: string implements HasIcon, HasLabel
     case Website = 'website';
     case YouTube = 'youtube';
     case Bluesky = 'bluesky';
+    case WhatsApp = 'whatsapp';
+    case LinkedIn = 'linkedin';
+    case GitHub = 'github';
+    case DevTo = 'devto';
 
     /**
      * @return array<int, string>
@@ -40,6 +44,10 @@ enum SocialPlatform: string implements HasIcon, HasLabel
             self::Website => Heroicon::GlobeAlt,
             self::YouTube => Heroicon::PlayCircle,
             self::Bluesky => Heroicon::Cloud,
+            self::WhatsApp => Heroicon::ChatBubbleLeftEllipsis,
+            self::LinkedIn => Heroicon::Briefcase,
+            self::GitHub => Heroicon::CodeBracket,
+            self::DevTo => Heroicon::CommandLine,
         };
     }
 }

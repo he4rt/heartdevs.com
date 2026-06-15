@@ -13,10 +13,8 @@ use Filament\Support\Icons\Heroicon;
 enum SeniorityLevel: string implements HasColor, HasIcon, HasLabel
 {
     case Junior = 'junior';
-    case Mid = 'mid';
+    case Pleno = 'pleno';
     case Senior = 'senior';
-    case Specialist = 'specialist';
-    case Lead = 'lead';
 
     public function getLabel(): string
     {
@@ -27,10 +25,8 @@ enum SeniorityLevel: string implements HasColor, HasIcon, HasLabel
     {
         return match ($this) {
             self::Junior => Color::Green,
-            self::Mid => Color::Blue,
+            self::Pleno => Color::Blue,
             self::Senior => Color::Purple,
-            self::Specialist => Color::Amber,
-            self::Lead => Color::Red,
         };
     }
 
@@ -38,10 +34,8 @@ enum SeniorityLevel: string implements HasColor, HasIcon, HasLabel
     {
         return match ($this) {
             self::Junior => Heroicon::AcademicCap,
-            self::Mid => Heroicon::CodeBracket,
+            self::Pleno => Heroicon::CodeBracket,
             self::Senior => Heroicon::Star,
-            self::Specialist => Heroicon::Beaker,
-            self::Lead => Heroicon::Flag,
         };
     }
 }

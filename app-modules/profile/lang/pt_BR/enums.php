@@ -5,10 +5,8 @@ declare(strict_types=1);
 return [
     'seniority_level' => [
         'junior' => 'Júnior',
-        'mid' => 'Pleno',
+        'pleno' => 'Pleno',
         'senior' => 'Sênior',
-        'specialist' => 'Especialista',
-        'lead' => 'Lead',
     ],
 
     'social_platform' => [
@@ -17,6 +15,10 @@ return [
         'website' => 'Website',
         'youtube' => 'YouTube',
         'bluesky' => 'Bluesky',
+        'whatsapp' => 'WhatsApp',
+        'linkedin' => 'LinkedIn',
+        'github' => 'GitHub',
+        'devto' => 'Dev.to',
     ],
 
     'start_availability' => [
@@ -27,5 +29,13 @@ return [
         '1_month' => '1 mês',
         '2_months' => '2 meses',
         'negotiable' => 'Negociável',
+    ],
+
+    'work_type' => [
+        'immediate' => 'Início imediato',
+        'remote' => 'Remoto',
+        'clt' => 'CLT',
+        'pj' => 'PJ',
+        'freelance' => 'Freelance',
     ],
 ];

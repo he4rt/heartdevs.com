@@ -47,6 +47,18 @@ final class UpsertProfile
             $attributes['social_links'] = $dto->socialLinks;
         }
 
+        if ($dto->workTypes !== null) {
+            $attributes['work_types'] = $dto->workTypes;
+        }
+
+        if ($dto->languages !== null) {
+            $attributes['languages'] = $dto->languages;
+        }
+
+        if ($dto->skills !== null) {
+            $attributes['skills'] = $dto->skills;
+        }
+
         if ($attributes !== []) {
             $profile->update($attributes);
         }
