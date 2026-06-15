@@ -11,6 +11,7 @@ use Filament\Support\Icons\Heroicon;
 use He4rt\Activity\Message\Models\Message;
 use He4rt\Identity\ExternalIdentity\Models\ExternalIdentity;
 use He4rt\PanelAdmin\Marketing\MarketingCluster;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\DB;
 
@@ -59,6 +60,7 @@ class MeetingShowcasePage extends Page
         $start = Date::parse($this->startDate, $tz)->utc();
         $end = Date::parse($this->endDate, $tz)->utc();
 
+        /** @var Collection<int, Message> $messageStats */
         $messageStats = Message::query()
             ->where('channel_id', $this->channelId)
             ->whereBetween('sent_at', [$start, $end])
@@ -78,8 +80,7 @@ class MeetingShowcasePage extends Page
         $this->participants = $messageStats->map(function (Message $stat) use ($identities): array {
             $identity = $identities->get($stat->external_identity_id);
 
-            /** @var int $totalMessages */
-            $totalMessages = $stat->total_messages; // @phpstan-ignore property.notFound
+            $totalMessages = (int) $stat->getAttribute('total_messages');
 
             return $this->extractDiscordData($identity, $totalMessages);
         })->all();

@@ -91,12 +91,11 @@ final class Profile extends Model
     }
 
     /**
-     * @return Attribute<array<string, string>|null, array<string, string>|null>
+     * @return Attribute<never, array<string, string>|null>
      */
     protected function socialLinks(): Attribute
     {
-        /** @phpstan-ignore return.type */
-        return Attribute::set(static function (?array $value): ?string {
+        return Attribute::make(set: /** @param array<string, string>|null $value */ static function (?array $value): ?string {
             if ($value === null) {
                 return null;
             }
