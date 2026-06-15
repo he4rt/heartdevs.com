@@ -14,7 +14,7 @@ return new class extends Migration
     public function up(): void
     {
         if (!Schema::hasTable('characters_badges')) {
-            Schema::create('characters_badges', function (Blueprint $table): void {
+            Schema::create('characters_badges', static function (Blueprint $table): void {
                 $table->foreignUuid('character_id')->constrained('characters')->cascadeOnDelete();
                 $table->foreignId('badge_id')->constrained('badges')->cascadeOnDelete();
                 $table->timestampTz('claimed_at');

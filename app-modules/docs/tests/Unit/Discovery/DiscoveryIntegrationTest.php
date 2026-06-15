@@ -7,7 +7,7 @@ use He4rt\Docs\Discovery\DocumentRegistry;
 use He4rt\Docs\Discovery\DTOs\DocumentSource;
 use Illuminate\Support\Facades\Cache;
 
-describe('DiscoverDocumentSourcesAction (real repository)', function (): void {
+describe('DiscoverDocumentSourcesAction (real repository)', static function (): void {
     it('finds module decisions and contexts while skipping vendor and fixtures', function (): void {
         $paths = array_map(
             static fn (DocumentSource $source): string => str_replace('\\', '/', (string) $source->file->getRealPath()),
@@ -21,7 +21,7 @@ describe('DiscoverDocumentSourcesAction (real repository)', function (): void {
     });
 });
 
-describe('DocumentRegistry caching', function (): void {
+describe('DocumentRegistry caching', static function (): void {
     beforeEach(function (): void {
         config()->set('cache.default', 'array');
         config()->set('docs.cache.enabled', true);

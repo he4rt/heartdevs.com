@@ -46,7 +46,7 @@ test('embed contains the case id', function (): void {
 
     resolve(NotifyModerationChannel::class)->handle(new CaseQueued($case));
 
-    $mockClient->assertSent(function ($request) use ($case): bool {
+    $mockClient->assertSent(static function ($request) use ($case): bool {
         if (!$request instanceof CreateMessage) {
             return false;
         }
@@ -69,7 +69,7 @@ test('message content includes role mentions for admins and mods', function (): 
 
     resolve(NotifyModerationChannel::class)->handle(new CaseQueued($case));
 
-    $mockClient->assertSent(function ($request): bool {
+    $mockClient->assertSent(static function ($request): bool {
         if (!$request instanceof CreateMessage) {
             return false;
         }

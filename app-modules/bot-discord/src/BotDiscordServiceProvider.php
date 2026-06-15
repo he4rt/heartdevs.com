@@ -26,7 +26,7 @@ class BotDiscordServiceProvider extends LaracordServiceProvider
         $this->app->singleton(DiscordModerationAdapter::class);
 
         // Register Discord adapter in the moderation PlatformRegistry for O(1) lookup during enforcement.
-        $this->app->afterResolving(PlatformRegistry::class, function (PlatformRegistry $registry): void {
+        $this->app->afterResolving(PlatformRegistry::class, static function (PlatformRegistry $registry): void {
             $registry->register(Platform::Discord, DiscordModerationAdapter::class);
         });
 
@@ -56,8 +56,8 @@ class BotDiscordServiceProvider extends LaracordServiceProvider
             ->discoverCommands(__DIR__.'/Commands', 'He4rt\BotDiscord\Commands')
             ->discoverSlashCommands(__DIR__.'/SlashCommands', 'He4rt\BotDiscord\SlashCommands')
             ->discoverTasks(__DIR__.'/Tasks', 'He4rt\BotDiscord\Tasks')
-            ->registerHook(Hook::AFTER_BOOT, function () use ($bot): void {
-                $bot->discord()->on('raw', function (object $payload): void {
+            ->registerHook(Hook::AFTER_BOOT, static function () use ($bot): void {
+                $bot->discord()->on('raw', static function (object $payload): void {
                     resolve(RawGatewayEvent::class)->handle($payload);
                 });
             });

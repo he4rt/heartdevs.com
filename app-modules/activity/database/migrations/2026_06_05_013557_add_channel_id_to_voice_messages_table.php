@@ -10,7 +10,7 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::table('voice_messages', function (Blueprint $table): void {
+        Schema::table('voice_messages', static function (Blueprint $table): void {
             $table->string('channel_id')->nullable()->after('channel_name');
         });
     }

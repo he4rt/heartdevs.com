@@ -29,7 +29,7 @@ final class CharacterFactory extends Factory
             'tenant_id' => Tenant::factory(),
             'user_id' => User::factory(),
             'reputation' => fake()->numberBetween(1, 10),
-            'experience' => fake()->numberBetween(1, 5000),
+            'experience' => fake()->numberBetween(1, 5_000),
             'daily_bonus_claimed_at' => now(),
         ];
     }

@@ -58,7 +58,7 @@ final readonly class CommunityRetrospective
             ->groupBy('actor_login')
             ->map(fn (Collection $items, string $login): array => $this->person($login, $items))
             ->sortByDesc(fn (array $person): int => match ($this->filters->sort) {
-                'prs' => (int) $person['prs'] * 1000 + (int) $person['total'],
+                'prs' => (int) $person['prs'] * 1_000 + (int) $person['total'],
                 'lines' => (int) $person['additions'] + (int) $person['deletions'],
                 default => (int) $person['total'],
             })
@@ -129,7 +129,7 @@ final readonly class CommunityRetrospective
      */
     private function sumMeta(Collection $items, string $key): int
     {
-        return (int) $items->sum(function (GithubContribution $contribution) use ($key): int {
+        return (int) $items->sum(static function (GithubContribution $contribution) use ($key): int {
             $metadata = $contribution->metadata ?? [];
 
             return (int) ($metadata[$key] ?? 0);

@@ -11,11 +11,11 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::table('moderation_actions', function (Blueprint $table): void {
+        Schema::table('moderation_actions', static function (Blueprint $table): void {
             $table->foreignUuid('tenant_id')->nullable()->after('automated')->constrained('tenants')->nullOnDelete();
         });
 
-        Schema::table('moderation_appeals', function (Blueprint $table): void {
+        Schema::table('moderation_appeals', static function (Blueprint $table): void {
             $table->foreignUuid('tenant_id')->nullable()->after('sla_deadline')->constrained('tenants')->nullOnDelete();
         });
 
@@ -37,11 +37,11 @@ return new class extends Migration
 
     public function down(): void
     {
-        Schema::table('moderation_actions', function (Blueprint $table): void {
+        Schema::table('moderation_actions', static function (Blueprint $table): void {
             $table->dropConstrainedForeignId('tenant_id');
         });
 
-        Schema::table('moderation_appeals', function (Blueprint $table): void {
+        Schema::table('moderation_appeals', static function (Blueprint $table): void {
             $table->dropConstrainedForeignId('tenant_id');
         });
     }

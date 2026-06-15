@@ -48,6 +48,6 @@ final class RateLimit
             return 60;
         }
 
-        return max(1, min((int) $reset - Date::now()->getTimestamp(), 3600));
+        return max(1, min((int) $reset - Date::now()->getTimestamp(), 3_600));
     }
 }

@@ -10,7 +10,7 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::create('twitch_subscriptions', function (Blueprint $table): void {
+        Schema::create('twitch_subscriptions', static function (Blueprint $table): void {
             $table->id();
             $table->string('subscription_id')->unique();
             $table->string('type');

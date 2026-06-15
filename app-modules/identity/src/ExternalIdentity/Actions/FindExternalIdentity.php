@@ -18,7 +18,7 @@ class FindExternalIdentity
 
         return Cache::remember(
             $cacheKey,
-            2 * 86400,
+            2 * 86_400,
             fn () => $this->find($provider, $providerId, $tenantId)
         );
     }

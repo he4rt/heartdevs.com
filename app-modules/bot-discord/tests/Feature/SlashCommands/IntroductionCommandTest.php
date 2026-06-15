@@ -30,7 +30,7 @@ function createIntroductionScenario(): array
     return ['tenant' => $tenant];
 }
 
-describe('persistence flow', function (): void {
+describe('persistence flow', static function (): void {
     test('resolves user context and upserts profile on introduction', function (): void {
         $data = createIntroductionScenario();
 

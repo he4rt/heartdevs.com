@@ -10,7 +10,7 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::create('github_event_logs', function (Blueprint $table): void {
+        Schema::create('github_event_logs', static function (Blueprint $table): void {
             $table->id();
             $table->string('event_type')->index();
             $table->string('repo')->nullable()->index();

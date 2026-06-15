@@ -114,7 +114,7 @@ class ModerationRuleResource extends Resource
                     ->required()
                     ->rows(4),
             ])
-            ->action(function (array $data, ModerationRule $record): void {
+            ->action(static function (array $data, ModerationRule $record): void {
                 if ($record->matches($data['test_input'])) {
                     Notification::make()
                         ->success()

@@ -10,14 +10,14 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::table('messages', function (Blueprint $table): void {
+        Schema::table('messages', static function (Blueprint $table): void {
             $table->index('external_identity_id');
         });
     }
 
     public function down(): void
     {
-        Schema::table('messages', function (Blueprint $table): void {
+        Schema::table('messages', static function (Blueprint $table): void {
             $table->dropIndex(['external_identity_id']);
         });
     }

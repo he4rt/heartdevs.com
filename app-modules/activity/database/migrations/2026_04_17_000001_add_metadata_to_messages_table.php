@@ -11,18 +11,18 @@ return new class extends Migration
     public function up(): void
     {
         if (!Schema::hasColumn('messages', 'tenant_id')) {
-            Schema::table('messages', function (Blueprint $table): void {
+            Schema::table('messages', static function (Blueprint $table): void {
                 $table->foreignUuid('tenant_id')->nullable()->after('id')->constrained('tenants');
             });
         }
 
         if (!Schema::hasColumn('voice_messages', 'tenant_id')) {
-            Schema::table('voice_messages', function (Blueprint $table): void {
+            Schema::table('voice_messages', static function (Blueprint $table): void {
                 $table->foreignUuid('tenant_id')->nullable()->after('id')->constrained('tenants');
             });
         }
 
-        Schema::table('messages', function (Blueprint $table): void {
+        Schema::table('messages', static function (Blueprint $table): void {
             $table->jsonb('metadata')->nullable()->after('obtained_experience');
             $table->unsignedInteger('reactions_count')->default(0)->after('metadata');
             $table->unsignedInteger('reactions_total')->default(0)->after('reactions_count');
@@ -45,7 +45,7 @@ return new class extends Migration
 
     public function down(): void
     {
-        Schema::table('messages', function (Blueprint $table): void {
+        Schema::table('messages', static function (Blueprint $table): void {
             $table->dropIndex('messages_tenant_sent_at_idx');
             $table->dropIndex('messages_tenant_channel_sent_at_idx');
             $table->dropIndex('messages_tenant_kind_idx');
@@ -66,14 +66,14 @@ return new class extends Migration
         });
 
         if (Schema::hasColumn('messages', 'tenant_id')) {
-            Schema::table('messages', function (Blueprint $table): void {
+            Schema::table('messages', static function (Blueprint $table): void {
                 $table->dropForeign(['tenant_id']);
                 $table->dropColumn('tenant_id');
             });
         }
 
         if (Schema::hasColumn('voice_messages', 'tenant_id')) {
-            Schema::table('voice_messages', function (Blueprint $table): void {
+            Schema::table('voice_messages', static function (Blueprint $table): void {
                 $table->dropForeign(['tenant_id']);
                 $table->dropColumn('tenant_id');
             });

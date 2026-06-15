@@ -13,7 +13,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('characters_leveling_logs', function (Blueprint $table): void {
+        Schema::create('characters_leveling_logs', static function (Blueprint $table): void {
             $table->uuid('id')->primary();
             $table->foreignUuid('character_id')->constrained('characters');
             $table->integer('level');

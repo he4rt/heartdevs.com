@@ -10,7 +10,7 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::create('activity_post_entries', function (Blueprint $table): void {
+        Schema::create('activity_post_entries', static function (Blueprint $table): void {
             $table->uuid('id')->primary();
             $table->text('content');
             $table->timestampsTz();

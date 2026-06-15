@@ -8,6 +8,6 @@ use Illuminate\Support\Facades\Route;
 
 Route::prefix('api/webhooks/github')
     ->middleware([VerifyGithubSignature::class])
-    ->group(function (): void {
+    ->group(static function (): void {
         Route::post('/', GithubWebhookController::class)->name('github.webhook');
     });

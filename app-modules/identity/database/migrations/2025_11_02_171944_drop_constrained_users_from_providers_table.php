@@ -18,7 +18,7 @@ return new class extends Migration
             DB::statement('alter table public.providers drop constraint if exists providers_user_id_foreign');
         }
 
-        Schema::table('providers', function (Blueprint $table): void {
+        Schema::table('providers', static function (Blueprint $table): void {
             $table->string('user_id')->nullable()->change();
         });
     }

@@ -11,7 +11,7 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::table('moderation_events', function (Blueprint $table): void {
+        Schema::table('moderation_events', static function (Blueprint $table): void {
             $table->string('provider_message_id')->nullable()->after('source_message_id');
         });
 
@@ -26,7 +26,7 @@ return new class extends Migration
     {
         DB::statement('DROP INDEX IF EXISTS moderation_events_tenant_provider_message_id_unique');
 
-        Schema::table('moderation_events', function (Blueprint $table): void {
+        Schema::table('moderation_events', static function (Blueprint $table): void {
             $table->dropColumn('provider_message_id');
         });
     }

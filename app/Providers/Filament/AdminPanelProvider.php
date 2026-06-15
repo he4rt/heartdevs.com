@@ -32,7 +32,7 @@ class AdminPanelProvider extends PanelProvider
             ->id('admin')
             ->path('admin')
             ->login(Login::class)
-            ->colors(function (): array {
+            ->colors(static function (): array {
                 $colors = Color::all();
 
                 unset($colors['gray']);

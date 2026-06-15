@@ -10,7 +10,7 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::create('activity_timeline', function (Blueprint $table): void {
+        Schema::create('activity_timeline', static function (Blueprint $table): void {
             $table->uuid('id')->primary();
             $table->foreignUuid('user_id');
             $table->foreignUuid('tenant_id');

@@ -46,7 +46,7 @@ class AppealSlaWidget extends TableWidget
                     ->formatStateUsing(fn (?string $state): string => $state ? '@'.$state : '—'),
                 TextColumn::make('sla_deadline')
                     ->label('SLA')
-                    ->formatStateUsing(function (ModerationAppeal $record): string {
+                    ->formatStateUsing(static function (ModerationAppeal $record): string {
                         $hours = (int) abs(now()->diffInHours($record->sla_deadline));
 
                         return $record->sla_deadline->isFuture()

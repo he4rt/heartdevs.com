@@ -39,7 +39,7 @@ test('creates a post entry and timeline record', function (): void {
 });
 
 test('creates a post with long content succeeds', function (): void {
-    $longContent = str_repeat('a', 2000);
+    $longContent = str_repeat('a', 2_000);
 
     $timeline = resolve(CreatePost::class)->handle(new CreatePostDTO(
         userId: $this->user->id,

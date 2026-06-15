@@ -94,8 +94,8 @@ it('ignora reviews PENDING (sem submitted_at) sem quebrar o backfill', function 
         ListPullRequests::class => MockResponse::make([prPayload(61, 'maria', 42)]),
         GetPullRequest::class => MockResponse::make(['additions' => 1, 'deletions' => 0, 'changed_files' => 1]),
         ListPullRequestReviews::class => MockResponse::make([
-            ['id' => 1597160462, 'state' => 'PENDING', 'submitted_at' => null, 'user' => ['login' => 'danielhe4rt', 'id' => 6912596]],
-            ['id' => 1597160999, 'state' => 'APPROVED', 'submitted_at' => '2026-06-02T10:00:00Z', 'user' => ['login' => 'maria', 'id' => 42]],
+            ['id' => 1_597_160_462, 'state' => 'PENDING', 'submitted_at' => null, 'user' => ['login' => 'danielhe4rt', 'id' => 6_912_596]],
+            ['id' => 1_597_160_999, 'state' => 'APPROVED', 'submitted_at' => '2026-06-02T10:00:00Z', 'user' => ['login' => 'maria', 'id' => 42]],
         ]),
     ]);
 
@@ -120,7 +120,7 @@ it('reporta o progresso por contribuição via callback (tipo + isNew, na ordem 
     $reported = [];
     resolve(BackfillRepository::class)->execute(
         $this->repo,
-        function (NewContributionDTO $contribution, bool $isNew) use (&$reported): void {
+        static function (NewContributionDTO $contribution, bool $isNew) use (&$reported): void {
             $reported[] = [$contribution->type->value, $isNew];
         },
     );
@@ -139,7 +139,7 @@ it('sinaliza isNew=false ao reprocessar contribuições que já existem', functi
     $reported = [];
     resolve(BackfillRepository::class)->execute(
         $this->repo,
-        function (NewContributionDTO $contribution, bool $isNew) use (&$reported): void {
+        static function (NewContributionDTO $contribution, bool $isNew) use (&$reported): void {
             $reported[] = $isNew;
         },
     );
@@ -280,7 +280,7 @@ it('faz backfill de comentários de issue com target_ref derivado da issue_url',
 it('faz backfill de comentários de review de PR com target_ref para o PR', function (): void {
     mockGithub([
         ListPullRequestReviewComments::class => MockResponse::make([
-            ['id' => 1200, 'created_at' => '2026-06-03T11:00:00Z', 'html_url' => 'u', 'pull_request_url' => 'https://api.github.com/repos/he4rt/heartdevs.com/pulls/12', 'user' => ['login' => 'joao', 'id' => 7]],
+            ['id' => 1_200, 'created_at' => '2026-06-03T11:00:00Z', 'html_url' => 'u', 'pull_request_url' => 'https://api.github.com/repos/he4rt/heartdevs.com/pulls/12', 'user' => ['login' => 'joao', 'id' => 7]],
         ]),
     ]);
 

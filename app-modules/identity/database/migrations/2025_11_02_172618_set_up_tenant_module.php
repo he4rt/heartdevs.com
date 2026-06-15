@@ -25,7 +25,7 @@ return new class() extends Migration
         ];
 
         foreach ($tables as $table => $indexableColumns) {
-            Schema::table($table, function (Blueprint $table) use ($indexableColumns): void {
+            Schema::table($table, static function (Blueprint $table) use ($indexableColumns): void {
                 $table->foreignUuid('tenant_id')
                     ->after('id')
                     ->constrained('tenants')

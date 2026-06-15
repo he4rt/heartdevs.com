@@ -23,7 +23,7 @@ test('buildCaseEmbed returns correct structure', function (): void {
         ->toHaveKeys(['title', 'description', 'color', 'fields', 'timestamp', 'footer'])
         ->and($embed['title'])->toContain('baduser')
         ->and($embed['description'])->toContain($case->id)
-        ->and($embed['color'])->toBe(0xFFA500)
+        ->and($embed['color'])->toBe(0xFF_A5_00)
         ->and($embed['footer']['text'])->toBe('He4rt Moderation System')
         ->and($embed['fields'])->toHaveCount(4)
         ->and($embed['fields'][0]['name'])->toBe('Platform')
@@ -34,7 +34,7 @@ test('buildCaseEmbed returns correct structure', function (): void {
 });
 
 test('buildCaseEmbed truncates content to 1024 chars', function (): void {
-    $longText = str_repeat('a', 2000);
+    $longText = str_repeat('a', 2_000);
 
     $case = ModerationCase::factory()->create([
         'content_snapshot' => [
@@ -48,7 +48,7 @@ test('buildCaseEmbed truncates content to 1024 chars', function (): void {
 
     $contentField = collect($embed['fields'])->firstWhere('name', 'Content');
 
-    expect((string) $contentField['value'])->toHaveLength(1024);
+    expect((string) $contentField['value'])->toHaveLength(1_024);
 });
 
 test('buildCaseEmbed handles null text gracefully', function (): void {

@@ -232,7 +232,7 @@ class ModerationDashboardLivewire extends Component
             ->orderByDesc('total_cases')
             ->limit(10)
             ->get()
-            ->map(function (object $row) use ($start): object {
+            ->map(static function (object $row) use ($start): object {
                 $actionIds = ModerationAction::query()
                     ->where('moderator_id', $row->id)
                     ->where('created_at', '>=', $start)
@@ -334,7 +334,7 @@ class ModerationDashboardLivewire extends Component
             ->orderByDesc('offense_count')
             ->limit(5)
             ->get()
-            ->map(function (object $row): object {
+            ->map(static function (object $row): object {
                 $user = DB::table('users')->where('id', $row->author_id)->first(['username']);
                 $row->username = $user->username ?? 'unknown';
 

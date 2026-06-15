@@ -176,14 +176,14 @@ final class FixPostSwitchTimestampsCommand extends Command
                     }
                 }
 
-                $moduleStats['elapsed'] = (microtime(true) - $moduleStart) * 1000;
+                $moduleStats['elapsed'] = (microtime(true) - $moduleStart) * 1_000;
                 $logger->label(sprintf(
                     '%s: %d tables, %d cols, %s rows — %.1fs',
                     $name,
                     $moduleStats['tables'],
                     $moduleStats['columns'],
                     number_format($moduleStats['rows']),
-                    $moduleStats['elapsed'] / 1000,
+                    $moduleStats['elapsed'] / 1_000,
                 ));
             },
         );
@@ -207,7 +207,7 @@ final class FixPostSwitchTimestampsCommand extends Command
                 [self::CUTOFF],
             );
 
-            return ['rows' => $count, 'elapsed' => (microtime(true) - $start) * 1000];
+            return ['rows' => $count, 'elapsed' => (microtime(true) - $start) * 1_000];
         }
 
         $rowsFixed = DB::affectingStatement(
@@ -215,7 +215,7 @@ final class FixPostSwitchTimestampsCommand extends Command
             [self::CUTOFF],
         );
 
-        return ['rows' => $rowsFixed, 'elapsed' => (microtime(true) - $start) * 1000];
+        return ['rows' => $rowsFixed, 'elapsed' => (microtime(true) - $start) * 1_000];
     }
 
     /**
@@ -235,7 +235,7 @@ final class FixPostSwitchTimestampsCommand extends Command
                 (string) $stats['tables'],
                 (string) $stats['columns'],
                 number_format($stats['rows']),
-                sprintf('%.1fs', $stats['elapsed'] / 1000),
+                sprintf('%.1fs', $stats['elapsed'] / 1_000),
             ];
             $totalTables += $stats['tables'];
             $totalColumns += $stats['columns'];
@@ -248,7 +248,7 @@ final class FixPostSwitchTimestampsCommand extends Command
             (string) $totalTables,
             (string) $totalColumns,
             number_format($totalRows),
-            sprintf('%.1fs', $totalElapsed / 1000),
+            sprintf('%.1fs', $totalElapsed / 1_000),
         ];
 
         table(

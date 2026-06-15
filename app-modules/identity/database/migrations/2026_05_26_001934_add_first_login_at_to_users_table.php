@@ -10,7 +10,7 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::table('users', function (Blueprint $table): void {
+        Schema::table('users', static function (Blueprint $table): void {
             $table->timestampTz('first_login_at')->nullable()->after('banned_at');
         });
     }

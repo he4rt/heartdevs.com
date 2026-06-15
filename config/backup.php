@@ -276,7 +276,7 @@ return [
             'disks' => [...array_filter(explode(',', (string) env('BACKUP_DISKS', 'local')))],
             'health_checks' => [
                 MaximumAgeInDays::class => 1,
-                MaximumStorageInMegabytes::class => 5000,
+                MaximumStorageInMegabytes::class => 5_000,
             ],
         ],
     ],
@@ -349,7 +349,7 @@ return [
              * this amount of megabytes has been reached.
              * Set null for unlimited size.
              */
-            'delete_oldest_backups_when_using_more_megabytes_than' => 5000,
+            'delete_oldest_backups_when_using_more_megabytes_than' => 5_000,
         ],
 
         /*

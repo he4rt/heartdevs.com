@@ -96,7 +96,7 @@ final class Profile extends Model
     protected function socialLinks(): Attribute
     {
         /** @phpstan-ignore return.type */
-        return Attribute::set(function (?array $value): ?string {
+        return Attribute::set(static function (?array $value): ?string {
             if ($value === null) {
                 return null;
             }

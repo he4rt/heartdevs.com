@@ -31,7 +31,7 @@ class ExternalIdentitiesTable
 
                 TextColumn::make('model.name')
                     ->label('Owner')
-                    ->searchable(query: fn (Builder $query, string $search): Builder => $query->whereHasMorph('model', '*', function (Builder $q) use ($search): void {
+                    ->searchable(query: fn (Builder $query, string $search): Builder => $query->whereHasMorph('model', '*', static function (Builder $q) use ($search): void {
                         $q->where('name', 'ilike', sprintf('%%%s%%', $search));
                     })),
 

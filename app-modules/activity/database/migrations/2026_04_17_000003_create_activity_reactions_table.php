@@ -10,7 +10,7 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::create('activity_reactions', function (Blueprint $table): void {
+        Schema::create('activity_reactions', static function (Blueprint $table): void {
             $table->uuid('id')->primary();
             $table->foreignUuid('tenant_id')->constrained('tenants');
             $table->uuidMorphs('reactable');

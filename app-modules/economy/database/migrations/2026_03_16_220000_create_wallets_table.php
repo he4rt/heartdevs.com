@@ -10,7 +10,7 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::create('wallets', function (Blueprint $table): void {
+        Schema::create('wallets', static function (Blueprint $table): void {
             $table->uuid('id')->primary();
             $table->uuidMorphs('owner');
             $table->string('currency');

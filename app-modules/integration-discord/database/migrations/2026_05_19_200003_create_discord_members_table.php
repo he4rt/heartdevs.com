@@ -13,7 +13,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('discord_members', function (Blueprint $table): void {
+        Schema::create('discord_members', static function (Blueprint $table): void {
             $table->id();
             $table->foreignId('discord_guild_id')->constrained('discord_guilds')->cascadeOnDelete();
             $table->string('discord_user_id');

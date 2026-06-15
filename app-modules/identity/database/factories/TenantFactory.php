@@ -46,7 +46,7 @@ final class TenantFactory extends Factory
 
     public function withProvider(IdentityProvider $provider = IdentityProvider::Discord, string $providerId = '123'): self
     {
-        return $this->afterCreating(function (Tenant $tenant) use ($provider, $providerId): void {
+        return $this->afterCreating(static function (Tenant $tenant) use ($provider, $providerId): void {
             ExternalIdentity::factory()->create([
                 'tenant_id' => $tenant->getKey(),
                 'model_type' => (new Tenant)->getMorphClass(),

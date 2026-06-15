@@ -10,7 +10,7 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::table('user_address', function (Blueprint $table): void {
+        Schema::table('user_address', static function (Blueprint $table): void {
             $table->string('country')->nullable()->change();
             $table->string('state')->nullable()->change();
         });
@@ -18,7 +18,7 @@ return new class extends Migration
 
     public function down(): void
     {
-        Schema::table('user_address', function (Blueprint $table): void {
+        Schema::table('user_address', static function (Blueprint $table): void {
             $table->string('country', 4)->nullable()->change();
             $table->string('state', 4)->nullable()->change();
         });

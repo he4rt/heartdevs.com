@@ -13,7 +13,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('discord_member_roles', function (Blueprint $table): void {
+        Schema::create('discord_member_roles', static function (Blueprint $table): void {
             $table->foreignId('discord_member_id')->constrained('discord_members')->cascadeOnDelete();
             $table->foreignId('discord_role_id')->constrained('discord_roles')->cascadeOnDelete();
             $table->timestampTz('assigned_at')->nullable();

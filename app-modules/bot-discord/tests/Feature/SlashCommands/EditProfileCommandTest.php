@@ -33,7 +33,7 @@ function createEditProfileScenario(array $profileOverrides = []): array
     return ['user' => $user, 'tenant' => $tenant, 'profile' => $profile];
 }
 
-describe('persistence flow', function (): void {
+describe('persistence flow', static function (): void {
     test('updates user name and profile data', function (): void {
         $data = createEditProfileScenario([
             'nickname' => 'OldNick',

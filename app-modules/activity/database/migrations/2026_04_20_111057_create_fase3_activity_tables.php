@@ -11,7 +11,7 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::create('message_attachments', function (Blueprint $table): void {
+        Schema::create('message_attachments', static function (Blueprint $table): void {
             $table->uuid('id')->primary();
             $table->foreignUuid('tenant_id')->constrained('tenants');
             $table->foreignUuid('message_id')->constrained('messages')->cascadeOnDelete();
@@ -27,7 +27,7 @@ return new class extends Migration
             $table->index('message_id', 'message_attachments_message_idx');
         });
 
-        Schema::create('message_embeds', function (Blueprint $table): void {
+        Schema::create('message_embeds', static function (Blueprint $table): void {
             $table->uuid('id')->primary();
             $table->foreignUuid('tenant_id')->constrained('tenants');
             $table->foreignUuid('message_id')->constrained('messages')->cascadeOnDelete();
@@ -46,7 +46,7 @@ return new class extends Migration
             $table->index(['tenant_id', 'kind'], 'message_embeds_tenant_kind_idx');
         });
 
-        Schema::create('membership_events', function (Blueprint $table): void {
+        Schema::create('membership_events', static function (Blueprint $table): void {
             $table->uuid('id')->primary();
             $table->foreignUuid('tenant_id')->constrained('tenants');
             $table->foreignUuid('external_identity_id')->constrained('external_identities');

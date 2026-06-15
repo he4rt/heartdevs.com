@@ -10,14 +10,14 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::table('notifications', function (Blueprint $table): void {
+        Schema::table('notifications', static function (Blueprint $table): void {
             $table->string('notifiable_id')->change();
         });
     }
 
     public function down(): void
     {
-        Schema::table('notifications', function (Blueprint $table): void {
+        Schema::table('notifications', static function (Blueprint $table): void {
             $table->unsignedBigInteger('notifiable_id')->change();
         });
     }

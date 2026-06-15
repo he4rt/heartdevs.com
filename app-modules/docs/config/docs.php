@@ -7,6 +7,6 @@ return [
 
     'cache' => [
         'enabled' => env('DOCS_CACHE_ENABLED', true),
-        'ttl' => (int) env('DOCS_CACHE_TTL', 3600),
+        'ttl' => (int) env('DOCS_CACHE_TTL', 3_600),
     ],
 ];

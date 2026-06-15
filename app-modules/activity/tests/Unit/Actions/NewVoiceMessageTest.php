@@ -21,7 +21,7 @@ test('unmuted voice state awards multiplier times level', function (): void {
     $character = Character::factory()
         ->recycle($user)
         ->recycle($tenant)
-        ->create(['experience' => 4500]); // level 10
+        ->create(['experience' => 4_500]); // level 10
 
     ExternalIdentity::factory()
         ->recycle($tenant)
@@ -45,7 +45,7 @@ test('unmuted voice state awards multiplier times level', function (): void {
     resolve(NewVoiceMessage::class)->persist($dto);
 
     // unmuted multiplier (3) * level (10) = 30
-    expect($character->fresh()->experience)->toBe(4530);
+    expect($character->fresh()->experience)->toBe(4_530);
 
     $voice = Voice::query()->latest()->first();
     expect($voice)->not->toBeNull()
@@ -63,7 +63,7 @@ test('muted voice state awards reduced xp', function (): void {
     $character = Character::factory()
         ->recycle($user)
         ->recycle($tenant)
-        ->create(['experience' => 4500]); // level 10
+        ->create(['experience' => 4_500]); // level 10
 
     ExternalIdentity::factory()
         ->recycle($tenant)
@@ -85,7 +85,7 @@ test('muted voice state awards reduced xp', function (): void {
     resolve(NewVoiceMessage::class)->persist($dto);
 
     // muted multiplier (1) * level (10) = 10
-    expect($character->fresh()->experience)->toBe(4510);
+    expect($character->fresh()->experience)->toBe(4_510);
 
     $voice = Voice::query()->latest()->first();
     expect($voice)->not->toBeNull()
@@ -99,7 +99,7 @@ test('disabled voice state awards zero xp', function (): void {
     $character = Character::factory()
         ->recycle($user)
         ->recycle($tenant)
-        ->create(['experience' => 4500]); // level 10
+        ->create(['experience' => 4_500]); // level 10
 
     ExternalIdentity::factory()
         ->recycle($tenant)
@@ -120,7 +120,7 @@ test('disabled voice state awards zero xp', function (): void {
 
     resolve(NewVoiceMessage::class)->persist($dto);
 
-    expect($character->fresh()->experience)->toBe(4500);
+    expect($character->fresh()->experience)->toBe(4_500);
 
     $voice = Voice::query()->latest()->first();
     expect($voice)->not->toBeNull()

@@ -33,7 +33,7 @@ function fakeFile(string $path): SplFileInfo
     return new SplFileInfo($path);
 }
 
-describe('matches', function (): void {
+describe('matches', static function (): void {
     it('routes each path to the right strategy', function (): void {
         expect(new AdrStrategy(strategyParser())->matches(fakeFile('/r/app-modules/moderation/docs/adr/0001-x.md')))->toBeTrue()
             ->and(new ContextStrategy(strategyParser())->matches(fakeFile('/r/app-modules/moderation/CONTEXT.md')))->toBeTrue()
@@ -54,7 +54,7 @@ describe('matches', function (): void {
     });
 });
 
-describe('AdrStrategy parse', function (): void {
+describe('AdrStrategy parse', static function (): void {
     it('parses inline status, date, deciders and strips the title prefix', function (): void {
         $doc = new AdrStrategy(strategyParser())->parse(fixtureFile('modules/sample/docs/adr/0001-sample-decision.md'), 'sample');
 
@@ -86,7 +86,7 @@ describe('AdrStrategy parse', function (): void {
     });
 });
 
-describe('PlanStrategy parse', function (): void {
+describe('PlanStrategy parse', static function (): void {
     it('derives status from task checkboxes', function (): void {
         $doc = new PlanStrategy(strategyParser())->parse(fixtureFile('modules/sample/docs/plans/2026-05-02-sample.md'), 'sample');
 
@@ -103,7 +103,7 @@ describe('PlanStrategy parse', function (): void {
     });
 });
 
-describe('ReadmeStrategy parse', function (): void {
+describe('ReadmeStrategy parse', static function (): void {
     it('builds the module url from the module name', function (): void {
         $doc = new ReadmeStrategy(strategyParser())->parse(fixtureFile('modules/sample/README.md'), 'sample');
 
@@ -113,7 +113,7 @@ describe('ReadmeStrategy parse', function (): void {
     });
 });
 
-describe('GuideStrategy parse', function (): void {
+describe('GuideStrategy parse', static function (): void {
     it('reads order from front-matter and computes reading time', function (): void {
         $doc = new GuideStrategy(strategyParser())->parse(fixtureFile('resources/docs/3.x/guide-order.md'), null);
 
@@ -123,7 +123,7 @@ describe('GuideStrategy parse', function (): void {
     });
 });
 
-describe('DocumentMetadata int', function (): void {
+describe('DocumentMetadata int', static function (): void {
     it('reads integers and numeric strings, null otherwise', function (): void {
         $meta = new DocumentMetadata(
             frontMatter: ['order' => 3, 'numeric' => '7', 'text' => 'abc'],

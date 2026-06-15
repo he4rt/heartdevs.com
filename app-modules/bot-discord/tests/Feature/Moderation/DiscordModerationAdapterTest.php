@@ -164,7 +164,7 @@ test('ban 24h sends PUT to bans endpoint with delete_message_seconds 86400', fun
 
     $mockClient->assertSent(fn ($request) => $request instanceof CreateBan
         && str_contains($request->resolveEndpoint(), '/guilds/123456789/bans/555')
-        && ($request->body()->all()['delete_message_seconds'] ?? null) === 86400);
+        && ($request->body()->all()['delete_message_seconds'] ?? null) === 86_400);
 });
 
 test('ban 7d sends delete_message_seconds 604800', function (): void {
@@ -182,7 +182,7 @@ test('ban 7d sends delete_message_seconds 604800', function (): void {
     DiscordModerationAdapter::make()->execute($action, $user);
 
     $mockClient->assertSent(fn ($request) => $request instanceof CreateBan
-        && ($request->body()->all()['delete_message_seconds'] ?? null) === 604800);
+        && ($request->body()->all()['delete_message_seconds'] ?? null) === 604_800);
 });
 
 test('permanent ban sends delete_message_seconds 0', function (): void {
@@ -487,7 +487,7 @@ test('admin can ban a moderator', function (): void {
 
     $getMemberCalls = 0;
     mockConnector([
-        GetMember::class => function () use (&$getMemberCalls): MockResponse {
+        GetMember::class => static function () use (&$getMemberCalls): MockResponse {
             $getMemberCalls++;
 
             // First call is for target (mod-role), second is for actor (admin-role)

@@ -10,7 +10,7 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::create('message_mentions', function (Blueprint $table): void {
+        Schema::create('message_mentions', static function (Blueprint $table): void {
             $table->uuid('id')->primary();
             $table->foreignUuid('tenant_id')->constrained('tenants');
             $table->foreignUuid('message_id')->constrained('messages')->cascadeOnDelete();
@@ -34,7 +34,7 @@ return new class extends Migration
             );
         });
 
-        Schema::create('message_threads', function (Blueprint $table): void {
+        Schema::create('message_threads', static function (Blueprint $table): void {
             $table->uuid('id')->primary();
             $table->foreignUuid('tenant_id')->constrained('tenants');
             $table->foreignUuid('message_id')->constrained('messages')->cascadeOnDelete();
@@ -51,7 +51,7 @@ return new class extends Migration
             $table->index('message_id', 'message_threads_message_idx');
         });
 
-        Schema::table('messages', function (Blueprint $table): void {
+        Schema::table('messages', static function (Blueprint $table): void {
             if (!Schema::hasColumn('messages', 'reply_to_message_id')) {
                 $table->foreignUuid('reply_to_message_id')
                     ->nullable()
@@ -64,7 +64,7 @@ return new class extends Migration
 
     public function down(): void
     {
-        Schema::table('messages', function (Blueprint $table): void {
+        Schema::table('messages', static function (Blueprint $table): void {
             if (Schema::hasColumn('messages', 'reply_to_message_id')) {
                 $table->dropForeign(['reply_to_message_id']);
                 $table->dropColumn('reply_to_message_id');

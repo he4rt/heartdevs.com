@@ -20,7 +20,7 @@ final class DiscordChannelFactory extends Factory
     {
         return [
             'discord_guild_id' => DiscordGuild::factory(),
-            'discord_channel_id' => (string) fake()->unique()->numberBetween(100000000000000000, 999999999999999999),
+            'discord_channel_id' => (string) fake()->unique()->numberBetween(100_000_000_000_000_000, 999_999_999_999_999_999),
             'name' => fake()->slug(2),
             'type' => DiscordChannelType::GuildText,
             'position' => fake()->numberBetween(0, 50),
@@ -32,7 +32,7 @@ final class DiscordChannelFactory extends Factory
     {
         return $this->state([
             'type' => DiscordChannelType::GuildVoice,
-            'bitrate' => 64000,
+            'bitrate' => 64_000,
             'user_limit' => 0,
         ]);
     }

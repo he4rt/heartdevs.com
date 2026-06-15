@@ -15,14 +15,14 @@ final readonly class TogglePinPost
     {
         throw_if($timeline->user_id !== $user->id, AuthorizationException::class, 'You can only pin your own posts.');
 
-        DB::transaction(function () use ($user, $timeline): void {
+        DB::transaction(static function () use ($user, $timeline): void {
             if ($timeline->pinned) {
                 Timeline::withoutTimestamps(fn () => $timeline->update(['pinned' => false]));
 
                 return;
             }
 
-            Timeline::withoutTimestamps(function () use ($user, $timeline): void {
+            Timeline::withoutTimestamps(static function () use ($user, $timeline): void {
                 Timeline::query()
                     ->where('user_id', $user->id)
                     ->where('tenant_id', $timeline->tenant_id)

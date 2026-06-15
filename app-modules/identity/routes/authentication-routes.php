@@ -8,10 +8,10 @@ use Illuminate\Support\Facades\Route;
 
 Route::prefix('auth')
     ->middleware('web')
-    ->group(function (): void {
+    ->group(static function (): void {
         Route::post('/{tenant}/logout', TenantLogoutController::class)->name('tenant.logout');
 
-        Route::prefix('oauth')->group(function (): void {
+        Route::prefix('oauth')->group(static function (): void {
             Route::get('/{provider}', [OAuthController::class, 'getAuthenticate'])
                 ->name('oauth.authenticate');
 

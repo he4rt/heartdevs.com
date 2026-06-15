@@ -11,7 +11,7 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::table('voice_messages', function (Blueprint $table): void {
+        Schema::table('voice_messages', static function (Blueprint $table): void {
             $table->string('provider_message_id')->nullable()->after('external_identity_id');
             $table->timestampTz('occurred_at')->nullable()->after('state');
         });
@@ -29,7 +29,7 @@ return new class extends Migration
     {
         DB::statement('DROP INDEX IF EXISTS voice_messages_tenant_provider_message_id_unique');
 
-        Schema::table('voice_messages', function (Blueprint $table): void {
+        Schema::table('voice_messages', static function (Blueprint $table): void {
             $table->dropColumn(['provider_message_id', 'occurred_at']);
         });
     }

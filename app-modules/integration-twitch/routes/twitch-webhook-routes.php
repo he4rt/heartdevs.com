@@ -12,7 +12,7 @@ Route::prefix('api/webhooks/twitch')
         SubstituteBindings::class,
         VerifyTwitchSignature::class,
     ])
-    ->group(function (): void {
+    ->group(static function (): void {
         Route::post('/eventsub/{tenant:slug}', TwitchWebhookController::class)
             ->name('twitch.eventsub.webhook');
     });

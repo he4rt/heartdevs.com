@@ -43,7 +43,7 @@ final class EventFactory extends Factory
 
     public function withStatus(AttendingStatusEnum $status = AttendingStatusEnum::Attending): self
     {
-        return $this->afterCreating(function (EventModel $model) use ($status): void {
+        return $this->afterCreating(static function (EventModel $model) use ($status): void {
             $attendees = User::factory()->count(fake()->numberBetween(3, 10))->create();
             $column = match ($status) {
                 AttendingStatusEnum::Attending => 'attendees_count',

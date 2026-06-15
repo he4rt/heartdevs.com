@@ -18,7 +18,7 @@ function tierDoc(DocumentType $type, ?string $module = null): DiscoveredDocument
     );
 }
 
-describe('DocumentTier', function (): void {
+describe('DocumentTier', static function (): void {
     it('exposes label, icon and order for every case', function (): void {
         foreach (DocumentTier::cases() as $tier) {
             expect($tier->label())->not->toBeEmpty()
@@ -46,7 +46,7 @@ describe('DocumentTier', function (): void {
     });
 });
 
-describe('DocumentType::tier', function (): void {
+describe('DocumentType::tier', static function (): void {
     it('maps the guide type to getting started', function (): void {
         expect(DocumentType::Guide->tier())->toBe(DocumentTier::GettingStarted);
     });
@@ -58,7 +58,7 @@ describe('DocumentType::tier', function (): void {
     });
 });
 
-describe('DocumentTier::for', function (): void {
+describe('DocumentTier::for', static function (): void {
     it('places the context map (module-less glossary) in getting started', function (): void {
         expect(DocumentTier::for(tierDoc(DocumentType::Glossary)))->toBe(DocumentTier::GettingStarted);
     });

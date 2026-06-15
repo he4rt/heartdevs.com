@@ -10,7 +10,7 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::create('whatsapp_event_logs', function (Blueprint $table): void {
+        Schema::create('whatsapp_event_logs', static function (Blueprint $table): void {
             $table->uuid('id')->primary();
             $table->uuid('event_id')->unique();
             $table->string('type')->index();

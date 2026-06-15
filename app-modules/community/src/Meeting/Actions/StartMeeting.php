@@ -37,6 +37,6 @@ final readonly class StartMeeting
 
     public function setMeetingCache(Meeting $currentMeeting): void
     {
-        Cache::tags(['meetings'])->put('current-meeting', $currentMeeting->id, 2 * 3600);
+        Cache::tags(['meetings'])->put('current-meeting', $currentMeeting->id, 2 * 3_600);
     }
 }

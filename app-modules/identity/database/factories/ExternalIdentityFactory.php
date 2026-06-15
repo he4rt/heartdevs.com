@@ -34,7 +34,7 @@ final class ExternalIdentityFactory extends Factory
             'credentials' => ClientAccessManager::make(
                 accessToken: Crypt::encrypt(fake()->sha256()),
                 refreshToken: Crypt::encrypt(fake()->sha256()),
-                expiresIn: Crypt::encrypt((string) 3600),
+                expiresIn: Crypt::encrypt((string) 3_600),
             ),
             'external_account_id' => fake()->numerify('######'),
             'connected_by' => User::factory(),

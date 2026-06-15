@@ -32,7 +32,7 @@ class ModeratorPerformanceWidget extends TableWidget
         return $table
             ->query(
                 User::query()
-                    ->whereIn('id', function ($query) use ($start): void {
+                    ->whereIn('id', static function ($query) use ($start): void {
                         $query->select('moderator_id')
                             ->from('moderation_actions')
                             ->where('created_at', '>=', $start)
@@ -54,7 +54,7 @@ class ModeratorPerformanceWidget extends TableWidget
                         ->count()),
                 TextColumn::make('avg_time')
                     ->label(__('panel-admin::moderation.dashboard.moderator_performance.avg_time'))
-                    ->state(function (User $record) use ($start): string {
+                    ->state(static function (User $record) use ($start): string {
                         $avg = (int) ModerationAction::query()
                             ->where('moderation_actions.moderator_id', $record->id)
                             ->where('moderation_actions.created_at', '>=', $start)
@@ -66,7 +66,7 @@ class ModeratorPerformanceWidget extends TableWidget
                     }),
                 TextColumn::make('overturn_rate')
                     ->label(__('panel-admin::moderation.dashboard.moderator_performance.overturn'))
-                    ->state(function (User $record) use ($start): string {
+                    ->state(static function (User $record) use ($start): string {
                         $actionIds = ModerationAction::query()
                             ->where('moderator_id', $record->id)
                             ->where('created_at', '>=', $start)

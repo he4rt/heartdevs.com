@@ -16,7 +16,7 @@ it('exchanges code for token and returns DiscordOAuthAccessDTO', function (): vo
         ExchangeCodeForToken::class => MockResponse::make([
             'access_token' => 'test-access-token',
             'refresh_token' => 'test-refresh-token',
-            'expires_in' => 604800,
+            'expires_in' => 604_800,
         ]),
     ]);
 
@@ -30,7 +30,7 @@ it('exchanges code for token and returns DiscordOAuthAccessDTO', function (): vo
         ->toBeInstanceOf(DiscordOAuthAccessDTO::class)
         ->and($result->accessToken)->toBe('test-access-token')
         ->and($result->refreshToken)->toBe('test-refresh-token')
-        ->and($result->expiresIn)->toBe(604800);
+        ->and($result->expiresIn)->toBe(604_800);
 });
 
 it('gets authenticated user and returns DiscordOAuthUser', function (): void {
@@ -50,7 +50,7 @@ it('gets authenticated user and returns DiscordOAuthUser', function (): void {
     $credentials = DiscordOAuthAccessDTO::make([
         'access_token' => 'test-access-token',
         'refresh_token' => 'test-refresh-token',
-        'expires_in' => 604800,
+        'expires_in' => 604_800,
     ]);
 
     $client = new DiscordOAuthClient($connector);

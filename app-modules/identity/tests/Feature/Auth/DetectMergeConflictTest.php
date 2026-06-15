@@ -14,11 +14,11 @@ function makeMergeOAuthUser(
     string $providerId = '204122995579551744',
     IdentityProvider $provider = IdentityProvider::Discord,
 ): OAuthUserDTO {
-    $credentials = new class('token', 'refresh', 3600) extends OAuthAccessDTO
+    $credentials = new class('token', 'refresh', 3_600) extends OAuthAccessDTO
     {
         public static function make(array $payload): self
         {
-            return new self('token', 'refresh', 3600);
+            return new self('token', 'refresh', 3_600);
         }
     };
 
@@ -33,11 +33,11 @@ function makeMergeOAuthUser(
 
 function makeMergeCredentials(): OAuthAccessDTO
 {
-    return new class('access-token', 'refresh-token', 3600) extends OAuthAccessDTO
+    return new class('access-token', 'refresh-token', 3_600) extends OAuthAccessDTO
     {
         public static function make(array $payload): self
         {
-            return new self('access-token', 'refresh-token', 3600);
+            return new self('access-token', 'refresh-token', 3_600);
         }
     };
 }

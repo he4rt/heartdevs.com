@@ -5,7 +5,7 @@ declare(strict_types=1);
 use He4rt\Docs\Discovery\Actions\ParseDocumentMetadataAction;
 use He4rt\Docs\Discovery\Actions\RenderMarkdownAction;
 
-describe('ParseDocumentMetadataAction', function (): void {
+describe('ParseDocumentMetadataAction', static function (): void {
     it('extracts front-matter and strips it from the body', function (): void {
         $markdown = <<<'MD'
 ---
@@ -49,7 +49,7 @@ MD;
     });
 });
 
-describe('RenderMarkdownAction', function (): void {
+describe('RenderMarkdownAction', static function (): void {
     it('renders html with heading ids and a table of contents', function (): void {
         $rendered = new RenderMarkdownAction()->execute("## Context\n\nText\n\n### Detail\n\nmore");
 

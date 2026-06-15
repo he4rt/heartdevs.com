@@ -191,7 +191,7 @@ test('DiscordMessageAdapter extracts a thread with archival metadata', function 
             'name' => 'Discussão',
             'thread_metadata' => [
                 'archived' => true,
-                'auto_archive_duration' => 10080,
+                'auto_archive_duration' => 10_080,
             ],
         ],
     ]));
@@ -200,7 +200,7 @@ test('DiscordMessageAdapter extracts a thread with archival metadata', function 
         ->and($thread->providerThreadId)->toBe('thread-1')
         ->and($thread->name)->toBe('Discussão')
         ->and($thread->archived)->toBeTrue()
-        ->and($thread->autoArchiveDuration)->toBe(10080);
+        ->and($thread->autoArchiveDuration)->toBe(10_080);
 });
 
 test('DiscordMessageAdapter returns null thread when payload has none', function (): void {
@@ -227,7 +227,7 @@ test('DiscordMessageAdapter extracts attachments with full metadata', function (
         'url' => 'https://cdn.discordapp.com/foo.png',
         'filename' => 'foo.png',
         'content_type' => 'image/png',
-        'size' => 2048,
+        'size' => 2_048,
         'width' => 640,
         'height' => 480,
     ]]]));
@@ -236,7 +236,7 @@ test('DiscordMessageAdapter extracts attachments with full metadata', function (
         ->and($attachments[0]->url)->toBe('https://cdn.discordapp.com/foo.png')
         ->and($attachments[0]->filename)->toBe('foo.png')
         ->and($attachments[0]->contentType)->toBe('image/png')
-        ->and($attachments[0]->size)->toBe(2048)
+        ->and($attachments[0]->size)->toBe(2_048)
         ->and($attachments[0]->width)->toBe(640)
         ->and($attachments[0]->height)->toBe(480);
 });

@@ -82,7 +82,7 @@ final readonly class DocumentRegistry
 
     private function ttl(): int
     {
-        return (int) $this->config->get('docs.cache.ttl', 3600);
+        return (int) $this->config->get('docs.cache.ttl', 3_600);
     }
 
     private function renderKey(DiscoveredDocument $document): string

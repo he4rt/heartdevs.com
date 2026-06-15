@@ -15,22 +15,22 @@ return new class extends Migration
         // ──────────────────────────────────────────────
         // 1. Drop all FK constraints referencing providers
         // ──────────────────────────────────────────────
-        Schema::table('provider_tokens', function (Blueprint $table): void {
+        Schema::table('provider_tokens', static function (Blueprint $table): void {
             $table->dropForeign(['provider_id']);
         });
 
-        Schema::table('messages', function (Blueprint $table): void {
+        Schema::table('messages', static function (Blueprint $table): void {
             $table->dropForeign(['provider_id']);
         });
 
-        Schema::table('voice_messages', function (Blueprint $table): void {
+        Schema::table('voice_messages', static function (Blueprint $table): void {
             $table->dropForeign(['provider_id']);
         });
 
         // ──────────────────────────────────────────────
         // 2. Add new columns to providers table
         // ──────────────────────────────────────────────
-        Schema::table('providers', function (Blueprint $table): void {
+        Schema::table('providers', static function (Blueprint $table): void {
             $table->string('type')->default('external')->after('model_id');
             $table->string('credentials_type')->default('oauth2')->after('provider');
             $table->text('credentials')->nullable()->after('credentials_type');
@@ -123,7 +123,7 @@ return new class extends Migration
         // ──────────────────────────────────────────────
         // 6. Drop old profile columns
         // ──────────────────────────────────────────────
-        Schema::table('providers', function (Blueprint $table): void {
+        Schema::table('providers', static function (Blueprint $table): void {
             $table->dropColumn(['email', 'avatar', 'username']);
         });
 
@@ -132,7 +132,7 @@ return new class extends Migration
         //    (this is the external platform ID column,
         //     NOT the UUID FK in other tables)
         // ──────────────────────────────────────────────
-        Schema::table('providers', function (Blueprint $table): void {
+        Schema::table('providers', static function (Blueprint $table): void {
             $table->renameColumn('provider_id', 'external_account_id');
         });
 
@@ -145,24 +145,24 @@ return new class extends Migration
         // 9. Rename FK columns in dependent tables
         //    (these are UUID FKs, NOT the external ID)
         // ──────────────────────────────────────────────
-        Schema::table('messages', function (Blueprint $table): void {
+        Schema::table('messages', static function (Blueprint $table): void {
             $table->renameColumn('provider_id', 'external_identity_id');
         });
 
-        Schema::table('voice_messages', function (Blueprint $table): void {
+        Schema::table('voice_messages', static function (Blueprint $table): void {
             $table->renameColumn('provider_id', 'external_identity_id');
         });
 
         // ──────────────────────────────────────────────
         // 10. Re-add FK constraints pointing to new table
         // ──────────────────────────────────────────────
-        Schema::table('messages', function (Blueprint $table): void {
+        Schema::table('messages', static function (Blueprint $table): void {
             $table->foreign('external_identity_id')
                 ->references('id')
                 ->on('external_identities');
         });
 
-        Schema::table('voice_messages', function (Blueprint $table): void {
+        Schema::table('voice_messages', static function (Blueprint $table): void {
             $table->foreign('external_identity_id')
                 ->references('id')
                 ->on('external_identities');
@@ -171,7 +171,7 @@ return new class extends Migration
         // ──────────────────────────────────────────────
         // 11. Add connected_by FK constraint
         // ──────────────────────────────────────────────
-        Schema::table('external_identities', function (Blueprint $table): void {
+        Schema::table('external_identities', static function (Blueprint $table): void {
             $table->foreign('connected_by')
                 ->references('id')
                 ->on('users');

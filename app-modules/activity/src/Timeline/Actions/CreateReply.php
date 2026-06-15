@@ -25,7 +25,7 @@ final readonly class CreateReply
 
         $rootId = $parentTimeline->root_id ?? $parentTimeline->id;
 
-        return DB::transaction(function () use ($dto, $content, $parentTimeline, $rootId): Timeline {
+        return DB::transaction(static function () use ($dto, $content, $parentTimeline, $rootId): Timeline {
             $postEntry = PostEntry::query()->create([
                 'content' => $content,
             ]);

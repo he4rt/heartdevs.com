@@ -50,7 +50,7 @@ class FetchDiscordMembers extends Command
 
         do {
             $result = $this->discordGet($token, sprintf('/guilds/%s/members', $guildId), [
-                'limit' => 1000,
+                'limit' => 1_000,
                 'after' => $after,
             ]);
 

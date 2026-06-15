@@ -39,7 +39,7 @@ class RegisterSubscriptionsAction extends Action
                     'secret' => $this->maskSecret(),
                 ]);
             })
-            ->action(function (): void {
+            ->action(static function (): void {
                 /** @var Tenant|null $tenant */
                 $tenant = filament()->getTenant();
 

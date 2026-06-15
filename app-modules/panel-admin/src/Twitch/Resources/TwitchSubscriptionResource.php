@@ -86,7 +86,7 @@ class TwitchSubscriptionResource extends Resource
             ])
             ->recordActions([
                 DeleteAction::make()
-                    ->before(function (TwitchSubscription $record): void {
+                    ->before(static function (TwitchSubscription $record): void {
                         try {
                             $helix = resolve(TwitchHelixConnector::class);
                             $helix->send(new DeleteSubscription(subscriptionId: $record->subscription_id));

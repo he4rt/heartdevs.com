@@ -23,12 +23,12 @@ final class PastSeasonFactory extends Factory
             'season_id' => Season::factory(),
             'tenant_id' => Tenant::factory(),
             'character_id' => Character::factory(),
-            'ranking_position' => fake()->numberBetween(1, 1000),
-            'experience' => fake()->numberBetween(1, 1000),
+            'ranking_position' => fake()->numberBetween(1, 1_000),
+            'experience' => fake()->numberBetween(1, 1_000),
             'level' => 1,
-            'messages_count' => fake()->numberBetween(1, 1000),
-            'badges_count' => fake()->numberBetween(1, 1000),
-            'meetings_count' => fake()->numberBetween(1, 1000),
+            'messages_count' => fake()->numberBetween(1, 1_000),
+            'badges_count' => fake()->numberBetween(1, 1_000),
+            'meetings_count' => fake()->numberBetween(1, 1_000),
         ];
     }
 }

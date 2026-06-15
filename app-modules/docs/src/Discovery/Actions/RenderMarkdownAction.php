@@ -22,7 +22,7 @@ final readonly class RenderMarkdownAction
 
         $html = (string) preg_replace_callback(
             '/<h([23])([^>]*)>(.*?)<\/h\1>/s',
-            function (array $matches) use (&$toc): string {
+            static function (array $matches) use (&$toc): string {
                 $level = (int) $matches[1];
                 $attributes = $matches[2];
                 $inner = $matches[3];

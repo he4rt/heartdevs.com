@@ -104,7 +104,7 @@ class GithubRepositoryResource extends Resource
             ->color('gray')
             ->requiresConfirmation()
             ->modalDescription('O histórico é coletado em segundo plano (centenas de chamadas ao GitHub). Você pode continuar usando o painel.')
-            ->action(function (GithubRepository $record): void {
+            ->action(static function (GithubRepository $record): void {
                 dispatch(new BackfillGithubRepository($record));
 
                 Notification::make()

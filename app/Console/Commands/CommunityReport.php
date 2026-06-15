@@ -730,7 +730,7 @@ class CommunityReport extends Command
         $totalRankings = DB::table('seasons_rankings')->count();
 
         $currentSeason = DB::table('seasons')
-            ->where(function (Builder $q): void {
+            ->where(static function (Builder $q): void {
                 $q->whereNull('ended_at')
                     ->orWhere('ended_at', '>', now());
             })

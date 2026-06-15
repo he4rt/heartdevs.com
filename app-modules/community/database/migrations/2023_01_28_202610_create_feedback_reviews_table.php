@@ -13,7 +13,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('feedback_reviews', function (Blueprint $table): void {
+        Schema::create('feedback_reviews', static function (Blueprint $table): void {
             $table->uuid('id')->primary();
             $table->foreignUuid('feedback_id')->constrained('feedbacks')->cascadeOnDelete();
             $table->foreignUuid('staff_id')->constrained('users')->cascadeOnDelete();

@@ -10,7 +10,7 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::create('moderation_audit_log', function (Blueprint $table): void {
+        Schema::create('moderation_audit_log', static function (Blueprint $table): void {
             $table->id();
             $table->string('event_type', 50);
             $table->uuid('actor_id')->nullable();

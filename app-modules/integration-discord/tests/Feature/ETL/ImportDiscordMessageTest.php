@@ -64,12 +64,12 @@ function discordMessage(array $overrides = []): array
 function dynoVoiceLog(string $userId, string $channelId, string $action = 'joined'): array
 {
     return discordMessage([
-        'id' => (string) fake()->unique()->numberBetween(100000, 999999),
+        'id' => (string) fake()->unique()->numberBetween(100_000, 999_999),
         'content' => '',
         'author' => ['id' => '155149108183695360', 'username' => 'Dyno', 'bot' => true],
         'embeds' => [[
             'description' => sprintf('**<@!%s> %s voice channel <#%s>**', $userId, $action, $channelId),
-            'color' => $action === 'joined' ? 3066993 : 15158332,
+            'color' => $action === 'joined' ? 3_066_993 : 15_158_332,
         ]],
     ]);
 }
@@ -77,7 +77,7 @@ function dynoVoiceLog(string $userId, string $channelId, string $action = 'joine
 function dynoModerationLog(string $username, string $discriminator, string $action): array
 {
     return discordMessage([
-        'id' => (string) fake()->unique()->numberBetween(100000, 999999),
+        'id' => (string) fake()->unique()->numberBetween(100_000, 999_999),
         'content' => '',
         'author' => ['id' => '155149108183695360', 'username' => 'Dyno', 'bot' => true],
         'embeds' => [[
@@ -89,7 +89,7 @@ function dynoModerationLog(string $username, string $discriminator, string $acti
 function heartdevsModerationLog(string $subjectId, string $moderatorId, string $type, string $reason): array
 {
     return discordMessage([
-        'id' => (string) fake()->unique()->numberBetween(100000, 999999),
+        'id' => (string) fake()->unique()->numberBetween(100_000, 999_999),
         'content' => '',
         'author' => ['id' => '123456789', 'username' => 'heartdevs.com', 'bot' => true],
         'embeds' => [[
@@ -494,7 +494,7 @@ test('it parses sent_at from discord timestamp', function (): void {
     $message = $action->handle(DiscordMessageDTO::fromDump(discordMessage()), $tenant->getKey());
 
     expect($message->sent_at)->toBeInstanceOf(CarbonInterface::class)
-        ->and($message->sent_at->year)->toBe(2019);
+        ->and($message->sent_at->year)->toBe(2_019);
 });
 
 // ── ImportDiscordReactionsAction Tests ───────────────────────────
@@ -823,7 +823,7 @@ test('it parses edited_at into a Carbon instance', function (): void {
     $message = $action->handle(DiscordMessageDTO::fromDump($raw), $tenant->getKey());
 
     expect($message->edited_at)->toBeInstanceOf(CarbonInterface::class)
-        ->and($message->edited_at->year)->toBe(2024);
+        ->and($message->edited_at->year)->toBe(2_024);
 });
 
 // ── Fase 1: Deleted User coalescence ─────────────────────────────
@@ -971,7 +971,7 @@ test('it creates a message_thread when payload has a thread block', function ():
         'thread' => [
             'id' => 'thread-xyz',
             'name' => 'Conversa',
-            'thread_metadata' => ['archived' => false, 'auto_archive_duration' => 1440],
+            'thread_metadata' => ['archived' => false, 'auto_archive_duration' => 1_440],
         ],
     ]);
 
@@ -984,7 +984,7 @@ test('it creates a message_thread when payload has a thread block', function ():
         ->and($thread->provider_thread_id)->toBe('thread-xyz')
         ->and($thread->name)->toBe('Conversa')
         ->and($thread->archived)->toBeFalse()
-        ->and($thread->auto_archive_duration)->toBe(1440);
+        ->and($thread->auto_archive_duration)->toBe(1_440);
 });
 
 test('it resolves reply_to_message_id when parent message already exists', function (): void {
@@ -1041,7 +1041,7 @@ test('it persists attachments with content type, size and dimensions', function 
             'url' => 'https://cdn.discordapp.com/attachments/foo.png',
             'filename' => 'foo.png',
             'content_type' => 'image/png',
-            'size' => 4096,
+            'size' => 4_096,
             'width' => 800,
             'height' => 600,
         ]],
@@ -1055,7 +1055,7 @@ test('it persists attachments with content type, size and dimensions', function 
     expect($attachment)->not->toBeNull()
         ->and($attachment->filename)->toBe('foo.png')
         ->and($attachment->content_type)->toBe('image/png')
-        ->and($attachment->size)->toBe(4096)
+        ->and($attachment->size)->toBe(4_096)
         ->and($attachment->width)->toBe(800);
 });
 

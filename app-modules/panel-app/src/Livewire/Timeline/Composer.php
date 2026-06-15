@@ -37,7 +37,7 @@ final class Composer extends Component implements HasSchemas
                     ->placeholder('O que está acontecendo?')
                     ->toolbarButtons([])
                     ->required()
-                    ->maxLength(5000),
+                    ->maxLength(5_000),
                 FileUpload::make('images')
                     ->hiddenLabel()
                     ->image()

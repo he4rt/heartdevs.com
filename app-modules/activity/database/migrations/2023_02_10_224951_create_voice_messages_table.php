@@ -11,7 +11,7 @@ return new class extends Migration
     public function up(): void
     {
         if (!Schema::hasTable('voice_messages')) {
-            Schema::create('voice_messages', function (Blueprint $table): void {
+            Schema::create('voice_messages', static function (Blueprint $table): void {
                 $table->id();
                 $table->foreignUuid('provider_id')->constrained('providers');
                 $table->string('channel_name');

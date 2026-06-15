@@ -18,7 +18,7 @@ final readonly class CreatePost
 
         throw_if(blank($content), InvalidArgumentException::class, 'Post content cannot be empty.');
 
-        return DB::transaction(function () use ($dto, $content): Timeline {
+        return DB::transaction(static function () use ($dto, $content): Timeline {
             $postEntry = PostEntry::query()->create([
                 'content' => $content,
             ]);

@@ -20,7 +20,7 @@ final class TransactionFactory extends Factory
             'wallet_id' => Wallet::factory(),
             'type' => TransactionType::Reward,
             'amount' => fake()->numberBetween(1, 100),
-            'balance_after' => fake()->numberBetween(0, 1000),
+            'balance_after' => fake()->numberBetween(0, 1_000),
             'description' => fake()->sentence(),
         ];
     }

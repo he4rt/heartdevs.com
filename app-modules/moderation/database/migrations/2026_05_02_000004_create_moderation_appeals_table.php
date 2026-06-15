@@ -10,7 +10,7 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::create('moderation_appeals', function (Blueprint $table): void {
+        Schema::create('moderation_appeals', static function (Blueprint $table): void {
             $table->uuid('id')->primary();
             $table->foreignUuid('action_id')->constrained('moderation_actions')->cascadeOnDelete();
             $table->foreignUuid('appellant_id')->constrained('users')->cascadeOnDelete();

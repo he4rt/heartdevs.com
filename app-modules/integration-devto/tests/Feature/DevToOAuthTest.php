@@ -29,7 +29,7 @@ test('exchanges code for access token', function (): void {
         'dev.to/oauth/token' => Http::response([
             'access_token' => 'test-access-token',
             'refresh_token' => 'test-refresh-token',
-            'expires_in' => 3600,
+            'expires_in' => 3_600,
         ]),
     ]);
 
@@ -44,7 +44,7 @@ test('exchanges code for access token', function (): void {
 test('fetches authenticated user info', function (): void {
     Http::fake([
         'dev.to/api/users/me' => Http::response([
-            'id' => 12345,
+            'id' => 12_345,
             'username' => 'testuser',
             'name' => 'Test User',
             'email' => 'test@example.com',
@@ -55,7 +55,7 @@ test('fetches authenticated user info', function (): void {
     $accessDTO = DevToOAuthAccessDTO::make([
         'access_token' => 'token',
         'refresh_token' => 'refresh',
-        'expires_in' => 3600,
+        'expires_in' => 3_600,
     ]);
 
     $client = new DevToOAuthClient();

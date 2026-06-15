@@ -88,7 +88,7 @@ final readonly class FindOrCreateUserByProvider
         $maxSuffix = User::query()
             ->where('username', 'LIKE', $base.'-%')
             ->pluck('username')
-            ->reduce(function (?int $max, string $username) use ($prefixLength): int {
+            ->reduce(static function (?int $max, string $username) use ($prefixLength): int {
                 $suffix = (int) mb_substr($username, $prefixLength);
 
                 return max($suffix, $max ?? 0);

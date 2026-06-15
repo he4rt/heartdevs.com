@@ -42,7 +42,7 @@ return new class extends Migration
             'tenant_users',
         ];
 
-        DB::transaction(function () use ($tables, $tenantId): void {
+        DB::transaction(static function () use ($tables, $tenantId): void {
             foreach ($tables as $table) {
                 DB::table($table)->where('tenant_id', $tenantId)->delete();
             }

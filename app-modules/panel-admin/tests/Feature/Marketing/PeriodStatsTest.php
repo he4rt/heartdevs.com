@@ -19,7 +19,7 @@ use Illuminate\Support\Facades\DB;
 beforeEach(function (): void {
     $this->displayTimezone = config('app.display_timezone');
 
-    Date::setTestNow(Date::create(2026, 6, 15, 12, 0, 0, $this->displayTimezone));
+    Date::setTestNow(Date::create(2_026, 6, 15, 12, 0, 0, $this->displayTimezone));
 });
 
 afterEach(function (): void {
@@ -33,9 +33,9 @@ test('it buckets messages, distinct users and voice joins into the correct daily
     $identityA = ExternalIdentity::factory()->recycle($tenant)->create();
     $identityB = ExternalIdentity::factory()->recycle($tenant)->create();
 
-    $firstBlockNoon = Date::create(2026, 6, 8, 12, 0, 0, $tz);   // block 0 (oldest day)
-    $lastBlockNoon = Date::create(2026, 6, 14, 12, 0, 0, $tz);   // block 6 (most recent full day)
-    $todayNoon = Date::create(2026, 6, 15, 12, 0, 0, $tz);       // outside every block
+    $firstBlockNoon = Date::create(2_026, 6, 8, 12, 0, 0, $tz);   // block 0 (oldest day)
+    $lastBlockNoon = Date::create(2_026, 6, 14, 12, 0, 0, $tz);   // block 6 (most recent full day)
+    $todayNoon = Date::create(2_026, 6, 15, 12, 0, 0, $tz);       // outside every block
 
     // Block 0: three messages from two distinct identities.
     Message::factory()->count(2)->recycle($tenant)->create([
@@ -59,7 +59,7 @@ test('it buckets messages, distinct users and voice joins into the correct daily
         'sent_at' => $todayNoon,
     ]);
 
-    $insertVoice = function (string $state, Carbon $occurredAt) use ($identityA, $tenant): void {
+    $insertVoice = static function (string $state, Carbon $occurredAt) use ($identityA, $tenant): void {
         DB::table('voice_messages')->insert([
             'external_identity_id' => $identityA->id,
             'tenant_id' => $tenant->id,

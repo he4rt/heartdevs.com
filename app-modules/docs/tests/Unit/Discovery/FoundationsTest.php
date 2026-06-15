@@ -24,7 +24,7 @@ function docsDtoFixture(string $url = '/docs/decisions/x', string $title = 'X'):
     );
 }
 
-describe('DocumentType', function (): void {
+describe('DocumentType', static function (): void {
     it('uses the URL section segment as backing value', function (): void {
         expect(DocumentType::Adr->value)->toBe('decisions')
             ->and(DocumentType::tryFrom('decisions'))->toBe(DocumentType::Adr)
@@ -56,7 +56,7 @@ describe('DocumentType', function (): void {
     });
 });
 
-describe('AdrStatus', function (): void {
+describe('AdrStatus', static function (): void {
     it('parses inline status with a trailing date', function (): void {
         expect(AdrStatus::fromRaw('Accepted (2026-06-08)'))->toBe(AdrStatus::Accepted)
             ->and(AdrStatus::fromRaw('Superseded'))->toBe(AdrStatus::Superseded);
@@ -75,7 +75,7 @@ describe('AdrStatus', function (): void {
     });
 });
 
-describe('PlanStatus', function (): void {
+describe('PlanStatus', static function (): void {
     it('derives from checkbox progress', function (): void {
         expect(PlanStatus::fromProgress(0, 0))->toBe(PlanStatus::Proposed)
             ->and(PlanStatus::fromProgress(0, 5))->toBe(PlanStatus::Proposed)
@@ -85,14 +85,14 @@ describe('PlanStatus', function (): void {
     });
 });
 
-describe('PlanMetadata', function (): void {
+describe('PlanMetadata', static function (): void {
     it('computes the progress percentage', function (): void {
         expect(new PlanMetadata(PlanStatus::InProgress, 2, 5)->progress())->toBe(40)
             ->and(new PlanMetadata(PlanStatus::Proposed, 0, 0)->progress())->toBe(0);
     });
 });
 
-describe('DiscoveredDocument', function (): void {
+describe('DiscoveredDocument', static function (): void {
     it('exposes section and dated flag from its type', function (): void {
         $doc = new DiscoveredDocument(
             type: DocumentType::Spec,
@@ -108,7 +108,7 @@ describe('DiscoveredDocument', function (): void {
     });
 });
 
-describe('NavigationGroup', function (): void {
+describe('NavigationGroup', static function (): void {
     it('is empty without documents nor non-empty subgroups', function (): void {
         expect(new NavigationGroup('Módulos')->isEmpty())->toBeTrue()
             ->and(new NavigationGroup('Decisões', documents: [docsDtoFixture()])->isEmpty())->toBeFalse();
@@ -145,7 +145,7 @@ describe('NavigationGroup', function (): void {
     });
 });
 
-describe('ModuleColor', function (): void {
+describe('ModuleColor', static function (): void {
     it('returns curated colors for known modules', function (): void {
         expect(ModuleColor::for('moderation'))->toBe('#782bf1')
             ->and(ModuleColor::for('Moderation'))->toBe('#782bf1')
@@ -167,7 +167,7 @@ describe('ModuleColor', function (): void {
     });
 });
 
-describe('DocumentTree', function (): void {
+describe('DocumentTree', static function (): void {
     it('finds by url, tolerating trailing and leading slashes', function (): void {
         $document = docsDtoFixture('/docs/specs/foo', 'Foo');
         $tree = new DocumentTree(groups: [], byUrl: ['/docs/specs/foo' => $document]);

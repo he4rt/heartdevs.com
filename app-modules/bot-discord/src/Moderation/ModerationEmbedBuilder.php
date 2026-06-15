@@ -24,7 +24,7 @@ final class ModerationEmbedBuilder
         if ($text !== null) {
             $fields[] = [
                 'name' => 'Content',
-                'value' => mb_substr($text, 0, 1024),
+                'value' => mb_substr($text, 0, 1_024),
                 'inline' => false,
             ];
         }
@@ -32,7 +32,7 @@ final class ModerationEmbedBuilder
         return [
             'title' => sprintf(':warning: New moderation case — %s', $author),
             'description' => sprintf('Case ID: `%s`', $case->id),
-            'color' => 0xFFA500,
+            'color' => 0xFF_A5_00,
             'fields' => $fields,
             'timestamp' => $case->created_at->toIso8601String(),
             'footer' => ['text' => 'He4rt Moderation System'],

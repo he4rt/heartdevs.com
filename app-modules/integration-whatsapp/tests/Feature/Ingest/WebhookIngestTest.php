@@ -49,7 +49,7 @@ function messagesUpsertEvent(array $overrides = []): array
                 'participant' => '5511999999999@s.whatsapp.net',
                 'id' => 'MSG1',
             ],
-            'messageTimestamp' => 1700000000,
+            'messageTimestamp' => 1_700_000_000,
             'message' => ['conversation' => 'oi'],
         ],
     ], $overrides);

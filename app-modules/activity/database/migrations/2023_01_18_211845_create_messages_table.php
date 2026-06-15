@@ -14,7 +14,7 @@ return new class extends Migration
     public function up(): void
     {
         if (!Schema::hasTable('messages')) {
-            Schema::create('messages', function (Blueprint $table): void {
+            Schema::create('messages', static function (Blueprint $table): void {
                 $table->uuid('id')->primary();
                 $table->foreignUuid('provider_id')->constrained('providers');
                 $table->string('provider_message_id')->nullable();

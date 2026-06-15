@@ -10,14 +10,14 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::table('twitch_event_logs', function (Blueprint $table): void {
+        Schema::table('twitch_event_logs', static function (Blueprint $table): void {
             $table->foreignUuid('tenant_id')->nullable()->after('id')->constrained()->nullOnDelete();
         });
     }
 
     public function down(): void
     {
-        Schema::table('twitch_event_logs', function (Blueprint $table): void {
+        Schema::table('twitch_event_logs', static function (Blueprint $table): void {
             $table->dropConstrainedForeignId('tenant_id');
         });
     }

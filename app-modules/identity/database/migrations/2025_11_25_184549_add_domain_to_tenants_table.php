@@ -13,7 +13,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('tenants', function (Blueprint $table): void {
+        Schema::table('tenants', static function (Blueprint $table): void {
             $table->string('domain')
                 ->after('owner_id')
                 ->nullable();
@@ -25,7 +25,7 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('tenants', function (Blueprint $table): void {
+        Schema::table('tenants', static function (Blueprint $table): void {
             $table->dropColumn('domain');
         });
     }

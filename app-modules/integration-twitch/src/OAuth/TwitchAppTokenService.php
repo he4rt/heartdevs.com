@@ -33,7 +33,7 @@ final readonly class TwitchAppTokenService
 
     private function getCacheTtl(): int
     {
-        $expiresIn = (int) Cache::get('twitch_app_token_expires_in', 3600);
+        $expiresIn = (int) Cache::get('twitch_app_token_expires_in', 3_600);
 
         return max($expiresIn - 300, 60);
     }

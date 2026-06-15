@@ -10,7 +10,7 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::create('characters_wallet', function (Blueprint $table): void {
+        Schema::create('characters_wallet', static function (Blueprint $table): void {
             $table->id();
             $table->integer('balance')->default(0);
             $table->foreignUuid('character_id')->constrained('characters')->cascadeOnDelete();

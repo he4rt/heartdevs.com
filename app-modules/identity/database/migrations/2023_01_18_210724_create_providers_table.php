@@ -14,7 +14,7 @@ return new class extends Migration
     public function up(): void
     {
         if (!Schema::hasTable('providers')) {
-            Schema::create('providers', function (Blueprint $table): void {
+            Schema::create('providers', static function (Blueprint $table): void {
                 $table->uuid('id')->primary();
                 $table->foreignUuid('user_id')->constrained('users')->cascadeOnDelete();
                 $table->string('provider');

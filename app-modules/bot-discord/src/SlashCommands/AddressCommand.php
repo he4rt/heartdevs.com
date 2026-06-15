@@ -123,7 +123,7 @@ class AddressCommand extends AbstractSlashCommand
     public function autocomplete(): array
     {
         return [
-            'estado' => function (Interaction $interaction, ?string $value): array {
+            'estado' => static function (Interaction $interaction, ?string $value): array {
                 $states = collect(self::STATES)
                     ->map(fn (string $name, string $uf): string => sprintf('%s - %s', $uf, $name));
 

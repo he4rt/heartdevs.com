@@ -10,7 +10,7 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::create('discord_member_role_history', function (Blueprint $table): void {
+        Schema::create('discord_member_role_history', static function (Blueprint $table): void {
             $table->id();
             $table->foreignId('discord_member_id')->constrained('discord_members')->cascadeOnDelete();
             $table->foreignId('discord_role_id')->constrained('discord_roles')->cascadeOnDelete();

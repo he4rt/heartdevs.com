@@ -18,7 +18,7 @@ class VoiceExperienceTask extends Task
     /**
      * The task interval in seconds.
      */
-    protected int $interval = 1200;
+    protected int $interval = 1_200;
 
     /**
      * Determine if the task handler should execute during boot.

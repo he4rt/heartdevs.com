@@ -32,7 +32,7 @@ class FetchDiscordProfiles extends Command
 
     private const string STATUS_FILE = 'discord/profiles_status.csv';
 
-    private const int CHUNK_SIZE = 1000;
+    private const int CHUNK_SIZE = 1_000;
 
     private int $successCount = 0;
 
@@ -185,7 +185,7 @@ class FetchDiscordProfiles extends Command
 
                     // Jittered delay: 1.5s + random 0.2-0.3s
                     $jitter = random_int(200, 300);
-                    Sleep::usleep((1_500 + $jitter) * 1000);
+                    Sleep::usleep((1_500 + $jitter) * 1_000);
                 }
             },
             limit: 10,

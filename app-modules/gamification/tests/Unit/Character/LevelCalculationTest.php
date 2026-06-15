@@ -19,10 +19,10 @@ test('experience at exact threshold gives that level', function (int $level, int
     expect($character->level)->toBe($level);
 })->with([
     'level 2 at 120 xp' => [2, 120],
-    'level 5 at 1000 xp' => [5, 1000],
-    'level 10 at 4500 xp' => [10, 4500],
-    'level 25 at 39000 xp' => [25, 39000],
-    'level 50 at 400000 xp' => [50, 400000],
+    'level 5 at 1000 xp' => [5, 1_000],
+    'level 10 at 4500 xp' => [10, 4_500],
+    'level 25 at 39000 xp' => [25, 39_000],
+    'level 50 at 400000 xp' => [50, 400_000],
 ]);
 
 test('experience just below threshold stays at previous level', function (int $expectedLevel, int $xp): void {
@@ -32,11 +32,11 @@ test('experience just below threshold stays at previous level', function (int $e
 })->with([
     'level 1 at 119 xp' => [1, 119],
     'level 4 at 999 xp' => [4, 999],
-    'level 9 at 4499 xp' => [9, 4499],
+    'level 9 at 4499 xp' => [9, 4_499],
 ]);
 
 test('experience beyond max threshold is still level 50', function (): void {
-    $character = Character::factory()->create(['experience' => 999999]);
+    $character = Character::factory()->create(['experience' => 999_999]);
 
     expect($character->level)->toBe(50);
 });
@@ -57,7 +57,7 @@ test('percentage experience at start of level', function (): void {
 });
 
 test('percentage experience at max level is 100', function (): void {
-    $character = Character::factory()->create(['experience' => 400000]);
+    $character = Character::factory()->create(['experience' => 400_000]);
 
     expect($character->level)->toBe(50)
         ->and($character->percentage_experience)->toBe(100.0);

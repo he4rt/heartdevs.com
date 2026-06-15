@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-describe('modal setValue validation', function (): void {
+describe('modal setValue validation', static function (): void {
     test('returns null when value does not meet minimum length', function (?string $value, int $minLength, ?string $expected): void {
         $result = $value !== null && mb_strlen($value) >= $minLength ? $value : null;
         expect($result)->toBe($expected);
@@ -19,7 +19,7 @@ describe('modal setValue validation', function (): void {
     ]);
 });
 
-describe('logging configuration', function (): void {
+describe('logging configuration', static function (): void {
     test('bot-discord log channel is configured as daily with 30-day retention', function (): void {
         $channel = config('logging.channels.bot-discord');
 

@@ -10,7 +10,7 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::create('interactions', function (Blueprint $table): void {
+        Schema::create('interactions', static function (Blueprint $table): void {
             $table->uuid('id')->primary();
             $table->foreignUuid('character_id')->constrained('characters');
             $table->foreignUuid('tenant_id')->constrained('tenants');

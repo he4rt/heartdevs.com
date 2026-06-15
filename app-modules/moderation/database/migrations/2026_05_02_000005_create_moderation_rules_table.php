@@ -10,7 +10,7 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::create('moderation_rules', function (Blueprint $table): void {
+        Schema::create('moderation_rules', static function (Blueprint $table): void {
             $table->uuid('id')->primary();
             $table->string('name', 100);
             $table->string('type', 20);

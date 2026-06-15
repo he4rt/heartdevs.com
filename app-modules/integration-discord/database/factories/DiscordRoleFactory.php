@@ -19,9 +19,9 @@ final class DiscordRoleFactory extends Factory
     {
         return [
             'discord_guild_id' => DiscordGuild::factory(),
-            'discord_role_id' => (string) fake()->unique()->numberBetween(100000000000000000, 999999999999999999),
+            'discord_role_id' => (string) fake()->unique()->numberBetween(100_000_000_000_000_000, 999_999_999_999_999_999),
             'name' => fake()->word(),
-            'color' => fake()->numberBetween(0, 16777215),
+            'color' => fake()->numberBetween(0, 16_777_215),
             'position' => fake()->numberBetween(0, 50),
             'permissions' => 0,
             'is_hoisted' => false,

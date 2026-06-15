@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\Route;
 
 Route::prefix('/api/webhooks')
     ->middleware(['api', VerifyWhatsAppSignature::class])
-    ->group(function (): void {
+    ->group(static function (): void {
         Route::post('/whatsapp', [WhatsAppWebhookController::class, 'store'])
             ->name('api.webhooks.whatsapp');
     });

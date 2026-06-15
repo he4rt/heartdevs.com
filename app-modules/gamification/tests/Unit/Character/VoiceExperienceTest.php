@@ -18,24 +18,24 @@ test('voice state multipliers', function (VoiceStatesEnum $state, int $expected)
 ]);
 
 test('voice xp increments by multiplier times level', function (): void {
-    $character = Character::factory()->create(['experience' => 4500]);
+    $character = Character::factory()->create(['experience' => 4_500]);
     // level 10 at 4500 xp, unmuted = 3 * 10 = 30
 
     $xp = resolve(IncrementExperience::class)
         ->incrementByVoiceMessage($character->id, VoiceStatesEnum::Unmuted);
 
     expect($xp)->toBe(30)
-        ->and($character->fresh()->experience)->toBe(4530);
+        ->and($character->fresh()->experience)->toBe(4_530);
 });
 
 test('disabled voice state gives zero xp', function (): void {
-    $character = Character::factory()->create(['experience' => 4500]);
+    $character = Character::factory()->create(['experience' => 4_500]);
 
     $xp = resolve(IncrementExperience::class)
         ->incrementByVoiceMessage($character->id, VoiceStatesEnum::Disabled);
 
     expect($xp)->toBe(0)
-        ->and($character->fresh()->experience)->toBe(4500);
+        ->and($character->fresh()->experience)->toBe(4_500);
 });
 
 test('text message increment works through action', function (): void {

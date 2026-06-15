@@ -17,11 +17,11 @@ final class DiscordGuildFactory extends Factory
     public function definition(): array
     {
         return [
-            'discord_guild_id' => (string) fake()->unique()->numberBetween(100000000000000000, 999999999999999999),
+            'discord_guild_id' => (string) fake()->unique()->numberBetween(100_000_000_000_000_000, 999_999_999_999_999_999),
             'name' => fake()->company(),
             'icon' => fake()->optional()->md5(),
             'description' => fake()->optional()->sentence(),
-            'member_count' => fake()->numberBetween(10, 50000),
+            'member_count' => fake()->numberBetween(10, 50_000),
             'premium_tier' => fake()->numberBetween(0, 3),
             'features' => [],
         ];

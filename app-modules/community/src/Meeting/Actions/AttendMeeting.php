@@ -21,7 +21,7 @@ final readonly class AttendMeeting
             ->attach($userId, ['attend_at' => now()]);
 
         $userAttendedCacheKey = sprintf('meeting-%s-attended', $userId);
-        Cache::tags(['meetings'])->put($userAttendedCacheKey, true, 2 * 3600);
+        Cache::tags(['meetings'])->put($userAttendedCacheKey, true, 2 * 3_600);
     }
 
     public function getMeetingId(): string

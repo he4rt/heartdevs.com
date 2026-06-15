@@ -14,7 +14,7 @@ return new class extends Migration
     public function up(): void
     {
         if (!Schema::hasTable('users')) {
-            Schema::create('users', function (Blueprint $table): void {
+            Schema::create('users', static function (Blueprint $table): void {
                 $table->uuid('id')->primary();
                 $table->string('username')->unique()->index();
                 $table->string('name')->unique()->index();

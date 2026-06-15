@@ -13,7 +13,7 @@ final class ListGuildMembers extends Request
 
     public function __construct(
         private readonly string $guildId,
-        private readonly int $limit = 1000,
+        private readonly int $limit = 1_000,
         private readonly ?string $after = null,
     ) {}
 

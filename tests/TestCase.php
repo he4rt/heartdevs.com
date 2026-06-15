@@ -15,7 +15,7 @@ abstract class TestCase extends BaseTestCase
     protected function actingAsAdmin(): self
     {
         Tenant::factory()
-            ->afterCreating(function (Tenant $tenant): void {
+            ->afterCreating(static function (Tenant $tenant): void {
                 ExternalIdentity::factory([
                     'tenant_id' => $tenant->getKey(),
                     'provider' => 'discord',

@@ -19,7 +19,7 @@ final class DiscordMemberFactory extends Factory
     {
         return [
             'discord_guild_id' => DiscordGuild::factory(),
-            'discord_user_id' => (string) fake()->unique()->numberBetween(100000000000000000, 999999999999999999),
+            'discord_user_id' => (string) fake()->unique()->numberBetween(100_000_000_000_000_000, 999_999_999_999_999_999),
             'username' => fake()->userName(),
             'global_name' => fake()->optional()->name(),
             'avatar' => fake()->optional()->md5(),

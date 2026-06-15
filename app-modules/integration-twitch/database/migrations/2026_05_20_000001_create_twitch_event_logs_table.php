@@ -10,7 +10,7 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::create('twitch_event_logs', function (Blueprint $table): void {
+        Schema::create('twitch_event_logs', static function (Blueprint $table): void {
             $table->id();
             $table->string('event_type')->index();
             $table->string('broadcaster_user_id')->nullable()->index();

@@ -13,7 +13,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('addresses', function (Blueprint $table): void {
+        Schema::create('addresses', static function (Blueprint $table): void {
             $table->uuid('id')->primary();
 
             $table->uuidMorphs('addressable'); // addressable_type && addressable_id

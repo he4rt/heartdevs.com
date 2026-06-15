@@ -14,7 +14,7 @@ return new class extends Migration
     public function up(): void
     {
         if (!Schema::hasTable('meetings')) {
-            Schema::create('meetings', function (Blueprint $table): void {
+            Schema::create('meetings', static function (Blueprint $table): void {
                 $table->uuid('id')->primary();
                 $table->foreignUuid('admin_id')->constrained('users')->cascadeOnDelete();
                 $table->text('content')->nullable();
