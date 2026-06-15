@@ -2,5 +2,8 @@ includes:
     - phpstan.ignore.neon
 
 parameters:
+    stubFiles:
+        - stubs/discord-php.stub
+
     paths:
         - src/
