@@ -11,6 +11,7 @@ use Discord\Parts\Embed\Embed;
 use Discord\Parts\Interactions\Command\Option;
 use Discord\Parts\Interactions\Interaction;
 use He4rt\BotDiscord\DTO\VoiceChannelDTO;
+use React\Promise\PromiseInterface;
 
 use function React\Async\await;
 
@@ -63,13 +64,15 @@ class DynamicVoiceCommand extends AbstractSlashCommand
      */
     public function handle(Interaction $interaction): void
     {
-        $channel = await($interaction->guild->channels->build(
+        /** @var PromiseInterface<Channel> $buildPromise */
+        $buildPromise = $interaction->guild->channels->build(
             $interaction->guild,
             ChannelBuilder::new($this->value('tipo'))
                 ->setType(Channel::TYPE_GUILD_VOICE)
                 ->setUserLimit($this->value('quantidade'))
                 ->setParentId(config('he4rt.channels.dynamic_voice_category')),
-        ));
+        );
+        $channel = await($buildPromise);
         $channels = cache()->tags(['voice_channels'])->get('active_voice_channels_keys', []);
 
         $channelDto = VoiceChannelDTO::make([
@@ -84,7 +87,9 @@ class DynamicVoiceCommand extends AbstractSlashCommand
 
         cache()->tags(['voice_channels'])->put('active_voice_channels_keys', $channels);
 
-        await($interaction->guild->channels->freshen());
+        /** @var PromiseInterface<mixed> $freshenPromise */
+        $freshenPromise = $interaction->guild->channels->freshen();
+        await($freshenPromise);
 
         $this->interactionWithUser($interaction, $channel);
     }

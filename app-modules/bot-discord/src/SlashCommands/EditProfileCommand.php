@@ -122,9 +122,16 @@ class EditProfileCommand extends AbstractSlashCommand
         Interaction $interaction,
         Collection $components
     ): void {
-        $name = $components->get('custom_id', 'name')?->value;
-        $nickname = $components->get('custom_id', 'nickname')?->value;
-        $about = $components->get('custom_id', 'about')?->value;
+        /** @var object{value: string}|null $nameComponent */
+        $nameComponent = $components->get('custom_id', 'name');
+        /** @var object{value: string}|null $nicknameComponent */
+        $nicknameComponent = $components->get('custom_id', 'nickname');
+        /** @var object{value: string}|null $aboutComponent */
+        $aboutComponent = $components->get('custom_id', 'about');
+
+        $name = $nameComponent->value ?? '';
+        $nickname = $nicknameComponent->value ?? '';
+        $about = $aboutComponent->value ?? '';
 
         try {
             $this->memberProvider->user->update(['name' => $name]);

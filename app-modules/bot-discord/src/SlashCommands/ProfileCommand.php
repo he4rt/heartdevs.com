@@ -6,6 +6,7 @@ namespace He4rt\BotDiscord\SlashCommands;
 
 use Discord\Parts\Interactions\Command\Option;
 use Discord\Parts\Interactions\Interaction;
+use Discord\Parts\User\User;
 use He4rt\Identity\ExternalIdentity\Models\ExternalIdentity;
 use He4rt\Profile\Models\Profile;
 use Illuminate\Support\Facades\Date;
@@ -67,10 +68,12 @@ class ProfileCommand extends AbstractSlashCommand
      */
     public function handle(Interaction $interaction): void
     {
+        /** @var User $mentionedUser */
         $mentionedUser = $interaction->user;
 
         if ($userId = $this->value('user')) {
             $this->memberProvider = $this->getMemberProviderQuery()->where('external_account_id', $userId)->first();
+            /** @var User $mentionedUser */
             $mentionedUser = $interaction->data->resolved->users->get('id', $userId);
         }
 
@@ -79,7 +82,7 @@ class ProfileCommand extends AbstractSlashCommand
             if (!$this->memberProvider instanceof ExternalIdentity) {
                 $this
                     ->message()
-                    ->content($mentionedUser.' ainda não se apresentou! Use o comando `/apresentar` primeiro.')
+                    ->content($mentionedUser->username.' ainda não se apresentou! Use o comando `/apresentar` primeiro.')
                     ->reply($interaction, true);
 
                 return;
@@ -93,7 +96,7 @@ class ProfileCommand extends AbstractSlashCommand
             if (!$profile) {
                 $this
                     ->message()
-                    ->content($mentionedUser.' ainda não possui um perfil.')
+                    ->content($mentionedUser->username.' ainda não possui um perfil.')
                     ->reply($interaction, true);
 
                 return;

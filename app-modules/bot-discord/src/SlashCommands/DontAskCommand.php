@@ -6,6 +6,7 @@ namespace He4rt\BotDiscord\SlashCommands;
 
 use Discord\Parts\Interactions\Command\Option;
 use Discord\Parts\Interactions\Interaction;
+use Discord\Parts\User\User;
 use Illuminate\Support\Facades\Date;
 
 class DontAskCommand extends AbstractSlashCommand
@@ -57,11 +58,14 @@ class DontAskCommand extends AbstractSlashCommand
      */
     public function handle(Interaction $interaction): void
     {
+        /** @var User $targetUser */
+        $targetUser = $interaction->data->resolved->users->get('id', $this->value('user'));
+
         $this
             ->message()
             ->title('Não peça para perguntar.')
             ->footerIcon($interaction->guild->icon)
-            ->thumbnailUrl($interaction->data->resolved->users->get('id', $this->value('user'))->avatar)
+            ->thumbnailUrl($targetUser->avatar)
             ->footerText(Date::now()->format('Y').' © He4rt Developers')
             ->imageUrl('https://media.discordapp.net/attachments/546151895010508827/1046092564513701909/Frame_1282_1.png')
             ->timestamp(now())

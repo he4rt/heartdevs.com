@@ -9,7 +9,7 @@ use He4rt\BotDiscord\DTO\VoiceChannelDTO;
 final class JoiningChannelAction
 {
     /**
-     * @param  array<string, mixed>  $activeChannels
+     * @param  array<string, VoiceChannelDTO>  $activeChannels
      */
     public function execute(string $channelId, array $activeChannels, string $user): void
     {
@@ -27,7 +27,7 @@ final class JoiningChannelAction
     }
 
     /**
-     * @param  array<string, mixed>  $activeChannels
+     * @param  array<string, VoiceChannelDTO>  $activeChannels
      */
     private function saveActiveChannels(array $activeChannels): void
     {

@@ -108,6 +108,7 @@ class CargoDelasCommand extends AbstractSlashCommand
 
     private function validateTarget(Interaction $interaction, string $targetUserId): ?Member
     {
+        /** @var Member|null $targetMember */
         $targetMember = $interaction->guild->members->get('id', $targetUserId);
 
         if (!$targetMember) {

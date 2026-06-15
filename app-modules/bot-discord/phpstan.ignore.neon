@@ -16,16 +16,6 @@ parameters:
             count: 1
             path: src/SlashCommands/EditVoiceChannelLimitCommand.php
         -
-            message: '#^Unable to resolve the template type T in call to function React\\Async\\await$#'
-            identifier: argument.templateType
-            count: 2
-            path: src/SlashCommands/DynamicVoiceCommand.php
-        -
-            message: '#^Unable to resolve the template type T in call to function React\\Async\\await$#'
-            identifier: argument.templateType
-            count: 1
-            path: src/SlashCommands/EditVoiceChannelLimitCommand.php
-        -
             message: '#^Using nullsafe property access "\?->user" on left side of \?\? is unnecessary. Use -> instead\.$#'
             identifier: nullsafe.neverNull
             count: 1
@@ -33,7 +23,7 @@ parameters:
         -
             message: '#^Cannot call method find\(\) on array<Discord\\Parts\\Guild\\Role>\.$#'
             identifier: method.nonObject
-            count: 1
+            count: 3
             path: src/SlashCommands/CargoDelasCommand.php
         -
             message: '#^Cannot call method find\(\) on array<Discord\\Parts\\Guild\\Role>\.$#'

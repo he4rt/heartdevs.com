@@ -13,7 +13,7 @@ final class VoiceChannelDTO
         public readonly string $channelId,
         public readonly string $ownerId,
         public int $usersCount,
-        /** @var array<string, mixed> */
+        /** @var list<string> */
         public array $users,
         public ?CarbonInterface $lastJoinedAt = null,
     ) {}

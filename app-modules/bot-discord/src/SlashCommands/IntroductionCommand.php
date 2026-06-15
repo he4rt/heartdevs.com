@@ -135,9 +135,16 @@ class IntroductionCommand extends AbstractSlashCommand
 
         $userContext = resolve(ResolveUserContext::class)->handle($userDto);
 
-        $name = $components->get('custom_id', 'name')->value;
-        $nickname = $components->get('custom_id', 'nickname')->value;
-        $about = $components->get('custom_id', 'about')->value;
+        /** @var object{value: string} $nameComponent */
+        $nameComponent = $components->get('custom_id', 'name');
+        /** @var object{value: string} $nicknameComponent */
+        $nicknameComponent = $components->get('custom_id', 'nickname');
+        /** @var object{value: string} $aboutComponent */
+        $aboutComponent = $components->get('custom_id', 'about');
+
+        $name = $nameComponent->value;
+        $nickname = $nicknameComponent->value;
+        $about = $aboutComponent->value;
 
         $userContext->user->update(['name' => $name]);
 

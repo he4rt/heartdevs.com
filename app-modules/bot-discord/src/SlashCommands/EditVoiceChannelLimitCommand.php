@@ -4,9 +4,11 @@ declare(strict_types=1);
 
 namespace He4rt\BotDiscord\SlashCommands;
 
+use Discord\Parts\Channel\Channel;
 use Discord\Parts\Interactions\Command\Option;
 use Discord\Parts\Interactions\Interaction;
 use Exception;
+use React\Promise\PromiseInterface;
 
 use function React\Async\await;
 
@@ -52,6 +54,7 @@ class EditVoiceChannelLimitCommand extends AbstractSlashCommand
             return;
         }
 
+        /** @var Channel|null $voiceChannel */
         $voiceChannel = $interaction->guild->channels->get('id', $channelId);
 
         if (!$voiceChannel) {
@@ -65,8 +68,10 @@ class EditVoiceChannelLimitCommand extends AbstractSlashCommand
         $newLimit = $this->value('limite');
 
         try {
-            $voiceChannel->user_limit = $newLimit;
-            await($interaction->guild->channels->save($voiceChannel));
+            $voiceChannel->user_limit = (int) $newLimit;
+            /** @var PromiseInterface<Channel> $promise */
+            $promise = $interaction->guild->channels->save($voiceChannel);
+            await($promise);
 
             $this->message()
                 ->content(sprintf('✅ Limite da sala atualizado para **%d** membros!', $newLimit))

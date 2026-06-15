@@ -9,21 +9,25 @@ use RuntimeException;
 
 final class RawGatewayEvent
 {
+    /** @param object{t?: string, d?: object} $payload */
     public function handle(object $payload): void
     {
         if (!isset($payload->t, $payload->d)) {
             return;
         }
 
-        $encodedPayload = json_encode($payload->d);
+        /** @var object{guild_id?: string, user_id?: string, channel_id?: string} $data */
+        $data = $payload->d;
+
+        $encodedPayload = json_encode($data);
 
         throw_if($encodedPayload === false, RuntimeException::class, 'Failed to encode Discord gateway payload to JSON.');
 
         DiscordEventLog::query()->create([
             'event_type' => $payload->t,
-            'guild_id' => $payload->d->guild_id ?? null,
-            'user_id' => $payload->d->user_id ?? $payload->d->author->id ?? null,
-            'channel_id' => $payload->d->channel_id ?? null,
+            'guild_id' => $data->guild_id ?? null,
+            'user_id' => $data->user_id ?? data_get($payload->d, 'author.id'),
+            'channel_id' => $data->channel_id ?? null,
             'payload' => json_decode($encodedPayload, true),
         ]);
     }
