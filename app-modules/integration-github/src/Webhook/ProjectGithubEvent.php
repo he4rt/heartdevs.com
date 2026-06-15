@@ -258,7 +258,12 @@ final readonly class ProjectGithubEvent
     {
         $value = data_get($source, $path);
 
-        return is_array($value) ? $value : [];
+        if (!is_array($value)) {
+            return [];
+        }
+
+        /** @var array<string, mixed> $value */
+        return $value;
     }
 
     private function isBot(string $login): bool
