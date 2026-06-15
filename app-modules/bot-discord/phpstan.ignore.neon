@@ -21,22 +21,12 @@ parameters:
             count: 1
             path: src/Tasks/VoiceExperienceTask.php
         -
-            message: '#^Cannot call method find\(\) on array<Discord\\Parts\\Guild\\Role>\.$#'
-            identifier: method.nonObject
-            count: 3
+            message: '#^Parameter \#1 \$roles of method Discord\\Parts\\User\\Member::setRoles\(\) expects#'
+            identifier: argument.type
+            count: 1
             path: src/SlashCommands/CargoDelasCommand.php
         -
-            message: '#^Cannot call method find\(\) on array<Discord\\Parts\\Guild\\Role>\.$#'
-            identifier: method.nonObject
+            message: '#^Parameter \#1 \$roles of method Discord\\Parts\\User\\Member::setRoles\(\) expects#'
+            identifier: argument.type
             count: 1
             path: src/SlashCommands/IntroductionCommand.php
-        -
-            message: '#^Cannot call method get\(\) on array<Discord\\Parts\\User\\User>\|\(Discord\\Helpers\\ExCollectionInterface&iterable<Discord\\Parts\\User\\User>\)\.$#'
-            identifier: method.nonObject
-            count: 1
-            path: src/SlashCommands/DontAskCommand.php
-        -
-            message: '#^Cannot call method get\(\) on array<Discord\\Parts\\User\\User>\|\(Discord\\Helpers\\ExCollectionInterface&iterable<Discord\\Parts\\User\\User>\)\.$#'
-            identifier: method.nonObject
-            count: 1
-            path: src/SlashCommands/ProfileCommand.php
