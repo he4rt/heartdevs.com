@@ -9,13 +9,13 @@ use He4rt\BotDiscord\DTO\VoiceChannelDTO;
 final class LeftChannelAction
 {
     /**
-     * @param  array<string, VoiceChannelDTO>  $activeChannels
+     * @param  list<VoiceChannelDTO>  $activeChannels
      */
     public function execute(array $activeChannels, string $user): void
     {
         foreach ($activeChannels as $index => $channel) {
             /** @var VoiceChannelDTO $channel */
-            if (in_array($user, $channel->users)) {
+            if (in_array($user, $channel->users, true)) {
                 $activeChannels[$index]->users = array_values(array_filter($channel->users, fn (string $userId) => $userId !== $user));
                 $activeChannels[$index]->usersCount--;
 
@@ -26,7 +26,7 @@ final class LeftChannelAction
     }
 
     /**
-     * @param  array<string, VoiceChannelDTO>  $activeChannels
+     * @param  list<VoiceChannelDTO>  $activeChannels
      */
     private function saveActiveChannels(array $activeChannels): void
     {
