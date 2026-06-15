@@ -100,4 +100,4 @@ Before marking a migration task as done, confirm:
 3. Types match the column definition and any explicit `casts()`
 4. The model has `#[Table(name: '...')]` with the explicit table name
 5. The model has `#[UseFactory(XxxFactory::class)]` if it has a factory
-5. PHPStan passes (`{{ $assist->binCommand('phpstan analyse') }}`)
+6. PHPStan passes (`{{ $assist->binCommand('phpstan analyse') }}`)
