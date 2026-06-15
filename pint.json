@@ -60,6 +60,10 @@
         "assign_null_coalescing_to_coalesce_equal": true,
         "align_multiline_comment": true,
         "not_operator_with_successor_space": false,
-        "unary_operator_spaces": true
+        "unary_operator_spaces": true,
+        "numeric_literal_separator": {
+            "strategy": "use_separator",
+            "override_existing": true
+        }
     }
 }
