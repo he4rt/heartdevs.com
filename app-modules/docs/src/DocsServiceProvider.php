@@ -8,6 +8,7 @@ use Dedoc\Scramble\Scramble;
 use He4rt\Docs\Console\Commands\CacheDocsCommand;
 use He4rt\Docs\Discovery\Actions\BuildDocumentTreeAction;
 use He4rt\Docs\Discovery\Actions\DiscoverDocumentSourcesAction;
+use He4rt\Docs\Discovery\Contracts\DocumentTypeStrategyContract;
 use He4rt\Docs\Discovery\DocumentRegistry;
 use He4rt\Docs\Discovery\Strategies\AdrStrategy;
 use He4rt\Docs\Discovery\Strategies\ContextMapStrategy;
@@ -40,10 +41,15 @@ class DocsServiceProvider extends ServiceProvider
             GuideStrategy::class,
         ], 'docs.strategies');
 
-        $this->app->bind(BuildDocumentTreeAction::class, static fn (Application $app): BuildDocumentTreeAction => new BuildDocumentTreeAction(
-            $app->make(DiscoverDocumentSourcesAction::class),
-            $app->tagged('docs.strategies'),
-        ));
+        $this->app->bind(BuildDocumentTreeAction::class, static function (Application $app): BuildDocumentTreeAction {
+            /** @var iterable<DocumentTypeStrategyContract> $strategies */
+            $strategies = $app->tagged('docs.strategies');
+
+            return new BuildDocumentTreeAction(
+                $app->make(DiscoverDocumentSourcesAction::class),
+                $strategies,
+            );
+        });
 
         $this->app->singleton(DocumentRegistry::class);
     }

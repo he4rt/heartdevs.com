@@ -24,8 +24,11 @@ class AnalyzeDiscordProfiles extends Command
         intro('Discord Profiles — Social Connections Report');
 
         // Load all chunk files
-        $files = collect(Storage::disk('local')->files('discord'))
-            ->filter(fn (string $f) => str_contains($f, 'profiles_chunk_'))
+        /** @var list<string> $allFiles */
+        $allFiles = Storage::disk('local')->files('discord');
+
+        $files = collect($allFiles)
+            ->filter(fn (string $f): bool => str_contains($f, 'profiles_chunk_'))
             ->sort()
             ->values();
 

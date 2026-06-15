@@ -62,6 +62,7 @@ final class FixPostSwitchTimestampsCommand extends Command
 
     private function validateSchemaReady(): bool
     {
+        /** @var list<object{table_name: string, column_name: string}> $remaining */
         $remaining = DB::select(
             "SELECT table_name, column_name
              FROM information_schema.columns
@@ -81,7 +82,7 @@ final class FixPostSwitchTimestampsCommand extends Command
 
         table(
             headers: ['Table', 'Column'],
-            rows: array_map(fn ($row) => [$row->table_name, $row->column_name], $remaining),
+            rows: array_map(fn (object $row): array => [$row->table_name, $row->column_name], $remaining),
         );
 
         return false;
@@ -259,6 +260,7 @@ final class FixPostSwitchTimestampsCommand extends Command
 
     private function runVerification(): void
     {
+        /** @var list<object{table_name: string, column_name: string}> $remaining */
         $remaining = DB::select(
             "SELECT table_name, column_name
              FROM information_schema.columns
@@ -280,7 +282,7 @@ final class FixPostSwitchTimestampsCommand extends Command
 
         table(
             headers: ['Table', 'Column'],
-            rows: array_map(fn ($row) => [$row->table_name, $row->column_name], $remaining),
+            rows: array_map(fn (object $row): array => [$row->table_name, $row->column_name], $remaining),
         );
     }
 

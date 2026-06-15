@@ -18,6 +18,6 @@ final class FeedbackException extends Exception
 
     public function render(Request $request): JsonResponse
     {
-        return response()->json($this->getMessage(), $this->code);
+        return response()->json($this->getMessage(), $this->getCode());
     }
 }

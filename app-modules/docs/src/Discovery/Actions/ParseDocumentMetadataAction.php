@@ -20,8 +20,9 @@ final readonly class ParseDocumentMetadataAction
         $parser = new FrontMatterParser(new SymfonyYamlFrontMatterParser());
         $result = $parser->parse($content);
 
-        $frontMatter = $result->getFrontMatter();
-        $frontMatter = is_array($frontMatter) ? $frontMatter : [];
+        $raw = $result->getFrontMatter();
+        /** @var array<string, mixed> $frontMatter */
+        $frontMatter = is_array($raw) ? $raw : [];
 
         $body = $result->getContent();
 

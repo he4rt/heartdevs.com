@@ -36,7 +36,13 @@ final class PlatformRegistry
             throw new RuntimeException('No adapter registered for platform: '.$platform->value);
         }
 
-        return resolve($class);
+        $adapter = app()->make($class);
+
+        if (!$adapter instanceof ModerationPlatformContract) {
+            throw new RuntimeException('Resolved adapter for platform '.$platform->value.' does not implement ModerationPlatformContract');
+        }
+
+        return $adapter;
     }
 
     public function has(Platform $platform): bool

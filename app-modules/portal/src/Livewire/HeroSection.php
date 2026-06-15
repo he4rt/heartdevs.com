@@ -78,7 +78,12 @@ final class HeroSection extends Component
             return [];
         }
 
-        $githubHandle = fn (array $metadata): ?string => $metadata['username'] ?? $metadata['name'] ?? null;
+        /** @param  array<string, mixed>  $metadata */
+        $githubHandle = static function (array $metadata): ?string {
+            $handle = $metadata['username'] ?? $metadata['name'] ?? null;
+
+            return is_string($handle) ? $handle : null;
+        };
 
         return ExternalIdentity::query()
             ->where('provider', IdentityProvider::GitHub)
