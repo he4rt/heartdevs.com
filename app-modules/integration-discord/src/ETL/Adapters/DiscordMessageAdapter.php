@@ -162,6 +162,7 @@ final class DiscordMessageAdapter implements MessageActivityAdapter
                 continue;
             }
 
+            /** @var array<string, mixed> $embed */
             $url = isset($embed['url']) ? (string) $embed['url'] : null;
 
             $out[] = new EmbedData(

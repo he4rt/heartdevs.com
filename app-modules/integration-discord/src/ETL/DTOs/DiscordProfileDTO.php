@@ -32,10 +32,10 @@ final readonly class DiscordProfileDTO
             username: $user['username'] ?? $user['id'],
             name: $user['global_name'] ?? $user['username'] ?? $user['id'],
             joinedAt: $guildMember['joined_at'] ?? null,
-            connectedAccounts: array_map(
+            connectedAccounts: array_values(array_map(
                 ConnectedAccountDTO::fromDump(...),
                 $profile['connected_accounts'] ?? [],
-            ),
+            )),
             metadata: $profile,
         );
     }

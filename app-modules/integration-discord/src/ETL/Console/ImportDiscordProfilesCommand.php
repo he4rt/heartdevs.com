@@ -218,7 +218,9 @@ class ImportDiscordProfilesCommand extends Command
 
         $missing = [];
         foreach ($required as $table => $cols) {
-            $existing = array_flip(Schema::getColumnListing($table));
+            /** @var array<int, string> $columnList */
+            $columnList = Schema::getColumnListing($table);
+            $existing = array_flip($columnList);
             foreach ($cols as $col) {
                 if (!isset($existing[$col])) {
                     $missing[] = $table.'.'.$col;

@@ -41,6 +41,7 @@ final readonly class GitHubOAuthClient implements OAuthClientContract
             redirectUri: $this->callbackUrl(),
         ));
 
+        /** @var array<string, mixed> $payload */
         $payload = $response->json();
         $tokenExchangeFailed = !isset($payload['access_token']);
 
@@ -57,7 +58,10 @@ final readonly class GitHubOAuthClient implements OAuthClientContract
             accessToken: $credentials->accessToken,
         ));
 
-        return GitHubOAuthUserDTO::make($credentials, $response->json());
+        /** @var array<string, mixed> $userPayload */
+        $userPayload = $response->json();
+
+        return GitHubOAuthUserDTO::make($credentials, $userPayload);
     }
 
     private function callbackUrl(): string

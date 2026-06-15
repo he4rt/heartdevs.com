@@ -47,6 +47,7 @@ final readonly class TwitchOAuthClient implements OAuthClientContract
             redirectUri: $this->callbackUrl(),
         ));
 
+        /** @var array<string, mixed> $payload */
         $payload = $response->json();
         $tokenExchangeFailed = !isset($payload['access_token']);
 
@@ -63,7 +64,10 @@ final readonly class TwitchOAuthClient implements OAuthClientContract
             accessToken: $credentials->accessToken,
         ));
 
-        return TwitchOAuthDTO::make($credentials, $response->json());
+        /** @var array<string, mixed> $payload */
+        $payload = $response->json();
+
+        return TwitchOAuthDTO::make($credentials, $payload);
     }
 
     private function callbackUrl(): string

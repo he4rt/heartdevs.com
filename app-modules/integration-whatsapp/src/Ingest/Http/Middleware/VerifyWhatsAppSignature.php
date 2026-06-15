@@ -11,6 +11,9 @@ use Symfony\Component\HttpFoundation\Response;
 
 final class VerifyWhatsAppSignature
 {
+    /**
+     * @param  Closure(Request): Response  $next
+     */
     public function handle(Request $request, Closure $next): Response
     {
         $secret = config('whatsapp.webhook_secret');

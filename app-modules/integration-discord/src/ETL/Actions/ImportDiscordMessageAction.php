@@ -155,6 +155,7 @@ final class ImportDiscordMessageAction
             return $existingCache;
         }
 
+        /** @var array<string, string> $existing */
         $existing = ExternalIdentity::query()
             ->where('provider', IdentityProvider::Discord)
             ->where('tenant_id', $tenantId)
@@ -198,6 +199,7 @@ final class ImportDiscordMessageAction
             return [];
         }
 
+        /** @var array<string, string> */
         return Message::query()
             ->where('tenant_id', $tenantId)
             ->whereIn('provider_message_id', array_keys($replyProviderIds))

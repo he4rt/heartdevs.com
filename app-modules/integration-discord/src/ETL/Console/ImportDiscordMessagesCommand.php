@@ -331,7 +331,9 @@ class ImportDiscordMessagesCommand extends Command
             'created_at', 'updated_at',
         ];
 
-        $existing = array_flip(Schema::getColumnListing('messages'));
+        /** @var array<int, string> $columns */
+        $columns = Schema::getColumnListing('messages');
+        $existing = array_flip($columns);
 
         return array_values(array_filter(
             $required,

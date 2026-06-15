@@ -39,6 +39,7 @@ class DiscordOAuthClient implements OAuthClientContract
             redirectUri: $this->callbackUrl(),
         ));
 
+        /** @var array<string, mixed> $payload */
         $payload = $response->json();
         $tokenExchangeFailed = !isset($payload['access_token']);
 
@@ -55,7 +56,10 @@ class DiscordOAuthClient implements OAuthClientContract
             accessToken: $credentials->accessToken,
         ));
 
-        return DiscordOAuthUser::make($credentials, $response->json());
+        /** @var array<string, mixed> $userData */
+        $userData = $response->json();
+
+        return DiscordOAuthUser::make($credentials, $userData);
     }
 
     private function callbackUrl(): string

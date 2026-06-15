@@ -26,6 +26,9 @@ final class VerifyGithubSignature
 
         abort_unless(hash_equals($expected, $signature), 403, 'Invalid signature');
 
-        return $next($request);
+        /** @var Response $response */
+        $response = $next($request);
+
+        return $response;
     }
 }

@@ -124,7 +124,7 @@ final readonly class SyncDiscordGuildAction
                 ],
             );
 
-            $roleMap[$roleData['id']] = $role->id;
+            $roleMap[(string) $roleData['id']] = $role->id;
         }
 
         return $roleMap;

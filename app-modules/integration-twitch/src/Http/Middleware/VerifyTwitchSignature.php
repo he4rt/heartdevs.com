@@ -27,6 +27,9 @@ final class VerifyTwitchSignature
 
         abort_unless(hash_equals($expectedSignature, $signature), 403, 'Invalid signature');
 
-        return $next($request);
+        /** @var Response $response */
+        $response = $next($request);
+
+        return $response;
     }
 }

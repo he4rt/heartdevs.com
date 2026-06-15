@@ -28,6 +28,7 @@ final readonly class DiscordMessageDTO
      */
     public static function fromDump(array $message): self
     {
+        /** @var array<string, mixed> $author */
         $author = $message['author'] ?? [];
         $rawUsername = $author['username'] ?? $author['id'];
         $authorDiscordId = (string) $author['id'];
@@ -49,7 +50,7 @@ final readonly class DiscordMessageDTO
             isBot: $author['bot'] ?? false,
             content: $message['content'] ?? '',
             sentAt: $message['timestamp'],
-            authorRaw: is_array($author) ? $author : [],
+            authorRaw: $author,
             metadata: $message,
         );
     }

@@ -22,8 +22,15 @@ final class TwitchWebhookController
         }
 
         $body = $request->all();
-        $subscription = $body['subscription'] ?? [];
-        $event = $body['event'] ?? [];
+
+        /** @var array<string, mixed> $subscription */
+        $subscription = is_array($body['subscription'] ?? null) ? $body['subscription'] : [];
+
+        /** @var array<string, mixed> $event */
+        $event = is_array($body['event'] ?? null) ? $body['event'] : [];
+
+        /** @var array<string, mixed> $condition */
+        $condition = is_array($subscription['condition'] ?? null) ? $subscription['condition'] : [];
         $messageId = $request->header('Twitch-Eventsub-Message-Id');
 
         $inserted = TwitchEventLog::query()->insertOrIgnore([
@@ -31,8 +38,8 @@ final class TwitchWebhookController
             'event_type' => $subscription['type'] ?? $messageType,
             'broadcaster_user_id' => $event['broadcaster_user_id']
                 ?? $event['to_broadcaster_user_id']
-                ?? $subscription['condition']['broadcaster_user_id']
-                ?? $subscription['condition']['to_broadcaster_user_id']
+                ?? $condition['broadcaster_user_id']
+                ?? $condition['to_broadcaster_user_id']
                 ?? null,
             'user_id' => $event['user_id']
                 ?? $event['chatter_user_id']

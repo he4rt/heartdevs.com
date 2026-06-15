@@ -89,11 +89,14 @@ final readonly class BackfillRepository
             },
             // PRs vêm ordenados por updated desc: ao cruzar o corte, todo o resto é mais
             // antigo — paramos de paginar (mata o N+1 de GetPullRequest + reviews).
-            reachedEnd: $since === null ? null : function (array $pr) use ($since): bool {
-                $updatedAt = $this->stringFrom($pr, 'updated_at');
+            reachedEnd: $since === null
+                ? null
+                : function (array $pr) use ($since): bool {
+                    /** @var array<string, mixed> $pr */
+                    $updatedAt = $this->stringFrom($pr, 'updated_at');
 
-                return $updatedAt !== '' && $updatedAt < $since;
-            },
+                    return $updatedAt !== '' && $updatedAt < $since;
+                },
         );
     }
 
