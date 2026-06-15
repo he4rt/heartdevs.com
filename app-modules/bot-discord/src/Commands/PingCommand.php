@@ -8,6 +8,9 @@ use Discord\Parts\Channel\Message;
 use Discord\Parts\Interactions\Interaction;
 use Laracord\Commands\Command;
 
+/**
+ * @method \Laracord\Discord\Message message(string $content = '')
+ */
 class PingCommand extends Command
 {
     /**

@@ -13,7 +13,11 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Pipeline\Pipeline;
 use Laracord\Commands\Middleware\Context;
 use Laracord\Commands\SlashCommand;
+use Laracord\Discord\Message;
 
+/**
+ * @method Message message(string $content = '')
+ */
 abstract class AbstractSlashCommand extends SlashCommand
 {
     protected ?ExternalIdentity $memberProvider = null;

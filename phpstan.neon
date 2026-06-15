@@ -5,5 +5,8 @@ includes:
 parameters:
     level: 7
 
+    stubFiles:
+        - stubs/phpstan/discord-php.stub
+
     paths:
         - app/

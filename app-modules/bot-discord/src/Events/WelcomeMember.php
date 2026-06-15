@@ -12,9 +12,13 @@ use He4rt\Identity\ExternalIdentity\DTOs\ResolveUserProviderDTO;
 use He4rt\Identity\User\Actions\ResolveUserContext;
 use He4rt\Identity\User\Models\User;
 use Illuminate\Support\Facades\Log;
+use Laracord\Discord\Message;
 use Laracord\Events\Event;
 use Throwable;
 
+/**
+ * @method Message message(string $content = '')
+ */
 class WelcomeMember extends Event
 {
     protected $handler = Events::GUILD_MEMBER_ADD;
