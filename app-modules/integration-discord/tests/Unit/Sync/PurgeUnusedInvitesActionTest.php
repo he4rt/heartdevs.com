@@ -155,6 +155,18 @@ it('includes expiring invites when flag is set', function (): void {
     $mockClient->assertNotSent(DeleteInvite::class);
 });
 
+it('throws when list invites response fails', function (): void {
+    $mockClient = new MockClient([
+        ListGuildInvites::class => MockResponse::make(['message' => 'Missing Permissions'], 403),
+    ]);
+
+    $connector = new DiscordConnector('test-token');
+    $connector->withMockClient($mockClient);
+
+    $action = new PurgeUnusedInvitesAction($connector);
+    $action->execute('guild-123');
+})->throws(RuntimeException::class, 'Failed to list guild invites: HTTP 403');
+
 it('handles an empty invite list', function (): void {
     $mockClient = new MockClient([
         ListGuildInvites::class => MockResponse::make([]),

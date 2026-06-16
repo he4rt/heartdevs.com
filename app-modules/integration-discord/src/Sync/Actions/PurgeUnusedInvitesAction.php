@@ -26,6 +26,10 @@ final readonly class PurgeUnusedInvitesAction
     {
         $response = $this->connector->send(new ListGuildInvites($guildId));
 
+        if ($response->failed()) {
+            throw new RuntimeException(sprintf('Failed to list guild invites: HTTP %d', $response->status()));
+        }
+
         /** @var list<array<string, mixed>> $allInvites */
         $allInvites = $response->json();
 
