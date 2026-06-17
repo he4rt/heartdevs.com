@@ -61,7 +61,7 @@ final readonly class PurgeUnusedInvitesAction
         $deleted = 0;
         $failed = 0;
 
-        foreach ($unused as $index => $invite) {
+        foreach (array_values($unused) as $index => $invite) {
             if ($index > 0) {
                 $this->jitteredSleep();
             }
