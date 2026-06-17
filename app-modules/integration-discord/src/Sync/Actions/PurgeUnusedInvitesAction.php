@@ -6,6 +6,7 @@ namespace He4rt\IntegrationDiscord\Sync\Actions;
 
 use He4rt\IntegrationDiscord\Sync\DTOs\MatchedInviteDTO;
 use He4rt\IntegrationDiscord\Sync\DTOs\PurgeInvitesResultDTO;
+use He4rt\IntegrationDiscord\Sync\Exceptions\CloudflareIpBanException;
 use He4rt\IntegrationDiscord\Transport\DiscordConnector;
 use He4rt\IntegrationDiscord\Transport\Requests\Invites\DeleteInvite;
 use He4rt\IntegrationDiscord\Transport\Requests\Invites\ListGuildInvites;
@@ -71,6 +72,14 @@ final readonly class PurgeUnusedInvitesAction
             try {
                 $this->deleteInvite($invite['code']);
                 $deleted++;
+            } catch (CloudflareIpBanException $e) {
+                $failed += count($unused) - $index;
+                Log::warning('Cloudflare IP ban detected, aborting purge', [
+                    'code' => $invite['code'],
+                    'error' => $e->getMessage(),
+                ]);
+
+                break;
             } catch (Throwable $e) {
                 $failed++;
                 Log::warning('Failed to delete Discord invite', [
@@ -99,6 +108,7 @@ final readonly class PurgeUnusedInvitesAction
     }
 
     /**
+     * @throws CloudflareIpBanException
      * @throws RandomException
      * @throws FatalRequestException
      * @throws RequestException
@@ -117,7 +127,7 @@ final readonly class PurgeUnusedInvitesAction
                 $retryAfter = $this->parseRetryAfter($response);
 
                 if ($retryAfter > 60.0) {
-                    throw new RuntimeException(sprintf('Cloudflare IP ban: Retry-After %ds', (int) $retryAfter));
+                    throw new CloudflareIpBanException(sprintf('Retry-After %ds', (int) $retryAfter));
                 }
 
                 if ($attempt < self::MAX_RETRIES) {

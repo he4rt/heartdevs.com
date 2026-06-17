@@ -239,15 +239,18 @@ it('retries on cloudflare 429 with non-json body and short retry-after header', 
         ->and($result->failed)->toBe(0);
 });
 
-it('aborts immediately on cloudflare ip ban', function (): void {
+it('aborts entire purge on cloudflare ip ban', function (): void {
     Sleep::fake();
 
     $invites = [
         makeInvite('aaa', maxAge: 0, uses: 0),
+        makeInvite('bbb', maxAge: 0, uses: 0),
+        makeInvite('ccc', maxAge: 0, uses: 0),
     ];
 
     $mockClient = new MockClient([
         MockResponse::make($invites),
+        MockResponse::make([], 204),
         MockResponse::make('error code: 1015', 429, ['Retry-After' => '80974']),
     ]);
 
@@ -257,10 +260,11 @@ it('aborts immediately on cloudflare ip ban', function (): void {
     $action = new PurgeUnusedInvitesAction($connector);
     $result = $action->execute('guild-123', dryRun: false);
 
-    expect($result->deleted)->toBe(0)
-        ->and($result->failed)->toBe(1);
+    expect($result->deleted)->toBe(1)
+        ->and($result->failed)->toBe(2);
 
-    Sleep::assertSleptTimes(0);
+    $mockClient->assertSentCount(3);
+    Sleep::assertSleptTimes(1);
 });
 
 it('fails after exhausting retries on persistent 429', function (): void {
