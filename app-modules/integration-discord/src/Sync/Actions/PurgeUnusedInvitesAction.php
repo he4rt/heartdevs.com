@@ -4,25 +4,35 @@ declare(strict_types=1);
 
 namespace He4rt\IntegrationDiscord\Sync\Actions;
 
+use He4rt\IntegrationDiscord\Sync\DTOs\MatchedInviteDTO;
+use He4rt\IntegrationDiscord\Sync\DTOs\PurgeInvitesResultDTO;
 use He4rt\IntegrationDiscord\Transport\DiscordConnector;
 use He4rt\IntegrationDiscord\Transport\Requests\Invites\DeleteInvite;
 use He4rt\IntegrationDiscord\Transport\Requests\Invites\ListGuildInvites;
-use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Sleep;
+use JsonException;
+use Random\RandomException;
 use RuntimeException;
+use Saloon\Exceptions\Request\FatalRequestException;
+use Saloon\Exceptions\Request\RequestException;
 use Throwable;
 
 final readonly class PurgeUnusedInvitesAction
 {
+    private const int MAX_RETRIES = 3;
+
     public function __construct(
         private DiscordConnector $connector,
     ) {}
 
     /**
-     * @return array{total: int, matched: int, deleted: int, failed: int, invites: list<array{code: string, channel: string, inviter: string, created_at: string}>}
+     * @throws RandomException
+     * @throws FatalRequestException
+     * @throws RequestException
+     * @throws JsonException
      */
-    public function execute(string $guildId, bool $dryRun = false, bool $includeExpiring = false): array
+    public function execute(string $guildId, bool $dryRun = false, bool $includeExpiring = false): PurgeInvitesResultDTO
     {
         $response = $this->connector->send(new ListGuildInvites($guildId));
 
@@ -40,25 +50,12 @@ final readonly class PurgeUnusedInvitesAction
         );
 
         $matches = array_values(array_map(
-            static fn (array $invite): array => [
-                'code' => $invite['code'],
-                'channel' => $invite['channel']['name'] ?? 'unknown',
-                'inviter' => $invite['inviter']['username'] ?? 'unknown',
-                'created_at' => isset($invite['created_at'])
-                    ? Date::parse($invite['created_at'])->timezone(config('app.display_timezone'))->format('d/m/Y H:i')
-                    : '',
-            ],
+            MatchedInviteDTO::fromDiscordApi(...),
             $unused,
         ));
 
         if ($dryRun) {
-            return [
-                'total' => count($allInvites),
-                'matched' => count($unused),
-                'deleted' => 0,
-                'failed' => 0,
-                'invites' => $matches,
-            ];
+            return PurgeInvitesResultDTO::fromDryRun(total: count($allInvites), invites: $matches);
         }
 
         $deleted = 0;
@@ -66,16 +63,11 @@ final readonly class PurgeUnusedInvitesAction
 
         foreach ($unused as $index => $invite) {
             if ($index > 0) {
-                Sleep::usleep(random_int(200_000, 500_000));
+                $this->jitteredSleep();
             }
 
             try {
-                $response = $this->connector->send(new DeleteInvite($invite['code']));
-
-                if ($response->failed()) {
-                    throw new RuntimeException(sprintf('HTTP %d: %s', $response->status(), $response->body()));
-                }
-
+                $this->deleteInvite($invite['code']);
                 $deleted++;
             } catch (Throwable $e) {
                 $failed++;
@@ -86,12 +78,47 @@ final readonly class PurgeUnusedInvitesAction
             }
         }
 
-        return [
-            'total' => count($allInvites),
-            'matched' => count($unused),
-            'deleted' => $deleted,
-            'failed' => $failed,
-            'invites' => $matches,
-        ];
+        return PurgeInvitesResultDTO::fromPurge(
+            total: count($allInvites),
+            invites: $matches,
+            deleted: $deleted,
+            failed: $failed,
+        );
+    }
+
+    /**
+     * @throws RandomException
+     */
+    private function jitteredSleep(float $baseSeconds = 0.0): void
+    {
+        $jitter = random_int(3_000, 6_000) / 1_000;
+
+        Sleep::for($baseSeconds + $jitter)->seconds();
+    }
+
+    /**
+     * @throws RandomException
+     * @throws FatalRequestException
+     * @throws RequestException
+     * @throws JsonException
+     */
+    private function deleteInvite(string $code): void
+    {
+        for ($attempt = 0; $attempt <= self::MAX_RETRIES; $attempt++) {
+            $response = $this->connector->send(new DeleteInvite($code));
+
+            if ($response->successful()) {
+                return;
+            }
+
+            if ($response->status() === 429 && $attempt < self::MAX_RETRIES) {
+                $retryAfter = (float) ($response->json('retry_after') ?? 1.0);
+                $this->jitteredSleep($retryAfter);
+
+                continue;
+            }
+
+            throw new RuntimeException(sprintf('HTTP %d: %s', $response->status(), $response->body()));
+        }
     }
 }

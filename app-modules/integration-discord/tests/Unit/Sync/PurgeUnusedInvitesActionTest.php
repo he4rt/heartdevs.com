@@ -6,6 +6,7 @@ use He4rt\IntegrationDiscord\Sync\Actions\PurgeUnusedInvitesAction;
 use He4rt\IntegrationDiscord\Transport\DiscordConnector;
 use He4rt\IntegrationDiscord\Transport\Requests\Invites\DeleteInvite;
 use He4rt\IntegrationDiscord\Transport\Requests\Invites\ListGuildInvites;
+use Illuminate\Support\Sleep;
 use Saloon\Http\Faking\MockClient;
 use Saloon\Http\Faking\MockResponse;
 
@@ -40,15 +41,15 @@ it('identifies unused infinite invites in dry-run mode', function (): void {
     $action = new PurgeUnusedInvitesAction($connector);
     $result = $action->execute('guild-123', dryRun: true);
 
-    expect($result['total'])->toBe(4)
-        ->and($result['matched'])->toBe(2)
-        ->and($result['deleted'])->toBe(0)
-        ->and($result['failed'])->toBe(0)
-        ->and($result['invites'])->toHaveCount(2)
-        ->and($result['invites'][0]['code'])->toBe('aaa')
-        ->and($result['invites'][1]['code'])->toBe('ddd')
-        ->and($result['invites'][1]['channel'])->toBe('dev-chat')
-        ->and($result['invites'][1]['inviter'])->toBe('bob');
+    expect($result->total)->toBe(4)
+        ->and($result->matched)->toBe(2)
+        ->and($result->deleted)->toBe(0)
+        ->and($result->failed)->toBe(0)
+        ->and($result->invites)->toHaveCount(2)
+        ->and($result->invites[0]->code)->toBe('aaa')
+        ->and($result->invites[1]->code)->toBe('ddd')
+        ->and($result->invites[1]->channel)->toBe('dev-chat')
+        ->and($result->invites[1]->inviter)->toBe('bob');
 
     $mockClient->assertNotSent(DeleteInvite::class);
 });
@@ -71,10 +72,10 @@ it('deletes matching invites in live mode', function (): void {
     $action = new PurgeUnusedInvitesAction($connector);
     $result = $action->execute('guild-123', dryRun: false);
 
-    expect($result['total'])->toBe(3)
-        ->and($result['matched'])->toBe(2)
-        ->and($result['deleted'])->toBe(2)
-        ->and($result['failed'])->toBe(0);
+    expect($result->total)->toBe(3)
+        ->and($result->matched)->toBe(2)
+        ->and($result->deleted)->toBe(2)
+        ->and($result->failed)->toBe(0);
 
     $mockClient->assertSentCount(3);
 });
@@ -96,10 +97,10 @@ it('returns zero matches when no invites qualify', function (): void {
     $action = new PurgeUnusedInvitesAction($connector);
     $result = $action->execute('guild-123', dryRun: false);
 
-    expect($result['total'])->toBe(3)
-        ->and($result['matched'])->toBe(0)
-        ->and($result['deleted'])->toBe(0)
-        ->and($result['invites'])->toBeEmpty();
+    expect($result->total)->toBe(3)
+        ->and($result->matched)->toBe(0)
+        ->and($result->deleted)->toBe(0)
+        ->and($result->invites)->toBeEmpty();
 });
 
 it('counts failures individually without aborting', function (): void {
@@ -122,9 +123,9 @@ it('counts failures individually without aborting', function (): void {
     $action = new PurgeUnusedInvitesAction($connector);
     $result = $action->execute('guild-123', dryRun: false);
 
-    expect($result['matched'])->toBe(3)
-        ->and($result['deleted'])->toBe(2)
-        ->and($result['failed'])->toBe(1);
+    expect($result->matched)->toBe(3)
+        ->and($result->deleted)->toBe(2)
+        ->and($result->failed)->toBe(1);
 });
 
 it('includes expiring invites when flag is set', function (): void {
@@ -146,11 +147,11 @@ it('includes expiring invites when flag is set', function (): void {
     $action = new PurgeUnusedInvitesAction($connector);
     $result = $action->execute('guild-123', dryRun: true, includeExpiring: true);
 
-    expect($result['total'])->toBe(5)
-        ->and($result['matched'])->toBe(3)
-        ->and($result['invites'][0]['code'])->toBe('aaa')
-        ->and($result['invites'][1]['code'])->toBe('bbb')
-        ->and($result['invites'][2]['code'])->toBe('ccc');
+    expect($result->total)->toBe(5)
+        ->and($result->matched)->toBe(3)
+        ->and($result->invites[0]->code)->toBe('aaa')
+        ->and($result->invites[1]->code)->toBe('bbb')
+        ->and($result->invites[2]->code)->toBe('ccc');
 
     $mockClient->assertNotSent(DeleteInvite::class);
 });
@@ -167,6 +168,56 @@ it('throws when list invites response fails', function (): void {
     $action->execute('guild-123');
 })->throws(RuntimeException::class, 'Failed to list guild invites: HTTP 403');
 
+it('retries on 429 rate limit and succeeds', function (): void {
+    Sleep::fake();
+
+    $invites = [
+        makeInvite('aaa', maxAge: 0, uses: 0),
+    ];
+
+    $mockClient = new MockClient([
+        MockResponse::make($invites),
+        MockResponse::make(['message' => 'You are being rate limited.', 'retry_after' => 0.3], 429),
+        MockResponse::make([], 204),
+    ]);
+
+    $connector = new DiscordConnector('test-token');
+    $connector->withMockClient($mockClient);
+
+    $action = new PurgeUnusedInvitesAction($connector);
+    $result = $action->execute('guild-123', dryRun: false);
+
+    expect($result->deleted)->toBe(1)
+        ->and($result->failed)->toBe(0);
+
+    Sleep::assertSleptTimes(1);
+});
+
+it('fails after exhausting retries on persistent 429', function (): void {
+    Sleep::fake();
+
+    $invites = [
+        makeInvite('aaa', maxAge: 0, uses: 0),
+    ];
+
+    $mockClient = new MockClient([
+        MockResponse::make($invites),
+        MockResponse::make(['message' => 'You are being rate limited.', 'retry_after' => 0.3], 429),
+        MockResponse::make(['message' => 'You are being rate limited.', 'retry_after' => 0.3], 429),
+        MockResponse::make(['message' => 'You are being rate limited.', 'retry_after' => 0.3], 429),
+        MockResponse::make(['message' => 'You are being rate limited.', 'retry_after' => 0.3], 429),
+    ]);
+
+    $connector = new DiscordConnector('test-token');
+    $connector->withMockClient($mockClient);
+
+    $action = new PurgeUnusedInvitesAction($connector);
+    $result = $action->execute('guild-123', dryRun: false);
+
+    expect($result->deleted)->toBe(0)
+        ->and($result->failed)->toBe(1);
+});
+
 it('handles an empty invite list', function (): void {
     $mockClient = new MockClient([
         ListGuildInvites::class => MockResponse::make([]),
@@ -178,7 +229,7 @@ it('handles an empty invite list', function (): void {
     $action = new PurgeUnusedInvitesAction($connector);
     $result = $action->execute('guild-123');
 
-    expect($result['total'])->toBe(0)
-        ->and($result['matched'])->toBe(0)
-        ->and($result['invites'])->toBeEmpty();
+    expect($result->total)->toBe(0)
+        ->and($result->matched)->toBe(0)
+        ->and($result->invites)->toBeEmpty();
 });
