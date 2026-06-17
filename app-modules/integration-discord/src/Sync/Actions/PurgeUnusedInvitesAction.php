@@ -9,6 +9,7 @@ use He4rt\IntegrationDiscord\Sync\DTOs\PurgeInvitesResultDTO;
 use He4rt\IntegrationDiscord\Transport\DiscordConnector;
 use He4rt\IntegrationDiscord\Transport\Requests\Invites\DeleteInvite;
 use He4rt\IntegrationDiscord\Transport\Requests\Invites\ListGuildInvites;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Sleep;
 use JsonException;
@@ -16,6 +17,7 @@ use Random\RandomException;
 use RuntimeException;
 use Saloon\Exceptions\Request\FatalRequestException;
 use Saloon\Exceptions\Request\RequestException;
+use Saloon\Http\Response;
 use Throwable;
 
 final readonly class PurgeUnusedInvitesAction
@@ -111,14 +113,38 @@ final readonly class PurgeUnusedInvitesAction
                 return;
             }
 
-            if ($response->status() === 429 && $attempt < self::MAX_RETRIES) {
-                $retryAfter = (float) ($response->json('retry_after') ?? 1.0);
-                $this->jitteredSleep($retryAfter);
+            if ($response->status() === 429) {
+                $retryAfter = $this->parseRetryAfter($response);
 
-                continue;
+                if ($retryAfter > 60.0) {
+                    throw new RuntimeException(sprintf('Cloudflare IP ban: Retry-After %ds', (int) $retryAfter));
+                }
+
+                if ($attempt < self::MAX_RETRIES) {
+                    $this->jitteredSleep($retryAfter);
+
+                    continue;
+                }
             }
 
             throw new RuntimeException(sprintf('HTTP %d: %s', $response->status(), $response->body()));
         }
+    }
+
+    private function parseRetryAfter(Response $response): float
+    {
+        $retryAfter = Arr::get(json_decode($response->body(), true), 'retry_after');
+
+        if ($retryAfter !== null) {
+            return (float) $retryAfter;
+        }
+
+        $header = $response->header('Retry-After');
+
+        if ($header !== '' && is_numeric($header)) {
+            return (float) $header;
+        }
+
+        return 1.0;
     }
 }
