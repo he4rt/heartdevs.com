@@ -139,6 +139,12 @@ final readonly class PurgeUnusedInvitesAction
             return (float) $retryAfter;
         }
 
+        $resetAfter = $response->header('X-RateLimit-Reset-After');
+
+        if ($resetAfter !== '' && is_numeric($resetAfter)) {
+            return (float) $resetAfter;
+        }
+
         $header = $response->header('Retry-After');
 
         if ($header !== '' && is_numeric($header)) {
