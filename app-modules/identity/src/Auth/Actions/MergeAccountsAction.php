@@ -19,6 +19,10 @@ final class MergeAccountsAction
                 ->where('model_id', $currentUser->id)
                 ->update(['model_id' => $oldUser->id]);
 
+            ExternalIdentity::query()
+                ->where('connected_by', $currentUser->id)
+                ->update(['connected_by' => $oldUser->id]);
+
             $oldUser->tenants()->syncWithoutDetaching(
                 $currentUser->tenants()->pluck('tenants.id')
             );
