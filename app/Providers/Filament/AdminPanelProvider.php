@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Providers\Filament;
 
+use App\Enums\FilamentPanel;
 use App\Filament\Pages\Login;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
@@ -25,12 +26,13 @@ use Illuminate\View\Middleware\ShareErrorsFromSession;
 
 class AdminPanelProvider extends PanelProvider
 {
+    private FilamentPanel $panelId = FilamentPanel::Admin;
+
     public function panel(Panel $panel): Panel
     {
-
-        $panel
-            ->id('admin')
-            ->path('admin')
+        return $panel
+            ->path($this->panelId->value)
+            ->id($this->panelId->value)
             ->login(Login::class)
             ->colors(static function (): array {
                 $colors = Color::all();
@@ -67,7 +69,5 @@ class AdminPanelProvider extends PanelProvider
             ->tenantMiddleware([
                 ApplyTenantScopes::class,
             ]);
-
-        return $panel;
     }
 }
