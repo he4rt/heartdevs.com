@@ -68,7 +68,7 @@ _Blocked by: Slice 1._
 
 - [ ] `DocsController@show` resolve o tier do documento atual e passa um flag `noindex` à view.
 - [ ] Layout `guest.blade.php`: `@props(['noindex' => false])` + `<meta name="robots" content="noindex,
-    nofollow">` quando interno; `home.blade.php` repassa `:noindex`.
+nofollow">` quando interno; `home.blade.php` repassa `:noindex`.
 - [ ] Aviso "documento interno · noindex" no header dos docs de Engenharia.
 
 **Verificação (manual):** view-source de um ADR contém `noindex`; de `installation` não contém.

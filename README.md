@@ -25,6 +25,7 @@ He4rt Developers Platform
 ## Modules Overview
 
 This project is divided into several interconnected modules:
+
 - **Activity**: Tracks user actions and engagement.
 - **Bot Discord**: The core Discord bot functionality.
 - **Community**: Forum, discussions, and community features.
@@ -39,6 +40,7 @@ This project is divided into several interconnected modules:
 ## Requirements
 
 Before starting, ensure you have the following installed:
+
 - PHP 8.3 or higher
 - Composer
 - Node.js & NPM
@@ -48,44 +50,47 @@ Before starting, ensure you have the following installed:
 
 1. **Start Infrastructure**:
    Spin up the required database and cache containers.
-   ```bash
-   make env-up
-   ```
+
+    ```bash
+    make env-up
+    ```
 
 2. **Project Setup**:
    Install PHP and Node dependencies, generate keys, and link storage.
-   ```bash
-   make setup
-   ```
+
+    ```bash
+    make setup
+    ```
 
 3. **Run the Development Server**:
    Start the Laravel server, Vite, and required queues.
-   ```bash
-   make dev
-   ```
+
+    ```bash
+    make dev
+    ```
 
 4. **Run the Discord Bot**:
    Boot up the Discord bot locally.
-   ```bash
-   make bot
-   ```
+    ```bash
+    make bot
+    ```
 
 ## Code Quality & Testing
 
 We use multiple tools to ensure code quality:
 
 - **Tests**: Run the Pest test suite.
-  ```bash
-  make test
-  ```
+    ```bash
+    make test
+    ```
 - **Code Styler**: Format code using Laravel Pint.
-  ```bash
-  make pint
-  ```
+    ```bash
+    make pint
+    ```
 - **Static Analysis**: Run PHPStan.
-  ```bash
-  make phpstan
-  ```
+    ```bash
+    make phpstan
+    ```
 
 ## Contributing to He4rt Developers Platform
 
@@ -247,6 +252,7 @@ Contributions of any kind are welcome!
 ## Our Ecosystem & Socials
 
 **Projects & Initiatives:**
+
 - [Website (heartdevs.com)](https://heartdevs.com/)
 - [He4rt Developers Platform (This Repo)](https://github.com/he4rt/heartdevs.com)
 - [4noobs](https://github.com/he4rt/4noobs)
@@ -254,6 +260,7 @@ Contributions of any kind are welcome!
 - [100DiasDeCodigo](https://github.com/he4rt/100diasdecodigo)
 
 **Social Media:**
+
 - [LinkedIn](https://www.linkedin.com/company/he4rt/)
 - [X / Twitter](https://x.com/He4rtDevs)
 - [Instagram](https://instagram.com/heartdevs)
@@ -264,4 +271,5 @@ Contributions of any kind are welcome!
 This project is under the MIT license. See the [LICENSE](LICENSE) file for more details.
 
 ---
-*Maintained by the [He4rt Developers](https://discord.gg/he4rt) team.*
+
+_Maintained by the [He4rt Developers](https://discord.gg/he4rt) team._
