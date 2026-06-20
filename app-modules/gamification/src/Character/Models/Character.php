@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace He4rt\Gamification\Character\Models;
 
-use Carbon\Carbon;
+use Carbon\CarbonInterface;
 use He4rt\Activity\Tracking\Concerns\HasInteractions;
 use He4rt\Economy\Concerns\HasWallet;
 use He4rt\Gamification\Badge\Models\Badge;
@@ -28,7 +28,7 @@ use Illuminate\Support\Facades\Date;
  * @property int $user_id
  * @property int $reputation
  * @property int $experience
- * @property Carbon|null $daily_bonus_claimed_at
+ * @property CarbonInterface|null $daily_bonus_claimed_at
  * @property int $level
  * @property float $percentage_experience
  * @property bool $can_claim_daily_bonus

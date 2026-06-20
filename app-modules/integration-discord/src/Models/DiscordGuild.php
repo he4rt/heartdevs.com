@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace He4rt\IntegrationDiscord\Models;
 
-use Carbon\Carbon;
+use Carbon\CarbonInterface;
 use He4rt\Identity\Tenant\Models\Tenant;
 use He4rt\IntegrationDiscord\Database\Factories\DiscordGuildFactory;
 use Illuminate\Database\Eloquent\Collection;
@@ -23,9 +23,9 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property int|null $member_count
  * @property int $premium_tier
  * @property array<int, string> $features
- * @property Carbon|null $synced_at
- * @property Carbon|null $created_at
- * @property Carbon|null $updated_at
+ * @property CarbonInterface|null $synced_at
+ * @property CarbonInterface|null $created_at
+ * @property CarbonInterface|null $updated_at
  * @property-read Tenant|null $tenant
  * @property-read Collection<int, DiscordChannel> $channels
  * @property-read Collection<int, DiscordRole> $roles

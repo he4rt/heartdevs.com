@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
+use Carbon\CarbonInterface;
 use He4rt\Activity\Message\Models\Message;
 use He4rt\Identity\ExternalIdentity\Models\ExternalIdentity;
 use He4rt\Identity\Tenant\Models\Tenant;
 use He4rt\PanelAdmin\Marketing\Pages\Discord\Dashboard\Queries\PeriodStats;
-use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\DB;
 
@@ -59,7 +59,7 @@ test('it buckets messages, distinct users and voice joins into the correct daily
         'sent_at' => $todayNoon,
     ]);
 
-    $insertVoice = static function (string $state, Carbon $occurredAt) use ($identityA, $tenant): void {
+    $insertVoice = static function (string $state, CarbonInterface $occurredAt) use ($identityA, $tenant): void {
         DB::table('voice_messages')->insert([
             'external_identity_id' => $identityA->id,
             'tenant_id' => $tenant->id,

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace He4rt\PanelAdmin\Marketing\Pages\Discord\Dashboard\Queries;
 
-use Carbon\Carbon;
+use Carbon\CarbonInterface;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\DB;
 
@@ -94,7 +94,7 @@ final readonly class PeriodStats
      * PostgreSQL `unnest(...) WITH ORDINALITY`, keeping the SQL a static literal
      * while the boundaries travel as array bindings.
      *
-     * @param  array<int, array{start: Carbon, end: Carbon, label: string}>  $subdivisions
+     * @param  array<int, array{start: CarbonInterface, end: CarbonInterface, label: string}>  $subdivisions
      * @return array<int, array{msgs: int, users: int}>
      */
     private function queryMessageStats(array $subdivisions): array
@@ -135,7 +135,7 @@ final readonly class PeriodStats
      * Fetches voice join counts for all subdivisions in a single query, using the
      * same `unnest(...) WITH ORDINALITY` window expansion as message stats.
      *
-     * @param  array<int, array{start: Carbon, end: Carbon, label: string}>  $subdivisions
+     * @param  array<int, array{start: CarbonInterface, end: CarbonInterface, label: string}>  $subdivisions
      * @return array<int, int>
      */
     private function queryVoiceStats(array $subdivisions): array
@@ -172,7 +172,7 @@ final readonly class PeriodStats
      * and end boundaries (in UTC), bound as static parameters to the `unnest`
      * queries above.
      *
-     * @param  array<int, array{start: Carbon, end: Carbon, label: string}>  $subdivisions
+     * @param  array<int, array{start: CarbonInterface, end: CarbonInterface, label: string}>  $subdivisions
      * @return array{0: string, 1: string}
      */
     private function boundaryArrayLiterals(array $subdivisions): array
@@ -189,7 +189,7 @@ final readonly class PeriodStats
     }
 
     /**
-     * @return array<int, array{start: Carbon, end: Carbon, label: string}>
+     * @return array<int, array{start: CarbonInterface, end: CarbonInterface, label: string}>
      */
     private function subdivisions(): array
     {
@@ -233,7 +233,7 @@ final readonly class PeriodStats
         });
     }
 
-    private function formatBlockLabel(Carbon $start, Carbon $end, string $unit, int $blockSize): string
+    private function formatBlockLabel(CarbonInterface $start, CarbonInterface $end, string $unit, int $blockSize): string
     {
         if ($unit === 'hours') {
             return $start->format('H:i').' – '.$end->format('H:i');

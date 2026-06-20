@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace He4rt\IntegrationDiscord\Models;
 
-use Carbon\Carbon;
+use Carbon\CarbonInterface;
 use He4rt\IntegrationDiscord\Database\Factories\DiscordChannelFactory;
 use He4rt\IntegrationDiscord\Enums\DiscordChannelType;
 use Illuminate\Database\Eloquent\Collection;
@@ -25,8 +25,8 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property bool $nsfw
  * @property int|null $bitrate
  * @property int|null $user_limit
- * @property Carbon|null $created_at
- * @property Carbon|null $updated_at
+ * @property CarbonInterface|null $created_at
+ * @property CarbonInterface|null $updated_at
  * @property-read DiscordGuild $guild
  * @property-read DiscordChannel|null $parent
  * @property-read Collection<int, DiscordChannel> $children

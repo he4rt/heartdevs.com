@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace He4rt\IntegrationWhatsapp\Models;
 
-use Carbon\Carbon;
+use Carbon\CarbonInterface;
 use He4rt\IntegrationWhatsapp\Database\Factories\WhatsAppEventLogFactory;
 use Illuminate\Database\Eloquent\Attributes\Table;
 use Illuminate\Database\Eloquent\Attributes\UseFactory;
@@ -17,10 +17,10 @@ use Illuminate\Database\Eloquent\Model;
  * @property string $event_id
  * @property string $type
  * @property string|null $chat_jid
- * @property Carbon $received_at
+ * @property CarbonInterface $received_at
  * @property array<string, mixed> $payload
- * @property Carbon|null $created_at
- * @property Carbon|null $updated_at
+ * @property CarbonInterface|null $created_at
+ * @property CarbonInterface|null $updated_at
  */
 #[Table(name: 'whatsapp_event_logs')]
 #[UseFactory(WhatsAppEventLogFactory::class)]

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace He4rt\IntegrationGithub\Models;
 
-use Carbon\Carbon;
+use Carbon\CarbonInterface;
 use He4rt\Identity\Tenant\Models\Tenant;
 use He4rt\IntegrationGithub\Database\Factories\GithubContributionFactory;
 use He4rt\IntegrationGithub\Enums\ContributionType;
@@ -23,10 +23,10 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property ContributionType $type
  * @property string $external_ref
  * @property string|null $target_ref
- * @property Carbon $occurred_at
+ * @property CarbonInterface $occurred_at
  * @property array<string, mixed>|null $metadata
- * @property Carbon|null $created_at
- * @property Carbon|null $updated_at
+ * @property CarbonInterface|null $created_at
+ * @property CarbonInterface|null $updated_at
  */
 #[Table(name: 'github_contributions')]
 final class GithubContribution extends Model

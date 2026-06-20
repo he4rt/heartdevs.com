@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace He4rt\PanelAdmin\Moderation\Widgets\Concerns;
 
-use Carbon\Carbon;
+use Carbon\CarbonInterface;
 
 trait ResolvesFilterPeriod
 {
-    protected function periodStart(): Carbon
+    protected function periodStart(): CarbonInterface
     {
         $period = $this->pageFilters['period'] ?? '30d';
 
@@ -21,7 +21,7 @@ trait ResolvesFilterPeriod
         };
     }
 
-    protected function previousPeriodStart(): Carbon
+    protected function previousPeriodStart(): CarbonInterface
     {
         $period = $this->pageFilters['period'] ?? '30d';
 

@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
+use Carbon\CarbonInterface;
 use He4rt\Identity\Tenant\Models\Tenant;
 use He4rt\IntegrationGithub\Enums\ContributionType;
 use He4rt\IntegrationGithub\Models\GithubContribution;
 use Illuminate\Database\QueryException;
-use Illuminate\Support\Carbon;
 
 it('persiste uma contribuição com casts de enum, data e metadata', function (): void {
     $contribution = GithubContribution::factory()->create([
@@ -18,7 +18,7 @@ it('persiste uma contribuição com casts de enum, data e metadata', function ()
     ]);
 
     expect($contribution->type)->toBe(ContributionType::Pr)
-        ->and($contribution->occurred_at)->toBeInstanceOf(Carbon::class)
+        ->and($contribution->occurred_at)->toBeInstanceOf(CarbonInterface::class)
         ->and($contribution->metadata['additions'])->toBe(10)
         ->and($contribution->id)->toBeString()
         ->and($contribution->tenant)->toBeInstanceOf(Tenant::class);

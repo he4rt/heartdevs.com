@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace He4rt\Gamification\Badge\Models;
 
-use Carbon\Carbon;
+use Carbon\CarbonInterface;
 use He4rt\Gamification\Character\Models\Character;
 use He4rt\Gamification\Database\Factories\BadgeFactory;
 use He4rt\Identity\ExternalIdentity\Enums\IdentityProvider;
@@ -26,8 +26,8 @@ use Spatie\MediaLibrary\InteractsWithMedia;
  * @property string $description
  * @property string $redeem_code
  * @property bool $active
- * @property Carbon|null $created_at
- * @property Carbon|null $updated_at
+ * @property CarbonInterface|null $created_at
+ * @property CarbonInterface|null $updated_at
  */
 #[Table(name: 'badges', keyType: 'string')]
 final class Badge extends Model implements HasMedia

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace He4rt\Community\Feedback\Models;
 
-use Carbon\Carbon;
+use Carbon\CarbonInterface;
 use He4rt\Community\Database\Factories\FeedbackFactory;
 use He4rt\Identity\Tenant\Models\Tenant;
 use He4rt\Identity\User\Models\User;
@@ -22,8 +22,8 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
  * @property string $target_id
  * @property string $type
  * @property string $message
- * @property Carbon|null $created_at
- * @property Carbon|null $updated_at
+ * @property CarbonInterface|null $created_at
+ * @property CarbonInterface|null $updated_at
  */
 #[Table(name: 'feedbacks')]
 final class Feedback extends Model

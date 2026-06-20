@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace He4rt\IntegrationDiscord\Models;
 
-use Carbon\Carbon;
+use Carbon\CarbonInterface;
 use He4rt\Identity\ExternalIdentity\Models\ExternalIdentity;
 use He4rt\IntegrationDiscord\Database\Factories\DiscordMemberFactory;
 use Illuminate\Database\Eloquent\Collection;
@@ -25,12 +25,12 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property string|null $nickname
  * @property bool $is_bot
  * @property bool $is_pending
- * @property Carbon|null $joined_at
- * @property Carbon|null $premium_since
- * @property Carbon|null $communication_disabled_until
- * @property Carbon|null $left_at
- * @property Carbon|null $created_at
- * @property Carbon|null $updated_at
+ * @property CarbonInterface|null $joined_at
+ * @property CarbonInterface|null $premium_since
+ * @property CarbonInterface|null $communication_disabled_until
+ * @property CarbonInterface|null $left_at
+ * @property CarbonInterface|null $created_at
+ * @property CarbonInterface|null $updated_at
  * @property-read DiscordGuild $guild
  * @property-read ExternalIdentity|null $externalIdentity
  * @property-read Collection<int, DiscordRole> $roles

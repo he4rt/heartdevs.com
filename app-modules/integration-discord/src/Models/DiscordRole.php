@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace He4rt\IntegrationDiscord\Models;
 
-use Carbon\Carbon;
+use Carbon\CarbonInterface;
 use He4rt\IntegrationDiscord\Database\Factories\DiscordRoleFactory;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -24,8 +24,8 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
  * @property bool $is_mentionable
  * @property bool $is_managed
  * @property string|null $icon
- * @property Carbon|null $created_at
- * @property Carbon|null $updated_at
+ * @property CarbonInterface|null $created_at
+ * @property CarbonInterface|null $updated_at
  * @property-read DiscordGuild $guild
  * @property-read Collection<int, DiscordMember> $members
  */

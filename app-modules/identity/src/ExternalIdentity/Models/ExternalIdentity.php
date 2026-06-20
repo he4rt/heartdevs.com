@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace He4rt\Identity\ExternalIdentity\Models;
 
+use Carbon\CarbonInterface;
 use He4rt\Activity\Message\Models\Message;
 use He4rt\Identity\Database\Factories\ExternalIdentityFactory;
 use He4rt\Identity\ExternalIdentity\Casts\AsCredentials;
@@ -22,7 +23,6 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Illuminate\Support\Carbon;
 
 /**
  * @property string $id
@@ -35,12 +35,12 @@ use Illuminate\Support\Carbon;
  * @property ClientAccessManager $credentials
  * @property string|null $external_account_id
  * @property string|null $connected_by
- * @property Carbon|null $connected_at
- * @property Carbon|null $disconnected_at
+ * @property CarbonInterface|null $connected_at
+ * @property CarbonInterface|null $disconnected_at
  * @property array<string, mixed>|null $metadata
- * @property Carbon $created_at
- * @property Carbon $updated_at
- * @property Carbon|null $deleted_at
+ * @property CarbonInterface $created_at
+ * @property CarbonInterface $updated_at
+ * @property CarbonInterface|null $deleted_at
  * @property-read User|null $connectedByUser
  */
 #[Appends([

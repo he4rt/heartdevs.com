@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace He4rt\Profile\Actions;
 
-use Carbon\Carbon;
+use Carbon\CarbonInterface;
 use He4rt\Profile\DTOs\UpsertProfileDTO;
 use He4rt\Profile\Enums\SeniorityLevel;
 use He4rt\Profile\Enums\SocialPlatform;
@@ -23,7 +23,7 @@ final class UpsertProfile
             $attributes['nickname'] = $dto->nickname;
         }
 
-        if ($dto->birthdate instanceof Carbon) {
+        if ($dto->birthdate instanceof CarbonInterface) {
             $attributes['birthdate'] = $dto->birthdate;
         }
 

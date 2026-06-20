@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace He4rt\Activity\Message\Models;
 
-use Carbon\Carbon;
+use Carbon\CarbonInterface;
 use He4rt\Identity\Tenant\Models\Tenant;
 use Illuminate\Database\Eloquent\Attributes\Table;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
@@ -23,8 +23,8 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property string|null $thumbnail_url
  * @property array<string, mixed>|null $raw
  * @property int $position
- * @property Carbon|null $created_at
- * @property Carbon|null $updated_at
+ * @property CarbonInterface|null $created_at
+ * @property CarbonInterface|null $updated_at
  */
 #[Table(name: 'message_embeds')]
 final class MessageEmbed extends Model

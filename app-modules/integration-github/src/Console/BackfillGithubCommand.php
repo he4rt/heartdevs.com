@@ -12,10 +12,8 @@ use He4rt\IntegrationGithub\Models\GithubRepository;
 use Illuminate\Console\Attributes\Description;
 use Illuminate\Console\Attributes\Signature;
 use Illuminate\Console\Command;
-use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Str;
-use RuntimeException;
 use Saloon\Exceptions\Request\RequestException;
 use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Output\ConsoleOutputInterface;
@@ -233,9 +231,6 @@ final class BackfillGithubCommand extends Command
             return 'data desconhecida';
         }
 
-        $localized = Date::parse($iso)->locale('pt_BR');
-        throw_unless($localized instanceof Carbon, RuntimeException::class, 'Falha ao localizar data ISO: '.$iso);
-
-        return $localized->diffForHumans();
+        return Date::parse($iso)->settings(['locale' => 'pt_BR'])->diffForHumans();
     }
 }

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace He4rt\Activity\Tracking\Models;
 
-use Carbon\Carbon;
+use Carbon\CarbonInterface;
 use He4rt\Activity\Database\Factories\InteractionFactory;
 use He4rt\Activity\Tracking\Enums\ActivityStatus;
 use He4rt\Activity\Tracking\Enums\ActivityType;
@@ -35,8 +35,8 @@ use Illuminate\Database\Eloquent\Relations\MorphTo;
  * @property string|null $source_id
  * @property string|null $external_ref
  * @property array<string, mixed>|null $metadata
- * @property Carbon $occurred_at
- * @property Carbon|null $reviewed_at
+ * @property CarbonInterface $occurred_at
+ * @property CarbonInterface|null $reviewed_at
  */
 #[Table(name: 'interactions')]
 final class Interaction extends Model

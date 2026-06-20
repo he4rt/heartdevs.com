@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace He4rt\Community\Meeting\Models;
 
-use Carbon\Carbon;
+use Carbon\CarbonInterface;
 use He4rt\Community\Database\Factories\MeetingTypeFactory;
 use Illuminate\Database\Eloquent\Attributes\Table;
 use Illuminate\Database\Eloquent\Casts\Attribute;
@@ -14,7 +14,7 @@ use Illuminate\Database\Eloquent\Model;
 /**
  * @property string $name
  * @property int $week_day
- * @property Carbon $start_at
+ * @property CarbonInterface $start_at
  * @property-read string $meeting_day_for_humans
  */
 #[Table(name: 'meeting_types')]

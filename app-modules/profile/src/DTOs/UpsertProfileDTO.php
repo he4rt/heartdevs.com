@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace He4rt\Profile\DTOs;
 
-use Carbon\Carbon;
+use Carbon\CarbonInterface;
 use He4rt\Profile\Enums\SeniorityLevel;
 use Illuminate\Support\Facades\Date;
 
@@ -12,7 +12,7 @@ final readonly class UpsertProfileDTO
 {
     public function __construct(
         public ?string $nickname = null,
-        public ?Carbon $birthdate = null,
+        public ?CarbonInterface $birthdate = null,
         public ?string $about = null,
         public ?string $headline = null,
         public ?SeniorityLevel $seniorityLevel = null,

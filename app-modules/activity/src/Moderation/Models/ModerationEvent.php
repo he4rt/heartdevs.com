@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace He4rt\Activity\Moderation\Models;
 
-use Carbon\Carbon;
+use Carbon\CarbonInterface;
 use He4rt\Activity\Message\Models\Message;
 use He4rt\Activity\Moderation\Enums\ModerationType;
 use He4rt\Activity\Timeline\Observers\ModerationEventObserver;
@@ -27,9 +27,9 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property string|null $source_message_id
  * @property string|null $provider_message_id
  * @property array<string, mixed>|null $metadata
- * @property Carbon $occurred_at
- * @property Carbon|null $created_at
- * @property Carbon|null $updated_at
+ * @property CarbonInterface $occurred_at
+ * @property CarbonInterface|null $created_at
+ * @property CarbonInterface|null $updated_at
  */
 #[ObservedBy(ModerationEventObserver::class)]
 #[Table(name: 'moderation_events')]

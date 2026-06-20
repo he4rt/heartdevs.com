@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace He4rt\IntegrationGithub\Models;
 
-use Carbon\Carbon;
+use Carbon\CarbonInterface;
 use He4rt\Identity\Tenant\Models\Tenant;
 use He4rt\IntegrationGithub\Database\Factories\GithubRepositoryFactory;
 use Illuminate\Database\Eloquent\Attributes\Table;
@@ -21,9 +21,9 @@ use Illuminate\Support\Str;
  * @property string $tenant_id
  * @property string $full_name
  * @property bool $enabled
- * @property Carbon|null $last_backfilled_at
- * @property Carbon|null $created_at
- * @property Carbon|null $updated_at
+ * @property CarbonInterface|null $last_backfilled_at
+ * @property CarbonInterface|null $created_at
+ * @property CarbonInterface|null $updated_at
  */
 #[Table(name: 'github_repositories')]
 final class GithubRepository extends Model
@@ -64,7 +64,7 @@ final class GithubRepository extends Model
      */
     protected function scopeEnabled(Builder $query): Builder
     {
-        return $query->where('enabled', true);
+        return $query->where('enabled', operator: true);
     }
 
     /**

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace He4rt\Moderation\Cases\Models;
 
-use Carbon\Carbon;
+use Carbon\CarbonInterface;
 use He4rt\Identity\Tenant\Models\Tenant;
 use He4rt\Identity\User\Models\User;
 use He4rt\Moderation\Database\Factories\ModerationCaseFactory;
@@ -40,10 +40,10 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property string|null $assigned_to
  * @property string|null $author_id
  * @property string|null $tenant_id
- * @property Carbon|null $assigned_at
- * @property Carbon|null $resolved_at
- * @property Carbon $created_at
- * @property Carbon $updated_at
+ * @property CarbonInterface|null $assigned_at
+ * @property CarbonInterface|null $resolved_at
+ * @property CarbonInterface $created_at
+ * @property CarbonInterface $updated_at
  */
 #[Table('moderation_cases')]
 #[UseFactory(ModerationCaseFactory::class)]

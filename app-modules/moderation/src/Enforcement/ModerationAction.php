@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace He4rt\Moderation\Enforcement;
 
-use Carbon\Carbon;
+use Carbon\CarbonInterface;
 use He4rt\Identity\Tenant\Models\Tenant;
 use He4rt\Identity\User\Models\User;
 use He4rt\Moderation\Appeals\ModerationAppeal;
@@ -31,7 +31,7 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
  * @property array<string, mixed>|null $execution_results
  * @property bool $automated
  * @property string|null $tenant_id
- * @property Carbon $created_at
+ * @property CarbonInterface $created_at
  */
 #[Table('moderation_actions', timestamps: false)]
 #[UseFactory(ModerationActionFactory::class)]

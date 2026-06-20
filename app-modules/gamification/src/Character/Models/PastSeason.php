@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace He4rt\Gamification\Character\Models;
 
-use Carbon\Carbon;
+use Carbon\CarbonInterface;
 use He4rt\Gamification\Database\Factories\PastSeasonFactory;
 use He4rt\Gamification\Season\Models\Season;
 use He4rt\Identity\Tenant\Models\Tenant;
@@ -25,8 +25,8 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property int $messages_count
  * @property int $badges_count
  * @property int $meetings_count
- * @property Carbon|null $created_at
- * @property Carbon|null $updated_at
+ * @property CarbonInterface|null $created_at
+ * @property CarbonInterface|null $updated_at
  */
 #[Table(name: 'seasons_rankings')]
 final class PastSeason extends Model
