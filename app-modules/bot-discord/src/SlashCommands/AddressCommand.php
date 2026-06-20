@@ -59,7 +59,7 @@ class AddressCommand extends AbstractSlashCommand
         if (!$this->memberProvider?->user) {
             $interaction->respondWithMessage(
                 'Você precisa se apresentar primeiro. Use o comando `/apresentar`.',
-                true
+                ephemeral: true
             );
 
             return;
@@ -70,7 +70,7 @@ class AddressCommand extends AbstractSlashCommand
             $city = $this->value('cidade');
 
             if (!isset(self::STATES[$state])) {
-                $interaction->respondWithMessage('Estado inválido. Use a sigla (ex: SP, RJ).', true);
+                $interaction->respondWithMessage('Estado inválido. Use a sigla (ex: SP, RJ).', ephemeral: true);
 
                 return;
             }
@@ -85,12 +85,12 @@ class AddressCommand extends AbstractSlashCommand
 
             $interaction->respondWithMessage(
                 sprintf('Localização atualizada para **%s, %s** 🇧🇷', $city, $stateName),
-                true
+                ephemeral: true
             );
         } catch (Throwable $throwable) {
             $this->logger()->error('Error AddressCommand:', [$throwable->getMessage()]);
 
-            $interaction->respondWithMessage('Erro ao atualizar localização.', true);
+            $interaction->respondWithMessage('Erro ao atualizar localização.', ephemeral: true);
         }
     }
 

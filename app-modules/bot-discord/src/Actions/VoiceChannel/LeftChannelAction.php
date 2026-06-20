@@ -15,7 +15,7 @@ final class LeftChannelAction
     {
         foreach ($activeChannels as $index => $channel) {
             /** @var VoiceChannelDTO $channel */
-            if (in_array($user, $channel->users, true)) {
+            if (in_array($user, $channel->users, strict: true)) {
                 $activeChannels[$index]->users = array_values(array_filter($channel->users, fn (string $userId) => $userId !== $user));
                 $activeChannels[$index]->usersCount--;
 

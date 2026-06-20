@@ -43,9 +43,9 @@ final readonly class CommunityRetrospective
             )
             ->when(
                 $this->filters->repos !== [],
-                fn (Collection $items): Collection => $items->filter(fn (GithubContribution $contribution): bool => in_array($contribution->repo, $this->filters->repos, true)),
+                fn (Collection $items): Collection => $items->filter(fn (GithubContribution $contribution): bool => in_array($contribution->repo, $this->filters->repos, strict: true)),
             )
-            ->filter(fn (GithubContribution $contribution): bool => in_array($contribution->type, $this->filters->types, true))
+            ->filter(fn (GithubContribution $contribution): bool => in_array($contribution->type, $this->filters->types, strict: true))
             ->reject(fn (GithubContribution $contribution): bool => $this->filteredOutByOutcome($contribution))
             ->when(
                 $this->filters->person !== null,

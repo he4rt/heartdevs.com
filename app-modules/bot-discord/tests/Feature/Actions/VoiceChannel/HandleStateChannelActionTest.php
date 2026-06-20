@@ -135,7 +135,7 @@ test('user leave voice', function (): void {
     expect($userLastChannel)->toBe($this->firstChannel->channelId);
 
     // left the voice channel
-    $action->execute($this->userId, null);
+    $action->execute($this->userId, channelId: null);
     $userLastChannel = cache()->tags(['voice_tracking'])->get('user_last_channel_'.$this->userId);
     expect($userLastChannel)->toBeNull();
 

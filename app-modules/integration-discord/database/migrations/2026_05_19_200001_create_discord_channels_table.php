@@ -22,7 +22,7 @@ return new class extends Migration
             $table->smallInteger('type');
             $table->text('topic')->nullable();
             $table->smallInteger('position')->default(0);
-            $table->boolean('nsfw')->default(false);
+            $table->boolean('nsfw')->default(value: false);
             $table->integer('bitrate')->nullable();
             $table->integer('user_limit')->nullable();
             $table->timestampsTz();

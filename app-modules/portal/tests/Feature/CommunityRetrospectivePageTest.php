@@ -97,8 +97,8 @@ it('filtra por tipo ao alternar um tipo de contribuição', function (): void {
 
 it('mantém o estado dos filtros (toggle de bots)', function (): void {
     livewire(CommunityRetrospectivePage::class)
-        ->set('hideBots', false)
-        ->assertSet('hideBots', false);
+        ->set('hideBots', value: false)
+        ->assertSet('hideBots', value: false);
 });
 
 it('preset "tudo" ancora o período na primeira contribuição e traz o histórico inteiro', function (): void {

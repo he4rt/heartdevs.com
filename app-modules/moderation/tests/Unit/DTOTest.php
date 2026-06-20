@@ -110,7 +110,7 @@ test('ModerationContentDTO can be json_encoded', function (): void {
 
     expect($json)->toBeString();
 
-    $decoded = json_decode($json, true);
+    $decoded = json_decode($json, associative: true);
     expect($decoded['content_id'])->toBe('msg-ser-1')
         ->and($decoded['source_platform'])->toBe('discord')
         ->and($decoded['author_external_id'])->toBe('ext-123')

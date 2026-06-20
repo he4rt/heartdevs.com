@@ -20,7 +20,7 @@ final class ClassifyActivity
         $tier = ValueTier::from($classification['tier']);
         $autoApproveTiers = config('activity-tracking.auto_approve_tiers', []);
 
-        $status = in_array($tier->value, $autoApproveTiers, true)
+        $status = in_array($tier->value, $autoApproveTiers, strict: true)
             ? ActivityStatus::AutoApproved
             : ActivityStatus::Pending;
 

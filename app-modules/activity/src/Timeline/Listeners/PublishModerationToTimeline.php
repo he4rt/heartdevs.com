@@ -22,7 +22,7 @@ final class PublishModerationToTimeline
     {
         $action = $event->action;
 
-        if (!in_array($action->action_type, self::PUBLISHABLE_TYPES, true)) {
+        if (!in_array($action->action_type, self::PUBLISHABLE_TYPES, strict: true)) {
             return;
         }
 

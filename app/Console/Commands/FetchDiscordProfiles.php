@@ -65,7 +65,7 @@ class FetchDiscordProfiles extends Command
 
         // Load members
         /** @var array<string, mixed> $membersData */
-        $membersData = (array) json_decode((string) Storage::disk('local')->get($membersFile), true);
+        $membersData = (array) json_decode((string) Storage::disk('local')->get($membersFile), associative: true);
         /** @var list<array<string, mixed>> $members */
         $members = is_array($membersData['members'] ?? null) ? $membersData['members'] : [];
         $allIds = array_map(static fn (array $m): string => (string) ($m['user']['id'] ?? ''), $members);
@@ -265,7 +265,7 @@ class FetchDiscordProfiles extends Command
         $existing = [];
 
         if (Storage::disk('local')->exists($chunkFile)) {
-            $existing = json_decode((string) Storage::disk('local')->get($chunkFile), true) ?? [];
+            $existing = json_decode((string) Storage::disk('local')->get($chunkFile), associative: true) ?? [];
         }
 
         $existing[$discordId] = $profile;

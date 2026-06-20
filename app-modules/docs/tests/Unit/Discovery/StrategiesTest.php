@@ -115,7 +115,7 @@ describe('ReadmeStrategy parse', static function (): void {
 
 describe('GuideStrategy parse', static function (): void {
     it('reads order from front-matter and computes reading time', function (): void {
-        $doc = new GuideStrategy(strategyParser())->parse(fixtureFile('resources/docs/3.x/guide-order.md'), null);
+        $doc = new GuideStrategy(strategyParser())->parse(fixtureFile('resources/docs/3.x/guide-order.md'), moduleName: null);
 
         expect($doc->title)->toBe('Guide With Order')
             ->and($doc->order)->toBe(4)

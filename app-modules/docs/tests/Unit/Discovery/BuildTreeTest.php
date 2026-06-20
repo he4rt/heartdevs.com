@@ -45,7 +45,7 @@ function sourceFixture(string $relative, ?string $module): DocumentSource
 function sampleTree(): DocumentTree
 {
     return buildTreeAction()->execute([
-        sourceFixture('CONTEXT-MAP.md', null),
+        sourceFixture('CONTEXT-MAP.md', module: null),
         sourceFixture('modules/sample/CONTEXT.md', 'sample'),
         sourceFixture('modules/sample/docs/adr/0001-sample-decision.md', 'sample'),
         sourceFixture('modules/sample/docs/adr/0002-frontmatter-decision.md', 'sample'),
@@ -95,8 +95,8 @@ it('orders each module by reading order: module, glossary, decisions, plan', fun
 function multiModuleTree(): DocumentTree
 {
     return buildTreeAction()->execute([
-        sourceFixture('CONTEXT-MAP.md', null),
-        sourceFixture('docs/specs/2026-03-01-transversal.md', null),
+        sourceFixture('CONTEXT-MAP.md', module: null),
+        sourceFixture('docs/specs/2026-03-01-transversal.md', module: null),
         sourceFixture('modules/sample/README.md', 'sample'),
         sourceFixture('modules/alpha/README.md', 'alpha'),
     ]);
@@ -126,7 +126,7 @@ it('keeps the curated tier before engineering even with many modules', function 
 
 it('omits a tier whose only documents are hidden', function (): void {
     $tree = buildTreeAction()->execute([
-        sourceFixture('CONTEXT-MAP.md', null),
+        sourceFixture('CONTEXT-MAP.md', module: null),
         sourceFixture('modules/sample/docs/specs/2026-01-01-hidden-spec.md', 'sample'),
     ]);
 

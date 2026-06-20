@@ -29,7 +29,7 @@ abstract class AbstractSlashCommand extends SlashCommand
         if ($interaction->guild_id === null) {
             $interaction->respondWithMessage(
                 'Este comando só pode ser usado em um servidor.',
-                true
+                ephemeral: true
             );
 
             return;

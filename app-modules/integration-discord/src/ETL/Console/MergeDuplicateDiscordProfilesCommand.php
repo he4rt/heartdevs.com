@@ -81,7 +81,7 @@ class MergeDuplicateDiscordProfilesCommand extends Command
                 continue;
             }
 
-            $pair = json_decode($raw, true);
+            $pair = json_decode($raw, associative: true);
             if (!is_array($pair)) {
                 $stats['errors']++;
                 Log::error('merge-duplicate-profiles invalid JSONL line', ['line' => $line, 'raw' => $raw]);

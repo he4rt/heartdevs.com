@@ -77,7 +77,7 @@ final readonly class DocumentRegistry
 
     private function shouldCache(): bool
     {
-        return (bool) $this->config->get('docs.cache.enabled', true) && !$this->app->environment('local');
+        return (bool) $this->config->get('docs.cache.enabled', default: true) && !$this->app->environment('local');
     }
 
     private function ttl(): int

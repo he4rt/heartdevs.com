@@ -53,6 +53,6 @@ class RecentActionsWidget extends TableWidget
                     ->label('When')
                     ->sortable(),
             ])
-            ->paginated(false);
+            ->paginated(condition: false);
     }
 }

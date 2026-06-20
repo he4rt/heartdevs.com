@@ -83,7 +83,7 @@ class ProfileCommand extends AbstractSlashCommand
                 $this
                     ->message()
                     ->content($mentionedUser->username.' ainda não se apresentou! Use o comando `/apresentar` primeiro.')
-                    ->reply($interaction, true);
+                    ->reply($interaction, ephemeral: true);
 
                 return;
             }
@@ -97,7 +97,7 @@ class ProfileCommand extends AbstractSlashCommand
                 $this
                     ->message()
                     ->content($mentionedUser->username.' ainda não possui um perfil.')
-                    ->reply($interaction, true);
+                    ->reply($interaction, ephemeral: true);
 
                 return;
             }
@@ -115,14 +115,14 @@ class ProfileCommand extends AbstractSlashCommand
                 ->footerIcon($interaction->guild->icon)
                 ->footerText(Date::now()->format('Y').' © He4rt Developers')
                 ->timestamp(now())
-                ->reply($interaction, true);
+                ->reply($interaction, ephemeral: true);
         } catch (Throwable $throwable) {
             $this->logger()->error('Erro ao buscar perfil: '.$throwable->getMessage());
 
             $this
                 ->message()
                 ->content('Erro ao buscar perfil.')
-                ->reply($interaction, true);
+                ->reply($interaction, ephemeral: true);
         }
     }
 }

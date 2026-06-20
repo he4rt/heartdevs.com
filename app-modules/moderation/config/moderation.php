@@ -4,13 +4,13 @@ declare(strict_types=1);
 
 return [
     'pipeline' => [
-        'sync' => env('MODERATION_PIPELINE_SYNC', true),
+        'sync' => env('MODERATION_PIPELINE_SYNC', default: true),
         'queue' => env('MODERATION_QUEUE', 'moderation'),
     ],
 
     'classifiers' => [
         'openai' => [
-            'enabled' => env('MODERATION_OPENAI_ENABLED', true),
+            'enabled' => env('MODERATION_OPENAI_ENABLED', default: true),
             'model' => 'omni-moderation-latest',
         ],
         'rules' => [

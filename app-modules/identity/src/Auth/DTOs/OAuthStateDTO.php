@@ -27,7 +27,7 @@ final readonly class OAuthStateDTO implements JsonSerializable, Stringable
 
     public static function fromEncryptedString(string $state): self
     {
-        $data = json_decode(Crypt::decryptString($state), true);
+        $data = json_decode(Crypt::decryptString($state), associative: true);
 
         return new self(
             intent: OAuthIntent::from($data['intent']),

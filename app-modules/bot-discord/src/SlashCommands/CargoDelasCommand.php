@@ -71,7 +71,7 @@ class CargoDelasCommand extends AbstractSlashCommand
             ->find(fn (Role $role) => $role->id === $comiteRoleId);
 
         if (!$hasComiteRole) {
-            $interaction->respondWithMessage('❌ Você não tem permissão para usar este comando.', true);
+            $interaction->respondWithMessage('❌ Você não tem permissão para usar este comando.', ephemeral: true);
 
             return;
         }
@@ -93,7 +93,7 @@ class CargoDelasCommand extends AbstractSlashCommand
 
         $targetMember->setRoles($roles);
 
-        $interaction->respondWithMessage(':he4rtDelas: Cargo adicionado com sucesso!', true);
+        $interaction->respondWithMessage(':he4rtDelas: Cargo adicionado com sucesso!', ephemeral: true);
 
         $delasChannelId = config('bot-discord.channels.he4rt_delas');
         $welcomeMessage = sprintf(
@@ -112,13 +112,13 @@ class CargoDelasCommand extends AbstractSlashCommand
         $targetMember = $interaction->guild->members->get('id', $targetUserId);
 
         if (!$targetMember) {
-            $interaction->respondWithMessage('❌ Usuário mencionado não foi encontrado no servidor.', true);
+            $interaction->respondWithMessage('❌ Usuário mencionado não foi encontrado no servidor.', ephemeral: true);
 
             return null;
         }
 
         if ($targetMember->user->bot ?? false) {
-            $interaction->respondWithMessage('❌ Não é possível adicionar roles a bots.', true);
+            $interaction->respondWithMessage('❌ Não é possível adicionar roles a bots.', ephemeral: true);
 
             return null;
         }
@@ -129,7 +129,7 @@ class CargoDelasCommand extends AbstractSlashCommand
 
         if (!$targetHasPresentation) {
             $username = $targetMember->user->username ?? 'usuário';
-            $interaction->respondWithMessage(sprintf('❌ @%s precisa se apresentar primeiro (/apresentar).', $username), true);
+            $interaction->respondWithMessage(sprintf('❌ @%s precisa se apresentar primeiro (/apresentar).', $username), ephemeral: true);
 
             return null;
         }
@@ -140,7 +140,7 @@ class CargoDelasCommand extends AbstractSlashCommand
 
         if ($targetHasHe4rtDelas) {
             $username = $targetMember->user->username ?? 'usuário';
-            $interaction->respondWithMessage(sprintf('❌ @%s já possui a role He4rt Delas.', $username), true);
+            $interaction->respondWithMessage(sprintf('❌ @%s já possui a role He4rt Delas.', $username), ephemeral: true);
 
             return null;
         }

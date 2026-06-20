@@ -27,7 +27,7 @@ final class FixPostSwitchTimestampsCommand extends Command
 
     public function handle(): int
     {
-        $totalStart = microtime(true);
+        $totalStart = microtime(as_float: true);
 
         intro('Fix post-switch timestamps (Option D — Step 2)');
 
@@ -54,7 +54,7 @@ final class FixPostSwitchTimestampsCommand extends Command
 
         $this->runVerification();
 
-        $total = microtime(true) - $totalStart;
+        $total = microtime(as_float: true) - $totalStart;
         outro(sprintf('Done in %.1fs', $total));
 
         return self::SUCCESS;
@@ -151,7 +151,7 @@ final class FixPostSwitchTimestampsCommand extends Command
         task(
             label: $name.': processing...',
             callback: function ($logger) use ($name, $tables, &$moduleStats): void {
-                $moduleStart = microtime(true);
+                $moduleStart = microtime(as_float: true);
 
                 foreach ($tables as $tableName => $columns) {
                     $moduleStats['tables']++;
@@ -177,7 +177,7 @@ final class FixPostSwitchTimestampsCommand extends Command
                     }
                 }
 
-                $moduleStats['elapsed'] = (microtime(true) - $moduleStart) * 1_000;
+                $moduleStats['elapsed'] = (microtime(as_float: true) - $moduleStart) * 1_000;
                 $logger->label(sprintf(
                     '%s: %d tables, %d cols, %s rows — %.1fs',
                     $name,
@@ -198,7 +198,7 @@ final class FixPostSwitchTimestampsCommand extends Command
      */
     private function fixColumn(string $table, string $column, string $fixScope = 'column'): array
     {
-        $start = microtime(true);
+        $start = microtime(as_float: true);
         $whereCol = $fixScope === 'row' ? 'created_at' : sprintf('"%s"', $column);
         $nullGuard = $fixScope === 'row' ? sprintf(' AND "%s" IS NOT NULL', $column) : '';
 
@@ -208,7 +208,7 @@ final class FixPostSwitchTimestampsCommand extends Command
                 [self::CUTOFF],
             );
 
-            return ['rows' => $count, 'elapsed' => (microtime(true) - $start) * 1_000];
+            return ['rows' => $count, 'elapsed' => (microtime(as_float: true) - $start) * 1_000];
         }
 
         $rowsFixed = DB::affectingStatement(
@@ -216,7 +216,7 @@ final class FixPostSwitchTimestampsCommand extends Command
             [self::CUTOFF],
         );
 
-        return ['rows' => $rowsFixed, 'elapsed' => (microtime(true) - $start) * 1_000];
+        return ['rows' => $rowsFixed, 'elapsed' => (microtime(as_float: true) - $start) * 1_000];
     }
 
     /**

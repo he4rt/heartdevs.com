@@ -149,7 +149,7 @@ class RegisterSubscriptionsAction extends Action
                 'value' => $type->value,
                 'name' => $type->name,
                 'version' => $type->getVersion(),
-                'exists' => in_array($type->value, $existingTypes, true),
+                'exists' => in_array($type->value, $existingTypes, strict: true),
             ];
 
             $group = match (true) {

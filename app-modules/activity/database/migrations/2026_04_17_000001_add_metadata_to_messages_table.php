@@ -30,8 +30,8 @@ return new class extends Migration
             $table->string('kind')->nullable()->after('reactions_total');
             $table->smallInteger('raw_message_type')->nullable()->after('kind');
             $table->string('source_kind')->nullable()->after('raw_message_type');
-            $table->boolean('is_pinned')->default(false)->after('source_kind');
-            $table->boolean('mentions_everyone')->default(false)->after('is_pinned');
+            $table->boolean('is_pinned')->default(value: false)->after('source_kind');
+            $table->boolean('mentions_everyone')->default(value: false)->after('is_pinned');
             $table->smallInteger('mention_role_count')->default(0)->after('mentions_everyone');
             $table->timestampTz('edited_at')->nullable()->after('mention_role_count');
             $table->string('reply_to_provider_message_id')->nullable()->after('edited_at');

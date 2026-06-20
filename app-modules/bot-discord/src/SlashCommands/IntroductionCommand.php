@@ -53,7 +53,7 @@ class IntroductionCommand extends AbstractSlashCommand
             ->find(fn (Role $role) => $role->id === $this->roleId);
 
         if ($hasRole) {
-            $interaction->respondWithMessage('Você já se apresentou. Esse comando só pode ser usado uma vez.', true);
+            $interaction->respondWithMessage('Você já se apresentou. Esse comando só pode ser usado uma vez.', ephemeral: true);
 
             return;
         }
@@ -68,21 +68,21 @@ class IntroductionCommand extends AbstractSlashCommand
                     ->setMinLength(2)
                     ->setMaxLength(32)
                     ->setPlaceholder('Fulano de Tal')
-                    ->setRequired(true),
+                    ->setRequired(required: true),
 
                 TextInput::new('Nickname', TextInput::STYLE_SHORT)
                     ->setCustomId('nickname')
                     ->setMinLength(2)
                     ->setMaxLength(32)
                     ->setPlaceholder('Fulano123')
-                    ->setRequired(true),
+                    ->setRequired(required: true),
 
                 TextInput::new('Nos conte um pouco sobre você', TextInput::STYLE_PARAGRAPH)
                     ->setCustomId('about')
                     ->setMinLength(5)
                     ->setMaxLength(500)
                     ->setPlaceholder('Entrei de curioso e acabei gostando do servidor!')
-                    ->setRequired(true),
+                    ->setRequired(required: true),
 
             ])
             ->submit(function (Interaction $interaction, Collection $components) use ($modalId): void {
@@ -93,7 +93,7 @@ class IntroductionCommand extends AbstractSlashCommand
                 try {
                     $this->persistData($interaction, $components);
 
-                    $interaction->respondWithMessage("Apresentação enviada com sucesso.\nhttps://heartdevs.com/", true);
+                    $interaction->respondWithMessage("Apresentação enviada com sucesso.\nhttps://heartdevs.com/", ephemeral: true);
 
                 } catch (Throwable $throwable) {
                     Log::channel('bot-discord')->error('IntroductionCommand: failed to process introduction', [
@@ -109,7 +109,7 @@ class IntroductionCommand extends AbstractSlashCommand
 
                     report($throwable);
 
-                    $interaction->respondWithMessage('Ocorreu um erro ao processar sua apresentação.', true);
+                    $interaction->respondWithMessage('Ocorreu um erro ao processar sua apresentação.', ephemeral: true);
                 }
             })
             ->show($interaction);

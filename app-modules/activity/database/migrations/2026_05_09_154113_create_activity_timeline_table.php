@@ -17,8 +17,8 @@ return new class extends Migration
             $table->uuidMorphs('postable');
             $table->foreignUuid('root_id')->nullable();
             $table->foreignUuid('parent_id')->nullable();
-            $table->boolean('is_ignored')->default(false);
-            $table->boolean('pinned')->default(false);
+            $table->boolean('is_ignored')->default(value: false);
+            $table->boolean('pinned')->default(value: false);
             $table->integer('views')->default(0);
             $table->timestampsTz();
 

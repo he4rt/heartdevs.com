@@ -34,7 +34,7 @@ class ImportDiscordMembers extends Command
             return;
         }
 
-        $membersData = json_decode((string) Storage::disk('local')->get($membersFile), true);
+        $membersData = json_decode((string) Storage::disk('local')->get($membersFile), associative: true);
         $members = $membersData['members'] ?? [];
         $guildId = $membersData['guild_id'] ?? config('he4rt.discord.guild_id');
 
@@ -44,7 +44,7 @@ class ImportDiscordMembers extends Command
         $githubMap = [];
 
         if (Storage::disk('local')->exists($githubFile)) {
-            $githubData = json_decode((string) Storage::disk('local')->get($githubFile), true);
+            $githubData = json_decode((string) Storage::disk('local')->get($githubFile), associative: true);
             foreach ($githubData['connections'] ?? [] as $conn) {
                 $githubMap[$conn['discord_id']] = $conn['github_username'];
             }

@@ -17,7 +17,7 @@ final readonly class PublishModerationEntry
 
     public function handle(ModerationEvent $event): ?Timeline
     {
-        if (!in_array($event->type, self::PUBLISHABLE_TYPES, true)) {
+        if (!in_array($event->type, self::PUBLISHABLE_TYPES, strict: true)) {
             return null;
         }
 

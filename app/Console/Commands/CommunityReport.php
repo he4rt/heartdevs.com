@@ -328,7 +328,7 @@ class CommunityReport extends Command
         info('=== 5. Badges ===');
 
         $totalBadges = DB::table('badges')->count();
-        $activeBadges = DB::table('badges')->where('active', true)->count();
+        $activeBadges = DB::table('badges')->where('active', operator: true)->count();
         $totalClaims = DB::table('characters_badges')->count();
         $totalCharacters = DB::table('characters')->count();
 
@@ -839,7 +839,7 @@ class CommunityReport extends Command
         }
 
         /** @var array<string, mixed> $membersData */
-        $membersData = (array) json_decode((string) Storage::disk('local')->get('discord/members.json'), true);
+        $membersData = (array) json_decode((string) Storage::disk('local')->get('discord/members.json'), associative: true);
         /** @var list<array<string, mixed>> $members */
         $members = is_array($membersData['members'] ?? null) ? $membersData['members'] : [];
         $scrapedDiscordIds = collect($members)
@@ -882,7 +882,7 @@ class CommunityReport extends Command
 
         if (Storage::disk('local')->exists('discord/github_connections.json')) {
             /** @var array<string, mixed> $githubData */
-            $githubData = (array) json_decode((string) Storage::disk('local')->get('discord/github_connections.json'), true);
+            $githubData = (array) json_decode((string) Storage::disk('local')->get('discord/github_connections.json'), associative: true);
             /** @var list<array<string, mixed>> $connections */
             $connections = is_array($githubData['connections'] ?? null) ? $githubData['connections'] : [];
             $githubConnections = collect($connections);

@@ -22,7 +22,7 @@ function makeMergeOAuthUser(
         }
     };
 
-    return new class($credentials, $providerId, $provider, 'testuser', 'Test User', 'test@example.com', null) extends OAuthUserDTO
+    return new class($credentials, $providerId, $provider, 'testuser', 'Test User', 'test@example.com', avatarUrl: null) extends OAuthUserDTO
     {
         public static function make(OAuthAccessDTO $credentials, array $payload): self
         {

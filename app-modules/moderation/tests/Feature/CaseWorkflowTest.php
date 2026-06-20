@@ -73,8 +73,8 @@ test('SubmitReport deduplicates reports to same content', function (): void {
         tenantId: null,
     );
 
-    $case1 = $action->handle($reporter1, $dto, ViolationType::Spam, null, Platform::Discord);
-    $case2 = $action->handle($reporter2, $dto, ViolationType::Spam, null, Platform::Discord);
+    $case1 = $action->handle($reporter1, $dto, ViolationType::Spam, details: null, platform: Platform::Discord);
+    $case2 = $action->handle($reporter2, $dto, ViolationType::Spam, details: null, platform: Platform::Discord);
 
     expect($case1->id)->toBe($case2->id);
     expect(ModerationReport::query()->where('case_id', $case1->id)->count())->toBe(2);

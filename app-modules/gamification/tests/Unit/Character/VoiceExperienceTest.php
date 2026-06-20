@@ -43,7 +43,7 @@ test('text message increment works through action', function (): void {
     $message = str_repeat('a', 200);
 
     $xp = resolve(IncrementExperience::class)
-        ->incrementByTextMessage($character->id, $message, false);
+        ->incrementByTextMessage($character->id, $message, isSupporter: false);
 
     // (200 * 0.01) + (1 * 0.1) = 2.1 → (int) 2
     expect($xp)->toBe(2)
@@ -55,7 +55,7 @@ test('text message increment passes supporter flag', function (): void {
     $message = str_repeat('a', 200);
 
     $xp = resolve(IncrementExperience::class)
-        ->incrementByTextMessage($character->id, $message, true);
+        ->incrementByTextMessage($character->id, $message, isSupporter: true);
 
     // non-supporter would be 2, supporter = 4
     expect($xp)->toBe(4)

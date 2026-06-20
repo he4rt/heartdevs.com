@@ -19,7 +19,7 @@ return new class extends Migration
             $table->string('violation_type', 30);
             $table->string('severity', 20);
             $table->string('action_on_match', 30);
-            $table->boolean('is_active')->default(true);
+            $table->boolean('is_active')->default(value: true);
             $table->foreignUuid('tenant_id')->nullable()->constrained('tenants')->nullOnDelete();
             $table->timestampsTz();
 

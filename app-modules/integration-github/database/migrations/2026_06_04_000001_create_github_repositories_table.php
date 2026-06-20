@@ -14,7 +14,7 @@ return new class extends Migration
             $table->uuid('id')->primary();
             $table->foreignUuid('tenant_id')->constrained('tenants');
             $table->string('full_name');   // owner/repo
-            $table->boolean('enabled')->default(true);
+            $table->boolean('enabled')->default(value: true);
             $table->timestampTz('last_backfilled_at')->nullable();
             $table->timestampsTz();
 

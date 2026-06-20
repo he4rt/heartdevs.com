@@ -57,7 +57,7 @@ final readonly class RegisterTwitchSubscriptionsAction
         $errors = [];
 
         foreach ($types as $type) {
-            if (in_array($type->value, $existingTypes, true)) {
+            if (in_array($type->value, $existingTypes, strict: true)) {
                 $skipped++;
 
                 continue;

@@ -59,10 +59,10 @@ final readonly class RetrospectiveFilters
             until: $until,
             repos: array_values(array_filter($repos)),
             types: $parsedTypes === [] ? ContributionType::cases() : $parsedTypes,
-            outcome: in_array($outcome, ['merged', 'open', 'closed'], true) ? $outcome : null,
+            outcome: in_array($outcome, ['merged', 'open', 'closed'], strict: true) ? $outcome : null,
             person: ($person === null || $person === '') ? null : $person,
             hideBots: $hideBots,
-            sort: in_array($sort, ['total', 'prs', 'lines'], true) ? $sort : 'total',
+            sort: in_array($sort, ['total', 'prs', 'lines'], strict: true) ? $sort : 'total',
         );
     }
 }

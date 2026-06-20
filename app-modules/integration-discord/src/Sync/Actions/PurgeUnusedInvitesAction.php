@@ -143,7 +143,7 @@ final readonly class PurgeUnusedInvitesAction
 
     private function parseRetryAfter(Response $response): float
     {
-        $retryAfter = Arr::get(json_decode($response->body(), true), 'retry_after');
+        $retryAfter = Arr::get(json_decode($response->body(), associative: true), 'retry_after');
 
         if ($retryAfter !== null) {
             return (float) $retryAfter;

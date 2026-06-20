@@ -22,7 +22,7 @@ return new class extends Migration
             $table->string('seniority_level', 30)->nullable();
             $table->smallInteger('years_experience')->nullable();
             $table->jsonb('social_links')->nullable();
-            $table->boolean('available_for_proposals')->default(false);
+            $table->boolean('available_for_proposals')->default(value: false);
             $table->string('start_availability', 30)->nullable();
             $table->timestampsTz();
 

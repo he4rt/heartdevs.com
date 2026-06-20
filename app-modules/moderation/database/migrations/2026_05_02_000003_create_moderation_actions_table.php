@@ -20,7 +20,7 @@ return new class extends Migration
             $table->text('reason')->nullable();
             $table->jsonb('metadata')->nullable();
             $table->jsonb('execution_results')->nullable();
-            $table->boolean('automated')->default(false);
+            $table->boolean('automated')->default(value: false);
             $table->timestampTz('created_at')->useCurrent();
 
             $table->index(['case_id'], 'idx_actions_case');
