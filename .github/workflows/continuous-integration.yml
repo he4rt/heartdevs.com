@@ -57,7 +57,7 @@ jobs:
           echo "key=${combined_key}" >> "$GITHUB_OUTPUT"
 
       - name: Setup PHP
-        uses: shivammathur/setup-php@7c071dfe9dc99bdf297fa79cb49ea005b9fcadbc # v2.37.1
+        uses: shivammathur/setup-php@f3e473d116dcccaddc5834248c87452386958240 # v2.37.2
         with:
           php-version: ${{ steps.setup.outputs.PHP_VERSION }}
           extensions: ${{ steps.setup.outputs.PHP_EXTENSIONS }}
