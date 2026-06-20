@@ -38,7 +38,7 @@ jobs:
         env:
           POSTGRES_USER: postgres
           POSTGRES_PASSWORD: postgres
-          POSTGRES_DB: test_he4rtbot
+          POSTGRES_DB: test_heartdevs
         ports:
           - 5432/tcp
         options: >-
