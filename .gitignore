@@ -3,7 +3,6 @@
 .env
 .env.backup
 .env.production
-.env.testing
 .phpactor.json
 .phpstorm.meta.php
 .phpunit.result.cache
@@ -29,11 +28,10 @@
 /storage/*.key
 /storage/debugbar
 /storage/pail
-/storage/private/dumps
 /vendor
 Homestead.json
 Homestead.yaml
-Makefile.local
+*.local
 Thumbs.db
 _ide_helper.php
 _ide_helper_models.php

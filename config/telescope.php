@@ -35,7 +35,7 @@ return [
     |
     */
 
-    'enabled' => env('TELESCOPE_ENABLED', false),
+    'enabled' => (bool) env('TELESCOPE_ENABLED', default: false),
 
     /*
     |--------------------------------------------------------------------------
@@ -78,7 +78,7 @@ return [
 
     'storage' => [
         'database' => [
-            'connection' => env('DB_CONNECTION', 'mysql'),
+            'connection' => env('DB_CONNECTION', 'sqlite'),
             'chunk' => 1_000,
         ],
     ],
@@ -154,77 +154,74 @@ return [
     */
 
     'watchers' => [
-        BatchWatcher::class => env('TELESCOPE_BATCH_WATCHER', true),
+        BatchWatcher::class => env('TELESCOPE_BATCH_WATCHER', default: true),
 
         CacheWatcher::class => [
-            'enabled' => env('TELESCOPE_CACHE_WATCHER', true),
+            'enabled' => env('TELESCOPE_CACHE_WATCHER', default: true),
             'hidden' => [],
             'ignore' => [],
         ],
 
-        ClientRequestWatcher::class => [
-            'enabled' => env('TELESCOPE_CLIENT_REQUEST_WATCHER', true),
-            'ignore_hosts' => [],
-        ],
+        ClientRequestWatcher::class => env('TELESCOPE_CLIENT_REQUEST_WATCHER', default: true),
 
         CommandWatcher::class => [
-            'enabled' => env('TELESCOPE_COMMAND_WATCHER', true),
+            'enabled' => env('TELESCOPE_COMMAND_WATCHER', default: true),
             'ignore' => [],
         ],
 
         DumpWatcher::class => [
-            'enabled' => env('TELESCOPE_DUMP_WATCHER', true),
-            'always' => env('TELESCOPE_DUMP_WATCHER_ALWAYS', false),
+            'enabled' => env('TELESCOPE_DUMP_WATCHER', default: true),
+            'always' => env('TELESCOPE_DUMP_WATCHER_ALWAYS', default: false),
         ],
 
         EventWatcher::class => [
-            'enabled' => env('TELESCOPE_EVENT_WATCHER', true),
+            'enabled' => env('TELESCOPE_EVENT_WATCHER', default: true),
             'ignore' => [],
         ],
 
-        ExceptionWatcher::class => env('TELESCOPE_EXCEPTION_WATCHER', true),
+        ExceptionWatcher::class => env('TELESCOPE_EXCEPTION_WATCHER', default: true),
 
         GateWatcher::class => [
-            'enabled' => env('TELESCOPE_GATE_WATCHER', true),
+            'enabled' => env('TELESCOPE_GATE_WATCHER', default: true),
             'ignore_abilities' => [],
             'ignore_packages' => true,
             'ignore_paths' => [],
         ],
 
-        JobWatcher::class => env('TELESCOPE_JOB_WATCHER', true),
+        JobWatcher::class => env('TELESCOPE_JOB_WATCHER', default: true),
 
         LogWatcher::class => [
-            'enabled' => env('TELESCOPE_LOG_WATCHER', true),
-            'level' => 'error',
+            'enabled' => env('TELESCOPE_LOG_WATCHER', default: true),
+            'level' => 'debug',
         ],
 
-        MailWatcher::class => env('TELESCOPE_MAIL_WATCHER', true),
+        MailWatcher::class => env('TELESCOPE_MAIL_WATCHER', default: true),
 
         ModelWatcher::class => [
-            'enabled' => env('TELESCOPE_MODEL_WATCHER', true),
+            'enabled' => env('TELESCOPE_MODEL_WATCHER', default: true),
             'events' => ['eloquent.*'],
             'hydrations' => true,
         ],
 
-        NotificationWatcher::class => env('TELESCOPE_NOTIFICATION_WATCHER', true),
+        NotificationWatcher::class => env('TELESCOPE_NOTIFICATION_WATCHER', default: true),
 
         QueryWatcher::class => [
-            'enabled' => env('TELESCOPE_QUERY_WATCHER', true),
+            'enabled' => env('TELESCOPE_QUERY_WATCHER', default: true),
             'ignore_packages' => true,
             'ignore_paths' => [],
             'slow' => 100,
         ],
 
-        RedisWatcher::class => env('TELESCOPE_REDIS_WATCHER', true),
+        RedisWatcher::class => env('TELESCOPE_REDIS_WATCHER', default: true),
 
         RequestWatcher::class => [
-            'enabled' => env('TELESCOPE_REQUEST_WATCHER', true),
+            'enabled' => env('TELESCOPE_REQUEST_WATCHER', default: true),
             'size_limit' => env('TELESCOPE_RESPONSE_SIZE_LIMIT', 64),
             'ignore_http_methods' => [],
             'ignore_status_codes' => [],
         ],
 
-        ScheduleWatcher::class => env('TELESCOPE_SCHEDULE_WATCHER', true),
-        ViewWatcher::class => env('TELESCOPE_VIEW_WATCHER', true),
+        ScheduleWatcher::class => env('TELESCOPE_SCHEDULE_WATCHER', default: true),
+        ViewWatcher::class => env('TELESCOPE_VIEW_WATCHER', default: true),
     ],
 ];

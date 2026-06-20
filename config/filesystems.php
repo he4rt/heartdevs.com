@@ -57,7 +57,7 @@ return [
             'bucket' => env('AWS_BUCKET'),
             'url' => env('AWS_URL'),
             'endpoint' => env('AWS_ENDPOINT'),
-            'use_path_style_endpoint' => env('AWS_USE_PATH_STYLE_ENDPOINT', false),
+            'use_path_style_endpoint' => env('AWS_USE_PATH_STYLE_ENDPOINT', default: false),
             'throw' => false,
             'report' => false,
         ],
@@ -70,7 +70,7 @@ return [
             'url' => env('CLOUDFLARE_R2_URL'),
             'visibility' => 'private',
             'endpoint' => env('CLOUDFLARE_R2_ENDPOINT'),
-            'use_path_style_endpoint' => env('CLOUDFLARE_R2_USE_PATH_STYLE_ENDPOINT', false),
+            'use_path_style_endpoint' => env('CLOUDFLARE_R2_USE_PATH_STYLE_ENDPOINT', default: false),
             'throw' => false,
         ],
 

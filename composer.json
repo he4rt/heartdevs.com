@@ -13,7 +13,7 @@
         "dedoc/scramble": "^0.13.28",
         "filament/filament": "^5.6.7",
         "filament/spatie-laravel-media-library-plugin": "^5.6.7",
-        "guzzlehttp/guzzle": "^7.11.2",
+        "guzzlehttp/guzzle": "^7.12.1",
         "he4rt/activity": ">=1",
         "he4rt/bot-discord": ">=1.0",
         "he4rt/community": ">=1",
@@ -41,12 +41,11 @@
         "laravel/telescope": "^5.20.0",
         "laravel/tinker": "^3.0.2",
         "league/flysystem-sftp-v3": "^3.33.0",
-        "livewire/flux": "^2.14.1",
+        "livewire/flux": "^2.15.0",
         "marvinlabs/laravel-discord-logger": "^1.4.4",
         "monicahq/laravel-cloudflare": "^4.1",
         "owenvoke/blade-fontawesome": "^3.2.2",
         "phiki/phiki": "^2.2",
-        "predis/predis": "^3.5.1",
         "ryangjchandler/commonmark-blade-block": "^1.1.1",
         "saloonphp/saloon": "^4.0",
         "spatie/laravel-backup": "^10.3.0",
@@ -74,7 +73,7 @@
         "pestphp/pest-plugin-laravel": "^4.1.0",
         "pestphp/pest-plugin-livewire": "^4.1.0",
         "phpstan/extension-installer": "^1.4.3",
-        "rector/rector": "^2.4.5"
+        "rector/rector": "^2.4.6"
     },
     "autoload": {
         "psr-4": {
@@ -148,7 +147,8 @@
     "extra": {
         "laravel": {
             "dont-discover": [
-                "barryvdh/laravel-debugbar"
+                "barryvdh/laravel-debugbar",
+                "laravel/telescope"
             ]
         }
     },
@@ -161,6 +161,10 @@
             "pestphp/pest-plugin": true,
             "php-http/discovery": true,
             "phpstan/extension-installer": true
+        },
+        "audit": {
+            "abandoned": "report",
+            "block-insecure": false
         }
     },
     "minimum-stability": "dev",

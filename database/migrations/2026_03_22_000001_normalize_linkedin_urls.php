@@ -101,7 +101,7 @@ return new class extends Migration
 
     private function isJunk(string $lower): bool
     {
-        if (in_array($lower, self::JUNK_EXACT, true)) {
+        if (in_array($lower, self::JUNK_EXACT, strict: true)) {
             return true;
         }
 
@@ -120,7 +120,7 @@ return new class extends Migration
 
         if (preg_match('#^https?://(?:www\.)?linkedin\.com/([\w\-]{3,})$#', $lower, $m)) {
             $path = $m[1];
-            if (!in_array($path, ['feed', 'jobs', 'company', 'me', 'messaging', 'notifications', 'search'], true)) {
+            if (!in_array($path, ['feed', 'jobs', 'company', 'me', 'messaging', 'notifications', 'search'], strict: true)) {
                 return 'https://linkedin.com/in/'.$path;
             }
         }

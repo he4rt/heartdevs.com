@@ -70,7 +70,7 @@ return new class extends Migration
 
     private function isJunk(string $lower): bool
     {
-        if (in_array($lower, self::JUNK_EXACT, true)) {
+        if (in_array($lower, self::JUNK_EXACT, strict: true)) {
             return true;
         }
 

@@ -84,7 +84,7 @@ final class AppServiceProvider extends ServiceProvider
 
     private function registerDebugbar(): void
     {
-        if ($this->app->isLocal() && class_exists(\Barryvdh\Debugbar\ServiceProvider::class)) {
+        if ($this->app->isLocal() && class_exists(\Fruitcake\LaravelDebugbar\ServiceProvider::class)) {
             $this->app->register(DebugbarServiceProvider::class);
         }
     }

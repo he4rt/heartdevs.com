@@ -14,7 +14,7 @@ return [
     |
     */
 
-    'enabled' => (bool) env('LARAVEL_CLOUDFLARE_ENABLED', true),
+    'enabled' => (bool) env('LARAVEL_CLOUDFLARE_ENABLED', default: true),
 
     /*
     |--------------------------------------------------------------------------
@@ -25,7 +25,7 @@ return [
     |
     */
 
-    'replace_ip' => (bool) env('LARAVEL_CLOUDFLARE_REPLACE_IP', false),
+    'replace_ip' => (bool) env('LARAVEL_CLOUDFLARE_REPLACE_IP', default: false),
 
     /*
     |--------------------------------------------------------------------------
