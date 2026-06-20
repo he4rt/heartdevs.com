@@ -84,11 +84,9 @@ jobs:
       - name: Install node dependencies
         run: |
           npm ci
-          npm run build
 
-      - name: Copy .env file
-        run: |
-          cp .env.testing.example .env.testing
+      - name: Build Assets
+        run: npm run build
 
       - name: Run Tests
         env:
