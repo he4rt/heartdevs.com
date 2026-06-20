@@ -1,8 +1,8 @@
 @props (['startsAt', 'endsAt', 'title', 'icon', 'speakers'])
 
 @php
-    /** @var \Carbon\Carbon $startsAt */
-    /** @var \Carbon\Carbon $endsAt */
+    /** @var \Carbon\CarbonInterface $startsAt */
+    /** @var \Carbon\CarbonInterface $endsAt */
 
     $startsAt = $startsAt->timezone(config('app.display_timezone'));
     $endsAt = $endsAt->timezone(config('app.display_timezone'));
