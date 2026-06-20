@@ -11,6 +11,7 @@ use Filament\Facades\Filament;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Notifications\Notification;
+use Filament\Resources\Pages\PageRegistration;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
@@ -66,7 +67,7 @@ class GithubRepositoryResource extends Resource
                 ->unique(ignoreRecord: true, modifyRuleUsing: fn (Unique $rule): Unique => $rule->where('tenant_id', Filament::getTenant()?->getKey())),
             Toggle::make('enabled')
                 ->label('Habilitado')
-                ->default(true),
+                ->default(state: true),
         ]);
     }
 
@@ -115,6 +116,9 @@ class GithubRepositoryResource extends Resource
             });
     }
 
+    /**
+     * @return array<string, PageRegistration>
+     */
     public static function getPages(): array
     {
         return [

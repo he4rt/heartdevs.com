@@ -9,8 +9,12 @@ use He4rt\Identity\User\Models\User;
 use He4rt\Profile\Actions\UpsertProfile;
 use He4rt\Profile\DTOs\UpsertProfileDTO;
 use He4rt\Profile\Models\Profile;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 
+/**
+ * @return array<string, User|Collection<int, User>|Collection<int, Tenant>|Tenant|Collection<int, Profile>|Profile>
+ */
 function createEditProfileScenario(array $profileOverrides = []): array
 {
     $user = User::factory()->create(['name' => 'OldName']);

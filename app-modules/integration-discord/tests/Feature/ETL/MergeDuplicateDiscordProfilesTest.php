@@ -6,10 +6,14 @@ use He4rt\Identity\ExternalIdentity\Enums\IdentityProvider;
 use He4rt\Identity\ExternalIdentity\Models\ExternalIdentity;
 use He4rt\Identity\Tenant\Models\Tenant;
 use He4rt\Identity\User\Models\User;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\DB;
 use Ramsey\Uuid\Uuid;
 
+/**
+ * @return array<int, User|Collection<int, User>|ExternalIdentity|Collection<int, ExternalIdentity>>
+ */
 function makeImportedDup(Tenant $tenant, string $discordId, string $username, array $metadataExtras = []): array
 {
     $newUser = User::factory()->create([

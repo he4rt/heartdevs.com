@@ -7,6 +7,9 @@ use He4rt\IntegrationTwitch\Models\TwitchEventLog;
 use Illuminate\Support\Str;
 use Illuminate\Testing\TestResponse;
 
+/**
+ * @return array<string, array<string, array<string, string>|string>|array<string, string>>
+ */
 function twitchWebhookPayload(string $eventType = 'stream.online', string $messageType = 'notification'): array
 {
     return [
@@ -32,6 +35,9 @@ function twitchWebhookPayload(string $eventType = 'stream.online', string $messa
     ];
 }
 
+/**
+ * @return array<string, string>
+ */
 function signedTwitchHeaders(string $body, string $messageType = 'notification', ?string $messageId = null, ?string $timestamp = null): array
 {
     $messageId ??= (string) Str::uuid();
@@ -87,7 +93,7 @@ test('rejects request with expired timestamp', function (): void {
     $body = json_encode($payload);
     $timestamp = now()->subMinutes(11)->toIso8601String();
 
-    $headers = signedTwitchHeaders($body, 'notification', null, $timestamp);
+    $headers = signedTwitchHeaders($body, 'notification', timestamp: $timestamp);
 
     $this->postJson('/api/webhooks/twitch/eventsub/'.$this->tenant->slug, $payload, $headers)
         ->assertStatus(403);

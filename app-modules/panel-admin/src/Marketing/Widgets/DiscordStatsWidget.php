@@ -16,6 +16,9 @@ class DiscordStatsWidget extends StatsOverviewWidget
 
     protected int|string|array $columnSpan = 'full';
 
+    /**
+     * @return Stat[]
+     */
     protected function getStats(): array
     {
         $stats = new PeriodStats(14)->statCards();

@@ -10,6 +10,9 @@ use Illuminate\Support\Sleep;
 use Saloon\Http\Faking\MockClient;
 use Saloon\Http\Faking\MockResponse;
 
+/**
+ * @return array<string, string|int|array<string, string>>
+ */
 function makeInvite(string $code, int $maxAge, int $uses, string $channel = 'general', string $inviter = 'alice'): array
 {
     return [

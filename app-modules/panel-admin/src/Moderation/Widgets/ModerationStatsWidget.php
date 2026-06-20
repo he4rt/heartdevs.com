@@ -23,6 +23,9 @@ class ModerationStatsWidget extends StatsOverviewWidget
 
     protected int|string|array $columnSpan = 'full';
 
+    /**
+     * @return Stat[]
+     */
     protected function getStats(): array
     {
         $start = $this->periodStart();

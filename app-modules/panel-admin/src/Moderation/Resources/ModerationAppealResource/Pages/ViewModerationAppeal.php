@@ -41,6 +41,9 @@ class ViewModerationAppeal extends ViewRecord
         ]);
     }
 
+    /**
+     * @return Action[]
+     */
     protected function getHeaderActions(): array
     {
         return [

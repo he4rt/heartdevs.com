@@ -70,6 +70,9 @@ class ViewModerationCase extends ViewRecord
         ]);
     }
 
+    /**
+     * @return Action[]
+     */
     protected function getHeaderActions(): array
     {
         return [

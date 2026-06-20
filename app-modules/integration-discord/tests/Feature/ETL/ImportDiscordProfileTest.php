@@ -10,6 +10,9 @@ use He4rt\IntegrationDiscord\ETL\Actions\ImportDiscordProfileAction;
 use He4rt\IntegrationDiscord\ETL\DTOs\ConnectedAccountDTO;
 use He4rt\IntegrationDiscord\ETL\DTOs\DiscordProfileDTO;
 
+/**
+ * @param  array<string, mixed>  $overrides
+ */
 function discordProfile(array $overrides = []): array
 {
     $default = [
