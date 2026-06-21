@@ -464,7 +464,7 @@ class ImportDiscordMessagesCommand extends Command
             static function (string $dir) use ($needles): bool {
                 $name = basename($dir);
 
-                return array_any($needles, fn ($needle) => str_contains($name, $needle));
+                return array_any($needles, fn (string $needle) => str_contains($name, $needle));
             },
         ));
     }

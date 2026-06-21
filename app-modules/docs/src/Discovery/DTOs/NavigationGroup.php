@@ -35,7 +35,7 @@ final readonly class NavigationGroup
             return false;
         }
 
-        return array_all($this->subgroups, fn ($subgroup) => $subgroup->isEmpty());
+        return array_all($this->subgroups, fn (NavigationGroup $subgroup) => $subgroup->isEmpty());
     }
 
     /**

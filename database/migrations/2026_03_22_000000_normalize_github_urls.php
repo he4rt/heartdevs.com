@@ -74,7 +74,7 @@ return new class extends Migration
             return true;
         }
 
-        return array_any(self::JUNK_KEYWORDS, fn ($keyword) => str_contains($lower, (string) $keyword));
+        return array_any(self::JUNK_KEYWORDS, fn (string $keyword) => str_contains($lower, $keyword));
     }
 
     private function tryFixUrl(string $lower): ?string
