@@ -11,6 +11,6 @@ it('responde 200 na home', function (): void {
 it('exibe o logo He4rt animado no hero', function (): void {
     get('/')
         ->assertOk()
-        ->assertSee('he4rt-logo', false)
-        ->assertSee('class="led', false);
+        ->assertSee('he4rt-logo', escape: false)
+        ->assertSee('class="led', escape: false);
 });
