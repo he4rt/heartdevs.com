@@ -17,7 +17,7 @@ final class SocialLinksPage extends Component
     /**
      * @return list<SocialLink>
      */
-    public function links(): array
+    public static function links(): array
     {
         return [
             new SocialLink('Discord', 'https://discord.gg/invite/he4rt', 'fab-discord', '#5865F2'),
@@ -31,7 +31,7 @@ final class SocialLinksPage extends Component
     public function render(): View
     {
         return view('portal::social-links', [
-            'links' => $this->links(),
+            'links' => self::links(),
         ]);
     }
 }
