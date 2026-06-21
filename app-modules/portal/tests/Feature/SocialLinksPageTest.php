@@ -35,3 +35,14 @@ it('abre cada link externo em nova aba com rel seguro', function (): void {
     expect(mb_substr_count($html, 'target="_blank"'))->toBe(6);
     expect(mb_substr_count($html, 'rel="noopener noreferrer"'))->toBe(6);
 });
+
+it('exibe a linha de batimento (ECG) animada', function (): void {
+    get('/redes')->assertSee('links-ecg', false);
+});
+
+it('exibe a tagline e o acento de marca de cada link', function (): void {
+    $html = get('/redes')->getContent();
+
+    expect($html)->toContain('Conecte-se com a comunidade He4rt Devs');
+    expect(mb_substr_count($html, '--accent:'))->toBe(6);
+});
