@@ -1,6 +1,9 @@
-<section class="hp-section relative" id="community">
-    <div class="absolute -z-1 flex h-full w-full p-8 sm:p-16">
-        <img src="{{ asset('images/landingLogo.svg') }}" alt="Logo" class="h-full w-full" />
+<section class="hp-section relative min-h-[calc(100svh-6rem)]!" id="community">
+    <div
+        class="pointer-events-none absolute -z-1 flex h-full w-full items-center justify-center overflow-hidden p-8 opacity-40 sm:p-16"
+        aria-hidden="true"
+    >
+        <x-portal::animated-logo class="w-full max-w-5xl" />
     </div>
     <div class="hp-container">
         <div class="grid grid-cols-1 gap-8 lg:grid-cols-2 lg:gap-12">

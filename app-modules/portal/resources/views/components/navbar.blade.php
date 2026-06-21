@@ -5,6 +5,7 @@
         ['label' => 'Projetos', 'anchor' => '#projects'],
         ['label' => 'Depoimentos', 'anchor' => '#testimonials'],
         ['label' => 'Contato', 'anchor' => '#contact'],
+        ['label' => 'Redes sociais', 'anchor' => route('social-links', absolute: false)],
     ];
 @endphp
 
@@ -26,6 +27,18 @@
         <div class="flex items-center gap-4">
             <x-he4rt::button href="/app" size="sm" variant="outline" class="hidden md:inline-flex">
                 Área do Usuário
+            </x-he4rt::button>
+
+            <x-he4rt::button
+                :href="route('social-links')"
+                size="xs"
+                icon="heroicon-s-link"
+                iconPosition="leading"
+                iconOnly
+                aria-label="Redes sociais"
+                class="w-auto! md:hidden"
+            >
+                Redes sociais
             </x-he4rt::button>
 
             <x-he4rt::button

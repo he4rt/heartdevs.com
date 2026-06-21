@@ -25,7 +25,6 @@ final class SocialLinksPage extends Component
             new SocialLink('LinkedIn', 'https://www.linkedin.com/company/he4rt/', 'fab-linkedin', '#0A66C2'),
             new SocialLink('WhatsApp', 'https://chat.whatsapp.com/EBKjYxIodpe1x5LLExbTzK', 'fab-whatsapp', '#25D366'),
             new SocialLink('GitHub', 'https://github.com/he4rt', 'fab-github', '#FFFFFF'),
-            new SocialLink('Site oficial', 'https://heartdevs.com/', 'fas-globe', '#782BF1'),
         ];
     }
 
