@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use He4rt\Activity\Message\Enums\MembershipEventKind;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\DB;
@@ -50,7 +51,7 @@ return new class extends Migration
             $table->uuid('id')->primary();
             $table->foreignUuid('tenant_id')->constrained('tenants');
             $table->foreignUuid('external_identity_id')->constrained('external_identities');
-            $table->string('kind');
+            $table->string('kind')->comment(MembershipEventKind::stringifyCases());
             $table->timestampTz('occurred_at');
             $table->string('provider_message_id')->nullable();
             $table->jsonb('metadata')->nullable();

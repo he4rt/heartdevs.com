@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use He4rt\Moderation\Enums\ActionType;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -14,7 +15,7 @@ return new class extends Migration
             $table->uuid('id')->primary();
             $table->foreignUuid('case_id')->constrained('moderation_cases')->cascadeOnDelete();
             $table->foreignUuid('moderator_id')->nullable()->constrained('users')->nullOnDelete();
-            $table->string('action_type', 30);
+            $table->string('action_type', 30)->comment(ActionType::stringifyCases());
             $table->jsonb('target_platforms');
             $table->string('duration', 20)->nullable();
             $table->text('reason')->nullable();

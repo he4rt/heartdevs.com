@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use He4rt\IntegrationDiscord\Enums\RoleHistoryAction;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -14,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('discord_member_id')->constrained('discord_members')->cascadeOnDelete();
             $table->foreignId('discord_role_id')->constrained('discord_roles')->cascadeOnDelete();
-            $table->string('action');
+            $table->string('action')->comment(RoleHistoryAction::stringifyCases());
             $table->timestampTz('occurred_at');
             $table->foreignId('source_event_log_id')->nullable()->constrained('discord_event_logs')->nullOnDelete();
             $table->timestampsTz();

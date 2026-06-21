@@ -4,11 +4,14 @@ declare(strict_types=1);
 
 namespace He4rt\IntegrationTwitch\Enums;
 
+use App\Enums\Concerns\StringifyEnum;
 use Filament\Support\Contracts\HasColor;
 use Filament\Support\Contracts\HasLabel;
 
 enum TwitchSubscriptionStatus: string implements HasColor, HasLabel
 {
+    use StringifyEnum;
+
     case Enabled = 'enabled';
     case VerificationPending = 'webhook_callback_verification_pending';
     case VerificationFailed = 'webhook_callback_verification_failed';

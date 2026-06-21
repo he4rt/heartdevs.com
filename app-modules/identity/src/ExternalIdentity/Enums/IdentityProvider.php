@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace He4rt\Identity\ExternalIdentity\Enums;
 
 use App\Contracts\OAuthClientContract;
+use App\Enums\Concerns\StringifyEnum;
 use Filament\Support\Colors\Color;
 use Filament\Support\Contracts\HasColor;
 use Filament\Support\Contracts\HasDescription;
@@ -19,6 +20,8 @@ use He4rt\IntegrationTwitch\OAuth\TwitchOAuthClient;
 
 enum IdentityProvider: string implements HasColor, HasDescription, HasIcon, HasLabel
 {
+    use StringifyEnum;
+
     case Discord = 'discord';
     case Twitch = 'twitch';
     case DevTo = 'devto';

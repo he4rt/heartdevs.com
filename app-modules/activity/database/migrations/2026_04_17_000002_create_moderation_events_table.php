@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use He4rt\Activity\Moderation\Enums\ModerationType;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -15,7 +16,7 @@ return new class extends Migration
             $table->foreignUuid('tenant_id')->constrained('tenants');
             $table->foreignUuid('external_identity_id')->nullable()->constrained('external_identities');
             $table->foreignUuid('moderator_identity_id')->nullable()->constrained('external_identities');
-            $table->string('type');
+            $table->string('type')->comment(ModerationType::stringifyCases());
             $table->text('reason')->nullable();
             $table->foreignUuid('source_identity_id')->nullable()->constrained('external_identities');
             $table->uuid('source_message_id')->nullable();

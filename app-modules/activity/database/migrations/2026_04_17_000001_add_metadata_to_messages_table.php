@@ -2,6 +2,8 @@
 
 declare(strict_types=1);
 
+use He4rt\Activity\Message\Enums\MessageKind;
+use He4rt\Activity\Message\Enums\MessageSourceKind;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -27,9 +29,9 @@ return new class extends Migration
             $table->unsignedInteger('reactions_count')->default(0)->after('metadata');
             $table->unsignedInteger('reactions_total')->default(0)->after('reactions_count');
 
-            $table->string('kind')->nullable()->after('reactions_total');
+            $table->string('kind')->nullable()->after('reactions_total')->comment(MessageKind::stringifyCases());
             $table->smallInteger('raw_message_type')->nullable()->after('kind');
-            $table->string('source_kind')->nullable()->after('raw_message_type');
+            $table->string('source_kind')->nullable()->after('raw_message_type')->comment(MessageSourceKind::stringifyCases());
             $table->boolean('is_pinned')->default(value: false)->after('source_kind');
             $table->boolean('mentions_everyone')->default(value: false)->after('is_pinned');
             $table->smallInteger('mention_role_count')->default(0)->after('mentions_everyone');

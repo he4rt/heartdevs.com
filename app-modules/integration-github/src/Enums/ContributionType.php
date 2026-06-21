@@ -4,8 +4,12 @@ declare(strict_types=1);
 
 namespace He4rt\IntegrationGithub\Enums;
 
+use App\Enums\Concerns\StringifyEnum;
+
 enum ContributionType: string
 {
+    use StringifyEnum;
+
     case Pr = 'pr';
     case Review = 'review';
     case Issue = 'issue';

@@ -4,11 +4,14 @@ declare(strict_types=1);
 
 namespace He4rt\Activity\Moderation\Enums;
 
+use App\Enums\Concerns\StringifyEnum;
 use Filament\Support\Contracts\HasColor;
 use Filament\Support\Contracts\HasLabel;
 
 enum ModerationType: string implements HasColor, HasLabel
 {
+    use StringifyEnum;
+
     case Ban = 'ban';
     case Unban = 'unban';
     case Mute = 'mute';
