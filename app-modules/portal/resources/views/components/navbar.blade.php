@@ -30,7 +30,7 @@
             </x-he4rt::button>
 
             <x-he4rt::button
-                :href="route('social-links')"
+                :href="route('social-links', absolute: false)"
                 size="xs"
                 icon="heroicon-s-link"
                 iconPosition="leading"
