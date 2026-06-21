@@ -16,14 +16,20 @@ use Throwable;
 class VoiceExperienceTask extends Task
 {
     /**
-     * The task interval in seconds.
-     */
-    protected int $interval = 1_200;
-
-    /**
      * Determine if the task handler should execute during boot.
      */
     protected bool $eager = false;
+
+    /**
+     * The task interval in seconds.
+     *
+     * Env-overridable so the cadence can be lowered locally for testing
+     * without affecting production (defaults to 20 minutes).
+     */
+    public function getInterval(): int
+    {
+        return config()->integer('he4rt.discord.voice_xp_interval');
+    }
 
     /**
      * Handle the task.
