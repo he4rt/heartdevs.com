@@ -82,10 +82,6 @@ class VoiceExperienceTask extends Task
 
         $state = $this->resolveVoiceState($voiceState);
 
-        if ($state === VoiceStatesEnum::Disabled) {
-            return;
-        }
-
         $channelId = (string) $voiceState->channel_id;
 
         $dto = new NewVoiceMessageDTO(
