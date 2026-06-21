@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "e5deee0e35a9727b59beda2869045704",
+    "content-hash": "95133fa7d60ae8dcf219057eba69c0fb",
     "packages": [
         {
             "name": "blade-ui-kit/blade-heroicons",
@@ -13533,16 +13533,16 @@
         },
         {
             "name": "team-reflex/discord-php",
-            "version": "v10.48.12",
+            "version": "v10.48.14",
             "source": {
                 "type": "git",
                 "url": "https://github.com/discord-php/DiscordPHP.git",
-                "reference": "3e93b746c1cfb696f45a113cba6c502b821b3b79"
+                "reference": "9bda258acb60ae752eab12c82547f080353d4381"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/discord-php/DiscordPHP/zipball/3e93b746c1cfb696f45a113cba6c502b821b3b79",
-                "reference": "3e93b746c1cfb696f45a113cba6c502b821b3b79",
+                "url": "https://api.github.com/repos/discord-php/DiscordPHP/zipball/9bda258acb60ae752eab12c82547f080353d4381",
+                "reference": "9bda258acb60ae752eab12c82547f080353d4381",
                 "shasum": ""
             },
             "require": {
@@ -13576,8 +13576,10 @@
                 "wyrihaximus/react-cache-redis": "^4.5"
             },
             "suggest": {
+                "discord-php-helpers/voice": "Required for voice support.",
                 "ext-ev": "For a faster, and more performant loop.",
                 "ext-event": "For a faster, and more performant loop.",
+                "ext-ffi": "ForRequired for voice support.",
                 "ext-fileinfo": "For function mime_content_type().",
                 "ext-gmp": "For 64 bit calculations on x86 (32 bit) PHP.",
                 "ext-mbstring": "For accurate calculations of string length when handling non-english characters.",
@@ -13612,7 +13614,7 @@
                 "chat": "https://discord.gg/dphp",
                 "docs": "https://discord-php.github.io/DiscordPHP/",
                 "issues": "https://github.com/discord-php/DiscordPHP/issues",
-                "source": "https://github.com/discord-php/DiscordPHP/tree/v10.48.12",
+                "source": "https://github.com/discord-php/DiscordPHP/tree/v10.48.14",
                 "wiki": "https://github.com/discord-php/DiscordPHP/wiki"
             },
             "funding": [
@@ -13633,7 +13635,7 @@
                     "type": "patreon"
                 }
             ],
-            "time": "2026-06-16T22:47:50+00:00"
+            "time": "2026-06-21T14:47:34+00:00"
         },
         {
             "name": "tijsverkoyen/css-to-inline-styles",
@@ -17312,16 +17314,16 @@
         },
         {
             "name": "rector/rector",
-            "version": "2.4.6",
+            "version": "2.5.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/rectorphp/rector.git",
-                "reference": "9b9e5c76618e4d359f65b54ca2eabcad3d1761ee"
+                "reference": "34a9124ece04df818e6b4be4ecd0a4e23f4c0c64"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/rectorphp/rector/zipball/9b9e5c76618e4d359f65b54ca2eabcad3d1761ee",
-                "reference": "9b9e5c76618e4d359f65b54ca2eabcad3d1761ee",
+                "url": "https://api.github.com/repos/rectorphp/rector/zipball/34a9124ece04df818e6b4be4ecd0a4e23f4c0c64",
+                "reference": "34a9124ece04df818e6b4be4ecd0a4e23f4c0c64",
                 "shasum": ""
             },
             "require": {
@@ -17360,7 +17362,7 @@
             ],
             "support": {
                 "issues": "https://github.com/rectorphp/rector/issues",
-                "source": "https://github.com/rectorphp/rector/tree/2.4.6"
+                "source": "https://github.com/rectorphp/rector/tree/2.5.1"
             },
             "funding": [
                 {
@@ -17368,7 +17370,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2026-06-17T11:56:28+00:00"
+            "time": "2026-06-21T10:28:27+00:00"
         },
         {
             "name": "sebastian/cli-parser",
