@@ -52,3 +52,9 @@ it('expõe o link de Redes sociais na navbar', function (): void {
         ->assertSee('Redes sociais')
         ->assertSee('/redes', false);
 });
+
+it('aplica a animação de entrada (logo desenha + conteúdo em cascata)', function (): void {
+    get('/redes')
+        ->assertSee('links-reveal', false)
+        ->assertSee('links-trace-draw', false);
+});
