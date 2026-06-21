@@ -3,16 +3,15 @@
 declare(strict_types=1);
 
 use Illuminate\Database\Migrations\Migration;
-use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\DB;
 
 return new class extends Migration
 {
+    public $withinTransaction = false;
+
     public function up(): void
     {
-        Schema::table('voice_messages', static function (Blueprint $table): void {
-            // filter by external_identity_id, order by id desc, limit 1.
-            $table->index(['external_identity_id', 'id'], 'voice_messages_external_identity_id_id_index');
-        });
+        // filter by external_identity_id, order by id desc, limit 1.
+        DB::statement('CREATE INDEX CONCURRENTLY IF NOT EXISTS voice_messages_external_identity_id_id_index ON voice_messages (external_identity_id, id)');
     }
 };
