@@ -4,13 +4,11 @@ title: Nossos valores
 order: 4
 ---
 
-> ⚠️ Rascunho — revisar com a comunidade (datas/números/fatos são placeholders).
+
 
 # Nossos valores
 
-Mais do que código, a He4rt Developers é feita de pessoas. Os valores abaixo são
-uma proposta de como enxergamos a convivência na comunidade — e precisam ser
-revisados e aprovados por quem faz a He4rt acontecer.
+Mais do que código, a He4rt Developers é feita de pessoas. Os valores abaixo guiam como vivemos a convivência na comunidade.
 
 ## Acolhimento
 
@@ -32,13 +30,10 @@ aberta, o open source e o crédito a quem contribui.
 
 A He4rt é um espaço para todas as pessoas. Não há lugar para preconceito,
 assédio ou qualquer forma de discriminação.
-[a confirmar: link para o Código de Conduta oficial da comunidade.]
+(https://github.com/he4rt/docs/blob/main/subpage/code-of-conduct.md)
 
 ## Transparência
 
 Decisões importantes são discutidas abertamente com a comunidade. Esta própria
 documentação é um exemplo: tudo aqui pode ser revisado e melhorado.
 
-> Estes valores são um rascunho inicial. A redação final deve sair de uma
-> conversa com a comunidade — possivelmente referenciando um Código de Conduta
-> formal [a confirmar].

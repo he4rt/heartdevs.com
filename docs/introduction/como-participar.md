@@ -4,7 +4,7 @@ title: Como participar
 order: 5
 ---
 
-> ⚠️ Rascunho — revisar com a comunidade (datas/números/fatos são placeholders).
+
 
 # Como participar
 
@@ -15,12 +15,12 @@ passos para fazer parte da comunidade e começar a aprender e construir junto.
 
 O Discord é o ponto de encontro da comunidade. É lá que acontecem as conversas
 do dia a dia, os avisos e as reuniões.
-[a confirmar: link oficial de convite do servidor no Discord.]
+(https://discord.gg/he4rt)
 
 ## 2. Se apresente
 
-Depois de entrar, passe pelo canal de boas-vindas
-**[a confirmar: nome do canal]** e conte um pouco sobre você: o que faz, o que
+Depois de entrar, passe pelo canal de boas-vindas:
+ **apresentações** e conte um pouco sobre você: o que faz, o que
 está estudando e o que te trouxe até aqui. A comunidade adora conhecer gente
 nova.
 
@@ -34,7 +34,7 @@ conhecer pessoas e entrar no ritmo da comunidade. Veja os detalhes na página
 
 A He4rt mantém projetos open source feitos pela comunidade. Você pode contribuir
 com código, documentação, ideias ou ajudando outras pessoas.
-[a confirmar: link para os repositórios / organização no GitHub.]
+(https://github.com/orgs/he4rt/repositories)
 
 ## 5. Conecte sua conta na plataforma
 
@@ -45,8 +45,5 @@ pontos e desbloquear conquistas.
 ## Precisa de ajuda?
 
 Se ficar com qualquer dúvida, pergunte nos canais da comunidade — sempre tem
-alguém disposto a ajudar.
-[a confirmar: canal de suporte / dúvidas.]
-
-> Os links e nomes de canais acima são placeholders. Confirme cada um com a
-> comunidade antes de publicar esta página.
+alguém disposto a ajudar. 
+Canal de suporte / dúvidas: **fórum-de-ajuda**.

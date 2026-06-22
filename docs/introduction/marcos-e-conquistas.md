@@ -4,7 +4,7 @@ title: Marcos e conquistas
 order: 2
 ---
 
-> ⚠️ Rascunho — revisar com a comunidade (datas/números/fatos são placeholders).
+
 
 # Marcos e conquistas
 
@@ -16,33 +16,32 @@ projetos que hoje conectam centenas de pessoas desenvolvedoras pelo Brasil.
 
 A He4rt nasceu da vontade de criar um espaço acolhedor onde quem está começando
 e quem já tem experiência pudessem aprender em conjunto, sem barreiras. O que
-começou como um grupo pequeno [a confirmar: ano de fundação] foi ganhando vida a
+começou como um grupo pequeno 2018 foi ganhando vida a
 cada conversa, live e projeto compartilhado.
 
 ## Linha do tempo
 
-> Os marcos abaixo são exemplos a serem validados com quem viveu cada um deles.
 
-- **[a confirmar: ano]** — Primeiros encontros e formação do núcleo da
+
+- 2018 — Primeiros encontros e formação do núcleo da
   comunidade.
-- **[a confirmar: ano]** — Lançamento do servidor no Discord como ponto central
+- 2018 — Lançamento do servidor no Discord como ponto central
   de convivência.
-- **[a confirmar: ano]** — Início das reuniões semanais abertas a toda a
+- 2018 — Início das reuniões semanais abertas a toda a
   comunidade.
-- **[a confirmar: ano]** — Primeiros projetos open source mantidos pela
+- 2020 — Primeiros projetos open source mantidos pela
   comunidade.
-- **[a confirmar: ano]** — Construção da plataforma he4rtdevs.com e do sistema de
+- 2020 — Construção da plataforma he4rtdevs.com e do sistema de
   gamificação.
 
 ## Em números
 
-> Todos os números abaixo são placeholders e precisam ser confirmados com dados
-> reais antes da publicação.
 
-- **[a confirmar]** pessoas na comunidade.
+
+- 25.040 pessoas na comunidade.
 - **[a confirmar]** reuniões semanais realizadas.
-- **[a confirmar]** projetos open source publicados.
-- **[a confirmar]** contribuidores ativos na plataforma.
+- 39 projetos open source publicados.
+- 21 contribuidores ativos na plataforma.
 
 ## O que vem por aí
 
