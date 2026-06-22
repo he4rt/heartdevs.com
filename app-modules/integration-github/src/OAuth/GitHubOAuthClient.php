@@ -14,6 +14,7 @@ use He4rt\IntegrationGithub\Transport\GitHubApiConnector;
 use He4rt\IntegrationGithub\Transport\GitHubOAuthConnector;
 use He4rt\IntegrationGithub\Transport\Requests\OAuth\ExchangeCodeForToken;
 use He4rt\IntegrationGithub\Transport\Requests\Users\GetCurrentUser;
+use He4rt\IntegrationGithub\Transport\Requests\Users\GetUserEmails;
 
 final readonly class GitHubOAuthClient implements OAuthClientContract
 {
@@ -61,7 +62,34 @@ final readonly class GitHubOAuthClient implements OAuthClientContract
         /** @var array<string, mixed> $userPayload */
         $userPayload = $response->json();
 
+        // GitHub's /user only exposes a *public* email, so it is null when the
+        // user keeps their address private. Recover the primary verified email
+        // from /user/emails (granted by the user:email scope); otherwise login
+        // can't match an existing account by email and forks a duplicate user.
+        if (($userPayload['email'] ?? null) === null) {
+            $userPayload['email'] = $this->resolvePrimaryEmail($credentials->accessToken);
+        }
+
         return GitHubOAuthUserDTO::make($credentials, $userPayload);
+    }
+
+    private function resolvePrimaryEmail(string $accessToken): ?string
+    {
+        $response = $this->apiConnector->send(new GetUserEmails(
+            accessToken: $accessToken,
+        ));
+
+        if (!$response->ok()) {
+            return null;
+        }
+
+        // Only the single primary + verified address identifies the account. A
+        // GitHub user often has several verified emails (work, school, noreply),
+        // so "any verified" could match the wrong one — require both flags.
+        return $response->collect()
+            ->where('primary', operator: true)
+            ->where('verified', operator: true)
+            ->value('email');
     }
 
     private function callbackUrl(): string
