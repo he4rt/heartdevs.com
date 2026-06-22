@@ -10,41 +10,52 @@ use He4rt\Identity\ExternalIdentity\DTOs\ResolveUserProviderDTO;
 use He4rt\Identity\User\Actions\ResolveUserContext;
 use He4rt\Identity\User\Models\User;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log;
-use Throwable;
 
 final readonly class RecordVoicePresence
 {
-    public function persist(RecordVoicePresenceDTO $dto): void
+    /**
+     * Persist every transition of a single voice-state change atomically.
+     *
+     * A channel move emits both a `left` and a `joined`; they must commit
+     * together or not at all, otherwise the presence log is left with an
+     * unpaired row. The transaction rolls back and rethrows on failure — error
+     * logging is the caller's concern (the gateway event boundary).
+     *
+     * @param  list<RecordVoicePresenceDTO>  $dtos
+     */
+    public function persistMany(array $dtos): void
     {
-        try {
-            DB::transaction(static function () use ($dto): void {
-                $userDto = ResolveUserProviderDTO::make([
-                    'tenant_id' => $dto->tenantId,
-                    'provider' => $dto->provider,
-                    'external_account_id' => $dto->externalAccountId,
-                    'model_type' => (new User)->getMorphClass(),
-                    'username' => $dto->username,
-                ]);
-
-                $userContext = resolve(ResolveUserContext::class)->handle($userDto);
-
-                Voice::query()->create([
-                    'tenant_id' => $dto->tenantId,
-                    'external_identity_id' => $userContext->provider->id,
-                    'channel_name' => $dto->channelName,
-                    'channel_id' => $dto->channelId,
-                    'state' => $dto->presence->value,
-                    'obtained_experience' => 0,
-                    'occurred_at' => now()->utc(),
-                ]);
-            });
-        } catch (Throwable $throwable) {
-            Log::channel('bot-discord')->error('RecordVoicePresence failed', [
-                'external_account_id' => $dto->externalAccountId,
-                'tenant_id' => $dto->tenantId,
-                'exception' => $throwable,
-            ]);
+        if ($dtos === []) {
+            return;
         }
+
+        DB::transaction(function () use ($dtos): void {
+            foreach ($dtos as $dto) {
+                $this->record($dto);
+            }
+        });
+    }
+
+    private function record(RecordVoicePresenceDTO $dto): void
+    {
+        $userDto = ResolveUserProviderDTO::make([
+            'tenant_id' => $dto->tenantId,
+            'provider' => $dto->provider,
+            'external_account_id' => $dto->externalAccountId,
+            'model_type' => (new User)->getMorphClass(),
+            'username' => $dto->username,
+        ]);
+
+        $userContext = resolve(ResolveUserContext::class)->handle($userDto);
+
+        Voice::query()->create([
+            'tenant_id' => $dto->tenantId,
+            'external_identity_id' => $userContext->provider->id,
+            'channel_name' => $dto->channelName,
+            'channel_id' => $dto->channelId,
+            'state' => $dto->presence->value,
+            'obtained_experience' => 0,
+            'occurred_at' => now()->utc(),
+        ]);
     }
 }
