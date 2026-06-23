@@ -16,6 +16,9 @@
             width: min(110vh, 150vw);
             max-width: 1100px;
         }
+        .dark .links-logo-bg {
+            opacity: 0.5;
+        }
 
         /* Entrance: the logo outline draws itself once, then the content cascades up. */
         @keyframes links-trace-draw {
@@ -45,18 +48,32 @@
         }
 
         .d-pill {
+            --accent-resolved: var(--accent-light);
             transition:
                 border-color 0.2s,
                 background-color 0.2s,
                 color 0.2s,
-                transform 0.2s;
+                transform 0.2s,
+                box-shadow 0.2s;
+            border-color: color-mix(in srgb, var(--outline-high) 18%, transparent);
+            background-color: color-mix(in srgb, var(--elevation-02dp) 78%, transparent);
+            color: var(--text-high);
             backdrop-filter: blur(6px);
+            box-shadow: 0 18px 40px color-mix(in srgb, var(--text-dark) 8%, transparent);
+        }
+        .dark .d-pill {
+            --accent-resolved: var(--accent-dark, var(--accent-light));
         }
         .d-pill:hover {
-            border-color: var(--accent);
-            color: var(--accent);
-            background-color: color-mix(in srgb, var(--accent) 12%, rgba(11, 10, 16, 0.6));
+            border-color: var(--accent-resolved);
+            color: var(--accent-resolved);
+            background-color: color-mix(
+                in srgb,
+                var(--accent-resolved) 12%,
+                color-mix(in srgb, var(--elevation-02dp) 78%, transparent)
+            );
             transform: scale(1.03);
+            box-shadow: 0 22px 44px color-mix(in srgb, var(--accent-resolved) 16%, transparent);
         }
 
         @media (prefers-reduced-motion: reduce) {
@@ -79,10 +96,10 @@
     <div
         class="relative z-10 mx-auto flex min-h-[calc(100svh-6rem)] w-full max-w-md flex-col items-center justify-center px-6"
     >
-        <p class="links-reveal text-xs font-semibold tracking-[0.3em] text-white/60 uppercase" style="
+        <p class="links-reveal text-text-medium text-xs font-semibold tracking-[0.3em] uppercase" style="
                 --i: 0;
             ">He4rt Devs</p>
-        <h1 class="links-reveal mt-3 text-center text-2xl font-bold text-white" style="--i: 1">Escolha seu canal</h1>
+        <h1 class="links-reveal text-text-high mt-3 text-center text-2xl font-bold" style="--i: 1">Escolha seu canal</h1>
 
         <nav class="mt-8 flex w-full flex-col gap-3" aria-label="Redes sociais da He4rt">
             @foreach ($links as $link)
@@ -90,8 +107,8 @@
                     href="{{ $link->url }}"
                     target="_blank"
                     rel="noopener noreferrer"
-                    style="--accent: {{ $link->accent }}; --i: {{ $loop->index + 2 }}"
-                    class="d-pill links-reveal flex items-center justify-center gap-3 rounded-full border border-white/15 bg-white/5 px-6 py-3.5 font-medium text-white"
+                    style="--accent-light: {{ $link->accent }}; --accent-dark: {{ $link->accentDark ?? $link->accent }}; --i: {{ $loop->index + 2 }}"
+                    class="d-pill links-reveal flex items-center justify-center gap-3 rounded-full border px-6 py-3.5 font-medium"
                 >
                     <x-filament::icon :icon="$link->icon" class="h-5 w-5 shrink-0" />
                     <span>{{ $link->label }}</span>

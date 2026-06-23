@@ -37,9 +37,9 @@
         {{-- a PILL de vidro --}}
         <nav
             :class="scrolled
-                ? 'mt-2 bg-elevation-surface/80 py-2 shadow-lg shadow-black/40'
-                : 'mt-4 bg-elevation-surface/55 py-3 shadow-md shadow-black/20'"
-            class="relative flex items-center justify-between gap-4 rounded-full px-4 ring-1 ring-white/10 backdrop-blur-xl transition-all duration-300 md:px-6"
+                ? 'mt-2 bg-elevation-surface/80 py-2 shadow-lg shadow-zinc-950/12 dark:shadow-black/40'
+                : 'mt-4 bg-elevation-surface/55 py-3 shadow-md shadow-zinc-950/8 dark:shadow-black/20'"
+            class="relative flex items-center justify-between gap-4 rounded-full px-4 ring-1 ring-zinc-950/8 backdrop-blur-xl transition-all duration-300 dark:ring-white/10 md:px-6"
         >
             <x-portal::logo size="sm" />
 
@@ -53,7 +53,7 @@
                             class="group relative rounded-full px-3 py-1.5 text-sm font-medium transition-colors {{ $link['active'] ? 'text-text-high' : 'text-text-medium hover:text-text-high' }}"
                         >
                             <span
-                                class="absolute inset-0 -z-10 rounded-full bg-white/5 transition-opacity {{ $link['active'] ? 'opacity-100' : 'opacity-0 group-hover:opacity-100' }}"
+                                class="absolute inset-0 -z-10 rounded-full bg-zinc-950/5 transition-opacity dark:bg-white/5 {{ $link['active'] ? 'opacity-100' : 'opacity-0 group-hover:opacity-100' }}"
                             ></span>
                             {{ $link['label'] }}
                             @if ($link['active'])
@@ -91,7 +91,7 @@
             <button
                 type="button"
                 @click="open = true"
-                class="text-text-high inline-flex items-center justify-center rounded-full p-2 ring-1 ring-white/10 transition hover:bg-white/5 lg:hidden"
+                class="text-text-high inline-flex items-center justify-center rounded-full p-2 ring-1 ring-zinc-950/8 transition hover:bg-zinc-950/5 dark:ring-white/10 dark:hover:bg-white/5 lg:hidden"
                 :aria-expanded="open.toString()"
                 aria-controls="mobile-drawer"
                 aria-label="Abrir menu"
@@ -122,17 +122,17 @@
         x-transition:leave="transition ease-in duration-200"
         x-transition:leave-start="translate-x-0"
         x-transition:leave-end="translate-x-full"
-        class="bg-elevation-surface/85 fixed inset-y-0 right-0 z-50 flex w-[82%] max-w-sm flex-col gap-6 overflow-y-auto rounded-l-3xl border-l border-white/15 p-6 shadow-2xl shadow-black/50 backdrop-blur-xl lg:hidden"
+        class="bg-elevation-surface/85 fixed inset-y-0 right-0 z-50 flex w-[82%] max-w-sm flex-col gap-6 overflow-y-auto rounded-l-3xl border-l border-zinc-950/10 p-6 shadow-2xl shadow-zinc-950/20 backdrop-blur-xl dark:border-white/15 dark:shadow-black/50 lg:hidden"
         role="dialog"
         aria-modal="true"
         aria-label="Menu de navegação"
     >
-        <div class="flex items-center justify-between border-b border-white/10 pb-4">
+        <div class="flex items-center justify-between border-b border-zinc-950/10 pb-4 dark:border-white/10">
             <span class="text-text-medium text-sm font-semibold tracking-wide">Menu</span>
             <button
                 type="button"
                 @click="open = false"
-                class="text-text-high rounded-full p-2 ring-1 ring-white/10 transition hover:bg-white/5"
+                class="text-text-high rounded-full p-2 ring-1 ring-zinc-950/8 transition hover:bg-zinc-950/5 dark:ring-white/10 dark:hover:bg-white/5"
                 aria-label="Fechar menu"
             >
                 <x-filament::icon icon="heroicon-o-x-mark" class="h-5 w-5" />
@@ -151,7 +151,7 @@
                     x-transition:enter-end="opacity-100 translate-x-0"
                     style="transition-delay: {{ 60 * $i }}ms"
                     @if ($link['active']) aria-current="page" @endif
-                    class="flex items-center justify-between rounded-xl px-3 py-3 text-base font-medium transition-colors {{ $link['active'] ? 'bg-white/5 text-text-high' : 'text-text-medium hover:bg-white/5 hover:text-text-high' }}"
+                    class="flex items-center justify-between rounded-xl px-3 py-3 text-base font-medium transition-colors {{ $link['active'] ? 'bg-zinc-950/5 text-text-high dark:bg-white/5' : 'text-text-medium hover:bg-zinc-950/5 hover:text-text-high dark:hover:bg-white/5' }}"
                 >
                     {{ $link['label'] }}
                     @if ($link['active'])
@@ -162,7 +162,7 @@
         </nav>
 
         {{-- CTAs full-width --}}
-        <div class="mt-auto flex flex-col gap-3 border-t border-white/10 pt-6">
+        <div class="mt-auto flex flex-col gap-3 border-t border-zinc-950/10 pt-6 dark:border-white/10">
             <x-he4rt::button
                 :href="route('social-links', absolute: false)"
                 variant="outline"
@@ -207,7 +207,7 @@
         width: 2px;
         height: 2px;
         border-radius: 9999px;
-        background: #fff;
+        background: color-mix(in srgb, var(--text-high) 45%, transparent);
         opacity: 0.3;
         animation: hpNavbarTwinkle 4s ease-in-out infinite;
         animation-delay: var(--d, 0s);

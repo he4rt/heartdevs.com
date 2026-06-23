@@ -6,6 +6,10 @@ use He4rt\Portal\Livewire\SocialLinksPage;
 
 use function Pest\Laravel\get;
 
+beforeEach(function (): void {
+    $this->withoutVite();
+});
+
 it('responde 200 em /redes', function (): void {
     get('/redes')->assertOk();
 });
@@ -40,7 +44,10 @@ it('exibe o título e o acento de marca de cada link', function (): void {
     $html = get('/redes')->getContent();
 
     expect($html)->toContain('Escolha seu canal');
-    expect(mb_substr_count($html, '--accent:'))->toBe(6);
+    expect(mb_substr_count($html, '--accent-light:'))->toBe(6);
+    expect(mb_substr_count($html, '--accent-dark:'))->toBe(6);
+    expect($html)->toContain('--accent-light: #0F172A; --accent-dark: #FFFFFF;')
+        ->and($html)->toContain('--accent-light: #111827; --accent-dark: #FFFFFF;');
 });
 
 it('expõe o link de Redes sociais na navbar', function (): void {
@@ -54,4 +61,16 @@ it('aplica a animação de entrada (logo desenha + conteúdo em cascata)', funct
     get('/redes')
         ->assertSee('links-reveal', escape: false)
         ->assertSee('links-trace-draw', escape: false);
+});
+
+it('usa cores compatíveis com light mode na página de redes', function (): void {
+    $html = get('/redes')->getContent();
+
+    expect($html)->toContain('text-text-high')
+        ->and($html)->toContain('flex items-center gap-2 text-text-high')
+        ->and($html)->toContain('<span class="text-lg font-bold">He4rt Devs</span>')
+        ->and($html)->toContain('background-color: color-mix(')
+        ->and($html)->not->toContain('text-white/60')
+        ->and($html)->not->toContain('text-white')
+        ->and($html)->not->toContain('bg-white/5 px-6 py-3.5');
 });
