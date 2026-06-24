@@ -159,3 +159,41 @@ it('projeta issues e pushes (commits)', function (): void {
     expect(GithubContribution::query()->where('external_ref', 'issue:10')->exists())->toBeTrue()
         ->and(GithubContribution::query()->where('external_ref', 'commit:sha1')->exists())->toBeTrue();
 });
+
+it('grava no lake mas NÃO projeta contribuição para repo de challenge', function (): void {
+    Event::fake([GithubContributionRecorded::class]);
+
+    GithubRepository::factory()->create([
+        'full_name' => 'he4rt/heartdevs.com',
+        'purpose' => 'challenge',
+    ]);
+
+    postGithubWebhook('pull_request', prWebhookPayload())->assertSuccessful();
+
+    expect(GithubEventLog::query()->count())->toBe(1)
+        ->and(GithubContribution::query()->count())->toBe(0);
+
+    Event::assertNotDispatched(GithubContributionRecorded::class);
+});
+
+it('grava no lake e projeta a contribuição para repo de contributions, emitindo o evento', function (): void {
+    Event::fake([GithubContributionRecorded::class]);
+
+    $repo = GithubRepository::factory()->create([
+        'full_name' => 'he4rt/heartdevs.com',
+        'purpose' => 'contributions',
+    ]);
+
+    postGithubWebhook('pull_request', prWebhookPayload())->assertSuccessful();
+
+    expect(GithubEventLog::query()->count())->toBe(1);
+
+    $contribution = GithubContribution::query()->where('external_ref', 'pr:1')->sole();
+
+    expect($contribution->type)->toBe(ContributionType::Pr)
+        ->and($contribution->tenant_id)->toBe($repo->tenant_id)
+        ->and($contribution->actor_login)->toBe('maria')
+        ->and($contribution->metadata['additions'])->toBe(5);
+
+    Event::assertDispatched(GithubContributionRecorded::class);
+});

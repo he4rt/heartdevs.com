@@ -56,6 +56,7 @@ final readonly class ProjectGithubEvent
         return array_values(GithubRepository::query()
             ->enabled()
             ->where('full_name', $repo)
+            ->where('purpose', 'contributions')
             ->pluck('tenant_id')
             ->map(static fn (mixed $tenantId): string => (string) $tenantId)
             ->all());

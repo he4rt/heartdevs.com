@@ -21,6 +21,7 @@ use Illuminate\Support\Str;
  * @property string $tenant_id
  * @property string $full_name
  * @property bool $enabled
+ * @property string $purpose
  * @property CarbonInterface|null $last_backfilled_at
  * @property CarbonInterface|null $created_at
  * @property CarbonInterface|null $updated_at
