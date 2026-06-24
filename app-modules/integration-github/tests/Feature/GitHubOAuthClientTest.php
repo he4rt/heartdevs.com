@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use He4rt\Identity\Auth\Exceptions\OAuthFlowException;
 use He4rt\Identity\ExternalIdentity\Enums\IdentityProvider;
 use He4rt\IntegrationGithub\OAuth\DTO\GitHubOAuthAccessDTO;
 use He4rt\IntegrationGithub\OAuth\GitHubOAuthClient;
@@ -66,28 +67,34 @@ test('falls back to the primary verified email when /user email is private', fun
     expect($user->email)->toBe('primary@example.com');
 });
 
-test('ignores verified emails that are not primary', function (): void {
+test('hard-fails when no email is primary', function (): void {
     // Several verified addresses (work, school, noreply) but none primary —
-    // none should be picked; only a primary+verified pair counts.
-    $user = githubOAuthClient([
+    // none can be picked, so login must abort instead of forking a duplicate.
+    expect(fn () => githubOAuthClient([
         GetCurrentUser::class => githubUser(['email' => null]),
         GetUserEmails::class => MockResponse::make([
             ['email' => 'noreply@example.com', 'primary' => false, 'verified' => true],
             ['email' => 'school@example.com', 'primary' => false, 'verified' => true],
         ]),
-    ])->getAuthenticatedUser(GitHubOAuthAccessDTO::make(['access_token' => 'tok']));
-
-    expect($user->email)->toBeNull();
+    ])->getAuthenticatedUser(GitHubOAuthAccessDTO::make(['access_token' => 'tok'])))
+        ->toThrow(OAuthFlowException::class);
 });
 
-test('ignores a primary email that is not verified', function (): void {
-    $user = githubOAuthClient([
+test('hard-fails when the primary email is not verified', function (): void {
+    expect(fn () => githubOAuthClient([
         GetCurrentUser::class => githubUser(['email' => null]),
         GetUserEmails::class => MockResponse::make([
             ['email' => 'primary-unverified@example.com', 'primary' => true, 'verified' => false],
             ['email' => 'verified@example.com', 'primary' => false, 'verified' => true],
         ]),
-    ])->getAuthenticatedUser(GitHubOAuthAccessDTO::make(['access_token' => 'tok']));
+    ])->getAuthenticatedUser(GitHubOAuthAccessDTO::make(['access_token' => 'tok'])))
+        ->toThrow(OAuthFlowException::class);
+});
 
-    expect($user->email)->toBeNull();
+test('hard-fails when /user/emails is empty', function (): void {
+    expect(fn () => githubOAuthClient([
+        GetCurrentUser::class => githubUser(['email' => null]),
+        GetUserEmails::class => MockResponse::make([]),
+    ])->getAuthenticatedUser(GitHubOAuthAccessDTO::make(['access_token' => 'tok'])))
+        ->toThrow(OAuthFlowException::class);
 });

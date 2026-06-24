@@ -33,4 +33,12 @@ final class OAuthFlowException extends RuntimeException
     {
         return new self(sprintf('Token exchange failed for "%s": %s', $provider, $error));
     }
+
+    public static function emailUnavailable(string $provider): self
+    {
+        return new self(sprintf(
+            'Could not resolve a primary verified email from "%s"; aborting login to avoid forking a duplicate user.',
+            $provider,
+        ));
+    }
 }

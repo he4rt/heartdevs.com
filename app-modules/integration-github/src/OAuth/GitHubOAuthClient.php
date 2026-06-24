@@ -66,8 +66,11 @@ final readonly class GitHubOAuthClient implements OAuthClientContract
         // user keeps their address private. Recover the primary verified email
         // from /user/emails (granted by the user:email scope); otherwise login
         // can't match an existing account by email and forks a duplicate user.
+        // When even the fallback can't yield a primary+verified address there is
+        // nothing trustworthy to correlate on, so hard-fail instead of forking.
         if (($userPayload['email'] ?? null) === null) {
-            $userPayload['email'] = $this->resolvePrimaryEmail($credentials->accessToken);
+            $userPayload['email'] = $this->resolvePrimaryEmail($credentials->accessToken)
+                ?? throw OAuthFlowException::emailUnavailable('github');
         }
 
         return GitHubOAuthUserDTO::make($credentials, $userPayload);
