@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use He4rt\IntegrationGithub\Enums\ContributionType;
+use He4rt\IntegrationGithub\Enums\PurposeType;
 use He4rt\IntegrationGithub\Events\GithubContributionRecorded;
 use He4rt\IntegrationGithub\Models\GithubContribution;
 use He4rt\IntegrationGithub\Models\GithubEventLog;
@@ -165,7 +166,7 @@ it('grava no lake mas NÃO projeta contribuição para repo de challenge', funct
 
     GithubRepository::factory()->create([
         'full_name' => 'he4rt/heartdevs.com',
-        'purpose' => 'challenge',
+        'purpose' => PurposeType::Challenge->value,
     ]);
 
     postGithubWebhook('pull_request', prWebhookPayload())->assertSuccessful();
@@ -181,7 +182,7 @@ it('grava no lake e projeta a contribuição para repo de contributions, emitind
 
     $repo = GithubRepository::factory()->create([
         'full_name' => 'he4rt/heartdevs.com',
-        'purpose' => 'contributions',
+        'purpose' => PurposeType::Contributions->value,
     ]);
 
     postGithubWebhook('pull_request', prWebhookPayload())->assertSuccessful();
