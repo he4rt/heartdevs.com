@@ -7,6 +7,7 @@ namespace He4rt\IntegrationGithub\Models;
 use Carbon\CarbonInterface;
 use He4rt\Identity\Tenant\Models\Tenant;
 use He4rt\IntegrationGithub\Database\Factories\GithubRepositoryFactory;
+use He4rt\IntegrationGithub\Enums\PurposeType;
 use Illuminate\Database\Eloquent\Attributes\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\Attribute;
