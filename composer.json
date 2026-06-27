@@ -54,7 +54,6 @@
         "symfony/yaml": "^8.1.0"
     },
     "require-dev": {
-        "barryvdh/laravel-ide-helper": "^3.7.0",
         "driftingly/rector-laravel": "^2.5.0",
         "fakerphp/faker": "^1.24.1",
         "fruitcake/laravel-debugbar": "^4.3.0",
@@ -106,19 +105,13 @@
             "@php -r \"file_exists('database/database.sqlite') || touch('database/database.sqlite');\"",
             "@php artisan migrate --graceful --ansi"
         ],
-        "ide-helper": [
-            "@php artisan ide-helper:generate -q",
-            "@php artisan ide-helper:meta -q",
-            "@php artisan ide-helper:models -q -N --dir='app-modules/*/src/Models' --dir='app/Models'"
-        ],
         "setup": [
             "composer install",
             "npm install",
             "composer run-script post-root-package-install",
             "composer run-script post-create-project-cmd",
             "@php artisan key:generate --ansi",
-            "@php artisan storage:link --ansi",
-            "composer run-script ide-helper"
+            "@php artisan storage:link --ansi"
         ],
         "bot": "@php artisan bot:boot",
         "dev": [
