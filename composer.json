@@ -159,7 +159,7 @@
                 "audit": "report"
             },
             "advisories": {
-                "block": false
+                "block": true
             }
         }
     },
