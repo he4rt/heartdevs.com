@@ -63,22 +63,19 @@ class IntroductionCommand extends AbstractSlashCommand
         $this->modal('Apresentar')
             ->id($modalId)
             ->components([
-                TextInput::new('Nome', TextInput::STYLE_SHORT)
-                    ->setCustomId('name')
+                TextInput::new('Nome', TextInput::STYLE_SHORT, 'name')
                     ->setMinLength(2)
                     ->setMaxLength(32)
                     ->setPlaceholder('Fulano de Tal')
                     ->setRequired(required: true),
 
-                TextInput::new('Nickname', TextInput::STYLE_SHORT)
-                    ->setCustomId('nickname')
+                TextInput::new('Nickname', TextInput::STYLE_SHORT, 'nickname')
                     ->setMinLength(2)
                     ->setMaxLength(32)
                     ->setPlaceholder('Fulano123')
                     ->setRequired(required: true),
 
-                TextInput::new('Nos conte um pouco sobre você', TextInput::STYLE_PARAGRAPH)
-                    ->setCustomId('about')
+                TextInput::new('Nos conte um pouco sobre você', TextInput::STYLE_PARAGRAPH, 'about')
                     ->setMinLength(5)
                     ->setMaxLength(500)
                     ->setPlaceholder('Entrei de curioso e acabei gostando do servidor!')
