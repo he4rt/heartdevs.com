@@ -81,6 +81,7 @@
                         size="sm"
                         icon="fab-discord"
                         iconPosition="leading"
+                        class="hp-navbar-static-icon"
                     >
                         Discord
                     </x-he4rt::button>
@@ -173,7 +174,13 @@
                 Redes sociais
             </x-he4rt::button>
             <x-he4rt::button href="/app" variant="outline" block> Área do Usuário </x-he4rt::button>
-            <x-he4rt::button href="https://discord.gg/he4rt" block icon="fab-discord" iconPosition="leading">
+            <x-he4rt::button
+                href="https://discord.gg/he4rt"
+                block
+                icon="fab-discord"
+                iconPosition="leading"
+                class="hp-navbar-static-icon"
+            >
                 Entrar no Discord
             </x-he4rt::button>
         </div>
@@ -230,5 +237,9 @@
         .hp-navbar-star {
             animation: none !important;
         }
+    }
+
+    .hp-navbar-static-icon:hover .hp-button-icon {
+        transform: none;
     }
 </style>

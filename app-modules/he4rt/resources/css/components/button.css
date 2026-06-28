@@ -14,7 +14,7 @@
 }
 
 .hp-button-solid {
-    @apply from-primary to-secondary text-text-high bg-gradient-to-br font-semibold;
+    @apply from-primary to-secondary text-text-light bg-gradient-to-br font-semibold;
 }
 
 .hp-button-outline {
