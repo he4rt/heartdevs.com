@@ -23,7 +23,7 @@ final class WelcomeOnboardingFlow implements OnboardingFlow
 
     public function advance(Onboarding $onboarding): void
     {
-        $onboarding->steps()
+        $advanced = $onboarding->steps()
             ->where('status', OnboardingStepStatus::Pending)->oldest()
             ->first()
             ?->update([
@@ -31,7 +31,7 @@ final class WelcomeOnboardingFlow implements OnboardingFlow
                 'completed_at' => now(),
             ]);
 
-        if ($this->isComplete($onboarding)) {
+        if ($advanced && $onboarding->status !== OnboardingStatus::Completed && $this->isComplete($onboarding)) {
             $onboarding->update([
                 'status' => OnboardingStatus::Completed,
                 'completed_at' => now(),
