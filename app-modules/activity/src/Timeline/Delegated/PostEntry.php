@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace He4rt\Activity\Timeline\Delegated;
 
-use Carbon\Carbon;
+use Carbon\CarbonInterface;
 use He4rt\Activity\Database\Factories\PostEntryFactory;
 use Illuminate\Database\Eloquent\Attributes\Table;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
@@ -17,9 +17,9 @@ use Spatie\MediaLibrary\InteractsWithMedia;
 /**
  * @property string $id
  * @property string $content
- * @property Carbon|null $created_at
- * @property Carbon|null $updated_at
- * @property Carbon|null $deleted_at
+ * @property CarbonInterface|null $created_at
+ * @property CarbonInterface|null $updated_at
+ * @property CarbonInterface|null $deleted_at
  */
 #[Table(name: 'activity_post_entries')]
 final class PostEntry extends Model implements HasMedia

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace He4rt\Activity\Message\Models;
 
-use Carbon\Carbon;
+use Carbon\CarbonInterface;
 use He4rt\Activity\Database\Factories\MessageFactory;
 use He4rt\Activity\Message\Enums\MessageKind;
 use He4rt\Activity\Message\Enums\MessageSourceKind;
@@ -26,7 +26,7 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
  * @property string|null $channel_id
  * @property string $content
  * @property int $obtained_experience
- * @property Carbon|null $sent_at
+ * @property CarbonInterface|null $sent_at
  * @property string $tenant_id
  * @property array<string, mixed>|null $metadata
  * @property int $reactions_count
@@ -37,11 +37,11 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
  * @property bool $is_pinned
  * @property bool $mentions_everyone
  * @property int $mention_role_count
- * @property Carbon|null $edited_at
+ * @property CarbonInterface|null $edited_at
  * @property string|null $reply_to_provider_message_id
  * @property string|null $reply_to_message_id
- * @property Carbon|null $created_at
- * @property Carbon|null $updated_at
+ * @property CarbonInterface|null $created_at
+ * @property CarbonInterface|null $updated_at
  */
 #[Table(name: 'messages')]
 final class Message extends Model

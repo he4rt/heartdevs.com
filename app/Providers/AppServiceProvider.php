@@ -8,9 +8,11 @@ use App\Contracts\Paginator as PaginatorInterface;
 use App\Providers\Tools\DebugbarServiceProvider;
 use App\Providers\Tools\TelescopeServiceProvider;
 use App\Support\Paginator;
+use Carbon\CarbonImmutable;
 use He4rt\Identity\User\Models\User;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\Relation;
+use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\URL;
@@ -72,7 +74,7 @@ final class AppServiceProvider extends ServiceProvider
 
     private function configureDates(): void
     {
-        // Date::use(CarbonImmutable::class);
+        Date::use(CarbonImmutable::class);
     }
 
     private function configureUrl(): void
@@ -82,7 +84,7 @@ final class AppServiceProvider extends ServiceProvider
 
     private function registerDebugbar(): void
     {
-        if ($this->app->isLocal() && class_exists(\Barryvdh\Debugbar\ServiceProvider::class)) {
+        if ($this->app->isLocal() && class_exists(\Fruitcake\LaravelDebugbar\ServiceProvider::class)) {
             $this->app->register(DebugbarServiceProvider::class);
         }
     }

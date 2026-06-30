@@ -14,7 +14,7 @@
 }
 
 .hp-button-solid {
-    @apply from-primary to-secondary text-text-high bg-gradient-to-br font-semibold;
+    @apply from-primary to-secondary text-text-light bg-gradient-to-br font-semibold;
 }
 
 .hp-button-outline {
@@ -109,6 +109,6 @@
     @apply absolute inline-flex items-center justify-center;
 }
 
-.hp-button:hover .hp-button-icon {
+.hp-button:not(.hp-button-icon-only):hover .hp-button-icon {
     @apply translate-x-0.5;
 }

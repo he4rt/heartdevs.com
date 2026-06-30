@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace He4rt\Activity\Message\Models;
 
-use Carbon\Carbon;
+use Carbon\CarbonInterface;
 use He4rt\Activity\Message\Enums\MembershipEventKind;
 use He4rt\Identity\ExternalIdentity\Models\ExternalIdentity;
 use He4rt\Identity\Tenant\Models\Tenant;
@@ -18,11 +18,11 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property string $tenant_id
  * @property string $external_identity_id
  * @property string $kind
- * @property Carbon $occurred_at
+ * @property CarbonInterface $occurred_at
  * @property string|null $provider_message_id
  * @property array<string, mixed>|null $metadata
- * @property Carbon|null $created_at
- * @property Carbon|null $updated_at
+ * @property CarbonInterface|null $created_at
+ * @property CarbonInterface|null $updated_at
  */
 #[Table(name: 'membership_events')]
 final class MembershipEvent extends Model

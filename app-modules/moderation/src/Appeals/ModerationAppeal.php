@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace He4rt\Moderation\Appeals;
 
-use Carbon\Carbon;
+use Carbon\CarbonInterface;
 use He4rt\Identity\Tenant\Models\Tenant;
 use He4rt\Identity\User\Models\User;
 use He4rt\Moderation\Database\Factories\ModerationAppealFactory;
@@ -26,10 +26,10 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property AppealStatus $status
  * @property string|null $reviewer_id
  * @property string|null $reviewer_notes
- * @property Carbon|null $resolved_at
- * @property Carbon $sla_deadline
+ * @property CarbonInterface|null $resolved_at
+ * @property CarbonInterface $sla_deadline
  * @property string|null $tenant_id
- * @property Carbon $created_at
+ * @property CarbonInterface $created_at
  */
 #[Table('moderation_appeals', timestamps: false)]
 #[UseFactory(ModerationAppealFactory::class)]

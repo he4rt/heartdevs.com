@@ -24,7 +24,7 @@ describe('DiscoverDocumentSourcesAction (real repository)', static function (): 
 describe('DocumentRegistry caching', static function (): void {
     beforeEach(function (): void {
         config()->set('cache.default', 'array');
-        config()->set('docs.cache.enabled', true);
+        config()->set('docs.cache.enabled', value: true);
         config()->set('docs.cache.ttl', 60);
         Cache::flush();
     });

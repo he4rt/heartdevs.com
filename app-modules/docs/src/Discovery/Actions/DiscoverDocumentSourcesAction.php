@@ -70,7 +70,7 @@ final readonly class DiscoverDocumentSourcesAction
         $contextMap = $basePath.'/CONTEXT-MAP.md';
 
         if (is_file($contextMap)) {
-            $sources[] = new DocumentSource(new SplFileInfo($contextMap), null);
+            $sources[] = new DocumentSource(new SplFileInfo($contextMap), moduleName: null);
         }
 
         $docsPath = $basePath.'/docs';
@@ -80,7 +80,7 @@ final readonly class DiscoverDocumentSourcesAction
                 ->path(['introduction', 'adr', 'specs', 'plans', 'prd', 'superpowers']);
 
             foreach ($finder as $file) {
-                $sources[] = new DocumentSource($file, null);
+                $sources[] = new DocumentSource($file, moduleName: null);
             }
         }
 
@@ -93,7 +93,7 @@ final readonly class DiscoverDocumentSourcesAction
             $guides = new Finder()->files()->in($guidesPath)->name('*.md');
 
             foreach ($guides as $file) {
-                $sources[] = new DocumentSource($file, null);
+                $sources[] = new DocumentSource($file, moduleName: null);
             }
         }
     }

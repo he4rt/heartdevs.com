@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace He4rt\Activity\Timeline;
 
+use Carbon\CarbonInterface;
 use He4rt\Activity\Database\Factories\TimelineFactory;
 use He4rt\Activity\Reaction\Concerns\HasReactions;
 use He4rt\Identity\Tenant\Models\Tenant;
@@ -15,7 +16,6 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
-use Illuminate\Support\Carbon;
 
 /**
  * @property string $id
@@ -28,8 +28,8 @@ use Illuminate\Support\Carbon;
  * @property bool $is_ignored
  * @property bool $pinned
  * @property int $views
- * @property Carbon $created_at
- * @property Carbon $updated_at
+ * @property CarbonInterface $created_at
+ * @property CarbonInterface $updated_at
  */
 #[Table(name: 'activity_timeline')]
 final class Timeline extends Model

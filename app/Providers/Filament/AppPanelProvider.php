@@ -34,7 +34,7 @@ class AppPanelProvider extends PanelProvider
             ->id($this->panelId->value)
             ->path($this->panelId->value)
             ->login(LoginPage::class)
-            ->topbar(false)
+            ->topbar(condition: false)
             ->colors([
                 'primary' => Color::Purple,
                 'gray' => Color::Zinc,

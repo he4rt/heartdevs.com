@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace He4rt\Moderation\Cases\Models;
 
-use Carbon\Carbon;
+use Carbon\CarbonInterface;
 use He4rt\Identity\User\Models\User;
 use He4rt\Moderation\Database\Factories\ModerationReportFactory;
 use He4rt\Moderation\Enums\Platform;
@@ -23,7 +23,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property ViolationType $reason
  * @property string|null $details
  * @property Platform $platform
- * @property Carbon $created_at
+ * @property CarbonInterface $created_at
  */
 #[Table('moderation_reports', timestamps: false)]
 #[UseFactory(ModerationReportFactory::class)]

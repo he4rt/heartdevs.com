@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace He4rt\Moderation\Audit;
 
-use Carbon\Carbon;
+use Carbon\CarbonInterface;
 use Illuminate\Database\Eloquent\Attributes\Table;
 use Illuminate\Database\Eloquent\Model;
 
@@ -17,7 +17,7 @@ use Illuminate\Database\Eloquent\Model;
  * @property array<string, mixed> $details
  * @property string|null $platform
  * @property string|null $tenant_id
- * @property Carbon $created_at
+ * @property CarbonInterface $created_at
  */
 #[Table('moderation_audit_log', timestamps: false)]
 final class ModerationAuditLog extends Model

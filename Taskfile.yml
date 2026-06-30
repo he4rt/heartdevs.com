@@ -118,4 +118,3 @@ tasks:
       - 'composer run post-create-project-cmd'
       - 'php artisan key:generate --ansi'
       - 'php artisan storage:link --ansi'
-      - 'composer run ide-helper'

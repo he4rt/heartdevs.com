@@ -4,11 +4,14 @@ declare(strict_types=1);
 
 namespace He4rt\Identity\ExternalIdentity\Enums;
 
+use App\Enums\Concerns\StringifyEnum;
 use Filament\Support\Contracts\HasColor;
 use Filament\Support\Contracts\HasLabel;
 
 enum IdentityType: string implements HasColor, HasLabel
 {
+    use StringifyEnum;
+
     case External = 'external';
 
     public function getLabel(): string

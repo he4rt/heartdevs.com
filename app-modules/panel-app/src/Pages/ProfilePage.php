@@ -165,7 +165,7 @@ class ProfilePage extends Page
                                         'TO' => 'Tocantins',
                                     ] : [])
                                     ->searchable()
-                                    ->allowHtml(false)
+                                    ->allowHtml(condition: false)
                                     ->live()
                                     ->columnSpan(1),
 
@@ -199,7 +199,7 @@ class ProfilePage extends Page
                                 ])
                                 ->addActionLabel(__('panel-app::profile.actions.add_social_link'))
                                 ->defaultItems(0)
-                                ->reorderable(false)
+                                ->reorderable(condition: false)
                                 ->columnSpanFull(),
                         ]),
 

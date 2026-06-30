@@ -70,7 +70,7 @@ final class SubscribeTwitchEventsCommand extends Command
         $results = [];
 
         foreach ($types as $type) {
-            if (in_array($type->value, $existingTypes, true)) {
+            if (in_array($type->value, $existingTypes, strict: true)) {
                 $results[] = [$type->value, $type->getVersion(), 'already_exists'];
 
                 continue;

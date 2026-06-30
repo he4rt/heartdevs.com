@@ -12,6 +12,9 @@ class ListExternalIdentities extends ListRecords
 {
     protected static string $resource = ExternalIdentityResource::class;
 
+    /**
+     * @return CreateAction[]
+     */
     protected function getHeaderActions(): array
     {
         return [

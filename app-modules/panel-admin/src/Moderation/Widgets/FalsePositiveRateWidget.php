@@ -27,6 +27,9 @@ class FalsePositiveRateWidget extends StatsOverviewWidget
         return __('panel-admin::moderation.dashboard.false_positive.heading');
     }
 
+    /**
+     * @return Stat[]
+     */
     protected function getStats(): array
     {
         $start = $this->periodStart();

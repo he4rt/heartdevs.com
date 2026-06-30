@@ -54,7 +54,7 @@ class AppealSlaWidget extends TableWidget
                             : __('panel-admin::moderation.dashboard.appeal_sla.overdue', ['hours' => $hours]);
                     }),
             ])
-            ->paginated(false);
+            ->paginated(condition: false);
     }
 
     protected function getTableDescription(): ?string

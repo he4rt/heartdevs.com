@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace He4rt\IntegrationDiscord\Models;
 
-use Carbon\Carbon;
+use Carbon\CarbonInterface;
 use He4rt\IntegrationDiscord\Enums\RoleHistoryAction;
 use Illuminate\Database\Eloquent\Attributes\Table;
 use Illuminate\Database\Eloquent\Model;
@@ -15,10 +15,10 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property int $discord_member_id
  * @property int $discord_role_id
  * @property RoleHistoryAction $action
- * @property Carbon $occurred_at
+ * @property CarbonInterface $occurred_at
  * @property int|null $source_event_log_id
- * @property Carbon|null $created_at
- * @property Carbon|null $updated_at
+ * @property CarbonInterface|null $created_at
+ * @property CarbonInterface|null $updated_at
  * @property-read DiscordMember $member
  * @property-read DiscordRole $role
  * @property-read DiscordEventLog|null $sourceEventLog

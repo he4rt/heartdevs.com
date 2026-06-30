@@ -30,7 +30,7 @@ class EditVoiceChannelLimitCommand extends AbstractSlashCommand
         if (!$channelId) {
             $this->message()
                 ->content('❌ Você precisa estar em uma sala de voz para usar este comando!')
-                ->reply($interaction, true);
+                ->reply($interaction, ephemeral: true);
 
             return;
         }
@@ -41,7 +41,7 @@ class EditVoiceChannelLimitCommand extends AbstractSlashCommand
         if (!$channelDto) {
             $this->message()
                 ->content('❌ Este comando só funciona em salas criadas com /sala!')
-                ->reply($interaction, true);
+                ->reply($interaction, ephemeral: true);
 
             return;
         }
@@ -49,7 +49,7 @@ class EditVoiceChannelLimitCommand extends AbstractSlashCommand
         if ($channelDto->ownerId !== $userId) {
             $this->message()
                 ->content('❌ Apenas o dono da sala pode alterar o limite de membros!')
-                ->reply($interaction, true);
+                ->reply($interaction, ephemeral: true);
 
             return;
         }
@@ -60,7 +60,7 @@ class EditVoiceChannelLimitCommand extends AbstractSlashCommand
         if (!$voiceChannel) {
             $this->message()
                 ->content('❌ Canal de voz não encontrado!')
-                ->reply($interaction, true);
+                ->reply($interaction, ephemeral: true);
 
             return;
         }
@@ -75,11 +75,11 @@ class EditVoiceChannelLimitCommand extends AbstractSlashCommand
 
             $this->message()
                 ->content(sprintf('✅ Limite da sala atualizado para **%d** membros!', $newLimit))
-                ->reply($interaction, true);
+                ->reply($interaction, ephemeral: true);
         } catch (Exception) {
             $this->message()
                 ->content('❌ Erro ao atualizar o limite da sala. Tente novamente.')
-                ->reply($interaction, true);
+                ->reply($interaction, ephemeral: true);
         }
     }
 

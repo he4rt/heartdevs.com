@@ -35,7 +35,7 @@ class GuestTenantIdentifier
         }
 
         $tenant = $panel->getTenant($tenantSlug);
-        Filament::setTenant($tenant, true);
+        Filament::setTenant($tenant, isQuiet: true);
 
         return $next($request);
     }

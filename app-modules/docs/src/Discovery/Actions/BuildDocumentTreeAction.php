@@ -136,7 +136,7 @@ final readonly class BuildDocumentTreeAction
 
         foreach ($byModule as $module => $list) {
             $this->sortByReadingOrder($list);
-            $subgroups[] = new NavigationGroup(Str::headline((string) $module), null, 0, $list, moduleName: (string) $module);
+            $subgroups[] = new NavigationGroup(Str::headline((string) $module), order: 0, documents: $list, moduleName: (string) $module);
         }
 
         return new NavigationGroup($tier->label(), $tier->icon(), $tier->order(), $direct, $subgroups, tier: $tier);

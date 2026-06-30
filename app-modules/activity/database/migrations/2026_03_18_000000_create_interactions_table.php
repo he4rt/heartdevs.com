@@ -2,6 +2,9 @@
 
 declare(strict_types=1);
 
+use He4rt\Activity\Tracking\Enums\ActivityStatus;
+use He4rt\Activity\Tracking\Enums\ActivityType;
+use He4rt\Activity\Tracking\Enums\ValueTier;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -14,14 +17,14 @@ return new class extends Migration
             $table->uuid('id')->primary();
             $table->foreignUuid('character_id')->constrained('characters');
             $table->foreignUuid('tenant_id')->constrained('tenants');
-            $table->string('type');
+            $table->string('type')->comment(ActivityType::stringifyCases());
             $table->string('provider');
-            $table->string('value_tier');
+            $table->string('value_tier')->comment(ValueTier::stringifyCases());
             $table->integer('coins_min');
             $table->integer('coins_max');
             $table->integer('coins_awarded')->nullable();
             $table->integer('xp_awarded')->nullable();
-            $table->string('status')->default('pending');
+            $table->string('status')->default('pending')->comment(ActivityStatus::stringifyCases());
             $table->nullableUuidMorphs('source');
             $table->string('external_ref')->nullable();
             $table->jsonb('metadata')->nullable();

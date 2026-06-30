@@ -37,7 +37,7 @@ class EditTenantProfilePage extends EditTenantProfile
                         TextInput::make('domain')
                             ->maxLength(255),
                         Toggle::make('active')
-                            ->default(true),
+                            ->default(state: true),
                     ]),
                 Section::make('Connections')
                     ->schema([

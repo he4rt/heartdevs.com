@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace He4rt\Community\Meeting\Models;
 
-use Carbon\Carbon;
+use Carbon\CarbonInterface;
 use He4rt\Community\Database\Factories\MeetingFactory;
 use He4rt\Identity\Tenant\Models\Tenant;
 use He4rt\Identity\User\Models\User;
@@ -22,10 +22,10 @@ use Illuminate\Database\Eloquent\Relations\Pivot;
  * @property string $admin_id
  * @property string|null $content
  * @property int $meeting_type_id
- * @property Carbon $starts_at
- * @property Carbon|null $ends_at
- * @property Carbon|null $created_at
- * @property Carbon|null $updated_at
+ * @property CarbonInterface $starts_at
+ * @property CarbonInterface|null $ends_at
+ * @property CarbonInterface|null $created_at
+ * @property CarbonInterface|null $updated_at
  */
 #[Table(name: 'meetings')]
 final class Meeting extends Model

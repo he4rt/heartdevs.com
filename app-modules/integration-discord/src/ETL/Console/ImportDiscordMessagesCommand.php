@@ -151,7 +151,7 @@ class ImportDiscordMessagesCommand extends Command
                 $chunkContents = file_get_contents($chunkFile);
                 throw_if($chunkContents === false, RuntimeException::class, 'Falha ao ler chunk: '.$chunkFile);
 
-                $allMessages = json_decode($chunkContents, true);
+                $allMessages = json_decode($chunkContents, associative: true);
                 if (!is_array($allMessages)) {
                     $chunkCurrent++;
                     $this->renderBox($chunkSection, $chunkTitle, $chunkCurrent, $totalChunks);
@@ -225,7 +225,7 @@ class ImportDiscordMessagesCommand extends Command
                                     }
                                 }
 
-                                $now = microtime(true);
+                                $now = microtime(as_float: true);
                                 if ($now - $lastStatsRender > 0.1) {
                                     $this->renderStats($statsSection, $stats);
                                     $lastStatsRender = $now;
@@ -238,7 +238,7 @@ class ImportDiscordMessagesCommand extends Command
                 $chunkCurrent++;
                 $this->renderBox($chunkSection, $chunkTitle, $chunkCurrent, $totalChunks);
                 $this->renderStats($statsSection, $stats);
-                $lastStatsRender = microtime(true);
+                $lastStatsRender = microtime(as_float: true);
             }
 
             $canalCurrent++;
@@ -424,7 +424,7 @@ class ImportDiscordMessagesCommand extends Command
         $channelsContents = file_get_contents($channelsFile);
         throw_if($channelsContents === false, RuntimeException::class, 'Falha ao ler channels.json: '.$channelsFile);
 
-        $payload = json_decode($channelsContents, true);
+        $payload = json_decode($channelsContents, associative: true);
         $channels = is_array($payload) ? ($payload['channels'] ?? $payload) : [];
         $map = [];
 
@@ -464,7 +464,7 @@ class ImportDiscordMessagesCommand extends Command
             static function (string $dir) use ($needles): bool {
                 $name = basename($dir);
 
-                return array_any($needles, fn ($needle) => str_contains($name, $needle));
+                return array_any($needles, fn (string $needle) => str_contains($name, $needle));
             },
         ));
     }

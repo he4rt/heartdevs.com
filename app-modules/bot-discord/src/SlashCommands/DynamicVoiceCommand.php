@@ -151,6 +151,6 @@ class DynamicVoiceCommand extends AbstractSlashCommand
 
         $this->message()
             ->content(sprintf('Sala Criada com sucesso !! <#%s>', $channel->id))
-            ->reply($interaction, true);
+            ->reply($interaction, ephemeral: true);
     }
 }

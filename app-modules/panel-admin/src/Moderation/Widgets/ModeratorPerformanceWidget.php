@@ -85,8 +85,8 @@ class ModeratorPerformanceWidget extends TableWidget
                         return $rate.'%';
                     }),
             ])
-            ->paginated(false)
-            ->defaultSort(null);
+            ->paginated(condition: false)
+            ->defaultSort(column: null);
     }
 
     protected function getTableDescription(): ?string

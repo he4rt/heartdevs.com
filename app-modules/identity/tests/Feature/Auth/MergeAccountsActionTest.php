@@ -55,6 +55,49 @@ test('deletes current user after merge', function (): void {
     expect(User::query()->find($currentUserId))->toBeNull();
 });
 
+test('reassigns connected_by from current to old user', function (): void {
+    $tenant = Tenant::factory()->create();
+    $oldUser = User::factory()->create(['first_login_at' => now()]);
+    $currentUser = User::factory()->create();
+
+    $identity = ExternalIdentity::factory()->create([
+        'tenant_id' => $tenant->id,
+        'model_type' => (new User)->getMorphClass(),
+        'model_id' => $oldUser->id,
+        'provider' => IdentityProvider::GitHub,
+        'external_account_id' => 'github-456',
+        'connected_by' => $currentUser->id,
+    ]);
+
+    $action = new MergeAccountsAction();
+    $action->execute($currentUser, $oldUser);
+
+    $identity->refresh();
+    expect($identity->connected_by)->toBe($oldUser->id);
+});
+
+test('reassigns connected_by on soft-deleted identities', function (): void {
+    $tenant = Tenant::factory()->create();
+    $oldUser = User::factory()->create(['first_login_at' => now()]);
+    $currentUser = User::factory()->create();
+
+    $identity = ExternalIdentity::factory()->create([
+        'tenant_id' => $tenant->id,
+        'model_type' => (new User)->getMorphClass(),
+        'model_id' => $oldUser->id,
+        'provider' => IdentityProvider::GitHub,
+        'external_account_id' => 'github-789',
+        'connected_by' => $currentUser->id,
+        'deleted_at' => now(),
+    ]);
+
+    $action = new MergeAccountsAction();
+    $action->execute($currentUser, $oldUser);
+
+    $identity->refresh();
+    expect($identity->connected_by)->toBe($oldUser->id);
+});
+
 test('enriches old user when first_login_at is null', function (): void {
     $oldUser = User::factory()->create([
         'username' => 'old-etl-user',

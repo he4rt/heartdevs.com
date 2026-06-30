@@ -86,7 +86,7 @@ test('execute suspend with 24h duration', function (): void {
 
     $user->refresh();
     expect($user->suspended_until->isFuture())->toBeTrue()
-        ->and((int) now()->diffInHours($user->suspended_until, false))->toBeGreaterThanOrEqual(20);
+        ->and((int) now()->diffInHours($user->suspended_until, absolute: false))->toBeGreaterThanOrEqual(20);
 });
 
 test('execute suspend with 30d duration', function (): void {
@@ -103,7 +103,7 @@ test('execute suspend with 30d duration', function (): void {
 
     $user->refresh();
     expect($user->suspended_until->isFuture())->toBeTrue()
-        ->and((int) now()->diffInDays($user->suspended_until, false))->toBeBetween(29, 30);
+        ->and((int) now()->diffInDays($user->suspended_until, absolute: false))->toBeBetween(29, 30);
 });
 
 test('execute suspend with unknown duration defaults to 7d', function (): void {

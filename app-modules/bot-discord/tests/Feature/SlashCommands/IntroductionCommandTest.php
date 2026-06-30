@@ -12,8 +12,12 @@ use He4rt\Identity\User\Models\User;
 use He4rt\Profile\Actions\UpsertProfile;
 use He4rt\Profile\DTOs\UpsertProfileDTO;
 use He4rt\Profile\Models\Profile;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 
+/**
+ * @return array<string, Collection<int, Tenant>|Tenant>
+ */
 function createIntroductionScenario(): array
 {
     $tenant = Tenant::factory()->create();

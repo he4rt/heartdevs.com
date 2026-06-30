@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace He4rt\Identity\Tenant\Models;
 
-use Carbon\Carbon;
+use Carbon\CarbonInterface;
 use He4rt\Activity\Message\Models\Message;
 use He4rt\Gamification\Character\Models\PastSeason;
 use He4rt\Gamification\Season\Models\Season;
@@ -27,9 +27,9 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property string|null $domain
  * @property string $owner_id
  * @property bool $active
- * @property Carbon|null $created_at
- * @property Carbon|null $updated_at
- * @property Carbon|null $deleted_at
+ * @property CarbonInterface|null $created_at
+ * @property CarbonInterface|null $updated_at
+ * @property CarbonInterface|null $deleted_at
  */
 class Tenant extends Model
 {

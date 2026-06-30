@@ -26,7 +26,7 @@ final readonly class TogglePinPost
                 Timeline::query()
                     ->where('user_id', $user->id)
                     ->where('tenant_id', $timeline->tenant_id)
-                    ->where('pinned', true)
+                    ->where('pinned', operator: true)
                     ->update(['pinned' => false]);
 
                 $timeline->update(['pinned' => true]);

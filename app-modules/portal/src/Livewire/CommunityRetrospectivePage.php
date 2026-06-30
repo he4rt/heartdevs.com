@@ -133,7 +133,7 @@ final class CommunityRetrospectivePage extends Component
     {
         $current = $selected === [] ? $all : $selected;
 
-        $next = in_array($value, $current, true)
+        $next = in_array($value, $current, strict: true)
             ? array_values(array_diff($current, [$value]))
             : array_values(array_unique([...$current, $value]));
 

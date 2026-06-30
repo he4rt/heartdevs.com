@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace He4rt\Moderation\Enums;
 
+use App\Enums\Concerns\StringifyEnum;
 use Filament\Support\Colors\Color;
 use Filament\Support\Contracts\HasColor;
 use Filament\Support\Contracts\HasIcon;
@@ -12,6 +13,8 @@ use Filament\Support\Icons\Heroicon;
 
 enum Severity: string implements HasColor, HasIcon, HasLabel
 {
+    use StringifyEnum;
+
     case Low = 'low';
     case Medium = 'medium';
     case High = 'high';

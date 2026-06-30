@@ -2,6 +2,8 @@
 
 declare(strict_types=1);
 
+use He4rt\Profile\Enums\SeniorityLevel;
+use He4rt\Profile\Enums\StartAvailability;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\DB;
@@ -19,11 +21,11 @@ return new class extends Migration
             $table->date('birthdate')->nullable();
             $table->text('about')->nullable();
             $table->string('headline')->nullable();
-            $table->string('seniority_level', 30)->nullable();
+            $table->string('seniority_level', 30)->nullable()->comment(SeniorityLevel::stringifyCases());
             $table->smallInteger('years_experience')->nullable();
             $table->jsonb('social_links')->nullable();
-            $table->boolean('available_for_proposals')->default(false);
-            $table->string('start_availability', 30)->nullable();
+            $table->boolean('available_for_proposals')->default(value: false);
+            $table->string('start_availability', 30)->nullable()->comment(StartAvailability::stringifyCases());
             $table->timestampsTz();
 
             $table->unique(['user_id', 'tenant_id']);

@@ -34,11 +34,11 @@ jobs:
 
     services:
       postgres:
-        image: postgres:18-alpine
+        image: postgres:18-alpine # zizmor: ignore[unpinned-images] — ephemeral CI test DB; tracking the patch tag keeps it updated (dependabot doesn't bump service-container images)
         env:
           POSTGRES_USER: postgres
           POSTGRES_PASSWORD: postgres
-          POSTGRES_DB: test_he4rtbot
+          POSTGRES_DB: test_heartdevs
         ports:
           - 5432/tcp
         options: >-
@@ -49,13 +49,13 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
         with:
           fetch-depth: 0
           persist-credentials: false
 
       - name: Setup PHP
-        uses: shivammathur/setup-php@7c071dfe9dc99bdf297fa79cb49ea005b9fcadbc # v2.37.1
+        uses: shivammathur/setup-php@f3e473d116dcccaddc5834248c87452386958240 # v2.37.2
         with:
           php-version: ${{ inputs.PHP_VERSION }}
           extensions: ${{ inputs.PHP_EXTENSIONS }}
@@ -64,9 +64,12 @@ jobs:
           tools: composer:v2
 
       - name: Setup Problem Matches
+        shell: bash
+        env:
+          RUNNER_TOOL_CACHE: ${{ runner.tool_cache }}
         run: |
-          echo "::add-matcher::${{ runner.tool_cache }}/php.json"
-          echo "::add-matcher::${{ runner.tool_cache }}/phpunit.json"
+          echo "::add-matcher::${RUNNER_TOOL_CACHE}/php.json"
+          echo "::add-matcher::${RUNNER_TOOL_CACHE}/phpunit.json"
 
       - name: Install composer dependencies
         uses: ramsey/composer-install@65e4f84970763564f46a70b8a54b90d033b3bdda # v4.0.0
@@ -84,11 +87,9 @@ jobs:
       - name: Install node dependencies
         run: |
           npm ci
-          npm run build
 
-      - name: Copy .env file
-        run: |
-          cp .env.testing.example .env.testing
+      - name: Build Assets
+        run: npm run build
 
       - name: Run Tests
         env:

@@ -88,7 +88,7 @@ test('appeal has null reason_text when not provided', function (): void {
     $case = ModerationCase::factory()->create(['author_id' => $user->id]);
     $action = ModerationAction::factory()->create(['case_id' => $case->id, 'created_at' => now()]);
 
-    $appeal = resolve(FileAppeal::class)->handle($action, $user, 'disproportionate', null);
+    $appeal = resolve(FileAppeal::class)->handle($action, $user, 'disproportionate', reasonText: null);
 
     expect($appeal->reason_text)->toBeNull()
         ->and($appeal->reason_category)->toBe('disproportionate');

@@ -12,6 +12,9 @@ class ListGithubRepositories extends ListRecords
 {
     protected static string $resource = GithubRepositoryResource::class;
 
+    /**
+     * @return CreateAction[]
+     */
     protected function getHeaderActions(): array
     {
         return [CreateAction::make()];

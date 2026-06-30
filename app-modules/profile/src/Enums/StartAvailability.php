@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace He4rt\Profile\Enums;
 
+use App\Enums\Concerns\StringifyEnum;
 use Filament\Support\Colors\Color;
 use Filament\Support\Contracts\HasColor;
 use Filament\Support\Contracts\HasIcon;
@@ -12,6 +13,8 @@ use Filament\Support\Icons\Heroicon;
 
 enum StartAvailability: string implements HasColor, HasIcon, HasLabel
 {
+    use StringifyEnum;
+
     case Immediate = 'immediate';
     case OneWeek = '1_week';
     case TwoWeeks = '2_weeks';

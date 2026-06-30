@@ -28,7 +28,7 @@ final class RawGatewayEvent
             'guild_id' => $data->guild_id ?? null,
             'user_id' => $data->user_id ?? data_get($payload->d, 'author.id'),
             'channel_id' => $data->channel_id ?? null,
-            'payload' => json_decode($encodedPayload, true),
+            'payload' => json_decode($encodedPayload, associative: true),
         ]);
     }
 }

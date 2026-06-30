@@ -6,7 +6,7 @@ return [
     'default_version' => '3.x',
 
     'cache' => [
-        'enabled' => env('DOCS_CACHE_ENABLED', true),
+        'enabled' => env('DOCS_CACHE_ENABLED', default: true),
         'ttl' => (int) env('DOCS_CACHE_TTL', 3_600),
     ],
 ];

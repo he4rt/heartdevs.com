@@ -443,7 +443,7 @@ test('it preserves empty arrays and null fields in metadata', function (): void 
         ->toHaveKey('mention_roles', [])
         ->toHaveKey('attachments', [])
         ->toHaveKey('embeds', [])
-        ->toHaveKey('edited_timestamp', null);
+        ->toHaveKey('edited_timestamp', value: null);
 });
 
 test('it returns null metadata when projection leaves empty object', function (): void {

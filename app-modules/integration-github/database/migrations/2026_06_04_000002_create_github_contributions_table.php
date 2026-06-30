@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use He4rt\IntegrationGithub\Enums\ContributionType;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -16,7 +17,7 @@ return new class extends Migration
             $table->string('repo');
             $table->string('actor_login');
             $table->unsignedBigInteger('actor_id')->nullable();
-            $table->string('type');
+            $table->string('type')->comment(ContributionType::stringifyCases());
             $table->string('external_ref');
             $table->string('target_ref')->nullable();
             $table->timestampTz('occurred_at');

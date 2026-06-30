@@ -22,8 +22,8 @@ return new class extends Migration
             $table->string('global_name')->nullable();
             $table->string('avatar')->nullable();
             $table->string('nickname')->nullable();
-            $table->boolean('is_bot')->default(false);
-            $table->boolean('is_pending')->default(false);
+            $table->boolean('is_bot')->default(value: false);
+            $table->boolean('is_pending')->default(value: false);
             $table->timestampTz('joined_at')->nullable();
             $table->timestampTz('premium_since')->nullable();
             $table->timestampTz('communication_disabled_until')->nullable();

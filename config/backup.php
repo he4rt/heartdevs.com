@@ -18,7 +18,7 @@ return [
     /*
      * Only change the behavior run by the scheduler.
      */
-    'enabled' => (bool) env('BACKUP_ENABLED', false),
+    'enabled' => (bool) env('BACKUP_ENABLED', default: false),
 
     'backup' => [
         /*

@@ -16,7 +16,7 @@ final class PostEntryFactory extends Factory
     public function definition(): array
     {
         return [
-            'content' => fake()->sentences(3, true),
+            'content' => fake()->sentences(3, asText: true),
         ];
     }
 }

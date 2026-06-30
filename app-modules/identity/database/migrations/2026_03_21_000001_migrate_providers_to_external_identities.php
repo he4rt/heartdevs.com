@@ -2,6 +2,8 @@
 
 declare(strict_types=1);
 
+use He4rt\Identity\ExternalIdentity\Enums\CredentialsType;
+use He4rt\Identity\ExternalIdentity\Enums\IdentityType;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Crypt;
@@ -31,8 +33,8 @@ return new class extends Migration
         // 2. Add new columns to providers table
         // ──────────────────────────────────────────────
         Schema::table('providers', static function (Blueprint $table): void {
-            $table->string('type')->default('external')->after('model_id');
-            $table->string('credentials_type')->default('oauth2')->after('provider');
+            $table->string('type')->default('external')->after('model_id')->comment(IdentityType::stringifyCases());
+            $table->string('credentials_type')->default('oauth2')->after('provider')->comment(CredentialsType::stringifyCases());
             $table->text('credentials')->nullable()->after('credentials_type');
             $table->uuid('connected_by')->nullable()->after('provider_id');
             $table->timestampTz('connected_at')->nullable()->after('connected_by');

@@ -64,7 +64,7 @@ describe('AdrStatus', static function (): void {
 
     it('falls back to proposed for unknown or null values', function (): void {
         expect(AdrStatus::fromRaw('garbage'))->toBe(AdrStatus::Proposed)
-            ->and(AdrStatus::fromRaw(null))->toBe(AdrStatus::Proposed);
+            ->and(AdrStatus::fromRaw(raw: null))->toBe(AdrStatus::Proposed);
     });
 
     it('has a color and label for every case', function (): void {
@@ -153,7 +153,7 @@ describe('ModuleColor', static function (): void {
     });
 
     it('falls back to the brand color for empty names', function (): void {
-        expect(ModuleColor::for(null))->toBe('#782bf1')
+        expect(ModuleColor::for(moduleName: null))->toBe('#782bf1')
             ->and(ModuleColor::for(''))->toBe('#782bf1');
     });
 

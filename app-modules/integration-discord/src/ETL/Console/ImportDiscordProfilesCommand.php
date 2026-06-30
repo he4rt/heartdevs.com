@@ -102,7 +102,7 @@ class ImportDiscordProfilesCommand extends Command
             $chunkContents = file_get_contents($chunkFile);
             throw_if($chunkContents === false, RuntimeException::class, 'Falha ao ler chunk: '.$chunkFile);
 
-            $profiles = json_decode($chunkContents, true);
+            $profiles = json_decode($chunkContents, associative: true);
 
             if (!is_array($profiles) || $profiles === []) {
                 $chunkCurrent++;
@@ -145,7 +145,7 @@ class ImportDiscordProfilesCommand extends Command
 
                         $profileCurrent++;
 
-                        $now = microtime(true);
+                        $now = microtime(as_float: true);
                         if ($now - $lastStatsRender > 0.1) {
                             $this->renderBox($profileSection, $profileTitle, $profileCurrent, $totalProfiles);
                             $this->renderStats($statsSection, $stats);
@@ -157,7 +157,7 @@ class ImportDiscordProfilesCommand extends Command
 
             $this->renderBox($profileSection, $profileTitle, $profileCurrent, $totalProfiles);
             $this->renderStats($statsSection, $stats);
-            $lastStatsRender = microtime(true);
+            $lastStatsRender = microtime(as_float: true);
 
             $chunkCurrent++;
             $this->renderBox($chunkSection, 'Chunks', $chunkCurrent, $totalChunks);

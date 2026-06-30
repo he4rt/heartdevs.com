@@ -47,7 +47,7 @@ class AnalyzeDiscordProfiles extends Command
         $topConnectors = [];
 
         foreach ($files as $file) {
-            $profiles = json_decode((string) Storage::disk('local')->get($file), true) ?? [];
+            $profiles = json_decode((string) Storage::disk('local')->get($file), associative: true) ?? [];
 
             foreach ($profiles as $discordId => $profile) {
                 $totalProfiles++;
@@ -119,7 +119,7 @@ class AnalyzeDiscordProfiles extends Command
         );
 
         // GitHub stats
-        $verifiedGh = collect($githubUsers)->where('verified', true)->count();
+        $verifiedGh = collect($githubUsers)->where('verified', operator: true)->count();
         info(sprintf('GitHub: %d verified out of ', $verifiedGh).count($githubUsers).' total');
 
         // Top connectors (3+ socials)

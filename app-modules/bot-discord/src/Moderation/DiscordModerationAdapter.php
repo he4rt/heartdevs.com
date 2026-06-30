@@ -262,7 +262,7 @@ final readonly class DiscordModerationAdapter implements ModerationPlatformContr
             ActionType::Suspend,
             ActionType::Kick,
             ActionType::Ban,
-        ], true);
+        ], strict: true);
     }
 
     private function resolveDiscordId(User $target): ?string
@@ -380,7 +380,7 @@ final readonly class DiscordModerationAdapter implements ModerationPlatformContr
 
     private function isPunitiveAction(ActionType $type): bool
     {
-        return in_array($type, [ActionType::Ban, ActionType::Kick, ActionType::Mute, ActionType::Suspend], true);
+        return in_array($type, [ActionType::Ban, ActionType::Kick, ActionType::Mute, ActionType::Suspend], strict: true);
     }
 
     private function actorIsAdmin(string $guildId, ModerationAction $action): bool

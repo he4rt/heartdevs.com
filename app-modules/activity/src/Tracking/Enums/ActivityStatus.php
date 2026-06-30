@@ -4,12 +4,15 @@ declare(strict_types=1);
 
 namespace He4rt\Activity\Tracking\Enums;
 
+use App\Enums\Concerns\StringifyEnum;
 use Filament\Support\Colors\Color;
 use Filament\Support\Contracts\HasColor;
 use Filament\Support\Contracts\HasLabel;
 
 enum ActivityStatus: string implements HasColor, HasLabel
 {
+    use StringifyEnum;
+
     case Pending = 'pending';
     case AutoApproved = 'auto_approved';
     case InReview = 'in_review';

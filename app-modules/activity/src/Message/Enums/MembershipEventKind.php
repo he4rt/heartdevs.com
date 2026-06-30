@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace He4rt\Activity\Message\Enums;
 
+use App\Enums\Concerns\StringifyEnum;
+
 /**
  * Canonical membership signals. Providers contribute their own mappings via
  * MessageActivityAdapter::extractMembershipEvent() — unknown string values are
@@ -12,6 +14,8 @@ namespace He4rt\Activity\Message\Enums;
  */
 enum MembershipEventKind: string
 {
+    use StringifyEnum;
+
     case UserJoin = 'user_join';
     case Boost = 'boost';
     case BoostTier1 = 'boost_tier_1';

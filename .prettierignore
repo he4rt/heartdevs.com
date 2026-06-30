@@ -4,7 +4,8 @@ dist
 vendor/
 public/
 .git
+bun.lock
 package-lock.json
 composer.lock
 storage/
-.ai
+.ai/guidelines/

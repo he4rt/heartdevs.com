@@ -8,7 +8,7 @@ use Illuminate\Routing\Router;
 
 beforeEach(function (): void {
     $this->withoutVite();
-    config()->set('docs.cache.enabled', false);
+    config()->set('docs.cache.enabled', value: false);
 });
 
 it('serves an ADR page publicly with status badge and stripped title', function (): void {

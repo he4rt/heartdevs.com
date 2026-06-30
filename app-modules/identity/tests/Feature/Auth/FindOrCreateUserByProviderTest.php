@@ -25,7 +25,7 @@ function makeOAuthUser(
         }
     };
 
-    return new class($credentials, $providerId, $provider, $username, $name, $email, null) extends OAuthUserDTO
+    return new class($credentials, $providerId, $provider, $username, $name, $email, avatarUrl: null) extends OAuthUserDTO
     {
         public static function make(OAuthAccessDTO $credentials, array $payload): self
         {

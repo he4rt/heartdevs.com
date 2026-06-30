@@ -17,7 +17,7 @@ final class CharacterException extends Exception
 
         if ($character->daily_bonus_claimed_at) {
             $nextClaimAt = Date::parse($character->daily_bonus_claimed_at)->addHours(24);
-            $minutesUntilClaim = (int) now()->diffInMinutes($nextClaimAt, false);
+            $minutesUntilClaim = (int) now()->diffInMinutes($nextClaimAt, absolute: false);
         }
 
         return new self(

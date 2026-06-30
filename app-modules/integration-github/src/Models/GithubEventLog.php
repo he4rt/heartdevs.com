@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace He4rt\IntegrationGithub\Models;
 
-use Carbon\Carbon;
+use Carbon\CarbonInterface;
 use Illuminate\Database\Eloquent\Model;
 
 /**
@@ -17,8 +17,8 @@ use Illuminate\Database\Eloquent\Model;
  * @property string|null $actor_login
  * @property string|null $delivery_id
  * @property array<string, mixed> $payload
- * @property Carbon|null $created_at
- * @property Carbon|null $updated_at
+ * @property CarbonInterface|null $created_at
+ * @property CarbonInterface|null $updated_at
  */
 final class GithubEventLog extends Model
 {

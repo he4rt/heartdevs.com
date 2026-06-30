@@ -21,7 +21,7 @@ function makeOAuthUserForEnrich(
         }
     };
 
-    return new class($credentials, '12345', IdentityProvider::GitHub, $username, $name, $email, null) extends OAuthUserDTO
+    return new class($credentials, '12345', IdentityProvider::GitHub, $username, $name, $email, avatarUrl: null) extends OAuthUserDTO
     {
         public static function make(OAuthAccessDTO $credentials, array $payload): self
         {

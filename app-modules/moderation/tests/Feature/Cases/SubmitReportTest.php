@@ -69,7 +69,7 @@ test('deduplicates reports on same content into existing case', function (): voi
     $dto = makeReportDTO('same-msg', 'bad word here');
 
     $action = resolve(SubmitReport::class);
-    $case1 = $action->handle($reporter1, $dto, ViolationType::Spam, null, Platform::Discord);
+    $case1 = $action->handle($reporter1, $dto, ViolationType::Spam, details: null, platform: Platform::Discord);
     $case2 = $action->handle($reporter2, $dto, ViolationType::Spam, 'also spam', Platform::Discord);
 
     expect($case1->id)->toBe($case2->id);
@@ -91,7 +91,7 @@ test('does not dedup against resolved cases', function (): void {
     ]);
 
     $dto = makeReportDTO('msg-resolved', 'same content');
-    $newCase = resolve(SubmitReport::class)->handle($reporter, $dto, ViolationType::Toxicity, null, Platform::Discord);
+    $newCase = resolve(SubmitReport::class)->handle($reporter, $dto, ViolationType::Toxicity, details: null, platform: Platform::Discord);
 
     expect($newCase->id)->not->toBe($resolvedCase->id);
 });
@@ -108,7 +108,7 @@ test('does not dedup against dismissed cases', function (): void {
     ]);
 
     $dto = makeReportDTO('msg-dismissed', 'content');
-    $newCase = resolve(SubmitReport::class)->handle($reporter, $dto, ViolationType::Spam, null, Platform::Web);
+    $newCase = resolve(SubmitReport::class)->handle($reporter, $dto, ViolationType::Spam, details: null, platform: Platform::Web);
 
     expect($newCase->id)->not->toBe($dismissedCase->id);
 });
@@ -158,10 +158,10 @@ test('dedup increments priority for each additional report', function (): void {
     $dto = makeReportDTO('flood-msg', 'spam flood');
     $action = resolve(SubmitReport::class);
 
-    $case = $action->handle(User::factory()->create(), $dto, ViolationType::Spam, null, Platform::Discord);
+    $case = $action->handle(User::factory()->create(), $dto, ViolationType::Spam, details: null, platform: Platform::Discord);
     $initialPriority = $case->refresh()->priority;
 
-    $action->handle(User::factory()->create(), $dto, ViolationType::Spam, null, Platform::Discord);
+    $action->handle(User::factory()->create(), $dto, ViolationType::Spam, details: null, platform: Platform::Discord);
 
     $case->refresh();
     expect($case->priority)->toBe($initialPriority + 10);

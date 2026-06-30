@@ -21,9 +21,9 @@ return new class extends Migration
             $table->integer('color')->default(0);
             $table->smallInteger('position')->default(0);
             $table->bigInteger('permissions')->default(0);
-            $table->boolean('is_hoisted')->default(false);
-            $table->boolean('is_mentionable')->default(false);
-            $table->boolean('is_managed')->default(false);
+            $table->boolean('is_hoisted')->default(value: false);
+            $table->boolean('is_mentionable')->default(value: false);
+            $table->boolean('is_managed')->default(value: false);
             $table->string('icon')->nullable();
             $table->timestampsTz();
 

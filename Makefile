@@ -91,7 +91,6 @@ setup: ## Setup the project
 	@composer run-script post-create-project-cmd
 	@php artisan key:generate --ansi
 	@php artisan storage:link --ansi
-	@composer run-script ide-helper
 
 .PHONY: import-db
 import-db: ## Import a PostgreSQL dump file (usage: make import-db file=path/to/dump)

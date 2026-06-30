@@ -4,8 +4,12 @@ declare(strict_types=1);
 
 namespace He4rt\Gamification\Character\Enums;
 
+use App\Enums\Concerns\StringifyEnum;
+
 enum VoiceStatesEnum: string
 {
+    use StringifyEnum;
+
     case Disabled = 'disabled';
     case Muted = 'muted';
     case Unmuted = 'unmuted';

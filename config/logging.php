@@ -36,7 +36,7 @@ return [
 
     'deprecations' => [
         'channel' => env('LOG_DEPRECATIONS_CHANNEL', 'null'),
-        'trace' => env('LOG_DEPRECATIONS_TRACE', false),
+        'trace' => env('LOG_DEPRECATIONS_TRACE', default: false),
     ],
 
     /*
@@ -143,7 +143,7 @@ return [
             'via' => Logger::class,
             'level' => 'debug',
             'url' => env('LOG_DISCORD_WEBHOOK_URL'),
-            'ignore_exceptions' => env('LOG_DISCORD_IGNORE_EXCEPTIONS', false),
+            'ignore_exceptions' => env('LOG_DISCORD_IGNORE_EXCEPTIONS', default: false),
         ],
 
     ],

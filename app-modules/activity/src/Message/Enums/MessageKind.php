@@ -4,8 +4,12 @@ declare(strict_types=1);
 
 namespace He4rt\Activity\Message\Enums;
 
+use App\Enums\Concerns\StringifyEnum;
+
 enum MessageKind: string
 {
+    use StringifyEnum;
+
     case Default = 'default';
     case Reply = 'reply';
     case ThreadCreated = 'thread_created';

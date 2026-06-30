@@ -20,7 +20,7 @@ return new class extends Migration
                 $table->string('name')->unique()->index();
                 $table->string('email')->nullable();
                 $table->string('password')->nullable();
-                $table->boolean('is_donator')->default(false);
+                $table->boolean('is_donator')->default(value: false);
                 $table->timestampsTz();
             });
         }
