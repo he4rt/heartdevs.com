@@ -1,0 +1,28 @@
+{
+    "name": "he4rt/onboarding",
+    "description": "",
+    "type": "library",
+    "version": "1.0",
+    "license": "proprietary",
+    "require": {},
+    "autoload": {
+        "psr-4": {
+            "He4rt\\Onboarding\\": "src/",
+            "He4rt\\Onboarding\\Database\\Factories\\": "database/factories/",
+            "He4rt\\Onboarding\\Database\\Seeders\\": "database/seeders/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "He4rt\\Onboarding\\Tests\\": "tests/"
+        }
+    },
+    "minimum-stability": "stable",
+    "extra": {
+        "laravel": {
+            "providers": [
+                "He4rt\\Onboarding\\OnboardingServiceProvider"
+            ]
+        }
+    }
+}

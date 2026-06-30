@@ -18,6 +18,7 @@ This is a modular monorepo (`internachi/modular`). Each bounded context lives un
 | Panel Admin         | `app-modules/panel-admin/`         | Filament admin panel — dashboards, resources, moderation UI, marketing                                         |
 | Integration Twitch  | `app-modules/integration-twitch/`  | Twitch platform transport (Helix API via Saloon), OAuth, EventSub webhooks                                     |
 | Integration GitHub  | `app-modules/integration-github/`  | GitHub transport (REST via Saloon), OAuth, community contribution ingestion (backfill + webhooks) + event lake |
+| Onboarding          | `app-modules/onboarding/`          | Polymorphic onboarding state machines per type (`Welcome`, `Squads`); owns the per-type completion gate         |
 
 ## Relationships
 
@@ -49,3 +50,4 @@ This is a modular monorepo (`internachi/modular`). Each bounded context lives un
 - **Integration Twitch** depends on Identity (OAuth user resolution, ExternalIdentity for tenant linking). It never imports from Moderation, Integration Discord, or Bot Discord.
 - **Integration GitHub** depends on Identity (OAuth user resolution; future `Character` seam via `ExternalIdentity`). It never imports from Activity, Economy, Moderation or any Bot/runtime module — it only emits the `GithubContributionRecorded` domain event. The community presentation (in `portal`) and the allowlist admin UI (in `panel-admin`) depend on it, never the reverse.
 - **Identity** has no upstream dependencies on other contexts listed here.
+- **Onboarding** depends on Identity (`User`, tenant scoping, GitHub `ExternalIdentity`) and listens to Integration GitHub's `GithubPullRequestApproved` for the `Squads` challenge step. Consumers (e.g. `squads`) only read its completion gate; it never imports from them.
