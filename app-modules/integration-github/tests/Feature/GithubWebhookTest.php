@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 use He4rt\IntegrationGithub\Enums\ContributionType;
 use He4rt\IntegrationGithub\Enums\PurposeType;
-use He4rt\IntegrationGithub\Events\GithubPullRequestApproved;
 use He4rt\IntegrationGithub\Events\GithubContributionRecorded;
+use He4rt\IntegrationGithub\Events\GithubPullRequestApproved;
 use He4rt\IntegrationGithub\Models\GithubContribution;
 use He4rt\IntegrationGithub\Models\GithubEventLog;
 use He4rt\IntegrationGithub\Models\GithubRepository;

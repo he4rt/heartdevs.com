@@ -7,8 +7,8 @@ namespace He4rt\IntegrationGithub\Webhook;
 use He4rt\IntegrationGithub\Contributions\DTOs\NewContributionDTO;
 use He4rt\IntegrationGithub\Contributions\RecordContribution;
 use He4rt\IntegrationGithub\Enums\ContributionType;
-use He4rt\IntegrationGithub\Events\GithubPullRequestApproved;
 use He4rt\IntegrationGithub\Enums\PurposeType;
+use He4rt\IntegrationGithub\Events\GithubPullRequestApproved;
 use He4rt\IntegrationGithub\Models\GithubRepository;
 use Illuminate\Support\Str;
 
@@ -106,8 +106,8 @@ final readonly class ProjectGithubEvent
         if ($submittedAt === '') {
             return;
         }
-        
-        $state = $this->stringFrom($review, 'state');        
+
+        $state = $this->stringFrom($review, 'state');
         if ($state === 'approved') {
             event(
                 new GithubPullRequestApproved(
