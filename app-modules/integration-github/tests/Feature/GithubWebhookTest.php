@@ -166,7 +166,7 @@ it('grava no lake mas NÃO projeta contribuição para repo de challenge', funct
 
     GithubRepository::factory()->create([
         'full_name' => 'he4rt/heartdevs.com',
-        'purpose' => PurposeType::Challenge->value,
+        'purpose' => PurposeType::Challenge,
     ]);
 
     postGithubWebhook('pull_request', prWebhookPayload())->assertSuccessful();
@@ -182,7 +182,7 @@ it('grava no lake e projeta a contribuição para repo de contributions, emitind
 
     $repo = GithubRepository::factory()->create([
         'full_name' => 'he4rt/heartdevs.com',
-        'purpose' => PurposeType::Contributions->value,
+        'purpose' => PurposeType::Contributions,
     ]);
 
     postGithubWebhook('pull_request', prWebhookPayload())->assertSuccessful();

@@ -77,6 +77,7 @@ final class GithubRepository extends Model
         return [
             'enabled' => 'boolean',
             'last_backfilled_at' => 'datetime',
+            'purpose' => PurposeType::class,
         ];
     }
 }
