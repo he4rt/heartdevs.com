@@ -1,10 +1,8 @@
 name: Continuous Integration
 
 on:
-  push:
-    branches: [4.x]
   pull_request:
-    branches: [4.x]
+    branches: [4.x, feat/squads]
     types: [opened, reopened, synchronize, ready_for_review]
 
 concurrency:
