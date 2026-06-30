@@ -7,6 +7,7 @@ namespace He4rt\IntegrationGithub\Webhook;
 use He4rt\IntegrationGithub\Contributions\DTOs\NewContributionDTO;
 use He4rt\IntegrationGithub\Contributions\RecordContribution;
 use He4rt\IntegrationGithub\Enums\ContributionType;
+use He4rt\IntegrationGithub\Enums\PurposeType;
 use He4rt\IntegrationGithub\Models\GithubRepository;
 use Illuminate\Support\Str;
 
@@ -56,6 +57,7 @@ final readonly class ProjectGithubEvent
         return array_values(GithubRepository::query()
             ->enabled()
             ->where('full_name', $repo)
+            ->where('purpose', PurposeType::Contributions)
             ->pluck('tenant_id')
             ->map(static fn (mixed $tenantId): string => (string) $tenantId)
             ->all());

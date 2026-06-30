@@ -10,10 +10,10 @@
     "require": {
         "php": "^8.4",
         "calebporzio/sushi": "^2.5.4",
-        "dedoc/scramble": "^0.13.28",
+        "dedoc/scramble": "^0.13.30",
         "filament/filament": "^5.6.7",
         "filament/spatie-laravel-media-library-plugin": "^5.6.7",
-        "guzzlehttp/guzzle": "^7.12.1",
+        "guzzlehttp/guzzle": "^7.13.1",
         "he4rt/activity": ">=1",
         "he4rt/bot-discord": ">=1.0",
         "he4rt/community": ">=1",
@@ -29,15 +29,16 @@
         "he4rt/integration-twitch": ">=1",
         "he4rt/integration-whatsapp": ">=1",
         "he4rt/moderation": "^1.0",
-        "he4rt/onboarding": "^1.0",
+        "he4rt/onboarding": ">=1",
         "he4rt/panel-admin": ">=1",
         "he4rt/panel-app": ">=1",
         "he4rt/portal": ">=1",
         "he4rt/profile": ">=1",
+        "he4rt/squads": ">=1",
         "internachi/modular": "^3.0.2",
         "laracord/framework": "dev-next#e7b64d6",
-        "laravel/framework": "^13.16.1",
-        "laravel/nightwatch": "^1.28.0",
+        "laravel/framework": "^13.17.0",
+        "laravel/nightwatch": "^1.28.3",
         "laravel/sanctum": "^4.3.2",
         "laravel/telescope": "^5.20.0",
         "laravel/tinker": "^3.0.2",
@@ -45,36 +46,34 @@
         "livewire/flux": "^2.15.0",
         "marvinlabs/laravel-discord-logger": "^1.4.4",
         "monicahq/laravel-cloudflare": "^4.1",
-        "owenvoke/blade-fontawesome": "^3.2.2",
+        "owenvoke/blade-fontawesome": "^3.3.0",
         "phiki/phiki": "^2.2",
         "ryangjchandler/commonmark-blade-block": "^1.1.1",
         "saloonphp/saloon": "^4.0",
         "spatie/laravel-backup": "^10.3.0",
-        "spatie/laravel-medialibrary": "^11.23.0",
-        "symfony/dom-crawler": "^8.1.0",
-        "symfony/yaml": "^8.1.0"
+        "spatie/laravel-medialibrary": "^11.23.1",
+        "symfony/dom-crawler": "^8.1.1",
+        "symfony/yaml": "^8.1.1"
     },
     "require-dev": {
-        "barryvdh/laravel-ide-helper": "^3.7.0",
         "driftingly/rector-laravel": "^2.5.0",
         "fakerphp/faker": "^1.24.1",
         "fruitcake/laravel-debugbar": "^4.3.0",
         "larastan/larastan": "^3.10.0",
         "laravel/boost": "^2.4.10",
         "laravel/pail": "^1.2.7",
-        "laravel/pao": "^1.1.1",
+        "laravel/pao": "^1.1.2",
         "laravel/pint": "^1.29.3",
-        "laravel/sail": "^1.62.0",
         "mockery/mockery": "^1.6.12",
         "mrpunyapal/rector-pest": "^0.2.15",
         "nunomaduro/collision": "^8.9.4",
-        "pestphp/pest": "^4.7.3",
+        "pestphp/pest": "^4.7.4",
         "pestphp/pest-plugin-drift": "^4.1.0",
         "pestphp/pest-plugin-faker": "^4.0.0",
         "pestphp/pest-plugin-laravel": "^4.1.0",
         "pestphp/pest-plugin-livewire": "^4.1.0",
         "phpstan/extension-installer": "^1.4.3",
-        "rector/rector": "^2.5.1"
+        "rector/rector": "^2.5.2"
     },
     "autoload": {
         "psr-4": {
@@ -107,19 +106,13 @@
             "@php -r \"file_exists('database/database.sqlite') || touch('database/database.sqlite');\"",
             "@php artisan migrate --graceful --ansi"
         ],
-        "ide-helper": [
-            "@php artisan ide-helper:generate -q",
-            "@php artisan ide-helper:meta -q",
-            "@php artisan ide-helper:models -q -N --dir='app-modules/*/src/Models' --dir='app/Models'"
-        ],
         "setup": [
             "composer install",
             "npm install",
             "composer run-script post-root-package-install",
             "composer run-script post-create-project-cmd",
             "@php artisan key:generate --ansi",
-            "@php artisan storage:link --ansi",
-            "composer run-script ide-helper"
+            "@php artisan storage:link --ansi"
         ],
         "bot": "@php artisan bot:boot",
         "dev": [
@@ -163,9 +156,13 @@
             "php-http/discovery": true,
             "phpstan/extension-installer": true
         },
-        "audit": {
-            "abandoned": "report",
-            "block-insecure": false
+        "policy": {
+            "abandoned": {
+                "audit": "report"
+            },
+            "advisories": {
+                "block": true
+            }
         }
     },
     "minimum-stability": "dev",

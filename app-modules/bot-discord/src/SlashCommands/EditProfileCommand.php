@@ -83,24 +83,21 @@ class EditProfileCommand extends AbstractSlashCommand
 
         $this->modal('Editar Perfil')
             ->components([
-                TextInput::new('Nome', TextInput::STYLE_SHORT)
-                    ->setCustomId('name')
+                TextInput::new('Nome', TextInput::STYLE_SHORT, 'name')
                     ->setMinLength(2)
                     ->setMaxLength(32)
                     ->setPlaceholder('Seu nome')
                     ->setValue(filled($name) && mb_strlen((string) $name) >= 2 ? $name : null)
                     ->setRequired(required: true),
 
-                TextInput::new('Nickname', TextInput::STYLE_SHORT)
-                    ->setCustomId('nickname')
+                TextInput::new('Nickname', TextInput::STYLE_SHORT, 'nickname')
                     ->setMinLength(2)
                     ->setMaxLength(32)
                     ->setPlaceholder('Seu nickname')
                     ->setValue(filled($nickname) && mb_strlen($nickname) >= 2 ? $nickname : null)
                     ->setRequired(required: true),
 
-                TextInput::new('Nos conte um pouco sobre você', TextInput::STYLE_PARAGRAPH)
-                    ->setCustomId('about')
+                TextInput::new('Nos conte um pouco sobre você', TextInput::STYLE_PARAGRAPH, 'about')
                     ->setMinLength(5)
                     ->setMaxLength(500)
                     ->setPlaceholder('Fale mais sobre você...')

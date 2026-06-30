@@ -7,6 +7,7 @@ namespace He4rt\IntegrationGithub\Models;
 use Carbon\CarbonInterface;
 use He4rt\Identity\Tenant\Models\Tenant;
 use He4rt\IntegrationGithub\Database\Factories\GithubRepositoryFactory;
+use He4rt\IntegrationGithub\Enums\PurposeType;
 use Illuminate\Database\Eloquent\Attributes\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\Attribute;
@@ -21,6 +22,7 @@ use Illuminate\Support\Str;
  * @property string $tenant_id
  * @property string $full_name
  * @property bool $enabled
+ * @property PurposeType $purpose
  * @property CarbonInterface|null $last_backfilled_at
  * @property CarbonInterface|null $created_at
  * @property CarbonInterface|null $updated_at
@@ -75,6 +77,7 @@ final class GithubRepository extends Model
         return [
             'enabled' => 'boolean',
             'last_backfilled_at' => 'datetime',
+            'purpose' => PurposeType::class,
         ];
     }
 }
