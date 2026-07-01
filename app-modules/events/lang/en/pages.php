@@ -28,4 +28,11 @@ return [
     'no_check_ins_yet' => 'No check-ins recorded yet.',
     'enter_check_in_code_hint' => 'Enter the check-in code announced by the organizer.',
     'check_in' => 'Check In',
+    'apply_hint' => 'Fill in the form below to apply for this event.',
+    'apply_submit' => 'Submit Application',
+    'application_submitted' => 'Your application has been submitted and is pending review.',
+    'application_pending_hint' => 'Your application is under review. You will be notified once it is evaluated.',
+    'application_your_answers' => 'Your Answers',
+    'application_rejected_hint' => 'Your application was not accepted.',
+    'application_rejection_reason' => 'Reason: :reason',
 ];

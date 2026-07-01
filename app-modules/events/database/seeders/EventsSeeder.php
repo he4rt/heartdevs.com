@@ -166,6 +166,12 @@ final class EventsSeeder extends Seeder
                 'minimum_days' => 2,
                 'cancellation_deadline_hours' => 48,
                 'xp' => [200, 300, 1000],
+                'application_schema' => [
+                    ['type' => 'text',     'label' => 'Por que quer participar da He4rt Conf?', 'required' => true],
+                    ['type' => 'select',   'label' => 'Nível de experiência em desenvolvimento', 'required' => true, 'options' => ['Iniciante', 'Intermediário', 'Avançado']],
+                    ['type' => 'textarea', 'label' => 'Descreva um projeto pessoal ou open source relevante', 'required' => false],
+                    ['type' => 'checkbox', 'label' => 'Em quais dias você pode comparecer?', 'required' => false, 'options' => ['Dia 1', 'Dia 2', 'Dia 3']],
+                ],
                 'enrollments' => [
                     EnrollmentStatus::Pending->value => 6,
                     EnrollmentStatus::Confirmed->value => 12,
@@ -258,6 +264,10 @@ final class EventsSeeder extends Seeder
                 'minimum_days' => null,
                 'cancellation_deadline_hours' => 48,
                 'xp' => [100, 200, 800],
+                'application_schema' => [
+                    ['type' => 'text',   'label' => 'Qual ideia de projeto você traria para o hackathon?', 'required' => true],
+                    ['type' => 'select', 'label' => 'Stack principal', 'required' => true, 'options' => ['PHP', 'JavaScript', 'Python', 'Go', 'Rust', 'Outra']],
+                ],
                 'enrollments' => [
                     EnrollmentStatus::Cancelled->value => 8,
                 ],
@@ -279,6 +289,7 @@ final class EventsSeeder extends Seeder
             'xp_on_confirmed' => $spec['xp'][0],
             'xp_on_checked_in' => $spec['xp'][1],
             'xp_on_attended' => $spec['xp'][2],
+            'application_schema' => $spec['application_schema'] ?? null,
         ]);
     }
 
@@ -307,6 +318,7 @@ final class EventsSeeder extends Seeder
                     'status' => $status,
                     'waitlist_position' => $status === EnrollmentStatus::Waitlisted ? $waitlistPosition++ : null,
                     'rejection_reason' => $status === EnrollmentStatus::Rejected ? 'Vagas esgotadas.' : null,
+                    'application_data' => $this->fakeApplicationData($spec['application_schema'] ?? null),
                     ...$this->enrollmentTimestamps($status),
                 ]);
             }
@@ -405,6 +417,30 @@ final class EventsSeeder extends Seeder
             EnrollmentStatus::Cancelled => ['enrolled_at' => $enrolledAt, 'cancelled_at' => Date::now()->subDay()],
             EnrollmentStatus::Rejected => ['enrolled_at' => $enrolledAt],
         };
+    }
+
+    /**
+     * @param  array<int, array<string, mixed>>|null  $schema
+     * @return array<int, mixed>|null
+     */
+    private function fakeApplicationData(?array $schema): ?array
+    {
+        if ($schema === null) {
+            return null;
+        }
+
+        $data = [];
+
+        foreach ($schema as $index => $field) {
+            $data[$index] = match ($field['type'] ?? 'text') {
+                'select' => fake()->randomElement($field['options'] ?? ['Opção A']),
+                'checkbox' => blank($field['options']) ? [] : fake()->randomElements($field['options'], fake()->numberBetween(1, count($field['options']))),
+                'textarea' => fake()->paragraph(),
+                default => fake()->sentence(),
+            };
+        }
+
+        return $data;
     }
 
     private function resolveTenant(): Tenant

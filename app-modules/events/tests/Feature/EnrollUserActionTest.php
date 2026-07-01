@@ -333,3 +333,117 @@ test('when duplicate enrollment exists in database, then only one enrollment rec
 
     expect(Enrollment::query()->where('event_id', $event->id)->where('user_id', $user->id)->count())->toBe(1);
 });
+
+// ── Application enrollment ────────────────────────────────────────────────────
+
+test('when a user submits an application, then enrollment is pending with application_data and audit trail', function (): void {
+    EventFacade::fake([EnrollmentConfirmed::class]);
+
+    $user = User::factory()->create();
+    $tenant = Tenant::factory()->create();
+    $event = Event::factory()
+        ->published()
+        ->upcoming()
+        ->for($tenant)
+        ->has(EnrollmentPolicy::factory()->application([
+            ['type' => 'text', 'label' => 'Why do you want to join?', 'required' => true],
+        ]), 'enrollmentPolicy')
+        ->create();
+
+    $dto = new EnrollUserDTO(
+        eventId: $event->id,
+        userId: $user->id,
+        applicationData: [0 => 'I love PHP!'],
+    );
+
+    $enrollment = resolve(EnrollUserAction::class)->handle($dto);
+
+    expect($enrollment->status)->toBe(EnrollmentStatus::Pending)
+        ->and($enrollment->confirmed_at)->toBeNull()
+        ->and($enrollment->application_data)->toBe([0 => 'I love PHP!']);
+
+    $transition = EnrollmentTransition::query()
+        ->where('enrollment_id', $enrollment->id)
+        ->first();
+
+    expect($transition)->not->toBeNull()
+        ->and($transition->from_status)->toBeNull()
+        ->and($transition->to_status)->toBe(EnrollmentStatus::Pending)
+        ->and($transition->triggered_by)->toBe(TriggeredBy::User);
+
+    EventFacade::assertNotDispatched(EnrollmentConfirmed::class);
+});
+
+test('when application is submitted without applicationData, then exception is thrown', function (): void {
+    $user = User::factory()->create();
+    $tenant = Tenant::factory()->create();
+    $event = Event::factory()
+        ->published()
+        ->upcoming()
+        ->for($tenant)
+        ->has(EnrollmentPolicy::factory()->application(), 'enrollmentPolicy')
+        ->create();
+
+    resolve(EnrollUserAction::class)->handle(EnrollUserDTO::fromModels($event, $user));
+})->throws(EnrollmentException::class);
+
+test('when application is missing a required field, then exception is thrown', function (): void {
+    $user = User::factory()->create();
+    $tenant = Tenant::factory()->create();
+    $event = Event::factory()
+        ->published()
+        ->upcoming()
+        ->for($tenant)
+        ->has(EnrollmentPolicy::factory()->application([
+            ['type' => 'text', 'label' => 'Why?', 'required' => true],
+        ]), 'enrollmentPolicy')
+        ->create();
+
+    $dto = new EnrollUserDTO(
+        eventId: $event->id,
+        userId: $user->id,
+        applicationData: [0 => ''],
+    );
+
+    resolve(EnrollUserAction::class)->handle($dto);
+})->throws(EnrollmentException::class);
+
+test('when application is submitted with no schema defined, then enrollment is pending', function (): void {
+    $user = User::factory()->create();
+    $tenant = Tenant::factory()->create();
+    $event = Event::factory()
+        ->published()
+        ->upcoming()
+        ->for($tenant)
+        ->has(EnrollmentPolicy::factory()->application(), 'enrollmentPolicy')
+        ->create();
+
+    $dto = new EnrollUserDTO(
+        eventId: $event->id,
+        userId: $user->id,
+        applicationData: [],
+    );
+
+    $enrollment = resolve(EnrollUserAction::class)->handle($dto);
+
+    expect($enrollment->status)->toBe(EnrollmentStatus::Pending);
+});
+
+test('when application event is past, then application enrollment is rejected', function (): void {
+    $user = User::factory()->create();
+    $tenant = Tenant::factory()->create();
+    $event = Event::factory()
+        ->published()
+        ->past()
+        ->for($tenant)
+        ->has(EnrollmentPolicy::factory()->application(), 'enrollmentPolicy')
+        ->create();
+
+    $dto = new EnrollUserDTO(
+        eventId: $event->id,
+        userId: $user->id,
+        applicationData: [],
+    );
+
+    resolve(EnrollUserAction::class)->handle($dto);
+})->throws(EnrollmentException::class);

@@ -13,4 +13,6 @@ return [
     'override_reason_required' => 'É obrigatório informar um motivo ao sobrescrever o status de uma inscrição.',
     'override_not_allowed' => 'Sobrescrita de :from para :to não é permitida.',
     'override_status_changed' => 'O status da inscrição mudou de :expected para :actual antes da sobrescrita ser salva. Revise o status atual e tente novamente.',
+    'enrollment_not_pending' => 'Esta inscrição não está pendente e não pode ser aprovada ou rejeitada.',
+    'application_data_invalid' => 'Os dados enviados na candidatura são inválidos ou faltam respostas obrigatórias.',
 ];

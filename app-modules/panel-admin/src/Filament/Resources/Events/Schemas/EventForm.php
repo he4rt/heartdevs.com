@@ -5,8 +5,9 @@ declare(strict_types=1);
 namespace He4rt\PanelAdmin\Filament\Resources\Events\Schemas;
 
 use Filament\Forms\Components\DateTimePicker;
-use Filament\Forms\Components\KeyValue;
+use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Select;
+use Filament\Forms\Components\TagsInput;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
@@ -153,13 +154,38 @@ final class EventForm
                             ->minValue(0)
                             ->default(0),
 
-                        KeyValue::make('application_schema')
-                            ->label('Application Form Schema')
-                            ->keyLabel('Field name')
-                            ->valueLabel('Field type / label')
+                        Repeater::make('application_schema')
+                            ->label('Application Form Questions')
                             ->nullable()
                             ->columnSpanFull()
-                            ->visible(fn (Get $get): bool => $get('enrollment_method') === EnrollmentMethod::Application->value),
+                            ->visible(fn (Get $get): bool => $get('enrollment_method') === EnrollmentMethod::Application)
+                            ->addActionLabel('Add question')
+                            ->reorderable()
+                            ->collapsible()
+                            ->schema([
+                                Select::make('type')
+                                    ->label('Type')
+                                    ->options([
+                                        'text' => 'Short text',
+                                        'textarea' => 'Long text',
+                                        'select' => 'Single choice',
+                                        'checkbox' => 'Multiple choice',
+                                    ])
+                                    ->required()
+                                    ->live(),
+                                TextInput::make('label')
+                                    ->label('Question')
+                                    ->required()
+                                    ->maxLength(255),
+                                Toggle::make('required')
+                                    ->label('Required')
+                                    ->default(false),
+                                TagsInput::make('options')
+                                    ->label('Options')
+                                    ->placeholder('Type an option and press Enter')
+                                    ->visible(fn (Get $get): bool => in_array($get('type'), ['select', 'checkbox'], strict: true))
+                                    ->nullable(),
+                            ]),
                     ]),
             ]);
     }

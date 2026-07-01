@@ -1,0 +1,121 @@
+<?php
+
+declare(strict_types=1);
+
+use Filament\Facades\Filament;
+use He4rt\Events\Enrollment\Enums\EnrollmentStatus;
+use He4rt\Events\Enrollment\Models\Enrollment;
+use He4rt\Events\Enrollment\Models\EnrollmentPolicy;
+use He4rt\Events\Event\Models\Event;
+use He4rt\Identity\Tenant\Models\Tenant;
+use He4rt\Identity\User\Models\User;
+use He4rt\PanelApp\Livewire\Events\EventDetail;
+use He4rt\PanelApp\Pages\EventPage;
+
+use function Pest\Livewire\livewire;
+
+beforeEach(function (): void {
+    $this->user = User::factory()->create();
+    $this->tenant = Tenant::factory()->create(['slug' => 'test-tenant']);
+    $this->tenant->members()->attach($this->user);
+
+    $this->actingAs($this->user);
+
+    Filament::setCurrentPanel(Filament::getPanel('app'));
+    Filament::setTenant($this->tenant);
+
+    $this->schema = [
+        ['type' => 'text', 'label' => 'Why do you want to join?', 'required' => true],
+        ['type' => 'select', 'label' => 'Experience level', 'required' => false, 'options' => ['Beginner', 'Intermediate', 'Advanced']],
+    ];
+
+    $this->event = Event::factory()
+        ->published()
+        ->upcoming()
+        ->for($this->tenant)
+        ->has(EnrollmentPolicy::factory()->application($this->schema), 'enrollmentPolicy')
+        ->create(['title' => 'He4rt Conf Application']);
+});
+
+test('event page renders apply button for application event', function (): void {
+    $this->get(EventPage::getUrl(['record' => $this->event->id]))
+        ->assertSuccessful()
+        ->assertSee('He4rt Conf Application')
+        ->assertSee(__('events::pages.apply_submit'));
+});
+
+test('event detail shows canApply true and canConfirmPresence false for application event', function (): void {
+    livewire(EventDetail::class, ['eventId' => $this->event->id])
+        ->assertSet('canApply', true)
+        ->assertSet('canConfirmPresence', false);
+});
+
+test('when user submits application, then enrollment is created as pending', function (): void {
+    livewire(EventDetail::class, ['eventId' => $this->event->id])
+        ->set('applicationFormData', [0 => 'I love Laravel!', 1 => 'Intermediate'])
+        ->call('apply')
+        ->assertHasNoErrors()
+        ->assertNotified();
+
+    $enrollment = Enrollment::query()
+        ->where('event_id', $this->event->id)
+        ->where('user_id', $this->user->id)
+        ->first();
+
+    expect($enrollment)->not->toBeNull()
+        ->and($enrollment->status)->toBe(EnrollmentStatus::Pending)
+        ->and($enrollment->confirmed_at)->toBeNull()
+        ->and($enrollment->application_data[0])->toBe('I love Laravel!');
+});
+
+test('after submitting application, event detail shows pending status with answers', function (): void {
+    livewire(EventDetail::class, ['eventId' => $this->event->id])
+        ->set('applicationFormData', [0 => 'I love Laravel!', 1 => 'Intermediate'])
+        ->call('apply');
+
+    livewire(EventDetail::class, ['eventId' => $this->event->id])
+        ->assertSet('canApply', false)
+        ->assertSee(EnrollmentStatus::Pending->getLabel())
+        ->assertSee(__('events::pages.application_pending_hint'))
+        ->assertSee('I love Laravel!');
+});
+
+test('when application is rejected, then rejection reason is shown', function (): void {
+    Enrollment::factory()->create([
+        'event_id' => $this->event->id,
+        'user_id' => $this->user->id,
+        'status' => EnrollmentStatus::Rejected,
+        'enrolled_at' => now(),
+        'rejection_reason' => 'Not enough experience.',
+        'application_data' => [0 => 'I am new'],
+    ]);
+
+    livewire(EventDetail::class, ['eventId' => $this->event->id])
+        ->assertSet('canApply', false)
+        ->assertSee(EnrollmentStatus::Rejected->getLabel())
+        ->assertSee(__('events::pages.application_rejected_hint'))
+        ->assertSee('Not enough experience.');
+});
+
+test('when user has already applied, then apply button is not shown', function (): void {
+    Enrollment::factory()->create([
+        'event_id' => $this->event->id,
+        'user_id' => $this->user->id,
+        'status' => EnrollmentStatus::Pending,
+        'enrolled_at' => now(),
+        'application_data' => [0 => 'My answer'],
+    ]);
+
+    livewire(EventDetail::class, ['eventId' => $this->event->id])
+        ->assertSet('canApply', false)
+        ->assertDontSee(__('events::pages.apply_submit'));
+});
+
+test('when application data is missing required field, then error notification is shown', function (): void {
+    livewire(EventDetail::class, ['eventId' => $this->event->id])
+        ->set('applicationFormData', [0 => '', 1 => 'Beginner'])
+        ->call('apply')
+        ->assertNotified();
+
+    expect(Enrollment::query()->where('event_id', $this->event->id)->count())->toBe(0);
+});

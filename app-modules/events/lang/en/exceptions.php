@@ -13,4 +13,6 @@ return [
     'override_reason_required' => 'A reason is required when overriding an enrollment status.',
     'override_not_allowed' => 'Override from :from to :to is not allowed.',
     'override_status_changed' => 'Enrollment status changed from :expected to :actual before the override was saved. Review the current status and try again.',
+    'enrollment_not_pending' => 'This enrollment is not pending and cannot be approved or rejected.',
+    'application_data_invalid' => 'The submitted application data is invalid or missing required answers.',
 ];

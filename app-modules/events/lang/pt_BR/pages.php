@@ -28,4 +28,11 @@ return [
     'no_check_ins_yet' => 'Nenhum check-in registrado ainda.',
     'enter_check_in_code_hint' => 'Insira o código de check-in informado pelo organizador.',
     'check_in' => 'Fazer Check-in',
+    'apply_hint' => 'Preencha o formulário abaixo para se candidatar a este evento.',
+    'apply_submit' => 'Enviar Candidatura',
+    'application_submitted' => 'Sua candidatura foi enviada e está aguardando avaliação.',
+    'application_pending_hint' => 'Sua candidatura está em análise. Você será notificado quando for avaliada.',
+    'application_your_answers' => 'Suas Respostas',
+    'application_rejected_hint' => 'Sua candidatura não foi aceita.',
+    'application_rejection_reason' => 'Motivo: :reason',
 ];

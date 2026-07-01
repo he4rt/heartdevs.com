@@ -27,7 +27,7 @@ final readonly class EnrollUserAction
         return DB::transaction(function () use ($dto): Enrollment {
             [$event, $policy] = $this->loadLockedEnrollmentContext($dto->eventId);
 
-            $this->validate($event, $policy, $dto->userId);
+            $this->validate($event, $policy, $dto->userId, $dto->applicationData);
 
             $initial = $this->resolveInitialEnrollment($dto->eventId, $policy);
 
@@ -39,6 +39,7 @@ final readonly class EnrollUserAction
                     'enrolled_at' => now(),
                     'confirmed_at' => $initial['confirmedAt'],
                     'waitlist_position' => $initial['waitlistPosition'],
+                    'application_data' => $dto->applicationData,
                 ]);
 
                 EnrollmentTransition::query()->create([
@@ -103,6 +104,14 @@ final readonly class EnrollUserAction
      */
     private function resolveInitialEnrollment(string $eventId, ?EnrollmentPolicy $policy): array
     {
+        if ($policy?->enrollment_method === EnrollmentMethod::Application) {
+            return [
+                'status' => EnrollmentStatus::Pending,
+                'waitlistPosition' => null,
+                'confirmedAt' => null,
+            ];
+        }
+
         $capacity = $policy?->capacity;
 
         if ($capacity === null) {
@@ -142,7 +151,10 @@ final readonly class EnrollUserAction
         throw EnrollmentException::eventFull();
     }
 
-    private function validate(Event $event, ?EnrollmentPolicy $policy, string $userId): void
+    /**
+     * @param  array<string, mixed>|null  $applicationData
+     */
+    private function validate(Event $event, ?EnrollmentPolicy $policy, string $userId, ?array $applicationData): void
     {
         throw_unless(
             $event->status === EventStatus::Published,
@@ -154,10 +166,12 @@ final readonly class EnrollUserAction
             EnrollmentException::eventPast(),
         );
 
+        $method = $policy?->enrollment_method;
+
         throw_unless(
             in_array(
-                $policy?->enrollment_method,
-                [EnrollmentMethod::Rsvp, EnrollmentMethod::RsvpCheckin],
+                $method,
+                [EnrollmentMethod::Rsvp, EnrollmentMethod::RsvpCheckin, EnrollmentMethod::Application],
                 strict: true,
             ),
             EnrollmentException::invalidEnrollmentMethod(),
@@ -170,5 +184,56 @@ final readonly class EnrollUserAction
                 ->exists(),
             EnrollmentException::alreadyEnrolled(),
         );
+
+        if ($method === EnrollmentMethod::Application) {
+            throw_if(
+                $applicationData === null,
+                EnrollmentException::applicationDataInvalid(),
+            );
+
+            $this->validateApplicationData($applicationData, $policy->application_schema ?? []);
+        }
+    }
+
+    /**
+     * @param  array<string, mixed>  $data
+     * @param  array<int, array<string, mixed>>  $schema
+     */
+    private function validateApplicationData(array $data, array $schema): void
+    {
+        foreach ($schema as $index => $field) {
+            $value = $data[$index] ?? null;
+            $type = $field['type'] ?? '';
+
+            if ($type === 'checkbox') {
+                $selected = is_array($value) ? $value : [];
+
+                throw_if(
+                    ($field['required'] ?? false) && $selected === [],
+                    EnrollmentException::applicationDataInvalid(),
+                );
+
+                $options = $field['options'] ?? [];
+                foreach ($selected as $option) {
+                    throw_unless(
+                        in_array($option, $options, strict: true),
+                        EnrollmentException::applicationDataInvalid(),
+                    );
+                }
+
+                continue;
+            }
+
+            if (($field['required'] ?? false) && (in_array($value, [null, '', false], true))) {
+                throw EnrollmentException::applicationDataInvalid();
+            }
+
+            if ($type === 'select' && $value !== null) {
+                $options = $field['options'] ?? [];
+                if (!in_array($value, $options, strict: true)) {
+                    throw EnrollmentException::applicationDataInvalid();
+                }
+            }
+        }
     }
 }

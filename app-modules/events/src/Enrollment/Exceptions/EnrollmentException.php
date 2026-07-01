@@ -65,4 +65,20 @@ final class EnrollmentException extends Exception
             Response::HTTP_INTERNAL_SERVER_ERROR,
         );
     }
+
+    public static function enrollmentNotPending(): self
+    {
+        return new self(
+            __('events::exceptions.enrollment_not_pending'),
+            Response::HTTP_UNPROCESSABLE_ENTITY,
+        );
+    }
+
+    public static function applicationDataInvalid(): self
+    {
+        return new self(
+            __('events::exceptions.application_data_invalid'),
+            Response::HTTP_UNPROCESSABLE_ENTITY,
+        );
+    }
 }

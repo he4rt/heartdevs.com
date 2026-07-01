@@ -34,15 +34,25 @@ use Livewire\Component;
  * @property-read Collection<int, CheckIn> $checkIns
  * @property-read bool $hasCheckedInToday
  * @property-read bool $canConfirmPresence
+ * @property-read bool $canApply
  * @property-read bool $isEventFull
  */
 final class EventDetail extends Component
 {
     public string $eventId;
 
+    /** @var array<int|string, mixed> */
+    public array $applicationFormData = [];
+
     public function mount(string $eventId): void
     {
         $this->eventId = $eventId;
+
+        foreach ($this->event->enrollmentPolicy?->application_schema ?? [] as $index => $field) {
+            if (($field['type'] ?? null) === 'checkbox') {
+                $this->applicationFormData[$index] = [];
+            }
+        }
     }
 
     #[Computed]
@@ -156,6 +166,24 @@ final class EventDetail extends Component
     }
 
     #[Computed]
+    public function canApply(): bool
+    {
+        if ($this->event->status !== EventStatus::Published) {
+            return false;
+        }
+
+        if ($this->enrollment !== null) {
+            return false;
+        }
+
+        if ($this->event->enrollmentPolicy?->enrollment_method !== EnrollmentMethod::Application) {
+            return false;
+        }
+
+        return $this->event->starts_at->isFuture();
+    }
+
+    #[Computed]
     public function isEventFull(): bool
     {
         if ($this->enrollment !== null) {
@@ -186,11 +214,40 @@ final class EventDetail extends Component
                 EnrollUserDTO::fromModels($this->event, $user),
             );
 
-            unset($this->enrollment, $this->canConfirmPresence, $this->isEventFull);
+            unset($this->enrollment, $this->canConfirmPresence, $this->canApply, $this->isEventFull);
 
             Notification::make()
                 ->success()
                 ->title($enrollment->status->getResponseMessage($enrollment->waitlist_position))
+                ->send();
+        } catch (EnrollmentException $enrollmentException) {
+            Notification::make()
+                ->danger()
+                ->title($enrollmentException->getMessage())
+                ->send();
+        }
+    }
+
+    public function apply(): void
+    {
+        /** @var User $user */
+        $user = auth()->user();
+
+        try {
+            resolve(EnrollUserAction::class)->handle(
+                new EnrollUserDTO(
+                    eventId: $this->event->id,
+                    userId: $user->id,
+                    applicationData: $this->applicationFormData,
+                ),
+            );
+
+            unset($this->enrollment, $this->canApply);
+            $this->applicationFormData = [];
+
+            Notification::make()
+                ->success()
+                ->title(__('events::pages.application_submitted'))
                 ->send();
         } catch (EnrollmentException $enrollmentException) {
             Notification::make()
