@@ -10,7 +10,7 @@ use He4rt\Identity\User\Models\User;
 final readonly class EnrollUserDTO
 {
     /**
-     * @param  array<string, mixed>|null  $applicationData
+     * @param  array<int, mixed>|null  $applicationData
      */
     public function __construct(
         public string $eventId,

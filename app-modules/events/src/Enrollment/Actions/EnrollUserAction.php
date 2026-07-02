@@ -152,7 +152,7 @@ final readonly class EnrollUserAction
     }
 
     /**
-     * @param  array<string, mixed>|null  $applicationData
+     * @param  array<int, mixed>|null  $applicationData
      */
     private function validate(Event $event, ?EnrollmentPolicy $policy, string $userId, ?array $applicationData): void
     {
@@ -196,7 +196,7 @@ final readonly class EnrollUserAction
     }
 
     /**
-     * @param  array<string, mixed>  $data
+     * @param  array<int, mixed>  $data
      * @param  array<int, array<string, mixed>>  $schema
      */
     private function validateApplicationData(array $data, array $schema): void

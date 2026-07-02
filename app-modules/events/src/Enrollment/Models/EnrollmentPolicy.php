@@ -30,7 +30,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property int $xp_on_confirmed
  * @property int $xp_on_checked_in
  * @property int $xp_on_attended
- * @property array<string, mixed>|null $application_schema
+ * @property array<int, array<string, mixed>>|null $application_schema
  * @property Carbon $created_at
  * @property Carbon $updated_at
  */
