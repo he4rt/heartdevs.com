@@ -37,7 +37,7 @@ final class EnrollmentsRelationManager extends RelationManager
     public function table(Table $table): Table
     {
         return $table
-            ->recordTitleAttribute('id')
+            ->recordTitle(fn (Enrollment $record): string => $record->user?->name ?? $record->id)
             ->modifyQueryUsing(fn (Builder $query): Builder => $query->with(['checkIns', 'user']))
             ->columns([
                 TextColumn::make('user.name')

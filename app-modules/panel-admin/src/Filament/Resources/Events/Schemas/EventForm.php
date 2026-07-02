@@ -184,7 +184,7 @@ final class EventForm
                                     ->label('Options')
                                     ->placeholder('Type an option and press Enter')
                                     ->visible(fn (Get $get): bool => in_array($get('type'), ['select', 'checkbox'], strict: true))
-                                    ->nullable(),
+                                    ->required(fn (Get $get): bool => in_array($get('type'), ['select', 'checkbox'], strict: true)),
                             ]),
                     ]),
             ]);
