@@ -25,11 +25,17 @@ use He4rt\Events\Event\Models\Event;
 use He4rt\PanelAdmin\Filament\Resources\Events\RelationManagers\Actions\OverrideEnrollmentStatusAction;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Date;
 
 final class EnrollmentsRelationManager extends RelationManager
 {
     protected static string $relationship = 'enrollments';
+
+    public static function getTitle(Model $ownerRecord, string $pageClass): string
+    {
+        return __('panel-admin::events.relations.enrollments');
+    }
 
     public function table(Table $table): Table
     {
@@ -38,33 +44,33 @@ final class EnrollmentsRelationManager extends RelationManager
             ->modifyQueryUsing(fn (Builder $query): Builder => $query->with(['checkIns', 'user']))
             ->columns([
                 TextColumn::make('user.name')
-                    ->label('Participant')
+                    ->label(__('panel-admin::events.enrollments.columns.participant'))
                     ->searchable()
                     ->sortable(),
 
                 TextColumn::make('status')
-                    ->label('Status')
+                    ->label(__('panel-admin::events.columns.status'))
                     ->badge()
                     ->sortable(),
 
                 TextColumn::make('waitlist_position')
-                    ->label('Waitlist')
+                    ->label(__('panel-admin::events.enrollments.columns.waitlist'))
                     ->sortable()
                     ->placeholder('-')
                     ->toggleable(),
 
                 TextColumn::make('enrolled_at')
-                    ->label('Enrolled At')
+                    ->label(__('panel-admin::events.enrollments.columns.enrolled_at'))
                     ->dateTime()
                     ->sortable(),
 
                 TextColumn::make('confirmed_at')
-                    ->label('Confirmed At')
+                    ->label(__('panel-admin::events.enrollments.columns.confirmed_at'))
                     ->dateTime()
                     ->sortable(),
 
                 TextColumn::make('check_in_history')
-                    ->label('Check-in History')
+                    ->label(__('panel-admin::events.enrollments.columns.check_in_history'))
                     ->state(fn (Enrollment $record): string => $record->checkIns
                         ->sortBy('event_date')
                         ->map(fn (CheckIn $checkIn): string => $checkIn->event_date->toDateString())
@@ -73,14 +79,14 @@ final class EnrollmentsRelationManager extends RelationManager
                     ->toggleable(),
 
                 TextColumn::make('cancelled_at')
-                    ->label('Cancelled At')
+                    ->label(__('panel-admin::events.enrollments.columns.cancelled_at'))
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
                 SelectFilter::make('status')
-                    ->label('Status')
+                    ->label(__('panel-admin::events.columns.status'))
                     ->options(EnrollmentStatus::class),
             ])
             ->recordActions([
@@ -99,7 +105,7 @@ final class EnrollmentsRelationManager extends RelationManager
     private function checkInAction(): Action
     {
         return Action::make('checkIn')
-            ->label('Check In')
+            ->label(__('panel-admin::events.enrollments.actions.check_in'))
             ->icon(Heroicon::OutlinedCheckCircle)
             ->color('success')
             ->visible(fn (Enrollment $record): bool => $record->status->is(EnrollmentStatus::Confirmed, EnrollmentStatus::CheckedIn))
@@ -109,7 +115,7 @@ final class EnrollmentsRelationManager extends RelationManager
 
                 Notification::make()
                     ->success()
-                    ->title('Participant checked in.')
+                    ->title(__('panel-admin::events.enrollments.notifications.participant_checked_in'))
                     ->send();
             });
     }
@@ -117,7 +123,7 @@ final class EnrollmentsRelationManager extends RelationManager
     private function bulkCheckInAction(): BulkAction
     {
         return BulkAction::make('checkInSelected')
-            ->label('Check In Selected')
+            ->label(__('panel-admin::events.enrollments.actions.check_in_selected'))
             ->icon(Heroicon::OutlinedCheckCircle)
             ->color('success')
             ->schema($this->checkInSchema())
@@ -132,7 +138,7 @@ final class EnrollmentsRelationManager extends RelationManager
 
                 Notification::make()
                     ->success()
-                    ->title('Selected participants checked in.')
+                    ->title(__('panel-admin::events.enrollments.notifications.selected_participants_checked_in'))
                     ->send();
             })
             ->deselectRecordsAfterCompletion();
@@ -148,7 +154,7 @@ final class EnrollmentsRelationManager extends RelationManager
 
         return [
             DatePicker::make('event_date')
-                ->label('Date')
+                ->label(__('panel-admin::events.columns.date'))
                 ->default(now())
                 ->minDate($event->starts_at->toDateString())
                 ->maxDate($event->ends_at->toDateString())

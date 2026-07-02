@@ -32,17 +32,17 @@ final class EditEvent extends EditRecord
     {
         return [
             Action::make('scanQr')
-                ->label('Scan QR')
+                ->label(__('panel-admin::events.edit.scan_qr'))
                 ->icon(Heroicon::QrCode)
                 ->color('success')
                 ->schema([
                     TextInput::make('token')
-                        ->label('QR Token')
+                        ->label(__('panel-admin::events.edit.qr_token'))
                         ->required()
                         ->autofocus()
-                        ->placeholder('Scan or paste the participant token'),
+                        ->placeholder(__('panel-admin::events.edit.qr_token_placeholder')),
                 ])
-                ->modalSubmitActionLabel('Check In')
+                ->modalSubmitActionLabel(__('panel-admin::events.edit.check_in_submit'))
                 ->action(function (array $data): void {
                     /** @var Event $event */
                     $event = $this->getRecord();
@@ -58,24 +58,26 @@ final class EditEvent extends EditRecord
                         );
 
                         $checkIn->enrollment->loadMissing('user');
-                        $participantName = $checkIn->enrollment->user->name ?? 'Participant';
+                        $participantName = $checkIn->enrollment->user->name ?? __('panel-admin::events.edit.participant_fallback');
 
                         Notification::make()
                             ->success()
-                            ->title('Check-in successful')
-                            ->body($participantName.' has been checked in.')
+                            ->title(__('panel-admin::events.edit.notifications.check_in_success_title'))
+                            ->body(__('panel-admin::events.edit.notifications.check_in_success_body', [
+                                'name' => $participantName,
+                            ]))
                             ->send();
                     } catch (CheckInException $e) {
                         Notification::make()
                             ->danger()
-                            ->title('Check-in failed')
+                            ->title(__('panel-admin::events.edit.notifications.check_in_failed_title'))
                             ->body($e->getMessage())
                             ->send();
                     } catch (Throwable $e) {
                         Notification::make()
                             ->danger()
-                            ->title('Check-in failed')
-                            ->body('An unexpected error occurred. Please try again.')
+                            ->title(__('panel-admin::events.edit.notifications.check_in_failed_title'))
+                            ->body(__('panel-admin::events.edit.notifications.check_in_unexpected_error'))
                             ->send();
 
                         report($e);

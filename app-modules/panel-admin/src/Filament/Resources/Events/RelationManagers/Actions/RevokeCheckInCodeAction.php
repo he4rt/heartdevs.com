@@ -15,7 +15,7 @@ final class RevokeCheckInCodeAction extends Action
     {
         parent::setUp();
 
-        $this->label('Revoke')
+        $this->label(__('panel-admin::events.check_in_codes.actions.revoke'))
             ->icon(Heroicon::OutlinedNoSymbol)
             ->color('danger')
             ->visible(fn (CheckInCode $record): bool => $record->revoked_at === null)
@@ -25,7 +25,7 @@ final class RevokeCheckInCodeAction extends Action
 
                 Notification::make()
                     ->success()
-                    ->title('Code revoked.')
+                    ->title(__('panel-admin::events.check_in_codes.notifications.code_revoked'))
                     ->send();
             });
     }

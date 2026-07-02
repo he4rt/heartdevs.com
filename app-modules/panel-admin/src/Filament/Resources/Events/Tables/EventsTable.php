@@ -21,48 +21,48 @@ final class EventsTable
         return $table
             ->columns([
                 TextColumn::make('title')
-                    ->label('Title')
+                    ->label(__('panel-admin::events.columns.title'))
                     ->searchable()
                     ->sortable(),
 
                 TextColumn::make('event_type')
-                    ->label('Type')
+                    ->label(__('panel-admin::events.columns.type'))
                     ->badge()
                     ->sortable(),
 
                 TextColumn::make('tenant.name')
-                    ->label('Tenant')
+                    ->label(__('panel-admin::events.columns.tenant'))
                     ->searchable()
                     ->sortable(),
 
                 TextColumn::make('starts_at')
-                    ->label('Starts At')
+                    ->label(__('panel-admin::events.columns.starts_at'))
                     ->dateTime()
                     ->sortable(),
 
                 TextColumn::make('ends_at')
-                    ->label('Ends At')
+                    ->label(__('panel-admin::events.columns.ends_at'))
                     ->dateTime()
                     ->sortable(),
 
                 TextColumn::make('status')
-                    ->label('Status')
+                    ->label(__('panel-admin::events.columns.status'))
                     ->badge()
                     ->sortable(),
 
                 TextColumn::make('created_at')
-                    ->label('Created At')
+                    ->label(__('panel-admin::events.columns.created_at'))
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
                 SelectFilter::make('event_type')
-                    ->label('Type')
+                    ->label(__('panel-admin::events.columns.type'))
                     ->options(EventType::class),
 
                 SelectFilter::make('status')
-                    ->label('Status')
+                    ->label(__('panel-admin::events.columns.status'))
                     ->options(EventStatus::class),
             ])
             ->recordActions([
