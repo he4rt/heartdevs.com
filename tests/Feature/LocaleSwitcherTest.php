@@ -36,6 +36,16 @@ it('applies locale from session via middleware', function (): void {
     });
 });
 
+it('formats datetimes according to the active locale', function (): void {
+    ApplicationLocale::apply(ApplicationLocale::PT_BR);
+
+    expect(ApplicationLocale::dateTimeFormat())->toBe('d/m/Y H:i:s');
+
+    ApplicationLocale::apply(ApplicationLocale::EN);
+
+    expect(ApplicationLocale::dateTimeFormat())->toBe('M j, Y H:i:s');
+});
+
 it('falls back to english for invalid session locale', function (): void {
     session([ApplicationLocale::SESSION_KEY => 'invalid']);
 

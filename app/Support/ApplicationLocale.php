@@ -51,4 +51,20 @@ final class ApplicationLocale
             default => 'en',
         };
     }
+
+    public static function dateFormat(): string
+    {
+        return match (app()->getLocale()) {
+            self::PT_BR => 'd/m/Y',
+            default => 'M j, Y',
+        };
+    }
+
+    public static function dateTimeFormat(): string
+    {
+        return match (app()->getLocale()) {
+            self::PT_BR => 'd/m/Y H:i:s',
+            default => 'M j, Y H:i:s',
+        };
+    }
 }
