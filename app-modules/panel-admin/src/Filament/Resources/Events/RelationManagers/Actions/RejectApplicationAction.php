@@ -20,13 +20,13 @@ final class RejectApplicationAction extends Action
     {
         parent::setUp();
 
-        $this->label('Reject')
+        $this->label(__('events::pages.admin_reject_application'))
             ->icon(Heroicon::OutlinedXCircle)
             ->color('danger')
             ->visible(fn (Enrollment $record): bool => $record->status === EnrollmentStatus::Pending)
             ->schema([
                 Textarea::make('reason')
-                    ->label('Rejection Reason')
+                    ->label(__('events::pages.admin_reject_application_reason_label'))
                     ->required()
                     ->minLength(3)
                     ->maxLength(500)
@@ -44,7 +44,7 @@ final class RejectApplicationAction extends Action
 
                     Notification::make()
                         ->success()
-                        ->title('Application rejected.')
+                        ->title(__('events::pages.admin_reject_application_success'))
                         ->send();
                 } catch (EnrollmentException $enrollmentException) {
                     Notification::make()

@@ -191,7 +191,7 @@
                                 class="focus:border-primary-500 focus:ring-primary-500 mt-1 block w-full rounded-lg border border-gray-300 p-2 text-sm shadow-sm dark:border-white/20 dark:bg-white/5 dark:text-white"
                                 @if ($field['required'] ?? false) required @endif
                             >
-                                <option value="">Select an option</option>
+                                <option value="">{{ __('events::pages.apply_select_option_placeholder') }}</option>
                                 @foreach ($field['options'] ?? [] as $option)
                                     <option value="{{ $option }}">{{ $option }}</option>
                                 @endforeach

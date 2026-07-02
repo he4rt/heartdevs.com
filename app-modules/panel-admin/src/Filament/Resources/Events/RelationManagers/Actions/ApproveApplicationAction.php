@@ -19,13 +19,13 @@ final class ApproveApplicationAction extends Action
     {
         parent::setUp();
 
-        $this->label('Approve')
+        $this->label(__('events::pages.admin_approve_application'))
             ->icon(Heroicon::OutlinedCheckCircle)
             ->color('success')
             ->visible(fn (Enrollment $record): bool => $record->status === EnrollmentStatus::Pending)
             ->requiresConfirmation()
-            ->modalHeading('Approve Application')
-            ->modalDescription(fn (Enrollment $record): string => sprintf('Approve the application from %s?', $record->user?->name))
+            ->modalHeading(__('events::pages.admin_approve_application_modal_heading'))
+            ->modalDescription(fn (Enrollment $record): string => __('events::pages.admin_approve_application_modal_description', ['name' => $record->user?->name]))
             ->action(function (Enrollment $record): void {
                 try {
                     resolve(ApproveApplicationDomainAction::class)->handle(
@@ -37,7 +37,7 @@ final class ApproveApplicationAction extends Action
 
                     Notification::make()
                         ->success()
-                        ->title('Application approved.')
+                        ->title(__('events::pages.admin_approve_application_success'))
                         ->send();
                 } catch (EnrollmentException $enrollmentException) {
                     Notification::make()
