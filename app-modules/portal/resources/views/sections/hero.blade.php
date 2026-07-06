@@ -46,8 +46,32 @@
                     </span>
                 </div>
             </div>
-            <div class="flex min-w-0 flex-col items-center justify-center">
+            <div class="flex min-w-0 flex-col items-center justify-center gap-6">
                 <x-portal::terminal :stats="$this->terminalStats" />
+
+                <x-he4rt::card
+                    href="/docs"
+                    density="compact"
+                    class="h-auto w-full max-w-md shadow-lg lg:max-w-lg"
+                    aria-label="Abrir documentação da comunidade"
+                >
+                    <div class="flex items-center gap-4">
+                        <div class="text-primary flex h-12 w-12 shrink-0 items-center justify-center rounded-full border border-current/15 bg-current/8">
+                            <x-filament::icon icon="heroicon-o-light-bulb" class="h-6 w-6" />
+                        </div>
+
+                        <div class="min-w-0 flex-1">
+                            <p class="text-text-high text-base font-semibold">
+                                Novo por aqui?
+                            </p>
+                            <p class="text-text-medium text-sm">
+                                Confira nossa documentação e descubra como participar.
+                            </p>
+                        </div>
+
+                        <x-filament::icon icon="heroicon-o-chevron-right" class="text-primary h-5 w-5 shrink-0" />
+                    </div>
+                </x-he4rt::card>
             </div>
         </div>
     </div>
