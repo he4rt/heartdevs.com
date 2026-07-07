@@ -13,6 +13,6 @@ Route::prefix('api/webhooks/twitch')
         VerifyTwitchSignature::class,
     ])
     ->group(static function (): void {
-        Route::post('/eventsub/{tenant:slug}', TwitchWebhookController::class)
+        Route::post('/eventsub', TwitchWebhookController::class)
             ->name('twitch.eventsub.webhook');
     });

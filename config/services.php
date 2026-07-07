@@ -51,6 +51,8 @@ return [
         'enabled' => env('TWITCH_OAUTH_ENABLED', default: true),
         'eventsub_secret' => env('TWITCH_EVENTSUB_SECRET', 'h34rt-tw1tch-3v3ntsub-s3cr3t-k3y'),
         'eventsub_callback' => env('TWITCH_EVENTSUB_CALLBACK'),
+        'broadcaster_login' => env('TWITCH_BROADCASTER_LOGIN'),
+        'broadcaster_id' => env('TWITCH_BROADCASTER_ID'),
     ],
 
     'devto' => [

@@ -4,25 +4,25 @@ declare(strict_types=1);
 
 namespace He4rt\IntegrationTwitch\Console;
 
-use He4rt\Identity\ExternalIdentity\Data\ClientAccessManager;
-use He4rt\Identity\ExternalIdentity\Enums\CredentialsType;
-use He4rt\Identity\ExternalIdentity\Enums\IdentityProvider;
-use He4rt\Identity\ExternalIdentity\Enums\IdentityType;
-use He4rt\Identity\Tenant\Models\Tenant;
 use He4rt\IntegrationTwitch\Transport\Requests\Users\GetUsers;
 use He4rt\IntegrationTwitch\Transport\TwitchHelixConnector;
 use Illuminate\Console\Attributes\Description;
 use Illuminate\Console\Attributes\Signature;
 use Illuminate\Console\Command;
 
-#[Description('Link a Twitch channel to a tenant via ExternalIdentity')]
-#[Signature('twitch:link-channel {login : Twitch channel login name} {--tenant= : Tenant slug or ID}')]
+#[Description('Resolve a Twitch channel broadcaster id for the fixed config-based integration')]
+#[Signature('twitch:link-channel {login? : Twitch channel login name (defaults to config broadcaster login)}')]
 final class LinkTwitchChannelCommand extends Command
 {
     public function handle(TwitchHelixConnector $helix): int
     {
-        $login = $this->argument('login');
-        $tenantOption = $this->option('tenant');
+        $login = $this->argument('login') ?? config()->string('services.twitch.broadcaster_login', '');
+
+        if ($login === '') {
+            $this->error('No Twitch login provided. Pass a login argument or set TWITCH_BROADCASTER_LOGIN.');
+
+            return self::FAILURE;
+        }
 
         $response = $helix->send(new GetUsers(login: $login));
         $users = $response->json('data', []);
@@ -37,46 +37,12 @@ final class LinkTwitchChannelCommand extends Command
         $broadcasterId = $twitchUser['id'];
         $displayName = $twitchUser['display_name'];
 
-        $query = Tenant::query()->where('slug', $tenantOption);
-
-        if (is_numeric($tenantOption)) {
-            $query->orWhere('id', $tenantOption);
-        }
-
-        $tenant = $query->first();
-
-        if (!$tenant) {
-            $this->error(sprintf("Tenant '%s' not found.", $tenantOption));
-
-            return self::FAILURE;
-        }
-
-        $existing = $tenant->providers()
-            ->where('provider', IdentityProvider::Twitch)
-            ->where('external_account_id', $broadcasterId)
-            ->first();
-
-        if ($existing) {
-            $this->warn(sprintf("Channel '%s' (ID: %s) is already linked to tenant '%s'.", $login, $broadcasterId, $tenant->name));
-
-            return self::SUCCESS;
-        }
-
-        $tenant->providers()->create([
-            'tenant_id' => $tenant->getKey(),
-            'type' => IdentityType::External,
-            'provider' => IdentityProvider::Twitch,
-            'credentials_type' => CredentialsType::OAuth2,
-            'credentials' => ClientAccessManager::make(),
-            'external_account_id' => $broadcasterId,
-            'connected_at' => now(),
-            'metadata' => [
-                'login' => $login,
-                'display_name' => $displayName,
-            ],
-        ]);
-
-        $this->info(sprintf("Linked Twitch channel '%s' (ID: %s) to tenant '%s'.", $displayName, $broadcasterId, $tenant->name));
+        $this->info(sprintf("Resolved Twitch channel '%s' (login: %s).", $displayName, $login));
+        $this->line(sprintf('Broadcaster ID: %s', $broadcasterId));
+        $this->newLine();
+        $this->comment('Set the following in your .env to activate the integration:');
+        $this->line(sprintf('  TWITCH_BROADCASTER_LOGIN=%s', $login));
+        $this->line(sprintf('  TWITCH_BROADCASTER_ID=%s', $broadcasterId));
 
         return self::SUCCESS;
     }

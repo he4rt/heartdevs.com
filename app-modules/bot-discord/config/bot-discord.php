@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 return [
+    'guild_id' => env('HE4RT_DISCORD_GUILD_ID'),
     'channels' => [
         'auto-report' => env('HE4RT_AUTO_REPORT_CHANNEL_ID', '1045804587195576451'),
         'presentations' => env('HE4RT_PRESENTATIONS_CHANNEL_ID', '540993663468306433'),
