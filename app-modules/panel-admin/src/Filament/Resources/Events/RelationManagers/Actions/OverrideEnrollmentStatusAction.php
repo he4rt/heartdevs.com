@@ -20,19 +20,19 @@ final class OverrideEnrollmentStatusAction extends Action
     {
         parent::setUp();
 
-        $this->label('Override Status')
+        $this->label(__('panel-admin::events.enrollments.actions.override_status'))
             ->icon(Heroicon::OutlinedPencilSquare)
             ->color('warning')
             ->visible(fn (Enrollment $record): bool => OverrideEnrollmentStatusDomainAction::allowedTargetsFor($record->status) !== [])
             ->schema([
                 Select::make('to_status')
-                    ->label('New Status')
+                    ->label(__('panel-admin::events.enrollments.actions.new_status'))
                     ->options(fn (Enrollment $record): array => collect(OverrideEnrollmentStatusDomainAction::allowedTargetsFor($record->status))
                         ->mapWithKeys(fn (EnrollmentStatus $s): array => [$s->value => $s->getLabel()])
                         ->all())
                     ->required(),
                 Textarea::make('reason')
-                    ->label('Reason')
+                    ->label(__('panel-admin::events.enrollments.actions.reason'))
                     ->required()
                     ->minLength(3)
                     ->rows(3),
@@ -50,7 +50,7 @@ final class OverrideEnrollmentStatusAction extends Action
 
                 Notification::make()
                     ->success()
-                    ->title('Enrollment status overridden.')
+                    ->title(__('panel-admin::events.enrollments.notifications.status_overridden'))
                     ->send();
             });
     }

@@ -1,4 +1,5 @@
 @import '../../../../vendor/filament/filament/resources/css/theme.css';
+@import '../locale-switcher.css' layer(components);
 
 @source '../../../../app/Filament/**/*';
 @source '../../../../app/Filament/**/*';

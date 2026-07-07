@@ -29,6 +29,21 @@ final class EventResource extends Resource
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedCalendarDays;
 
+    public static function getNavigationLabel(): string
+    {
+        return __('panel-admin::events.plural');
+    }
+
+    public static function getModelLabel(): string
+    {
+        return __('panel-admin::events.label');
+    }
+
+    public static function getPluralModelLabel(): string
+    {
+        return __('panel-admin::events.plural');
+    }
+
     public static function form(Schema $schema): Schema
     {
         return EventForm::configure($schema);

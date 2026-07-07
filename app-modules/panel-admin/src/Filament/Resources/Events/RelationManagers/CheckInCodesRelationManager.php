@@ -18,7 +18,10 @@ final class CheckInCodesRelationManager extends RelationManager
 {
     protected static string $relationship = 'checkInCodes';
 
-    protected static ?string $title = 'Check-in Codes';
+    public static function getTitle(Model $ownerRecord, string $pageClass): string
+    {
+        return __('panel-admin::events.relations.check_in_codes');
+    }
 
     public static function getBadge(Model $ownerRecord, string $pageClass): string
     {
@@ -33,32 +36,32 @@ final class CheckInCodesRelationManager extends RelationManager
             ->modifyQueryUsing(fn (Builder $query): Builder => $query->latest())
             ->columns([
                 TextColumn::make('code')
-                    ->label('Code')
+                    ->label(__('panel-admin::events.columns.code'))
                     ->badge()
                     ->color(fn (CheckInCode $record): string => $record->revoked_at !== null ? 'gray' : ($record->expires_at->isPast() ? 'warning' : 'success'))
                     ->searchable(),
 
                 TextColumn::make('event_date')
-                    ->label('Event Date')
+                    ->label(__('panel-admin::events.columns.event_date'))
                     ->date()
                     ->sortable(),
 
                 TextColumn::make('starts_at')
-                    ->label('Valid From')
+                    ->label(__('panel-admin::events.columns.valid_from'))
                     ->dateTime()
                     ->sortable(),
 
                 TextColumn::make('expires_at')
-                    ->label('Expires At')
+                    ->label(__('panel-admin::events.columns.expires_at'))
                     ->dateTime()
                     ->sortable(),
 
                 TextColumn::make('uses_count')
-                    ->label('Uses')
+                    ->label(__('panel-admin::events.columns.uses'))
                     ->state(fn (CheckInCode $record): string => $record->uses_count.($record->max_uses !== null ? '/'.$record->max_uses : '')),
 
                 TextColumn::make('revoked_at')
-                    ->label('Revoked At')
+                    ->label(__('panel-admin::events.columns.revoked_at'))
                     ->dateTime()
                     ->placeholder('-'),
             ])

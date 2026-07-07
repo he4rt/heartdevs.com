@@ -17,79 +17,79 @@ final class EventInfolist
             ->columns(2)
             ->components([
                 TextEntry::make('title')
-                    ->label('Title')
+                    ->label(__('panel-admin::events.columns.title'))
                     ->columnSpanFull(),
 
                 TextEntry::make('slug')
-                    ->label('Slug'),
+                    ->label(__('panel-admin::events.columns.slug')),
 
                 TextEntry::make('event_type')
-                    ->label('Type')
+                    ->label(__('panel-admin::events.columns.type'))
                     ->badge(),
 
                 TextEntry::make('tenant.name')
-                    ->label('Tenant'),
+                    ->label(__('panel-admin::events.columns.tenant')),
 
                 TextEntry::make('location')
-                    ->label('Location'),
+                    ->label(__('panel-admin::events.columns.location')),
 
                 TextEntry::make('description')
-                    ->label('Description')
+                    ->label(__('panel-admin::events.columns.description'))
                     ->columnSpanFull(),
 
                 TextEntry::make('starts_at')
-                    ->label('Starts At')
+                    ->label(__('panel-admin::events.columns.starts_at'))
                     ->dateTime(),
 
                 TextEntry::make('ends_at')
-                    ->label('Ends At')
+                    ->label(__('panel-admin::events.columns.ends_at'))
                     ->dateTime(),
 
                 TextEntry::make('status')
-                    ->label('Status')
+                    ->label(__('panel-admin::events.columns.status'))
                     ->badge(),
 
                 TextEntry::make('created_at')
-                    ->label('Created At')
+                    ->label(__('panel-admin::events.columns.created_at'))
                     ->dateTime(),
 
-                Section::make('Enrollment Policy')
+                Section::make(__('panel-admin::events.sections.enrollment_policy'))
                     ->relationship('enrollmentPolicy')
                     ->columns(2)
                     ->schema([
                         TextEntry::make('enrollment_method')
-                            ->label('Enrollment Method')
+                            ->label(__('panel-admin::events.form.enrollment_method'))
                             ->badge(),
 
                         TextEntry::make('check_in_method')
-                            ->label('Check-in Method')
+                            ->label(__('panel-admin::events.form.check_in_method'))
                             ->badge(),
 
                         TextEntry::make('capacity')
-                            ->label('Capacity'),
+                            ->label(__('panel-admin::events.form.capacity')),
 
                         IconEntry::make('has_waitlist')
-                            ->label('Waitlist Enabled')
+                            ->label(__('panel-admin::events.form.waitlist_enabled'))
                             ->boolean(),
 
                         TextEntry::make('attendance_requirement')
-                            ->label('Attendance Requirement')
+                            ->label(__('panel-admin::events.form.attendance_requirement'))
                             ->badge(),
 
                         TextEntry::make('minimum_days')
-                            ->label('Minimum Days'),
+                            ->label(__('panel-admin::events.form.minimum_days')),
 
                         TextEntry::make('cancellation_deadline_hours')
-                            ->label('Cancellation Deadline (hours before event)'),
+                            ->label(__('panel-admin::events.form.cancellation_deadline_hours')),
 
                         TextEntry::make('xp_on_confirmed')
-                            ->label('XP on Confirmed'),
+                            ->label(__('panel-admin::events.form.xp_on_confirmed')),
 
                         TextEntry::make('xp_on_checked_in')
-                            ->label('XP on Checked-in'),
+                            ->label(__('panel-admin::events.form.xp_on_checked_in')),
 
                         TextEntry::make('xp_on_attended')
-                            ->label('XP on Attended'),
+                            ->label(__('panel-admin::events.form.xp_on_attended')),
                     ]),
             ]);
     }

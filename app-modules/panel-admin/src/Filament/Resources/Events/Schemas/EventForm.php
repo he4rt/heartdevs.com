@@ -31,13 +31,13 @@ final class EventForm
             ->columns(2)
             ->components([
                 TextInput::make('title')
-                    ->label('Title')
+                    ->label(__('panel-admin::events.columns.title'))
                     ->required()
                     ->maxLength(200)
                     ->columnSpanFull(),
 
                 TextInput::make('slug')
-                    ->label('Slug')
+                    ->label(__('panel-admin::events.columns.slug'))
                     ->required()
                     ->maxLength(120)
                     ->unique(
@@ -54,75 +54,75 @@ final class EventForm
                     ),
 
                 Select::make('event_type')
-                    ->label('Type')
+                    ->label(__('panel-admin::events.columns.type'))
                     ->options(EventType::class)
                     ->required(),
 
                 Select::make('tenant_id')
-                    ->label('Tenant')
+                    ->label(__('panel-admin::events.columns.tenant'))
                     ->relationship('tenant', 'name')
                     ->searchable()
                     ->nullable(),
 
                 TextInput::make('location')
-                    ->label('Location')
+                    ->label(__('panel-admin::events.columns.location'))
                     ->nullable(),
 
                 Textarea::make('description')
-                    ->label('Description')
+                    ->label(__('panel-admin::events.columns.description'))
                     ->nullable()
                     ->columnSpanFull(),
 
                 DateTimePicker::make('starts_at')
-                    ->label('Starts At')
+                    ->label(__('panel-admin::events.columns.starts_at'))
                     ->required(),
 
                 DateTimePicker::make('ends_at')
-                    ->label('Ends At')
+                    ->label(__('panel-admin::events.columns.ends_at'))
                     ->required()
                     ->after('starts_at'),
 
                 Select::make('status')
-                    ->label('Status')
+                    ->label(__('panel-admin::events.columns.status'))
                     ->options(EventStatus::class)
                     ->default(EventStatus::Draft)
                     ->required()
                     ->columnSpanFull(),
 
-                Section::make('Enrollment Policy')
+                Section::make(__('panel-admin::events.sections.enrollment_policy'))
                     ->relationship('enrollmentPolicy')
                     ->columns(2)
                     ->schema([
                         Select::make('enrollment_method')
-                            ->label('Enrollment Method')
+                            ->label(__('panel-admin::events.form.enrollment_method'))
                             ->options(EnrollmentMethod::class)
                             ->live()
                             ->required(),
 
                         Select::make('check_in_method')
-                            ->label('Check-in Method')
+                            ->label(__('panel-admin::events.form.check_in_method'))
                             ->options(CheckInMethod::class)
                             ->required(),
 
                         TextInput::make('capacity')
-                            ->label('Capacity')
+                            ->label(__('panel-admin::events.form.capacity'))
                             ->integer()
                             ->minValue(1)
                             ->nullable(),
 
                         Toggle::make('has_waitlist')
-                            ->label('Waitlist Enabled')
+                            ->label(__('panel-admin::events.form.waitlist_enabled'))
                             ->default(false),
 
                         Select::make('attendance_requirement')
-                            ->label('Attendance Requirement')
+                            ->label(__('panel-admin::events.form.attendance_requirement'))
                             ->options(fn (Get $get): array => self::attendanceRequirementOptions($get))
                             ->live()
                             ->required(),
 
                         TextInput::make('minimum_days')
-                            ->label('Minimum Days')
-                            ->helperText('Required when attendance requirement is "Minimum Days". Default 1, max = event days.')
+                            ->label(__('panel-admin::events.form.minimum_days'))
+                            ->helperText(__('panel-admin::events.form.helpers.minimum_days'))
                             ->integer()
                             ->minValue(1)
                             ->maxValue(fn (Get $get): ?int => self::minimumDaysMaxValue($get))
@@ -131,25 +131,25 @@ final class EventForm
                             ->visible(fn (Get $get): bool => $get('attendance_requirement') === AttendanceRequirement::MinimumDays->value),
 
                         TextInput::make('cancellation_deadline_hours')
-                            ->label('Cancellation Deadline (hours before event)')
+                            ->label(__('panel-admin::events.form.cancellation_deadline_hours'))
                             ->integer()
                             ->minValue(0)
                             ->nullable(),
 
                         TextInput::make('xp_on_confirmed')
-                            ->label('XP on Confirmed')
+                            ->label(__('panel-admin::events.form.xp_on_confirmed'))
                             ->integer()
                             ->minValue(0)
                             ->default(0),
 
                         TextInput::make('xp_on_checked_in')
-                            ->label('XP on Checked-in')
+                            ->label(__('panel-admin::events.form.xp_on_checked_in'))
                             ->integer()
                             ->minValue(0)
                             ->default(0),
 
                         TextInput::make('xp_on_attended')
-                            ->label('XP on Attended')
+                            ->label(__('panel-admin::events.form.xp_on_attended'))
                             ->integer()
                             ->minValue(0)
                             ->default(0),
