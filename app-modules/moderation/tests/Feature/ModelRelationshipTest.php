@@ -2,7 +2,6 @@
 
 declare(strict_types=1);
 
-use He4rt\Identity\Tenant\Models\Tenant;
 use He4rt\Identity\User\Models\User;
 use He4rt\Moderation\Appeals\ModerationAppeal;
 use He4rt\Moderation\Cases\Models\ModerationCase;
@@ -42,13 +41,6 @@ test('ModerationCase belongs to assignee', function (): void {
     $case = ModerationCase::factory()->create(['assigned_to' => $moderator->id]);
 
     expect($case->assignee->id)->toBe($moderator->id);
-});
-
-test('ModerationCase belongs to tenant', function (): void {
-    $tenant = Tenant::factory()->create();
-    $case = ModerationCase::factory()->create(['tenant_id' => $tenant->id]);
-
-    expect($case->tenant->id)->toBe($tenant->id);
 });
 
 test('ModerationAction belongs to case', function (): void {

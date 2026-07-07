@@ -10,7 +10,6 @@ use He4rt\Identity\Auth\DTOs\OAuthUserDTO;
 use He4rt\Identity\Auth\Enums\OAuthIntent;
 use He4rt\Identity\ExternalIdentity\Enums\IdentityProvider;
 use He4rt\Identity\ExternalIdentity\Models\ExternalIdentity;
-use He4rt\Identity\Tenant\Models\Tenant;
 use He4rt\Identity\User\Models\User;
 use He4rt\IntegrationGithub\OAuth\GitHubOAuthClient;
 
@@ -67,11 +66,9 @@ function bindFakeGithubClient(OAuthUserDTO $githubUser): void
 
 test('links a second provider to the logged-in user even when the email differs', function (): void {
     // A user who originally signed up via Discord (discord@discord.com)...
-    $tenant = Tenant::factory()->create();
     $discordUser = User::factory()->create(['email' => 'discord@discord.com']);
 
     ExternalIdentity::factory()->create([
-        'tenant_id' => $tenant->id,
         'model_type' => (new User)->getMorphClass(),
         'model_id' => $discordUser->id,
         'connected_by' => $discordUser->id,
@@ -88,7 +85,6 @@ test('links a second provider to the logged-in user even when the email differs'
         intent: OAuthIntent::Link,
         provider: IdentityProvider::GitHub,
         panel: 'app',
-        tenant: $tenant->slug,
         returnUrl: 'https://he4rt.test/app',
     );
 
@@ -121,11 +117,9 @@ test('links a second provider to the logged-in user even when the email differs'
 
 test('forks a separate account when a logged-out github login has a different email', function (): void {
     // Same starting point — a Discord user (discord@discord.com).
-    $tenant = Tenant::factory()->create();
     $discordUser = User::factory()->create(['email' => 'discord@discord.com']);
 
     ExternalIdentity::factory()->create([
-        'tenant_id' => $tenant->id,
         'model_type' => (new User)->getMorphClass(),
         'model_id' => $discordUser->id,
         'connected_by' => $discordUser->id,
@@ -143,7 +137,6 @@ test('forks a separate account when a logged-out github login has a different em
         intent: OAuthIntent::Login,
         provider: IdentityProvider::GitHub,
         panel: 'app',
-        tenant: $tenant->slug,
         returnUrl: 'https://he4rt.test/app',
     );
 

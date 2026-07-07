@@ -9,22 +9,18 @@ use He4rt\Activity\Message\Models\Message;
 use He4rt\Gamification\Character\Models\Character;
 use He4rt\Identity\ExternalIdentity\Enums\IdentityProvider;
 use He4rt\Identity\ExternalIdentity\Models\ExternalIdentity;
-use He4rt\Identity\Tenant\Models\Tenant;
 use He4rt\Identity\User\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
 uses(RefreshDatabase::class);
 
 test('persist delegates to IncrementExperience and stores message', function (): void {
-    $tenant = Tenant::factory()->create();
     $user = User::factory()->create(['is_donator' => false]);
     $character = Character::factory()
         ->recycle($user)
-        ->recycle($tenant)
         ->create(['experience' => 0]);
 
     $provider = ExternalIdentity::factory()
-        ->recycle($tenant)
         ->create([
             'model_type' => (new User)->getMorphClass(),
             'model_id' => $user->id,
@@ -34,7 +30,6 @@ test('persist delegates to IncrementExperience and stores message', function ():
 
     $content = str_repeat('a', 200);
     $dto = new NewMessageDTO(
-        tenantId: $tenant->id,
         provider: IdentityProvider::Discord,
         providerUsername: 'testuser',
         externalAccountId: '123456',
@@ -57,15 +52,12 @@ test('persist delegates to IncrementExperience and stores message', function ():
 });
 
 test('supporter gets double xp on message', function (): void {
-    $tenant = Tenant::factory()->create();
     $user = User::factory()->create(['is_donator' => true]);
     $character = Character::factory()
         ->recycle($user)
-        ->recycle($tenant)
         ->create(['experience' => 0]);
 
     ExternalIdentity::factory()
-        ->recycle($tenant)
         ->create([
             'model_type' => (new User)->getMorphClass(),
             'model_id' => $user->id,
@@ -74,7 +66,6 @@ test('supporter gets double xp on message', function (): void {
         ]);
 
     $dto = new NewMessageDTO(
-        tenantId: $tenant->id,
         provider: IdentityProvider::Discord,
         providerUsername: 'supporter',
         externalAccountId: '789',
@@ -91,15 +82,12 @@ test('supporter gets double xp on message', function (): void {
 });
 
 test('short message gives minimum 1 xp at level 1', function (): void {
-    $tenant = Tenant::factory()->create();
     $user = User::factory()->create(['is_donator' => false]);
     $character = Character::factory()
         ->recycle($user)
-        ->recycle($tenant)
         ->create(['experience' => 0]);
 
     ExternalIdentity::factory()
-        ->recycle($tenant)
         ->create([
             'model_type' => (new User)->getMorphClass(),
             'model_id' => $user->id,
@@ -108,7 +96,6 @@ test('short message gives minimum 1 xp at level 1', function (): void {
         ]);
 
     $dto = new NewMessageDTO(
-        tenantId: $tenant->id,
         provider: IdentityProvider::Discord,
         providerUsername: 'newbie',
         externalAccountId: '456',

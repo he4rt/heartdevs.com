@@ -5,7 +5,6 @@ declare(strict_types=1);
 use He4rt\Activity\Timeline\Actions\DeleteReply;
 use He4rt\Activity\Timeline\Delegated\PostEntry;
 use He4rt\Activity\Timeline\Timeline;
-use He4rt\Identity\Tenant\Models\Tenant;
 use He4rt\Identity\User\Models\User;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -13,14 +12,12 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 uses(RefreshDatabase::class);
 
 test('owner can delete their own reply', function (): void {
-    $tenant = Tenant::factory()->create();
     $user = User::factory()->create();
 
     $rootEntry = PostEntry::factory()->create();
     $rootPost = Timeline::factory()
         ->for($user)
         ->create([
-            'tenant_id' => $tenant->id,
             'postable_type' => (new PostEntry)->getMorphClass(),
             'postable_id' => $rootEntry->id,
         ]);
@@ -30,7 +27,6 @@ test('owner can delete their own reply', function (): void {
     $reply = Timeline::factory()
         ->for($replier)
         ->create([
-            'tenant_id' => $tenant->id,
             'postable_type' => (new PostEntry)->getMorphClass(),
             'postable_id' => $replyEntry->id,
             'root_id' => $rootPost->id,
@@ -44,14 +40,12 @@ test('owner can delete their own reply', function (): void {
 });
 
 test('cannot delete another users reply', function (): void {
-    $tenant = Tenant::factory()->create();
     $user = User::factory()->create();
 
     $rootEntry = PostEntry::factory()->create();
     $rootPost = Timeline::factory()
         ->for($user)
         ->create([
-            'tenant_id' => $tenant->id,
             'postable_type' => (new PostEntry)->getMorphClass(),
             'postable_id' => $rootEntry->id,
         ]);
@@ -61,7 +55,6 @@ test('cannot delete another users reply', function (): void {
     $reply = Timeline::factory()
         ->for($replier)
         ->create([
-            'tenant_id' => $tenant->id,
             'postable_type' => (new PostEntry)->getMorphClass(),
             'postable_id' => $replyEntry->id,
             'root_id' => $rootPost->id,
@@ -74,14 +67,12 @@ test('cannot delete another users reply', function (): void {
 })->throws(AuthorizationException::class);
 
 test('cannot delete a root post via delete reply', function (): void {
-    $tenant = Tenant::factory()->create();
     $user = User::factory()->create();
 
     $rootEntry = PostEntry::factory()->create();
     $rootPost = Timeline::factory()
         ->for($user)
         ->create([
-            'tenant_id' => $tenant->id,
             'postable_type' => (new PostEntry)->getMorphClass(),
             'postable_id' => $rootEntry->id,
         ]);

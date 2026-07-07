@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 use He4rt\Identity\ExternalIdentity\Enums\IdentityProvider;
 use He4rt\Identity\ExternalIdentity\Models\ExternalIdentity;
-use He4rt\Identity\Tenant\Models\Tenant;
 use He4rt\Identity\User\Models\User;
 use He4rt\IntegrationDiscord\ETL\Actions\ImportDiscordProfileAction;
 use He4rt\IntegrationDiscord\ETL\DTOs\ConnectedAccountDTO;
@@ -134,12 +133,11 @@ test('it preserves entire dump in metadata', function (): void {
 // Action Tests
 
 test('it creates user and external identity from discord profile', function (): void {
-    $tenant = Tenant::factory()->create(['slug' => 'he4rt']);
     $profile = discordProfile();
     $dto = DiscordProfileDTO::fromDump($profile);
 
     $action = resolve(ImportDiscordProfileAction::class);
-    $identity = $action->handle($dto, $tenant->getKey());
+    $identity = $action->handle($dto);
 
     expect($identity)->toBeInstanceOf(ExternalIdentity::class);
 
@@ -151,45 +149,29 @@ test('it creates user and external identity from discord profile', function (): 
     $this->assertDatabaseHas('external_identities', [
         'provider' => 'discord',
         'external_account_id' => '49615312957476864',
-        'tenant_id' => $tenant->getKey(),
     ]);
 });
 
 test('it upserts external identity when already exists', function (): void {
-    $tenant = Tenant::factory()->create(['slug' => 'he4rt']);
     $action = resolve(ImportDiscordProfileAction::class);
 
     $profileOld = discordProfile(['user_profile' => ['bio' => 'old bio'], 'connected_accounts' => []]);
-    $action->handle(DiscordProfileDTO::fromDump($profileOld), $tenant->getKey());
+    $action->handle(DiscordProfileDTO::fromDump($profileOld));
 
     $profileNew = discordProfile(['user_profile' => ['bio' => 'new bio'], 'connected_accounts' => []]);
-    $identity = $action->handle(DiscordProfileDTO::fromDump($profileNew), $tenant->getKey());
+    $identity = $action->handle(DiscordProfileDTO::fromDump($profileNew));
 
     expect(ExternalIdentity::query()->count())->toBe(1)
         ->and(User::query()->where('username', '_tats')->count())->toBe(1)
         ->and($identity->metadata['user_profile']['bio'])->toBe('new bio');
 });
 
-test('it attaches user to tenant', function (): void {
-    $tenant = Tenant::factory()->create(['slug' => 'he4rt']);
-    $dto = DiscordProfileDTO::fromDump(discordProfile());
-
-    $action = resolve(ImportDiscordProfileAction::class);
-    $identity = $action->handle($dto, $tenant->getKey());
-
-    $this->assertDatabaseHas('tenant_users', [
-        'user_id' => $identity->model_id,
-        'tenant_id' => $tenant->getKey(),
-    ]);
-});
-
 test('it stores complete discord metadata in external identity', function (): void {
-    $tenant = Tenant::factory()->create(['slug' => 'he4rt']);
     $profile = discordProfile();
     $dto = DiscordProfileDTO::fromDump($profile);
 
     $action = resolve(ImportDiscordProfileAction::class);
-    $identity = $action->handle($dto, $tenant->getKey());
+    $identity = $action->handle($dto);
 
     $identity->refresh();
 
@@ -212,18 +194,16 @@ test('it stores complete discord metadata in external identity', function (): vo
 });
 
 test('it sets connected_at to null when guild_member joined_at is absent', function (): void {
-    $tenant = Tenant::factory()->create(['slug' => 'he4rt']);
     $profile = discordProfile(['guild_member' => ['joined_at' => null]]);
     $dto = DiscordProfileDTO::fromDump($profile);
 
     $action = resolve(ImportDiscordProfileAction::class);
-    $identity = $action->handle($dto, $tenant->getKey());
+    $identity = $action->handle($dto);
 
     expect($identity->connected_at)->toBeNull();
 });
 
 test('it creates external identities for each connected account', function (): void {
-    $tenant = Tenant::factory()->create(['slug' => 'he4rt']);
     $profile = discordProfile([
         'connected_accounts' => [
             ['type' => 'twitch', 'id' => '81085454', 'name' => 'fewerygor', 'verified' => true],
@@ -233,7 +213,7 @@ test('it creates external identities for each connected account', function (): v
     $dto = DiscordProfileDTO::fromDump($profile);
 
     $action = resolve(ImportDiscordProfileAction::class);
-    $action->handle($dto, $tenant->getKey());
+    $action->handle($dto);
 
     expect(ExternalIdentity::query()->count())->toBe(3)
         ->and(ExternalIdentity::query()->where('provider', 'discord')->exists())->toBeTrue()
@@ -245,7 +225,6 @@ test('it creates external identities for each connected account', function (): v
 });
 
 test('it stores connected account metadata in external identity', function (): void {
-    $tenant = Tenant::factory()->create(['slug' => 'he4rt']);
     $profile = discordProfile([
         'connected_accounts' => [
             [
@@ -260,7 +239,7 @@ test('it stores connected account metadata in external identity', function (): v
     $dto = DiscordProfileDTO::fromDump($profile);
 
     $action = resolve(ImportDiscordProfileAction::class);
-    $action->handle($dto, $tenant->getKey());
+    $action->handle($dto);
 
     $steamIdentity = ExternalIdentity::query()->where('provider', 'steam')->first();
 
@@ -272,19 +251,17 @@ test('it stores connected account metadata in external identity', function (): v
 });
 
 test('it handles profile with no connected accounts', function (): void {
-    $tenant = Tenant::factory()->create(['slug' => 'he4rt']);
     $profile = discordProfile(['connected_accounts' => []]);
     $dto = DiscordProfileDTO::fromDump($profile);
 
     $action = resolve(ImportDiscordProfileAction::class);
-    $action->handle($dto, $tenant->getKey());
+    $action->handle($dto);
 
     expect(ExternalIdentity::query()->count())->toBe(1)
         ->and(ExternalIdentity::query()->where('provider', 'discord')->exists())->toBeTrue();
 });
 
 test('it upserts connected account external identities', function (): void {
-    $tenant = Tenant::factory()->create(['slug' => 'he4rt']);
     $action = resolve(ImportDiscordProfileAction::class);
 
     $profileOld = discordProfile([
@@ -292,7 +269,7 @@ test('it upserts connected account external identities', function (): void {
             ['type' => 'spotify', 'id' => 'user123', 'name' => 'old_name', 'verified' => false],
         ],
     ]);
-    $action->handle(DiscordProfileDTO::fromDump($profileOld), $tenant->getKey());
+    $action->handle(DiscordProfileDTO::fromDump($profileOld));
 
     expect(ExternalIdentity::query()->count())->toBe(2)
         ->and(ExternalIdentity::query()->where('provider', 'spotify')->first()->metadata['name'])->toBe('old_name');
@@ -302,7 +279,7 @@ test('it upserts connected account external identities', function (): void {
             ['type' => 'spotify', 'id' => 'user123', 'name' => 'new_name', 'verified' => true],
         ],
     ]);
-    $action->handle(DiscordProfileDTO::fromDump($profileNew), $tenant->getKey());
+    $action->handle(DiscordProfileDTO::fromDump($profileNew));
 
     expect(ExternalIdentity::query()->count())->toBe(2)
         ->and(ExternalIdentity::query()->where('provider', 'spotify')->count())->toBe(1)
@@ -330,7 +307,6 @@ test('connected account dto creates from dump format', function (): void {
 // Regression: identity-first lookup prevents user duplication on Discord username changes.
 
 test('it reuses existing user when discord identity already exists with legacy #0 username', function (): void {
-    $tenant = Tenant::factory()->create(['slug' => 'he4rt']);
     $action = resolve(ImportDiscordProfileAction::class);
 
     $oldUser = User::factory()->create(['username' => 'sun.dev_#0', 'name' => 'Sun']);
@@ -339,7 +315,6 @@ test('it reuses existing user when discord identity already exists with legacy #
         ->create([
             'provider' => IdentityProvider::Discord,
             'external_account_id' => '49615312957476864',
-            'tenant_id' => $tenant->getKey(),
             'model_id' => $oldUser->id,
         ]);
 
@@ -348,7 +323,6 @@ test('it reuses existing user when discord identity already exists with legacy #
             'user' => ['username' => 'sun.dev_', 'global_name' => 'Sun'],
             'connected_accounts' => [],
         ])),
-        $tenant->getKey(),
     );
 
     expect(User::query()->whereIn('username', ['sun.dev_', 'sun.dev_#0'])->count())->toBe(1)
@@ -363,7 +337,6 @@ test('it reuses existing user when discord identity already exists with legacy #
 });
 
 test('it updates username when discord pomelo handle changes', function (): void {
-    $tenant = Tenant::factory()->create(['slug' => 'he4rt']);
     $action = resolve(ImportDiscordProfileAction::class);
 
     $user = User::factory()->create(['username' => 'oldhandle', 'name' => 'oldhandle']);
@@ -372,7 +345,6 @@ test('it updates username when discord pomelo handle changes', function (): void
         ->create([
             'provider' => IdentityProvider::Discord,
             'external_account_id' => '49615312957476864',
-            'tenant_id' => $tenant->getKey(),
             'model_id' => $user->id,
         ]);
 
@@ -381,7 +353,6 @@ test('it updates username when discord pomelo handle changes', function (): void
             'user' => ['username' => 'newhandle', 'global_name' => 'New Display'],
             'connected_accounts' => [],
         ])),
-        $tenant->getKey(),
     );
 
     $user->refresh();
@@ -391,7 +362,6 @@ test('it updates username when discord pomelo handle changes', function (): void
 });
 
 test('it does not steal connected account identity already linked to another user', function (): void {
-    $tenant = Tenant::factory()->create(['slug' => 'he4rt']);
     $action = resolve(ImportDiscordProfileAction::class);
 
     $alice = User::factory()->create(['username' => 'alice']);
@@ -400,7 +370,6 @@ test('it does not steal connected account identity already linked to another use
         ->create([
             'provider' => IdentityProvider::Twitch,
             'external_account_id' => '81085454',
-            'tenant_id' => $tenant->getKey(),
             'model_id' => $alice->id,
         ]);
 
@@ -411,7 +380,6 @@ test('it does not steal connected account identity already linked to another use
                 ['type' => 'twitch', 'id' => '81085454', 'name' => 'fake', 'verified' => true],
             ],
         ])),
-        $tenant->getKey(),
     );
 
     $aliceTwitch->refresh();
@@ -420,7 +388,6 @@ test('it does not steal connected account identity already linked to another use
 });
 
 test('it creates user when no identity and no username match exists', function (): void {
-    $tenant = Tenant::factory()->create(['slug' => 'he4rt']);
     $action = resolve(ImportDiscordProfileAction::class);
 
     $usersBefore = User::query()->count();
@@ -430,7 +397,6 @@ test('it creates user when no identity and no username match exists', function (
             'user' => ['id' => '777', 'username' => 'fresh', 'global_name' => 'Fresh'],
             'connected_accounts' => [],
         ])),
-        $tenant->getKey(),
     );
 
     expect(User::query()->count())->toBe($usersBefore + 1)
@@ -438,7 +404,6 @@ test('it creates user when no identity and no username match exists', function (
 });
 
 test('it links discord identity to portal user matching username when no identity exists yet', function (): void {
-    $tenant = Tenant::factory()->create(['slug' => 'he4rt']);
     $action = resolve(ImportDiscordProfileAction::class);
 
     $portalUser = User::factory()->create(['username' => 'portal_user', 'name' => 'Portal']);
@@ -448,7 +413,6 @@ test('it links discord identity to portal user matching username when no identit
             'user' => ['id' => '888', 'username' => 'portal_user'],
             'connected_accounts' => [],
         ])),
-        $tenant->getKey(),
     );
 
     $identity = ExternalIdentity::query()

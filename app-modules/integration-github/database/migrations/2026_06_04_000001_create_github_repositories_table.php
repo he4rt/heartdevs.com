@@ -12,15 +12,13 @@ return new class extends Migration
     {
         Schema::create('github_repositories', static function (Blueprint $table): void {
             $table->uuid('id')->primary();
-            $table->foreignUuid('tenant_id')->constrained('tenants');
             $table->string('full_name');   // owner/repo
             $table->boolean('enabled')->default(value: true);
             $table->timestampTz('last_backfilled_at')->nullable();
             $table->timestampsTz();
 
-            // A allowlist é por tenant: cada comunidade mantém a sua, e o mesmo
-            // repo público pode ser acompanhado por mais de uma comunidade.
-            $table->unique(['tenant_id', 'full_name'], 'uniq_github_repositories_tenant_repo');
+            // A allowlist é global: cada repo público é acompanhado uma única vez.
+            $table->unique('full_name', 'uniq_github_repositories_repo');
         });
     }
 

@@ -2,7 +2,6 @@
 
 declare(strict_types=1);
 
-use He4rt\Identity\Tenant\Models\Tenant;
 use He4rt\Identity\User\Models\User;
 use He4rt\Moderation\Audit\ModerationAuditLog;
 use He4rt\Moderation\Audit\RecordAuditLog;
@@ -84,15 +83,4 @@ test('ActionExecuted marks actor_type as system for automated actions', function
     $log = ModerationAuditLog::query()->where('event_type', 'action_executed')->first();
     expect($log->actor_type)->toBe('system')
         ->and($log->actor_id)->toBeNull();
-});
-
-test('audit log stores tenant_id from case', function (): void {
-    $tenant = Tenant::factory()->create();
-    $case = ModerationCase::factory()->create(['tenant_id' => $tenant->id]);
-
-    $listener = new RecordAuditLog();
-    $listener->handleCaseCreated(new CaseCreated($case));
-
-    $log = ModerationAuditLog::query()->where('event_type', 'case_created')->first();
-    expect($log->tenant_id)->toBe($tenant->id);
 });

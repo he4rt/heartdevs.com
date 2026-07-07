@@ -7,7 +7,6 @@ use He4rt\Identity\Auth\DTOs\OAuthAccessDTO;
 use He4rt\Identity\Auth\DTOs\OAuthUserDTO;
 use He4rt\Identity\ExternalIdentity\Enums\IdentityProvider;
 use He4rt\Identity\ExternalIdentity\Models\ExternalIdentity;
-use He4rt\Identity\Tenant\Models\Tenant;
 use He4rt\Identity\User\Models\User;
 
 function makeOAuthUser(
@@ -34,13 +33,10 @@ function makeOAuthUser(
     };
 }
 
-test('finds existing user by external identity cross-tenant', function (): void {
-    $tenantA = Tenant::factory()->create();
-    $tenantB = Tenant::factory()->create();
+test('finds existing user by external identity', function (): void {
     $user = User::factory()->create();
 
     ExternalIdentity::factory()->create([
-        'tenant_id' => $tenantA->id,
         'model_type' => (new User)->getMorphClass(),
         'model_id' => $user->id,
         'provider' => IdentityProvider::GitHub,
@@ -50,27 +46,23 @@ test('finds existing user by external identity cross-tenant', function (): void 
     $action = resolve(FindOrCreateUserByProvider::class);
     $result = $action->execute(
         makeOAuthUser(providerId: '12345', provider: IdentityProvider::GitHub),
-        $tenantB,
     );
 
     expect($result->id)->toBe($user->id);
 });
 
 test('finds existing user by email', function (): void {
-    $tenant = Tenant::factory()->create();
     $user = User::factory()->create(['email' => 'daniel@example.com']);
 
     $action = resolve(FindOrCreateUserByProvider::class);
     $result = $action->execute(
         makeOAuthUser(providerId: 'new-id', email: 'daniel@example.com'),
-        $tenant,
     );
 
     expect($result->id)->toBe($user->id);
 });
 
 test('does not search by email when email is null', function (): void {
-    $tenant = Tenant::factory()->create();
     User::factory()->create(['email' => null, 'username' => 'someone']);
 
     $userCountBefore = User::query()->count();
@@ -78,7 +70,6 @@ test('does not search by email when email is null', function (): void {
     $action = resolve(FindOrCreateUserByProvider::class);
     $result = $action->execute(
         makeOAuthUser(providerId: 'new-id', username: 'newuser', email: null),
-        $tenant,
     );
 
     expect($result->username)->toBe('newuser');
@@ -86,12 +77,9 @@ test('does not search by email when email is null', function (): void {
 });
 
 test('creates new user when no match found', function (): void {
-    $tenant = Tenant::factory()->create();
-
     $action = resolve(FindOrCreateUserByProvider::class);
     $result = $action->execute(
         makeOAuthUser(providerId: 'fresh-id', username: 'freshuser', name: 'Fresh User', email: 'fresh@example.com'),
-        $tenant,
     );
 
     expect($result->username)->toBe('freshuser')
@@ -100,13 +88,11 @@ test('creates new user when no match found', function (): void {
 });
 
 test('creates user with sequential suffix when username collides', function (): void {
-    $tenant = Tenant::factory()->create();
     User::factory()->create(['username' => 'danielhe4rt']);
 
     $action = resolve(FindOrCreateUserByProvider::class);
     $result = $action->execute(
         makeOAuthUser(providerId: 'new-id', username: 'danielhe4rt', email: 'new@example.com'),
-        $tenant,
     );
 
     expect($result->username)->toBe('danielhe4rt-2')
@@ -114,7 +100,6 @@ test('creates user with sequential suffix when username collides', function (): 
 });
 
 test('increments suffix when previous suffixed usernames exist', function (): void {
-    $tenant = Tenant::factory()->create();
     User::factory()->create(['username' => 'danielhe4rt']);
     User::factory()->create(['username' => 'danielhe4rt-2']);
     User::factory()->create(['username' => 'danielhe4rt-3']);
@@ -122,63 +107,7 @@ test('increments suffix when previous suffixed usernames exist', function (): vo
     $action = resolve(FindOrCreateUserByProvider::class);
     $result = $action->execute(
         makeOAuthUser(providerId: 'new-id', username: 'danielhe4rt', email: 'new@example.com'),
-        $tenant,
     );
 
     expect($result->username)->toBe('danielhe4rt-4');
-});
-
-test('attaches user to tenant when not already attached', function (): void {
-    $tenant = Tenant::factory()->create();
-
-    $action = resolve(FindOrCreateUserByProvider::class);
-    $result = $action->execute(
-        makeOAuthUser(providerId: 'new-id', username: 'newuser'),
-        $tenant,
-    );
-
-    expect($result->tenants()->where('tenants.id', $tenant->getKey())->exists())->toBeTrue();
-});
-
-test('does not duplicate tenant attachment when already attached', function (): void {
-    $tenant = Tenant::factory()->create();
-    $user = User::factory()->create();
-    $user->tenants()->attach($tenant);
-
-    ExternalIdentity::factory()->create([
-        'tenant_id' => $tenant->id,
-        'model_type' => (new User)->getMorphClass(),
-        'model_id' => $user->id,
-        'provider' => IdentityProvider::GitHub,
-        'external_account_id' => '12345',
-    ]);
-
-    $action = resolve(FindOrCreateUserByProvider::class);
-    $action->execute(
-        makeOAuthUser(providerId: '12345', provider: IdentityProvider::GitHub),
-        $tenant,
-    );
-
-    expect($user->tenants()->count())->toBe(1);
-});
-
-test('ignores tenant-owned external identities during lookup', function (): void {
-    $tenant = Tenant::factory()->create();
-
-    ExternalIdentity::factory()->create([
-        'tenant_id' => $tenant->id,
-        'model_type' => (new Tenant)->getMorphClass(),
-        'model_id' => $tenant->id,
-        'provider' => IdentityProvider::Discord,
-        'external_account_id' => '204122995579551744',
-    ]);
-
-    $action = resolve(FindOrCreateUserByProvider::class);
-    $result = $action->execute(
-        makeOAuthUser(providerId: '204122995579551744', provider: IdentityProvider::Discord, username: 'newuser'),
-        $tenant,
-    );
-
-    expect($result->username)->toBe('newuser');
-    expect(User::query()->where('username', 'newuser')->exists())->toBeTrue();
 });

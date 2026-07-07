@@ -5,7 +5,6 @@ declare(strict_types=1);
 use Carbon\CarbonInterface;
 use He4rt\Activity\Message\Models\Message;
 use He4rt\Identity\ExternalIdentity\Models\ExternalIdentity;
-use He4rt\Identity\Tenant\Models\Tenant;
 use He4rt\PanelAdmin\Marketing\Pages\Discord\Dashboard\Queries\PeriodStats;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\DB;
@@ -29,40 +28,38 @@ afterEach(function (): void {
 test('it buckets messages, distinct users and voice joins into the correct daily blocks', function (): void {
     $tz = $this->displayTimezone;
 
-    $tenant = Tenant::factory()->create();
-    $identityA = ExternalIdentity::factory()->recycle($tenant)->create();
-    $identityB = ExternalIdentity::factory()->recycle($tenant)->create();
+    $identityA = ExternalIdentity::factory()->create();
+    $identityB = ExternalIdentity::factory()->create();
 
     $firstBlockNoon = Date::create(2_026, 6, 8, 12, 0, 0, $tz);   // block 0 (oldest day)
     $lastBlockNoon = Date::create(2_026, 6, 14, 12, 0, 0, $tz);   // block 6 (most recent full day)
     $todayNoon = Date::create(2_026, 6, 15, 12, 0, 0, $tz);       // outside every block
 
     // Block 0: three messages from two distinct identities.
-    Message::factory()->count(2)->recycle($tenant)->create([
+    Message::factory()->count(2)->create([
         'external_identity_id' => $identityA->id,
         'sent_at' => $firstBlockNoon,
     ]);
-    Message::factory()->recycle($tenant)->create([
+    Message::factory()->create([
         'external_identity_id' => $identityB->id,
         'sent_at' => $firstBlockNoon,
     ]);
 
     // Block 6: two messages from a single identity.
-    Message::factory()->count(2)->recycle($tenant)->create([
+    Message::factory()->count(2)->create([
         'external_identity_id' => $identityA->id,
         'sent_at' => $lastBlockNoon,
     ]);
 
     // Today's message falls outside all seven blocks and must not be counted.
-    Message::factory()->recycle($tenant)->create([
+    Message::factory()->create([
         'external_identity_id' => $identityA->id,
         'sent_at' => $todayNoon,
     ]);
 
-    $insertVoice = static function (string $state, CarbonInterface $occurredAt) use ($identityA, $tenant): void {
+    $insertVoice = static function (string $state, CarbonInterface $occurredAt) use ($identityA): void {
         DB::table('voice_messages')->insert([
             'external_identity_id' => $identityA->id,
-            'tenant_id' => $tenant->id,
             'channel_name' => 'general',
             'state' => $state,
             'obtained_experience' => 0,

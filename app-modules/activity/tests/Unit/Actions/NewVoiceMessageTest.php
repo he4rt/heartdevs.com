@@ -9,22 +9,18 @@ use He4rt\Gamification\Character\Enums\VoiceStatesEnum;
 use He4rt\Gamification\Character\Models\Character;
 use He4rt\Identity\ExternalIdentity\Enums\IdentityProvider;
 use He4rt\Identity\ExternalIdentity\Models\ExternalIdentity;
-use He4rt\Identity\Tenant\Models\Tenant;
 use He4rt\Identity\User\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
 uses(RefreshDatabase::class);
 
 test('unmuted voice state awards multiplier times level', function (): void {
-    $tenant = Tenant::factory()->create();
     $user = User::factory()->create();
     $character = Character::factory()
         ->recycle($user)
-        ->recycle($tenant)
         ->create(['experience' => 4_500]); // level 10
 
     ExternalIdentity::factory()
-        ->recycle($tenant)
         ->create([
             'model_type' => (new User)->getMorphClass(),
             'model_id' => $user->id,
@@ -33,7 +29,6 @@ test('unmuted voice state awards multiplier times level', function (): void {
         ]);
 
     $dto = new NewVoiceMessageDTO(
-        tenantId: $tenant->id,
         provider: IdentityProvider::Discord,
         externalAccountId: '123456',
         voiceState: VoiceStatesEnum::Unmuted,
@@ -53,20 +48,16 @@ test('unmuted voice state awards multiplier times level', function (): void {
         ->and($voice->state)->toBe('unmuted')
         ->and($voice->channel_name)->toBe('general-voice')
         ->and($voice->channel_id)->toBe('111222333')
-        ->and($voice->tenant_id)->toBe($tenant->id)
         ->and($voice->occurred_at)->not->toBeNull();
 });
 
 test('muted voice state awards reduced xp', function (): void {
-    $tenant = Tenant::factory()->create();
     $user = User::factory()->create();
     $character = Character::factory()
         ->recycle($user)
-        ->recycle($tenant)
         ->create(['experience' => 4_500]); // level 10
 
     ExternalIdentity::factory()
-        ->recycle($tenant)
         ->create([
             'model_type' => (new User)->getMorphClass(),
             'model_id' => $user->id,
@@ -75,7 +66,6 @@ test('muted voice state awards reduced xp', function (): void {
         ]);
 
     $dto = new NewVoiceMessageDTO(
-        tenantId: $tenant->id,
         provider: IdentityProvider::Discord,
         externalAccountId: '789',
         voiceState: VoiceStatesEnum::Muted,
@@ -94,15 +84,12 @@ test('muted voice state awards reduced xp', function (): void {
 });
 
 test('disabled voice state awards zero xp', function (): void {
-    $tenant = Tenant::factory()->create();
     $user = User::factory()->create();
     $character = Character::factory()
         ->recycle($user)
-        ->recycle($tenant)
         ->create(['experience' => 4_500]); // level 10
 
     ExternalIdentity::factory()
-        ->recycle($tenant)
         ->create([
             'model_type' => (new User)->getMorphClass(),
             'model_id' => $user->id,
@@ -111,7 +98,6 @@ test('disabled voice state awards zero xp', function (): void {
         ]);
 
     $dto = new NewVoiceMessageDTO(
-        tenantId: $tenant->id,
         provider: IdentityProvider::Discord,
         externalAccountId: '456',
         voiceState: VoiceStatesEnum::Disabled,
@@ -129,15 +115,12 @@ test('disabled voice state awards zero xp', function (): void {
 });
 
 test('records channel name, channel id and occurred_at', function (): void {
-    $tenant = Tenant::factory()->create();
     $user = User::factory()->create();
     Character::factory()
         ->recycle($user)
-        ->recycle($tenant)
         ->create(['experience' => 0]);
 
     ExternalIdentity::factory()
-        ->recycle($tenant)
         ->create([
             'model_type' => (new User)->getMorphClass(),
             'model_id' => $user->id,
@@ -146,7 +129,6 @@ test('records channel name, channel id and occurred_at', function (): void {
         ]);
 
     $dto = new NewVoiceMessageDTO(
-        tenantId: $tenant->id,
         provider: IdentityProvider::Discord,
         externalAccountId: '321',
         voiceState: VoiceStatesEnum::Unmuted,

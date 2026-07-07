@@ -5,7 +5,6 @@ declare(strict_types=1);
 use He4rt\BotDiscord\Moderation\DiscordModerationAdapter;
 use He4rt\Identity\ExternalIdentity\Data\ClientAccessManager;
 use He4rt\Identity\ExternalIdentity\Enums\IdentityProvider;
-use He4rt\Identity\Tenant\Models\Tenant;
 use He4rt\Identity\User\Models\User;
 use He4rt\IntegrationDiscord\Transport\DiscordConnector;
 use He4rt\IntegrationDiscord\Transport\Requests\Bans\CreateBan;
@@ -26,12 +25,10 @@ use Saloon\Http\Faking\MockResponse;
 function makeUserWithDiscord(string $discordId = '999'): User
 {
     $user = User::factory()->create();
-    $tenant = Tenant::factory()->create();
 
     $user->providers()->create([
         'provider' => IdentityProvider::Discord->value,
         'external_account_id' => $discordId,
-        'tenant_id' => $tenant->id,
         'type' => 'external',
         'credentials_type' => 'oauth2',
         'credentials' => ClientAccessManager::make(),
@@ -295,7 +292,6 @@ test('ingest maps raw discord payload to ModerationContentDTO', function (): voi
         'channel_id' => 'chan-789',
         'guild_id' => 'guild-111',
         'username' => 'badguy',
-        'tenant_id' => null,
     ];
 
     $dto = DiscordModerationAdapter::make()->ingest($payload);

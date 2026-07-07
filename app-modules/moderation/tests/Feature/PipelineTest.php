@@ -24,7 +24,6 @@ test('IngestContent creates a ModerationCase from DTO', function (): void {
         mediaUrls: [],
         metadata: ['channel_id' => 'ch-1'],
         snapshot: ['text' => 'some spam content'],
-        tenantId: null,
     );
 
     $job = new IngestContent($dto, CaseSource::UserReport);
@@ -129,7 +128,6 @@ test('full pipeline flow: ingest -> classify -> route', function (): void {
         mediaUrls: [],
         metadata: [],
         snapshot: ['text' => 'Get free followers at spam.com'],
-        tenantId: null,
     );
 
     $case = new IngestContent($dto, CaseSource::AutoDetect)->handle();

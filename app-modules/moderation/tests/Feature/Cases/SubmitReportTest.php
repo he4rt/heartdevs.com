@@ -31,7 +31,6 @@ function makeReportDTO(string $contentId = 'msg-1', string $text = 'test'): Mode
         mediaUrls: [],
         metadata: [],
         snapshot: ['text' => $text],
-        tenantId: null,
     );
 }
 
