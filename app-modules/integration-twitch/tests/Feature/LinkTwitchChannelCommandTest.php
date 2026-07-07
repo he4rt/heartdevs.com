@@ -53,6 +53,9 @@ test('fails when twitch user is not found', function (): void {
 });
 
 test('fails when no login is provided and no broadcaster login is configured', function (): void {
+    // Bind a connector instance so resolving the command does not build the real
+    // one from (absent) Twitch credentials; the command fails before it ever sends.
+    mockHelixUsersResponse();
     config()->set('services.twitch.broadcaster_login', '');
 
     $this->artisan('twitch:link-channel')

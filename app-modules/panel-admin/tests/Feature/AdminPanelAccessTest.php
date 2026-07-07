@@ -25,7 +25,7 @@ test('authenticated admin can access admin panel', function (): void {
     $this
         ->actingAs($user)
         ->get('/admin')
-        ->assertRedirect();
+        ->assertOk();
 });
 
 test('admin user can access panel via canAccessPanel', function (): void {

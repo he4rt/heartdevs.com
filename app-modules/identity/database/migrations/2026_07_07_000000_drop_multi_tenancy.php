@@ -101,6 +101,7 @@ return new class extends Migration
     {
         $statements = [
             // messages: unique[tenant_id, provider_message_id] -> unique(provider_message_id)
+            'ALTER TABLE messages DROP CONSTRAINT IF EXISTS messages_tenant_provider_message_id_unique',
             'DROP INDEX IF EXISTS messages_tenant_provider_message_id_unique',
             'CREATE UNIQUE INDEX IF NOT EXISTS messages_provider_message_id_unique ON messages (provider_message_id)',
             'DROP INDEX IF EXISTS messages_tenant_sent_at_idx',
@@ -108,39 +109,47 @@ return new class extends Migration
             'DROP INDEX IF EXISTS messages_tenant_kind_idx',
 
             // voice_messages: partial unique (tenant_id, provider_message_id) -> (provider_message_id)
+            'ALTER TABLE voice_messages DROP CONSTRAINT IF EXISTS voice_messages_tenant_provider_message_id_unique',
             'DROP INDEX IF EXISTS voice_messages_tenant_provider_message_id_unique',
             'CREATE UNIQUE INDEX IF NOT EXISTS voice_messages_provider_message_id_unique ON voice_messages (provider_message_id) WHERE provider_message_id IS NOT NULL',
 
             // moderation_events: partial unique -> (provider_message_id) + drop tenant secondary
+            'ALTER TABLE moderation_events DROP CONSTRAINT IF EXISTS moderation_events_tenant_provider_message_id_unique',
             'DROP INDEX IF EXISTS moderation_events_tenant_provider_message_id_unique',
             'CREATE UNIQUE INDEX IF NOT EXISTS moderation_events_provider_message_id_unique ON moderation_events (provider_message_id) WHERE provider_message_id IS NOT NULL',
             'DROP INDEX IF EXISTS moderation_events_tenant_id_type_occurred_at_index',
 
             // membership_events: partial unique -> (provider_message_id) + drop tenant secondary
+            'ALTER TABLE membership_events DROP CONSTRAINT IF EXISTS membership_events_tenant_provider_unique',
             'DROP INDEX IF EXISTS membership_events_tenant_provider_unique',
             'CREATE UNIQUE INDEX IF NOT EXISTS membership_events_provider_message_id_unique ON membership_events (provider_message_id) WHERE provider_message_id IS NOT NULL',
             'DROP INDEX IF EXISTS membership_events_tenant_kind_time_idx',
 
             // message_threads: unique[tenant_id, provider_thread_id] -> unique(provider_thread_id)
+            'ALTER TABLE message_threads DROP CONSTRAINT IF EXISTS message_threads_tenant_provider_unique',
             'DROP INDEX IF EXISTS message_threads_tenant_provider_unique',
             'CREATE UNIQUE INDEX IF NOT EXISTS message_threads_provider_thread_id_unique ON message_threads (provider_thread_id)',
 
             // interactions: unique[tenant_id, provider, external_ref] -> unique(provider, external_ref) + drop [tenant_id, occurred_at]
+            'ALTER TABLE interactions DROP CONSTRAINT IF EXISTS uniq_interactions_tenant_provider_ref',
             'DROP INDEX IF EXISTS uniq_interactions_tenant_provider_ref',
             'CREATE UNIQUE INDEX IF NOT EXISTS uniq_interactions_provider_ref ON interactions (provider, external_ref)',
             'DROP INDEX IF EXISTS idx_interactions_tenant',
 
             // github_repositories: unique[tenant_id, full_name] -> unique(full_name)
+            'ALTER TABLE github_repositories DROP CONSTRAINT IF EXISTS uniq_github_repositories_tenant_repo',
             'DROP INDEX IF EXISTS uniq_github_repositories_tenant_repo',
             'CREATE UNIQUE INDEX IF NOT EXISTS uniq_github_repositories_full_name ON github_repositories (full_name)',
 
             // github_contributions: unique[tenant_id, repo, type, external_ref] -> unique(repo, type, external_ref) + drop tenant time/type indexes
+            'ALTER TABLE github_contributions DROP CONSTRAINT IF EXISTS uniq_github_contributions_ref',
             'DROP INDEX IF EXISTS uniq_github_contributions_ref',
             'CREATE UNIQUE INDEX IF NOT EXISTS uniq_github_contributions_repo_type_ref ON github_contributions (repo, type, external_ref)',
             'DROP INDEX IF EXISTS idx_github_contributions_tenant_time',
             'DROP INDEX IF EXISTS idx_github_contributions_type_time',
 
             // user_profiles: unique[user_id, tenant_id] -> unique(user_id) + partial (tenant_id, user_id) -> (user_id)
+            'ALTER TABLE user_profiles DROP CONSTRAINT IF EXISTS user_profiles_user_id_tenant_id_unique',
             'DROP INDEX IF EXISTS user_profiles_user_id_tenant_id_unique',
             'CREATE UNIQUE INDEX IF NOT EXISTS user_profiles_user_id_unique ON user_profiles (user_id)',
             'DROP INDEX IF EXISTS user_profiles_available_for_proposals_index',
