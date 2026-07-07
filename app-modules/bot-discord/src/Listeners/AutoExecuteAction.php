@@ -42,7 +42,6 @@ final class AutoExecuteAction
             'duration' => $this->resolveDuration($case->suggested_action),
             'reason' => 'Auto-moderation triggered by rule-based classification.',
             'automated' => true,
-            'tenant_id' => $case->tenant_id,
         ]);
 
         // Async: enforcement runs in the queue (API calls, DM, delete — may fail/retry).

@@ -6,7 +6,6 @@ namespace He4rt\Identity\Auth\Actions;
 
 use He4rt\Identity\Auth\DTOs\OAuthUserDTO;
 use He4rt\Identity\ExternalIdentity\Models\ExternalIdentity;
-use He4rt\Identity\Tenant\Models\Tenant;
 use He4rt\Identity\User\Models\User;
 use Illuminate\Database\UniqueConstraintViolationException;
 use Illuminate\Support\Facades\DB;
@@ -17,22 +16,16 @@ final readonly class FindOrCreateUserByProvider
         private EnrichUserOnFirstLogin $enrichUser,
     ) {}
 
-    public function execute(OAuthUserDTO $oauthUser, Tenant $tenant): User
+    public function execute(OAuthUserDTO $oauthUser): User
     {
         $existing = $this->findExistingUser($oauthUser);
 
-        $user = match ($existing instanceof User) {
+        // Profile bootstrapping now happens on User creation (UserObserver),
+        // no longer as a side-effect of tenant membership.
+        return match ($existing instanceof User) {
             true => $this->enrichUser->execute($existing, $oauthUser),
             false => $this->createUser($oauthUser),
         };
-
-        $alreadyBelongsToTenant = $user->tenants()->where('tenants.id', $tenant->getKey())->exists();
-
-        if (!$alreadyBelongsToTenant) {
-            $user->tenants()->attach($tenant);
-        }
-
-        return $user;
     }
 
     private function findExistingUser(OAuthUserDTO $oauthUser): ?User

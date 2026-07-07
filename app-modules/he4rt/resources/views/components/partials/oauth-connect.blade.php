@@ -5,7 +5,6 @@
 
 @props([
     'providers',
-    'tenant',
 ])
 <div>
     <x-he4rt::text class="mb-4 text-center">Sign in to your account to continue</x-he4rt::text>
@@ -14,7 +13,7 @@
         @foreach ($providers as $provider)
             @if ($provider->isEnabled())
                 <x-he4rt::button
-                    :href="$provider->getRedirectUri($tenant)"
+                    :href="$provider->getRedirectUri()"
                     :icon="$provider->getIcon()"
                     icon-position="leading"
                 >

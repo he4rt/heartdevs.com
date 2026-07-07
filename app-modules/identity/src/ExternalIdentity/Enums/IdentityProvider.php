@@ -195,10 +195,9 @@ enum IdentityProvider: string implements HasColor, HasDescription, HasIcon, HasL
         return config(sprintf('services.%s.enabled', $this->value));
     }
 
-    public function getRedirectUri(?string $tenant = null): string
+    public function getRedirectUri(): string
     {
         return route('oauth.redirect', [
-            'tenant' => $tenant ?? request()->getHost(),
             'panel' => filament()->getCurrentPanel()->getId(),
             'provider' => $this->value,
         ]);

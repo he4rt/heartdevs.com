@@ -7,8 +7,8 @@ namespace He4rt\BotDiscord\Events;
 use Discord\Discord;
 use Discord\Parts\User\Member;
 use Discord\WebSockets\Event as Events;
-use He4rt\BotDiscord\Actions\ResolveDiscordTenant;
 use He4rt\Identity\ExternalIdentity\DTOs\ResolveUserProviderDTO;
+use He4rt\Identity\ExternalIdentity\Enums\IdentityProvider;
 use He4rt\Identity\User\Actions\ResolveUserContext;
 use He4rt\Identity\User\Models\User;
 use Illuminate\Support\Facades\Log;
@@ -27,14 +27,10 @@ class WelcomeMember extends Event
     {
         $channelId = config('bot-discord.channels.auto-report');
 
-        $tenantProvider = null;
-
         try {
-            $tenantProvider = resolve(ResolveDiscordTenant::class)->handle((string) $member->guild_id);
-
             $userDto = ResolveUserProviderDTO::make([
-                'tenant_id' => $tenantProvider->tenant_id,
-                'provider' => $tenantProvider->provider,
+                'tenant_id' => (string) config('he4rt.tenant_id'),
+                'provider' => IdentityProvider::Discord,
                 'external_account_id' => $member->user->id,
                 'model_type' => (new User)->getMorphClass(),
                 'username' => $member->user->username,
@@ -44,8 +40,7 @@ class WelcomeMember extends Event
             resolve(ResolveUserContext::class)->handle($userDto);
         } catch (Throwable $throwable) {
             Log::channel('bot-discord')->error('WelcomeMember: failed to resolve user', [
-                'tenant_id' => $tenantProvider?->tenant_id,
-                'provider' => $tenantProvider?->provider,
+                'provider' => IdentityProvider::Discord->value,
                 'external_account_id' => $member->user->id ?? null,
                 'exception' => $throwable,
             ]);

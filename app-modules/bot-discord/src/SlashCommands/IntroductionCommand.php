@@ -8,8 +8,8 @@ use Discord\Builders\Components\TextInput;
 use Discord\Helpers\Collection;
 use Discord\Parts\Guild\Role;
 use Discord\Parts\Interactions\Interaction;
-use He4rt\BotDiscord\Actions\ResolveDiscordTenant;
 use He4rt\Identity\ExternalIdentity\DTOs\ResolveUserProviderDTO;
+use He4rt\Identity\ExternalIdentity\Enums\IdentityProvider;
 use He4rt\Identity\User\Actions\ResolveUserContext;
 use He4rt\Identity\User\Models\User;
 use He4rt\Profile\Actions\UpsertProfile;
@@ -119,11 +119,11 @@ class IntroductionCommand extends AbstractSlashCommand
      */
     private function persistData(Interaction $interaction, Collection $components): void
     {
-        $tenantProvider = resolve(ResolveDiscordTenant::class)->handle((string) $interaction->guild_id);
+        $tenantId = (string) config('he4rt.tenant_id');
 
         $userDto = ResolveUserProviderDTO::make([
-            'tenant_id' => $tenantProvider->tenant_id,
-            'provider' => $tenantProvider->provider,
+            'tenant_id' => $tenantId,
+            'provider' => IdentityProvider::Discord,
             'external_account_id' => $interaction->user->id,
             'model_type' => (new User)->getMorphClass(),
             'username' => $interaction->user->username,
@@ -145,7 +145,7 @@ class IntroductionCommand extends AbstractSlashCommand
 
         $userContext->user->update(['name' => $name]);
 
-        $profile = Profile::ensureExists($userContext->user->id, $tenantProvider->tenant_id);
+        $profile = Profile::ensureExists($userContext->user->id, $tenantId);
 
         $dto = UpsertProfileDTO::fromArray([
             'nickname' => $nickname,

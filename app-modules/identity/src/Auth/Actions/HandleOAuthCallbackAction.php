@@ -11,7 +11,6 @@ use He4rt\Identity\Auth\DTOs\OAuthStateDTO;
 use He4rt\Identity\Auth\Enums\OAuthIntent;
 use He4rt\Identity\Auth\Exceptions\OAuthFlowException;
 use He4rt\Identity\ExternalIdentity\Enums\IdentityProvider;
-use He4rt\Identity\Tenant\Models\Tenant;
 use He4rt\Identity\User\Models\User;
 use Illuminate\Support\Facades\Auth;
 
@@ -34,19 +33,14 @@ final readonly class HandleOAuthCallbackAction
         $access = $client->auth($code);
         $oauthUser = $client->getAuthenticatedUser($access);
 
-        $tenant = Tenant::query()
-            ->where('domain', $state->tenant)
-            ->orWhere('slug', $state->tenant)
-            ->firstOrFail();
-
         $user = match ($state->intent) {
-            OAuthIntent::Login => $this->findOrCreateUser->execute($oauthUser, $tenant),
+            OAuthIntent::Login => $this->findOrCreateUser->execute($oauthUser),
             OAuthIntent::Link => $this->resolveAuthenticatedUser(),
         };
 
         $redirectUrl = $state->returnUrl ?? filament()
             ->getPanel($state->panel)
-            ->getUrl($tenant);
+            ->getUrl();
 
         if ($state->intent === OAuthIntent::Link) {
             $mergeConflict = $this->detectMergeConflict->execute($user, $oauthUser, $access);
@@ -54,7 +48,6 @@ final readonly class HandleOAuthCallbackAction
             if ($mergeConflict instanceof MergeConflictDTO) {
                 return new OAuthResultDTO(
                     user: $user,
-                    tenant: $tenant,
                     identity: null,
                     intent: $state->intent,
                     redirectUrl: $redirectUrl,
@@ -63,12 +56,10 @@ final readonly class HandleOAuthCallbackAction
             }
         }
 
-        $owner = $state->panel === 'admin' ? $tenant : $user;
-        $identity = $this->attachProvider->execute($owner, $tenant, $oauthUser, $access);
+        $identity = $this->attachProvider->execute($user, $oauthUser, $access);
 
         return new OAuthResultDTO(
             user: $user,
-            tenant: $tenant,
             identity: $identity,
             intent: $state->intent,
             redirectUrl: $redirectUrl,

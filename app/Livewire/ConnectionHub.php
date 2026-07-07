@@ -8,7 +8,6 @@ use Filament\Notifications\Notification;
 use He4rt\Identity\Auth\Actions\MergeAccountsAction;
 use He4rt\Identity\ExternalIdentity\Enums\IdentityProvider;
 use He4rt\Identity\ExternalIdentity\Models\ExternalIdentity;
-use He4rt\Identity\Tenant\Models\Tenant;
 use He4rt\Identity\User\Models\User;
 use Illuminate\Contracts\View\View;
 use Illuminate\Database\Eloquent\Collection;
@@ -55,10 +54,7 @@ class ConnectionHub extends Component
 
     public function connect(IdentityProvider $provider): void
     {
-        $tenant = Tenant::query()->find($this->tenantId);
-
         $this->redirect(route('oauth.redirect', [
-            'tenant' => $tenant->domain ?? $tenant->slug,
             'panel' => $this->panel,
             'provider' => $provider->value,
         ]));

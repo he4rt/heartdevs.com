@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace He4rt\BotDiscord\SlashCommands;
 
 use Discord\Parts\Interactions\Interaction;
-use He4rt\BotDiscord\Actions\ResolveDiscordTenant;
 use He4rt\Identity\ExternalIdentity\Enums\IdentityProvider;
 use He4rt\Identity\ExternalIdentity\Models\ExternalIdentity;
 use He4rt\Identity\User\Models\User;
@@ -21,8 +20,6 @@ use Laracord\Discord\Message;
 abstract class AbstractSlashCommand extends SlashCommand
 {
     protected ?ExternalIdentity $memberProvider = null;
-
-    protected ?ExternalIdentity $tenantProvider = null;
 
     public function maybeHandle(Interaction $interaction): void
     {
@@ -60,19 +57,13 @@ abstract class AbstractSlashCommand extends SlashCommand
     protected function getMemberProviderQuery(): Builder
     {
         return ExternalIdentity::query()
-            ->where('tenant_id', $this->tenantProvider->tenant_id)
             ->where('model_type', (new User)->getMorphClass())
             ->where('provider', IdentityProvider::Discord);
     }
 
     private function beforePipeline(Interaction $interaction): void
     {
-        $this->tenantProvider = resolve(ResolveDiscordTenant::class)->handle((string) $interaction->guild_id);
-
-        $this->memberProvider = ExternalIdentity::query()
-            ->where('tenant_id', $this->tenantProvider->tenant_id)
-            ->where('model_type', (new User)->getMorphClass())
-            ->where('provider', IdentityProvider::Discord)
+        $this->memberProvider = $this->getMemberProviderQuery()
             ->where('external_account_id', $interaction->user->id)
             ->first();
     }

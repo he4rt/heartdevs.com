@@ -7,7 +7,6 @@ namespace He4rt\BotDiscord\Tasks;
 use Discord\Parts\WebSockets\VoiceStateUpdate;
 use He4rt\Activity\Voice\Actions\NewVoiceMessage;
 use He4rt\Activity\Voice\DTOs\NewVoiceMessageDTO;
-use He4rt\BotDiscord\Actions\ResolveDiscordTenant;
 use He4rt\Gamification\Character\Enums\VoiceStatesEnum;
 use He4rt\Identity\ExternalIdentity\Enums\IdentityProvider;
 use Laracord\Tasks\Task;
@@ -43,7 +42,7 @@ class VoiceExperienceTask extends Task
             return;
         }
 
-        $tenantId = resolve(ResolveDiscordTenant::class)->handle($guildId)->tenant_id;
+        $tenantId = (string) config('he4rt.tenant_id');
 
         $afkChannelId = $guild->afk_channel_id;
 
