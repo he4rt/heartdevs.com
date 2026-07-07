@@ -13,6 +13,10 @@ return new class extends Migration
      */
     public function up(): void
     {
+        if (!Schema::hasTable('tenants') || Schema::hasColumn('tenants', 'domain')) {
+            return;
+        }
+
         Schema::table('tenants', static function (Blueprint $table): void {
             $table->string('domain')
                 ->after('owner_id')

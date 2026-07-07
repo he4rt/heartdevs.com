@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
@@ -42,12 +43,20 @@ return new class extends Migration
             'tenant_users',
         ];
 
+        // Guarded so a replay after multi-tenancy removal is a no-op instead of
+        // referencing dropped `tenant_id` columns / the dropped `tenants` table.
         DB::transaction(static function () use ($tables, $tenantId): void {
             foreach ($tables as $table) {
+                if (!Schema::hasColumn($table, 'tenant_id')) {
+                    continue;
+                }
+
                 DB::table($table)->where('tenant_id', $tenantId)->delete();
             }
 
-            DB::table('tenants')->where('id', $tenantId)->delete();
+            if (Schema::hasTable('tenants')) {
+                DB::table('tenants')->where('id', $tenantId)->delete();
+            }
         });
     }
 };

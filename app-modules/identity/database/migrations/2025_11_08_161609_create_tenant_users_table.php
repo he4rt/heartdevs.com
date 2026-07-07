@@ -13,6 +13,10 @@ return new class extends Migration
      */
     public function up(): void
     {
+        if (Schema::hasTable('tenant_users') || !Schema::hasTable('tenants')) {
+            return;
+        }
+
         Schema::create('tenant_users', static function (Blueprint $table): void {
             $table->foreignUuid('tenant_id')->constrained('tenants')->cascadeOnDelete();
             $table->foreignUuid('user_id')->constrained('users')->cascadeOnDelete();

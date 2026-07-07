@@ -24,7 +24,18 @@ return new class() extends Migration
             'seasons' => [],
         ];
 
+        // Guarded so `migrate:fresh` stays green after multi-tenancy removal:
+        // if the tenants table is gone, or a target table is missing / already
+        // carries the column, there is nothing to set up.
+        if (!Schema::hasTable('tenants')) {
+            return;
+        }
+
         foreach ($tables as $table => $indexableColumns) {
+            if (!Schema::hasTable($table) || Schema::hasColumn($table, 'tenant_id')) {
+                continue;
+            }
+
             Schema::table($table, static function (Blueprint $table) use ($indexableColumns): void {
                 $table->foreignUuid('tenant_id')
                     ->after('id')
