@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace He4rt\Profile\Database\Factories;
 
-use He4rt\Identity\Tenant\Models\Tenant;
 use He4rt\Identity\User\Models\User;
 use He4rt\Profile\Enums\SeniorityLevel;
 use He4rt\Profile\Enums\SocialPlatform;
@@ -23,7 +22,6 @@ final class ProfileFactory extends Factory
     {
         return [
             'user_id' => User::factory(),
-            'tenant_id' => Tenant::factory(),
             'nickname' => null,
             'birthdate' => null,
             'about' => null,

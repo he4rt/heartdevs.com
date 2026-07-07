@@ -10,7 +10,6 @@ use He4rt\Activity\Tracking\Enums\ValueTier;
 use He4rt\Activity\Tracking\Models\Interaction;
 use He4rt\Gamification\Character\Models\Character;
 use He4rt\Identity\ExternalIdentity\Enums\IdentityProvider;
-use He4rt\Identity\Tenant\Models\Tenant;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -24,7 +23,6 @@ final class InteractionFactory extends Factory
     {
         return [
             'character_id' => Character::factory(),
-            'tenant_id' => Tenant::factory(),
             'type' => ActivityType::Article,
             'provider' => IdentityProvider::DevTo,
             'value_tier' => ValueTier::High,

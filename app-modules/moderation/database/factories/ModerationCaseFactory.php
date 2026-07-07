@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace He4rt\Moderation\Database\Factories;
 
-use He4rt\Identity\Tenant\Models\Tenant;
 use He4rt\Identity\User\Models\User;
 use He4rt\Moderation\Cases\Models\ModerationCase;
 use Illuminate\Database\Eloquent\Factories\Factory;
@@ -28,7 +27,6 @@ final class ModerationCaseFactory extends Factory
             'violation_type' => fake()->randomElement(['spam', 'toxicity', 'harassment']),
             'ai_scores' => ['spam' => fake()->randomFloat(2, 0, 1)],
             'author_id' => User::factory(),
-            'tenant_id' => Tenant::factory(),
         ];
     }
 

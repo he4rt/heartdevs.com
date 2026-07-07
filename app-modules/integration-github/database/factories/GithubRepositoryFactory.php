@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace He4rt\IntegrationGithub\Database\Factories;
 
-use He4rt\Identity\Tenant\Models\Tenant;
 use He4rt\IntegrationGithub\Enums\PurposeType;
 use He4rt\IntegrationGithub\Models\GithubRepository;
 use Illuminate\Database\Eloquent\Factories\Factory;
@@ -22,7 +21,6 @@ final class GithubRepositoryFactory extends Factory
     public function definition(): array
     {
         return [
-            'tenant_id' => Tenant::factory(),
             'full_name' => 'he4rt/'.fake()->unique()->slug(2),
             'enabled' => true,
             'last_backfilled_at' => null,

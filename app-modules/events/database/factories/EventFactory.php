@@ -8,7 +8,6 @@ use Exception;
 use He4rt\Events\Enums\AttendingStatusEnum;
 use He4rt\Events\Enums\EventTypeEnum;
 use He4rt\Events\Models\EventModel;
-use He4rt\Identity\Tenant\Models\Tenant;
 use He4rt\Identity\User\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Facades\Date;
@@ -23,7 +22,6 @@ final class EventFactory extends Factory
     public function definition(): array
     {
         return [
-            'tenant_id' => Tenant::factory(),
             'event_type' => fake()->randomElement(EventTypeEnum::cases()),
             'slug' => fake()->slug(),
             'active' => true,

@@ -8,7 +8,6 @@ use He4rt\Events\Models\EventAgenda;
 use He4rt\Events\Models\EventModel;
 use He4rt\Events\Models\EventSegment;
 use He4rt\Events\Models\EventSubmission;
-use He4rt\Identity\Tenant\Models\Tenant;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Facades\Date;
 
@@ -22,7 +21,6 @@ final class EventAgendaFactory extends Factory
     public function definition(): array
     {
         return [
-            'tenant_id' => Tenant::factory(),
             'event_id' => EventModel::factory(),
             'start_at' => Date::now(),
             'end_at' => Date::now()->addHour(),

@@ -6,7 +6,6 @@ namespace He4rt\Community\Database\Factories;
 
 use He4rt\Community\Meeting\Models\Meeting;
 use He4rt\Community\Meeting\Models\MeetingType;
-use He4rt\Identity\Tenant\Models\Tenant;
 use He4rt\Identity\User\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
@@ -21,7 +20,6 @@ final class MeetingFactory extends Factory
     {
         return [
             'id' => fake()->uuid(),
-            'tenant_id' => Tenant::factory(),
             'meeting_type_id' => MeetingType::factory(),
             'admin_id' => User::factory(),
             'content' => 'Fake content',

@@ -9,7 +9,6 @@ use He4rt\Identity\ExternalIdentity\Enums\CredentialsType;
 use He4rt\Identity\ExternalIdentity\Enums\IdentityProvider;
 use He4rt\Identity\ExternalIdentity\Enums\IdentityType;
 use He4rt\Identity\ExternalIdentity\Models\ExternalIdentity;
-use He4rt\Identity\Tenant\Models\Tenant;
 use He4rt\Identity\User\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Facades\Crypt;
@@ -25,7 +24,6 @@ final class ExternalIdentityFactory extends Factory
     {
         return [
             'id' => fake()->uuid(),
-            'tenant_id' => Tenant::factory(),
             'model_type' => (new User)->getMorphClass(),
             'model_id' => User::factory(),
             'type' => IdentityType::External,
