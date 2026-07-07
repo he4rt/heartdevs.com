@@ -48,8 +48,12 @@ final class UpsertProfile
             $attributes['social_links'] = $dto->socialLinks;
         }
 
-        if ($dto->expectedSalary !== null) {
-            $attributes['expected_salary'] = $dto->expectedSalary;
+        if ($dto->expectedSalaryMin !== null) {
+            $attributes['expected_salary_min'] = $dto->expectedSalaryMin;
+        }
+
+        if ($dto->expectedSalaryMax !== null) {
+            $attributes['expected_salary_max'] = $dto->expectedSalaryMax;
         }
 
         if ($dto->preferences instanceof WorkPreferences) {
@@ -83,8 +87,23 @@ final class UpsertProfile
             $errors['years_experience'] = [__('validation.between.numeric', ['attribute' => 'years_experience', 'min' => 0, 'max' => 50])];
         }
 
-        if ($dto->expectedSalary !== null && (!is_numeric($dto->expectedSalary) || (float) $dto->expectedSalary < 0)) {
-            $errors['expected_salary'] = [__('validation.min.numeric', ['attribute' => 'expected_salary', 'min' => 0])];
+        if ($dto->expectedSalaryMin !== null && (!is_numeric($dto->expectedSalaryMin) || (float) $dto->expectedSalaryMin < 0)) {
+            $errors['expected_salary_min'] = [__('validation.min.numeric', ['attribute' => 'expected_salary_min', 'min' => 0])];
+        }
+
+        if ($dto->expectedSalaryMax !== null && (!is_numeric($dto->expectedSalaryMax) || (float) $dto->expectedSalaryMax < 0)) {
+            $errors['expected_salary_max'] = [__('validation.min.numeric', ['attribute' => 'expected_salary_max', 'min' => 0])];
+        }
+
+        if (
+            $dto->expectedSalaryMin !== null && is_numeric($dto->expectedSalaryMin)
+            && $dto->expectedSalaryMax !== null && is_numeric($dto->expectedSalaryMax)
+            && (float) $dto->expectedSalaryMin > (float) $dto->expectedSalaryMax
+        ) {
+            $errors['expected_salary_max'] = [__('validation.gte.numeric', [
+                'attribute' => 'expected_salary_max',
+                'value' => $dto->expectedSalaryMin,
+            ])];
         }
 
         if ($dto->socialLinks !== null) {

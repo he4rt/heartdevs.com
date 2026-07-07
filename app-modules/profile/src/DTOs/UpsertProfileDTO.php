@@ -20,7 +20,8 @@ final readonly class UpsertProfileDTO
         public ?int $yearsExperience = null,
         /** @var array<string, string>|null */
         public ?array $socialLinks = null,
-        public ?string $expectedSalary = null,
+        public ?string $expectedSalaryMin = null,
+        public ?string $expectedSalaryMax = null,
         public ?WorkPreferences $preferences = null,
     ) {}
 
@@ -39,8 +40,11 @@ final readonly class UpsertProfileDTO
                 : null,
             yearsExperience: isset($data['years_experience']) ? (int) $data['years_experience'] : null,
             socialLinks: $data['social_links'] ?? null,
-            expectedSalary: isset($data['expected_salary']) && $data['expected_salary'] !== ''
-                ? (string) $data['expected_salary']
+            expectedSalaryMin: isset($data['expected_salary_min']) && $data['expected_salary_min'] !== ''
+                ? (string) $data['expected_salary_min']
+                : null,
+            expectedSalaryMax: isset($data['expected_salary_max']) && $data['expected_salary_max'] !== ''
+                ? (string) $data['expected_salary_max']
                 : null,
             preferences: isset($data['preferences'])
                 ? ($data['preferences'] instanceof WorkPreferences

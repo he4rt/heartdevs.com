@@ -34,7 +34,8 @@ use InvalidArgumentException;
  * @property array<string, string>|null $social_links
  * @property bool $available_for_proposals
  * @property StartAvailability|null $start_availability
- * @property string|null $expected_salary
+ * @property string|null $expected_salary_min
+ * @property string|null $expected_salary_max
  * @property WorkPreferences $preferences
  * @property CarbonInterface|null $created_at
  * @property CarbonInterface|null $updated_at
@@ -58,7 +59,8 @@ final class Profile extends Model
         'social_links',
         'available_for_proposals',
         'start_availability',
-        'expected_salary',
+        'expected_salary_min',
+        'expected_salary_max',
         'preferences',
     ];
 
@@ -127,7 +129,8 @@ final class Profile extends Model
             'available_for_proposals' => 'boolean',
             'seniority_level' => SeniorityLevel::class,
             'start_availability' => StartAvailability::class,
-            'expected_salary' => 'decimal:2',
+            'expected_salary_min' => 'decimal:2',
+            'expected_salary_max' => 'decimal:2',
             'preferences' => AsWorkPreferences::class,
         ];
     }
