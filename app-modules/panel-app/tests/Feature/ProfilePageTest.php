@@ -6,6 +6,7 @@ use Filament\Facades\Filament;
 use He4rt\Identity\Tenant\Models\Tenant;
 use He4rt\Identity\User\Models\User;
 use He4rt\PanelApp\Pages\ProfilePage;
+use He4rt\Profile\Enums\EmploymentType;
 use He4rt\Profile\Enums\SeniorityLevel;
 use He4rt\Profile\Enums\StartAvailability;
 use He4rt\Profile\Models\Profile;
@@ -124,4 +125,23 @@ test('profile page does not show account fields', function (): void {
     livewire(ProfilePage::class)
         ->assertFormFieldDoesNotExist('email')
         ->assertFormFieldDoesNotExist('password');
+});
+
+test('profile page saves work preferences', function (): void {
+    livewire(ProfilePage::class)
+        ->fillForm([
+            'is_open_to_remote' => true,
+            'willing_to_relocate' => true,
+            'has_disability' => false,
+            'employment_types' => ['pj', 'freelance'],
+        ])
+        ->call('save')
+        ->assertNotified();
+
+    $this->profile->refresh();
+
+    expect($this->profile->preferences->isOpenToRemote)->toBeTrue()
+        ->and($this->profile->preferences->willingToRelocate)->toBeTrue()
+        ->and($this->profile->preferences->hasDisability)->toBeFalse()
+        ->and($this->profile->preferences->employmentTypes)->toBe([EmploymentType::Pj, EmploymentType::Freelance]);
 });

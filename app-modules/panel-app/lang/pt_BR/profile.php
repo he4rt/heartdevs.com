@@ -10,6 +10,7 @@ return [
         'address' => 'Localização',
         'social_links' => 'Links Sociais',
         'availability' => 'Disponibilidade',
+        'preferences' => 'Preferências',
         'connections' => 'Conexões',
     ],
 
@@ -29,6 +30,10 @@ return [
         'cover' => 'Capa',
         'available_for_proposals' => 'Disponível para propostas',
         'start_availability' => 'Disponibilidade para início',
+        'is_open_to_remote' => 'Aberto a trabalho remoto',
+        'willing_to_relocate' => 'Disposto a mudar de cidade',
+        'has_disability' => 'Pessoa com deficiência (PcD)',
+        'employment_types' => 'Tipo de contratação',
     ],
 
     'placeholders' => [
@@ -41,6 +46,7 @@ return [
     'hints' => [
         'headline' => 'Ex: Frontend Developer, Product Designer',
         'available_for_proposals' => 'Quando ativo, recrutadores verão um badge verde no seu perfil',
+        'has_disability' => 'Informação sensível — usada apenas para vagas afirmativas/PcD.',
     ],
 
     'actions' => [

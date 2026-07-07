@@ -7,6 +7,8 @@ namespace He4rt\Profile\Models;
 use Carbon\CarbonInterface;
 use He4rt\Identity\Tenant\Models\Tenant;
 use He4rt\Identity\User\Models\User;
+use He4rt\Profile\Casts\AsWorkPreferences;
+use He4rt\Profile\Data\WorkPreferences;
 use He4rt\Profile\Database\Factories\ProfileFactory;
 use He4rt\Profile\Enums\SeniorityLevel;
 use He4rt\Profile\Enums\SocialPlatform;
@@ -32,6 +34,7 @@ use InvalidArgumentException;
  * @property array<string, string>|null $social_links
  * @property bool $available_for_proposals
  * @property StartAvailability|null $start_availability
+ * @property WorkPreferences $preferences
  * @property CarbonInterface|null $created_at
  * @property CarbonInterface|null $updated_at
  */
@@ -54,6 +57,7 @@ final class Profile extends Model
         'social_links',
         'available_for_proposals',
         'start_availability',
+        'preferences',
     ];
 
     public static function ensureExists(string $userId, string $tenantId): self
@@ -121,6 +125,7 @@ final class Profile extends Model
             'available_for_proposals' => 'boolean',
             'seniority_level' => SeniorityLevel::class,
             'start_availability' => StartAvailability::class,
+            'preferences' => AsWorkPreferences::class,
         ];
     }
 }

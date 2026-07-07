@@ -28,4 +28,10 @@ return [
         '2_months' => '2 meses',
         'negotiable' => 'Negociável',
     ],
+
+    'employment_type' => [
+        'clt' => 'CLT',
+        'pj' => 'PJ',
+        'freelance' => 'Freelancer',
+    ],
 ];

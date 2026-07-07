@@ -25,6 +25,7 @@ use He4rt\Identity\User\Models\User;
 use He4rt\Profile\Actions\ToggleAvailability;
 use He4rt\Profile\Actions\UpsertProfile;
 use He4rt\Profile\DTOs\UpsertProfileDTO;
+use He4rt\Profile\Enums\EmploymentType;
 use He4rt\Profile\Enums\SeniorityLevel;
 use He4rt\Profile\Enums\SocialPlatform;
 use He4rt\Profile\Enums\StartAvailability;
@@ -79,6 +80,13 @@ class ProfilePage extends Page
             'social_links' => $this->socialLinksToRepeater($profile->social_links),
             'available_for_proposals' => $profile->available_for_proposals,
             'start_availability' => $profile->start_availability,
+            'has_disability' => $profile->preferences->hasDisability,
+            'willing_to_relocate' => $profile->preferences->willingToRelocate,
+            'is_open_to_remote' => $profile->preferences->isOpenToRemote,
+            'employment_types' => array_map(
+                static fn (EmploymentType $type): string => $type->value,
+                $profile->preferences->employmentTypes,
+            ),
         ]);
     }
 
@@ -216,6 +224,28 @@ class ProfilePage extends Page
                                 ->live()
                                 ->visible(fn (Get $get): bool => (bool) $get('available_for_proposals')),
                         ]),
+
+                    Section::make(__('panel-app::profile.sections.preferences'))
+                        ->schema([
+                            Toggle::make('is_open_to_remote')
+                                ->label(__('panel-app::profile.fields.is_open_to_remote'))
+                                ->live(),
+
+                            Toggle::make('willing_to_relocate')
+                                ->label(__('panel-app::profile.fields.willing_to_relocate'))
+                                ->live(),
+
+                            Toggle::make('has_disability')
+                                ->label(__('panel-app::profile.fields.has_disability'))
+                                ->hint(__('panel-app::profile.hints.has_disability'))
+                                ->live(),
+
+                            Select::make('employment_types')
+                                ->label(__('panel-app::profile.fields.employment_types'))
+                                ->options(EmploymentType::class)
+                                ->multiple()
+                                ->live(),
+                        ]),
                 ])
                     ->livewireSubmitHandler('save')
                     ->footer([
@@ -245,6 +275,12 @@ class ProfilePage extends Page
             'seniority_level' => $formData['seniority_level'] ?? null,
             'years_experience' => $formData['years_experience'] ?? null,
             'social_links' => $socialLinks !== [] ? $socialLinks : null,
+            'preferences' => [
+                'has_disability' => $formData['has_disability'] ?? false,
+                'willing_to_relocate' => $formData['willing_to_relocate'] ?? false,
+                'is_open_to_remote' => $formData['is_open_to_remote'] ?? false,
+                'employment_types' => $formData['employment_types'] ?? [],
+            ],
         ]);
 
         resolve(UpsertProfile::class)->handle($profile, $dto);

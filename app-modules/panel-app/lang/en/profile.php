@@ -10,6 +10,7 @@ return [
         'address' => 'Location',
         'social_links' => 'Social Links',
         'availability' => 'Availability',
+        'preferences' => 'Preferences',
         'connections' => 'Connections',
     ],
 
@@ -29,6 +30,10 @@ return [
         'cover' => 'Cover',
         'available_for_proposals' => 'Available for proposals',
         'start_availability' => 'Start availability',
+        'is_open_to_remote' => 'Open to remote work',
+        'willing_to_relocate' => 'Willing to relocate',
+        'has_disability' => 'Person with a disability',
+        'employment_types' => 'Employment type',
     ],
 
     'placeholders' => [
@@ -41,6 +46,7 @@ return [
     'hints' => [
         'headline' => 'e.g. Frontend Developer, Product Designer',
         'available_for_proposals' => 'When active, recruiters will see a green badge on your profile',
+        'has_disability' => 'Sensitive information — used only for affirmative-action roles.',
     ],
 
     'actions' => [

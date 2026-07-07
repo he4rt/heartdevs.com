@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace He4rt\Profile\Actions;
 
 use Carbon\CarbonInterface;
+use He4rt\Profile\Data\WorkPreferences;
 use He4rt\Profile\DTOs\UpsertProfileDTO;
 use He4rt\Profile\Enums\SeniorityLevel;
 use He4rt\Profile\Enums\SocialPlatform;
@@ -45,6 +46,10 @@ final class UpsertProfile
 
         if ($dto->socialLinks !== null) {
             $attributes['social_links'] = $dto->socialLinks;
+        }
+
+        if ($dto->preferences instanceof WorkPreferences) {
+            $attributes['preferences'] = $dto->preferences;
         }
 
         if ($attributes !== []) {
