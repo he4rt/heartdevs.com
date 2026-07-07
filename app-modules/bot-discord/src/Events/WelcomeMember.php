@@ -29,7 +29,6 @@ class WelcomeMember extends Event
 
         try {
             $userDto = ResolveUserProviderDTO::make([
-                'tenant_id' => (string) config('he4rt.tenant_id'),
                 'provider' => IdentityProvider::Discord,
                 'external_account_id' => $member->user->id,
                 'model_type' => (new User)->getMorphClass(),

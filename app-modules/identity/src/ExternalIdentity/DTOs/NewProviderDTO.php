@@ -10,7 +10,6 @@ use JsonSerializable;
 final readonly class NewProviderDTO implements JsonSerializable
 {
     public function __construct(
-        private string $tenantId,
         private IdentityProvider $provider,
         private string $externalAccountId
     ) {}
@@ -21,7 +20,6 @@ final readonly class NewProviderDTO implements JsonSerializable
     public function jsonSerialize(): array
     {
         return [
-            'tenant_id' => $this->tenantId,
             'provider' => $this->provider->value,
             'external_account_id' => $this->externalAccountId,
         ];

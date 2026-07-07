@@ -10,25 +10,20 @@ use Illuminate\Support\Facades\Cache;
 
 class FindExternalIdentity
 {
-    public function handle(string $provider, string $providerId, ?string $tenantId = null): ExternalIdentity
+    public function handle(string $provider, string $providerId): ExternalIdentity
     {
-        $cacheKey = $tenantId !== null
-            ? sprintf('provider-%s-%s-%s', $provider, $providerId, $tenantId)
-            : sprintf('provider-%s-%s', $provider, $providerId);
+        $cacheKey = sprintf('provider-%s-%s', $provider, $providerId);
 
         return Cache::remember(
             $cacheKey,
             2 * 86_400,
-            fn () => $this->find($provider, $providerId, $tenantId)
+            fn () => $this->find($provider, $providerId)
         );
     }
 
-    private function find(string $provider, string $providerId, ?string $tenantId = null): ExternalIdentity
+    private function find(string $provider, string $providerId): ExternalIdentity
     {
-        $resolvedTenantId = $tenantId ?? request()->input('tenant_id');
-
         $model = ExternalIdentity::query()
-            ->where('tenant_id', $resolvedTenantId)
             ->where('provider', $provider)
             ->where('external_account_id', $providerId)
             ->first();

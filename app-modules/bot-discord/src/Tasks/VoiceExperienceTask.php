@@ -42,14 +42,12 @@ class VoiceExperienceTask extends Task
             return;
         }
 
-        $tenantId = (string) config('he4rt.tenant_id');
-
         $afkChannelId = $guild->afk_channel_id;
 
         foreach ($guild->voice_states as $voiceState) {
             /** @var VoiceStateUpdate $voiceState */
             try {
-                $this->processVoiceState($voiceState, $tenantId, $afkChannelId);
+                $this->processVoiceState($voiceState, $afkChannelId);
             } catch (Throwable $e) {
                 $this->logger()->error(sprintf(
                     'VoiceExperienceTask failed for user %s: %s | File: %s | Line: %s',
@@ -64,7 +62,6 @@ class VoiceExperienceTask extends Task
 
     private function processVoiceState(
         VoiceStateUpdate $voiceState,
-        string $tenantId,
         ?string $afkChannelId,
     ): void {
         if ($voiceState->channel_id === null) {
@@ -84,7 +81,6 @@ class VoiceExperienceTask extends Task
         $channelId = (string) $voiceState->channel_id;
 
         $dto = new NewVoiceMessageDTO(
-            tenantId: $tenantId,
             provider: IdentityProvider::Discord,
             externalAccountId: (string) $voiceState->user_id,
             voiceState: $state,

@@ -8,7 +8,6 @@ use He4rt\Moderation\Classification\Actions\ContentClassifierContract;
 use He4rt\Moderation\DTOs\ClassificationResultDTO;
 use He4rt\Moderation\DTOs\ModerationContentDTO;
 use He4rt\Moderation\Rules\ModerationRule;
-use Illuminate\Contracts\Database\Query\Builder;
 
 final class RuleBasedClassifier implements ContentClassifierContract
 {
@@ -21,9 +20,6 @@ final class RuleBasedClassifier implements ContentClassifierContract
     {
         $rules = ModerationRule::query()
             ->where('is_active', operator: true)
-            ->when($content->tenantId, fn ($q) => $q->where(static function (Builder $q) use ($content): void {
-                $q->where('tenant_id', $content->tenantId)->orWhereNull('tenant_id');
-            }))
             ->get();
 
         $scores = [];

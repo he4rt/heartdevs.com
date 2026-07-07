@@ -16,7 +16,6 @@ final class ResolveExternalIdentity
         return ExternalIdentity::query()->firstOrCreate(
             [
                 'provider' => $dto->provider,
-                'tenant_id' => $dto->tenantId,
                 'external_account_id' => $dto->externalAccountId,
                 'model_type' => $dto->modelType,
             ],

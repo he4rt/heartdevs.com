@@ -70,12 +70,8 @@ final class ReplyComposer extends Component implements HasSchemas
         /** @var User $user */
         $user = auth()->user();
 
-        /** @var string $tenantId */
-        $tenantId = (string) config('he4rt.tenant_id');
-
         resolve(CreateReply::class)->handle(new CreateReplyDTO(
             userId: $user->id,
-            tenantId: $tenantId,
             parentTimelineId: $this->timelineId,
             content: $state['content'],
             images: $state['images'] ?? [],

@@ -34,45 +34,39 @@ final readonly class ProjectGithubEvent
             return;
         }
 
-        // Fan-out: cada comunidade que acompanha esse repo recebe a sua própria
-        // contribuição (isolamento por tenant). Uma entrega vira N projeções.
-        foreach ($this->tenantsTracking($repo) as $tenantId) {
-            match ($event) {
-                'pull_request' => $this->pullRequest($tenantId, $repo, $payload),
-                'pull_request_review' => $this->review($tenantId, $repo, $payload),
-                'issues' => $this->issue($tenantId, $repo, $payload),
-                'issue_comment' => $this->issueComment($tenantId, $repo, $payload),
-                'pull_request_review_comment' => $this->reviewComment($tenantId, $repo, $payload),
-                'push' => $this->push($tenantId, $repo, $payload),
-                default => null,
-            };
+        if (!$this->isTracked($repo)) {
+            return;
         }
+
+        match ($event) {
+            'pull_request' => $this->pullRequest($repo, $payload),
+            'pull_request_review' => $this->review($repo, $payload),
+            'issues' => $this->issue($repo, $payload),
+            'issue_comment' => $this->issueComment($repo, $payload),
+            'pull_request_review_comment' => $this->reviewComment($repo, $payload),
+            'push' => $this->push($repo, $payload),
+            default => null,
+        };
     }
 
-    /**
-     * @return list<string>
-     */
-    private function tenantsTracking(string $repo): array
+    private function isTracked(string $repo): bool
     {
-        return array_values(GithubRepository::query()
+        return GithubRepository::query()
             ->enabled()
             ->where('full_name', $repo)
             ->where('purpose', PurposeType::Contributions)
-            ->pluck('tenant_id')
-            ->map(static fn (mixed $tenantId): string => (string) $tenantId)
-            ->all());
+            ->exists();
     }
 
     /**
      * @param  array<string, mixed>  $payload
      */
-    private function pullRequest(string $tenantId, string $repo, array $payload): void
+    private function pullRequest(string $repo, array $payload): void
     {
         $pr = $this->arrayFrom($payload, 'pull_request');
         $login = $this->stringFrom($pr, 'user.login', 'ghost');
 
         $this->recorder->execute(new NewContributionDTO(
-            tenantId: $tenantId,
             repo: $repo,
             type: ContributionType::Pr,
             externalRef: ContributionType::Pr->ref($this->stringFrom($pr, 'number')),
@@ -96,7 +90,7 @@ final readonly class ProjectGithubEvent
     /**
      * @param  array<string, mixed>  $payload
      */
-    private function review(string $tenantId, string $repo, array $payload): void
+    private function review(string $repo, array $payload): void
     {
         $review = $this->arrayFrom($payload, 'review');
         $submittedAt = $this->stringFrom($review, 'submitted_at');
@@ -109,7 +103,6 @@ final readonly class ProjectGithubEvent
         $login = $this->stringFrom($review, 'user.login', 'ghost');
 
         $this->recorder->execute(new NewContributionDTO(
-            tenantId: $tenantId,
             repo: $repo,
             type: ContributionType::Review,
             externalRef: ContributionType::Review->ref($this->stringFrom($review, 'id')),
@@ -127,13 +120,12 @@ final readonly class ProjectGithubEvent
     /**
      * @param  array<string, mixed>  $payload
      */
-    private function issue(string $tenantId, string $repo, array $payload): void
+    private function issue(string $repo, array $payload): void
     {
         $issue = $this->arrayFrom($payload, 'issue');
         $login = $this->stringFrom($issue, 'user.login', 'ghost');
 
         $this->recorder->execute(new NewContributionDTO(
-            tenantId: $tenantId,
             repo: $repo,
             type: ContributionType::Issue,
             externalRef: ContributionType::Issue->ref($this->stringFrom($issue, 'number')),
@@ -153,7 +145,7 @@ final readonly class ProjectGithubEvent
     /**
      * @param  array<string, mixed>  $payload
      */
-    private function issueComment(string $tenantId, string $repo, array $payload): void
+    private function issueComment(string $repo, array $payload): void
     {
         $comment = $this->arrayFrom($payload, 'comment');
         $login = $this->stringFrom($comment, 'user.login', 'ghost');
@@ -161,7 +153,6 @@ final readonly class ProjectGithubEvent
         $target = ($isPr ? ContributionType::Pr : ContributionType::Issue)->ref($this->stringFrom($payload, 'issue.number'));
 
         $this->recorder->execute(new NewContributionDTO(
-            tenantId: $tenantId,
             repo: $repo,
             type: ContributionType::Comment,
             externalRef: ContributionType::Comment->ref($this->stringFrom($comment, 'id')),
@@ -180,13 +171,12 @@ final readonly class ProjectGithubEvent
     /**
      * @param  array<string, mixed>  $payload
      */
-    private function reviewComment(string $tenantId, string $repo, array $payload): void
+    private function reviewComment(string $repo, array $payload): void
     {
         $comment = $this->arrayFrom($payload, 'comment');
         $login = $this->stringFrom($comment, 'user.login', 'ghost');
 
         $this->recorder->execute(new NewContributionDTO(
-            tenantId: $tenantId,
             repo: $repo,
             type: ContributionType::ReviewComment,
             externalRef: ContributionType::ReviewComment->ref($this->stringFrom($comment, 'id')),
@@ -205,7 +195,7 @@ final readonly class ProjectGithubEvent
     /**
      * @param  array<string, mixed>  $payload
      */
-    private function push(string $tenantId, string $repo, array $payload): void
+    private function push(string $repo, array $payload): void
     {
         foreach ($this->arrayFrom($payload, 'commits') as $commit) {
             if (!is_array($commit)) {
@@ -216,7 +206,6 @@ final readonly class ProjectGithubEvent
             $login = $username !== '' ? $username : $this->stringFrom($commit, 'author.name', 'ghost');
 
             $this->recorder->execute(new NewContributionDTO(
-                tenantId: $tenantId,
                 repo: $repo,
                 type: ContributionType::Commit,
                 externalRef: ContributionType::Commit->ref($this->stringFrom($commit, 'id')),

@@ -119,10 +119,7 @@ class IntroductionCommand extends AbstractSlashCommand
      */
     private function persistData(Interaction $interaction, Collection $components): void
     {
-        $tenantId = (string) config('he4rt.tenant_id');
-
         $userDto = ResolveUserProviderDTO::make([
-            'tenant_id' => $tenantId,
             'provider' => IdentityProvider::Discord,
             'external_account_id' => $interaction->user->id,
             'model_type' => (new User)->getMorphClass(),
@@ -145,7 +142,7 @@ class IntroductionCommand extends AbstractSlashCommand
 
         $userContext->user->update(['name' => $name]);
 
-        $profile = Profile::ensureExists($userContext->user->id, $tenantId);
+        $profile = Profile::ensureExists($userContext->user->id);
 
         $dto = UpsertProfileDTO::fromArray([
             'nickname' => $nickname,

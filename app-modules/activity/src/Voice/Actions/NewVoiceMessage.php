@@ -25,7 +25,6 @@ final readonly class NewVoiceMessage
         try {
             DB::transaction(function () use ($voiceDTO): void {
                 $userDto = ResolveUserProviderDTO::make([
-                    'tenant_id' => $voiceDTO->tenantId,
                     'provider' => $voiceDTO->provider,
                     'external_account_id' => $voiceDTO->externalAccountId,
                     'model_type' => (new User)->getMorphClass(),
@@ -40,7 +39,6 @@ final readonly class NewVoiceMessage
                 );
 
                 Voice::query()->create([
-                    'tenant_id' => $voiceDTO->tenantId,
                     'external_identity_id' => $userContext->provider->id,
                     'channel_name' => $voiceDTO->channelName,
                     'channel_id' => $voiceDTO->channelId,
@@ -52,7 +50,6 @@ final readonly class NewVoiceMessage
         } catch (Throwable $throwable) {
             Log::channel('bot-discord')->error('NewVoiceMessage failed', [
                 'external_account_id' => $voiceDTO->externalAccountId,
-                'tenant_id' => $voiceDTO->tenantId,
                 'exception' => $throwable,
             ]);
         }

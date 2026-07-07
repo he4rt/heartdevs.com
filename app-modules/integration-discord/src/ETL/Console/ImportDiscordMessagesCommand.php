@@ -54,14 +54,6 @@ class ImportDiscordMessagesCommand extends Command
             return self::FAILURE;
         }
 
-        $tenantId = (string) config('he4rt.tenant_id');
-
-        if ($tenantId === '') {
-            error('No tenant configured (set HE4RT_TENANT_ID).');
-
-            return self::FAILURE;
-        }
-
         $basePath = $this->argument('path');
 
         if (!is_dir($basePath)) {
@@ -84,7 +76,7 @@ class ImportDiscordMessagesCommand extends Command
         $limit = $this->option('limit') !== null ? (int) $this->option('limit') : null;
         $chunksPerChannel = $this->option('chunks') !== null ? (int) $this->option('chunks') : null;
 
-        info(sprintf('Importando mensagens de %d canais para tenant "%s"...', count($channelDirs), $tenantId));
+        info(sprintf('Importando mensagens de %d canais...', count($channelDirs)));
         if ($limit !== null) {
             info(sprintf('Limite total: %s mensagens.', number_format($limit)));
         }
@@ -159,7 +151,7 @@ class ImportDiscordMessagesCommand extends Command
 
                 /** @var list<array<string, mixed>> $rawMessages */
                 $rawMessages = array_values(array_filter($allMessages, is_array(...)));
-                $messages = $this->filterNewMessages($rawMessages, $tenantId);
+                $messages = $this->filterNewMessages($rawMessages);
                 $stats['skipped'] += count($allMessages) - count($messages);
 
                 if ($messages !== []) {
@@ -173,8 +165,8 @@ class ImportDiscordMessagesCommand extends Command
                         $dtos = array_slice($dtos, 0, $remaining);
                     }
 
-                    $identityCache = $messageAction->prewarm($dtos, $tenantId, $identityCache);
-                    $replyCache = $messageAction->prewarmReplyTargets($dtos, $tenantId);
+                    $identityCache = $messageAction->prewarm($dtos, $identityCache);
+                    $replyCache = $messageAction->prewarmReplyTargets($dtos);
 
                     $rawById = [];
                     foreach ($messages as $raw) {
@@ -190,12 +182,12 @@ class ImportDiscordMessagesCommand extends Command
 
                         DB::transaction(function () use (
                             $dtoBatch, $rawById, $messageAction, $reactionsAction, $voiceAction, $moderationAction,
-                            $tenantId, $channelMap, $channelName, &$stats, &$errorSamples,
+                            $channelMap, $channelName, &$stats, &$errorSamples,
                             $identityCache, $replyCache, $statsSection, &$lastStatsRender,
                         ): void {
                             DB::statement('SET LOCAL synchronous_commit = off');
 
-                            $stubs = $messageAction->handleBatch($dtoBatch, $tenantId, $identityCache, $replyCache);
+                            $stubs = $messageAction->handleBatch($dtoBatch, $identityCache, $replyCache);
                             $stats['messages'] += count($stubs);
 
                             foreach ($stubs as $providerId => $stub) {
@@ -207,7 +199,7 @@ class ImportDiscordMessagesCommand extends Command
                                 try {
                                     $this->processSubEntities(
                                         $raw, $stub, $reactionsAction, $voiceAction, $moderationAction,
-                                        $tenantId, $channelMap, $stats,
+                                        $channelMap, $stats,
                                     );
                                 } catch (Throwable $e) {
                                     $stats['errors']++;
@@ -290,19 +282,18 @@ class ImportDiscordMessagesCommand extends Command
         ImportDiscordReactionsAction $reactionsAction,
         ImportDiscordVoiceLogAction $voiceAction,
         ImportDiscordModerationEventAction $moderationAction,
-        string $tenantId,
         array $channelMap,
         array &$stats,
     ): void {
         $reactions = DiscordMessageReactionDTO::fromDumpMessage($raw);
         if ($reactions !== []) {
-            $reactionsAction->handle($message, $reactions, $tenantId);
+            $reactionsAction->handle($message, $reactions);
             $stats['reactions'] += count($reactions);
         }
 
         $voiceDto = DiscordVoiceLogDTO::fromDump($raw);
         if ($voiceDto instanceof DiscordVoiceLogDTO) {
-            $voice = $voiceAction->handle($voiceDto, $tenantId, $channelMap);
+            $voice = $voiceAction->handle($voiceDto, $channelMap);
             if ($voice instanceof Voice) {
                 $stats['voice']++;
             }
@@ -310,7 +301,7 @@ class ImportDiscordMessagesCommand extends Command
 
         $moderationDto = DiscordModerationEventDTO::fromDump($raw);
         if ($moderationDto instanceof DiscordModerationEventDTO) {
-            $moderationAction->handle($moderationDto, $tenantId, $message->id);
+            $moderationAction->handle($moderationDto, $message->id);
             $stats['moderation']++;
         }
     }
@@ -321,7 +312,7 @@ class ImportDiscordMessagesCommand extends Command
     private function assertSchema(): array
     {
         $required = [
-            'id', 'tenant_id', 'external_identity_id', 'provider_message_id',
+            'id', 'external_identity_id', 'provider_message_id',
             'channel_id', 'content', 'metadata', 'sent_at', 'edited_at',
             'kind', 'raw_message_type', 'source_kind', 'is_pinned',
             'mentions_everyone', 'mention_role_count', 'obtained_experience',
@@ -383,7 +374,7 @@ class ImportDiscordMessagesCommand extends Command
      * @param  list<array<string, mixed>>  $messages
      * @return list<array<string, mixed>>
      */
-    private function filterNewMessages(array $messages, string $tenantId): array
+    private function filterNewMessages(array $messages): array
     {
         $unique = [];
         foreach ($messages as $m) {
@@ -397,7 +388,6 @@ class ImportDiscordMessagesCommand extends Command
         }
 
         $existing = Message::query()
-            ->where('tenant_id', $tenantId)
             ->whereIn('provider_message_id', array_keys($unique))
             ->pluck('provider_message_id')
             ->flip()

@@ -29,18 +29,10 @@ class UserObserver
     /**
      * Previously a profile was created as a side-effect of attaching a user to a
      * tenant (TenantUserObserver). With tenancy removed, every newly created user
-     * gets a profile here instead. The tenant_id column still exists (dropped in a
-     * later phase), so it is sourced from the fixed single-tenant config value when
-     * available; unset config (e.g. in tests) simply skips the bootstrap.
+     * gets a profile here instead.
      */
     private function ensureProfileExists(User $user): void
     {
-        $tenantId = config('he4rt.tenant_id');
-
-        if (!is_string($tenantId) || $tenantId === '') {
-            return;
-        }
-
-        Profile::ensureExists((string) $user->getKey(), $tenantId);
+        Profile::ensureExists((string) $user->getKey());
     }
 }

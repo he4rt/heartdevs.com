@@ -25,7 +25,6 @@ final readonly class CreateFeedback
 
         return Feedback::query()->create([
             ...$newFeedbackDTO->jsonSerialize(),
-            'tenant_id' => request()->input('tenant_id'),
         ]);
     }
 

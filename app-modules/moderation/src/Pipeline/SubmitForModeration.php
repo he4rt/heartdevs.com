@@ -58,7 +58,6 @@ final readonly class SubmitForModeration
                 'status' => CaseStatus::Pending,
                 'priority' => 50,
                 'author_id' => $this->resolveAuthorId($content),
-                'tenant_id' => $content->tenantId,
                 'ai_scores' => $ruleResult->scores,
                 'violation_type' => $ruleResult->primary,
                 'severity' => $ruleResult->severity,

@@ -31,17 +31,16 @@ final class ImportDiscordMessageAction
     /**
      * @param  array<string, string>  $replyCache  provider_message_id => message uuid
      */
-    public function handle(DiscordMessageDTO $dto, string $tenantId, ?string $cachedIdentityId = null, array $replyCache = []): Message
+    public function handle(DiscordMessageDTO $dto, ?string $cachedIdentityId = null, array $replyCache = []): Message
     {
-        $identityId = $cachedIdentityId ?? $this->resolveAuthorIdentity($dto, $tenantId)->id;
+        $identityId = $cachedIdentityId ?? $this->resolveAuthorIdentity($dto)->id;
         $adapter = IdentityProvider::Discord->getMessageAdapter();
 
         $payload = $dto->toDatabase([
-            'tenant_id' => $tenantId,
             'external_identity_id' => $identityId,
             'obtained_experience' => 0,
             ...$this->extractProviderSignals($dto, $adapter),
-            'reply_to_message_id' => $this->resolveReplyTargetId($dto, $adapter, $replyCache, $tenantId),
+            'reply_to_message_id' => $this->resolveReplyTargetId($dto, $adapter, $replyCache, allowDbLookup: true),
         ]);
 
         $providerMessageId = $payload['provider_message_id'] ?? null;
@@ -49,18 +48,17 @@ final class ImportDiscordMessageAction
 
         $message = Message::query()->updateOrCreate(
             [
-                'tenant_id' => $tenantId,
                 'provider_message_id' => $providerMessageId,
             ],
             $payload,
         );
 
         if ($adapter instanceof MessageActivityAdapter) {
-            $this->syncMentions($message, $dto, $tenantId, $adapter);
-            $this->syncThread($message, $dto, $tenantId, $adapter);
-            $this->syncAttachments($message, $dto, $tenantId, $adapter);
-            $this->syncEmbeds($message, $dto, $tenantId, $adapter);
-            $this->syncMembershipEvent($message, $dto, $tenantId, $adapter);
+            $this->syncMentions($message, $dto, $adapter);
+            $this->syncThread($message, $dto, $adapter);
+            $this->syncAttachments($message, $dto, $adapter);
+            $this->syncEmbeds($message, $dto, $adapter);
+            $this->syncMembershipEvent($message, $dto, $adapter);
         }
 
         return $message;
@@ -72,7 +70,7 @@ final class ImportDiscordMessageAction
      * @param  array<string, string>  $replyCache
      * @return array<string, Message> discordMessageId => Message stub
      */
-    public function handleBatch(array $dtos, string $tenantId, array $identityCache, array $replyCache): array
+    public function handleBatch(array $dtos, array $identityCache, array $replyCache): array
     {
         $adapter = IdentityProvider::Discord->getMessageAdapter();
         $now = now();
@@ -82,11 +80,10 @@ final class ImportDiscordMessageAction
 
         foreach ($dtos as $dto) {
             $id = (string) Uuid::uuid4();
-            $identityId = $identityCache[$dto->authorDiscordId] ?? $this->resolveAuthorIdentity($dto, $tenantId)->id;
+            $identityId = $identityCache[$dto->authorDiscordId] ?? $this->resolveAuthorIdentity($dto)->id;
 
             $row = $dto->toDatabase([
                 'id' => $id,
-                'tenant_id' => $tenantId,
                 'external_identity_id' => $identityId,
                 'obtained_experience' => 0,
                 ...$this->extractProviderSignals($dto, $adapter),
@@ -117,11 +114,11 @@ final class ImportDiscordMessageAction
         if ($adapter instanceof MessageActivityAdapter) {
             foreach ($dtos as $dto) {
                 $stub = $stubs[$dto->discordMessageId];
-                $this->syncMentions($stub, $dto, $tenantId, $adapter);
-                $this->syncThread($stub, $dto, $tenantId, $adapter);
-                $this->syncAttachments($stub, $dto, $tenantId, $adapter);
-                $this->syncEmbeds($stub, $dto, $tenantId, $adapter);
-                $this->syncMembershipEvent($stub, $dto, $tenantId, $adapter);
+                $this->syncMentions($stub, $dto, $adapter);
+                $this->syncThread($stub, $dto, $adapter);
+                $this->syncAttachments($stub, $dto, $adapter);
+                $this->syncEmbeds($stub, $dto, $adapter);
+                $this->syncMembershipEvent($stub, $dto, $adapter);
             }
         }
 
@@ -136,7 +133,7 @@ final class ImportDiscordMessageAction
      * @param  array<string, string>  $existingCache
      * @return array<string, string>
      */
-    public function prewarm(iterable $dtos, string $tenantId, array $existingCache = []): array
+    public function prewarm(iterable $dtos, array $existingCache = []): array
     {
         $newAuthors = [];
         foreach ($dtos as $dto) {
@@ -158,7 +155,6 @@ final class ImportDiscordMessageAction
         /** @var array<string, string> $existing */
         $existing = ExternalIdentity::query()
             ->where('provider', IdentityProvider::Discord)
-            ->where('tenant_id', $tenantId)
             ->whereIn('external_account_id', array_keys($newAuthors))
             ->pluck('id', 'external_account_id')
             ->all();
@@ -170,7 +166,7 @@ final class ImportDiscordMessageAction
                 continue;
             }
 
-            $cache[$discordId] = $this->createIdentity($dto, $tenantId)->id;
+            $cache[$discordId] = $this->createIdentity($dto)->id;
         }
 
         return $cache;
@@ -180,7 +176,7 @@ final class ImportDiscordMessageAction
      * @param  iterable<DiscordMessageDTO>  $dtos
      * @return array<string, string> reply_to_provider_message_id => message uuid
      */
-    public function prewarmReplyTargets(iterable $dtos, string $tenantId): array
+    public function prewarmReplyTargets(iterable $dtos): array
     {
         $adapter = IdentityProvider::Discord->getMessageAdapter();
         if (!$adapter instanceof MessageActivityAdapter) {
@@ -201,7 +197,6 @@ final class ImportDiscordMessageAction
 
         /** @var array<string, string> */
         return Message::query()
-            ->where('tenant_id', $tenantId)
             ->whereIn('provider_message_id', array_keys($replyProviderIds))
             ->pluck('id', 'provider_message_id')
             ->all();
@@ -239,7 +234,7 @@ final class ImportDiscordMessageAction
         DiscordMessageDTO $dto,
         ?MessageActivityAdapter $adapter,
         array $replyCache = [],
-        ?string $tenantId = null,
+        bool $allowDbLookup = false,
     ): ?string {
         if (!$adapter instanceof MessageActivityAdapter) {
             return null;
@@ -254,12 +249,11 @@ final class ImportDiscordMessageAction
             return $replyCache[$reply->replyToProviderMessageId];
         }
 
-        if ($tenantId === null) {
+        if (!$allowDbLookup) {
             return null;
         }
 
         return Message::query()
-            ->where('tenant_id', $tenantId)
             ->where('provider_message_id', $reply->replyToProviderMessageId)
             ->value('id');
     }
@@ -267,7 +261,6 @@ final class ImportDiscordMessageAction
     private function syncMentions(
         Message $message,
         DiscordMessageDTO $dto,
-        string $tenantId,
         MessageActivityAdapter $adapter,
     ): void {
         $mentions = $adapter->extractMentions($dto->metadata);
@@ -282,7 +275,6 @@ final class ImportDiscordMessageAction
 
         $identityMap = ExternalIdentity::query()
             ->where('provider', IdentityProvider::Discord)
-            ->where('tenant_id', $tenantId)
             ->whereIn('external_account_id', $providerIds)
             ->pluck('id', 'external_account_id')
             ->all();
@@ -294,7 +286,6 @@ final class ImportDiscordMessageAction
                     'mentioned_provider_account_id' => $mention->mentionedProviderAccountId,
                 ],
                 [
-                    'tenant_id' => $tenantId,
                     'mentioned_identity_id' => $identityMap[$mention->mentionedProviderAccountId] ?? null,
                     'mentioned_username' => $mention->mentionedUsername,
                     'position' => $mention->position,
@@ -306,7 +297,6 @@ final class ImportDiscordMessageAction
     private function syncThread(
         Message $message,
         DiscordMessageDTO $dto,
-        string $tenantId,
         MessageActivityAdapter $adapter,
     ): void {
         $thread = $adapter->extractThread($dto->metadata);
@@ -316,7 +306,6 @@ final class ImportDiscordMessageAction
 
         MessageThread::query()->updateOrCreate(
             [
-                'tenant_id' => $tenantId,
                 'provider_thread_id' => $thread->providerThreadId,
             ],
             [
@@ -331,7 +320,6 @@ final class ImportDiscordMessageAction
     private function syncAttachments(
         Message $message,
         DiscordMessageDTO $dto,
-        string $tenantId,
         MessageActivityAdapter $adapter,
     ): void {
         $attachments = $adapter->extractAttachments($dto->metadata);
@@ -353,7 +341,6 @@ final class ImportDiscordMessageAction
         foreach ($attachments as $index => $attachment) {
             $rows[] = [
                 'id' => (string) Uuid::uuid4(),
-                'tenant_id' => $tenantId,
                 'message_id' => $message->id,
                 'provider_attachment_id' => $providerIds[$index] ?? null,
                 'url' => $attachment->url,
@@ -373,7 +360,6 @@ final class ImportDiscordMessageAction
     private function syncEmbeds(
         Message $message,
         DiscordMessageDTO $dto,
-        string $tenantId,
         MessageActivityAdapter $adapter,
     ): void {
         $embeds = $adapter->extractEmbeds($dto->metadata);
@@ -389,7 +375,6 @@ final class ImportDiscordMessageAction
         foreach ($embeds as $index => $embed) {
             $rows[] = [
                 'id' => (string) Uuid::uuid4(),
-                'tenant_id' => $tenantId,
                 'message_id' => $message->id,
                 'url' => $embed->url,
                 'title' => $embed->title,
@@ -410,7 +395,6 @@ final class ImportDiscordMessageAction
     private function syncMembershipEvent(
         Message $message,
         DiscordMessageDTO $dto,
-        string $tenantId,
         MessageActivityAdapter $adapter,
     ): void {
         $event = $adapter->extractMembershipEvent($dto->metadata);
@@ -420,7 +404,6 @@ final class ImportDiscordMessageAction
 
         MembershipEvent::query()->updateOrCreate(
             [
-                'tenant_id' => $tenantId,
                 'provider_message_id' => $message->provider_message_id,
             ],
             [
@@ -432,29 +415,27 @@ final class ImportDiscordMessageAction
         );
     }
 
-    private function resolveAuthorIdentity(DiscordMessageDTO $dto, string $tenantId): ExternalIdentity
+    private function resolveAuthorIdentity(DiscordMessageDTO $dto): ExternalIdentity
     {
         $identity = ExternalIdentity::query()
             ->where('provider', IdentityProvider::Discord)
             ->where('external_account_id', $dto->authorDiscordId)
-            ->where('tenant_id', $tenantId)
             ->first();
 
         if ($identity) {
             return $identity;
         }
 
-        return $this->createIdentity($dto, $tenantId);
+        return $this->createIdentity($dto);
     }
 
-    private function createIdentity(DiscordMessageDTO $dto, string $tenantId): ExternalIdentity
+    private function createIdentity(DiscordMessageDTO $dto): ExternalIdentity
     {
         $user = $this->resolveOrCreateUser($dto);
 
         return ExternalIdentity::query()->create([
             'provider' => IdentityProvider::Discord,
             'external_account_id' => $dto->authorDiscordId,
-            'tenant_id' => $tenantId,
             'model_type' => (new User)->getMorphClass(),
             'model_id' => $user->id,
             'type' => IdentityProvider::Discord->getType(),

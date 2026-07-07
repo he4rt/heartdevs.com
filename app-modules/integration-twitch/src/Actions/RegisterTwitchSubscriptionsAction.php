@@ -22,8 +22,6 @@ final readonly class RegisterTwitchSubscriptionsAction
      */
     public function __invoke(array $types = []): array
     {
-        $tenantId = config('he4rt.tenant_id');
-
         $broadcasterId = $this->resolveBroadcasterId();
 
         if ($broadcasterId === null) {
@@ -97,7 +95,6 @@ final readonly class RegisterTwitchSubscriptionsAction
                         'callback_url' => $data['transport']['callback'] ?? $callbackUrl,
                         'cost' => $data['cost'] ?? 0,
                         'version' => $data['version'] ?? $type->getVersion(),
-                        'tenant_id' => $tenantId,
                     ]
                 );
 

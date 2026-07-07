@@ -37,35 +37,33 @@ final readonly class BackfillRepository
      */
     public function execute(GithubRepository $repository, ?callable $onProgress = null, bool $full = false): void
     {
-        $tenantId = $repository->tenant_id;
         $repo = $repository->full_name;
 
         $since = $full || $repository->last_backfilled_at === null
             ? null
             : $repository->last_backfilled_at->subDay()->utc()->format('Y-m-d\TH:i:s\Z');
 
-        $this->backfillPullRequests($tenantId, $repo, $since, $onProgress);
-        $this->backfillIssues($tenantId, $repo, $since, $onProgress);
-        $this->backfillIssueComments($tenantId, $repo, $since, $onProgress);
-        $this->backfillReviewComments($tenantId, $repo, $since, $onProgress);
-        $this->backfillCommits($tenantId, $repo, $since, $onProgress);
+        $this->backfillPullRequests($repo, $since, $onProgress);
+        $this->backfillIssues($repo, $since, $onProgress);
+        $this->backfillIssueComments($repo, $since, $onProgress);
+        $this->backfillReviewComments($repo, $since, $onProgress);
+        $this->backfillCommits($repo, $since, $onProgress);
     }
 
     /**
      * @param  (callable(NewContributionDTO, bool): void)|null  $onProgress
      */
-    private function backfillPullRequests(string $tenantId, string $repo, ?string $since, ?callable $onProgress): void
+    private function backfillPullRequests(string $repo, ?string $since, ?callable $onProgress): void
     {
         $this->paginate(
             fn (int $page): Request => new ListPullRequests($repo, $page, self::PER_PAGE),
-            function (array $pr) use ($tenantId, $repo, $onProgress): void {
+            function (array $pr) use ($repo, $onProgress): void {
                 $number = $this->intFrom($pr, 'number') ?? 0;
                 /** @var array<string, mixed> $prSize */
                 $prSize = (array) $this->github->send(new GetPullRequest($repo, $number))->throw()->json();
                 $login = $this->actorLogin($pr);
 
                 $this->record(new NewContributionDTO(
-                    tenantId: $tenantId,
                     repo: $repo,
                     type: ContributionType::Pr,
                     externalRef: ContributionType::Pr->ref($number),
@@ -85,7 +83,7 @@ final readonly class BackfillRepository
                     ],
                 ), $onProgress);
 
-                $this->backfillReviews($tenantId, $repo, $number, $onProgress);
+                $this->backfillReviews($repo, $number, $onProgress);
             },
             // PRs vêm ordenados por updated desc: ao cruzar o corte, todo o resto é mais
             // antigo — paramos de paginar (mata o N+1 de GetPullRequest + reviews).
@@ -103,11 +101,11 @@ final readonly class BackfillRepository
     /**
      * @param  (callable(NewContributionDTO, bool): void)|null  $onProgress
      */
-    private function backfillReviews(string $tenantId, string $repo, int $number, ?callable $onProgress): void
+    private function backfillReviews(string $repo, int $number, ?callable $onProgress): void
     {
         $this->paginate(
             fn (int $page): Request => new ListPullRequestReviews($repo, $number, $page, self::PER_PAGE),
-            function (array $review) use ($tenantId, $repo, $number, $onProgress): void {
+            function (array $review) use ($repo, $number, $onProgress): void {
                 $submittedAt = $this->stringFrom($review, 'submitted_at');
 
                 // Reviews PENDING (rascunho não enviado) não têm submitted_at — a API
@@ -119,7 +117,6 @@ final readonly class BackfillRepository
                 $login = $this->actorLogin($review);
 
                 $this->record(new NewContributionDTO(
-                    tenantId: $tenantId,
                     repo: $repo,
                     type: ContributionType::Review,
                     externalRef: ContributionType::Review->ref($this->stringFrom($review, 'id')),
@@ -139,11 +136,11 @@ final readonly class BackfillRepository
     /**
      * @param  (callable(NewContributionDTO, bool): void)|null  $onProgress
      */
-    private function backfillIssues(string $tenantId, string $repo, ?string $since, ?callable $onProgress): void
+    private function backfillIssues(string $repo, ?string $since, ?callable $onProgress): void
     {
         $this->paginate(
             fn (int $page): Request => new ListIssues($repo, $page, self::PER_PAGE, $since),
-            function (array $issue) use ($tenantId, $repo, $onProgress): void {
+            function (array $issue) use ($repo, $onProgress): void {
                 if (isset($issue['pull_request'])) {
                     return; // o endpoint de issues também devolve PRs; estes já entram via backfillPullRequests
                 }
@@ -151,7 +148,6 @@ final readonly class BackfillRepository
                 $login = $this->actorLogin($issue);
 
                 $this->record(new NewContributionDTO(
-                    tenantId: $tenantId,
                     repo: $repo,
                     type: ContributionType::Issue,
                     externalRef: ContributionType::Issue->ref($this->stringFrom($issue, 'number')),
@@ -173,15 +169,14 @@ final readonly class BackfillRepository
     /**
      * @param  (callable(NewContributionDTO, bool): void)|null  $onProgress
      */
-    private function backfillIssueComments(string $tenantId, string $repo, ?string $since, ?callable $onProgress): void
+    private function backfillIssueComments(string $repo, ?string $since, ?callable $onProgress): void
     {
         $this->paginate(
             fn (int $page): Request => new ListIssueComments($repo, $page, self::PER_PAGE, $since),
-            function (array $comment) use ($tenantId, $repo, $onProgress): void {
+            function (array $comment) use ($repo, $onProgress): void {
                 $login = $this->actorLogin($comment);
 
                 $this->record(new NewContributionDTO(
-                    tenantId: $tenantId,
                     repo: $repo,
                     type: ContributionType::Comment,
                     externalRef: ContributionType::Comment->ref($this->stringFrom($comment, 'id')),
@@ -202,15 +197,14 @@ final readonly class BackfillRepository
     /**
      * @param  (callable(NewContributionDTO, bool): void)|null  $onProgress
      */
-    private function backfillReviewComments(string $tenantId, string $repo, ?string $since, ?callable $onProgress): void
+    private function backfillReviewComments(string $repo, ?string $since, ?callable $onProgress): void
     {
         $this->paginate(
             fn (int $page): Request => new ListPullRequestReviewComments($repo, $page, self::PER_PAGE, $since),
-            function (array $comment) use ($tenantId, $repo, $onProgress): void {
+            function (array $comment) use ($repo, $onProgress): void {
                 $login = $this->actorLogin($comment);
 
                 $this->record(new NewContributionDTO(
-                    tenantId: $tenantId,
                     repo: $repo,
                     type: ContributionType::ReviewComment,
                     externalRef: ContributionType::ReviewComment->ref($this->stringFrom($comment, 'id')),
@@ -231,16 +225,15 @@ final readonly class BackfillRepository
     /**
      * @param  (callable(NewContributionDTO, bool): void)|null  $onProgress
      */
-    private function backfillCommits(string $tenantId, string $repo, ?string $since, ?callable $onProgress): void
+    private function backfillCommits(string $repo, ?string $since, ?callable $onProgress): void
     {
         $this->paginate(
             fn (int $page): Request => new ListCommits($repo, $page, self::PER_PAGE, $since),
-            function (array $commit) use ($tenantId, $repo, $onProgress): void {
+            function (array $commit) use ($repo, $onProgress): void {
                 $login = $this->stringFrom($commit, 'author.login')
                     ?: $this->stringFrom($commit, 'commit.author.name', 'ghost');
 
                 $this->record(new NewContributionDTO(
-                    tenantId: $tenantId,
                     repo: $repo,
                     type: ContributionType::Commit,
                     externalRef: ContributionType::Commit->ref($this->stringFrom($commit, 'sha')),

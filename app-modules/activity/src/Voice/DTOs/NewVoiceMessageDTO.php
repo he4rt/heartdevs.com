@@ -10,7 +10,6 @@ use He4rt\Identity\ExternalIdentity\Enums\IdentityProvider;
 final readonly class NewVoiceMessageDTO
 {
     public function __construct(
-        public string $tenantId,
         public IdentityProvider $provider,
         public string $externalAccountId,
         public VoiceStatesEnum $voiceState,

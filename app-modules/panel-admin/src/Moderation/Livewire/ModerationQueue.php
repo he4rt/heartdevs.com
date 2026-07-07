@@ -145,7 +145,6 @@ class ModerationQueue extends Component implements HasActions, HasForms
                     'duration' => $data['duration'],
                     'reason' => $data['reason'],
                     'automated' => false,
-                    'tenant_id' => $case->tenant_id,
                 ]);
 
                 if ($case->author) {

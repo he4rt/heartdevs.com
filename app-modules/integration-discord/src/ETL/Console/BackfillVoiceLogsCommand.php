@@ -17,7 +17,6 @@ use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Sleep;
 
-use function Laravel\Prompts\error;
 use function Laravel\Prompts\intro;
 use function Laravel\Prompts\note;
 use function Laravel\Prompts\outro;
@@ -53,14 +52,6 @@ final class BackfillVoiceLogsCommand extends Command
     ): int {
         DB::disableQueryLog();
 
-        $tenantId = (string) config('he4rt.tenant_id');
-
-        if ($tenantId === '') {
-            error('No tenant configured (set HE4RT_TENANT_ID).');
-
-            return self::FAILURE;
-        }
-
         $channelId = (string) $this->argument('channel_id');
         $botId = (string) $this->option('bot-id');
         $isDryRun = (bool) $this->option('dry-run');
@@ -70,7 +61,6 @@ final class BackfillVoiceLogsCommand extends Command
         intro(sprintf('Discord Voice Backfill%s', $isDryRun ? ' [DRY RUN]' : ''));
 
         $existingCount = Voice::query()
-            ->where('tenant_id', $tenantId)
             ->whereBetween('occurred_at', [$since, $until])
             ->count();
 
@@ -80,7 +70,6 @@ final class BackfillVoiceLogsCommand extends Command
                 ['Channel', $channelId],
                 ['Bot filter', $botId],
                 ['Period', sprintf('%s → %s', $since->toDateString(), $until->toDateString())],
-                ['Tenant', $tenantId],
                 ['Existing voice events in period', number_format($existingCount)],
             ],
         );
@@ -96,7 +85,7 @@ final class BackfillVoiceLogsCommand extends Command
             label: 'Fetching voice logs [starting...]',
             callback: function ($logger) use (
                 $connector, $voiceAction, $channelId, $botId,
-                $isDryRun, $since, $until, $tenantId, $channelMap,
+                $isDryRun, $since, $until, $channelMap,
                 &$before, &$pages, &$fetched,
             ): void {
                 $reachedSince = false;
@@ -170,7 +159,6 @@ final class BackfillVoiceLogsCommand extends Command
 
                         $channelName = $channelMap[$voiceDto->voiceChannelId] ?? $voiceDto->voiceChannelId;
                         $exists = Voice::query()
-                            ->where('tenant_id', $tenantId)
                             ->where('provider_message_id', (string) $message['id'])
                             ->exists();
 
@@ -185,7 +173,7 @@ final class BackfillVoiceLogsCommand extends Command
                             ));
                         } else {
                             if (!$isDryRun) {
-                                $voiceAction->handle($voiceDto, $tenantId, $channelMap);
+                                $voiceAction->handle($voiceDto, $channelMap);
                             }
 
                             $this->voiceCount++;

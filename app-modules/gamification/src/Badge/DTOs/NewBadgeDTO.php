@@ -14,7 +14,6 @@ final readonly class NewBadgeDTO implements JsonSerializable
         private string $description,
         private string $redeemCode,
         private bool $active,
-        private string $tenant_id
     ) {}
 
     /**
@@ -28,7 +27,6 @@ final readonly class NewBadgeDTO implements JsonSerializable
             description: $payload['description'],
             redeemCode: $payload['redeem_code'],
             active: $payload['active'],
-            tenant_id: $payload['tenant_id']
         );
     }
 
@@ -43,7 +41,6 @@ final readonly class NewBadgeDTO implements JsonSerializable
             'description' => $this->description,
             'redeem_code' => $this->redeemCode,
             'active' => $this->active,
-            'tenant_id' => $this->tenant_id,
         ];
     }
 }

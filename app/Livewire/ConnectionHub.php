@@ -18,8 +18,6 @@ class ConnectionHub extends Component
 {
     public string $panel = 'app';
 
-    public string $tenantId = '';
-
     public bool $showMergeModal = false;
 
     /** @var array<string, mixed>|null */
@@ -28,7 +26,6 @@ class ConnectionHub extends Component
     public function mount(): void
     {
         $this->panel = filament()->getCurrentPanel()?->getId() ?? 'app';
-        $this->tenantId = (string) config('he4rt.tenant_id');
         $this->checkPendingMerge();
     }
 
@@ -104,7 +101,6 @@ class ConnectionHub extends Component
     {
         $identity = auth()->user()
             ->providers()
-            ->where('tenant_id', $this->tenantId)
             ->where('provider', $provider->value)
             ->whereNotNull('connected_at')
             ->whereNull('disconnected_at')
@@ -131,7 +127,6 @@ class ConnectionHub extends Component
     {
         $identity = ExternalIdentity::query()
             ->where('id', $identityId)
-            ->where('tenant_id', $this->tenantId)
             ->whereNotNull('connected_at')
             ->whereNull('disconnected_at')
             ->first();
@@ -197,14 +192,13 @@ class ConnectionHub extends Component
     /** @return Collection<int, ExternalIdentity> */
     private function getUserProviders(): Collection
     {
-        return auth()->user()->providers()->where('tenant_id', $this->tenantId)->get();
+        return auth()->user()->providers()->get();
     }
 
     /** @return Collection<int, ExternalIdentity> */
     private function getTenantProviders(): Collection
     {
         return ExternalIdentity::query()
-            ->where('tenant_id', $this->tenantId)
             ->where('model_type', 'tenant')
             ->whereNotNull('connected_at')
             ->whereNull('disconnected_at')

@@ -40,10 +40,7 @@ class VoicePresenceEvent extends Event
         }
 
         try {
-            $tenantId = (string) config('he4rt.tenant_id');
-
             $current = resolve(GetCurrentVoiceChannel::class)->handle(
-                $tenantId,
                 IdentityProvider::Discord,
                 (string) $state->user_id,
             );
@@ -65,7 +62,6 @@ class VoicePresenceEvent extends Event
             // A move emits left+joined; persist them together so the log stays paired.
             resolve(RecordVoicePresence::class)->persistMany(
                 RecordVoicePresenceDTO::makeMany(
-                    tenantId: $tenantId,
                     provider: IdentityProvider::Discord,
                     externalAccountId: (string) $state->user_id,
                     transitions: $transitions,

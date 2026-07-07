@@ -53,7 +53,7 @@ final class Profile extends Model
         'start_availability',
     ];
 
-    public static function ensureExists(string $userId, string $tenantId): self
+    public static function ensureExists(string $userId): self
     {
         /** @var Profile $profile */
         $profile = self::query()->firstOrCreate([

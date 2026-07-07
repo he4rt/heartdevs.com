@@ -271,14 +271,10 @@ class ProfilePage extends Page
 
     public function getRecord(): Profile
     {
-        $tenantId = config('he4rt.tenant_id');
-        abort_unless($tenantId, 403);
-
         return Profile::query()
             ->firstOrCreate(
                 [
                     'user_id' => auth()->id(),
-                    'tenant_id' => $tenantId,
                 ],
             );
     }

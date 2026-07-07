@@ -7,16 +7,12 @@ namespace He4rt\PanelApp\Livewire\Timeline;
 use He4rt\Activity\Timeline\Queries\TimelineFeed;
 use He4rt\PanelApp\Livewire\Timeline\Concerns\HasLoadMore;
 use Illuminate\View\View;
-use Livewire\Attributes\Locked;
 use Livewire\Attributes\On;
 use Livewire\Component;
 
 final class Feed extends Component
 {
     use HasLoadMore;
-
-    #[Locked]
-    public string $tenantId;
 
     #[On('timeline.post-created')]
     #[On('timeline.reply-created')]
@@ -25,7 +21,7 @@ final class Feed extends Component
 
     public function render(): View
     {
-        $items = new TimelineFeed($this->tenantId)
+        $items = new TimelineFeed()
             ->builder()
             ->with(['user', 'postable'])
             ->withCount('children', 'reactions')

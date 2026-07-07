@@ -11,7 +11,6 @@ use He4rt\Identity\ExternalIdentity\Enums\IdentityProvider;
 final readonly class RecordVoicePresenceDTO
 {
     public function __construct(
-        public string $tenantId,
         public IdentityProvider $provider,
         public string $externalAccountId,
         public VoicePresenceEnum $presence,
@@ -23,7 +22,7 @@ final readonly class RecordVoicePresenceDTO
     /**
      * Fan a single voice-state change out into one DTO per transition.
      *
-     * The identity (tenant, provider, account, username) is shared across every
+     * The identity (provider, account, username) is shared across every
      * transition of the change; the presence and channel come from each
      * already-resolved VoiceTransition — a move emits both a `left` and a
      * `joined`.
@@ -32,14 +31,12 @@ final readonly class RecordVoicePresenceDTO
      * @return list<self>
      */
     public static function makeMany(
-        string $tenantId,
         IdentityProvider $provider,
         string $externalAccountId,
         array $transitions,
         ?string $username = null,
     ): array {
         return array_map(fn (VoiceTransition $transition): self => new self(
-            tenantId: $tenantId,
             provider: $provider,
             externalAccountId: $externalAccountId,
             presence: $transition->presence,

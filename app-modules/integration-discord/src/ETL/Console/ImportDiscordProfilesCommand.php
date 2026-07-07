@@ -40,14 +40,6 @@ class ImportDiscordProfilesCommand extends Command
             return self::FAILURE;
         }
 
-        $tenantId = (string) config('he4rt.tenant_id');
-
-        if ($tenantId === '') {
-            error('No tenant configured (set HE4RT_TENANT_ID).');
-
-            return self::FAILURE;
-        }
-
         $basePath = $this->argument('path');
 
         if (!is_dir($basePath)) {
@@ -76,7 +68,7 @@ class ImportDiscordProfilesCommand extends Command
         /** @var list<array{chunk: string, discord_id: string, username: string, error: string}> */
         $errorSamples = [];
 
-        info(sprintf('Encontrados %d chunks para importar no tenant "%s".', count($chunks), $tenantId));
+        info(sprintf('Encontrados %d chunks para importar.', count($chunks)));
 
         $output = $this->output->getOutput();
 
@@ -117,7 +109,7 @@ class ImportDiscordProfilesCommand extends Command
 
             foreach (array_chunk($profiles, 250) as $batch) {
                 DB::transaction(function () use (
-                    $batch, $action, $tenantId, $chunkName,
+                    $batch, $action, $chunkName,
                     &$stats, &$errorSamples, &$profileCurrent, $totalProfiles,
                     $profileSection, $statsSection, $profileTitle, &$lastStatsRender,
                 ): void {
@@ -125,7 +117,7 @@ class ImportDiscordProfilesCommand extends Command
                         $dto = DiscordProfileDTO::fromDump($profile);
 
                         try {
-                            $identity = $action->handle($dto, $tenantId);
+                            $identity = $action->handle($dto);
                             $identity->wasRecentlyCreated ? $stats['created']++ : $stats['skipped']++;
                         } catch (Throwable $e) {
                             $stats['errors']++;
@@ -205,7 +197,7 @@ class ImportDiscordProfilesCommand extends Command
     {
         $required = [
             'external_identities' => [
-                'id', 'tenant_id', 'provider', 'external_account_id', 'type',
+                'id', 'provider', 'external_account_id', 'type',
                 'model_type', 'model_id', 'credentials_type', 'credentials',
                 'connected_at', 'metadata', 'created_at', 'updated_at',
             ],

@@ -167,13 +167,6 @@ class MergeDuplicateDiscordProfilesCommand extends Command
 
     private function runFromHeuristic(MergeDuplicateDiscordUserAction $merge): int
     {
-        $tenantId = (string) config('he4rt.tenant_id');
-        if ($tenantId === '') {
-            error('No tenant configured (set HE4RT_TENANT_ID).');
-
-            return self::FAILURE;
-        }
-
         $fromDate = (string) $this->option('from-date');
         $dryRun = (bool) $this->option('dry-run');
         $limit = $this->option('limit') !== null ? (int) $this->option('limit') : null;
@@ -182,9 +175,8 @@ class MergeDuplicateDiscordProfilesCommand extends Command
         $stats = ['merged' => 0, 'no_match' => 0, 'conflict' => 0, 'errors' => 0];
 
         info(sprintf(
-            'Procurando dups apos %s no tenant "%s"%s (heuristic mode)...',
+            'Procurando dups apos %s%s (heuristic mode)...',
             $fromDate,
-            $tenantId,
             $dryRun ? ' [DRY-RUN]' : '',
         ));
 
@@ -199,7 +191,6 @@ class MergeDuplicateDiscordProfilesCommand extends Command
         $candidates = ExternalIdentity::query()
             ->where('provider', IdentityProvider::Discord)
             ->where('model_type', $userMorph)
-            ->where('tenant_id', $tenantId)
             ->whereExists(fn (Builder $q) => $q
                 ->select(DB::raw(1))
                 ->from('users')

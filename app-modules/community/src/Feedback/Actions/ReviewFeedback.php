@@ -26,7 +26,6 @@ final readonly class ReviewFeedback
 
         Review::query()->create([
             ...$reviewDTO->jsonSerialize(),
-            'tenant_id' => request()->input('tenant_id'),
         ]);
     }
 }

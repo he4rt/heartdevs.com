@@ -51,16 +51,6 @@ class ImportDiscordMembers extends Command
             $this->warn(sprintf('GitHub file not found (%s), skipping GitHub imports.', $githubFile));
         }
 
-        $tenantId = (string) config('he4rt.tenant_id');
-
-        if ($tenantId === '') {
-            $this->error('No tenant configured (set HE4RT_TENANT_ID).');
-
-            return;
-        }
-
-        $this->info(sprintf('Importing into tenant: %s', $tenantId));
-
         $stats = ['created' => 0, 'existing' => 0, 'github_set' => 0, 'github_skipped' => 0];
         $csvRows = [];
         $isDryRun = $this->option('dry-run');
@@ -97,7 +87,6 @@ class ImportDiscordMembers extends Command
 
                 if (!$isDryRun) {
                     $identity = $createAccount->handle(
-                        tenantId: $tenantId,
                         provider: IdentityProvider::Discord,
                         providerId: $discordId,
                         username: $username,

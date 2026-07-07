@@ -62,15 +62,11 @@ final class Composer extends Component implements HasSchemas
         /** @var array{content: string, images?: list<string>} $state */
         $state = $this->form->getState();
 
-        /** @var string $tenantId */
-        $tenantId = (string) config('he4rt.tenant_id');
-
         /** @var User $user */
         $user = auth()->user();
 
         resolve(CreatePost::class)->handle(new CreatePostDTO(
             userId: $user->id,
-            tenantId: $tenantId,
             content: $state['content'],
             images: $state['images'] ?? [],
         ));

@@ -20,13 +20,12 @@ use He4rt\Identity\ExternalIdentity\Enums\IdentityProvider;
  */
 final readonly class GetCurrentVoiceChannel
 {
-    public function handle(string $tenantId, IdentityProvider $provider, string $externalAccountId): ?CurrentVoiceChannel
+    public function handle(IdentityProvider $provider, string $externalAccountId): ?CurrentVoiceChannel
     {
         $latest = Voice::query()
             ->join('external_identities', 'external_identities.id', '=', 'voice_messages.external_identity_id')
             ->where('external_identities.external_account_id', $externalAccountId)
             ->where('external_identities.provider', $provider->value)
-            ->where('voice_messages.tenant_id', $tenantId)
             ->orderByDesc('voice_messages.id')
             ->first(['voice_messages.state', 'voice_messages.channel_id', 'voice_messages.channel_name']);
 

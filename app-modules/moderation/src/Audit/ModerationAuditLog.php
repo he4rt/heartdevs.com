@@ -16,7 +16,6 @@ use Illuminate\Database\Eloquent\Model;
  * @property string|null $case_id
  * @property array<string, mixed> $details
  * @property string|null $platform
- * @property string|null $tenant_id
  * @property CarbonInterface $created_at
  */
 #[Table('moderation_audit_log', timestamps: false)]

@@ -22,7 +22,7 @@ readonly class ResolveUserContext
     {
         $provider = $this->providerResolver->handle($dto);
         $user = $this->userResolver->handle($provider);
-        $character = $this->characterInitializer->ensure($user, $dto->tenantId);
+        $character = $this->characterInitializer->ensure($user);
 
         return UserContext::make(user: $user, character: $character, provider: $provider);
     }

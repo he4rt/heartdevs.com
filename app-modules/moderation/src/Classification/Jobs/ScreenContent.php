@@ -75,7 +75,6 @@ final class ScreenContent implements ShouldQueue
             'status' => CaseStatus::Pending,
             'priority' => 50,
             'author_id' => $authorId,
-            'tenant_id' => $this->content->tenantId,
             'ai_scores' => $result->scores,
             'violation_type' => $result->primary,
             'severity' => $result->severity,

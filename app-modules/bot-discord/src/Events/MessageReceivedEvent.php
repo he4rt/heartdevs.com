@@ -32,11 +32,8 @@ class MessageReceivedEvent extends Event
         }
 
         try {
-            $tenantId = (string) config('he4rt.tenant_id');
-
             // Activity tracking — records message for XP/gamification regardless of moderation outcome.
             resolve(NewMessage::class)->persist(new NewMessageDTO(
-                tenantId: $tenantId,
                 provider: IdentityProvider::Discord,
                 providerUsername: $message->author->username.'#'.$message->author->discriminator,
                 externalAccountId: $message->user_id,

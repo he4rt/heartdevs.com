@@ -17,7 +17,6 @@ final readonly class NewContributionDTO
      * @param  array<string, mixed>  $metadata
      */
     public function __construct(
-        public string $tenantId,
         public string $repo,
         public ContributionType $type,
         public string $externalRef,

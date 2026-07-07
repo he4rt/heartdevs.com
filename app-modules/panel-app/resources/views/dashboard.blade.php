@@ -1,5 +1,5 @@
 <x-filament-panels::page>
     <div class="mx-auto w-full max-w-4xl">
-        <livewire:timeline-feed :tenant-id="config('he4rt.tenant_id')" />
+        <livewire:timeline-feed />
     </div>
 </x-filament-panels::page>

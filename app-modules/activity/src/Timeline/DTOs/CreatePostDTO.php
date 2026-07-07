@@ -11,7 +11,6 @@ final readonly class CreatePostDTO
      */
     public function __construct(
         public string $userId,
-        public string $tenantId,
         public string $content,
         public array $images = [],
     ) {}
