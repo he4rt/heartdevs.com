@@ -11,7 +11,6 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('user_profiles', static function (Blueprint $table): void {
-            $table->dropColumn('expected_salary');
             $table->decimal('expected_salary_min', 10, 2)->nullable();
             $table->decimal('expected_salary_max', 10, 2)->nullable();
         });
@@ -21,7 +20,6 @@ return new class extends Migration
     {
         Schema::table('user_profiles', static function (Blueprint $table): void {
             $table->dropColumn(['expected_salary_min', 'expected_salary_max']);
-            $table->decimal('expected_salary', 10, 2)->nullable();
         });
     }
 };
