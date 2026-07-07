@@ -8,6 +8,7 @@ use He4rt\IntegrationGithub\Contributions\DTOs\NewContributionDTO;
 use He4rt\IntegrationGithub\Contributions\RecordContribution;
 use He4rt\IntegrationGithub\Enums\ContributionType;
 use He4rt\IntegrationGithub\Enums\PurposeType;
+use He4rt\IntegrationGithub\Events\GithubPullRequestApproved;
 use He4rt\IntegrationGithub\Models\GithubRepository;
 use Illuminate\Support\Str;
 
@@ -104,6 +105,18 @@ final readonly class ProjectGithubEvent
         // Reviews PENDING (rascunho) não têm submitted_at e não são contribuição.
         if ($submittedAt === '') {
             return;
+        }
+
+        $state = $this->stringFrom($review, 'state');
+        if ($state === 'approved') {
+            event(
+                new GithubPullRequestApproved(
+                    author_login: $this->stringFrom($payload, 'pull_request.user.login', 'ghost'),
+                    repo: $repo,
+                    pr_number: (int) $this->stringFrom($payload, 'pull_request.number'),
+                    approved_at: $submittedAt,
+                ),
+            );
         }
 
         $login = $this->stringFrom($review, 'user.login', 'ghost');

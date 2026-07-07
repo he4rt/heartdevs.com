@@ -5,6 +5,7 @@ declare(strict_types=1);
 use He4rt\IntegrationGithub\Enums\ContributionType;
 use He4rt\IntegrationGithub\Enums\PurposeType;
 use He4rt\IntegrationGithub\Events\GithubContributionRecorded;
+use He4rt\IntegrationGithub\Events\GithubPullRequestApproved;
 use He4rt\IntegrationGithub\Models\GithubContribution;
 use He4rt\IntegrationGithub\Models\GithubEventLog;
 use He4rt\IntegrationGithub\Models\GithubRepository;
@@ -45,6 +46,36 @@ function prWebhookPayload(string $repo = 'he4rt/heartdevs.com', int $number = 1,
             'created_at' => '2026-06-01T12:00:00Z', 'html_url' => 'u',
             'additions' => 5, 'deletions' => 1, 'changed_files' => 2,
             'user' => ['login' => $login, 'id' => $id],
+        ],
+    ];
+}
+
+/**
+ * @return array<string, mixed>
+ */
+function prReviewWebhookPayload(
+    string $state = 'approved',
+    string $repo = 'he4rt/heartdevs.com',
+    int $number = 123,
+    string $authorLogin = 'maria',
+    int $authorId = 42,
+    string $reviewerLogin = 'joao',
+    int $reviewerId = 99,
+    string $submittedAt = '2026-06-01T12:00:00Z',
+): array {
+    return [
+        'action' => 'submitted',
+        'repository' => ['full_name' => $repo],
+        'sender' => ['login' => $reviewerLogin, 'id' => $reviewerId],
+        'pull_request' => [
+            'number' => $number,
+            'user' => ['login' => $authorLogin, 'id' => $authorId],
+        ],
+        'review' => [
+            'id' => 555,
+            'state' => $state,
+            'submitted_at' => $submittedAt,
+            'user' => ['login' => $reviewerLogin, 'id' => $reviewerId],
         ],
     ];
 }
@@ -107,6 +138,53 @@ it('grava no lake e projeta a contribuição para repo na allowlist, emitindo o 
         ->and($contribution->metadata['additions'])->toBe(5);
 
     Event::assertDispatched(GithubContributionRecorded::class);
+});
+
+it('emite GithubPullRequestApproved quando uma review aprova o PR', function (): void {
+    Event::fake([GithubPullRequestApproved::class]);
+    GithubRepository::factory()->create(['full_name' => 'he4rt/heartdevs.com']);
+
+    postGithubWebhook('pull_request_review', prReviewWebhookPayload())->assertSuccessful();
+
+    Event::assertDispatched(fn (GithubPullRequestApproved $event): bool => $event->author_login === 'maria'
+        && $event->repo === 'he4rt/heartdevs.com'
+        && $event->pr_number === 123
+        && $event->approved_at === '2026-06-01T12:00:00Z');
+});
+
+it('usa o autor do PR, nao o revisor, no evento de PR aprovado', function (): void {
+    Event::fake([GithubPullRequestApproved::class]);
+    GithubRepository::factory()->create(['full_name' => 'he4rt/heartdevs.com']);
+
+    postGithubWebhook(
+        'pull_request_review',
+        prReviewWebhookPayload(authorLogin: 'autora-do-pr', reviewerLogin: 'revisor-da-review'),
+    )->assertSuccessful();
+
+    Event::assertDispatched(fn (GithubPullRequestApproved $event): bool => $event->author_login === 'autora-do-pr');
+});
+
+it('nao emite GithubPullRequestApproved quando a review nao e aprovada', function (): void {
+    Event::fake([GithubPullRequestApproved::class]);
+    GithubRepository::factory()->create(['full_name' => 'he4rt/heartdevs.com']);
+
+    postGithubWebhook(
+        'pull_request_review',
+        prReviewWebhookPayload(state: 'changes_requested'),
+    )->assertSuccessful();
+
+    Event::assertNotDispatched(GithubPullRequestApproved::class);
+});
+
+it('nao duplica GithubPullRequestApproved em reentrega do mesmo delivery id', function (): void {
+    Event::fake([GithubPullRequestApproved::class]);
+    GithubRepository::factory()->create(['full_name' => 'he4rt/heartdevs.com']);
+    $delivery = Str::uuid()->toString();
+
+    postGithubWebhook('pull_request_review', prReviewWebhookPayload(), delivery: $delivery)->assertSuccessful();
+    postGithubWebhook('pull_request_review', prReviewWebhookPayload(), delivery: $delivery)->assertSuccessful();
+
+    Event::assertDispatchedTimes(GithubPullRequestApproved::class, 1);
 });
 
 it('faz fan-out: projeta uma contribuição por tenant que acompanha o repo', function (): void {
