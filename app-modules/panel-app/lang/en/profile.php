@@ -30,6 +30,7 @@ return [
         'cover' => 'Cover',
         'available_for_proposals' => 'Available for proposals',
         'start_availability' => 'Start availability',
+        'expected_salary' => 'Expected salary',
         'is_open_to_remote' => 'Open to remote work',
         'willing_to_relocate' => 'Willing to relocate',
         'has_disability' => 'Person with a disability',
@@ -47,6 +48,7 @@ return [
         'headline' => 'e.g. Frontend Developer, Product Designer',
         'available_for_proposals' => 'When active, recruiters will see a green badge on your profile',
         'has_disability' => 'Sensitive information — used only for affirmative-action roles.',
+        'expected_salary' => 'Monthly amount in BRL. Private, used only in proposals.',
     ],
 
     'actions' => [

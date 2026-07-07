@@ -127,6 +127,18 @@ test('profile page does not show account fields', function (): void {
         ->assertFormFieldDoesNotExist('password');
 });
 
+test('profile page saves expected salary', function (): void {
+    livewire(ProfilePage::class)
+        ->fillForm([
+            'available_for_proposals' => true,
+            'expected_salary' => 7_500,
+        ])
+        ->call('save')
+        ->assertNotified();
+
+    expect($this->profile->refresh()->expected_salary)->toBe('7500.00');
+});
+
 test('profile page saves work preferences', function (): void {
     livewire(ProfilePage::class)
         ->fillForm([

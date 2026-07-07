@@ -30,6 +30,7 @@ return [
         'cover' => 'Capa',
         'available_for_proposals' => 'Disponível para propostas',
         'start_availability' => 'Disponibilidade para início',
+        'expected_salary' => 'Pretensão salarial',
         'is_open_to_remote' => 'Aberto a trabalho remoto',
         'willing_to_relocate' => 'Disposto a mudar de cidade',
         'has_disability' => 'Pessoa com deficiência (PcD)',
@@ -47,6 +48,7 @@ return [
         'headline' => 'Ex: Frontend Developer, Product Designer',
         'available_for_proposals' => 'Quando ativo, recrutadores verão um badge verde no seu perfil',
         'has_disability' => 'Informação sensível — usada apenas para vagas afirmativas/PcD.',
+        'expected_salary' => 'Valor mensal em R$. Informação privada, usada apenas em propostas.',
     ],
 
     'actions' => [

@@ -30,8 +30,8 @@ return [
     ],
 
     'employment_type' => [
-        'clt' => 'Employee (CLT)',
-        'pj' => 'Contractor (PJ)',
+        'clt' => 'Employee',
+        'pj' => 'Contractor',
         'freelance' => 'Freelancer',
     ],
 ];

@@ -37,6 +37,10 @@ quando essa informação for exposta.
   devolve VO default quando null).
 - Preenchimento na `ProfilePage` (3 toggles + multi-select), montado no `UpsertProfileDTO`
   como array e convertido em VO pelo `makeFromPayload`.
+- **Fora do `preferences` de propósito:** `expected_salary` é uma coluna **`decimal:2`
+  dedicada** (não jsonb) — dinheiro exige precisão e filtro por faixa no talent-search, que um
+  campo JSON não entrega bem. E a disponibilidade **reusa o `start_availability` existente**
+  em vez de duplicar num `availability_date` novo.
 - **Dívida conhecida:** `social_links` ainda usa `'array'` solto — não migrado neste change
   (fora do escopo), candidato ao mesmo tratamento.
 - O arch test que bane casts soltos (proposto na diretriz) **ainda não existe** aqui; por ora

@@ -48,6 +48,10 @@ final class UpsertProfile
             $attributes['social_links'] = $dto->socialLinks;
         }
 
+        if ($dto->expectedSalary !== null) {
+            $attributes['expected_salary'] = $dto->expectedSalary;
+        }
+
         if ($dto->preferences instanceof WorkPreferences) {
             $attributes['preferences'] = $dto->preferences;
         }
@@ -77,6 +81,10 @@ final class UpsertProfile
 
         if ($dto->yearsExperience !== null && ($dto->yearsExperience < 0 || $dto->yearsExperience > 50)) {
             $errors['years_experience'] = [__('validation.between.numeric', ['attribute' => 'years_experience', 'min' => 0, 'max' => 50])];
+        }
+
+        if ($dto->expectedSalary !== null && (!is_numeric($dto->expectedSalary) || (float) $dto->expectedSalary < 0)) {
+            $errors['expected_salary'] = [__('validation.min.numeric', ['attribute' => 'expected_salary', 'min' => 0])];
         }
 
         if ($dto->socialLinks !== null) {

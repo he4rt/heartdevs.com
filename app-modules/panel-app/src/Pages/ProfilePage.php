@@ -80,6 +80,7 @@ class ProfilePage extends Page
             'social_links' => $this->socialLinksToRepeater($profile->social_links),
             'available_for_proposals' => $profile->available_for_proposals,
             'start_availability' => $profile->start_availability,
+            'expected_salary' => $profile->expected_salary,
             'has_disability' => $profile->preferences->hasDisability,
             'willing_to_relocate' => $profile->preferences->willingToRelocate,
             'is_open_to_remote' => $profile->preferences->isOpenToRemote,
@@ -223,6 +224,15 @@ class ProfilePage extends Page
                                 ->options(StartAvailability::class)
                                 ->live()
                                 ->visible(fn (Get $get): bool => (bool) $get('available_for_proposals')),
+
+                            TextInput::make('expected_salary')
+                                ->label(__('panel-app::profile.fields.expected_salary'))
+                                ->hint(__('panel-app::profile.hints.expected_salary'))
+                                ->numeric()
+                                ->minValue(0)
+                                ->prefix('R$')
+                                ->live(onBlur: true)
+                                ->visible(fn (Get $get): bool => (bool) $get('available_for_proposals')),
                         ]),
 
                     Section::make(__('panel-app::profile.sections.preferences'))
@@ -275,6 +285,7 @@ class ProfilePage extends Page
             'seniority_level' => $formData['seniority_level'] ?? null,
             'years_experience' => $formData['years_experience'] ?? null,
             'social_links' => $socialLinks !== [] ? $socialLinks : null,
+            'expected_salary' => $formData['expected_salary'] ?? null,
             'preferences' => [
                 'has_disability' => $formData['has_disability'] ?? false,
                 'willing_to_relocate' => $formData['willing_to_relocate'] ?? false,
