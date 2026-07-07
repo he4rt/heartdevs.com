@@ -6,7 +6,6 @@ namespace He4rt\IntegrationDiscord\ETL\Console;
 
 use He4rt\Identity\ExternalIdentity\Enums\IdentityProvider;
 use He4rt\Identity\ExternalIdentity\Models\ExternalIdentity;
-use He4rt\Identity\Tenant\Models\Tenant;
 use He4rt\Identity\User\Models\User;
 use He4rt\IntegrationDiscord\ETL\Actions\MergeDuplicateDiscordUserAction;
 use Illuminate\Console\Attributes\Description;
@@ -168,9 +167,9 @@ class MergeDuplicateDiscordProfilesCommand extends Command
 
     private function runFromHeuristic(MergeDuplicateDiscordUserAction $merge): int
     {
-        $tenant = Tenant::query()->where('slug', $this->option('tenant'))->first();
-        if (!$tenant instanceof Tenant) {
-            error('Tenant nao encontrado: '.$this->option('tenant'));
+        $tenantId = (string) config('he4rt.tenant_id');
+        if ($tenantId === '') {
+            error('No tenant configured (set HE4RT_TENANT_ID).');
 
             return self::FAILURE;
         }
@@ -185,7 +184,7 @@ class MergeDuplicateDiscordProfilesCommand extends Command
         info(sprintf(
             'Procurando dups apos %s no tenant "%s"%s (heuristic mode)...',
             $fromDate,
-            $tenant->slug,
+            $tenantId,
             $dryRun ? ' [DRY-RUN]' : '',
         ));
 
@@ -200,7 +199,7 @@ class MergeDuplicateDiscordProfilesCommand extends Command
         $candidates = ExternalIdentity::query()
             ->where('provider', IdentityProvider::Discord)
             ->where('model_type', $userMorph)
-            ->where('tenant_id', $tenant->getKey())
+            ->where('tenant_id', $tenantId)
             ->whereExists(fn (Builder $q) => $q
                 ->select(DB::raw(1))
                 ->from('users')

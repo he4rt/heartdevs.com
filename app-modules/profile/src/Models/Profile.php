@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace He4rt\Profile\Models;
 
 use Carbon\CarbonInterface;
-use He4rt\Identity\Tenant\Models\Tenant;
 use He4rt\Identity\User\Models\User;
 use He4rt\Profile\Database\Factories\ProfileFactory;
 use He4rt\Profile\Enums\SeniorityLevel;
@@ -22,7 +21,6 @@ use InvalidArgumentException;
 /**
  * @property string $id
  * @property string $user_id
- * @property string $tenant_id
  * @property string|null $nickname
  * @property CarbonInterface|null $birthdate
  * @property string|null $about
@@ -44,7 +42,6 @@ final class Profile extends Model
 
     protected $fillable = [
         'user_id',
-        'tenant_id',
         'nickname',
         'birthdate',
         'about',
@@ -61,7 +58,6 @@ final class Profile extends Model
         /** @var Profile $profile */
         $profile = self::query()->firstOrCreate([
             'user_id' => $userId,
-            'tenant_id' => $tenantId,
         ], [
             'available_for_proposals' => false,
         ]);
@@ -75,14 +71,6 @@ final class Profile extends Model
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
-    }
-
-    /**
-     * @return BelongsTo<Tenant, $this>
-     */
-    public function tenant(): BelongsTo
-    {
-        return $this->belongsTo(Tenant::class);
     }
 
     protected static function newFactory(): ProfileFactory

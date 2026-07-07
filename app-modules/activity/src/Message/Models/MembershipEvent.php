@@ -7,7 +7,6 @@ namespace He4rt\Activity\Message\Models;
 use Carbon\CarbonInterface;
 use He4rt\Activity\Message\Enums\MembershipEventKind;
 use He4rt\Identity\ExternalIdentity\Models\ExternalIdentity;
-use He4rt\Identity\Tenant\Models\Tenant;
 use Illuminate\Database\Eloquent\Attributes\Table;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Model;
@@ -15,7 +14,6 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 /**
  * @property string $id
- * @property string $tenant_id
  * @property string $external_identity_id
  * @property string $kind
  * @property CarbonInterface $occurred_at
@@ -35,14 +33,6 @@ final class MembershipEvent extends Model
     public function identity(): BelongsTo
     {
         return $this->belongsTo(ExternalIdentity::class, 'external_identity_id');
-    }
-
-    /**
-     * @return BelongsTo<Tenant, $this>
-     */
-    public function tenant(): BelongsTo
-    {
-        return $this->belongsTo(Tenant::class, 'tenant_id');
     }
 
     public function canonicalKind(): ?MembershipEventKind

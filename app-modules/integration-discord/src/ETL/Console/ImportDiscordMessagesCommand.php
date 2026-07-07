@@ -6,7 +6,6 @@ namespace He4rt\IntegrationDiscord\ETL\Console;
 
 use He4rt\Activity\Message\Models\Message;
 use He4rt\Activity\Voice\Models\Voice;
-use He4rt\Identity\Tenant\Models\Tenant;
 use He4rt\IntegrationDiscord\ETL\Actions\ImportDiscordMessageAction;
 use He4rt\IntegrationDiscord\ETL\Actions\ImportDiscordModerationEventAction;
 use He4rt\IntegrationDiscord\ETL\Actions\ImportDiscordReactionsAction;
@@ -55,10 +54,10 @@ class ImportDiscordMessagesCommand extends Command
             return self::FAILURE;
         }
 
-        $tenant = Tenant::query()->where('slug', 'he4rt')->first();
+        $tenantId = (string) config('he4rt.tenant_id');
 
-        if (!$tenant) {
-            error('Tenant "he4rt" nao encontrado.');
+        if ($tenantId === '') {
+            error('No tenant configured (set HE4RT_TENANT_ID).');
 
             return self::FAILURE;
         }
@@ -72,7 +71,6 @@ class ImportDiscordMessagesCommand extends Command
         }
 
         $channelMap = $this->loadChannelMap($basePath);
-        $tenantId = $tenant->getKey();
 
         $channelDirs = $this->getChannelDirectories($basePath);
         $channelDirs = $this->filterChannels($channelDirs, $this->option('channels'));
@@ -86,7 +84,7 @@ class ImportDiscordMessagesCommand extends Command
         $limit = $this->option('limit') !== null ? (int) $this->option('limit') : null;
         $chunksPerChannel = $this->option('chunks') !== null ? (int) $this->option('chunks') : null;
 
-        info(sprintf('Importando mensagens de %d canais para tenant "%s"...', count($channelDirs), $tenant->name));
+        info(sprintf('Importando mensagens de %d canais para tenant "%s"...', count($channelDirs), $tenantId));
         if ($limit !== null) {
             info(sprintf('Limite total: %s mensagens.', number_format($limit)));
         }

@@ -450,7 +450,6 @@ final class ImportDiscordMessageAction
     private function createIdentity(DiscordMessageDTO $dto, string $tenantId): ExternalIdentity
     {
         $user = $this->resolveOrCreateUser($dto);
-        $user->tenants()->syncWithoutDetaching([$tenantId]);
 
         return ExternalIdentity::query()->create([
             'provider' => IdentityProvider::Discord,

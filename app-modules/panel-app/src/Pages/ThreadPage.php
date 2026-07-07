@@ -25,9 +25,7 @@ class ThreadPage extends Page
     public function mount(string $record): void
     {
         $exists = Timeline::query()
-            ->where('id', $record)
-            ->where('tenant_id', filament()->getTenant()->getKey())
-            ->whereNull('parent_id')
+            ->where('id', $record)->whereNull('parent_id')
             ->exists();
 
         abort_unless($exists, 404);

@@ -10,7 +10,6 @@ use He4rt\Activity\Message\Enums\MessageKind;
 use He4rt\Activity\Message\Enums\MessageSourceKind;
 use He4rt\Activity\Reaction\Concerns\HasReactions;
 use He4rt\Identity\ExternalIdentity\Models\ExternalIdentity;
-use He4rt\Identity\Tenant\Models\Tenant;
 use Illuminate\Database\Eloquent\Attributes\Table;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -27,7 +26,6 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
  * @property string $content
  * @property int $obtained_experience
  * @property CarbonInterface|null $sent_at
- * @property string $tenant_id
  * @property array<string, mixed>|null $metadata
  * @property int $reactions_count
  * @property int $reactions_total
@@ -57,14 +55,6 @@ final class Message extends Model
     public function provider(): BelongsTo
     {
         return $this->belongsTo(ExternalIdentity::class, 'external_identity_id');
-    }
-
-    /**
-     * @return BelongsTo<Tenant, $this>
-     */
-    public function tenant(): BelongsTo
-    {
-        return $this->belongsTo(Tenant::class, 'tenant_id');
     }
 
     /**

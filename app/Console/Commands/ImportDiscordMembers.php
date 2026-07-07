@@ -7,11 +7,9 @@ namespace App\Console\Commands;
 use He4rt\Identity\ExternalIdentity\Actions\CreateAccountByExternalIdentity;
 use He4rt\Identity\ExternalIdentity\Enums\IdentityProvider;
 use He4rt\Identity\ExternalIdentity\Models\ExternalIdentity;
-use He4rt\Identity\Tenant\Models\Tenant;
 use Illuminate\Console\Attributes\Description;
 use Illuminate\Console\Attributes\Signature;
 use Illuminate\Console\Command;
-use Illuminate\Contracts\Database\Query\Builder;
 use Illuminate\Support\Facades\Storage;
 
 #[Description('Import Discord members and GitHub connections from JSON files into the database')]
@@ -36,7 +34,6 @@ class ImportDiscordMembers extends Command
 
         $membersData = json_decode((string) Storage::disk('local')->get($membersFile), associative: true);
         $members = $membersData['members'] ?? [];
-        $guildId = $membersData['guild_id'] ?? config('he4rt.discord.guild_id');
 
         $this->info('Loaded '.count($members).sprintf(' members from %s (scraped: %s)', $membersFile, $membersData['scraped_at']));
 
@@ -54,23 +51,17 @@ class ImportDiscordMembers extends Command
             $this->warn(sprintf('GitHub file not found (%s), skipping GitHub imports.', $githubFile));
         }
 
-        // Find tenant by guild ID
-        $tenant = Tenant::query()
-            ->whereHas('providers', fn (Builder $q) => $q
-                ->where('provider', IdentityProvider::Discord->value)
-                ->where('provider_id', $guildId)
-            )
-            ->first();
+        $tenantId = (string) config('he4rt.tenant_id');
 
-        if (!$tenant) {
-            $this->error(sprintf('No tenant found for guild ID %s. Run `php artisan misc:generate-discord-tenant %s` first.', $guildId, $guildId));
+        if ($tenantId === '') {
+            $this->error('No tenant configured (set HE4RT_TENANT_ID).');
 
             return;
         }
 
-        $this->info(sprintf('Importing into tenant: %s (ID: %d)', $tenant->name, $tenant->id));
+        $this->info(sprintf('Importing into tenant: %s', $tenantId));
 
-        $stats = ['created' => 0, 'existing' => 0, 'github_set' => 0, 'github_skipped' => 0, 'tenant_attached' => 0];
+        $stats = ['created' => 0, 'existing' => 0, 'github_set' => 0, 'github_skipped' => 0];
         $csvRows = [];
         $isDryRun = $this->option('dry-run');
         $this->option('force');
@@ -106,19 +97,13 @@ class ImportDiscordMembers extends Command
 
                 if (!$isDryRun) {
                     $identity = $createAccount->handle(
-                        tenantId: $tenant->id,
+                        tenantId: $tenantId,
                         provider: IdentityProvider::Discord,
                         providerId: $discordId,
                         username: $username,
                     );
                     $user = $identity->user;
                 }
-            }
-
-            // Attach user to tenant if not already
-            if ($user && !$isDryRun && !$tenant->members()->where('user_id', $user->id)->exists()) {
-                $tenant->members()->attach($user->id);
-                $stats['tenant_attached']++;
             }
 
             // GitHub URL import removed — legacy information() model no longer exists.
@@ -160,7 +145,6 @@ class ImportDiscordMembers extends Command
                 [$prefix.'Existing users found', $stats['existing']],
                 [$prefix.'GitHub URLs set', $stats['github_set']],
                 [$prefix.'GitHub URLs skipped (existing)', $stats['github_skipped']],
-                [$prefix.'Users attached to tenant', $stats['tenant_attached']],
             ]
         );
     }

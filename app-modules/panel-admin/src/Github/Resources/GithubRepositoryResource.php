@@ -7,7 +7,6 @@ namespace He4rt\PanelAdmin\Github\Resources;
 use BackedEnum;
 use Filament\Actions\Action;
 use Filament\Actions\EditAction;
-use Filament\Facades\Filament;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Notifications\Notification;
@@ -62,9 +61,7 @@ class GithubRepositoryResource extends Resource
                 ->required()
                 ->maxLength(255)
                 ->rule('regex:/^[\w.-]+\/[\w.-]+$/')
-                // Unicidade é por tenant: o mesmo repo pode ser acompanhado por
-                // mais de uma comunidade, então a validação respeita o tenant atual.
-                ->unique(ignoreRecord: true, modifyRuleUsing: fn (Unique $rule): Unique => $rule->where('tenant_id', Filament::getTenant()?->getKey())),
+                ->unique(ignoreRecord: true, modifyRuleUsing: fn (Unique $rule): Unique => $rule->where('tenant_id', config('he4rt.tenant_id'))),
             Toggle::make('enabled')
                 ->label('Habilitado')
                 ->default(state: true),

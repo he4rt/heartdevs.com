@@ -23,28 +23,18 @@ class TwitchStatsWidget extends StatsOverviewWidget
      */
     protected function getStats(): array
     {
-        $tenantId = filament()->getTenant()?->getKey();
+        $totalEvents = TwitchEventLog::query()->count();
 
-        $totalEvents = TwitchEventLog::query()
-            ->when($tenantId, fn ($q) => $q->where('tenant_id', $tenantId))
+        $eventsToday = TwitchEventLog::query()->where('created_at', '>=', today())
             ->count();
 
-        $eventsToday = TwitchEventLog::query()
-            ->when($tenantId, fn ($q) => $q->where('tenant_id', $tenantId))
-            ->where('created_at', '>=', today())
+        $activeSubs = TwitchSubscription::query()->where('status', TwitchSubscriptionStatus::Enabled)
             ->count();
 
-        $activeSubs = TwitchSubscription::query()
-            ->when($tenantId, fn ($q) => $q->where('tenant_id', $tenantId))
-            ->where('status', TwitchSubscriptionStatus::Enabled)
-            ->count();
-
-        $errorSubs = TwitchSubscription::query()
-            ->when($tenantId, fn ($q) => $q->where('tenant_id', $tenantId))
-            ->whereNotIn('status', [
-                TwitchSubscriptionStatus::Enabled->value,
-                TwitchSubscriptionStatus::VerificationPending->value,
-            ])
+        $errorSubs = TwitchSubscription::query()->whereNotIn('status', [
+            TwitchSubscriptionStatus::Enabled->value,
+            TwitchSubscriptionStatus::VerificationPending->value,
+        ])
             ->count();
 
         return [

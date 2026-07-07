@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace He4rt\PanelApp\Livewire\Timeline;
 
-use Filament\Facades\Filament;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\MarkdownEditor;
 use Filament\Schemas\Concerns\InteractsWithSchemas;
@@ -64,7 +63,7 @@ final class Composer extends Component implements HasSchemas
         $state = $this->form->getState();
 
         /** @var string $tenantId */
-        $tenantId = Filament::getTenant()->getKey();
+        $tenantId = (string) config('he4rt.tenant_id');
 
         /** @var User $user */
         $user = auth()->user();

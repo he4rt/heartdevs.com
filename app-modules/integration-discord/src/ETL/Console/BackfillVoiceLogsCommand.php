@@ -6,7 +6,6 @@ namespace He4rt\IntegrationDiscord\ETL\Console;
 
 use Carbon\CarbonImmutable;
 use He4rt\Activity\Voice\Models\Voice;
-use He4rt\Identity\Tenant\Models\Tenant;
 use He4rt\IntegrationDiscord\ETL\Actions\ImportDiscordVoiceLogAction;
 use He4rt\IntegrationDiscord\ETL\DTOs\DiscordVoiceLogDTO;
 use He4rt\IntegrationDiscord\Transport\DiscordConnector;
@@ -54,11 +53,10 @@ final class BackfillVoiceLogsCommand extends Command
     ): int {
         DB::disableQueryLog();
 
-        $tenantSlug = (string) $this->option('tenant');
-        $tenant = Tenant::query()->where('slug', $tenantSlug)->first();
+        $tenantId = (string) config('he4rt.tenant_id');
 
-        if ($tenant === null) {
-            error(sprintf('Tenant "%s" not found.', $tenantSlug));
+        if ($tenantId === '') {
+            error('No tenant configured (set HE4RT_TENANT_ID).');
 
             return self::FAILURE;
         }
@@ -68,7 +66,6 @@ final class BackfillVoiceLogsCommand extends Command
         $isDryRun = (bool) $this->option('dry-run');
         $since = CarbonImmutable::parse($this->option('since') ?? '2026-03-01');
         $until = CarbonImmutable::parse($this->option('until') ?? 'now');
-        $tenantId = $tenant->getKey();
 
         intro(sprintf('Discord Voice Backfill%s', $isDryRun ? ' [DRY RUN]' : ''));
 
@@ -83,7 +80,7 @@ final class BackfillVoiceLogsCommand extends Command
                 ['Channel', $channelId],
                 ['Bot filter', $botId],
                 ['Period', sprintf('%s → %s', $since->toDateString(), $until->toDateString())],
-                ['Tenant', sprintf('%s (ID: %d)', $tenant->name, $tenantId)],
+                ['Tenant', $tenantId],
                 ['Existing voice events in period', number_format($existingCount)],
             ],
         );

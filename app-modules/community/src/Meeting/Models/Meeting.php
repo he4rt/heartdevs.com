@@ -6,7 +6,6 @@ namespace He4rt\Community\Meeting\Models;
 
 use Carbon\CarbonInterface;
 use He4rt\Community\Database\Factories\MeetingFactory;
-use He4rt\Identity\Tenant\Models\Tenant;
 use He4rt\Identity\User\Models\User;
 use Illuminate\Database\Eloquent\Attributes\Table;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
@@ -18,7 +17,6 @@ use Illuminate\Database\Eloquent\Relations\Pivot;
 
 /**
  * @property string $id
- * @property string $tenant_id
  * @property string $admin_id
  * @property string|null $content
  * @property int $meeting_type_id
@@ -58,14 +56,6 @@ final class Meeting extends Model
             'meeting_id',
             'user_id'
         )->withPivot(['attend_at']);
-    }
-
-    /**
-     * @return BelongsTo<Tenant, $this>
-     */
-    public function tenant(): BelongsTo
-    {
-        return $this->belongsTo(Tenant::class);
     }
 
     /**

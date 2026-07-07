@@ -28,7 +28,7 @@ class ConnectionHub extends Component
     public function mount(): void
     {
         $this->panel = filament()->getCurrentPanel()?->getId() ?? 'app';
-        $this->tenantId = filament()->getTenant()?->getKey() ?? '';
+        $this->tenantId = (string) config('he4rt.tenant_id');
         $this->checkPendingMerge();
     }
 
@@ -90,7 +90,7 @@ class ConnectionHub extends Component
             ->success()
             ->send();
 
-        $this->redirect(filament()->getCurrentPanel()->getUrl(filament()->getTenant()));
+        $this->redirect(filament()->getCurrentPanel()->getUrl());
     }
 
     public function cancelMerge(): void

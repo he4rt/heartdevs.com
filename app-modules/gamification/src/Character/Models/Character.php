@@ -9,7 +9,6 @@ use He4rt\Activity\Tracking\Concerns\HasInteractions;
 use He4rt\Economy\Concerns\HasWallet;
 use He4rt\Gamification\Badge\Models\Badge;
 use He4rt\Gamification\Database\Factories\CharacterFactory;
-use He4rt\Identity\Tenant\Models\Tenant;
 use He4rt\Identity\User\Models\User;
 use Illuminate\Database\Eloquent\Attributes\Appends;
 use Illuminate\Database\Eloquent\Attributes\Table;
@@ -32,7 +31,6 @@ use Illuminate\Support\Facades\Date;
  * @property int $level
  * @property float $percentage_experience
  * @property bool $can_claim_daily_bonus
- * @property string|null $tenant_id
  */
 #[Appends([
     'ranking',
@@ -73,14 +71,6 @@ final class Character extends Model
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
-    }
-
-    /**
-     * @return BelongsTo<Tenant, $this>
-     */
-    public function tenant(): BelongsTo
-    {
-        return $this->belongsTo(Tenant::class);
     }
 
     /**

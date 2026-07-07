@@ -40,7 +40,7 @@ class ListTwitchSubscriptions extends ListRecords
             /** @var array<int, array<string, mixed>> $remoteSubscriptions */
             $remoteSubscriptions = $response->json('data', []);
 
-            $tenantId = filament()->getTenant()?->getKey();
+            $tenantId = config('he4rt.tenant_id');
             $syncedIds = [];
 
             foreach ($remoteSubscriptions as $sub) {

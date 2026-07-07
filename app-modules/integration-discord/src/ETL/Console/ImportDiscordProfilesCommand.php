@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace He4rt\IntegrationDiscord\ETL\Console;
 
-use He4rt\Identity\Tenant\Models\Tenant;
 use He4rt\IntegrationDiscord\ETL\Actions\ImportDiscordProfileAction;
 use He4rt\IntegrationDiscord\ETL\DTOs\DiscordProfileDTO;
 use Illuminate\Console\Attributes\Description;
@@ -41,10 +40,10 @@ class ImportDiscordProfilesCommand extends Command
             return self::FAILURE;
         }
 
-        $tenant = Tenant::query()->where('slug', 'he4rt')->first();
+        $tenantId = (string) config('he4rt.tenant_id');
 
-        if (!$tenant) {
-            error('Tenant "he4rt" nao encontrado.');
+        if ($tenantId === '') {
+            error('No tenant configured (set HE4RT_TENANT_ID).');
 
             return self::FAILURE;
         }
@@ -73,12 +72,11 @@ class ImportDiscordProfilesCommand extends Command
             ));
         }
 
-        $tenantId = $tenant->getKey();
         $stats = ['created' => 0, 'skipped' => 0, 'errors' => 0];
         /** @var list<array{chunk: string, discord_id: string, username: string, error: string}> */
         $errorSamples = [];
 
-        info(sprintf('Encontrados %d chunks para importar no tenant "%s".', count($chunks), $tenant->name));
+        info(sprintf('Encontrados %d chunks para importar no tenant "%s".', count($chunks), $tenantId));
 
         $output = $this->output->getOutput();
 

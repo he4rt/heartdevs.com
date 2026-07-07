@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace He4rt\IntegrationTwitch\Actions;
 
-use He4rt\Identity\Tenant\Models\Tenant;
 use He4rt\IntegrationTwitch\Enums\TwitchEventSubType;
 use He4rt\IntegrationTwitch\Models\TwitchSubscription;
 use He4rt\IntegrationTwitch\Transport\Requests\EventSub\CreateSubscription;
@@ -21,8 +20,10 @@ final readonly class RegisterTwitchSubscriptionsAction
      * @param  array<int, TwitchEventSubType>  $types
      * @return array{created: int, skipped: int, failed: int, errors: array<string, string>}
      */
-    public function __invoke(Tenant $tenant, array $types = []): array
+    public function __invoke(array $types = []): array
     {
+        $tenantId = config('he4rt.tenant_id');
+
         $broadcasterId = $this->resolveBroadcasterId();
 
         if ($broadcasterId === null) {
@@ -43,7 +44,6 @@ final readonly class RegisterTwitchSubscriptionsAction
         $secret = config()->string('services.twitch.eventsub_secret');
 
         $existingTypes = TwitchSubscription::query()
-            ->where('tenant_id', $tenant->getKey())
             ->where('broadcaster_user_id', $broadcasterId)
             ->where('status', 'enabled')
             ->pluck('type')
@@ -97,7 +97,7 @@ final readonly class RegisterTwitchSubscriptionsAction
                         'callback_url' => $data['transport']['callback'] ?? $callbackUrl,
                         'cost' => $data['cost'] ?? 0,
                         'version' => $data['version'] ?? $type->getVersion(),
-                        'tenant_id' => $tenant->getKey(),
+                        'tenant_id' => $tenantId,
                     ]
                 );
 

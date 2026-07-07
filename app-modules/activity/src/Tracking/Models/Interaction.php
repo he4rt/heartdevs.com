@@ -11,7 +11,6 @@ use He4rt\Activity\Tracking\Enums\ActivityType;
 use He4rt\Activity\Tracking\Enums\ValueTier;
 use He4rt\Gamification\Character\Models\Character;
 use He4rt\Identity\ExternalIdentity\Enums\IdentityProvider;
-use He4rt\Identity\Tenant\Models\Tenant;
 use Illuminate\Database\Eloquent\Attributes\Table;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -22,7 +21,6 @@ use Illuminate\Database\Eloquent\Relations\MorphTo;
 /**
  * @property string $id
  * @property string $character_id
- * @property string $tenant_id
  * @property ActivityType $type
  * @property IdentityProvider $provider
  * @property ValueTier $value_tier
@@ -51,14 +49,6 @@ final class Interaction extends Model
     public function character(): BelongsTo
     {
         return $this->belongsTo(Character::class);
-    }
-
-    /**
-     * @return BelongsTo<Tenant, $this>
-     */
-    public function tenant(): BelongsTo
-    {
-        return $this->belongsTo(Tenant::class);
     }
 
     /**

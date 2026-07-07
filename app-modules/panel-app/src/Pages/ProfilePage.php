@@ -271,7 +271,7 @@ class ProfilePage extends Page
 
     public function getRecord(): Profile
     {
-        $tenantId = filament()->getTenant()?->getKey();
+        $tenantId = config('he4rt.tenant_id');
         abort_unless($tenantId, 403);
 
         return Profile::query()
@@ -289,7 +289,6 @@ class ProfilePage extends Page
         return Character::query()
             ->with('badges')
             ->where('user_id', auth()->id())
-            ->where('tenant_id', filament()->getTenant()?->getKey())
             ->first();
     }
 

@@ -5,10 +5,8 @@ declare(strict_types=1);
 namespace He4rt\IntegrationTwitch\Models;
 
 use Carbon\CarbonInterface;
-use He4rt\Identity\Tenant\Models\Tenant;
 use He4rt\IntegrationTwitch\Enums\TwitchSubscriptionStatus;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 /**
  * @property int $id
@@ -21,7 +19,6 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property string|null $callback_url
  * @property int $cost
  * @property string $version
- * @property string $tenant_id
  * @property CarbonInterface|null $created_at
  * @property CarbonInterface|null $updated_at
  */
@@ -37,16 +34,7 @@ final class TwitchSubscription extends Model
         'callback_url',
         'cost',
         'version',
-        'tenant_id',
     ];
-
-    /**
-     * @return BelongsTo<Tenant, $this>
-     */
-    public function tenant(): BelongsTo
-    {
-        return $this->belongsTo(Tenant::class);
-    }
 
     /**
      * @return array<string, string>

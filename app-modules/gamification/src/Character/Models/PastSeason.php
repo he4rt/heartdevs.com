@@ -7,7 +7,6 @@ namespace He4rt\Gamification\Character\Models;
 use Carbon\CarbonInterface;
 use He4rt\Gamification\Database\Factories\PastSeasonFactory;
 use He4rt\Gamification\Season\Models\Season;
-use He4rt\Identity\Tenant\Models\Tenant;
 use Illuminate\Database\Eloquent\Attributes\Table;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -16,7 +15,6 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 /**
  * @property string $id
- * @property string $tenant_id
  * @property string $season_id
  * @property string $character_id
  * @property int $ranking_position
@@ -34,14 +32,6 @@ final class PastSeason extends Model
     /** @use HasFactory<PastSeasonFactory> */
     use HasFactory;
     use HasUuids;
-
-    /**
-     * @return BelongsTo<Tenant, $this>
-     */
-    public function tenant(): BelongsTo
-    {
-        return $this->belongsTo(Tenant::class);
-    }
 
     /**
      * @return BelongsTo<Season, $this>

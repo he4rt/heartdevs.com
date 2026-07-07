@@ -20,7 +20,6 @@ final class ImportDiscordProfileAction
     public function handle(DiscordProfileDTO $dto, string $tenantId): ExternalIdentity
     {
         $user = $this->resolveUser($dto, $tenantId);
-        $user->tenants()->syncWithoutDetaching([$tenantId]);
 
         $discordIdentity = ExternalIdentity::query()->updateOrCreate(
             [

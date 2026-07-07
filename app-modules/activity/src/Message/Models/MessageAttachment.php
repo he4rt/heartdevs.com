@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace He4rt\Activity\Message\Models;
 
 use Carbon\CarbonInterface;
-use He4rt\Identity\Tenant\Models\Tenant;
 use Illuminate\Database\Eloquent\Attributes\Table;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Model;
@@ -13,7 +12,6 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 /**
  * @property string $id
- * @property string $tenant_id
  * @property string $message_id
  * @property string|null $provider_attachment_id
  * @property string $url
@@ -36,13 +34,5 @@ final class MessageAttachment extends Model
     public function message(): BelongsTo
     {
         return $this->belongsTo(Message::class, 'message_id');
-    }
-
-    /**
-     * @return BelongsTo<Tenant, $this>
-     */
-    public function tenant(): BelongsTo
-    {
-        return $this->belongsTo(Tenant::class, 'tenant_id');
     }
 }

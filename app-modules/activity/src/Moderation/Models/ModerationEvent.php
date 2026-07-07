@@ -9,7 +9,6 @@ use He4rt\Activity\Message\Models\Message;
 use He4rt\Activity\Moderation\Enums\ModerationType;
 use He4rt\Activity\Timeline\Observers\ModerationEventObserver;
 use He4rt\Identity\ExternalIdentity\Models\ExternalIdentity;
-use He4rt\Identity\Tenant\Models\Tenant;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Attributes\Table;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
@@ -18,7 +17,6 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 /**
  * @property string $id
- * @property string $tenant_id
  * @property string|null $external_identity_id
  * @property string|null $moderator_identity_id
  * @property ModerationType $type
@@ -59,12 +57,6 @@ final class ModerationEvent extends Model
     public function sourceMessage(): BelongsTo
     {
         return $this->belongsTo(Message::class, 'source_message_id');
-    }
-
-    /** @return BelongsTo<Tenant, $this> */
-    public function tenant(): BelongsTo
-    {
-        return $this->belongsTo(Tenant::class);
     }
 
     /** @return array<string, mixed> */

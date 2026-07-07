@@ -8,17 +8,14 @@ use He4rt\Community\Meeting\Models\Meeting;
 use He4rt\Gamification\Badge\Models\Badge;
 use He4rt\Gamification\Character\Models\PastSeason;
 use He4rt\Gamification\Database\Factories\SeasonFactory;
-use He4rt\Identity\Tenant\Models\Tenant;
 use Illuminate\Database\Eloquent\Attributes\Table;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Facades\Date;
 
 /**
- * @property string $tenant_id
  * @property string $name
  * @property string $description
  * @property int $messages_count
@@ -57,14 +54,6 @@ final class Season extends Model
     public function rankings(): HasMany
     {
         return $this->hasMany(PastSeason::class, 'season_id');
-    }
-
-    /**
-     * @return BelongsTo<Tenant, $this>
-     */
-    public function tenant(): BelongsTo
-    {
-        return $this->belongsTo(Tenant::class);
     }
 
     protected static function newFactory(): SeasonFactory

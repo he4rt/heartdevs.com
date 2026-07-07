@@ -71,7 +71,7 @@ final class ReplyComposer extends Component implements HasSchemas
         $user = auth()->user();
 
         /** @var string $tenantId */
-        $tenantId = filament()->getTenant()->getKey();
+        $tenantId = (string) config('he4rt.tenant_id');
 
         resolve(CreateReply::class)->handle(new CreateReplyDTO(
             userId: $user->id,

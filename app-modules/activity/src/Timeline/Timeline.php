@@ -7,7 +7,6 @@ namespace He4rt\Activity\Timeline;
 use Carbon\CarbonInterface;
 use He4rt\Activity\Database\Factories\TimelineFactory;
 use He4rt\Activity\Reaction\Concerns\HasReactions;
-use He4rt\Identity\Tenant\Models\Tenant;
 use He4rt\Identity\User\Models\User;
 use Illuminate\Database\Eloquent\Attributes\Table;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
@@ -20,7 +19,6 @@ use Illuminate\Database\Eloquent\Relations\MorphTo;
 /**
  * @property string $id
  * @property string $user_id
- * @property string $tenant_id
  * @property string $postable_type
  * @property string $postable_id
  * @property string|null $root_id
@@ -43,12 +41,6 @@ final class Timeline extends Model
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
-    }
-
-    /** @return BelongsTo<Tenant, $this> */
-    public function tenant(): BelongsTo
-    {
-        return $this->belongsTo(Tenant::class);
     }
 
     /** @return MorphTo<Model, $this> */
@@ -85,7 +77,6 @@ final class Timeline extends Model
     {
         return [
             'user_id' => 'string',
-            'tenant_id' => 'string',
             'root_id' => 'string',
             'parent_id' => 'string',
             'is_ignored' => 'boolean',

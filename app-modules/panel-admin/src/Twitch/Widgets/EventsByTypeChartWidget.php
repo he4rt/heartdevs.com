@@ -25,10 +25,7 @@ class EventsByTypeChartWidget extends ChartWidget
 
     protected function getData(): array
     {
-        $tenantId = filament()->getTenant()?->getKey();
-
         $counts = TwitchEventLog::query()
-            ->when($tenantId, fn ($q) => $q->where('tenant_id', $tenantId))
             ->selectRaw('event_type, COUNT(*) as total')
             ->groupBy('event_type')
             ->orderByDesc('total')

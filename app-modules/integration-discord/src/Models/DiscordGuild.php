@@ -5,17 +5,14 @@ declare(strict_types=1);
 namespace He4rt\IntegrationDiscord\Models;
 
 use Carbon\CarbonInterface;
-use He4rt\Identity\Tenant\Models\Tenant;
 use He4rt\IntegrationDiscord\Database\Factories\DiscordGuildFactory;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 /**
  * @property int $id
- * @property string|null $tenant_id
  * @property string $discord_guild_id
  * @property string $name
  * @property string|null $icon
@@ -26,7 +23,6 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property CarbonInterface|null $synced_at
  * @property CarbonInterface|null $created_at
  * @property CarbonInterface|null $updated_at
- * @property-read Tenant|null $tenant
  * @property-read Collection<int, DiscordChannel> $channels
  * @property-read Collection<int, DiscordRole> $roles
  * @property-read Collection<int, DiscordMember> $members
@@ -35,14 +31,6 @@ final class DiscordGuild extends Model
 {
     /** @use HasFactory<DiscordGuildFactory> */
     use HasFactory;
-
-    /**
-     * @return BelongsTo<Tenant, $this>
-     */
-    public function tenant(): BelongsTo
-    {
-        return $this->belongsTo(Tenant::class);
-    }
 
     /**
      * @return HasMany<DiscordChannel, $this>
