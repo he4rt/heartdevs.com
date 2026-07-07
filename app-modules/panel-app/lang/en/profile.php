@@ -8,6 +8,7 @@ return [
         'professional' => 'Professional',
         'about' => 'About',
         'address' => 'Location',
+        'skills' => 'Skills',
         'social_links' => 'Social Links',
         'availability' => 'Availability',
         'connections' => 'Connections',
@@ -20,6 +21,9 @@ return [
         'seniority_level' => 'Seniority Level',
         'years_experience' => 'Years of Experience',
         'about' => 'About',
+        'skill' => 'Skill',
+        'proficiency' => 'Level',
+        'skill_years_experience' => 'Years',
         'platform' => 'Platform',
         'handle' => 'Handle / URL',
         'country' => 'Country (ISO)',
@@ -41,11 +45,13 @@ return [
     'hints' => [
         'headline' => 'e.g. Frontend Developer, Product Designer',
         'available_for_proposals' => 'When active, recruiters will see a green badge on your profile',
+        'skills' => 'Pick your skills and set your level and years of experience for each.',
     ],
 
     'actions' => [
         'save' => 'Save profile',
         'add_social_link' => 'Add social link',
+        'add_skill' => 'Add skill',
     ],
 
     'notifications' => [

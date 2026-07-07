@@ -22,13 +22,17 @@ use Filament\Schemas\Schema;
 use Filament\Support\Enums\Width;
 use He4rt\Gamification\Character\Models\Character;
 use He4rt\Identity\User\Models\User;
+use He4rt\Profile\Actions\SyncProfileSkills;
 use He4rt\Profile\Actions\ToggleAvailability;
 use He4rt\Profile\Actions\UpsertProfile;
+use He4rt\Profile\DTOs\ProfileSkillDTO;
 use He4rt\Profile\DTOs\UpsertProfileDTO;
 use He4rt\Profile\Enums\SeniorityLevel;
+use He4rt\Profile\Enums\SkillProficiency;
 use He4rt\Profile\Enums\SocialPlatform;
 use He4rt\Profile\Enums\StartAvailability;
 use He4rt\Profile\Models\Profile;
+use He4rt\Profile\Models\Skill;
 use Illuminate\Support\Str;
 use Livewire\Attributes\Computed;
 use Livewire\Attributes\Validate;
@@ -77,6 +81,7 @@ class ProfilePage extends Page
             'years_experience' => $profile->years_experience,
             'about' => $profile->about,
             'social_links' => $this->socialLinksToRepeater($profile->social_links),
+            'skills' => $this->skillsToRepeater($profile),
             'available_for_proposals' => $profile->available_for_proposals,
             'start_availability' => $profile->start_availability,
         ]);
@@ -118,6 +123,43 @@ class ProfilePage extends Page
                                     ->live(onBlur: true)
                                     ->columnSpanFull(),
                             ]),
+                        ]),
+
+                    Section::make(__('panel-app::profile.sections.skills'))
+                        ->description(__('panel-app::profile.hints.skills'))
+                        ->schema([
+                            Repeater::make('skills')
+                                ->label('')
+                                ->schema([
+                                    Grid::make(3)->schema([
+                                        Select::make('skill_id')
+                                            ->label(__('panel-app::profile.fields.skill'))
+                                            ->searchable()
+                                            ->getSearchResultsUsing(fn (string $search): array => Skill::search($search))
+                                            ->getOptionLabelUsing(fn (?string $value): ?string => $value === null ? null : (Skill::labelsById()[$value] ?? null))
+                                            ->optionsLimit(50)
+                                            ->distinct()
+                                            ->required()
+                                            ->columnSpan(1),
+
+                                        Select::make('proficiency')
+                                            ->label(__('panel-app::profile.fields.proficiency'))
+                                            ->options(SkillProficiency::class)
+                                            ->required()
+                                            ->columnSpan(1),
+
+                                        TextInput::make('years_experience')
+                                            ->label(__('panel-app::profile.fields.skill_years_experience'))
+                                            ->numeric()
+                                            ->minValue(0)
+                                            ->maxValue(50)
+                                            ->columnSpan(1),
+                                    ]),
+                                ])
+                                ->addActionLabel(__('panel-app::profile.actions.add_skill'))
+                                ->defaultItems(0)
+                                ->reorderable(condition: false)
+                                ->columnSpanFull(),
                         ]),
 
                     Section::make(__('panel-app::profile.sections.address'))
@@ -259,6 +301,8 @@ class ProfilePage extends Page
         };
 
         resolve(ToggleAvailability::class)->handle($profile, $available, $startAvailability);
+
+        resolve(SyncProfileSkills::class)->handle($profile, $this->repeaterToSkills($formData['skills'] ?? []));
 
         $this->saveMedia();
         $this->form->saveRelationships();
@@ -403,5 +447,52 @@ class ProfilePage extends Page
         }
 
         return $links;
+    }
+
+    /**
+     * @return list<array{skill_id: string, proficiency: SkillProficiency, years_experience: int|null}>
+     */
+    private function skillsToRepeater(Profile $profile): array
+    {
+        $skills = [];
+
+        foreach ($profile->profileSkills()->get() as $profileSkill) {
+            $skills[] = [
+                'skill_id' => $profileSkill->skill_id,
+                'proficiency' => $profileSkill->proficiency,
+                'years_experience' => $profileSkill->years_experience,
+            ];
+        }
+
+        return $skills;
+    }
+
+    /**
+     * @param  array<int|string, array<string, mixed>>  $repeaterData
+     * @return list<ProfileSkillDTO>
+     */
+    private function repeaterToSkills(array $repeaterData): array
+    {
+        $skills = [];
+
+        foreach ($repeaterData as $item) {
+            $skillId = $item['skill_id'] ?? null;
+            $proficiency = $item['proficiency'] ?? null;
+            if (blank($skillId)) {
+                continue;
+            }
+
+            if (blank($proficiency)) {
+                continue;
+            }
+
+            $skills[] = ProfileSkillDTO::fromArray([
+                'skill_id' => $skillId,
+                'proficiency' => $proficiency,
+                'years_experience' => $item['years_experience'] ?? null,
+            ]);
+        }
+
+        return $skills;
     }
 }
