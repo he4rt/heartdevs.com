@@ -13,10 +13,7 @@ use Filament\Http\Middleware\DispatchServingFilamentEvent;
 use Filament\Panel;
 use Filament\PanelProvider;
 use Filament\Support\Colors\Color;
-use He4rt\Identity\Tenant\Models\Tenant;
-use He4rt\PanelAdmin\Http\Middleware\ApplyTenantScopes;
 use He4rt\PanelAdmin\Pages\Dashboard;
-use He4rt\PanelAdmin\Tenant\EditTenantProfilePage;
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
 use Illuminate\Cookie\Middleware\EncryptCookies;
 use Illuminate\Foundation\Http\Middleware\PreventRequestForgery;
@@ -46,8 +43,6 @@ class AdminPanelProvider extends PanelProvider
                 ];
             })
             ->sidebarCollapsibleOnDesktop()
-            ->tenant(Tenant::class, slugAttribute: 'slug')
-            ->tenantProfile(EditTenantProfilePage::class)
             ->viteTheme('resources/css/filament/admin/theme.css')
             ->middleware([
                 EncryptCookies::class,
@@ -65,9 +60,6 @@ class AdminPanelProvider extends PanelProvider
             ])
             ->authMiddleware([
                 Authenticate::class,
-            ])
-            ->tenantMiddleware([
-                ApplyTenantScopes::class,
             ]);
     }
 }

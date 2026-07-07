@@ -6,7 +6,6 @@ use Illuminate\Support\Facades\Date;
 
 return [
     'admins' => env('HE4RT_ADMINS_USERNAMES', 'danielhe4rt,kaster'),
-    'main_tenant' => env('HE4RT_MAIN_TENANT', 'he4rt'),
     // Single-tenant deployment: the fixed tenant UUID used while the legacy
     // tenant_id columns still exist (dropped in a later phase). Sourced from
     // env so the former Discord-guild → tenant infrastructure mapping lives in

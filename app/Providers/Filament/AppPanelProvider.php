@@ -12,7 +12,6 @@ use Filament\Http\Middleware\DispatchServingFilamentEvent;
 use Filament\Panel;
 use Filament\PanelProvider;
 use Filament\Support\Colors\Color;
-use He4rt\Identity\Tenant\Models\Tenant;
 use He4rt\PanelApp\Pages\LoginPage;
 use He4rt\PanelApp\Pages\ProfilePage;
 use He4rt\PanelApp\Pages\ThreadPage;
@@ -30,7 +29,7 @@ class AppPanelProvider extends PanelProvider
 
     public function panel(Panel $panel): Panel
     {
-        $panel
+        return $panel
             ->id($this->panelId->value)
             ->path($this->panelId->value)
             ->login(LoginPage::class)
@@ -63,11 +62,5 @@ class AppPanelProvider extends PanelProvider
             ->authMiddleware([
                 Authenticate::class,
             ]);
-
-        app()->isProduction()
-            ? $panel->tenantDomain('{tenant:domain}')->tenant(model: Tenant::class, slugAttribute: 'domain')
-            : $panel->tenant(model: Tenant::class, slugAttribute: 'slug');
-
-        return $panel;
     }
 }

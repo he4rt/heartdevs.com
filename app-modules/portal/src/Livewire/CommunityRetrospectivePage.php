@@ -6,7 +6,6 @@ namespace He4rt\Portal\Livewire;
 
 use Carbon\CarbonImmutable;
 use Carbon\CarbonInterface;
-use He4rt\Identity\Tenant\Models\Tenant;
 use He4rt\IntegrationGithub\Enums\ContributionType;
 use He4rt\IntegrationGithub\Models\GithubContribution;
 use He4rt\Portal\Retrospective\CommunityRetrospective;
@@ -21,8 +20,6 @@ use Livewire\Component;
 #[Title('Quem fez a He4rt bater')]
 final class CommunityRetrospectivePage extends Component
 {
-    public string $tenantId;
-
     #[Url]
     public ?string $since = null;
 
@@ -54,16 +51,6 @@ final class CommunityRetrospectivePage extends Component
 
     #[Url]
     public bool $showHighlights = true;
-
-    public function mount(?string $tenantSlug = null): void
-    {
-        $slug = $tenantSlug ?? config()->string('he4rt.main_tenant');
-
-        /** @var Tenant $tenant */
-        $tenant = Tenant::query()->where('slug', $slug)->firstOrFail();
-
-        $this->tenantId = $tenant->id;
-    }
 
     public function toggleType(string $type): void
     {
@@ -97,7 +84,7 @@ final class CommunityRetrospectivePage extends Component
             : CarbonImmutable::now();
 
         $filters = RetrospectiveFilters::make($since, $until, $this->repos, $this->types, $this->outcome, $this->person, $this->hideBots, $this->sort);
-        $data = new CommunityRetrospective($this->tenantId, $filters)->build();
+        $data = new CommunityRetrospective($filters)->build();
 
         $repoOptions = collect($this->allRepos())
             ->mapWithKeys(fn (string $repo): array => [$repo => (string) str($repo)->afterLast('/')])
@@ -141,14 +128,13 @@ final class CommunityRetrospectivePage extends Component
     }
 
     /**
-     * Data da contribuição mais antiga dentro do escopo atual (tenant + repos
+     * Data da contribuição mais antiga dentro do escopo atual (repos
      * selecionados), para o preset "tudo" cobrir o histórico real do que está
      * sendo apresentado. Sem registros, cai no mesmo default semanal do render().
      */
     private function firstContributionDate(): string
     {
         $first = GithubContribution::query()
-            ->where('tenant_id', $this->tenantId)
             ->when($this->repos !== [], fn ($query) => $query->whereIn('repo', $this->repos))
             ->min('occurred_at');
 
@@ -164,7 +150,6 @@ final class CommunityRetrospectivePage extends Component
     {
         /** @var list<string> $repos */
         $repos = GithubContribution::query()
-            ->where('tenant_id', $this->tenantId)
             ->distinct()
             ->orderBy('repo')
             ->pluck('repo')

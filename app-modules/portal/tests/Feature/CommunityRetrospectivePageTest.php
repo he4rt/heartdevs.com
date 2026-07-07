@@ -11,7 +11,6 @@ use He4rt\Portal\Livewire\CommunityRetrospectivePage;
 use function Pest\Livewire\livewire;
 
 beforeEach(function (): void {
-    config(['he4rt.main_tenant' => 'he4rt']);
     $this->tenant = Tenant::factory()->create(['slug' => 'he4rt']);
 });
 
@@ -40,12 +39,8 @@ it('usa a janela padrão (segunda passada → hoje) quando sem parâmetros', fun
         ->assertSee('joao');
 });
 
-it('responde na rota pública /comunidade/retrospectiva (tenant principal)', function (): void {
+it('responde na rota pública /comunidade/retrospectiva', function (): void {
     test()->get('/comunidade/retrospectiva')->assertOk();
-});
-
-it('responde na rota com slug /comunidade/{tenant}/retrospectiva', function (): void {
-    test()->get('/comunidade/he4rt/retrospectiva')->assertOk();
 });
 
 it('inclui e marca contribuidor cujo único PR foi fechado sem merge', function (): void {
