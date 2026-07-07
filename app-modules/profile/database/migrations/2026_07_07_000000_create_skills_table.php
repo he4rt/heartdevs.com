@@ -71,6 +71,7 @@ return new class extends Migration
             'redis' => 'Redis',
             'mongodb' => 'MongoDB',
             'cassandra' => 'Cassandra',
+            'scylladb' => 'ScyllaDB',
             'elasticsearch' => 'Elasticsearch',
             'dynamodb' => 'DynamoDB',
             'clickhouse' => 'ClickHouse',
