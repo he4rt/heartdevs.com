@@ -478,11 +478,18 @@ class ProfilePage extends Page
         foreach ($repeaterData as $item) {
             $skillId = $item['skill_id'] ?? null;
             $proficiency = $item['proficiency'] ?? null;
+
             if (blank($skillId)) {
                 continue;
             }
 
-            if (blank($proficiency)) {
+            $proficiency = $proficiency instanceof SkillProficiency
+                ? $proficiency
+                : SkillProficiency::tryFrom((string) $proficiency);
+
+            // Guarda payload adulterado/inválido: sem isso, o from() no DTO lançaria
+            // ValueError antes da validação graciosa do SyncProfileSkills.
+            if (!$proficiency instanceof SkillProficiency) {
                 continue;
             }
 
