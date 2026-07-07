@@ -161,5 +161,5 @@ test('forks a separate account when a logged-out github login has a different em
         ->and($githubIdentity->model_id)->toBe($result->user->id)
         ->and($githubIdentity->model_id)->not->toBe($discordUser->id);
 
-    assertDatabaseCount(User::class, 3);
+    assertDatabaseCount(User::class, 2);
 });
