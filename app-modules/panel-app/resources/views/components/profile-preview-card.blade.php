@@ -50,6 +50,30 @@
             ? round((($experience - $currentThreshold) / ($nextThreshold - $currentThreshold)) * 100)
             : 100;
     $badges = $character?->badges ?? collect();
+
+    $skillLabels = \He4rt\Profile\Models\Skill::labelsById();
+    $skills = collect($data['skills'] ?? [])
+        ->map(function ($item) use ($skillLabels) {
+            $skillId = $item['skill_id'] ?? null;
+
+            if (empty($skillId) || !isset($skillLabels[$skillId])) {
+                return null;
+            }
+
+            $proficiencyRaw = $item['proficiency'] ?? null;
+            $proficiency =
+                $proficiencyRaw instanceof \He4rt\Profile\Enums\SkillProficiency
+                    ? $proficiencyRaw
+                    : (is_string($proficiencyRaw)
+                        ? \He4rt\Profile\Enums\SkillProficiency::tryFrom($proficiencyRaw)
+                        : null);
+
+            return [
+                'name' => $skillLabels[$skillId],
+                'proficiency' => $proficiency,
+            ];
+        })
+        ->filter();
 @endphp
 
 <div
@@ -148,6 +172,28 @@
         {{-- Bio --}}
         @if ($about)
             <p class="text-sm leading-relaxed text-gray-600 dark:text-gray-400">{{ Str::limit($about, 200) }}</p>
+        @endif
+
+        {{-- Skills --}}
+        @if ($skills->isNotEmpty())
+            <div>
+                <span class="mb-1.5 block text-xs font-semibold tracking-wider text-gray-500 uppercase dark:text-gray-400">
+                    Skills
+                </span>
+                <div class="flex flex-wrap gap-1.5">
+                    @foreach ($skills as $skill)
+                        <span
+                            class="inline-flex items-center gap-1 rounded-md bg-purple-50 px-2 py-0.5 text-xs font-medium text-purple-700 dark:bg-purple-500/10 dark:text-purple-300"
+                        >
+                            {{ $skill['name'] }}
+                            @if ($skill['proficiency'])
+                                <span class="text-purple-300 dark:text-purple-500">·</span>
+                                {{ $skill['proficiency']->getLabel() }}
+                            @endif
+                        </span>
+                    @endforeach
+                </div>
+            </div>
         @endif
 
         {{-- XP bar --}}

@@ -8,6 +8,7 @@ return [
         'professional' => 'Profissional',
         'about' => 'Sobre',
         'address' => 'Localização',
+        'skills' => 'Skills',
         'social_links' => 'Links Sociais',
         'availability' => 'Disponibilidade',
         'preferences' => 'Preferências',
@@ -21,6 +22,9 @@ return [
         'seniority_level' => 'Senioridade',
         'years_experience' => 'Anos de Experiência',
         'about' => 'Sobre',
+        'skill' => 'Skill',
+        'proficiency' => 'Nível',
+        'skill_years_experience' => 'Anos',
         'platform' => 'Plataforma',
         'handle' => 'Handle / URL',
         'country' => 'País (ISO)',
@@ -50,11 +54,13 @@ return [
         'available_for_proposals' => 'Quando ativo, recrutadores verão um badge verde no seu perfil',
         'has_disability' => 'Informação sensível — usada apenas para vagas afirmativas/PcD.',
         'expected_salary' => 'Valor mensal em R$. Informação privada, usada apenas em propostas.',
+        'skills' => 'Selecione suas skills e informe o nível e os anos de experiência em cada uma.',
     ],
 
     'actions' => [
         'save' => 'Salvar perfil',
         'add_social_link' => 'Adicionar link social',
+        'add_skill' => 'Adicionar skill',
     ],
 
     'notifications' => [

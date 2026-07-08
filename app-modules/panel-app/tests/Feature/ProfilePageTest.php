@@ -8,8 +8,10 @@ use He4rt\Identity\User\Models\User;
 use He4rt\PanelApp\Pages\ProfilePage;
 use He4rt\Profile\Enums\EmploymentType;
 use He4rt\Profile\Enums\SeniorityLevel;
+use He4rt\Profile\Enums\SkillProficiency;
 use He4rt\Profile\Enums\StartAvailability;
 use He4rt\Profile\Models\Profile;
+use He4rt\Profile\Models\Skill;
 
 use function Pest\Livewire\livewire;
 
@@ -86,6 +88,30 @@ test('profile page saves social links from repeater', function (): void {
         'instagram' => '@danielhe4rt',
         'website' => 'https://danielheart.dev',
     ]);
+});
+
+test('profile page saves skills from repeater', function (): void {
+    $php = Skill::query()->where('slug', 'php')->sole();
+    $laravel = Skill::query()->where('slug', 'laravel')->sole();
+
+    livewire(ProfilePage::class)
+        ->fillForm([
+            'skills' => [
+                ['skill_id' => $php->id, 'proficiency' => 'advanced', 'years_experience' => 5],
+                ['skill_id' => $laravel->id, 'proficiency' => 'expert', 'years_experience' => 3],
+            ],
+        ])
+        ->call('save')
+        ->assertNotified();
+
+    $this->profile->refresh();
+
+    expect($this->profile->profileSkills()->count())->toBe(2);
+
+    $pivot = $this->profile->profileSkills()->where('skill_id', $php->id)->first();
+
+    expect($pivot->proficiency)->toBe(SkillProficiency::Advanced)
+        ->and($pivot->years_experience)->toBe(5);
 });
 
 test('profile page saves availability toggle', function (): void {
