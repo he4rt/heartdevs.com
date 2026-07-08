@@ -112,9 +112,4 @@ tasks:
     desc: Setup the project
     aliases: [s]
     cmds:
-      - 'composer install'
-      - 'npm install'
-      - 'composer run post-root-package-install'
-      - 'composer run post-create-project-cmd'
-      - 'php artisan key:generate --ansi'
-      - 'php artisan storage:link --ansi'
+      - 'composer run setup'

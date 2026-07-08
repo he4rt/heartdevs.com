@@ -102,8 +102,11 @@
             "@php -r \"file_exists('.env') || copy('.env.example', '.env');\"",
             "@php -r \"file_exists('.env.testing') || copy('.env.testing.example', '.env.testing');\""
         ],
-        "post-create-project-cmd": [
+        "key:generate": [
             "@php artisan key:generate --ansi",
+            "@php artisan key:generate --ansi --env=testing"
+        ],
+        "post-create-project-cmd": [
             "@php -r \"file_exists('database/database.sqlite') || touch('database/database.sqlite');\"",
             "@php artisan migrate --graceful --ansi"
         ],
@@ -111,8 +114,8 @@
             "composer install",
             "npm install",
             "composer run-script post-root-package-install",
+            "composer run-script key:generate",
             "composer run-script post-create-project-cmd",
-            "@php artisan key:generate --ansi",
             "@php artisan storage:link --ansi"
         ],
         "bot": "@php artisan bot:boot",

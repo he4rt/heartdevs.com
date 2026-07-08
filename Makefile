@@ -85,12 +85,7 @@ dev: ## Start the server
 
 .PHONY: setup
 setup: ## Setup the project
-	@composer install
-	@npm install
-	@composer run-script post-root-package-install
-	@composer run-script post-create-project-cmd
-	@php artisan key:generate --ansi
-	@php artisan storage:link --ansi
+	@composer run-script setup
 
 .PHONY: import-db
 import-db: ## Import a PostgreSQL dump file (usage: make import-db file=path/to/dump)

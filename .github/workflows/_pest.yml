@@ -97,7 +97,9 @@ jobs:
         run: npm run build
 
       - name: Prepare test env
-        run: cp .env.testing.example .env.testing
+        run: |
+          composer run-script post-root-package-install
+          composer run-script key:generate
 
       - name: Run Tests
         env:
