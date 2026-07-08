@@ -27,6 +27,7 @@ use He4rt\Profile\Actions\ToggleAvailability;
 use He4rt\Profile\Actions\UpsertProfile;
 use He4rt\Profile\DTOs\ProfileSkillDTO;
 use He4rt\Profile\DTOs\UpsertProfileDTO;
+use He4rt\Profile\Enums\EmploymentType;
 use He4rt\Profile\Enums\SeniorityLevel;
 use He4rt\Profile\Enums\SkillProficiency;
 use He4rt\Profile\Enums\SocialPlatform;
@@ -84,6 +85,15 @@ class ProfilePage extends Page
             'skills' => $this->skillsToRepeater($profile),
             'available_for_proposals' => $profile->available_for_proposals,
             'start_availability' => $profile->start_availability,
+            'expected_salary_min' => $profile->expected_salary_min,
+            'expected_salary_max' => $profile->expected_salary_max,
+            'has_disability' => $profile->preferences->hasDisability,
+            'willing_to_relocate' => $profile->preferences->willingToRelocate,
+            'is_open_to_remote' => $profile->preferences->isOpenToRemote,
+            'employment_types' => array_map(
+                static fn (EmploymentType $type): string => $type->value,
+                $profile->preferences->employmentTypes,
+            ),
         ]);
     }
 
@@ -257,6 +267,47 @@ class ProfilePage extends Page
                                 ->options(StartAvailability::class)
                                 ->live()
                                 ->visible(fn (Get $get): bool => (bool) $get('available_for_proposals')),
+
+                            Grid::make(2)
+                                ->visible(fn (Get $get): bool => (bool) $get('available_for_proposals'))
+                                ->schema([
+                                    TextInput::make('expected_salary_min')
+                                        ->label(__('panel-app::profile.fields.expected_salary_min'))
+                                        ->hint(__('panel-app::profile.hints.expected_salary'))
+                                        ->numeric()
+                                        ->minValue(0)
+                                        ->prefix('R$')
+                                        ->live(onBlur: true),
+
+                                    TextInput::make('expected_salary_max')
+                                        ->label(__('panel-app::profile.fields.expected_salary_max'))
+                                        ->numeric()
+                                        ->minValue(0)
+                                        ->prefix('R$')
+                                        ->live(onBlur: true),
+                                ]),
+                        ]),
+
+                    Section::make(__('panel-app::profile.sections.preferences'))
+                        ->schema([
+                            Toggle::make('is_open_to_remote')
+                                ->label(__('panel-app::profile.fields.is_open_to_remote'))
+                                ->live(),
+
+                            Toggle::make('willing_to_relocate')
+                                ->label(__('panel-app::profile.fields.willing_to_relocate'))
+                                ->live(),
+
+                            Toggle::make('has_disability')
+                                ->label(__('panel-app::profile.fields.has_disability'))
+                                ->hint(__('panel-app::profile.hints.has_disability'))
+                                ->live(),
+
+                            Select::make('employment_types')
+                                ->label(__('panel-app::profile.fields.employment_types'))
+                                ->options(EmploymentType::class)
+                                ->multiple()
+                                ->live(),
                         ]),
                 ])
                     ->livewireSubmitHandler('save')
@@ -287,6 +338,14 @@ class ProfilePage extends Page
             'seniority_level' => $formData['seniority_level'] ?? null,
             'years_experience' => $formData['years_experience'] ?? null,
             'social_links' => $socialLinks !== [] ? $socialLinks : null,
+            'expected_salary_min' => $formData['expected_salary_min'] ?? null,
+            'expected_salary_max' => $formData['expected_salary_max'] ?? null,
+            'preferences' => [
+                'has_disability' => $formData['has_disability'] ?? false,
+                'willing_to_relocate' => $formData['willing_to_relocate'] ?? false,
+                'is_open_to_remote' => $formData['is_open_to_remote'] ?? false,
+                'employment_types' => $formData['employment_types'] ?? [],
+            ],
         ]);
 
         resolve(UpsertProfile::class)->handle($profile, $dto);

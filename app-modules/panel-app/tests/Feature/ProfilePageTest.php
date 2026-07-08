@@ -6,6 +6,7 @@ use Filament\Facades\Filament;
 use He4rt\Identity\Tenant\Models\Tenant;
 use He4rt\Identity\User\Models\User;
 use He4rt\PanelApp\Pages\ProfilePage;
+use He4rt\Profile\Enums\EmploymentType;
 use He4rt\Profile\Enums\SeniorityLevel;
 use He4rt\Profile\Enums\SkillProficiency;
 use He4rt\Profile\Enums\StartAvailability;
@@ -150,4 +151,39 @@ test('profile page does not show account fields', function (): void {
     livewire(ProfilePage::class)
         ->assertFormFieldDoesNotExist('email')
         ->assertFormFieldDoesNotExist('password');
+});
+
+test('profile page saves expected salary range', function (): void {
+    livewire(ProfilePage::class)
+        ->fillForm([
+            'available_for_proposals' => true,
+            'expected_salary_min' => 5_000,
+            'expected_salary_max' => 9_000,
+        ])
+        ->call('save')
+        ->assertNotified();
+
+    $this->profile->refresh();
+
+    expect($this->profile->expected_salary_min)->toBe('5000.00')
+        ->and($this->profile->expected_salary_max)->toBe('9000.00');
+});
+
+test('profile page saves work preferences', function (): void {
+    livewire(ProfilePage::class)
+        ->fillForm([
+            'is_open_to_remote' => true,
+            'willing_to_relocate' => true,
+            'has_disability' => false,
+            'employment_types' => ['pj', 'freelance'],
+        ])
+        ->call('save')
+        ->assertNotified();
+
+    $this->profile->refresh();
+
+    expect($this->profile->preferences->isOpenToRemote)->toBeTrue()
+        ->and($this->profile->preferences->willingToRelocate)->toBeTrue()
+        ->and($this->profile->preferences->hasDisability)->toBeFalse()
+        ->and($this->profile->preferences->employmentTypes)->toBe([EmploymentType::IndependentContractor, EmploymentType::Freelancer]);
 });
