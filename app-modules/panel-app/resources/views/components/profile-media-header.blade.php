@@ -59,10 +59,10 @@
     </div>
 
     {{-- Bottom section: avatar + fields --}}
-    <div class="relative px-6 pt-16 pb-6 sm:pt-18">
+    <div class="relative z-10 px-6 pt-16 pb-6 sm:pt-18">
         {{-- Avatar (overlapping cover) --}}
         <div
-            class="absolute -top-12 left-6 sm:-top-14"
+            class="absolute -top-12 left-6 z-20 sm:-top-14"
             x-data="{ hover: false }"
             @mouseenter="hover = true"
             @mouseleave="hover = false"
