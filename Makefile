@@ -65,7 +65,7 @@ test-feature: ## Run feature tests
 
 .PHONY: setup-test-db
 setup-test-db: ## Create the testing database for running tests
-	@PGHOST=localhost PGUSER=postgres PGPASSWORD=postgres createdb test_he4rtbot 2>/dev/null || echo "Database test_he4rtbot already exists"
+	@php artisan migrate --env=testing --no-interaction --force
 
 .PHONY: migrate-fresh
 migrate-fresh: ## Run migrations and seed the database
