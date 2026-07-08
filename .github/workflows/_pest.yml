@@ -23,14 +23,18 @@ permissions: {}
 
 jobs:
   tests:
-    name: Run
+    name: 'Shard ${{ matrix.shard }}/2'
     runs-on: ubuntu-latest
-    timeout-minutes: 5
+    timeout-minutes: 10
     permissions:
       contents: read
     concurrency:
-      group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}-tests
+      group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}-tests-${{ matrix.shard }}
       cancel-in-progress: true
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: [1, 2]
 
     services:
       postgres:
@@ -43,9 +47,10 @@ jobs:
           - 5432/tcp
         options: >-
           --health-cmd pg_isready
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
+          --health-interval 3s
+          --health-timeout 3s
+          --health-retries 10
+          --health-start-period 5s
 
     steps:
       - name: Checkout code
@@ -60,7 +65,7 @@ jobs:
           php-version: ${{ inputs.PHP_VERSION }}
           extensions: ${{ inputs.PHP_EXTENSIONS }}
           ini-values: ${{ inputs.PHP_INI_PROPERTIES }}
-          coverage: xdebug
+          coverage: none
           tools: composer:v2
 
       - name: Setup Problem Matches
@@ -91,9 +96,12 @@ jobs:
       - name: Build Assets
         run: npm run build
 
+      - name: Prepare test env
+        run: cp .env.testing.example .env.testing
+
       - name: Run Tests
         env:
-          XDEBUG_MODE: coverage
           DB_PORT: ${{ job.services.postgres.ports['5432'] }}
+          SHARD: ${{ matrix.shard }}
         run: |
-          vendor/bin/pest --ci --parallel
+          vendor/bin/pest --ci --parallel --shard="${SHARD}"/2

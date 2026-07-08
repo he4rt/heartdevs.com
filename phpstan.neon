@@ -6,6 +6,10 @@ parameters:
     level: 7
     checkImplicitMixed: true
 
-
     paths:
         - app/
+
+    # Verbatim copy of Pest's internal Shard plugin (only the discovery regex is
+    # patched). Treated as third-party code — kept re-syncable with upstream.
+    excludePaths:
+        - app/Support/PestShardPlugin.php
