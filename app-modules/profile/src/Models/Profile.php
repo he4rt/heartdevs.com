@@ -14,6 +14,7 @@ use He4rt\Profile\Enums\SeniorityLevel;
 use He4rt\Profile\Enums\SocialPlatform;
 use He4rt\Profile\Enums\StartAvailability;
 use Illuminate\Database\Eloquent\Attributes\Table;
+use Illuminate\Database\Eloquent\Attributes\UseFactory;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -42,6 +43,7 @@ use InvalidArgumentException;
  * @property CarbonInterface|null $created_at
  * @property CarbonInterface|null $updated_at
  */
+#[UseFactory(ProfileFactory::class)]
 #[Table(name: 'user_profiles')]
 final class Profile extends Model
 {
@@ -121,11 +123,6 @@ final class Profile extends Model
         return $this->belongsToMany(Skill::class, 'profile_skills')
             ->withPivot(['proficiency', 'years_experience'])
             ->withTimestamps();
-    }
-
-    protected static function newFactory(): ProfileFactory
-    {
-        return ProfileFactory::new();
     }
 
     /**

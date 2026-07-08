@@ -5,7 +5,7 @@ declare(strict_types=1);
 use He4rt\Profile\Models\Profile;
 use He4rt\Profile\Models\WorkExperience;
 
-test('profile tem muitas work experiences', function (): void {
+test('profile has many work experiences', function (): void {
     $profile = Profile::factory()->create();
     WorkExperience::factory()->count(3)->create(['profile_id' => $profile->id]);
 
@@ -13,7 +13,7 @@ test('profile tem muitas work experiences', function (): void {
         ->and($profile->workExperiences->first())->toBeInstanceOf(WorkExperience::class);
 });
 
-test('work experiences vem ordenada: atual primeiro, depois start_date desc', function (): void {
+test('work experiences are ordered: current first, then start_date desc', function (): void {
     $profile = Profile::factory()->create();
 
     $antiga = WorkExperience::factory()->create([

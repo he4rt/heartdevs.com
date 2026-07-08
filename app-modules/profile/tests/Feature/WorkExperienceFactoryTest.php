@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 use He4rt\Profile\Models\WorkExperience;
 
-test('factory nunca gera experiencia atual com end_date preenchido', function (): void {
+test('factory never generates current experiment with end_date filled in', function (): void {
     $experiences = WorkExperience::factory()->count(30)->create();
 
     $experiences->each(static function (WorkExperience $experience): void {
@@ -14,7 +14,7 @@ test('factory nunca gera experiencia atual com end_date preenchido', function ()
     });
 });
 
-test('factory nao-atual gera end_date maior ou igual a start_date', function (): void {
+test('non-current factory generates end_date greater than or equal to start_date', function (): void {
     $experiences = WorkExperience::factory()->count(30)->create();
 
     $experiences
@@ -25,7 +25,7 @@ test('factory nao-atual gera end_date maior ou igual a start_date', function ():
         });
 });
 
-test('state current gera experiencia atual com end_date null', function (): void {
+test('state current generates current experience with end_date null', function (): void {
     $experience = WorkExperience::factory()->current()->create();
 
     expect($experience->is_currently_working_here)->toBeTrue()

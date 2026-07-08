@@ -7,6 +7,7 @@ namespace He4rt\Profile\Models;
 use Carbon\CarbonInterface;
 use He4rt\Profile\Database\Factories\WorkExperienceFactory;
 use Illuminate\Database\Eloquent\Attributes\Table;
+use Illuminate\Database\Eloquent\Attributes\UseFactory;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -25,6 +26,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property CarbonInterface|null $updated_at
  * @property-read Profile $profile
  */
+#[UseFactory(WorkExperienceFactory::class)]
 #[Table(name: 'work_experiences')]
 final class WorkExperience extends Model
 {
@@ -65,11 +67,6 @@ final class WorkExperience extends Model
         }
 
         return (int) $this->start_date->diffInMonths($end);
-    }
-
-    protected static function newFactory(): WorkExperienceFactory
-    {
-        return WorkExperienceFactory::new();
     }
 
     protected function casts(): array
