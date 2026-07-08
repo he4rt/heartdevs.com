@@ -15,9 +15,9 @@ enum EmploymentType: string implements HasColor, HasIcon, HasLabel
 {
     use StringifyEnum;
 
-    case SalariedEmployee = 'employee';
-    case IndependentContractor = 'contractor';
-    case Freelancer = 'freelancer';
+    case SalariedEmployee = 'clt';
+    case IndependentContractor = 'pj';
+    case Freelancer = 'freelance';
 
     public function getLabel(): string
     {

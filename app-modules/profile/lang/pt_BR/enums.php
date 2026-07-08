@@ -45,8 +45,8 @@ return [
     ],
 
     'employment_type' => [
-        'employee' => 'CLT',
-        'contractor' => 'PJ',
-        'freelancer' => 'Freelancer',
+        'clt' => 'CLT',
+        'pj' => 'PJ',
+        'freelance' => 'Freelancer',
     ],
 ];
