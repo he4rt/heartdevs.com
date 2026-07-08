@@ -19,6 +19,21 @@ return [
         'bluesky' => 'Bluesky',
     ],
 
+    'skill_category' => [
+        'language' => 'Language',
+        'framework' => 'Framework',
+        'database' => 'Database',
+        'tool' => 'Tool',
+        'soft' => 'Soft skill',
+    ],
+
+    'skill_proficiency' => [
+        'beginner' => 'Beginner',
+        'intermediate' => 'Intermediate',
+        'advanced' => 'Advanced',
+        'expert' => 'Expert',
+    ],
+
     'start_availability' => [
         'immediate' => 'Immediate',
         '1_week' => '1 Week',
