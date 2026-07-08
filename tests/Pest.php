@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
 use Tests\TestCase;
 
 /*
@@ -21,7 +21,7 @@ pest()->extend(TestCase::class)
     ->in('Unit', '../app-modules/*/tests/Unit');
 
 pest()->extend(TestCase::class)
-    ->use(RefreshDatabase::class)
+    ->use(LazilyRefreshDatabase::class)
     ->group('feature')
     ->in('Feature', '../app-modules/*/tests/Feature');
 
