@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace He4rt\Profile\Actions;
 
 use Carbon\CarbonInterface;
+use He4rt\Profile\Data\WorkPreferences;
 use He4rt\Profile\DTOs\UpsertProfileDTO;
 use He4rt\Profile\Enums\SeniorityLevel;
 use He4rt\Profile\Enums\SocialPlatform;
@@ -47,6 +48,18 @@ final class UpsertProfile
             $attributes['social_links'] = $dto->socialLinks;
         }
 
+        if ($dto->expectedSalaryMin !== null) {
+            $attributes['expected_salary_min'] = $dto->expectedSalaryMin;
+        }
+
+        if ($dto->expectedSalaryMax !== null) {
+            $attributes['expected_salary_max'] = $dto->expectedSalaryMax;
+        }
+
+        if ($dto->preferences instanceof WorkPreferences) {
+            $attributes['preferences'] = $dto->preferences;
+        }
+
         if ($attributes !== []) {
             $profile->update($attributes);
         }
@@ -72,6 +85,25 @@ final class UpsertProfile
 
         if ($dto->yearsExperience !== null && ($dto->yearsExperience < 0 || $dto->yearsExperience > 50)) {
             $errors['years_experience'] = [__('validation.between.numeric', ['attribute' => 'years_experience', 'min' => 0, 'max' => 50])];
+        }
+
+        if ($dto->expectedSalaryMin !== null && (!is_numeric($dto->expectedSalaryMin) || (float) $dto->expectedSalaryMin < 0)) {
+            $errors['expected_salary_min'] = [__('validation.min.numeric', ['attribute' => 'expected_salary_min', 'min' => 0])];
+        }
+
+        if ($dto->expectedSalaryMax !== null && (!is_numeric($dto->expectedSalaryMax) || (float) $dto->expectedSalaryMax < 0)) {
+            $errors['expected_salary_max'] = [__('validation.min.numeric', ['attribute' => 'expected_salary_max', 'min' => 0])];
+        }
+
+        if (
+            $dto->expectedSalaryMin !== null && is_numeric($dto->expectedSalaryMin)
+            && $dto->expectedSalaryMax !== null && is_numeric($dto->expectedSalaryMax)
+            && (float) $dto->expectedSalaryMin > (float) $dto->expectedSalaryMax
+        ) {
+            $errors['expected_salary_max'] = [__('validation.gte.numeric', [
+                'attribute' => 'expected_salary_max',
+                'value' => $dto->expectedSalaryMin,
+            ])];
         }
 
         if ($dto->socialLinks !== null) {

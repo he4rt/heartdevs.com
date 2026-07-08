@@ -11,6 +11,7 @@ return [
         'skills' => 'Skills',
         'social_links' => 'Social Links',
         'availability' => 'Availability',
+        'preferences' => 'Preferences',
         'connections' => 'Connections',
         'work_experiences' => 'Work experience',
     ],
@@ -40,6 +41,12 @@ return [
         'start_date' => 'Start date',
         'end_date' => 'End date',
         'is_currently_working_here' => 'I currently work here',
+        'expected_salary_min' => 'Expected salary (min)',
+        'expected_salary_max' => 'Expected salary (max)',
+        'is_open_to_remote' => 'Open to remote work',
+        'willing_to_relocate' => 'Willing to relocate',
+        'has_disability' => 'Person with a disability',
+        'employment_types' => 'Employment type',
     ],
 
     'placeholders' => [
@@ -52,6 +59,8 @@ return [
     'hints' => [
         'headline' => 'e.g. Frontend Developer, Product Designer',
         'available_for_proposals' => 'When active, recruiters will see a green badge on your profile',
+        'has_disability' => 'Sensitive information — used only for affirmative-action roles.',
+        'expected_salary' => 'Monthly amount in BRL. Private, used only in proposals.',
         'skills' => 'Pick your skills and set your level and years of experience for each.',
     ],
 

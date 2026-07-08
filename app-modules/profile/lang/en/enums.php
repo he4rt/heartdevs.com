@@ -43,4 +43,10 @@ return [
         '2_months' => '2 Months',
         'negotiable' => 'Negotiable',
     ],
+
+    'employment_type' => [
+        'clt' => 'Employee',
+        'pj' => 'Contractor',
+        'freelance' => 'Freelancer',
+    ],
 ];

@@ -11,6 +11,7 @@ return [
         'skills' => 'Skills',
         'social_links' => 'Links Sociais',
         'availability' => 'Disponibilidade',
+        'preferences' => 'Preferências',
         'connections' => 'Conexões',
         'work_experiences' => 'Experiência profissional',
     ],
@@ -40,6 +41,12 @@ return [
         'start_date' => 'Data de início',
         'end_date' => 'Data de término',
         'is_currently_working_here' => 'Trabalho aqui atualmente',
+        'expected_salary_min' => 'Pretensão salarial (mín.)',
+        'expected_salary_max' => 'Pretensão salarial (máx.)',
+        'is_open_to_remote' => 'Aberto a trabalho remoto',
+        'willing_to_relocate' => 'Disposto a mudar de cidade',
+        'has_disability' => 'Pessoa com deficiência (PcD)',
+        'employment_types' => 'Tipo de contratação',
     ],
 
     'placeholders' => [
@@ -52,6 +59,8 @@ return [
     'hints' => [
         'headline' => 'Ex: Frontend Developer, Product Designer',
         'available_for_proposals' => 'Quando ativo, recrutadores verão um badge verde no seu perfil',
+        'has_disability' => 'Informação sensível — usada apenas para vagas afirmativas/PcD.',
+        'expected_salary' => 'Valor mensal em R$. Informação privada, usada apenas em propostas.',
         'skills' => 'Selecione suas skills e informe o nível e os anos de experiência em cada uma.',
     ],
 
