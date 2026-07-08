@@ -20,8 +20,8 @@ use function Laravel\Prompts\table;
 use function Laravel\Prompts\task;
 use function Laravel\Prompts\warning;
 
-#[Description('Fetch full Discord profiles for all members, tracking progress across runs')]
-#[Signature('discord:fetch-profiles
+#[Description(description: 'Fetch full Discord profiles for all members, tracking progress across runs')]
+#[Signature(signature: 'discord:fetch-profiles
         {--token= : Discord user token (or set DISCORD_USER_TOKEN in .env)}
         {--members-file=discord/members.json : Path to members JSON}
         {--limit=0 : Max profiles to fetch this run (0 = all remaining)}

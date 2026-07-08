@@ -32,8 +32,8 @@ use Throwable;
  * backoff até o limite de exceções; o resto é encerrado em failed().
  */
 #[Backoff([10, 30, 60])]
-#[MaxExceptions(3)]
-#[Timeout(600)]
+#[MaxExceptions(maxExceptions: 3)]
+#[Timeout(timeout: 600)]
 final class BackfillGithubRepository implements ShouldBeUniqueUntilProcessing, ShouldQueue
 {
     use Dispatchable;

@@ -15,8 +15,8 @@ use Illuminate\Console\Attributes\Description;
 use Illuminate\Console\Attributes\Signature;
 use Illuminate\Console\Command;
 
-#[Description('Link a Twitch channel to a tenant via ExternalIdentity')]
-#[Signature('twitch:link-channel {login : Twitch channel login name} {--tenant= : Tenant slug or ID}')]
+#[Description(description: 'Link a Twitch channel to a tenant via ExternalIdentity')]
+#[Signature(signature: 'twitch:link-channel {login : Twitch channel login name} {--tenant= : Tenant slug or ID}')]
 final class LinkTwitchChannelCommand extends Command
 {
     public function handle(TwitchHelixConnector $helix): int

@@ -31,7 +31,7 @@ use Throwable;
  * created by rules (classifier_version='rules'), auto-execution IS allowed here.
  */
 #[Backoff([5, 15, 30])]
-#[Tries(3)]
+#[Tries(tries: 3)]
 final class ClassifyAndRoute implements ShouldQueue
 {
     use InteractsWithQueue;

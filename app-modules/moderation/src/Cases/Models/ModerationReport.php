@@ -25,8 +25,8 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property Platform $platform
  * @property CarbonInterface $created_at
  */
-#[Table('moderation_reports', timestamps: false)]
-#[UseFactory(ModerationReportFactory::class)]
+#[Table(name: 'moderation_reports', timestamps: false)]
+#[UseFactory(factoryClass: ModerationReportFactory::class)]
 final class ModerationReport extends Model
 {
     /** @use HasFactory<ModerationReportFactory> */

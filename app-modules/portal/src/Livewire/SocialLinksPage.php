@@ -10,8 +10,8 @@ use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
 use Livewire\Component;
 
-#[Layout('portal::components.layouts.app')]
-#[Title('Nossas redes')]
+#[Layout(name: 'portal::components.layouts.app')]
+#[Title(content: 'Nossas redes')]
 final class SocialLinksPage extends Component
 {
     /**
