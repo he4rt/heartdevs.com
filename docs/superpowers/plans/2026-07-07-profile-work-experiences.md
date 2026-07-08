@@ -4,7 +4,7 @@
 
 **Goal:** Portar `WorkExperience` do `recruit-party-quest` para o módulo `profile` da he4rt (com `profile_id` no lugar de `candidate_id`) e expor um formulário de experiências profissionais na `ProfilePage`.
 
-**Architecture:** Tabela própria `work_experiences` com `hasMany` em `Profile`. O formulário usa o Repeater nativo do Filament com `->relationship('workExperiences')` + `->model()` (o record do schema é o `User`, a relação vive na `Profile`). A regra `is_currently_working_here → end_date = null` mora numa Action (`NormalizeWorkExperience`) que delega a um DTO (`WorkExperienceDTO`), chamada pelos hooks `mutateRelationshipData...` do Repeater.
+**Architecture:** Tabela própria `work_experiences` com `hasMany` em `Profile`. O formulário usa o Repeater nativo do Filament com `->relationship('workExperiences')` + `->model()` (o record do schema é o `User`, a relação vive na `Profile`). A regra `is_currently_working_here → end_date = null` é um método privado da própria `ProfilePage` (`normalizeWorkExperienceData`), chamado pelos hooks `mutateRelationshipData...` do Repeater. Sem Action nem DTO dedicados.
 
 **Tech Stack:** Laravel (módulos em `app-modules/`), Filament v5.6.x, Pest, PostgreSQL.
 
@@ -17,7 +17,7 @@
 - **Sem** `tenant_id`, **sem** SoftDeletes, **sem** Policy, **sem** `metadata`.
 - Timestamps sempre `timestampsTz()`.
 - Model `WorkExperience`: `final`, `HasUuids`, `HasFactory`, `#[Table(name: 'work_experiences')]` (mesmo padrão da `Profile`); **não** herdar `BaseModel`.
-- Namespaces: model `He4rt\Profile\Models`; factory `He4rt\Profile\Database\Factories`; DTO `He4rt\Profile\DTOs`; Action `He4rt\Profile\Actions`.
+- Namespaces: model `He4rt\Profile\Models`; factory `He4rt\Profile\Database\Factories`. (Normalização é método privado na `ProfilePage`, sem Action/DTO dedicados.)
 - Testes: Pest. **Unit roda sem banco**; **Feature usa `LazilyRefreshDatabase`** aplicado automaticamente pelo `tests/Pest.php` da raiz (não colocar `uses()` por arquivo). Rodar targeted e sequencial: `./vendor/bin/pest <caminho>`. **Nunca** `pest --parallel` sem `--processes=10`.
 - Commits: Conventional Commits. **Nunca** adicionar `Co-Authored-By` nem referência ao Claude.
 - Branch de trabalho: `feat/profile-work-experiences` (já criada).
@@ -432,7 +432,9 @@ git commit -m "feat(profile): relacao hasMany workExperiences em Profile"
 
 ---
 
-### Task 3: DTO + Action de normalização
+### Task 3: DTO + Action de normalização — SUPERADA
+
+> **Superada:** a normalização passou a ser um método privado `normalizeWorkExperienceData()` na `ProfilePage` (ver Task 4). Não há mais Action `NormalizeWorkExperience` nem DTO `WorkExperienceDTO`. Os passos abaixo ficam apenas como histórico e **não devem ser executados**.
 
 **Files:**
 
@@ -619,9 +621,9 @@ git commit -m "feat(profile): DTO e Action de normalizacao de work_experience"
 
 **Interfaces:**
 
-- Consumes: `Profile::workExperiences()` (Task 2), `He4rt\Profile\Actions\NormalizeWorkExperience` (Task 3), `$this->getRecord(): Profile` (já existe na página).
+- Consumes: `Profile::workExperiences()` (Task 2), `$this->getRecord(): Profile` (já existe na página).
 
-> **Sem teste automatizado:** não há infraestrutura de `Livewire::test` no repo. A verificação é manual via `/verify` (Step 6). A regra de negócio já está coberta por testes na Task 3.
+> **Teste:** o form é testado de ponta a ponta com a função global `livewire()` (`pestphp/pest-plugin-livewire`), seguindo o `ProfilePageTest` já existente, que monta o contexto do painel/tenant no `beforeEach`. A normalização é um método privado da página, coberto por esses testes.
 
 - [ ] **Step 1: Adicionar as chaves de tradução em inglês**
 
@@ -666,7 +668,6 @@ Em `app-modules/panel-app/src/Pages/ProfilePage.php`, adicionar aos `use` existe
 ```php
 use Filament\Forms\Components\DatePicker;
 use Filament\Schemas\Components\Utilities\Set;
-use He4rt\Profile\Actions\NormalizeWorkExperience;
 ```
 
 (`Get`, `Toggle`, `TextInput`, `Textarea`, `Repeater`, `Grid`, `Section` já estão importados.)
@@ -730,8 +731,8 @@ Section::make(__('panel-app::profile.sections.work_experiences'))
             ->collapsible()
             ->defaultItems(0)
             ->columnSpanFull()
-            ->mutateRelationshipDataBeforeCreateUsing(fn (array $data): array => resolve(NormalizeWorkExperience::class)->handle($data))
-            ->mutateRelationshipDataBeforeSaveUsing(fn (array $data): array => resolve(NormalizeWorkExperience::class)->handle($data)),
+            ->mutateRelationshipDataBeforeCreateUsing($this->normalizeWorkExperienceData(...))
+            ->mutateRelationshipDataBeforeSaveUsing($this->normalizeWorkExperienceData(...)),
     ]),
 ```
 
@@ -745,15 +746,79 @@ Section::make(__('panel-app::profile.sections.work_experiences'))
 
 Expected: rector sem mudanças pendentes; pint OK; phpstan sem erros.
 
-- [ ] **Step 6: Verificação manual via `/verify`**
+- [ ] **Step 6: Método privado de normalização + testes `livewire()`**
 
-Rodar a aplicação e exercitar o fluxo no perfil (`/panel/.../profile` ou rota equivalente do painel):
+1. Em `app-modules/panel-app/src/Pages/ProfilePage.php`, junto aos métodos privados, adicionar:
 
-1. Abrir a página de perfil logado num tenant; confirmar que a seção "Experiência profissional" aparece após "Disponibilidade".
-2. Adicionar uma experiência (empresa, cargo, descrição, data de início) e salvar; recarregar e confirmar que ela persiste e reaparece no repeater (valida o carregamento com `->model()` no `mount()` e o `saveRelationships()` no `save()`).
-3. Marcar "Trabalho aqui atualmente"; confirmar que a data de término some; salvar; conferir no banco que `end_date` está `null`.
-4. Remover uma experiência do repeater e salvar; confirmar que a linha some do banco (hard delete).
-5. Confirmar ordenação: a atual aparece primeiro, depois as demais por data decrescente.
+```php
+/**
+ * @param  array<string, mixed>  $data
+ * @return array<string, mixed>
+ */
+private function normalizeWorkExperienceData(array $data): array
+{
+    if ($data['is_currently_working_here'] ?? false) {
+        $data['end_date'] = null;
+    }
+
+    return $data;
+}
+```
+
+2. Em `app-modules/panel-app/tests/Feature/ProfilePageTest.php` (já existente; reaproveita o `beforeEach` com `actingAs` + `Filament::setCurrentPanel(Filament::getPanel('app'))` + `Filament::setTenant($this->tenant)`), adicionar dois testes `livewire()`:
+
+```php
+test('profile page saves a work experience', function (): void {
+    livewire(ProfilePage::class)
+        ->fillForm([
+            'workExperiences' => [
+                [
+                    'company_name' => 'He4rt',
+                    'position' => 'Backend Developer',
+                    'description' => 'Trampo com Laravel',
+                    'start_date' => '2020-01-01',
+                    'end_date' => '2022-01-01',
+                    'is_currently_working_here' => false,
+                ],
+            ],
+        ])
+        ->call('save')
+        ->assertNotified();
+
+    $experience = $this->profile->workExperiences()->sole();
+
+    expect($experience->company_name)->toBe('He4rt')
+        ->and($experience->position)->toBe('Backend Developer')
+        ->and($experience->is_currently_working_here)->toBeFalse();
+});
+
+test('profile page nulls end_date when currently working here', function (): void {
+    livewire(ProfilePage::class)
+        ->fillForm([
+            'workExperiences' => [
+                [
+                    'company_name' => 'He4rt',
+                    'position' => 'Tech Lead',
+                    'description' => 'Trabalho atual',
+                    'start_date' => '2023-01-01',
+                    'is_currently_working_here' => true,
+                ],
+            ],
+        ])
+        ->call('save')
+        ->assertNotified();
+
+    $experience = $this->profile->workExperiences()->sole();
+
+    expect($experience->is_currently_working_here)->toBeTrue()
+        ->and($experience->end_date)->toBeNull();
+});
+```
+
+3. Rodar e confirmar verde:
+
+Run: `./vendor/bin/pest app-modules/panel-app/tests/Feature/ProfilePageTest.php`
+Expected: PASS (todos, incluindo os 2 novos).
 
 - [ ] **Step 7: Commitar**
 
@@ -781,7 +846,7 @@ Se tudo passar: `git push --no-verify` e abrir a pull request.
 
 - Migration/colunas → Task 1. Model + `durationInMonths` → Task 1. Factory + invariante `is_currently_working_here`/`end_date` → Task 1.
 - Relação `hasMany` + ordenação → Task 2.
-- DTO + Action de normalização (regra `end_date=null`) → Task 3.
+- Normalização (regra `end_date=null`) → método privado na `ProfilePage` (Task 4). A Task 3 (DTO+Action) foi superada.
 - Section no `ProfilePage` + `->model()` + hooks + datas/obrigatórios/`is_currently_working_here` → Task 4. Traduções → Task 4.
-- Comportamento do form (carregamento, create/update/delete) → verificação manual `/verify` (Task 4, Step 6), por ausência de infraestrutura de `Livewire::test`.
+- Comportamento do form (carregamento, create, normalização) → testes `livewire()` em `ProfilePageTest` (Task 4). Delete via `saveRelationships()` do Filament (nativo).
 - Fora de escopo (preview card, companies, metadata, policy, softdeletes, sobreposição) → não implementado, conforme spec.

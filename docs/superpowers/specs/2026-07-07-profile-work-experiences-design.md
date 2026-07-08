@@ -22,16 +22,16 @@ O form do RPQ estende `Jeffgreco13\FilamentBreezy\Livewire\MyProfileComponent` (
 
 ## 2. Decisões de arquitetura
 
-| Decisão                                             | Escolha                                                                                     | Motivo                                                                                                                                                                                                                                                                                   |
-| --------------------------------------------------- | ------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Onde os dados moram                                 | Tabela própria `work_experiences` com `hasMany`                                             | Fidelidade à modelagem do RPQ; cada experiência é uma linha com identidade, consultável e validável.                                                                                                                                                                                     |
-| Campos                                              | Campos do form do RPQ + `position`                                                          | Sem `metadata` (campo morto no RPQ). `position` promovido a coluna dedicada.                                                                                                                                                                                                             |
-| Gravação no form                                    | Relationship nativo do Filament (`->relationship('workExperiences')`)                       | Praticidade: o Filament faz create/update/delete (diff) sozinho via `saveRelationships()`.                                                                                                                                                                                               |
-| Record do Repeater                                  | `->model(fn () => $this->getRecord())`                                                      | O record do schema é o `User` (linha 229 da `ProfilePage`); a relação está no `Profile`. Sem o override, o Filament chamaria `auth()->user()->workExperiences()` (inexistente) e lançaria `LogicException`.                                                                              |
-| Regra `is_currently_working_here → end_date = null` | Action `NormalizeWorkExperience` + DTO `WorkExperienceDTO`, chamada pelos hooks do Repeater | Testável direto (`resolve(NormalizeWorkExperience::class)->handle(...)`), igual o módulo já faz com `UpsertProfile`. Não existe `Livewire::test` no repo, então testar um método privado da página seria sem precedente e frágil. A factory garante a mesma coerência por conta própria. |
-| `tenant_id` na tabela filha                         | Não                                                                                         | O form sempre opera no perfil do usuário logado (escopado por `profile_id`); o tenant é derivável via `profile`. Sem necessidade de busca cross-tenant.                                                                                                                                  |
-| SoftDeletes                                         | Não                                                                                         | Consistente com o módulo `profile` (a `Profile` não usa). Remover uma linha do repeater apaga de vez. Dado de currículo gerenciado pelo próprio usuário não exige trilha de auditoria.                                                                                                   |
-| Policy                                              | Não                                                                                         | Acesso é controlado pela própria página + escopo de tenant do `getRecord()`. O `WorkExperiencePolicy` do RPQ não é portado.                                                                                                                                                              |
+| Decisão                                             | Escolha                                                                                          | Motivo                                                                                                                                                                                                                        |
+| --------------------------------------------------- | ------------------------------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Onde os dados moram                                 | Tabela própria `work_experiences` com `hasMany`                                                  | Fidelidade à modelagem do RPQ; cada experiência é uma linha com identidade, consultável e validável.                                                                                                                          |
+| Campos                                              | Campos do form do RPQ + `position`                                                               | Sem `metadata` (campo morto no RPQ). `position` promovido a coluna dedicada.                                                                                                                                                  |
+| Gravação no form                                    | Relationship nativo do Filament (`->relationship('workExperiences')`)                            | Praticidade: o Filament faz create/update/delete (diff) sozinho via `saveRelationships()`.                                                                                                                                    |
+| Record do Repeater                                  | `->model(fn () => $this->getRecord())`                                                           | O record do schema é o `User` (linha 229 da `ProfilePage`); a relação está no `Profile`. Sem o override, o Filament chamaria `auth()->user()->workExperiences()` (inexistente) e lançaria `LogicException`.                   |
+| Regra `is_currently_working_here → end_date = null` | Método privado `normalizeWorkExperienceData()` na `ProfilePage`, chamado pelos hooks do Repeater | Uma única regra; uma classe Action + DTO dedicados eram cerimônia demais. O comportamento é coberto por teste `livewire()` de ponta a ponta (ver `ProfilePageTest`), e a factory garante a mesma coerência por conta própria. |
+| `tenant_id` na tabela filha                         | Não                                                                                              | O form sempre opera no perfil do usuário logado (escopado por `profile_id`); o tenant é derivável via `profile`. Sem necessidade de busca cross-tenant.                                                                       |
+| SoftDeletes                                         | Não                                                                                              | Consistente com o módulo `profile` (a `Profile` não usa). Remover uma linha do repeater apaga de vez. Dado de currículo gerenciado pelo próprio usuário não exige trilha de auditoria.                                        |
+| Policy                                              | Não                                                                                              | Acesso é controlado pela própria página + escopo de tenant do `getRecord()`. O `WorkExperiencePolicy` do RPQ não é portado.                                                                                                   |
 
 ## 3. Estrutura de arquivos
 
@@ -43,21 +43,18 @@ app-modules/profile/
 │   └── migrations/
 │       └── xxxx_create_work_experiences_table.php           (NOVO)
 └── src/
-    ├── Actions/
-    │   └── NormalizeWorkExperience.php                       (NOVO)
-    ├── DTOs/
-    │   └── WorkExperienceDTO.php                             (NOVO)
     └── Models/
         └── WorkExperience.php                                (NOVO)
 app-modules/profile/src/Models/Profile.php                   (EDIT — relação workExperiences)
 
 app-modules/panel-app/
-├── src/Pages/ProfilePage.php                                (EDIT — Section chamando NormalizeWorkExperience nos hooks)
-└── lang/
-    ├── en/profile.php                                       (EDIT — chaves work_experiences)
-    └── pt_BR/profile.php                                    (EDIT — chaves work_experiences)
+├── src/Pages/ProfilePage.php                                (EDIT — Section + método privado normalizeWorkExperienceData nos hooks)
+├── lang/
+│   ├── en/profile.php                                       (EDIT — chaves work_experiences)
+│   └── pt_BR/profile.php                                    (EDIT — chaves work_experiences)
+└── tests/Feature/ProfilePageTest.php                        (EDIT — testes livewire() de work experience)
 
-app-modules/profile/tests/                                   (NOVO — testes Unit/Feature)
+app-modules/profile/tests/                                   (NOVO — testes Unit/Feature de model/relação/factory)
 ```
 
 ## 4. Migration `work_experiences`
@@ -289,74 +286,24 @@ Section::make(__('panel-app::profile.sections.work_experiences'))
     ]),
 ```
 
-Imports novos necessários na `ProfilePage`: `Filament\Forms\Components\DatePicker`, `Filament\Schemas\Components\Utilities\Set` e `He4rt\Profile\Actions\NormalizeWorkExperience`. Os demais (`Get`, `Toggle`, `TextInput`, `Textarea`, `Repeater`, `Grid`, `Section`) já estão importados. O import de `HasMany` é na `Profile` (seção 6), não na página.
+Imports novos necessários na `ProfilePage`: `Filament\Forms\Components\DatePicker` e `Filament\Schemas\Components\Utilities\Set`. Os demais (`Get`, `Toggle`, `TextInput`, `Textarea`, `Repeater`, `Grid`, `Section`) já estão importados. O import de `HasMany` é na `Profile` (seção 6), não na página.
 
-### 7.2 Normalização (Action + DTO)
+### 7.2 Normalização (método privado na página)
 
-A normalização (`is_currently_working_here → end_date = null`) mora numa Action do módulo `profile`, delegando a transformação a um DTO. Testável direto, sem Livewire.
-
-**`src/DTOs/WorkExperienceDTO.php`** (`He4rt\Profile\DTOs`, `final readonly`):
+A normalização (`is_currently_working_here → end_date = null`) é um método privado da própria `ProfilePage`, chamado pelos hooks `mutateRelationshipDataBeforeCreateUsing`/`...BeforeSaveUsing` do Repeater (via first-class callable `$this->normalizeWorkExperienceData(...)`). Sem Action nem DTO dedicados: é uma regra só, e o comportamento é coberto de ponta a ponta por teste `livewire()` (ver seção 11).
 
 ```php
-final readonly class WorkExperienceDTO
+/**
+ * @param  array<string, mixed>  $data
+ * @return array<string, mixed>
+ */
+private function normalizeWorkExperienceData(array $data): array
 {
-    public function __construct(
-        public string $companyName,
-        public string $position,
-        public string $description,
-        public ?string $startDate,
-        public ?string $endDate,
-        public bool $isCurrentlyWorkingHere,
-    ) {}
-
-    /**
-     * @param  array<string, mixed>  $data
-     */
-    public static function fromArray(array $data): self
-    {
-        $isCurrent = (bool) ($data['is_currently_working_here'] ?? false);
-        $endDate = $data['end_date'] ?? null;
-
-        return new self(
-            companyName: (string) ($data['company_name'] ?? ''),
-            position: (string) ($data['position'] ?? ''),
-            description: (string) ($data['description'] ?? ''),
-            startDate: isset($data['start_date']) ? (string) $data['start_date'] : null,
-            endDate: $isCurrent || $endDate === null ? null : (string) $endDate,
-            isCurrentlyWorkingHere: $isCurrent,
-        );
+    if ($data['is_currently_working_here'] ?? false) {
+        $data['end_date'] = null;
     }
 
-    /**
-     * @return array<string, mixed>
-     */
-    public function toArray(): array
-    {
-        return [
-            'company_name' => $this->companyName,
-            'position' => $this->position,
-            'description' => $this->description,
-            'start_date' => $this->startDate,
-            'end_date' => $this->endDate,
-            'is_currently_working_here' => $this->isCurrentlyWorkingHere,
-        ];
-    }
-}
-```
-
-**`src/Actions/NormalizeWorkExperience.php`** (`He4rt\Profile\Actions`, invokável de ação única):
-
-```php
-final class NormalizeWorkExperience
-{
-    /**
-     * @param  array<string, mixed>  $data
-     * @return array<string, mixed>
-     */
-    public function handle(array $data): array
-    {
-        return WorkExperienceDTO::fromArray($data)->toArray();
-    }
+    return $data;
 }
 ```
 
@@ -447,17 +394,18 @@ public function current(): self
 
 ## 11. Testes
 
-Seguir o padrão do módulo `profile` (Pest, pastas `tests/Unit` e `tests/Feature`). Unit roda sem banco; Feature usa `LazilyRefreshDatabase` (aplicado automaticamente pelo `tests/Pest.php` da raiz). A regra de negócio é testada direto na Action/DTO, como o módulo já faz com `UpsertProfile` (não há `Livewire::test` no repo).
+Seguir o padrão do módulo `profile` (Pest, pastas `tests/Unit` e `tests/Feature`). Unit roda sem banco; Feature usa `LazilyRefreshDatabase` (aplicado automaticamente pelo `tests/Pest.php` da raiz). O form é testado de ponta a ponta com a função global `livewire()` (`pestphp/pest-plugin-livewire`), seguindo o `ProfilePageTest` já existente (que monta o contexto do painel com `Filament::setCurrentPanel(Filament::getPanel('app'))` + `Filament::setTenant($tenant)` no `beforeEach`).
 
-- **Unit:**
-    - `WorkExperience::durationInMonths()` retorna null quando a experiência é passada e sem `end_date` (usar `factory()->make()`, sem banco).
+- **Unit (`app-modules/profile/tests/Unit/WorkExperienceTest.php`):**
+    - `WorkExperience::durationInMonths()` retorna null quando a experiência é passada e sem `end_date` (usar `new WorkExperience([...])`, sem banco).
     - `WorkExperience::durationInMonths()` calcula meses com `now()` quando `is_currently_working_here` é true.
-    - `WorkExperienceDTO::fromArray()` zera `endDate` quando `is_currently_working_here` é true, mesmo com `end_date` no array de entrada; e preserva `end_date` quando não é atual.
-    - `NormalizeWorkExperience::handle()` retorna o array com `end_date => null` quando atual.
-- **Feature:**
+    - `WorkExperience::durationInMonths()` calcula meses entre `start_date` e `end_date`.
+- **Feature (módulo `profile`):**
     - `Profile::workExperiences()` retorna as experiências ordenadas (atual primeiro, depois `start_date` desc).
     - Factory: várias linhas geradas nunca têm `is_currently_working_here = true` com `end_date` não nulo; `current()` gera `end_date` null; não-atual tem `end_date >= start_date`.
-- **Verificação manual (`/verify`):** a fiação do form (carregamento do Repeater com `->relationship()` + `->model()` no `mount()`, e o create/update/delete via `saveRelationships()` no `save()`) é validada rodando a página, já que não há infraestrutura de `Livewire::test` no repositório.
+- **Feature `livewire()` (`app-modules/panel-app/tests/Feature/ProfilePageTest.php`):**
+    - Salvar uma work experience pelo repeater cria a linha em `work_experiences` com os campos corretos (empresa, cargo, descrição, datas, `is_currently_working_here = false`).
+    - Salvar com `is_currently_working_here = true` persiste `end_date = null` (valida a normalização do método privado ponta a ponta).
 
 ## 12. Fora de escopo
 
