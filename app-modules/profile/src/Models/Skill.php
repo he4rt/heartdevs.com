@@ -41,9 +41,10 @@ final class Skill extends Model
      * Server-side search for the skill select. Returns "Category · Name" labels,
      * capped — only matches travel to the client, so the catalog can grow freely.
      *
+     * @param  array<int, string>  $exclude  skill ids to omit (e.g. already chosen in a repeater)
      * @return array<string, string>
      */
-    public static function search(string $search): array
+    public static function search(string $search, array $exclude = []): array
     {
         $results = [];
 
@@ -54,6 +55,7 @@ final class Skill extends Model
                         ->orWhere('slug', 'ilike', '%'.$search.'%');
                 },
             ))
+            ->when($exclude !== [], static fn (Builder $query): Builder => $query->whereNotIn('id', $exclude))
             ->orderBy('name')
             ->limit(50)
             ->get(['id', 'name', 'category'])

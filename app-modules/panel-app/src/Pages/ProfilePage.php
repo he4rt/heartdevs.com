@@ -148,7 +148,10 @@ class ProfilePage extends Page
                                         Select::make('skill_id')
                                             ->label(__('panel-app::profile.fields.skill'))
                                             ->searchable()
-                                            ->getSearchResultsUsing(fn (string $search): array => Skill::search($search))
+                                            ->getSearchResultsUsing(fn (string $search, Get $get): array => Skill::search(
+                                                $search,
+                                                exclude: $this->skillIdsInSiblingRows($get),
+                                            ))
                                             ->getOptionLabelUsing(fn (?string $value): ?string => $value === null ? null : (Skill::labelsById()[$value] ?? null))
                                             ->optionsLimit(50)
                                             ->distinct()
@@ -586,6 +589,27 @@ class ProfilePage extends Page
         }
 
         return $skills;
+    }
+
+    /**
+     * Skill ids already chosen in the other rows of the skills repeater, so the
+     * search can omit them and each skill is only pickable once.
+     *
+     * @return list<string>
+     */
+    private function skillIdsInSiblingRows(Get $get): array
+    {
+        /** @var array<int|string, array<string, mixed>> $rows */
+        $rows = $get('../../skills') ?? [];
+
+        $skillIds = collect($rows)
+            ->pluck('skill_id')
+            ->filter()
+            ->reject(fn ($id): bool => $id === $get('skill_id'))
+            ->map(fn ($id): string => (string) $id)
+            ->all();
+
+        return array_values($skillIds);
     }
 
     /**
