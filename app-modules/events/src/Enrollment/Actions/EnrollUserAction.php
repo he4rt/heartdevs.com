@@ -203,7 +203,12 @@ final readonly class EnrollUserAction
     {
         foreach ($schema as $field) {
             $key = $field['key'] ?? null;
-            $value = $key !== null ? ($data[$key] ?? null) : null;
+
+            if ($key === null) {
+                continue;
+            }
+
+            $value = $data[$key] ?? null;
             $type = $field['type'] ?? '';
 
             if ($type === 'checkbox') {

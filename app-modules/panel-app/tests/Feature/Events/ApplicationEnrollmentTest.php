@@ -111,6 +111,24 @@ test('when user has already applied, then apply button is not shown', function (
         ->assertDontSee(__('events::pages.apply_submit'));
 });
 
+test('when questions are reordered after submission, then answers still match the correct question', function (): void {
+    livewire(EventDetail::class, ['eventId' => $this->event->id])
+        ->set('applicationFormData', ['why_join' => 'I love Laravel!', 'experience_level' => 'Intermediate'])
+        ->call('apply');
+
+    $this->event->enrollmentPolicy->update([
+        'application_schema' => array_reverse($this->schema),
+    ]);
+
+    livewire(EventDetail::class, ['eventId' => $this->event->id])
+        ->assertSeeInOrder([
+            'Experience level',
+            'Intermediate',
+            'Why do you want to join?',
+            'I love Laravel!',
+        ]);
+});
+
 test('when application data is missing required field, then error notification is shown', function (): void {
     livewire(EventDetail::class, ['eventId' => $this->event->id])
         ->set('applicationFormData', ['why_join' => '', 'experience_level' => 'Beginner'])
