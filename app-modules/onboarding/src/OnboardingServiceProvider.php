@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace He4rt\Squads\Providers;
+namespace He4rt\Onboarding;
 
 use Illuminate\Support\ServiceProvider;
 
-class SquadsServiceProvider extends ServiceProvider
+class OnboardingServiceProvider extends ServiceProvider
 {
     public function register(): void {}
 
