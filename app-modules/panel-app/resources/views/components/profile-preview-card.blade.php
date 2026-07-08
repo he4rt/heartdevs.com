@@ -37,9 +37,11 @@
     );
 
     $address = $data['address'] ?? [];
-    $location = collect([$address['city'] ?? null, $address['state'] ?? null, $address['country'] ?? null])
-        ->filter()
-        ->implode(', ');
+    $location = \App\Geo\Support\GeoLocation::formatLocation(
+        $address['city'] ?? null,
+        $address['state'] ?? null,
+        $address['country'] ?? null,
+    );
 
     $level = $character?->level ?? 1;
     $experience = $character?->experience ?? 0;

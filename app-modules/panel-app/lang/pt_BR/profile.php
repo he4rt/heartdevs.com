@@ -28,8 +28,8 @@ return [
         'skill_years_experience' => 'Anos',
         'platform' => 'Plataforma',
         'handle' => 'Handle / URL',
-        'country' => 'País (ISO)',
-        'state' => 'Estado (UF)',
+        'country' => 'País',
+        'state' => 'Estado',
         'city' => 'Cidade',
         'avatar' => 'Foto',
         'cover' => 'Capa',
@@ -54,6 +54,7 @@ return [
         'headline' => 'Seu cargo ou título profissional',
         'about' => 'Conte um pouco sobre você...',
         'handle' => '@usuario ou https://...',
+        'city_search' => 'Buscar cidade...',
     ],
 
     'hints' => [
@@ -62,6 +63,7 @@ return [
         'has_disability' => 'Informação sensível — usada apenas para vagas afirmativas/PcD.',
         'expected_salary' => 'Valor mensal em R$. Informação privada, usada apenas em propostas.',
         'skills' => 'Selecione suas skills e informe o nível e os anos de experiência em cada uma.',
+        'city' => 'Se sua cidade não estiver na listagem, pesquise.',
     ],
 
     'actions' => [

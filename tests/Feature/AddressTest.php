@@ -46,23 +46,23 @@ it('updateOrCreate via relationship creates and updates address', function (): v
     $user = User::factory()->create();
 
     $user->address()->updateOrCreate([], [
-        'country' => 'BRA',
-        'state' => 'SP',
+        'country' => 'BR',
+        'state' => 'São Paulo',
         'city' => 'São Paulo',
     ]);
 
     expect($user->fresh()->address)
-        ->country->toBe('BRA')
-        ->state->toBe('SP')
+        ->country->toBe('BR')
+        ->state->toBe('São Paulo')
         ->city->toBe('São Paulo');
 
     $user->address()->updateOrCreate([], [
-        'state' => 'RJ',
+        'state' => 'Rio de Janeiro',
         'city' => 'Rio de Janeiro',
     ]);
 
     expect($user->fresh()->address)
-        ->state->toBe('RJ')
+        ->state->toBe('Rio de Janeiro')
         ->city->toBe('Rio de Janeiro')
         ->and(Address::query()->where('addressable_id', $user->id)->count())->toBe(1);
 });

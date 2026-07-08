@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace He4rt\PanelApp\Pages;
 
+use App\Geo\Support\GeoLocation;
 use BackedEnum;
 use Filament\Actions\Action;
 use Filament\Forms\Components\DatePicker;
@@ -180,54 +181,38 @@ class ProfilePage extends Page
                             Grid::make(3)->schema([
                                 Select::make('country')
                                     ->label(__('panel-app::profile.fields.country'))
-                                    ->options([
-                                        'BRA' => '🇧🇷 Brasil',
-                                        'USA' => '🇺🇸 United States',
-                                        'PRT' => '🇵🇹 Portugal',
-                                        'ARG' => '🇦🇷 Argentina',
-                                        'DEU' => '🇩🇪 Deutschland',
-                                        'CAN' => '🇨🇦 Canada',
-                                        'GBR' => '🇬🇧 United Kingdom',
-                                        'FRA' => '🇫🇷 France',
-                                        'ESP' => '🇪🇸 España',
-                                        'ITA' => '🇮🇹 Italia',
-                                        'JPN' => '🇯🇵 Japan',
-                                        'AUS' => '🇦🇺 Australia',
-                                        'MEX' => '🇲🇽 México',
-                                        'COL' => '🇨🇴 Colombia',
-                                        'CHL' => '🇨🇱 Chile',
-                                        'URY' => '🇺🇾 Uruguay',
-                                        'IRL' => '🇮🇪 Ireland',
-                                        'NLD' => '🇳🇱 Nederland',
-                                    ])
+                                    ->options(static fn (): array => GeoLocation::countries())
                                     ->default('BRA')
                                     ->searchable()
+                                    ->preload()
                                     ->live()
+                                    ->afterStateUpdated(static function (Set $set): void {
+                                        $set('state', null);
+                                        $set('city', null);
+                                    })
                                     ->columnSpan(1),
 
                                 Select::make('state')
                                     ->label(__('panel-app::profile.fields.state'))
-                                    ->options(fn (Get $get): array => ($get('country') ?? 'BRA') === 'BRA' ? [
-                                        'AC' => 'Acre', 'AL' => 'Alagoas', 'AP' => 'Amapá', 'AM' => 'Amazonas',
-                                        'BA' => 'Bahia', 'CE' => 'Ceará', 'DF' => 'Distrito Federal',
-                                        'ES' => 'Espírito Santo', 'GO' => 'Goiás', 'MA' => 'Maranhão',
-                                        'MT' => 'Mato Grosso', 'MS' => 'Mato Grosso do Sul', 'MG' => 'Minas Gerais',
-                                        'PA' => 'Pará', 'PB' => 'Paraíba', 'PR' => 'Paraná', 'PE' => 'Pernambuco',
-                                        'PI' => 'Piauí', 'RJ' => 'Rio de Janeiro', 'RN' => 'Rio Grande do Norte',
-                                        'RS' => 'Rio Grande do Sul', 'RO' => 'Rondônia', 'RR' => 'Roraima',
-                                        'SC' => 'Santa Catarina', 'SP' => 'São Paulo', 'SE' => 'Sergipe',
-                                        'TO' => 'Tocantins',
-                                    ] : [])
+                                    ->options(static fn (Get $get): array => GeoLocation::statesFor($get('country')))
                                     ->searchable()
-                                    ->allowHtml(condition: false)
                                     ->live()
+                                    ->visible(static fn (Get $get): bool => filled($get('country')))
+                                    ->afterStateUpdated(static function (Set $set): void {
+                                        $set('city', null);
+                                    })
                                     ->columnSpan(1),
 
-                                TextInput::make('city')
+                                Select::make('city')
                                     ->label(__('panel-app::profile.fields.city'))
-                                    ->placeholder('São Paulo')
-                                    ->maxLength(100)
-                                    ->live(onBlur: true)
+                                    ->options(static fn (Get $get): array => GeoLocation::citiesFor($get('country'), $get('state')))
+                                    ->getSearchResultsUsing(static fn (string $search, Get $get): array => GeoLocation::citiesFor($get('country'), $get('state'), $search))
+                                    ->getOptionLabelUsing(static fn (?string $value): ?string => $value)
+                                    ->searchable()
+                                    ->preload()
+                                    ->searchPrompt(__('panel-app::profile.placeholders.city_search'))
+                                    ->hintIcon('heroicon-o-information-circle', __('panel-app::profile.hints.city'))
+                                    ->visible(static fn (Get $get): bool => filled($get('state')))
                                     ->columnSpan(1),
                             ]),
                         ]),
