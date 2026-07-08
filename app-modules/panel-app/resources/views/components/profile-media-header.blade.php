@@ -72,11 +72,11 @@
                     <img
                         src="{{ $avatarPreviewUrl }}"
                         alt="{{ $name }}"
-                        class="h-full w-full rounded-full border-4 border-white object-cover shadow-lg dark:border-gray-900"
+                        class="h-full w-full rounded-full border-4 border-white object-cover shadow-lg dark:border-gray-800"
                     />
                 @else
                     <div
-                        class="flex h-full w-full items-center justify-center rounded-full border-4 border-white bg-purple-600 text-2xl font-bold text-white shadow-lg sm:text-3xl dark:border-gray-900"
+                        class="flex h-full w-full items-center justify-center rounded-full border-4 border-white bg-purple-600 text-2xl font-bold text-white shadow-lg ring-1 ring-black/5 sm:text-3xl dark:border-gray-800 dark:ring-white/15"
                     >
                         {{ $initials }}
                     </div>
