@@ -170,6 +170,7 @@
 
             <form wire:submit="apply" class="space-y-4">
                 @foreach ($this->event->enrollmentPolicy->application_schema ?? [] as $field)
+                    @continue(!isset($field['key']))
                     <div>
                         <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">
                             {{ $field['label'] ?? '' }}
