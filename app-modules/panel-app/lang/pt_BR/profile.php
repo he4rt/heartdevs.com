@@ -11,6 +11,7 @@ return [
         'social_links' => 'Links Sociais',
         'availability' => 'Disponibilidade',
         'connections' => 'Conexões',
+        'work_experiences' => 'Experiência profissional',
     ],
 
     'fields' => [
@@ -29,6 +30,12 @@ return [
         'cover' => 'Capa',
         'available_for_proposals' => 'Disponível para propostas',
         'start_availability' => 'Disponibilidade para início',
+        'company_name' => 'Empresa',
+        'position' => 'Cargo',
+        'experience_description' => 'Descrição',
+        'start_date' => 'Data de início',
+        'end_date' => 'Data de término',
+        'is_currently_working_here' => 'Trabalho aqui atualmente',
     ],
 
     'placeholders' => [
@@ -46,6 +53,7 @@ return [
     'actions' => [
         'save' => 'Salvar perfil',
         'add_social_link' => 'Adicionar link social',
+        'add_work_experience' => 'Adicionar experiência',
     ],
 
     'notifications' => [

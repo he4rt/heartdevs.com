@@ -11,6 +11,7 @@ return [
         'social_links' => 'Social Links',
         'availability' => 'Availability',
         'connections' => 'Connections',
+        'work_experiences' => 'Work experience',
     ],
 
     'fields' => [
@@ -29,6 +30,12 @@ return [
         'cover' => 'Cover',
         'available_for_proposals' => 'Available for proposals',
         'start_availability' => 'Start availability',
+        'company_name' => 'Company',
+        'position' => 'Position',
+        'experience_description' => 'Description',
+        'start_date' => 'Start date',
+        'end_date' => 'End date',
+        'is_currently_working_here' => 'I currently work here',
     ],
 
     'placeholders' => [
@@ -46,6 +53,7 @@ return [
     'actions' => [
         'save' => 'Save profile',
         'add_social_link' => 'Add social link',
+        'add_work_experience' => 'Add experience',
     ],
 
     'notifications' => [

@@ -17,6 +17,7 @@ use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use InvalidArgumentException;
 
 /**
@@ -83,6 +84,16 @@ final class Profile extends Model
     public function tenant(): BelongsTo
     {
         return $this->belongsTo(Tenant::class);
+    }
+
+    /**
+     * @return HasMany<WorkExperience, $this>
+     */
+    public function workExperiences(): HasMany
+    {
+        return $this->hasMany(WorkExperience::class)
+            ->orderByDesc('is_currently_working_here')
+            ->latest('start_date');
     }
 
     protected static function newFactory(): ProfileFactory

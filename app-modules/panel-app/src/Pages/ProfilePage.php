@@ -6,6 +6,7 @@ namespace He4rt\PanelApp\Pages;
 
 use BackedEnum;
 use Filament\Actions\Action;
+use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
@@ -18,6 +19,7 @@ use Filament\Schemas\Components\Form;
 use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Components\Utilities\Get;
+use Filament\Schemas\Components\Utilities\Set;
 use Filament\Schemas\Schema;
 use Filament\Support\Enums\Width;
 use He4rt\Gamification\Character\Models\Character;
@@ -216,6 +218,68 @@ class ProfilePage extends Page
                                 ->live()
                                 ->visible(fn (Get $get): bool => (bool) $get('available_for_proposals')),
                         ]),
+
+                    Section::make(__('panel-app::profile.sections.work_experiences'))
+                        ->schema([
+                            Repeater::make('workExperiences')
+                                ->relationship('workExperiences')
+                                ->model(fn (): Profile => $this->getRecord()) // record do schema e o User; a relacao vive na Profile
+                                ->schema([
+                                    Grid::make(2)->schema([
+                                        TextInput::make('company_name')
+                                            ->label(__('panel-app::profile.fields.company_name'))
+                                            ->required()
+                                            ->maxLength(255)
+                                            ->columnSpan(1),
+                                        TextInput::make('position')
+                                            ->label(__('panel-app::profile.fields.position'))
+                                            ->required()
+                                            ->maxLength(255)
+                                            ->columnSpan(1),
+                                    ]),
+                                    Textarea::make('description')
+                                        ->label(__('panel-app::profile.fields.experience_description'))
+                                        ->required()
+                                        ->rows(3)
+                                        ->maxLength(2_000)
+                                        ->columnSpanFull(),
+                                    Grid::make(2)->schema([
+                                        DatePicker::make('start_date')
+                                            ->label(__('panel-app::profile.fields.start_date'))
+                                            ->native(condition: false)
+                                            ->displayFormat('M Y')
+                                            ->format('Y-m-d')
+                                            ->maxDate(now())
+                                            ->required()
+                                            ->columnSpan(1),
+                                        DatePicker::make('end_date')
+                                            ->label(__('panel-app::profile.fields.end_date'))
+                                            ->native(condition: false)
+                                            ->displayFormat('M Y')
+                                            ->format('Y-m-d')
+                                            ->maxDate(now())
+                                            ->afterOrEqual('start_date')
+                                            ->required(fn (Get $get): bool => !$get('is_currently_working_here'))
+                                            ->hidden(fn (Get $get): bool => (bool) $get('is_currently_working_here'))
+                                            ->columnSpan(1),
+                                    ]),
+                                    Toggle::make('is_currently_working_here')
+                                        ->label(__('panel-app::profile.fields.is_currently_working_here'))
+                                        ->live()
+                                        ->afterStateUpdated(fn (Set $set, bool $state) => $state ? $set('end_date', null) : null),
+                                ])
+                                ->itemLabel(static function (array $state): ?string {
+                                    $companyName = $state['company_name'] ?? null;
+
+                                    return is_string($companyName) ? $companyName : null;
+                                })
+                                ->addActionLabel(__('panel-app::profile.actions.add_work_experience'))
+                                ->collapsible()
+                                ->defaultItems(0)
+                                ->columnSpanFull()
+                                ->mutateRelationshipDataBeforeCreateUsing($this->normalizeWorkExperienceData(...))
+                                ->mutateRelationshipDataBeforeSaveUsing($this->normalizeWorkExperienceData(...)),
+                        ]),
                 ])
                     ->livewireSubmitHandler('save')
                     ->footer([
@@ -403,5 +467,18 @@ class ProfilePage extends Page
         }
 
         return $links;
+    }
+
+    /**
+     * @param  array<string, mixed>  $data
+     * @return array<string, mixed>
+     */
+    private function normalizeWorkExperienceData(array $data): array
+    {
+        if ($data['is_currently_working_here'] ?? false) {
+            $data['end_date'] = null;
+        }
+
+        return $data;
     }
 }

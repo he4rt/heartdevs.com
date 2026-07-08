@@ -125,3 +125,52 @@ test('profile page does not show account fields', function (): void {
         ->assertFormFieldDoesNotExist('email')
         ->assertFormFieldDoesNotExist('password');
 });
+
+test('profile page saves a work experience', function (): void {
+    livewire(ProfilePage::class)
+        ->fillForm([
+            'workExperiences' => [
+                [
+                    'company_name' => 'He4rt',
+                    'position' => 'Backend Developer',
+                    'description' => 'Trampo com Laravel',
+                    'start_date' => '2020-01-01',
+                    'end_date' => '2022-01-01',
+                    'is_currently_working_here' => false,
+                ],
+            ],
+        ])
+        ->call('save')
+        ->assertNotified();
+
+    $experience = $this->profile->workExperiences()->sole();
+
+    expect($experience->company_name)->toBe('He4rt')
+        ->and($experience->position)->toBe('Backend Developer')
+        ->and($experience->description)->toBe('Trampo com Laravel')
+        ->and($experience->start_date->toDateString())->toBe('2020-01-01')
+        ->and($experience->end_date->toDateString())->toBe('2022-01-01')
+        ->and($experience->is_currently_working_here)->toBeFalse();
+});
+
+test('profile page nulls end_date when currently working here', function (): void {
+    livewire(ProfilePage::class)
+        ->fillForm([
+            'workExperiences' => [
+                [
+                    'company_name' => 'He4rt',
+                    'position' => 'Tech Lead',
+                    'description' => 'Trabalho atual',
+                    'start_date' => '2023-01-01',
+                    'is_currently_working_here' => true,
+                ],
+            ],
+        ])
+        ->call('save')
+        ->assertNotified();
+
+    $experience = $this->profile->workExperiences()->sole();
+
+    expect($experience->is_currently_working_here)->toBeTrue()
+        ->and($experience->end_date)->toBeNull();
+});
