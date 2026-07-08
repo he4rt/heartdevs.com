@@ -2,7 +2,13 @@ name: Continuous Integration
 
 on:
   pull_request:
-    branches: [4.x, feat/squads]
+    branches:
+      - '*.x'
+      - 'feature/**'
+      - 'feat/**'
+      - 'bugfix/**'
+      - 'chore/**'
+      - 'story/**'
     types: [opened, reopened, synchronize, ready_for_review]
 
 concurrency:
