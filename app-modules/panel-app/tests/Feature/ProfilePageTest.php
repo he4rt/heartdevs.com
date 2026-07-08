@@ -159,5 +159,5 @@ test('profile page saves work preferences', function (): void {
     expect($this->profile->preferences->isOpenToRemote)->toBeTrue()
         ->and($this->profile->preferences->willingToRelocate)->toBeTrue()
         ->and($this->profile->preferences->hasDisability)->toBeFalse()
-        ->and($this->profile->preferences->employmentTypes)->toBe([EmploymentType::Pj, EmploymentType::Freelance]);
+        ->and($this->profile->preferences->employmentTypes)->toBe([EmploymentType::IndependentContractor, EmploymentType::Freelancer]);
 });

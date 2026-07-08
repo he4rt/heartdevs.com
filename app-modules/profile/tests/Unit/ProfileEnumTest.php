@@ -47,7 +47,7 @@ test('start availability implements filament enum interfaces', function (): void
 });
 
 test('employment type implements filament enum interfaces with labels', function (): void {
-    expect(EmploymentType::Clt)
+    expect(EmploymentType::SalariedEmployee)
         ->toBeInstanceOf(HasLabel::class)
         ->toBeInstanceOf(HasColor::class)
         ->toBeInstanceOf(HasIcon::class);

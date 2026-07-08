@@ -24,7 +24,7 @@ test('preferences cast persists and rehydrates a value object', function (): voi
         hasDisability: true,
         willingToRelocate: true,
         isOpenToRemote: true,
-        employmentTypes: [EmploymentType::Pj, EmploymentType::Freelance],
+        employmentTypes: [EmploymentType::IndependentContractor, EmploymentType::Freelancer],
     );
     $profile->save();
 
@@ -32,7 +32,7 @@ test('preferences cast persists and rehydrates a value object', function (): voi
 
     expect($fresh->preferences)->toBeInstanceOf(WorkPreferences::class)
         ->and($fresh->preferences->hasDisability)->toBeTrue()
-        ->and($fresh->preferences->employmentTypes)->toBe([EmploymentType::Pj, EmploymentType::Freelance]);
+        ->and($fresh->preferences->employmentTypes)->toBe([EmploymentType::IndependentContractor, EmploymentType::Freelancer]);
 
     $raw = DB::table('user_profiles')->where('id', $profile->id)->value('preferences');
 
@@ -58,5 +58,5 @@ test('upsert profile stores preferences from an array payload', function (): voi
 
     expect($profile->preferences->isOpenToRemote)->toBeTrue()
         ->and($profile->preferences->hasDisability)->toBeFalse()
-        ->and($profile->preferences->employmentTypes)->toBe([EmploymentType::Clt]);
+        ->and($profile->preferences->employmentTypes)->toBe([EmploymentType::SalariedEmployee]);
 });

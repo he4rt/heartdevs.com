@@ -15,9 +15,9 @@ enum EmploymentType: string implements HasColor, HasIcon, HasLabel
 {
     use StringifyEnum;
 
-    case Clt = 'clt';
-    case Pj = 'pj';
-    case Freelance = 'freelance';
+    case SalariedEmployee = 'employee';
+    case IndependentContractor = 'contractor';
+    case Freelancer = 'freelancer';
 
     public function getLabel(): string
     {
@@ -27,18 +27,18 @@ enum EmploymentType: string implements HasColor, HasIcon, HasLabel
     public function getColor(): array
     {
         return match ($this) {
-            self::Clt => Color::Blue,
-            self::Pj => Color::Purple,
-            self::Freelance => Color::Amber,
+            self::SalariedEmployee => Color::Blue,
+            self::IndependentContractor => Color::Purple,
+            self::Freelancer => Color::Amber,
         };
     }
 
     public function getIcon(): Heroicon
     {
         return match ($this) {
-            self::Clt => Heroicon::Briefcase,
-            self::Pj => Heroicon::BuildingOffice,
-            self::Freelance => Heroicon::Bolt,
+            self::SalariedEmployee => Heroicon::Briefcase,
+            self::IndependentContractor => Heroicon::BuildingOffice,
+            self::Freelancer => Heroicon::Bolt,
         };
     }
 }

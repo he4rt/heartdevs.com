@@ -25,7 +25,7 @@ test('makeFromPayload parses booleans and employment types', function (): void {
     expect($preferences->hasDisability)->toBeTrue()
         ->and($preferences->willingToRelocate)->toBeFalse()
         ->and($preferences->isOpenToRemote)->toBeTrue()
-        ->and($preferences->employmentTypes)->toBe([EmploymentType::Pj, EmploymentType::Freelance]);
+        ->and($preferences->employmentTypes)->toBe([EmploymentType::IndependentContractor, EmploymentType::Freelancer]);
 });
 
 test('makeFromPayload drops invalid employment types and dedupes', function (): void {
@@ -33,7 +33,7 @@ test('makeFromPayload drops invalid employment types and dedupes', function (): 
         'employment_types' => ['pj', 'hacker', 'pj', 'clt'],
     ]);
 
-    expect($preferences->employmentTypes)->toBe([EmploymentType::Pj, EmploymentType::Clt]);
+    expect($preferences->employmentTypes)->toBe([EmploymentType::IndependentContractor, EmploymentType::SalariedEmployee]);
 });
 
 test('makeFromPayload handles an empty payload', function (): void {
@@ -44,7 +44,7 @@ test('makeFromPayload handles an empty payload', function (): void {
 });
 
 test('toArray serializes employment types to their backed values', function (): void {
-    $preferences = new WorkPreferences(employmentTypes: [EmploymentType::Pj, EmploymentType::Clt]);
+    $preferences = new WorkPreferences(employmentTypes: [EmploymentType::IndependentContractor, EmploymentType::SalariedEmployee]);
 
     expect($preferences->toArray())->toBe([
         'has_disability' => false,
@@ -59,7 +59,7 @@ test('toArray round-trips through makeFromPayload', function (): void {
         hasDisability: true,
         willingToRelocate: true,
         isOpenToRemote: false,
-        employmentTypes: [EmploymentType::Clt, EmploymentType::Freelance],
+        employmentTypes: [EmploymentType::SalariedEmployee, EmploymentType::Freelancer],
     );
 
     expect(WorkPreferences::makeFromPayload($original->toArray()))->toEqual($original);
