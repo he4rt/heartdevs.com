@@ -2,6 +2,8 @@
 
 declare(strict_types=1);
 
+use He4rt\Activity\Timeline\Delegated\PostEntry;
+use He4rt\Activity\Timeline\Timeline;
 use He4rt\Identity\Auth\Actions\MergeAccountsAction;
 use He4rt\Identity\ExternalIdentity\Enums\IdentityProvider;
 use He4rt\Identity\ExternalIdentity\Models\ExternalIdentity;
@@ -42,6 +44,23 @@ test('syncs tenant memberships from current to old user', function (): void {
 
     expect($oldUser->tenants()->pluck('tenants.id')->sort()->values()->toArray())
         ->toBe(collect([$tenantA->id, $tenantB->id])->sort()->values()->all());
+});
+
+test('reassigns timeline posts from current to old user so they are not orphaned', function (): void {
+    $tenant = Tenant::factory()->create();
+    $oldUser = User::factory()->create(['first_login_at' => now()]);
+    $currentUser = User::factory()->create();
+
+    $post = Timeline::factory()->for($currentUser)->create([
+        'tenant_id' => $tenant->id,
+        'postable_type' => (new PostEntry)->getMorphClass(),
+        'postable_id' => PostEntry::factory()->create()->id,
+    ]);
+
+    $action = new MergeAccountsAction();
+    $action->execute($currentUser, $oldUser);
+
+    expect($post->refresh()->user_id)->toBe($oldUser->id);
 });
 
 test('deletes current user after merge', function (): void {
