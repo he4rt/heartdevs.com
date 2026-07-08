@@ -25,8 +25,8 @@ beforeEach(function (): void {
     Filament::setTenant($this->tenant);
 
     $this->schema = [
-        ['type' => 'text', 'label' => 'Why do you want to join?', 'required' => true],
-        ['type' => 'select', 'label' => 'Experience level', 'required' => false, 'options' => ['Beginner', 'Intermediate', 'Advanced']],
+        ['key' => 'why_join', 'type' => 'text', 'label' => 'Why do you want to join?', 'required' => true],
+        ['key' => 'experience_level', 'type' => 'select', 'label' => 'Experience level', 'required' => false, 'options' => ['Beginner', 'Intermediate', 'Advanced']],
     ];
 
     $this->event = Event::factory()
@@ -52,7 +52,7 @@ test('event detail shows canApply true and canConfirmPresence false for applicat
 
 test('when user submits application, then enrollment is created as pending', function (): void {
     livewire(EventDetail::class, ['eventId' => $this->event->id])
-        ->set('applicationFormData', [0 => 'I love Laravel!', 1 => 'Intermediate'])
+        ->set('applicationFormData', ['why_join' => 'I love Laravel!', 'experience_level' => 'Intermediate'])
         ->call('apply')
         ->assertHasNoErrors()
         ->assertNotified();
@@ -65,12 +65,12 @@ test('when user submits application, then enrollment is created as pending', fun
     expect($enrollment)->not->toBeNull()
         ->and($enrollment->status)->toBe(EnrollmentStatus::Pending)
         ->and($enrollment->confirmed_at)->toBeNull()
-        ->and($enrollment->application_data[0])->toBe('I love Laravel!');
+        ->and($enrollment->application_data['why_join'])->toBe('I love Laravel!');
 });
 
 test('after submitting application, event detail shows pending status with answers', function (): void {
     livewire(EventDetail::class, ['eventId' => $this->event->id])
-        ->set('applicationFormData', [0 => 'I love Laravel!', 1 => 'Intermediate'])
+        ->set('applicationFormData', ['why_join' => 'I love Laravel!', 'experience_level' => 'Intermediate'])
         ->call('apply');
 
     livewire(EventDetail::class, ['eventId' => $this->event->id])
@@ -87,7 +87,7 @@ test('when application is rejected, then rejection reason is shown', function ()
         'status' => EnrollmentStatus::Rejected,
         'enrolled_at' => now(),
         'rejection_reason' => 'Not enough experience.',
-        'application_data' => [0 => 'I am new'],
+        'application_data' => ['why_join' => 'I am new'],
     ]);
 
     livewire(EventDetail::class, ['eventId' => $this->event->id])
@@ -103,7 +103,7 @@ test('when user has already applied, then apply button is not shown', function (
         'user_id' => $this->user->id,
         'status' => EnrollmentStatus::Pending,
         'enrolled_at' => now(),
-        'application_data' => [0 => 'My answer'],
+        'application_data' => ['why_join' => 'My answer'],
     ]);
 
     livewire(EventDetail::class, ['eventId' => $this->event->id])
@@ -113,7 +113,7 @@ test('when user has already applied, then apply button is not shown', function (
 
 test('when application data is missing required field, then error notification is shown', function (): void {
     livewire(EventDetail::class, ['eventId' => $this->event->id])
-        ->set('applicationFormData', [0 => '', 1 => 'Beginner'])
+        ->set('applicationFormData', ['why_join' => '', 'experience_level' => 'Beginner'])
         ->call('apply')
         ->assertNotified();
 

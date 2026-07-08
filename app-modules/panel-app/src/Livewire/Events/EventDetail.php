@@ -41,16 +41,16 @@ final class EventDetail extends Component
 {
     public string $eventId;
 
-    /** @var array<int, mixed> */
+    /** @var array<string, mixed> */
     public array $applicationFormData = [];
 
     public function mount(string $eventId): void
     {
         $this->eventId = $eventId;
 
-        foreach ($this->event->enrollmentPolicy->application_schema ?? [] as $index => $field) {
+        foreach ($this->event->enrollmentPolicy?->application_schema ?? [] as $field) {
             if (($field['type'] ?? null) === 'checkbox') {
-                $this->applicationFormData[$index] = [];
+                $this->applicationFormData[(string) $field['key']] = [];
             }
         }
     }

@@ -167,10 +167,10 @@ final class EventsSeeder extends Seeder
                 'cancellation_deadline_hours' => 48,
                 'xp' => [200, 300, 1_000],
                 'application_schema' => [
-                    ['type' => 'text',     'label' => 'Por que quer participar da He4rt Conf?', 'required' => true],
-                    ['type' => 'select',   'label' => 'Nível de experiência em desenvolvimento', 'required' => true, 'options' => ['Iniciante', 'Intermediário', 'Avançado']],
-                    ['type' => 'textarea', 'label' => 'Descreva um projeto pessoal ou open source relevante', 'required' => false],
-                    ['type' => 'checkbox', 'label' => 'Em quais dias você pode comparecer?', 'required' => false, 'options' => ['Dia 1', 'Dia 2', 'Dia 3']],
+                    ['key' => 'why_participate',    'type' => 'text',     'label' => 'Por que quer participar da He4rt Conf?', 'required' => true],
+                    ['key' => 'experience_level',   'type' => 'select',   'label' => 'Nível de experiência em desenvolvimento', 'required' => true, 'options' => ['Iniciante', 'Intermediário', 'Avançado']],
+                    ['key' => 'personal_project',   'type' => 'textarea', 'label' => 'Descreva um projeto pessoal ou open source relevante', 'required' => false],
+                    ['key' => 'attendance_days',    'type' => 'checkbox', 'label' => 'Em quais dias você pode comparecer?', 'required' => false, 'options' => ['Dia 1', 'Dia 2', 'Dia 3']],
                 ],
                 'enrollments' => [
                     EnrollmentStatus::Pending->value => 6,
@@ -265,8 +265,8 @@ final class EventsSeeder extends Seeder
                 'cancellation_deadline_hours' => 48,
                 'xp' => [100, 200, 800],
                 'application_schema' => [
-                    ['type' => 'text',   'label' => 'Qual ideia de projeto você traria para o hackathon?', 'required' => true],
-                    ['type' => 'select', 'label' => 'Stack principal', 'required' => true, 'options' => ['PHP', 'JavaScript', 'Python', 'Go', 'Rust', 'Outra']],
+                    ['key' => 'project_idea',    'type' => 'text',   'label' => 'Qual ideia de projeto você traria para o hackathon?', 'required' => true],
+                    ['key' => 'main_stack',      'type' => 'select', 'label' => 'Stack principal', 'required' => true, 'options' => ['PHP', 'JavaScript', 'Python', 'Go', 'Rust', 'Outra']],
                 ],
                 'enrollments' => [
                     EnrollmentStatus::Cancelled->value => 8,
@@ -427,7 +427,7 @@ final class EventsSeeder extends Seeder
 
     /**
      * @param  array<int, array<string, mixed>>|null  $schema
-     * @return array<int, mixed>|null
+     * @return array<string, mixed>|null
      */
     private function fakeApplicationData(?array $schema): ?array
     {
@@ -437,8 +437,8 @@ final class EventsSeeder extends Seeder
 
         $data = [];
 
-        foreach ($schema as $index => $field) {
-            $data[$index] = match ($field['type'] ?? 'text') {
+        foreach ($schema as $field) {
+            $data[$field['key']] = match ($field['type'] ?? 'text') {
                 'select' => fake()->randomElement($field['options'] ?? ['Opção A']),
                 'checkbox' => blank($field['options']) ? [] : fake()->randomElements($field['options'], fake()->numberBetween(1, count($field['options']))),
                 'textarea' => fake()->paragraph(),

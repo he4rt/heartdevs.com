@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace He4rt\PanelAdmin\Filament\Resources\Events\Schemas;
 
 use Filament\Forms\Components\DateTimePicker;
+use Filament\Forms\Components\Hidden;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TagsInput;
@@ -21,6 +22,7 @@ use He4rt\Events\Event\Enums\EventStatus;
 use He4rt\Events\Event\Enums\EventType;
 use He4rt\Events\Event\Models\Event;
 use Illuminate\Support\Facades\Date;
+use Illuminate\Support\Str;
 use Illuminate\Validation\Rules\Unique;
 
 final class EventForm
@@ -163,6 +165,8 @@ final class EventForm
                             ->reorderable()
                             ->collapsible()
                             ->schema([
+                                Hidden::make('key')
+                                    ->default(fn (): string => (string) Str::uuid()),
                                 Select::make('type')
                                     ->label('Type')
                                     ->options([

@@ -346,21 +346,21 @@ test('when a user submits an application, then enrollment is pending with applic
         ->upcoming()
         ->for($tenant)
         ->has(EnrollmentPolicy::factory()->application([
-            ['type' => 'text', 'label' => 'Why do you want to join?', 'required' => true],
+            ['key' => 'why_join', 'type' => 'text', 'label' => 'Why do you want to join?', 'required' => true],
         ]), 'enrollmentPolicy')
         ->create();
 
     $dto = new EnrollUserDTO(
         eventId: $event->id,
         userId: $user->id,
-        applicationData: [0 => 'I love PHP!'],
+        applicationData: ['why_join' => 'I love PHP!'],
     );
 
     $enrollment = resolve(EnrollUserAction::class)->handle($dto);
 
     expect($enrollment->status)->toBe(EnrollmentStatus::Pending)
         ->and($enrollment->confirmed_at)->toBeNull()
-        ->and($enrollment->application_data)->toBe([0 => 'I love PHP!']);
+        ->and($enrollment->application_data)->toBe(['why_join' => 'I love PHP!']);
 
     $transition = EnrollmentTransition::query()
         ->where('enrollment_id', $enrollment->id)
@@ -395,14 +395,14 @@ test('when application is missing a required field, then exception is thrown', f
         ->upcoming()
         ->for($tenant)
         ->has(EnrollmentPolicy::factory()->application([
-            ['type' => 'text', 'label' => 'Why?', 'required' => true],
+            ['key' => 'why', 'type' => 'text', 'label' => 'Why?', 'required' => true],
         ]), 'enrollmentPolicy')
         ->create();
 
     $dto = new EnrollUserDTO(
         eventId: $event->id,
         userId: $user->id,
-        applicationData: [0 => ''],
+        applicationData: ['why' => ''],
     );
 
     resolve(EnrollUserAction::class)->handle($dto);

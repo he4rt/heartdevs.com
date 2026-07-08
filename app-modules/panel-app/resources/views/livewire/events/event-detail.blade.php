@@ -56,11 +56,11 @@
                         <p class="text-xs font-medium tracking-wide text-gray-400 uppercase">
                             {{ __('events::pages.application_your_answers') }}
                         </p>
-                        @foreach ($this->event->enrollmentPolicy->application_schema as $index => $field)
+                        @foreach ($this->event->enrollmentPolicy->application_schema as $field)
                             <div>
                                 <p class="text-xs text-gray-500 dark:text-gray-400">{{ $field['label'] ?? '' }}</p>
                                 <p class="text-sm text-gray-900 dark:text-white">
-                                    @php $answer = $this->enrollment->application_data[$index] ?? null; @endphp
+                                    @php $answer = $this->enrollment->application_data[$field['key'] ?? null] ?? null; @endphp
                                     @if (is_array($answer))
                                         {{ $answer !== [] ? implode(', ', $answer) : '—' }}
                                     @else
@@ -169,7 +169,7 @@
             <p class="mb-4 text-sm text-gray-600 dark:text-gray-300">{{ __('events::pages.apply_hint') }}</p>
 
             <form wire:submit="apply" class="space-y-4">
-                @foreach ($this->event->enrollmentPolicy->application_schema ?? [] as $index => $field)
+                @foreach ($this->event->enrollmentPolicy->application_schema ?? [] as $field)
                     <div>
                         <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">
                             {{ $field['label'] ?? '' }}
@@ -180,14 +180,14 @@
 
                         @if (($field['type'] ?? '') === 'textarea')
                             <textarea
-                                wire:model="applicationFormData.{{ $index }}"
+                                wire:model="applicationFormData.{{ $field['key'] }}"
                                 rows="3"
                                 class="focus:border-primary-500 focus:ring-primary-500 mt-1 block w-full rounded-lg border border-gray-300 p-2 text-sm shadow-sm dark:border-white/20 dark:bg-white/5 dark:text-white"
                                 @if ($field['required'] ?? false) required @endif
                             ></textarea>
                         @elseif (($field['type'] ?? '') === 'select')
                             <select
-                                wire:model="applicationFormData.{{ $index }}"
+                                wire:model="applicationFormData.{{ $field['key'] }}"
                                 class="focus:border-primary-500 focus:ring-primary-500 mt-1 block w-full rounded-lg border border-gray-300 p-2 text-sm shadow-sm dark:border-white/20 dark:bg-white/5 dark:text-white"
                                 @if ($field['required'] ?? false) required @endif
                             >
@@ -202,7 +202,7 @@
                                     <label class="flex items-center gap-2">
                                         <input
                                             type="checkbox"
-                                            wire:model="applicationFormData.{{ $index }}"
+                                            wire:model="applicationFormData.{{ $field['key'] }}"
                                             value="{{ $option }}"
                                             class="text-primary-600 focus:ring-primary-500 rounded border-gray-300"
                                         />
@@ -213,7 +213,7 @@
                         @else
                             <input
                                 type="text"
-                                wire:model="applicationFormData.{{ $index }}"
+                                wire:model="applicationFormData.{{ $field['key'] }}"
                                 class="focus:border-primary-500 focus:ring-primary-500 mt-1 block w-full rounded-lg border border-gray-300 p-2 text-sm shadow-sm dark:border-white/20 dark:bg-white/5 dark:text-white"
                                 @if ($field['required'] ?? false) required @endif
                             />

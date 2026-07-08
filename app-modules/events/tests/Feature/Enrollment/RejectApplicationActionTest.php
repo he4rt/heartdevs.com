@@ -29,7 +29,7 @@ test('when an application is rejected with a reason, then enrollment transitions
         'user_id' => User::factory()->create()->id,
         'status' => EnrollmentStatus::Pending,
         'enrolled_at' => now(),
-        'application_data' => [0 => 'My answer'],
+        'application_data' => ['q1' => 'My answer'],
     ]);
 
     $result = resolve(RejectApplicationAction::class)->handle(
@@ -97,7 +97,7 @@ test('when application is rejected, then application_data is preserved', functio
         'user_id' => User::factory()->create()->id,
         'status' => EnrollmentStatus::Pending,
         'enrolled_at' => now(),
-        'application_data' => [0 => 'Original answer'],
+        'application_data' => ['q1' => 'Original answer'],
     ]);
 
     $result = resolve(RejectApplicationAction::class)->handle(
@@ -108,5 +108,5 @@ test('when application is rejected, then application_data is preserved', functio
         ),
     );
 
-    expect($result->application_data)->toBe([0 => 'Original answer']);
+    expect($result->application_data)->toBe(['q1' => 'Original answer']);
 });

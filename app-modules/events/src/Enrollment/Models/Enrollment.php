@@ -27,7 +27,7 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
  * @property EnrollmentStatus $status
  * @property bool $is_public
  * @property int|null $waitlist_position
- * @property array<int, mixed>|null $application_data
+ * @property array<string, mixed>|null $application_data
  * @property string|null $rejection_reason
  * @property Carbon|null $enrolled_at
  * @property Carbon|null $confirmed_at

@@ -26,7 +26,7 @@ function createPendingApplicationEnrollment(Event $event, ?User $user = null): E
         'user_id' => $user->id,
         'status' => EnrollmentStatus::Pending,
         'enrolled_at' => now(),
-        'application_data' => [0 => 'My answer'],
+        'application_data' => ['q1' => 'My answer'],
     ]);
 }
 
