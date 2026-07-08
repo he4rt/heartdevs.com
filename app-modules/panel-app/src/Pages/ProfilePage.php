@@ -148,9 +148,9 @@ class ProfilePage extends Page
                                         Select::make('skill_id')
                                             ->label(__('panel-app::profile.fields.skill'))
                                             ->searchable()
-                                            ->getSearchResultsUsing(fn (string $search, Get $get): array => Skill::search(
+                                            ->getSearchResultsUsing(fn (string $search, Select $component): array => Skill::search(
                                                 $search,
-                                                exclude: $this->skillIdsInSiblingRows($get),
+                                                exclude: $this->skillIdsInSiblingRows($component),
                                             ))
                                             ->getOptionLabelUsing(fn (?string $value): ?string => $value === null ? null : (Skill::labelsById()[$value] ?? null))
                                             ->optionsLimit(50)
@@ -597,19 +597,23 @@ class ProfilePage extends Page
      *
      * @return list<string>
      */
-    private function skillIdsInSiblingRows(Get $get): array
+    private function skillIdsInSiblingRows(Select $component): array
     {
+        $repeater = $component->getParentRepeater();
+        if ($repeater === null) {
+            return [];
+        }
+
         /** @var array<int|string, array<string, mixed>> $rows */
-        $rows = $get('../../skills') ?? [];
+        $rows = $repeater->getRawState();
 
-        $skillIds = collect($rows)
-            ->pluck('skill_id')
-            ->filter()
-            ->reject(fn ($id): bool => $id === $get('skill_id'))
-            ->map(fn ($id): string => (string) $id)
-            ->all();
-
-        return array_values($skillIds);
+        return array_values(
+            collect($rows)
+                ->pluck('skill_id')
+                ->reject(fn (mixed $id): bool => blank($id) || $id === $component->getState())
+                ->map(fn (mixed $id): string => (string) $id)
+                ->all()
+        );
     }
 
     /**
