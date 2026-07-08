@@ -135,7 +135,7 @@ return new class extends Migration
         foreach (self::CATALOG as $category => $skills) {
             foreach ($skills as $slug => $name) {
                 $rows[] = [
-                    'id' => Str::orderedUuid()->toString(),
+                    'id' => Str::uuid7()->toString(),
                     'slug' => $slug,
                     'name' => $name,
                     'category' => $category,
