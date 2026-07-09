@@ -130,3 +130,22 @@ jobs:
       PHP_EXTENSIONS: ${{ needs.setup.outputs.PHP_EXTENSIONS }}
       PHP_INI_PROPERTIES: ${{ needs.setup.outputs.PHP_INI_PROPERTIES }}
       PHP_VERSION: ${{ needs.setup.outputs.PHP_VERSION }}
+
+  gate:
+    name: CI Gate
+    needs: [setup, pint, rector, phpstan, pest]
+    if: ${{ !cancelled() }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions: {}
+    steps:
+      - name: Fail if any check failed
+        if: ${{ contains(needs.*.result, 'failure') || contains(needs.*.result, 'cancelled') }}
+        env:
+          RESULTS: ${{ join(needs.*.result, ', ') }}
+        run: |
+          echo "One or more CI checks did not pass: ${RESULTS}"
+          exit 1
+      - name: All checks passed
+        if: ${{ !contains(needs.*.result, 'failure') && !contains(needs.*.result, 'cancelled') }}
+        run: echo "All CI checks passed."

@@ -107,22 +107,3 @@ jobs:
           SHARD: ${{ matrix.shard }}
         run: |
           vendor/bin/pest --ci --parallel --shard="${SHARD}"/2
-
-  gate:
-    name: Gate
-    needs: [tests]
-    if: ${{ !cancelled() }}
-    runs-on: ubuntu-latest
-    timeout-minutes: 5
-    permissions: {}
-    steps:
-      - name: Fail if any shard failed
-        if: ${{ needs.tests.result != 'success' }}
-        env:
-          TESTS_RESULT: ${{ needs.tests.result }}
-        run: |
-          echo "One or more Pest shards failed: ${TESTS_RESULT}"
-          exit 1
-      - name: All shards passed
-        if: ${{ needs.tests.result == 'success' }}
-        run: echo "All Pest shards passed."
