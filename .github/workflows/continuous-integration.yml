@@ -134,18 +134,20 @@ jobs:
   gate:
     name: CI Gate
     needs: [setup, pint, rector, phpstan, pest]
-    if: ${{ !cancelled() }}
+    if: ${{ always() && !github.event.pull_request.draft }}
     runs-on: ubuntu-latest
     timeout-minutes: 5
     permissions: {}
     steps:
-      - name: Fail if any check failed
-        if: ${{ contains(needs.*.result, 'failure') || contains(needs.*.result, 'cancelled') }}
+      - name: Require every check to succeed
         env:
           RESULTS: ${{ join(needs.*.result, ', ') }}
         run: |
-          echo "One or more CI checks did not pass: ${RESULTS}"
-          exit 1
-      - name: All checks passed
-        if: ${{ !contains(needs.*.result, 'failure') && !contains(needs.*.result, 'cancelled') }}
-        run: echo "All CI checks passed."
+          echo "Dependency results: ${RESULTS}"
+          for result in ${RESULTS//,/ }; do
+            if [ "${result}" != "success" ]; then
+              echo "::error::CI did not pass cleanly (${RESULTS})."
+              exit 1
+            fi
+          done
+          echo "All CI checks passed."
