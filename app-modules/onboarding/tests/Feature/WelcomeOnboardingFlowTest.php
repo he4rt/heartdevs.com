@@ -7,6 +7,7 @@ use He4rt\Onboarding\Actions\StartOnboarding;
 use He4rt\Onboarding\Enums\OnboardingStatus;
 use He4rt\Onboarding\Enums\OnboardingStepStatus;
 use He4rt\Onboarding\Enums\OnboardingType;
+use He4rt\Onboarding\Exceptions\OnboardingPausedException;
 use He4rt\Onboarding\Flows\WelcomeOnboardingFlow;
 
 test('advancing the form step completes the Welcome onboarding', function (): void {
@@ -42,6 +43,24 @@ test('advancing an already-completed Welcome onboarding preserves the original c
 
     expect($onboarding->status)->toBe(OnboardingStatus::Completed)
         ->and($onboarding->completed_at?->equalTo($firstCompletedAt))->toBeTrue();
+});
+
+test('advancing a paused Welcome onboarding is rejected and leaves the step untouched', function (): void {
+    $onboarding = resolve(StartOnboarding::class)->handle(
+        Tenant::factory()->create(),
+        User::factory()->create(),
+        OnboardingType::Welcome,
+    );
+
+    $onboarding->update([
+        'status' => OnboardingStatus::Paused,
+        'paused_at' => now(),
+    ]);
+
+    expect(fn () => resolve(WelcomeOnboardingFlow::class)->advance($onboarding))
+        ->toThrow(OnboardingPausedException::class);
+
+    expect($onboarding->steps()->sole()->status)->toBe(OnboardingStepStatus::Pending);
 });
 
 test('Welcome has no prerequisites and a single form step', function (): void {

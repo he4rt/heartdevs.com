@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace He4rt\Onboarding\Contracts;
 
 use He4rt\Onboarding\Enums\OnboardingType;
+use He4rt\Onboarding\Exceptions\OnboardingPausedException;
 use He4rt\Onboarding\Models\Onboarding;
 
 interface OnboardingFlow
@@ -30,6 +31,8 @@ interface OnboardingFlow
 
     /**
      * Move the onboarding to its next step, completing it when the flow is done.
+     *
+     * @throws OnboardingPausedException when the onboarding is paused.
      */
     public function advance(Onboarding $onboarding): void;
 
