@@ -12,8 +12,8 @@ use Illuminate\Console\Attributes\Signature;
 use Illuminate\Console\Command;
 use Illuminate\Contracts\Database\Query\Builder;
 
-#[Description('Dispatch closure jobs for past events with non-terminal enrollments')]
-#[Signature('events:close-pending')]
+#[Description(description: 'Dispatch closure jobs for past events with non-terminal enrollments')]
+#[Signature(signature: 'events:close-pending')]
 final class ClosePendingEventsCommand extends Command
 {
     public function handle(): int

@@ -34,7 +34,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property Carbon $created_at
  * @property Carbon $updated_at
  */
-#[Table('events_enrollment_policies')]
+#[Table(name: 'events_enrollment_policies')]
 final class EnrollmentPolicy extends Model
 {
     /** @use HasFactory<EnrollmentPolicyFactory> */

@@ -37,7 +37,7 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
  * @property Carbon $created_at
  * @property Carbon $updated_at
  */
-#[Table('events_enrollments')]
+#[Table(name: 'events_enrollments')]
 final class Enrollment extends Model
 {
     /** @use HasFactory<EnrollmentFactory> */

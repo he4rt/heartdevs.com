@@ -24,7 +24,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property Carbon $created_at
  * @property Carbon $updated_at
  */
-#[Table('events_check_ins')]
+#[Table(name: 'events_check_ins')]
 final class CheckIn extends Model
 {
     /** @use HasFactory<CheckInFactory> */

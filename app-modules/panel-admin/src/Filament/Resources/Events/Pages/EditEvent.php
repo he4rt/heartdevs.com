@@ -24,7 +24,7 @@ final class EditEvent extends EditRecord
 {
     protected static string $resource = EventResource::class;
 
-    #[On('reopen-scan-qr')]
+    #[On(event: 'reopen-scan-qr')]
     public function reopenScanQrModal(): void
     {
         $this->mountAction('scanQr');

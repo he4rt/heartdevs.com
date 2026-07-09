@@ -21,7 +21,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property Carbon $created_at
  * @property Carbon $updated_at
  */
-#[Table('events_qr_tokens')]
+#[Table(name: 'events_qr_tokens')]
 final class QrToken extends Model
 {
     /** @use HasFactory<QrTokenFactory> */

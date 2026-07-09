@@ -118,7 +118,7 @@ final class EnrollmentsRelationManager extends RelationManager
             ->color('gray')
             ->visible(fn (Enrollment $record): bool => $record->application_data !== null)
             ->modalContent(static function (Enrollment $record): View {
-                $schema = $record->event?->enrollmentPolicy?->application_schema ?? [];
+                $schema = $record->event?->enrollmentPolicy->application_schema ?? [];
                 $data = $record->application_data ?? [];
 
                 $answers = collect($schema)

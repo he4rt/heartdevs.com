@@ -26,7 +26,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property array<string, mixed>|null $metadata
  * @property Carbon $created_at
  */
-#[Table('events_enrollment_transitions')]
+#[Table(name: 'events_enrollment_transitions')]
 final class EnrollmentTransition extends Model
 {
     /** @use HasFactory<EnrollmentTransitionFactory> */

@@ -48,7 +48,7 @@ final class EventDetail extends Component
     {
         $this->eventId = $eventId;
 
-        foreach ($this->event->enrollmentPolicy?->application_schema ?? [] as $field) {
+        foreach ($this->event->enrollmentPolicy->application_schema ?? [] as $field) {
             if (($field['type'] ?? null) === 'checkbox' && isset($field['key'])) {
                 $this->applicationFormData[(string) $field['key']] = [];
             }
