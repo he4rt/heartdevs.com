@@ -219,6 +219,28 @@ it('aplica filtros de tipo, repo, desfecho e pessoa', function (): void {
         ->and($data['people'][0]['prs'])->toBe(1);
 });
 
+it('keeps only truly-closed PRs under outcome=closed: !(A ∧ ¬B) ≡ ¬A ∨ B', function (string $state, bool $merged, bool $shouldKeep): void {
+    contribution($this->tenant, [
+        'actor_login' => 'a',
+        'type' => ContributionType::Pr,
+        'external_ref' => 'pr:1',
+        'occurred_at' => '2026-06-02',
+        'metadata' => ['state' => $state, 'merged' => $merged],
+    ]);
+
+    $filters = RetrospectiveFilters::make($this->since, $this->until, outcome: 'closed');
+    $data = ($this->build)($filters);
+
+    // meta.prs counts PRs surviving reject(filteredOutByOutcome).
+    expect($data['meta']['prs'])->toBe($shouldKeep ? 1 : 0);
+})->with([
+    //                                       state,    merged, keep?
+    'closed + unmerged → kept (the only true "closed")' => ['closed', false, true],
+    'closed + merged   → dropped (it is a merge, not a pure close)' => ['closed', true, false],
+    'open + unmerged   → dropped (state !== closed)' => ['open', false, false],
+    'open + merged     → dropped (state !== closed)' => ['open', true, false],
+]);
+
 it('ordena o ranking por linhas quando sort=lines', function (): void {
     contribution($this->tenant, ['actor_login' => 'poucas', 'type' => ContributionType::Pr, 'external_ref' => 'pr:1', 'occurred_at' => '2026-06-02', 'metadata' => ['state' => 'open', 'merged' => false, 'additions' => 10, 'deletions' => 0]]);
     contribution($this->tenant, ['actor_login' => 'muitas', 'type' => ContributionType::Pr, 'external_ref' => 'pr:2', 'occurred_at' => '2026-06-02', 'metadata' => ['state' => 'open', 'merged' => false, 'additions' => 900, 'deletions' => 50]]);
