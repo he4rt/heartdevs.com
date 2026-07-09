@@ -29,8 +29,8 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property CarbonInterface|null $created_at
  * @property CarbonInterface|null $updated_at
  */
-#[Table('onboardings')]
-#[UseFactory(OnboardingFactory::class)]
+#[Table(name: 'onboardings')]
+#[UseFactory(factoryClass: OnboardingFactory::class)]
 final class Onboarding extends Model
 {
     /** @use HasFactory<OnboardingFactory> */

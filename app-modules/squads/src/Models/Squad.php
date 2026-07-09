@@ -25,7 +25,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property CarbonInterface|null $created_at
  * @property CarbonInterface|null $updated_at
  */
-#[UseFactory(SquadFactory::class)]
+#[UseFactory(factoryClass: SquadFactory::class)]
 #[Table(name: 'squads')]
 final class Squad extends Model
 {

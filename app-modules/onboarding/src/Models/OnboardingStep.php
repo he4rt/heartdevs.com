@@ -24,8 +24,8 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property CarbonInterface|null $created_at
  * @property CarbonInterface|null $updated_at
  */
-#[Table('onboarding_steps')]
-#[UseFactory(OnboardingStepFactory::class)]
+#[Table(name: 'onboarding_steps')]
+#[UseFactory(factoryClass: OnboardingStepFactory::class)]
 final class OnboardingStep extends Model
 {
     /** @use HasFactory<OnboardingStepFactory> */
