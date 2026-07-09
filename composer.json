@@ -10,10 +10,10 @@
     "require": {
         "php": "^8.4",
         "calebporzio/sushi": "^2.5.4",
-        "dedoc/scramble": "^0.13.31",
+        "dedoc/scramble": "^0.13.32",
         "filament/filament": "^5.6.8",
         "filament/spatie-laravel-media-library-plugin": "^5.6.8",
-        "guzzlehttp/guzzle": "^7.13.2",
+        "guzzlehttp/guzzle": "^7.14.0",
         "he4rt/activity": "^1.0.0",
         "he4rt/bot-discord": "^1.0.0",
         "he4rt/community": "^1.0.0",
@@ -60,7 +60,7 @@
         "fakerphp/faker": "^1.24.1",
         "fruitcake/laravel-debugbar": "^4.4.0",
         "larastan/larastan": "^3.10.0",
-        "laravel/boost": "^2.4.11",
+        "laravel/boost": "^2.4.12",
         "laravel/pail": "^1.2.7",
         "laravel/pao": "^1.1.2",
         "laravel/pint": "^1.29.3",
@@ -73,7 +73,7 @@
         "pestphp/pest-plugin-laravel": "^4.1.0",
         "pestphp/pest-plugin-livewire": "^4.1.0",
         "phpstan/extension-installer": "^1.4.3",
-        "rector/rector": "^2.5.4"
+        "rector/rector": "^2.5.5"
     },
     "autoload": {
         "psr-4": {
