@@ -47,3 +47,15 @@
         opacity: 0.35;
     }
 }
+
+/* Keep user avatar circle visible against dark sidebar
+   (default ui-avatars uses gray-950, which blends into dark mode) */
+.fi-sidebar .fi-user-avatar {
+    @apply ring-1 ring-gray-300 dark:ring-white/20;
+}
+
+/* Soft edge between sidebar navigation and main content
+   (same weight as Filament form input borders) */
+.fi-sidebar {
+    @apply border-e border-gray-200 dark:border-white/10;
+}
