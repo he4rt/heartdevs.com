@@ -37,9 +37,11 @@
     );
 
     $address = $data['address'] ?? [];
-    $location = collect([$address['city'] ?? null, $address['state'] ?? null, $address['country'] ?? null])
-        ->filter()
-        ->implode(', ');
+    $location = \App\Geo\Support\GeoLocation::formatLocation(
+        $address['city'] ?? null,
+        $address['state'] ?? null,
+        $address['country'] ?? null,
+    );
 
     $level = $character?->level ?? 1;
     $experience = $character?->experience ?? 0;
@@ -98,11 +100,11 @@
                 <img
                     src="{{ $avatarPreviewUrl }}"
                     alt="{{ $name }}"
-                    class="h-16 w-16 rounded-full border-4 border-white object-cover shadow-md dark:border-gray-900"
+                    class="h-16 w-16 rounded-full border-4 border-white object-cover shadow-md dark:border-gray-800"
                 />
             @else
                 <div
-                    class="flex h-16 w-16 items-center justify-center rounded-full border-4 border-white bg-purple-600 text-lg font-bold text-white shadow-md dark:border-gray-900"
+                    class="flex h-16 w-16 items-center justify-center rounded-full border-4 border-white bg-purple-600 text-lg font-bold text-white shadow-md ring-1 ring-black/5 dark:border-gray-800 dark:ring-white/15"
                 >
                     {{ $initials }}
                 </div>

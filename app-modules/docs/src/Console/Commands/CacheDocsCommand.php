@@ -13,8 +13,8 @@ use Illuminate\Console\Command;
  * Warms or clears the documentation portal cache. Run `docs:cache` during
  * deploy to pre-build the navigation tree and rendered pages.
  */
-#[Description('Warm or clear the documentation portal cache')]
-#[Signature('docs:cache {--clear : Clear the cached documentation index instead of warming it}')]
+#[Description(description: 'Warm or clear the documentation portal cache')]
+#[Signature(signature: 'docs:cache {--clear : Clear the cached documentation index instead of warming it}')]
 final class CacheDocsCommand extends Command
 {
     public function handle(DocumentRegistry $registry): int

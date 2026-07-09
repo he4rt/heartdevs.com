@@ -41,7 +41,7 @@ use Spatie\MediaLibrary\InteractsWithMedia;
  * @property CarbonInterface|null $created_at
  * @property CarbonInterface|null $updated_at
  */
-#[ObservedBy(UserObserver::class)]
+#[ObservedBy(classes: UserObserver::class)]
 #[Table(name: 'users')]
 #[Hidden('password', 'remember_token', 'email_verified_at')]
 final class User extends Authenticatable implements FilamentUser, HasMedia, HasName, HasTenants

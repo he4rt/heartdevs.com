@@ -14,8 +14,8 @@ use Illuminate\Console\Command;
 use Illuminate\Contracts\Database\Query\Builder;
 use Illuminate\Support\Facades\Storage;
 
-#[Description('Import Discord members and GitHub connections from JSON files into the database')]
-#[Signature('discord:import-members
+#[Description(description: 'Import Discord members and GitHub connections from JSON files into the database')]
+#[Signature(signature: 'discord:import-members
         {--members-file=discord/members.json : Path to members JSON (relative to storage/app/private)}
         {--github-file=discord/github_connections.json : Path to GitHub connections JSON}
         {--dry-run : Show what would be imported without writing}

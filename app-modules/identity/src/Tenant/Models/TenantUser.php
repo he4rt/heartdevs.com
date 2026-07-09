@@ -14,5 +14,5 @@ use Illuminate\Database\Eloquent\Relations\Pivot;
  * @property string $user_id
  */
 #[Table(name: 'tenant_users')]
-#[ObservedBy(TenantUserObserver::class)]
+#[ObservedBy(classes: TenantUserObserver::class)]
 final class TenantUser extends Pivot {}

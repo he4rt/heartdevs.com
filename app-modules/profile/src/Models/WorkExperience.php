@@ -26,7 +26,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property CarbonInterface|null $updated_at
  * @property-read Profile $profile
  */
-#[UseFactory(WorkExperienceFactory::class)]
+#[UseFactory(factoryClass: WorkExperienceFactory::class)]
 #[Table(name: 'work_experiences')]
 final class WorkExperience extends Model
 {

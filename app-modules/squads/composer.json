@@ -20,7 +20,7 @@
     "extra": {
         "laravel": {
             "providers": [
-                "He4rt\\Squads\\Providers\\SquadsServiceProvider"
+                "He4rt\\Squads\\SquadsServiceProvider"
             ]
         }
     }

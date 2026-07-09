@@ -31,7 +31,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property CarbonInterface|null $created_at
  * @property CarbonInterface|null $updated_at
  */
-#[ObservedBy(ModerationEventObserver::class)]
+#[ObservedBy(classes: ModerationEventObserver::class)]
 #[Table(name: 'moderation_events')]
 final class ModerationEvent extends Model
 {

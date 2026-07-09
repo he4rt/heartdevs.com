@@ -84,6 +84,31 @@ test('excludes ignored posts from feed', function (): void {
         ->and($result->first()->id)->toBe($visible->id);
 });
 
+test('excludes posts whose author no longer exists', function (): void {
+    $tenant = Tenant::factory()->create();
+    $author = User::factory()->create();
+    $ghost = User::factory()->create();
+
+    $visible = Timeline::factory()->for($author)->create([
+        'tenant_id' => $tenant->id,
+        'postable_type' => (new PostEntry)->getMorphClass(),
+        'postable_id' => PostEntry::factory()->create()->id,
+    ]);
+
+    Timeline::factory()->for($ghost)->create([
+        'tenant_id' => $tenant->id,
+        'postable_type' => (new PostEntry)->getMorphClass(),
+        'postable_id' => PostEntry::factory()->create()->id,
+    ]);
+
+    $ghost->delete();
+
+    $result = new TimelineFeed($tenant->id)->builder()->simplePaginate(15);
+
+    expect($result)->toHaveCount(1)
+        ->and($result->first()->id)->toBe($visible->id);
+});
+
 test('does not show posts from other tenants', function (): void {
     $tenantA = Tenant::factory()->create();
     $tenantB = Tenant::factory()->create();

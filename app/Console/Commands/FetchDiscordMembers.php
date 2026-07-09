@@ -11,8 +11,8 @@ use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Sleep;
 
-#[Description('Fetch all guild members from Discord API and save to JSON')]
-#[Signature('discord:fetch-members {--limit=0 : Max members to fetch (0 = all)}')]
+#[Description(description: 'Fetch all guild members from Discord API and save to JSON')]
+#[Signature(signature: 'discord:fetch-members {--limit=0 : Max members to fetch (0 = all)}')]
 class FetchDiscordMembers extends Command
 {
     public function handle(): void

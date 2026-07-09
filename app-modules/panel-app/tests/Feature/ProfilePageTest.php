@@ -12,10 +12,33 @@ use He4rt\Profile\Enums\SkillProficiency;
 use He4rt\Profile\Enums\StartAvailability;
 use He4rt\Profile\Models\Profile;
 use He4rt\Profile\Models\Skill;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Http;
 
 use function Pest\Livewire\livewire;
 
 beforeEach(function (): void {
+    Cache::flush();
+
+    Http::fake([
+        'world.bmbc.cloud/api/countries*' => Http::response([
+            'success' => true,
+            'data' => [
+                ['id' => 31, 'iso2' => 'BR', 'iso3' => 'BRA', 'name' => 'Brazil'],
+                ['id' => 231, 'iso2' => 'US', 'iso3' => 'USA', 'name' => 'United States'],
+            ],
+        ]),
+        'world.bmbc.cloud/api/states*' => Http::response([
+            'success' => true,
+            'data' => [
+                ['id' => 486, 'name' => 'São Paulo', 'cities' => [
+                    ['id' => 2, 'name' => 'São Paulo'],
+                    ['id' => 3, 'name' => 'Campinas'],
+                ]],
+            ],
+        ]),
+    ]);
+
     $this->user = User::factory()->create();
     $this->tenant = Tenant::factory()->create(['slug' => 'test-tenant']);
     $this->tenant->members()->attach($this->user);

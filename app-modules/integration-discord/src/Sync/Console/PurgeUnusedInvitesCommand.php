@@ -14,8 +14,8 @@ use Random\RandomException;
 use Saloon\Exceptions\Request\FatalRequestException;
 use Saloon\Exceptions\Request\RequestException;
 
-#[Description('Purge unused infinite Discord guild invites (max_age=0, uses=0)')]
-#[Signature('discord:purge-invites {guild_id?} {--dry-run : List invites without deleting} {--include-expiring : Also purge unused invites that have an expiration time}')]
+#[Description(description: 'Purge unused infinite Discord guild invites (max_age=0, uses=0)')]
+#[Signature(signature: 'discord:purge-invites {guild_id?} {--dry-run : List invites without deleting} {--include-expiring : Also purge unused invites that have an expiration time}')]
 final class PurgeUnusedInvitesCommand extends Command
 {
     /**

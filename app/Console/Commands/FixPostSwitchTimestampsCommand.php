@@ -16,8 +16,8 @@ use function Laravel\Prompts\table;
 use function Laravel\Prompts\task;
 use function Laravel\Prompts\warning;
 
-#[Description('Fix post-switch timestamp data after ALTER migrations (Option D Step 2)')]
-#[Signature('maintenance:fix-post-switch-timestamps
+#[Description(description: 'Fix post-switch timestamp data after ALTER migrations (Option D Step 2)')]
+#[Signature(signature: 'maintenance:fix-post-switch-timestamps
         {--dry-run : Show what would be done without altering data}
         {--module= : Process only a specific module}
         {--table= : Process only a specific table}')]

@@ -43,7 +43,7 @@ use InvalidArgumentException;
  * @property CarbonInterface|null $created_at
  * @property CarbonInterface|null $updated_at
  */
-#[UseFactory(ProfileFactory::class)]
+#[UseFactory(factoryClass: ProfileFactory::class)]
 #[Table(name: 'user_profiles')]
 final class Profile extends Model
 {
