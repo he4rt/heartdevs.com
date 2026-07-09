@@ -29,7 +29,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property CarbonInterface $created_at
  * @property CarbonInterface $updated_at
  */
-#[Table('moderation_rules')]
+#[Table(name: 'moderation_rules')]
 final class ModerationRule extends Model
 {
     use HasUuids;

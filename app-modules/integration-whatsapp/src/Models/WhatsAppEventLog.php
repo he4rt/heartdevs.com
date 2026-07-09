@@ -23,7 +23,7 @@ use Illuminate\Database\Eloquent\Model;
  * @property CarbonInterface|null $updated_at
  */
 #[Table(name: 'whatsapp_event_logs')]
-#[UseFactory(WhatsAppEventLogFactory::class)]
+#[UseFactory(factoryClass: WhatsAppEventLogFactory::class)]
 final class WhatsAppEventLog extends Model
 {
     /** @use HasFactory<WhatsAppEventLogFactory> */

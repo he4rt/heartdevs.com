@@ -13,8 +13,8 @@ use Illuminate\Console\Attributes\Description;
 use Illuminate\Console\Attributes\Signature;
 use Illuminate\Console\Command;
 
-#[Description('Command description')]
-#[Signature('misc:generate-discord-tenant {guildId}')]
+#[Description(description: 'Command description')]
+#[Signature(signature: 'misc:generate-discord-tenant {guildId}')]
 class GenerateDiscordTenant extends Command
 {
     /**

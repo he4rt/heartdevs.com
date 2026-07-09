@@ -54,11 +54,11 @@ class ProfilePage extends Page
     public ?array $data = [];
 
     /** @var TemporaryUploadedFile|null */
-    #[Validate('nullable|image|mimes:jpg,jpeg,png,webp|max:2048')]
+    #[Validate(rule: 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048')]
     public $avatarUpload;
 
     /** @var TemporaryUploadedFile|null */
-    #[Validate('nullable|image|mimes:jpg,jpeg,png,webp|max:4096')]
+    #[Validate(rule: 'nullable|image|mimes:jpg,jpeg,png,webp|max:4096')]
     public $coverUpload;
 
     protected static string|null|BackedEnum $navigationIcon = 'heroicon-o-user-circle';

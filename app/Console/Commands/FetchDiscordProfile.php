@@ -9,8 +9,8 @@ use Illuminate\Console\Attributes\Signature;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Http;
 
-#[Description('Fetch a Discord user profile including connected accounts using a user token')]
-#[Signature('discord:fetch-profile
+#[Description(description: 'Fetch a Discord user profile including connected accounts using a user token')]
+#[Signature(signature: 'discord:fetch-profile
         {user_id : Discord user ID to fetch}
         {--token= : Discord user token (or set DISCORD_USER_TOKEN in .env)}')]
 class FetchDiscordProfile extends Command

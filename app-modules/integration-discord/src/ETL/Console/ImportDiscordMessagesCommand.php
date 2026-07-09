@@ -31,8 +31,8 @@ use function Laravel\Prompts\error;
 use function Laravel\Prompts\info;
 use function Laravel\Prompts\table;
 
-#[Description('Importa mensagens Discord de um dump completo (messages, reactions, voice, moderation)')]
-#[Signature('discord:import-messages
+#[Description(description: 'Importa mensagens Discord de um dump completo (messages, reactions, voice, moderation)')]
+#[Signature(signature: 'discord:import-messages
                             {path : Caminho da pasta discord-dump}
                             {--limit= : Para apos importar N mensagens (total)}
                             {--channels= : Lista de nomes (ou substrings) de canais separados por virgula}

@@ -21,7 +21,7 @@ final class PostShow extends Component
 
     public bool $showReplies = true;
 
-    #[On('timeline.post-updated')]
+    #[On(event: 'timeline.post-updated')]
     public function refresh(): void {}
 
     public function togglePin(#[CurrentUser] ?User $user): void
