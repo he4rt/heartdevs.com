@@ -25,8 +25,8 @@ use function Laravel\Prompts\outro;
 use function Laravel\Prompts\table;
 use function Laravel\Prompts\warning;
 
-#[Description('Faz backfill do histórico de contribuições dos repositórios da allowlist')]
-#[Signature('github:backfill
+#[Description(description: 'Faz backfill do histórico de contribuições dos repositórios da allowlist')]
+#[Signature(signature: 'github:backfill
     {repo? : owner/repo específico. Default: todos os repositórios habilitados}
     {--full : Ignora o last_backfilled_at e varre o histórico inteiro}')]
 final class BackfillGithubCommand extends Command

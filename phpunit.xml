@@ -21,7 +21,6 @@
     </source>
     <php>
         <ini name="memory_limit" value="2G"/>
-
         <env name="APP_ENV" value="testing"/>
     </php>
 </phpunit>

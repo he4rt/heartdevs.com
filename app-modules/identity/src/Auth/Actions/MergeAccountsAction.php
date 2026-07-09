@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace He4rt\Identity\Auth\Actions;
 
+use He4rt\Identity\Auth\Events\AccountsMerged;
 use He4rt\Identity\ExternalIdentity\Models\ExternalIdentity;
 use He4rt\Identity\User\Models\User;
 use Illuminate\Database\UniqueConstraintViolationException;
@@ -27,6 +28,8 @@ final class MergeAccountsAction
             $oldUser->tenants()->syncWithoutDetaching(
                 $currentUser->tenants()->pluck('tenants.id')
             );
+
+            event(new AccountsMerged($oldUser->id, $currentUser->id));
 
             $currentUser->delete();
 

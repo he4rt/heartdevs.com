@@ -10,35 +10,35 @@
     "require": {
         "php": "^8.4",
         "calebporzio/sushi": "^2.5.4",
-        "dedoc/scramble": "^0.13.30",
-        "filament/filament": "^5.6.7",
-        "filament/spatie-laravel-media-library-plugin": "^5.6.7",
-        "guzzlehttp/guzzle": "^7.13.1",
-        "he4rt/activity": ">=1",
-        "he4rt/bot-discord": ">=1.0",
-        "he4rt/community": ">=1",
-        "he4rt/docs": ">=1",
-        "he4rt/economy": ">=1",
-        "he4rt/events": ">=1",
-        "he4rt/gamification": ">=1",
-        "he4rt/he4rt-core": ">=1",
-        "he4rt/identity": ">=1",
-        "he4rt/integration-devto": ">=1",
-        "he4rt/integration-discord": ">=1",
-        "he4rt/integration-github": ">=1",
-        "he4rt/integration-twitch": ">=1",
-        "he4rt/integration-whatsapp": ">=1",
-        "he4rt/moderation": "^1.0",
-        "he4rt/onboarding": ">=1",
-        "he4rt/panel-admin": ">=1",
-        "he4rt/panel-app": ">=1",
-        "he4rt/portal": ">=1",
-        "he4rt/profile": ">=1",
-        "he4rt/squads": ">=1",
+        "dedoc/scramble": "^0.13.32",
+        "filament/filament": "^5.6.8",
+        "filament/spatie-laravel-media-library-plugin": "^5.6.8",
+        "guzzlehttp/guzzle": "^7.14.0",
+        "he4rt/activity": "^1.0.0",
+        "he4rt/bot-discord": "^1.0.0",
+        "he4rt/community": "^1.0.0",
+        "he4rt/docs": "^1.0.0",
+        "he4rt/economy": "^1.0.0",
+        "he4rt/events": "^1.0.0",
+        "he4rt/gamification": "^1.0.0",
+        "he4rt/he4rt-core": "^1.0.0",
+        "he4rt/identity": "^1.0.0",
+        "he4rt/integration-devto": "^1.0.0",
+        "he4rt/integration-discord": "^1.0.0",
+        "he4rt/integration-github": "^1.0.0",
+        "he4rt/integration-twitch": "^1.0.0",
+        "he4rt/integration-whatsapp": "^1.0.0",
+        "he4rt/moderation": "^1.0.0",
+        "he4rt/onboarding": "^1.0.0",
+        "he4rt/panel-admin": "^1.0.0",
+        "he4rt/panel-app": "^1.0.0",
+        "he4rt/portal": "^1.0.0",
+        "he4rt/profile": "^1.0.0",
+        "he4rt/squads": "^1.0.0",
         "internachi/modular": "^3.0.2",
         "laracord/framework": "dev-next#e7b64d6",
-        "laravel/framework": "^13.17.0",
-        "laravel/nightwatch": "^1.28.3",
+        "laravel/framework": "^13.19.0",
+        "laravel/nightwatch": "^1.28.4",
         "laravel/sanctum": "^4.3.2",
         "laravel/telescope": "^5.20.0",
         "laravel/tinker": "^3.0.2",
@@ -58,22 +58,22 @@
     "require-dev": {
         "driftingly/rector-laravel": "^2.5.0",
         "fakerphp/faker": "^1.24.1",
-        "fruitcake/laravel-debugbar": "^4.3.0",
+        "fruitcake/laravel-debugbar": "^4.4.0",
         "larastan/larastan": "^3.10.0",
-        "laravel/boost": "^2.4.10",
+        "laravel/boost": "^2.4.12",
         "laravel/pail": "^1.2.7",
         "laravel/pao": "^1.1.2",
         "laravel/pint": "^1.29.3",
         "mockery/mockery": "^1.6.12",
-        "mrpunyapal/rector-pest": "^0.2.15",
+        "mrpunyapal/rector-pest": "^0.2.17",
         "nunomaduro/collision": "^8.9.4",
-        "pestphp/pest": "^4.7.4",
+        "pestphp/pest": "^4.7.5",
         "pestphp/pest-plugin-drift": "^4.1.0",
         "pestphp/pest-plugin-faker": "^4.0.0",
         "pestphp/pest-plugin-laravel": "^4.1.0",
         "pestphp/pest-plugin-livewire": "^4.1.0",
         "phpstan/extension-installer": "^1.4.3",
-        "rector/rector": "^2.5.2"
+        "rector/rector": "^2.5.5"
     },
     "autoload": {
         "psr-4": {
@@ -93,16 +93,25 @@
     "scripts": {
         "post-autoload-dump": [
             "Illuminate\\Foundation\\ComposerScripts::postAutoloadDump",
-            "@php artisan package:discover --ansi"
+            "@php artisan package:discover --ansi",
+            "@php artisan filament:upgrade",
+            "@php artisan modules:sync --no-phpunit --ansi"
         ],
         "post-update-cmd": [
             "@php artisan vendor:publish --tag=laravel-assets --ansi --force"
         ],
+        "pre-package-uninstall": [
+            "Illuminate\\Foundation\\ComposerScripts::prePackageUninstall"
+        ],
         "post-root-package-install": [
-            "@php -r \"file_exists('.env') || copy('.env.example', '.env');\""
+            "@php -r \"file_exists('.env') || copy('.env.example', '.env');\"",
+            "@php -r \"file_exists('.env.testing') || copy('.env.testing.example', '.env.testing');\""
+        ],
+        "key:generate": [
+            "@php artisan key:generate --ansi",
+            "@php artisan key:generate --ansi --env=testing"
         ],
         "post-create-project-cmd": [
-            "@php artisan key:generate --ansi",
             "@php -r \"file_exists('database/database.sqlite') || touch('database/database.sqlite');\"",
             "@php artisan migrate --graceful --ansi"
         ],
@@ -110,8 +119,8 @@
             "composer install",
             "npm install",
             "composer run-script post-root-package-install",
+            "composer run-script key:generate",
             "composer run-script post-create-project-cmd",
-            "@php artisan key:generate --ansi",
             "@php artisan storage:link --ansi"
         ],
         "bot": "@php artisan bot:boot",
@@ -143,6 +152,11 @@
             "dont-discover": [
                 "barryvdh/laravel-debugbar",
                 "laravel/telescope"
+            ]
+        },
+        "pest": {
+            "plugins": [
+                "App\\Support\\PestShardPlugin"
             ]
         }
     },

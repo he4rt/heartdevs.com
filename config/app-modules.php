@@ -85,7 +85,7 @@ return [
         'composer.json' => base_path('stubs/app-modules/composer-stub.json'),
         'phpstan.neon' => base_path('stubs/app-modules/phpstan.neon'),
         'phpstan.ignore.neon' => base_path('stubs/app-modules/phpstan.ignore.neon'),
-        'src/Providers/StubClassNamePrefixServiceProvider.php' => base_path('stubs/app-modules/ServiceProvider.php'),
+        'src/StubClassNamePrefixServiceProvider.php' => base_path('stubs/app-modules/ServiceProvider.php'),
         'tests/Unit/.gitkeep' => base_path('stubs/app-modules/.gitkeep'),
         'tests/Feature/.gitkeep' => base_path('stubs/app-modules/.gitkeep'),
         'database/factories/.gitkeep' => base_path('stubs/app-modules/.gitkeep'),

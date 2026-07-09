@@ -33,8 +33,8 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
  * @property string|null $tenant_id
  * @property CarbonInterface $created_at
  */
-#[Table('moderation_actions', timestamps: false)]
-#[UseFactory(ModerationActionFactory::class)]
+#[Table(name: 'moderation_actions', timestamps: false)]
+#[UseFactory(factoryClass: ModerationActionFactory::class)]
 final class ModerationAction extends Model
 {
     /** @use HasFactory<ModerationActionFactory> */

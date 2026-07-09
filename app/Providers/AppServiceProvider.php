@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Providers;
 
 use App\Contracts\Paginator as PaginatorInterface;
+use App\Geo\WorldApiClient;
 use App\Providers\Tools\DebugbarServiceProvider;
 use App\Providers\Tools\TelescopeServiceProvider;
 use App\Support\Paginator;
@@ -27,6 +28,10 @@ final class AppServiceProvider extends ServiceProvider
     public function register(): void
     {
         $this->app->bind(PaginatorInterface::class, Paginator::class);
+
+        $this->app->singleton(WorldApiClient::class, fn (): WorldApiClient => new WorldApiClient(
+            config()->string('geo.world_api_url'),
+        ));
 
         $this->registerDebugbar();
         $this->registerTelescope();

@@ -19,6 +19,7 @@ final readonly class TimelineFeed
         return Timeline::query()
             ->where('tenant_id', $this->tenantId)
             ->where('is_ignored', operator: false)
+            ->whereHas('user')
             ->whereNull('parent_id')->latest();
     }
 }

@@ -6,13 +6,39 @@ use Filament\Facades\Filament;
 use He4rt\Identity\Tenant\Models\Tenant;
 use He4rt\Identity\User\Models\User;
 use He4rt\PanelApp\Pages\ProfilePage;
+use He4rt\Profile\Enums\EmploymentType;
 use He4rt\Profile\Enums\SeniorityLevel;
+use He4rt\Profile\Enums\SkillProficiency;
 use He4rt\Profile\Enums\StartAvailability;
 use He4rt\Profile\Models\Profile;
+use He4rt\Profile\Models\Skill;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Http;
 
 use function Pest\Livewire\livewire;
 
 beforeEach(function (): void {
+    Cache::flush();
+
+    Http::fake([
+        'world.bmbc.cloud/api/countries*' => Http::response([
+            'success' => true,
+            'data' => [
+                ['id' => 31, 'iso2' => 'BR', 'iso3' => 'BRA', 'name' => 'Brazil'],
+                ['id' => 231, 'iso2' => 'US', 'iso3' => 'USA', 'name' => 'United States'],
+            ],
+        ]),
+        'world.bmbc.cloud/api/states*' => Http::response([
+            'success' => true,
+            'data' => [
+                ['id' => 486, 'name' => 'São Paulo', 'cities' => [
+                    ['id' => 2, 'name' => 'São Paulo'],
+                    ['id' => 3, 'name' => 'Campinas'],
+                ]],
+            ],
+        ]),
+    ]);
+
     $this->user = User::factory()->create();
     $this->tenant = Tenant::factory()->create(['slug' => 'test-tenant']);
     $this->tenant->members()->attach($this->user);
@@ -87,6 +113,30 @@ test('profile page saves social links from repeater', function (): void {
     ]);
 });
 
+test('profile page saves skills from repeater', function (): void {
+    $php = Skill::query()->where('slug', 'php')->sole();
+    $laravel = Skill::query()->where('slug', 'laravel')->sole();
+
+    livewire(ProfilePage::class)
+        ->fillForm([
+            'skills' => [
+                ['skill_id' => $php->id, 'proficiency' => 'advanced', 'years_experience' => 5],
+                ['skill_id' => $laravel->id, 'proficiency' => 'expert', 'years_experience' => 3],
+            ],
+        ])
+        ->call('save')
+        ->assertNotified();
+
+    $this->profile->refresh();
+
+    expect($this->profile->profileSkills()->count())->toBe(2);
+
+    $pivot = $this->profile->profileSkills()->where('skill_id', $php->id)->first();
+
+    expect($pivot->proficiency)->toBe(SkillProficiency::Advanced)
+        ->and($pivot->years_experience)->toBe(5);
+});
+
 test('profile page saves availability toggle', function (): void {
     livewire(ProfilePage::class)
         ->fillForm([
@@ -124,4 +174,88 @@ test('profile page does not show account fields', function (): void {
     livewire(ProfilePage::class)
         ->assertFormFieldDoesNotExist('email')
         ->assertFormFieldDoesNotExist('password');
+});
+
+test('profile page saves expected salary range', function (): void {
+    livewire(ProfilePage::class)
+        ->fillForm([
+            'available_for_proposals' => true,
+            'expected_salary_min' => 5_000,
+            'expected_salary_max' => 9_000,
+        ])
+        ->call('save')
+        ->assertNotified();
+
+    $this->profile->refresh();
+
+    expect($this->profile->expected_salary_min)->toBe('5000.00')
+        ->and($this->profile->expected_salary_max)->toBe('9000.00');
+});
+
+test('profile page saves work preferences', function (): void {
+    livewire(ProfilePage::class)
+        ->fillForm([
+            'is_open_to_remote' => true,
+            'willing_to_relocate' => true,
+            'has_disability' => false,
+            'employment_types' => ['pj', 'freelance'],
+        ])
+        ->call('save')
+        ->assertNotified();
+
+    $this->profile->refresh();
+
+    expect($this->profile->preferences->isOpenToRemote)->toBeTrue()
+        ->and($this->profile->preferences->willingToRelocate)->toBeTrue()
+        ->and($this->profile->preferences->hasDisability)->toBeFalse()
+        ->and($this->profile->preferences->employmentTypes)->toBe([EmploymentType::IndependentContractor, EmploymentType::Freelancer]);
+});
+
+test('profile page saves a work experience', function (): void {
+    livewire(ProfilePage::class)
+        ->fillForm([
+            'workExperiences' => [
+                [
+                    'company_name' => 'He4rt',
+                    'position' => 'Backend Developer',
+                    'description' => 'Trampo com Laravel',
+                    'start_date' => '2020-01-01',
+                    'end_date' => '2022-01-01',
+                    'is_currently_working_here' => false,
+                ],
+            ],
+        ])
+        ->call('save')
+        ->assertNotified();
+
+    $experience = $this->profile->workExperiences()->sole();
+
+    expect($experience->company_name)->toBe('He4rt')
+        ->and($experience->position)->toBe('Backend Developer')
+        ->and($experience->description)->toBe('Trampo com Laravel')
+        ->and($experience->start_date->toDateString())->toBe('2020-01-01')
+        ->and($experience->end_date->toDateString())->toBe('2022-01-01')
+        ->and($experience->is_currently_working_here)->toBeFalse();
+});
+
+test('profile page nulls end_date when currently working here', function (): void {
+    livewire(ProfilePage::class)
+        ->fillForm([
+            'workExperiences' => [
+                [
+                    'company_name' => 'He4rt',
+                    'position' => 'Tech Lead',
+                    'description' => 'Trabalho atual',
+                    'start_date' => '2023-01-01',
+                    'is_currently_working_here' => true,
+                ],
+            ],
+        ])
+        ->call('save')
+        ->assertNotified();
+
+    $experience = $this->profile->workExperiences()->sole();
+
+    expect($experience->is_currently_working_here)->toBeTrue()
+        ->and($experience->end_date)->toBeNull();
 });

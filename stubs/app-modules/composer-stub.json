@@ -19,7 +19,7 @@
     "minimum-stability": "stable",
     "extra": {
         "laravel": {
-            "providers": ["StubModuleNamespace\\StubClassNamePrefix\\Providers\\StubClassNamePrefixServiceProvider"]
+            "providers": ["StubModuleNamespace\\StubClassNamePrefix\\StubClassNamePrefixServiceProvider"]
         }
     }
 }

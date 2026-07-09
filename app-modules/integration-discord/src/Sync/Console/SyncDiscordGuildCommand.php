@@ -9,8 +9,8 @@ use Illuminate\Console\Attributes\Description;
 use Illuminate\Console\Attributes\Signature;
 use Illuminate\Console\Command;
 
-#[Description('Sync Discord guild data (channels, roles, members) from the Discord API')]
-#[Signature('discord:sync {guild_id?} {--fresh : Truncate guild data before re-importing}')]
+#[Description(description: 'Sync Discord guild data (channels, roles, members) from the Discord API')]
+#[Signature(signature: 'discord:sync {guild_id?} {--fresh : Truncate guild data before re-importing}')]
 final class SyncDiscordGuildCommand extends Command
 {
     public function handle(SyncDiscordGuildAction $action): int

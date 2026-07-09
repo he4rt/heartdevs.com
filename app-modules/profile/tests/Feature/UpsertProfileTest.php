@@ -133,3 +133,35 @@ test('upsert profile dto fromArray handles enum instances', function (): void {
 
     expect($dto->seniorityLevel)->toBe(SeniorityLevel::Senior);
 });
+
+test('upsert profile stores expected salary range with decimal precision', function (): void {
+    $profile = Profile::factory()->create();
+    $dto = UpsertProfileDTO::fromArray([
+        'expected_salary_min' => '5000',
+        'expected_salary_max' => '8000.5',
+    ]);
+
+    $result = resolve(UpsertProfile::class)->handle($profile, $dto);
+
+    expect($result->expected_salary_min)->toBe('5000.00')
+        ->and($result->expected_salary_max)->toBe('8000.50');
+});
+
+test('upsert profile rejects negative expected salary', function (): void {
+    $profile = Profile::factory()->create();
+    $dto = UpsertProfileDTO::fromArray([
+        'expected_salary_min' => '-100',
+    ]);
+
+    resolve(UpsertProfile::class)->handle($profile, $dto);
+})->throws(ValidationException::class);
+
+test('upsert profile rejects salary range where min exceeds max', function (): void {
+    $profile = Profile::factory()->create();
+    $dto = UpsertProfileDTO::fromArray([
+        'expected_salary_min' => '9000',
+        'expected_salary_max' => '5000',
+    ]);
+
+    resolve(UpsertProfile::class)->handle($profile, $dto);
+})->throws(ValidationException::class);

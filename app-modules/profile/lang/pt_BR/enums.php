@@ -19,6 +19,21 @@ return [
         'bluesky' => 'Bluesky',
     ],
 
+    'skill_category' => [
+        'language' => 'Linguagem',
+        'framework' => 'Framework',
+        'database' => 'Banco de dados',
+        'tool' => 'Ferramenta',
+        'soft' => 'Soft skill',
+    ],
+
+    'skill_proficiency' => [
+        'beginner' => 'Básico',
+        'intermediate' => 'Intermediário',
+        'advanced' => 'Avançado',
+        'expert' => 'Especialista',
+    ],
+
     'start_availability' => [
         'immediate' => 'Imediato',
         '1_week' => '1 semana',
@@ -27,5 +42,11 @@ return [
         '1_month' => '1 mês',
         '2_months' => '2 meses',
         'negotiable' => 'Negociável',
+    ],
+
+    'employment_type' => [
+        'clt' => 'CLT',
+        'pj' => 'PJ',
+        'freelance' => 'Freelancer',
     ],
 ];

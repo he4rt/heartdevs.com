@@ -37,9 +37,11 @@
     );
 
     $address = $data['address'] ?? [];
-    $location = collect([$address['city'] ?? null, $address['state'] ?? null, $address['country'] ?? null])
-        ->filter()
-        ->implode(', ');
+    $location = \App\Geo\Support\GeoLocation::formatLocation(
+        $address['city'] ?? null,
+        $address['state'] ?? null,
+        $address['country'] ?? null,
+    );
 
     $level = $character?->level ?? 1;
     $experience = $character?->experience ?? 0;
@@ -50,6 +52,30 @@
             ? round((($experience - $currentThreshold) / ($nextThreshold - $currentThreshold)) * 100)
             : 100;
     $badges = $character?->badges ?? collect();
+
+    $skillLabels = \He4rt\Profile\Models\Skill::labelsById();
+    $skills = collect($data['skills'] ?? [])
+        ->map(function ($item) use ($skillLabels) {
+            $skillId = $item['skill_id'] ?? null;
+
+            if (empty($skillId) || !isset($skillLabels[$skillId])) {
+                return null;
+            }
+
+            $proficiencyRaw = $item['proficiency'] ?? null;
+            $proficiency =
+                $proficiencyRaw instanceof \He4rt\Profile\Enums\SkillProficiency
+                    ? $proficiencyRaw
+                    : (is_string($proficiencyRaw)
+                        ? \He4rt\Profile\Enums\SkillProficiency::tryFrom($proficiencyRaw)
+                        : null);
+
+            return [
+                'name' => $skillLabels[$skillId],
+                'proficiency' => $proficiency,
+            ];
+        })
+        ->filter();
 @endphp
 
 <div
@@ -74,11 +100,11 @@
                 <img
                     src="{{ $avatarPreviewUrl }}"
                     alt="{{ $name }}"
-                    class="h-16 w-16 rounded-full border-4 border-white object-cover shadow-md dark:border-gray-900"
+                    class="h-16 w-16 rounded-full border-4 border-white object-cover shadow-md dark:border-gray-800"
                 />
             @else
                 <div
-                    class="flex h-16 w-16 items-center justify-center rounded-full border-4 border-white bg-purple-600 text-lg font-bold text-white shadow-md dark:border-gray-900"
+                    class="flex h-16 w-16 items-center justify-center rounded-full border-4 border-white bg-purple-600 text-lg font-bold text-white shadow-md ring-1 ring-black/5 dark:border-gray-800 dark:ring-white/15"
                 >
                     {{ $initials }}
                 </div>
@@ -148,6 +174,28 @@
         {{-- Bio --}}
         @if ($about)
             <p class="text-sm leading-relaxed text-gray-600 dark:text-gray-400">{{ Str::limit($about, 200) }}</p>
+        @endif
+
+        {{-- Skills --}}
+        @if ($skills->isNotEmpty())
+            <div>
+                <span class="mb-1.5 block text-xs font-semibold tracking-wider text-gray-500 uppercase dark:text-gray-400">
+                    Skills
+                </span>
+                <div class="flex flex-wrap gap-1.5">
+                    @foreach ($skills as $skill)
+                        <span
+                            class="inline-flex items-center gap-1 rounded-md bg-purple-50 px-2 py-0.5 text-xs font-medium text-purple-700 dark:bg-purple-500/10 dark:text-purple-300"
+                        >
+                            {{ $skill['name'] }}
+                            @if ($skill['proficiency'])
+                                <span class="text-purple-300 dark:text-purple-500">·</span>
+                                {{ $skill['proficiency']->getLabel() }}
+                            @endif
+                        </span>
+                    @endforeach
+                </div>
+            </div>
         @endif
 
         {{-- XP bar --}}

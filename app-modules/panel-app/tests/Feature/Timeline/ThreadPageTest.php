@@ -7,6 +7,7 @@ use He4rt\Activity\Timeline\Delegated\PostEntry;
 use He4rt\Activity\Timeline\Timeline;
 use He4rt\Identity\Tenant\Models\Tenant;
 use He4rt\Identity\User\Models\User;
+use He4rt\PanelApp\Livewire\Timeline\PostShow;
 use He4rt\PanelApp\Livewire\Timeline\ReplyComposer;
 use He4rt\PanelApp\Livewire\Timeline\ThreadReplies;
 use He4rt\PanelApp\Pages\ThreadPage;
@@ -82,6 +83,23 @@ test('thread replies shows all replies in chronological order', function (): voi
         ->assertSee('First reply')
         ->assertSee('Second reply')
         ->assertSeeInOrder(['First reply', 'Second reply']);
+});
+
+test('post renders without crashing when its author was deleted', function (): void {
+    $ghost = User::factory()->create();
+    $entry = PostEntry::factory()->create(['content' => 'Orphaned post content']);
+    $orphan = Timeline::factory()->for($ghost)->create([
+        'tenant_id' => $this->tenant->id,
+        'postable_type' => (new PostEntry)->getMorphClass(),
+        'postable_id' => $entry->id,
+    ]);
+
+    $ghost->delete();
+
+    livewire(PostShow::class, ['timelineId' => $orphan->id])
+        ->assertOk()
+        ->assertSee('Usuário removido')
+        ->assertSee('Orphaned post content');
 });
 
 // --- Critical: Tenant isolation ---

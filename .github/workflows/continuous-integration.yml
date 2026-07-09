@@ -2,7 +2,13 @@ name: Continuous Integration
 
 on:
   pull_request:
-    branches: [4.x, feat/squads]
+    branches:
+      - '*.x'
+      - 'feature/**'
+      - 'feat/**'
+      - 'bugfix/**'
+      - 'chore/**'
+      - 'story/**'
     types: [opened, reopened, synchronize, ready_for_review]
 
 concurrency:
@@ -124,3 +130,24 @@ jobs:
       PHP_EXTENSIONS: ${{ needs.setup.outputs.PHP_EXTENSIONS }}
       PHP_INI_PROPERTIES: ${{ needs.setup.outputs.PHP_INI_PROPERTIES }}
       PHP_VERSION: ${{ needs.setup.outputs.PHP_VERSION }}
+
+  gate:
+    name: CI Gate
+    needs: [setup, pint, rector, phpstan, pest]
+    if: ${{ always() && !github.event.pull_request.draft }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions: {}
+    steps:
+      - name: Require every check to succeed
+        env:
+          RESULTS: ${{ join(needs.*.result, ', ') }}
+        run: |
+          echo "Dependency results: ${RESULTS}"
+          for result in ${RESULTS//,/ }; do
+            if [ "${result}" != "success" ]; then
+              echo "::error::CI did not pass cleanly (${RESULTS})."
+              exit 1
+            fi
+          done
+          echo "All CI checks passed."
