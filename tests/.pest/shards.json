@@ -105,6 +105,8 @@
         "Appmodules\\moderation\\tests\\Unit\\PenaltyAdvisorTest": 2.1791,
         "Appmodules\\moderation\\tests\\Unit\\PlatformRegistryTest": 0.2098,
         "Appmodules\\moderation\\tests\\Unit\\RouteCaseActionTest": 0.8256,
+        "Appmodules\\onboarding\\tests\\Feature\\StartOnboardingTest": 0.5448,
+        "Appmodules\\onboarding\\tests\\Feature\\WelcomeOnboardingFlowTest": 0.5448,
         "Appmodules\\paneladmin\\tests\\Feature\\AdminPanelAccessTest": 0.5649,
         "Appmodules\\paneladmin\\tests\\Feature\\ApplyTenantScopesTest": 0.266,
         "Appmodules\\paneladmin\\tests\\Feature\\Github\\GithubRepositoryResourceTest": 1.301,
@@ -132,9 +134,11 @@
         "Appmodules\\profile\\tests\\Unit\\SkillEnumTest": 0.1017,
         "Appmodules\\profile\\tests\\Unit\\WorkExperienceTest": 0.1599,
         "Appmodules\\profile\\tests\\Unit\\WorkPreferencesTest": 0.3199,
+        "Appmodules\\squads\\tests\\Feature\\CreateSquadTest": 0.5448,
+        "Appmodules\\squads\\tests\\Feature\\SquadLifecycleTest": 0.5448,
         "Tests\\Feature\\AddressTest": 0.5364,
         "Tests\\Feature\\Geo\\GeoLocationTest": 0.4048
     },
-    "checksum": "aea25aa9b8c207999f85b63b1b884917",
-    "updated_at": "2026-07-08T13:57:20+00:00"
+    "checksum": "1aa149caf2d6b8527d8c0f54ba5a8d3e",
+    "updated_at": "2026-07-09T17:17:11+00:00"
 }
