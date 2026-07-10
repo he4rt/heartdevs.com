@@ -74,10 +74,22 @@
                             `<div class="tt-title"><b>${p.name}</b> <span>(${p.uf})</span></div>` +
                             `<div class="tt-body"><span class="num">${v.toLocaleString('pt-BR')}</span> membros · ${pct}%</div>`;
 
-                        const rect = chart.canvas.getBoundingClientRect();
+                        // Make it measurable, then keep it inside the viewport:
+                        // clamp horizontally (edge states) and flip below the
+                        // point when there isn't room above (top edge).
                         el.style.opacity = '1';
-                        el.style.left = (rect.left + tooltip.caretX) + 'px';
-                        el.style.top = (rect.top + tooltip.caretY) + 'px';
+                        const rect = chart.canvas.getBoundingClientRect();
+                        const margin = 8;
+                        const half = el.offsetWidth / 2;
+                        let x = rect.left + tooltip.caretX;
+                        x = Math.max(margin + half, Math.min(x, window.innerWidth - margin - half));
+                        const anchorY = rect.top + tooltip.caretY;
+                        const fitsAbove = (anchorY - el.offsetHeight - 12) >= margin;
+                        el.style.left = x + 'px';
+                        el.style.top = anchorY + 'px';
+                        el.style.transform = fitsAbove
+                            ? 'translate(-50%, calc(-100% - 12px))'
+                            : 'translate(-50%, 12px)';
                     },
 
                     render() {
