@@ -11,18 +11,18 @@
                     </span>
                     <div class="flex-1">
                         <div class="mb-1 flex items-baseline justify-between gap-2">
-                            <span class="text-sm font-semibold text-zinc-950 dark:text-white">{{ $row['name'] }}</span>
-                            <span class="text-xs text-zinc-400 tabular-nums">{{ number_format($row['members']) }}</span>
+                            <span class="text-sm font-semibold text-zinc-950 dark:text-white">{{ $row->name }}</span>
+                            <span class="text-xs text-zinc-400 tabular-nums">{{ number_format($row->members) }}</span>
                         </div>
                         <div class="h-2 overflow-hidden rounded-full bg-zinc-100 dark:bg-white/10">
                             <div
                                 class="h-full rounded-full"
-                                style="width: {{ $row['members'] > 0 ? round($row['members'] / $top[0]['members'] * 100) : 0 }}%; background: #7c3aed;"
+                                style="width: {{ $row->members > 0 ? round($row->members / $top[0]->members * 100) : 0 }}%; background: #7c3aed;"
                             ></div>
                         </div>
                     </div>
                     <span class="w-12 text-right text-sm font-bold text-zinc-950 tabular-nums dark:text-white">
-                        {{ number_format($row['share'], 1) }}%
+                        {{ number_format($row->share, 1) }}%
                     </span>
                 </div>
             @empty

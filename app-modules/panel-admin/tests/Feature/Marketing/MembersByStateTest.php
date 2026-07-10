@@ -38,14 +38,14 @@ test('it aggregates members by state, normalizing accents and casing', function 
 
     $data = new MembersByState()->get();
 
-    expect($data['by_name']['sao paulo'])->toBe(2)
-        ->and($data['by_name']['minas gerais'])->toBe(1)
-        ->and($data['total'])->toBe(3)
-        ->and($data['states_reached'])->toBe(2)
-        ->and($data['states_total'])->toBe(3)
-        ->and($data['top'][0]['name'])->toBe('São Paulo')
-        ->and($data['top'][0]['members'])->toBe(2)
-        ->and($data['top'][0]['share'])->toBe(66.7);
+    expect($data->byName['sao paulo'])->toBe(2)
+        ->and($data->byName['minas gerais'])->toBe(1)
+        ->and($data->total)->toBe(3)
+        ->and($data->statesReached)->toBe(2)
+        ->and($data->statesTotal)->toBe(3)
+        ->and($data->top[0]->name)->toBe('São Paulo')
+        ->and($data->top[0]->members)->toBe(2)
+        ->and($data->top[0]->share)->toBe(66.7);
 });
 
 test('it ignores addresses whose state is not a recognized brazilian state', function (): void {
@@ -55,6 +55,6 @@ test('it ignores addresses whose state is not a recognized brazilian state', fun
 
     $data = new MembersByState()->get();
 
-    expect($data['total'])->toBe(0)
-        ->and($data['by_name'])->toBeEmpty();
+    expect($data->total)->toBe(0)
+        ->and($data->byName)->toBeEmpty();
 });

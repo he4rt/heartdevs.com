@@ -25,41 +25,29 @@ class LocationStatsWidget extends StatsOverviewWidget
     {
         $stats = new CommunityActivityStats(self::RANGE_DAYS)->get();
 
-        $webDiff = $this->pctDiff($stats['web_active'], $stats['web_active_prev']);
-        $discordDiff = $this->pctDiff($stats['discord_active'], $stats['discord_active_prev']);
-        $coverage = $stats['total_members'] > 0
-            ? (int) round($stats['located_members'] / $stats['total_members'] * 100)
-            : 0;
+        $webTrend = $stats->webTrend();
+        $discordTrend = $stats->discordTrend();
 
         return [
-            Stat::make(__('panel-admin::location.stats.web_active'), number_format($stats['web_active']))
-                ->description(abs($webDiff).__('panel-admin::location.stats.vs_previous'))
-                ->descriptionIcon($webDiff >= 0 ? Heroicon::ArrowTrendingUp : Heroicon::ArrowTrendingDown)
-                ->color($webDiff >= 0 ? Color::Purple : Color::Red),
+            Stat::make(__('panel-admin::location.stats.web_active'), number_format($stats->webActive))
+                ->description(abs($webTrend).__('panel-admin::location.stats.vs_previous'))
+                ->descriptionIcon($webTrend >= 0 ? Heroicon::ArrowTrendingUp : Heroicon::ArrowTrendingDown)
+                ->color($webTrend >= 0 ? Color::Purple : Color::Red),
 
-            Stat::make(__('panel-admin::location.stats.discord_active'), number_format($stats['discord_active']))
-                ->description(abs($discordDiff).__('panel-admin::location.stats.vs_previous'))
-                ->descriptionIcon($discordDiff >= 0 ? Heroicon::ArrowTrendingUp : Heroicon::ArrowTrendingDown)
-                ->color($discordDiff >= 0 ? Color::Green : Color::Red),
+            Stat::make(__('panel-admin::location.stats.discord_active'), number_format($stats->discordActive))
+                ->description(abs($discordTrend).__('panel-admin::location.stats.vs_previous'))
+                ->descriptionIcon($discordTrend >= 0 ? Heroicon::ArrowTrendingUp : Heroicon::ArrowTrendingDown)
+                ->color($discordTrend >= 0 ? Color::Green : Color::Red),
 
-            Stat::make(__('panel-admin::location.stats.located'), number_format($stats['located_members']))
-                ->description(__('panel-admin::location.stats.coverage', ['percent' => $coverage]))
+            Stat::make(__('panel-admin::location.stats.located'), number_format($stats->locatedMembers))
+                ->description(__('panel-admin::location.stats.coverage', ['percent' => $stats->coverage()]))
                 ->descriptionIcon(Heroicon::OutlinedMapPin)
                 ->color(Color::Amber),
 
-            Stat::make(__('panel-admin::location.stats.states'), $stats['states_reached'].'/'.$stats['states_total'])
+            Stat::make(__('panel-admin::location.stats.states'), sprintf('%d/%d', $stats->statesReached, $stats->statesTotal))
                 ->description(__('panel-admin::location.stats.states_hint'))
                 ->descriptionIcon(Heroicon::OutlinedGlobeAmericas)
                 ->color(Color::Blue),
         ];
-    }
-
-    private function pctDiff(int|float $current, int|float $previous): float
-    {
-        if ($previous === 0 || $previous === 0.0) {
-            return 0.0;
-        }
-
-        return round((($current - $previous) / $previous) * 100, 1);
     }
 }

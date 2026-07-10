@@ -24,8 +24,8 @@ class LocationMapWidget extends Widget
         $members = new MembersByState()->get();
 
         return [
-            'byName' => $members['by_name'],
-            'total' => $members['total'],
+            'byName' => $members->byName,
+            'total' => $members->total,
             'geometry' => BrazilStatesGeometry::get(),
         ];
     }

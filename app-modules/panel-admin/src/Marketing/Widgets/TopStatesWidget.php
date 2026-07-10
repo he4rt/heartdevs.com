@@ -23,9 +23,9 @@ class TopStatesWidget extends Widget
         $members = new MembersByState()->get();
 
         return [
-            'top' => $members['top'],
-            'total' => $members['total'],
-            'statesReached' => $members['states_reached'],
+            'top' => $members->top,
+            'total' => $members->total,
+            'statesReached' => $members->statesReached,
         ];
     }
 }

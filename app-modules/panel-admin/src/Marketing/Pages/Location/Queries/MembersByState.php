@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace He4rt\PanelAdmin\Marketing\Pages\Location\Queries;
 
 use App\Geo\Support\GeoLocation;
+use He4rt\PanelAdmin\Marketing\Pages\Location\Data\MemberDistribution;
+use He4rt\PanelAdmin\Marketing\Pages\Location\Data\StateShare;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
@@ -20,18 +22,9 @@ final readonly class MembersByState
 {
     private const string BRAZIL_ISO3 = 'BRA';
 
-    /**
-     * @return array{
-     *     total: int,
-     *     states_reached: int,
-     *     states_total: int,
-     *     by_name: array<string, int>,
-     *     top: array<int, array{name: string, members: int, share: float}>,
-     * }
-     */
-    public function get(): array
+    public function get(): MemberDistribution
     {
-        return once(function (): array {
+        return once(function (): MemberDistribution {
             $canonical = [];
             foreach (GeoLocation::statesFor(self::BRAZIL_ISO3) as $name) {
                 $canonical[$this->normalize($name)] = $name;
@@ -63,20 +56,20 @@ final readonly class MembersByState
 
             $top = [];
             foreach (array_slice($counts, 0, 5, preserve_keys: true) as $key => $members) {
-                $top[] = [
-                    'name' => $canonical[$key],
-                    'members' => $members,
-                    'share' => $total > 0 ? round($members / $total * 100, 1) : 0.0,
-                ];
+                $top[] = new StateShare(
+                    name: $canonical[$key],
+                    members: $members,
+                    share: $total > 0 ? round($members / $total * 100, 1) : 0.0,
+                );
             }
 
-            return [
-                'total' => $total,
-                'states_reached' => count($counts),
-                'states_total' => count($canonical),
-                'by_name' => $counts,
-                'top' => $top,
-            ];
+            return new MemberDistribution(
+                total: $total,
+                statesReached: count($counts),
+                statesTotal: count($canonical),
+                byName: $counts,
+                top: $top,
+            );
         });
     }
 

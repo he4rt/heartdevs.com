@@ -56,9 +56,9 @@ test('it counts distinct web and discord actives within the current window', fun
 
     $stats = new CommunityActivityStats(30)->get();
 
-    expect($stats['web_active'])->toBe(2)
-        ->and($stats['discord_active'])->toBe(1)
-        ->and($stats['located_members'])->toBe(1)
-        ->and($stats['states_reached'])->toBe(1)
-        ->and($stats['states_total'])->toBe(1);
+    expect($stats->webActive)->toBe(2)
+        ->and($stats->discordActive)->toBe(1)
+        ->and($stats->locatedMembers)->toBe(1)
+        ->and($stats->statesReached)->toBe(1)
+        ->and($stats->statesTotal)->toBe(1);
 });

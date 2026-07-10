@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace He4rt\PanelAdmin\Marketing\Pages\Location\Queries;
 
 use Carbon\CarbonInterface;
+use He4rt\PanelAdmin\Marketing\Pages\Location\Data\CommunityActivitySnapshot;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\DB;
 
@@ -19,35 +20,23 @@ final readonly class CommunityActivityStats
         private int $rangeDays,
     ) {}
 
-    /**
-     * @return array{
-     *     web_active: int,
-     *     web_active_prev: int,
-     *     discord_active: int,
-     *     discord_active_prev: int,
-     *     located_members: int,
-     *     total_members: int,
-     *     states_reached: int,
-     *     states_total: int,
-     * }
-     */
-    public function get(): array
+    public function get(): CommunityActivitySnapshot
     {
-        return once(function (): array {
+        return once(function (): CommunityActivitySnapshot {
             [$currentStart, $currentEnd, $prevStart, $prevEnd] = $this->windows();
 
             $byState = new MembersByState()->get();
 
-            return [
-                'web_active' => $this->distinctTimelineUsers($currentStart, $currentEnd),
-                'web_active_prev' => $this->distinctTimelineUsers($prevStart, $prevEnd),
-                'discord_active' => $this->distinctMessageIdentities($currentStart, $currentEnd),
-                'discord_active_prev' => $this->distinctMessageIdentities($prevStart, $prevEnd),
-                'located_members' => $this->locatedMembers(),
-                'total_members' => $this->totalMembers(),
-                'states_reached' => $byState['states_reached'],
-                'states_total' => $byState['states_total'],
-            ];
+            return new CommunityActivitySnapshot(
+                webActive: $this->distinctTimelineUsers($currentStart, $currentEnd),
+                webActivePrev: $this->distinctTimelineUsers($prevStart, $prevEnd),
+                discordActive: $this->distinctMessageIdentities($currentStart, $currentEnd),
+                discordActivePrev: $this->distinctMessageIdentities($prevStart, $prevEnd),
+                locatedMembers: $this->locatedMembers(),
+                totalMembers: $this->totalMembers(),
+                statesReached: $byState->statesReached,
+                statesTotal: $byState->statesTotal,
+            );
         });
     }
 
