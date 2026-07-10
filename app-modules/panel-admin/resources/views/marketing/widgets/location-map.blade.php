@@ -1,6 +1,17 @@
+{{-- Chart.js + chartjs-chart-geo via CDN, fixados por SRI (integrity).
+     Ao bumpar a versão nas URLs, recalcule o hash, senão o script para de carregar:
+     curl -sSL <url> | openssl dgst -sha384 -binary | openssl base64 -A --}}
 @assets
-    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chartjs-chart-geo@4.3.4/build/index.umd.min.js"></script>
+    <script
+        src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"
+        integrity="sha384-vsrfeLOOY6KuIYKDlmVH5UiBmgIdB1oEf7p01YgWHuqmOHfZr374+odEv96n9tNC"
+        crossorigin="anonymous"
+    ></script>
+    <script
+        src="https://cdn.jsdelivr.net/npm/chartjs-chart-geo@4.3.4/build/index.umd.min.js"
+        integrity="sha384-w1pUD3mXXBR/E/GTwT4uFKy89MVbiK9B2muZoTm4RLgdZM9u1xnIgzUlixoW/NLR"
+        crossorigin="anonymous"
+    ></script>
 @endassets
 
 <x-filament-widgets::widget>
