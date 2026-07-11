@@ -11,13 +11,17 @@ class CreateOrderAction
 
     public function handle(array $data): Order
     {
-        $order = Order::create($data);
-        $this->inventory->reserve($order);
+        return DB::transaction(function () use ($data) {
+            $order = Order::create($data);
+            $this->inventory->reserve($order);
 
-        return $order;
+            return $order;
+        });
     }
 }
 ```
+
+If inventory is managed by an external service (API, queue), the transaction cannot guarantee atomicity across systems. In that case, persist the order first, dispatch a job to reserve inventory externally, and implement a **compensation flow** (e.g., cancel the order if reservation fails) or an **outbox pattern** to ensure at-least-once delivery of the reservation request.
 
 ## Use Dependency Injection
 
