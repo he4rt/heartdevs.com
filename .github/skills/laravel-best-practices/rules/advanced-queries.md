@@ -58,21 +58,23 @@ $feature->load('comments.user');
 $feature->comments->each->setRelation('feature', $feature);
 ```
 
-## Prefer `whereIn` + Subquery Over `whereHas`
+## When to Use `whereIn` + Subquery vs `whereHas`
 
-`whereHas()` emits a correlated `EXISTS` subquery that re-executes per row. Using `whereIn()` with a `select('id')` subquery lets the database use an index lookup instead, without loading data into PHP memory.
+`whereHas()` emits a correlated `EXISTS` subquery. `whereIn()` with a `select('id')` subquery may or may not be more efficient — it depends on the database optimizer, table size, and available indexes. Neither is universally "correct" or "incorrect."
 
-Incorrect (correlated EXISTS re-executes per row):
+Example using `whereHas`:
 
 ```php
 $query->whereHas('company', fn ($q) => $q->where('name', 'like', $term));
 ```
 
-Correct (index-friendly subquery, no PHP memory overhead):
+Alternative using `whereIn` + subquery:
 
 ```php
 $query->whereIn('company_id', Company::where('name', 'like', $term)->select('id'));
 ```
+
+**Always verify** the chosen approach with `EXPLAIN` and confirm that appropriate indexes exist (a covering index on the filtered column, and a foreign key index on the joining column).
 
 ## Sometimes Two Simple Queries Beat One Complex Query
 
