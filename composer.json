@@ -60,7 +60,7 @@
         "fakerphp/faker": "^1.24.1",
         "fruitcake/laravel-debugbar": "^4.4.0",
         "larastan/larastan": "^3.10.0",
-        "laravel/boost": "^2.4.12",
+        "laravel/boost": "^2.4",
         "laravel/pail": "^1.2.7",
         "laravel/pao": "^1.1.2",
         "laravel/pint": "^1.29.3",
