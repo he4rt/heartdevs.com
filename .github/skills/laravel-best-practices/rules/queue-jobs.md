@@ -70,7 +70,7 @@ Handle errors explicitly — don't rely on silent failure.
 public function failed(?Throwable $exception): void
 {
     $this->podcast->update(['status' => 'failed']);
-    Log::error('Processing failed', ['id' => $this->podcast->id, 'error' => $exception->getMessage()]);
+    Log::error('Processing failed', ['id' => $this->podcast->id, 'error' => $exception?->getMessage()]);
 }
 ```
 
