@@ -44,8 +44,11 @@ if ($response->failed()) {
 
 Correct:
 ```php
+$idempotencyKey = (string) Str::uuid();
+
 $response = Http::retry([100, 500, 1000])
     ->timeout(10)
+    ->withHeader('Idempotency-Key', $idempotencyKey)
     ->post('https://api.stripe.com/v1/charges', $data);
 ```
 
