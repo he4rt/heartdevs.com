@@ -107,8 +107,12 @@ Cache::lock('order-processing-'.$order->id, 10)->block(5, function () use ($orde
     $order->process();
 });
 
-// Or at query level
-$product = Product::where('id', $id)->lockForUpdate()->first();
+// Or at query level (must be inside a transaction for the lock to be active)
+DB::transaction(function () use ($id) {
+    $product = Product::where('id', $id)->lockForUpdate()->first();
+    // The lock is held until the transaction commits
+    $product->decrement('stock', 1);
+});
 ```
 
 ## Use `mb_*` String Functions
