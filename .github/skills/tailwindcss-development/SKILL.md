@@ -18,14 +18,15 @@ Use `search-docs` for detailed Tailwind CSS v4 patterns and documentation.
 - Offer to extract repeated patterns into components that match the project's conventions (e.g., Blade, JSX, Vue).
 - Consider class placement, order, priority, and defaults. Remove redundant classes, add classes to parent or child elements carefully to reduce repetition, and group elements logically.
 
-## Tailwind CSS v4 Specifics
+## Version-Specific Workflows
 
-- Always use Tailwind CSS v4 and avoid deprecated utilities.
-- `corePlugins` is not supported in Tailwind v4.
+### Tailwind CSS v4
 
-### CSS-First Configuration
+Tailwind v4 uses CSS-first configuration with `@theme` and `@import "tailwindcss"` — no `tailwind.config.js`. `corePlugins` is not supported.
 
-In Tailwind v4, configuration is CSS-first using the `@theme` directive — no separate `tailwind.config.js` file is needed:
+#### CSS-First Configuration
+
+In Tailwind v4, configuration is CSS-first using the `@theme` directive:
 
 <!-- CSS-First Config -->
 ```css
@@ -34,7 +35,7 @@ In Tailwind v4, configuration is CSS-first using the `@theme` directive — no s
 }
 ```
 
-### Import Syntax
+#### Import Syntax
 
 In Tailwind v4, import Tailwind with a regular CSS `@import` statement instead of the `@tailwind` directives used in v3:
 
@@ -46,7 +47,7 @@ In Tailwind v4, import Tailwind with a regular CSS `@import` statement instead o
 + @import "tailwindcss";
 ```
 
-### Replaced Utilities
+#### Replaced Utilities
 
 Tailwind v4 removed deprecated utilities. Use the replacements shown below. Opacity values remain numeric.
 
@@ -63,6 +64,31 @@ Tailwind v4 removed deprecated utilities. Use the replacements shown below. Opac
 | overflow-ellipsis | text-ellipsis |
 | decoration-slice | box-decoration-slice |
 | decoration-clone | box-decoration-clone |
+
+### Tailwind CSS v3
+
+Tailwind v3 uses `tailwind.config.js` for configuration and `@tailwind` directives for imports:
+
+```js
+// tailwind.config.js
+module.exports = {
+  content: ['./resources/**/*.blade.php', './resources/**/*.js'],
+  theme: {
+    extend: {
+      colors: {
+        brand: '#0ea5e9',
+      },
+    },
+  },
+};
+```
+
+```css
+/* app.css */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+```
 
 ## Spacing
 
@@ -112,8 +138,10 @@ If existing pages and components support dark mode, new pages and components mus
 
 ## Common Pitfalls
 
-- Using deprecated v3 utilities (bg-opacity-*, flex-shrink-*, etc.)
-- Using `@tailwind` directives instead of `@import "tailwindcss"`
-- Trying to use `tailwind.config.js` instead of CSS `@theme` directive
+- Using deprecated v3 utilities (bg-opacity-*, flex-shrink-*, etc.) in a v4 project
+- Using `@tailwind` directives in a v4 project (use `@import "tailwindcss"` instead)
+- Using `tailwind.config.js` in a v4 project (use CSS `@theme` instead)
+- Using `@import "tailwindcss"` in a v3 project (use `@tailwind` directives instead)
+- Trying to configure v3 with `@theme` — v3 requires `tailwind.config.js`
 - Using margins for spacing between siblings instead of gap utilities
 - Forgetting to add dark mode variants when the project uses dark mode
