@@ -54,10 +54,15 @@
     }
 
     const informationElement = detailsElement.children[0];
-    const rawText = informationElement?.textContent.trim() || '';
+
+    if (!informationElement) {
+      return null;
+    }
+
+    const rawText = informationElement.textContent.trim() || '';
     const type = rawText.split(/\r?\n/)[0].trim() || UNKNOWN_VALUE;
 
-    const userLink = informationElement?.querySelector('a');
+    const userLink = informationElement.querySelector('a');
 
     return {
       type,
@@ -100,7 +105,6 @@
     textarea.style.position = 'fixed';
     textarea.style.opacity = '0';
     document.body.appendChild(textarea);
-    textarea.focus();
     textarea.select();
 
     try {
@@ -168,6 +172,10 @@
   }
 
   const reactions = extractReactions(reactionsContainer);
+
+  if (reactions.length === 0) {
+    console.debug('⚠️ Container "Reactions History" encontrado, mas nenhuma entrada foi extraída. O seletor pode estar desatualizado.');
+  }
 
   return outputResult(buildResult(metadata, reactions));
 })();
