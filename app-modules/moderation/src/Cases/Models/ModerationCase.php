@@ -43,8 +43,8 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property CarbonInterface $created_at
  * @property CarbonInterface $updated_at
  */
-#[Table('moderation_cases')]
-#[UseFactory(ModerationCaseFactory::class)]
+#[Table(name: 'moderation_cases')]
+#[UseFactory(factoryClass: ModerationCaseFactory::class)]
 final class ModerationCase extends Model
 {
     /** @use HasFactory<ModerationCaseFactory> */

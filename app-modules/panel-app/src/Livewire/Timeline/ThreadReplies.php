@@ -21,8 +21,8 @@ final class ThreadReplies extends Component
     #[Locked]
     public string $timelineId;
 
-    #[On('timeline.reply-created')]
-    #[On('timeline.reply-deleted')]
+    #[On(event: 'timeline.reply-created')]
+    #[On(event: 'timeline.reply-deleted')]
     public function refresh(): void {}
 
     public function deleteReply(string $replyId, #[CurrentUser] ?User $user): void

@@ -14,8 +14,8 @@ use Illuminate\Console\Attributes\Signature;
 use Illuminate\Console\Command;
 use Saloon\Exceptions\Request\RequestException;
 
-#[Description('Manage Twitch EventSub webhook subscriptions for a broadcaster')]
-#[Signature('twitch:subscribe
+#[Description(description: 'Manage Twitch EventSub webhook subscriptions for a broadcaster')]
+#[Signature(signature: 'twitch:subscribe
         {broadcaster_user_id : The Twitch broadcaster user ID}
         {--type= : Subscribe to a specific event type}
         {--all : Subscribe to all available event types}

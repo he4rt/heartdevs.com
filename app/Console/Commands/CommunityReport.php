@@ -21,8 +21,8 @@ use function Laravel\Prompts\outro;
 use function Laravel\Prompts\table;
 use function Laravel\Prompts\warning;
 
-#[Description('Generate a comprehensive community analytics report')]
-#[Signature('discord:community-report')]
+#[Description(description: 'Generate a comprehensive community analytics report')]
+#[Signature(signature: 'discord:community-report')]
 class CommunityReport extends Command
 {
     /** @var array<string, mixed> */

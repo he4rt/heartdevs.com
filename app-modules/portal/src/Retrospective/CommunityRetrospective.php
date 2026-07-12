@@ -209,7 +209,7 @@ final readonly class CommunityRetrospective
         return match ($this->filters->outcome) {
             'merged' => !$merged,
             'open' => $state !== 'open',
-            'closed' => !($state === 'closed' && !$merged),
+            'closed' => $state !== 'closed' || $merged,
         };
     }
 

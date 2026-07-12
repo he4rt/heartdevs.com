@@ -53,4 +53,18 @@ return [
             'badges_count' => 0,
         ],
     ],
+
+    /*
+     * Fonte única das redes sociais da He4rt. Alimenta a página /redes
+     * (He4rt\Portal\Livewire\SocialLinksPage) e qualquer outro lugar que
+     * precise dos links. `accent_dark` é opcional (cai no `accent` quando ausente).
+     */
+    'social_media' => [
+        'discord' => ['label' => 'Discord', 'url' => 'https://discord.gg/invite/he4rt', 'icon' => 'fab-discord', 'accent' => '#5865F2'],
+        'twitter' => ['label' => 'X (Twitter)', 'url' => 'https://x.com/He4rtDevs', 'icon' => 'fab-x-twitter', 'accent' => '#0F172A', 'accent_dark' => '#FFFFFF'],
+        'linkedin' => ['label' => 'LinkedIn', 'url' => 'https://www.linkedin.com/company/he4rt/', 'icon' => 'fab-linkedin', 'accent' => '#0A66C2'],
+        'whatsapp' => ['label' => 'WhatsApp', 'url' => 'https://chat.whatsapp.com/EBKjYxIodpe1x5LLExbTzK', 'icon' => 'fab-whatsapp', 'accent' => '#25D366'],
+        'instagram' => ['label' => 'Instagram', 'url' => 'https://www.instagram.com/heartdevs/', 'icon' => 'fab-instagram', 'accent' => '#E4405F'],
+        'github' => ['label' => 'GitHub', 'url' => 'https://github.com/he4rt', 'icon' => 'fab-github', 'accent' => '#111827', 'accent_dark' => '#FFFFFF'],
+    ],
 ];

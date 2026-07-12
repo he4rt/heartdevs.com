@@ -14,6 +14,7 @@ final readonly class TimelineFeed
     {
         return Timeline::query()
             ->where('is_ignored', operator: false)
+            ->whereHas('user')
             ->whereNull('parent_id')->latest();
     }
 }

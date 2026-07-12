@@ -38,7 +38,7 @@ use Throwable;
  * CaseReadyForEnforcement is never emitted — AI-only results always go to human review.
  */
 #[Backoff([5, 15, 30])]
-#[Tries(3)]
+#[Tries(tries: 3)]
 final class ScreenContent implements ShouldQueue
 {
     use InteractsWithQueue;

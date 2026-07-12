@@ -21,8 +21,8 @@ use function Laravel\Prompts\info;
 use function Laravel\Prompts\table;
 use function Laravel\Prompts\warning;
 
-#[Description('Reverte users duplicados criados pelo bug do discord:import-profiles (re-aponta FKs e identities, deleta dups)')]
-#[Signature('discord:merge-duplicate-profiles
+#[Description(description: 'Reverte users duplicados criados pelo bug do discord:import-profiles (re-aponta FKs e identities, deleta dups)')]
+#[Signature(signature: 'discord:merge-duplicate-profiles
                             {--tenant=he4rt : Slug do tenant alvo (ignorado se --pairs-file for usado)}
                             {--from-date=2026-05-01 : Cutoff: users criados a partir desta data sao candidatos (ignorado se --pairs-file for usado)}
                             {--pairs-file= : Caminho de JSONL pre-gerado por discord:export-merge-pairs (fonte de verdade)}

@@ -4,49 +4,39 @@ title: Como participar
 order: 5
 ---
 
-> ⚠️ Rascunho — revisar com a comunidade (datas/números/fatos são placeholders).
-
 # Como participar
 
-Entrar para a He4rt Developers é simples e gratuito. Aqui vão os primeiros
-passos para fazer parte da comunidade e começar a aprender e construir junto.
+Existem diferentes formas de fazer parte da comunidade. Dá uma olhada:
 
-## 1. Entre no Discord
+## Discord
 
-O Discord é o ponto de encontro da comunidade. É lá que acontecem as conversas
-do dia a dia, os avisos e as reuniões.
-[a confirmar: link oficial de convite do servidor no Discord.]
+Você pode entrar no nosso servidor [clicando aqui](https://discord.gg/invite/he4rt). Lá dentro é só seguir a orientação do bot, fazer sua apresentação e pronto, você já faz parte oficialmente da comunidade. Dá para participar das reuniões semanais, aulões, spaces e muito mais.
 
-## 2. Se apresente
+## WhatsApp
 
-Depois de entrar, passe pelo canal de boas-vindas
-**[a confirmar: nome do canal]** e conte um pouco sobre você: o que faz, o que
-está estudando e o que te trouxe até aqui. A comunidade adora conhecer gente
-nova.
+Temos um grupo no WhatsApp dedicado à conversa e ao networking, para quem gosta de bater papo e viver mais de perto o dia a dia da comunidade. É uma ótima oportunidade para estar mais próximo da gente.
 
-## 3. Participe das reuniões semanais
+A gente publica as novidades por lá antes de qualquer outro lugar. Então, se quiser saber em primeira mão, [clique aqui](https://chat.whatsapp.com/EBKjYxIodpe1x5LLExbTzK).
 
-Toda semana acontecem encontros abertos a todo mundo. É uma ótima forma de
-conhecer pessoas e entrar no ritmo da comunidade. Veja os detalhes na página
-[Reuniões semanais](reunioes-semanais).
+## Projetos
 
-## 4. Contribua com os projetos
+Na aba de Iniciativas você viu que existem várias formas de contribuir, seja ensinando, desenvolvendo ou melhorando o que já existe. É um mundo de possibilidades esperando por você.
 
-A He4rt mantém projetos open source feitos pela comunidade. Você pode contribuir
-com código, documentação, ideias ou ajudando outras pessoas.
-[a confirmar: link para os repositórios / organização no GitHub.]
+E não importa se você é de programação, design, negócios, produto, segurança, teste, liderança ou qualquer outra área. Sua contribuição é muito bem-vinda, com o conhecimento que você já tem.
 
-## 5. Conecte sua conta na plataforma
+Para participar, é só chamar um administrador (com a tag He4rtless no Discord) ou um administrador do grupo do WhatsApp da comunidade.
 
-A plataforma he4rtdevs.com tem perfis, gamificação e acompanhamento da sua
-participação. Você pode entrar usando sua conta do Discord para começar a somar
-pontos e desbloquear conquistas.
+## Parcerias, eventos ou oportunidades
 
-## Precisa de ajuda?
+Se você quer trazer oportunidades para a comunidade ou propor uma parceria com a He4rt, fale direto com 7K ou danielhe4rt.
 
-Se ficar com qualquer dúvida, pergunte nos canais da comunidade — sempre tem
-alguém disposto a ajudar.
-[a confirmar: canal de suporte / dúvidas.]
+## Nossas redes
 
-> Os links e nomes de canais acima são placeholders. Confirme cada um com a
-> comunidade antes de publicar esta página.
+Fica por dentro de tudo e escolhe o canal que mais combina com você:
+
+- [Discord](https://discord.gg/invite/he4rt)
+- [WhatsApp](https://chat.whatsapp.com/EBKjYxIodpe1x5LLExbTzK)
+- [X (Twitter)](https://x.com/He4rtDevs)
+- [LinkedIn](https://www.linkedin.com/company/he4rt/)
+- [Instagram](https://www.instagram.com/heartdevs/)
+- [GitHub](https://github.com/he4rt)

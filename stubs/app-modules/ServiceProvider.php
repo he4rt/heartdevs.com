@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace StubModuleNamespace\StubClassNamePrefix\Providers;
+namespace StubModuleNamespace\StubClassNamePrefix;
 
 use Illuminate\Support\ServiceProvider;
 

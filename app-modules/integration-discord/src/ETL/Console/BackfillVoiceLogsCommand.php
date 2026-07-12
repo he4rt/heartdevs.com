@@ -24,8 +24,8 @@ use function Laravel\Prompts\table;
 use function Laravel\Prompts\task;
 use function Laravel\Prompts\warning;
 
-#[Description('Backfill voice logs by paginating a Discord channel where a bot logs voice join/left events')]
-#[Signature('discord:backfill-voice
+#[Description(description: 'Backfill voice logs by paginating a Discord channel where a bot logs voice join/left events')]
+#[Signature(signature: 'discord:backfill-voice
         {channel_id : Discord channel ID where the bot posts voice join/left logs}
         {--since= : Start date (Y-m-d). Defaults to 2026-03-01}
         {--until= : End date (Y-m-d). Defaults to now}

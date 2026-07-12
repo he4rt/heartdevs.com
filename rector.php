@@ -3,10 +3,8 @@
 declare(strict_types=1);
 
 use Rector\Caching\ValueObject\Storage\FileCacheStorage;
-use Rector\CodingStyle\Rector\Closure\StaticClosureRector;
 use Rector\CodingStyle\Rector\PostInc\PostIncDecToPreIncDecRector;
 use Rector\Config\RectorConfig;
-use Rector\Php70\Rector\StaticCall\StaticCallOnNonStaticToInstanceCallRector;
 use Rector\Php83\Rector\ClassMethod\AddOverrideAttributeToOverriddenMethodsRector;
 use Rector\TypeDeclaration\Rector\ArrowFunction\AddArrowFunctionReturnTypeRector;
 use RectorLaravel\Rector\Class_\AddHasFactoryToModelsRector;
@@ -78,8 +76,10 @@ return RectorConfig::configure()
         AddHasFactoryToModelsRector::class,
         AddOverrideAttributeToOverriddenMethodsRector::class,
         PostIncDecToPreIncDecRector::class,
-        StaticCallOnNonStaticToInstanceCallRector::class,
         __DIR__.'/bootstrap/cache',
+        // Verbatim copy of Pest's internal Shard plugin (only the discovery
+        // regex is patched) — keep it re-syncable with upstream.
+        __DIR__.'/app/Support/PestShardPlugin.php',
     ])
     ->withCache(cacheDirectory: __DIR__.'/.rector.result.cache', cacheClass: FileCacheStorage::class)
     ->withImportNames(removeUnusedImports: true)
@@ -111,7 +111,6 @@ return RectorConfig::configure()
         ReplaceFakerInstanceWithHelperRector::class,
         ConfigToTypedConfigMethodCallRector::class,
         EnsureTypeChecksFirstRector::class,
-        StaticClosureRector::class,
         ...$laravel13Attributes,
     ])
     ->withSets([

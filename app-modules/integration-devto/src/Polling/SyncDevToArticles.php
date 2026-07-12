@@ -17,8 +17,8 @@ use Illuminate\Console\Attributes\Signature;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Log;
 
-#[Description('Sync articles from DevTo organization and track as interactions')]
-#[Signature('devto:sync-articles')]
+#[Description(description: 'Sync articles from DevTo organization and track as interactions')]
+#[Signature(signature: 'devto:sync-articles')]
 class SyncDevToArticles extends Command
 {
     public function __construct(

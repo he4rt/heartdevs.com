@@ -9,6 +9,7 @@ use He4rt\Profile\Enums\SeniorityLevel;
 use He4rt\Profile\Enums\SocialPlatform;
 use He4rt\Profile\Enums\StartAvailability;
 use He4rt\Profile\Models\Profile;
+use He4rt\Profile\Models\ProfileSkill;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -72,5 +73,15 @@ final class ProfileFactory extends Factory
             'available_for_proposals' => true,
             'start_availability' => fake()->randomElement(StartAvailability::cases()),
         ]);
+    }
+
+    public function withSkills(int $count = 3): self
+    {
+        return $this->afterCreating(static function (Profile $profile) use ($count): void {
+            ProfileSkill::factory()
+                ->count($count)
+                ->for($profile)
+                ->create();
+        });
     }
 }

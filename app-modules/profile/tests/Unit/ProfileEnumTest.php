@@ -5,6 +5,7 @@ declare(strict_types=1);
 use Filament\Support\Contracts\HasColor;
 use Filament\Support\Contracts\HasIcon;
 use Filament\Support\Contracts\HasLabel;
+use He4rt\Profile\Enums\EmploymentType;
 use He4rt\Profile\Enums\SeniorityLevel;
 use He4rt\Profile\Enums\SocialPlatform;
 use He4rt\Profile\Enums\StartAvailability;
@@ -43,6 +44,17 @@ test('start availability implements filament enum interfaces', function (): void
     expect(StartAvailability::Immediate->getLabel())->toBeString()->not->toBeEmpty()
         ->and(StartAvailability::OneWeek->getLabel())->toBeString()->not->toBeEmpty()
         ->and(StartAvailability::Negotiable->getLabel())->toBeString()->not->toBeEmpty();
+});
+
+test('employment type implements filament enum interfaces with labels', function (): void {
+    expect(EmploymentType::SalariedEmployee)
+        ->toBeInstanceOf(HasLabel::class)
+        ->toBeInstanceOf(HasColor::class)
+        ->toBeInstanceOf(HasIcon::class);
+
+    foreach (EmploymentType::cases() as $type) {
+        expect($type->getLabel())->toBeString()->not->toBeEmpty();
+    }
 });
 
 test('all seniority level cases have distinct colors and icons', function (): void {

@@ -16,8 +16,8 @@ use Livewire\Attributes\Title;
 use Livewire\Attributes\Url;
 use Livewire\Component;
 
-#[Layout('portal::components.layouts.deck')]
-#[Title('Quem fez a He4rt bater')]
+#[Layout(name: 'portal::components.layouts.deck')]
+#[Title(content: 'Quem fez a He4rt bater')]
 final class CommunityRetrospectivePage extends Component
 {
     #[Url]

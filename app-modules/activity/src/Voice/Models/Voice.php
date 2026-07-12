@@ -28,7 +28,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 // `state` is a plain string: the voice experience ticker writes
 // VoiceStatesEnum values (muted/unmuted/disabled) and the historical
 // ETL import writes joined/left as raw strings.
-#[UseFactory(VoiceFactory::class)]
+#[UseFactory(factoryClass: VoiceFactory::class)]
 #[Table(name: 'voice_messages')]
 final class Voice extends Model
 {

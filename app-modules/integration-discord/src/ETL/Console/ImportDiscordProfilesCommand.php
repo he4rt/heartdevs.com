@@ -22,8 +22,8 @@ use function Laravel\Prompts\error;
 use function Laravel\Prompts\info;
 use function Laravel\Prompts\table;
 
-#[Description('Importa perfis Discord de todos os chunks JSON para Users e ExternalIdentities')]
-#[Signature('discord:import-profiles
+#[Description(description: 'Importa perfis Discord de todos os chunks JSON para Users e ExternalIdentities')]
+#[Signature(signature: 'discord:import-profiles
                             {path : Caminho do diretorio com os chunks JSON}
                             {--from=0 : Numero do chunk inicial (ex: 5 para comecar do chunk_5)}')]
 class ImportDiscordProfilesCommand extends Command

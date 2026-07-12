@@ -20,7 +20,7 @@
     "extra": {
         "laravel": {
             "providers": [
-                "He4rt\\Onboarding\\Providers\\OnboardingServiceProvider"
+                "He4rt\\Onboarding\\OnboardingServiceProvider"
             ]
         }
     }

@@ -8,8 +8,10 @@ use He4rt\Activity\Message\Models\Message;
 use He4rt\Activity\Moderation\Models\ModerationEvent;
 use He4rt\Activity\Timeline\Delegated\PostEntry;
 use He4rt\Activity\Timeline\Listeners\PublishModerationToTimeline;
+use He4rt\Activity\Timeline\Listeners\ReassignTimelineOwnership;
 use He4rt\Activity\Timeline\Timeline;
 use He4rt\Activity\Voice\Models\Voice;
+use He4rt\Identity\Auth\Events\AccountsMerged;
 use He4rt\Moderation\Enforcement\ActionExecuted;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\Facades\Event;
@@ -36,5 +38,6 @@ class ActivityServiceProvider extends ServiceProvider
         ]);
 
         Event::listen(ActionExecuted::class, [PublishModerationToTimeline::class, 'handle']);
+        Event::listen(AccountsMerged::class, [ReassignTimelineOwnership::class, 'handle']);
     }
 }

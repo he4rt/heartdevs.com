@@ -73,3 +73,25 @@ test('excludes ignored posts from feed', function (): void {
     expect($result)->toHaveCount(1)
         ->and($result->first()->id)->toBe($visible->id);
 });
+
+test('excludes posts whose author no longer exists', function (): void {
+    $author = User::factory()->create();
+    $ghost = User::factory()->create();
+
+    $visible = Timeline::factory()->for($author)->create([
+        'postable_type' => (new PostEntry)->getMorphClass(),
+        'postable_id' => PostEntry::factory()->create()->id,
+    ]);
+
+    Timeline::factory()->for($ghost)->create([
+        'postable_type' => (new PostEntry)->getMorphClass(),
+        'postable_id' => PostEntry::factory()->create()->id,
+    ]);
+
+    $ghost->delete();
+
+    $result = (new TimelineFeed)->builder()->simplePaginate(15);
+
+    expect($result)->toHaveCount(1)
+        ->and($result->first()->id)->toBe($visible->id);
+});

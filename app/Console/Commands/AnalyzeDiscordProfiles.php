@@ -15,8 +15,8 @@ use function Laravel\Prompts\outro;
 use function Laravel\Prompts\table;
 use function Laravel\Prompts\warning;
 
-#[Description('Analyze scraped Discord profiles and count connected social accounts')]
-#[Signature('discord:analyze-profiles')]
+#[Description(description: 'Analyze scraped Discord profiles and count connected social accounts')]
+#[Signature(signature: 'discord:analyze-profiles')]
 class AnalyzeDiscordProfiles extends Command
 {
     public function handle(): void

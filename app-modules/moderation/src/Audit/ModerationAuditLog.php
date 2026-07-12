@@ -18,7 +18,7 @@ use Illuminate\Database\Eloquent\Model;
  * @property string|null $platform
  * @property CarbonInterface $created_at
  */
-#[Table('moderation_audit_log', timestamps: false)]
+#[Table(name: 'moderation_audit_log', timestamps: false)]
 final class ModerationAuditLog extends Model
 {
     /** @return array<string, mixed> */

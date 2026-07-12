@@ -65,7 +65,7 @@ test-feature: ## Run feature tests
 
 .PHONY: setup-test-db
 setup-test-db: ## Create the testing database for running tests
-	@PGHOST=localhost PGUSER=postgres PGPASSWORD=postgres createdb test_he4rtbot 2>/dev/null || echo "Database test_he4rtbot already exists"
+	@php artisan migrate --env=testing --no-interaction --force
 
 .PHONY: migrate-fresh
 migrate-fresh: ## Run migrations and seed the database
@@ -85,12 +85,7 @@ dev: ## Start the server
 
 .PHONY: setup
 setup: ## Setup the project
-	@composer install
-	@npm install
-	@composer run-script post-root-package-install
-	@composer run-script post-create-project-cmd
-	@php artisan key:generate --ansi
-	@php artisan storage:link --ansi
+	@composer run-script setup
 
 .PHONY: import-db
 import-db: ## Import a PostgreSQL dump file (usage: make import-db file=path/to/dump)
@@ -99,6 +94,13 @@ import-db: ## Import a PostgreSQL dump file (usage: make import-db file=path/to/
 .PHONY: bot
 bot: ## Run the Discord bot
 	@php artisan bot:boot
+
+# Fixes the boot error "failed to initialize voice class /
+# LibDaveNotFoundException: libdave is required but could not be loaded" — since
+# 2026-03-01 Discord mandates the DAVE E2EE protocol for voice.
+.PHONY: libdave
+libdave: ## Link libdave (DAVE E2EE) into the Discord bot voice probe path
+	@mkdir -p "$(CURDIR)/.cache" && ln -sfn "$${LIBDAVE_HOME:-$$HOME/.local/lib/libdave}" "$(CURDIR)/.cache/libdave"
 
 .PHONY: truncate
 truncate: ## Truncate laravel.log file

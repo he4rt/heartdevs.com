@@ -3,6 +3,7 @@
 .env
 .env.backup
 .env.production
+.env.testing
 .phpactor.json
 .phpstorm.meta.php
 .phpunit.result.cache
@@ -29,6 +30,7 @@
 /storage/debugbar
 /storage/pail
 /vendor
+/.cache
 Homestead.json
 Homestead.yaml
 *.local
@@ -40,6 +42,10 @@ npm-debug.log
 yarn-error.log
 tests/Browser/Screenshots
 /.composer
+
+# Lerd
+.env.before_lerd
+.lerd.yaml
 
 # === AI Agents ===
 

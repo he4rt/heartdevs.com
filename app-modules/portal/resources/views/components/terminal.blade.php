@@ -61,18 +61,27 @@
             <span class="ml-2 text-xs text-gray-500">he4rt@dev ~</span>
         </div>
 
-        <div class="flex w-full flex-col gap-0.5 p-4 font-mono text-xs leading-tight sm:text-sm">
-            <template x-for="(line, i) in lines.slice(0, visible)" :key="i">
-                <div
-                    x-show="i < visible"
-                    x-transition:enter="transition duration-150"
-                    x-transition:enter-start="opacity-0 translate-y-1"
-                    x-transition:enter-end="opacity-100 translate-y-0"
-                    :class="[colorClass(line.type), line.type === 'blank' ? 'h-2' : '']"
-                >
-                    <span x-text="line.text"></span>
-                </div>
-            </template>
+        <div class="relative p-4 font-mono text-xs leading-tight sm:text-sm">
+            <div class="pointer-events-none invisible flex w-full flex-col gap-0.5" aria-hidden="true">
+                <template x-for="(line, i) in lines" :key="`ghost-${i}`">
+                    <div :class="[line.type === 'blank' ? 'h-2' : '']">
+                        <span x-text="line.text || ' '"></span>
+                    </div>
+                </template>
+            </div>
+
+            <div class="absolute inset-4 flex w-[calc(100%-2rem)] flex-col gap-0.5">
+                <template x-for="(line, i) in lines.slice(0, visible)" :key="i">
+                    <div
+                        x-transition:enter="transition duration-150"
+                        x-transition:enter-start="opacity-0 translate-y-1"
+                        x-transition:enter-end="opacity-100 translate-y-0"
+                        :class="[colorClass(line.type), line.type === 'blank' ? 'h-2' : '']"
+                    >
+                        <span x-text="line.text"></span>
+                    </div>
+                </template>
+            </div>
         </div>
     </div>
 </div>

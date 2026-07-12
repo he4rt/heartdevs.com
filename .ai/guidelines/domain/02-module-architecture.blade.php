@@ -101,9 +101,47 @@ Add `mergeConfigFrom()`, `loadTranslationsFrom()`, `Event::listen()`, `Relation:
 </code-snippet>
 @endverbatim
 
+## Version constraints — mandatory `^1.0.0` style
+
+Every intra-repo `he4rt/*` module dependency (in the root `composer.json` and in any
+module's `composer.json`) MUST be declared with the caret style `^1.0.0`. Never use
+loose constraints like `>=1`, `*`, `dev-main`, or a truncated `^1.0`.
+
+@verbatim
+<code-snippet name="he4rt/* module constraints" lang="json">
+{
+    "require": {
+        // GOOD — caret with full three-part version:
+        "he4rt/identity": "^1.0.0",
+        "he4rt/moderation": "^1.0.0",
+
+        // BAD — loose or truncated constraints:
+        "he4rt/identity": ">=1",
+        "he4rt/moderation": "^1.0",
+        "he4rt/economy": "*"
+    }
+}
+</code-snippet>
+@endverbatim
+
+This keeps every module pinned to a predictable, SemVer-compatible range and avoids
+accidental major upgrades. When you add a new module dependency, match this style.
+
 ## Dependency rules
 
 - **Domain** modules never import from Presentation or Integration.
 - **Integration** modules may depend on Domain (e.g., Identity for user resolution).
 - **Presentation** imports from Domain and Integration, never the reverse.
 - Check `CONTEXT-MAP.md` for cross-context constraints.
+
+## Registering a new module — mandatory label sync
+
+Every `app-modules/<slug>/` has exactly one `mod:<slug>` triage label, and vice
+versa. When you scaffold a **new** module you MUST, in the same change:
+
+1. **Add a row** to the module table in `workflow/triage-labels` (`mod:<slug>` → `<slug>`).
+2. **Create the label on GitHub** so the issue tracker can use it:
+   `gh label create "mod:<slug>" --color "c2e0c6" --description "<short description>"`
+
+Do not leave the guideline table and the live GitHub labels out of sync — an issue
+that can't be tagged with its module's label means triage and routing break.

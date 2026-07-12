@@ -9,8 +9,8 @@ use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
 use Livewire\Component;
 
-#[Layout('portal::components.layouts.app')]
-#[Title('Home')]
+#[Layout(name: 'portal::components.layouts.app')]
+#[Title(content: 'Home')]
 final class Homepage extends Component
 {
     public function render(): View

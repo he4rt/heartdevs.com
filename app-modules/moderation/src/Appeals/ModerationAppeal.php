@@ -29,8 +29,8 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property CarbonInterface $sla_deadline
  * @property CarbonInterface $created_at
  */
-#[Table('moderation_appeals', timestamps: false)]
-#[UseFactory(ModerationAppealFactory::class)]
+#[Table(name: 'moderation_appeals', timestamps: false)]
+#[UseFactory(factoryClass: ModerationAppealFactory::class)]
 final class ModerationAppeal extends Model
 {
     /** @use HasFactory<ModerationAppealFactory> */
