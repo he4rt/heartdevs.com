@@ -10,8 +10,8 @@ use Illuminate\Console\Attributes\Description;
 use Illuminate\Console\Attributes\Signature;
 use Illuminate\Console\Command;
 
-#[Description('Resolve a Twitch channel broadcaster id for the fixed config-based integration')]
-#[Signature('twitch:link-channel {login? : Twitch channel login name (defaults to config broadcaster login)}')]
+#[Description(description: 'Resolve a Twitch channel broadcaster id for the fixed config-based integration')]
+#[Signature(signature: 'twitch:link-channel {login? : Twitch channel login name (defaults to config broadcaster login)}')]
 final class LinkTwitchChannelCommand extends Command
 {
     public function handle(TwitchHelixConnector $helix): int

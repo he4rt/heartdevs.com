@@ -14,9 +14,9 @@ final class Feed extends Component
 {
     use HasLoadMore;
 
-    #[On('timeline.post-created')]
-    #[On('timeline.reply-created')]
-    #[On('timeline.reply-deleted')]
+    #[On(event: 'timeline.post-created')]
+    #[On(event: 'timeline.reply-created')]
+    #[On(event: 'timeline.reply-deleted')]
     public function refresh(): void {}
 
     public function render(): View

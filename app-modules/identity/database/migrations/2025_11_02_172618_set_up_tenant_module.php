@@ -32,7 +32,11 @@ return new class() extends Migration
         }
 
         foreach ($tables as $table => $indexableColumns) {
-            if (!Schema::hasTable($table) || Schema::hasColumn($table, 'tenant_id')) {
+            if (!Schema::hasTable($table)) {
+                continue;
+            }
+
+            if (Schema::hasColumn($table, 'tenant_id')) {
                 continue;
             }
 

@@ -27,14 +27,12 @@ class RegisterSubscriptionsAction extends Action
             ->modalHeading(__('panel-admin::twitch.subscriptions.actions.register'))
             ->modalSubmitActionLabel(__('panel-admin::twitch.subscriptions.actions.register_confirm_button'))
             ->modalWidth(Width::ThreeExtraLarge)
-            ->modalContent(function (): View {
-                return view('panel-admin::twitch.register-subscriptions-modal', [
-                    'broadcaster' => $this->resolveBroadcaster(),
-                    'callbackUrl' => $this->resolveCallbackUrl(),
-                    'groups' => $this->buildEventTypeGroups(),
-                    'secret' => $this->maskSecret(),
-                ]);
-            })
+            ->modalContent(fn (): View => view('panel-admin::twitch.register-subscriptions-modal', [
+                'broadcaster' => $this->resolveBroadcaster(),
+                'callbackUrl' => $this->resolveCallbackUrl(),
+                'groups' => $this->buildEventTypeGroups(),
+                'secret' => $this->maskSecret(),
+            ]))
             ->action(static function (): void {
                 $action = resolve(RegisterTwitchSubscriptionsAction::class);
                 $result = $action();

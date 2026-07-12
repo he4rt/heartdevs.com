@@ -207,13 +207,7 @@ it('aplica filtros de tipo, repo, desfecho e pessoa', function (): void {
 });
 
 it('keeps only truly-closed PRs under outcome=closed: !(A ∧ ¬B) ≡ ¬A ∨ B', function (string $state, bool $merged, bool $shouldKeep): void {
-    contribution($this->tenant, [
-        'actor_login' => 'a',
-        'type' => ContributionType::Pr,
-        'external_ref' => 'pr:1',
-        'occurred_at' => '2026-06-02',
-        'metadata' => ['state' => $state, 'merged' => $merged],
-    ]);
+    contribution($this->tenant);
 
     $filters = RetrospectiveFilters::make($this->since, $this->until, outcome: 'closed');
     $data = ($this->build)($filters);

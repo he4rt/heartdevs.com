@@ -82,7 +82,11 @@ return new class extends Migration
     public function down(): void
     {
         foreach ($this->tenantColumnTables as $table) {
-            if (!Schema::hasTable($table) || Schema::hasColumn($table, 'tenant_id')) {
+            if (!Schema::hasTable($table)) {
+                continue;
+            }
+
+            if (Schema::hasColumn($table, 'tenant_id')) {
                 continue;
             }
 
@@ -187,8 +191,8 @@ return new class extends Migration
 
             // Conventional FK name, plus the legacy `providers_*` name kept by
             // external_identities. Both guarded so tables without an FK no-op.
-            DB::statement("ALTER TABLE {$table} DROP CONSTRAINT IF EXISTS {$table}_tenant_id_foreign");
-            DB::statement("ALTER TABLE {$table} DROP CONSTRAINT IF EXISTS providers_tenant_id_foreign");
+            DB::statement(sprintf('ALTER TABLE %s DROP CONSTRAINT IF EXISTS %s_tenant_id_foreign', $table, $table));
+            DB::statement(sprintf('ALTER TABLE %s DROP CONSTRAINT IF EXISTS providers_tenant_id_foreign', $table));
 
             Schema::table($table, static function (Blueprint $blueprint): void {
                 $blueprint->dropColumn('tenant_id');
