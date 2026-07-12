@@ -19,6 +19,11 @@ return [
         'plural' => 'Event Logs',
     ],
 
+    'connect' => [
+        'connect' => 'Connect Twitch',
+        'reconnect' => 'Reconnect Twitch (:login)',
+    ],
+
     'subscriptions' => [
         'label' => 'Subscription',
         'plural' => 'Subscriptions',
