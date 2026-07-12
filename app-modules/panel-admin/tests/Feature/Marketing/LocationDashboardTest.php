@@ -3,7 +3,6 @@
 declare(strict_types=1);
 
 use Filament\Facades\Filament;
-use He4rt\Identity\Tenant\Models\Tenant;
 use He4rt\Identity\User\Models\User;
 use He4rt\PanelAdmin\Marketing\Pages\Location\LocationDashboard;
 use Illuminate\Support\Facades\Cache;
@@ -24,12 +23,9 @@ beforeEach(function (): void {
     ]);
 
     $admin = User::factory()->create();
-    $tenant = Tenant::factory()->create();
-    $tenant->members()->attach($admin);
 
     $this->actingAs($admin);
     Filament::setCurrentPanel(Filament::getPanel('admin'));
-    Filament::setTenant($tenant);
 });
 
 test('the location dashboard renders for an admin', function (): void {

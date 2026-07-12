@@ -6,11 +6,6 @@ use Illuminate\Support\Facades\Date;
 
 return [
     'admins' => env('HE4RT_ADMINS_USERNAMES', 'danielhe4rt,kaster'),
-    // Single-tenant deployment: the fixed tenant UUID used while the legacy
-    // tenant_id columns still exist (dropped in a later phase). Sourced from
-    // env so the former Discord-guild → tenant infrastructure mapping lives in
-    // config instead of an ExternalIdentity(model_type='tenant') row.
-    'tenant_id' => env('HE4RT_TENANT_ID'),
     'season' => [
         'id' => (int) env('HE4RT_SEASON_ID', 2),
         'minimum_level_for_retro' => env('HE4RT_SEASON_MIN_LEVEL', 3),
