@@ -4,17 +4,10 @@ declare(strict_types=1);
 
 namespace He4rt\PanelAdmin\Discord\Resources\DiscordEventLogs\Pages;
 
-use Filament\Resources\Pages\CreateRecord;
+use Filament\Resources\Pages\ViewRecord;
 use He4rt\PanelAdmin\Discord\Resources\DiscordEventLogs\DiscordEventLogResource;
 
-class CreateDiscordEventLog extends CreateRecord
+class ViewDiscordEventLog extends ViewRecord
 {
     protected static string $resource = DiscordEventLogResource::class;
-
-    protected function getHeaderActions(): array
-    {
-        return [
-
-        ];
-    }
 }
