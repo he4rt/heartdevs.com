@@ -10,7 +10,7 @@ use Filament\Support\Icons\Heroicon;
 
 class DiscordCluster extends Cluster
 {
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedCodeBracket;
+    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedChatBubbleLeftRight;
 
     protected static ?int $navigationSort = 40;
 
@@ -20,11 +20,11 @@ class DiscordCluster extends Cluster
 
     public static function getNavigationLabel(): string
     {
-        return 'Discord';
+        return __('panel-admin::discord.navigation.cluster');
     }
 
     public static function getClusterBreadcrumb(): ?string
     {
-        return 'Discord';
+        return __('panel-admin::discord.navigation.cluster_breadcrumb');
     }
 }

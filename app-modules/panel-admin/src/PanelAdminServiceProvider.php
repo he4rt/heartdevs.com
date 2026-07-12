@@ -8,7 +8,6 @@ use Filament\Navigation\NavigationBuilder;
 use Filament\Navigation\NavigationItem;
 use Filament\Panel;
 use He4rt\PanelAdmin\Discord\DiscordCluster;
-use He4rt\PanelAdmin\Filament\Resources\Discords\DiscordResource;
 use He4rt\PanelAdmin\Filament\Resources\ExternalIdentities\ExternalIdentityResource;
 use He4rt\PanelAdmin\Github\GithubCluster;
 use He4rt\PanelAdmin\Marketing\MarketingCluster;
@@ -63,6 +62,10 @@ class PanelAdminServiceProvider extends ServiceProvider
                 ->discoverPages(
                     in: __DIR__.'/Twitch/Pages',
                     for: 'He4rt\\PanelAdmin\\Twitch\\Pages',
+                )
+                ->discoverPages(
+                    in: __DIR__.'/Discord/Pages',
+                    for: 'He4rt\\PanelAdmin\\Discord\\Pages',
                 )
                 ->discoverResources(
                     in: __DIR__.'/Github/Resources',
@@ -136,6 +139,7 @@ class PanelAdminServiceProvider extends ServiceProvider
 
         ])->groups(resolve(ModerationCluster::class)->getCachedSubNavigation());
     }
+
     private function discordNavigation(NavigationBuilder $builder): NavigationBuilder
     {
         return $builder->items([
