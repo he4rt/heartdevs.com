@@ -5,30 +5,51 @@ declare(strict_types=1);
 namespace He4rt\PanelAdmin\Discord\Resources\DiscordMembers;
 
 use BackedEnum;
+use Filament\Resources\Pages\PageRegistration;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
 use He4rt\IntegrationDiscord\Models\DiscordMember;
 use He4rt\PanelAdmin\Discord\DiscordCluster;
-use He4rt\PanelAdmin\Discord\Resources\DiscordMembers\Schemas\DiscordMemberForm;
+use He4rt\PanelAdmin\Discord\Resources\DiscordMembers\Pages\ListDiscordMembers;
+use He4rt\PanelAdmin\Discord\Resources\DiscordMembers\Pages\ViewDiscordMember;
 use He4rt\PanelAdmin\Discord\Resources\DiscordMembers\Schemas\DiscordMemberInfolist;
 use He4rt\PanelAdmin\Discord\Resources\DiscordMembers\Tables\DiscordMembersTable;
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 
 class DiscordMemberResource extends Resource
 {
     protected static ?string $cluster = DiscordCluster::class;
+
     protected static ?string $model = DiscordMember::class;
 
     protected static ?string $slug = 'discord-members';
 
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
+    protected static ?string $recordTitleAttribute = 'username';
 
-    public static function form(Schema $schema): Schema
+    protected static ?int $navigationSort = 4;
+
+    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedUsers;
+
+    public static function getNavigationLabel(): string
     {
-        return DiscordMemberForm::configure($schema);
+        return __('panel-admin::discord.navigation.members');
+    }
+
+    public static function getNavigationGroup(): ?string
+    {
+        return __('panel-admin::discord.navigation.group_server');
+    }
+
+    public static function getModelLabel(): string
+    {
+        return __('panel-admin::discord.members.label');
+    }
+
+    public static function getPluralModelLabel(): string
+    {
+        return __('panel-admin::discord.members.plural');
     }
 
     public static function infolist(Schema $schema): Schema
@@ -41,26 +62,20 @@ class DiscordMemberResource extends Resource
         return DiscordMembersTable::table($table);
     }
 
+    /**
+     * @return array<string, PageRegistration>
+     */
     public static function getPages(): array
     {
         return [
-            'index' => \He4rt\PanelAdmin\Discord\Resources\DiscordMembers\Pages\ListDiscordMembers::route('/'),
-            'create' => \He4rt\PanelAdmin\Discord\Resources\DiscordMembers\Pages\CreateDiscordMember::route('/create'),
-            'edit' => \He4rt\PanelAdmin\Discord\Resources\DiscordMembers\Pages\EditDiscordMember::route('/{record}/edit'),
+            'index' => ListDiscordMembers::route('/'),
+            'view' => ViewDiscordMember::route('/{record}'),
         ];
-    }
-
-    /**
-     * @return Builder<DiscordMember>
-     */
-    public static function getGlobalSearchEloquentQuery(): Builder
-    {
-        return parent::getGlobalSearchEloquentQuery()->with(['guild', 'externalIdentity']);
     }
 
     public static function getGloballySearchableAttributes(): array
     {
-        return ['guild.name', 'externalIdentity.email'];
+        return ['username', 'global_name', 'nickname'];
     }
 
     /**
@@ -70,12 +85,12 @@ class DiscordMemberResource extends Resource
     {
         $details = [];
 
-        if ($record->guild) {
-            $details['Guild'] = $record->guild->name;
+        if ($record->global_name) {
+            $details[__('panel-admin::discord.members.fields.global_name')] = $record->global_name;
         }
 
-        if ($record->externalIdentity) {
-            $details['ExternalIdentity'] = $record->externalIdentity->email;
+        if ($record->nickname) {
+            $details[__('panel-admin::discord.members.fields.nickname')] = $record->nickname;
         }
 
         return $details;

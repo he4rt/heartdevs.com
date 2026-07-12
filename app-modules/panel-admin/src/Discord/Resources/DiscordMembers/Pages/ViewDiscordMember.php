@@ -4,17 +4,10 @@ declare(strict_types=1);
 
 namespace He4rt\PanelAdmin\Discord\Resources\DiscordMembers\Pages;
 
-use Filament\Resources\Pages\CreateRecord;
+use Filament\Resources\Pages\ViewRecord;
 use He4rt\PanelAdmin\Discord\Resources\DiscordMembers\DiscordMemberResource;
 
-class CreateDiscordMember extends CreateRecord
+class ViewDiscordMember extends ViewRecord
 {
     protected static string $resource = DiscordMemberResource::class;
-
-    protected function getHeaderActions(): array
-    {
-        return [
-
-        ];
-    }
 }

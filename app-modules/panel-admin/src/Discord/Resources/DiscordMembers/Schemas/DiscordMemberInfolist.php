@@ -4,56 +4,98 @@ declare(strict_types=1);
 
 namespace He4rt\PanelAdmin\Discord\Resources\DiscordMembers\Schemas;
 
+use Filament\Infolists\Components\IconEntry;
+use Filament\Infolists\Components\ImageEntry;
 use Filament\Infolists\Components\TextEntry;
+use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
+use Filament\Support\Enums\FontWeight;
+use He4rt\IntegrationDiscord\Models\DiscordMember;
+use He4rt\PanelAdmin\Discord\Resources\DiscordGuilds\DiscordGuildResource;
 
 class DiscordMemberInfolist
 {
     public static function configure(Schema $schema): Schema
     {
         return $schema
+            ->columns(1)
             ->components([
-                TextEntry::make('id')
-                    ->label('Id'),
+                Section::make(__('panel-admin::discord.members.sections.profile'))
+                    ->columns(2)
+                    ->schema([
+                        ImageEntry::make('avatar')
+                            ->label(__('panel-admin::discord.members.fields.avatar'))
+                            ->circular()
+                            ->state(fn (DiscordMember $record): ?string => $record->avatar
+                                ? sprintf('https://cdn.discordapp.com/avatars/%s/%s.png?size=128', $record->discord_user_id, $record->avatar)
+                                : null)
+                            ->defaultImageUrl(fn (DiscordMember $record): string => sprintf('https://cdn.discordapp.com/embed/avatars/%d.png', ((int) $record->discord_user_id >> 22) % 6)),
 
-                TextEntry::make('guild.name')
-                    ->label('Discord Guild Id'),
+                        TextEntry::make('username')
+                            ->label(__('panel-admin::discord.members.fields.username'))
+                            ->weight(FontWeight::Bold),
 
-                TextEntry::make('discord_user_id')
-                    ->label('Discord User Id'),
+                        TextEntry::make('global_name')
+                            ->label(__('panel-admin::discord.members.fields.global_name'))
+                            ->placeholder('—'),
 
-                TextEntry::make('externalIdentity.email')
-                    ->label('External Identity Id'),
+                        TextEntry::make('nickname')
+                            ->label(__('panel-admin::discord.members.fields.nickname'))
+                            ->placeholder('—'),
 
-                TextEntry::make('username')
-                    ->label('Username'),
+                        TextEntry::make('discord_user_id')
+                            ->label(__('panel-admin::discord.members.fields.discord_user_id'))
+                            ->copyable(),
 
-                TextEntry::make('global_name')
-                    ->label('Global Name'),
+                        TextEntry::make('guild.name')
+                            ->label(__('panel-admin::discord.members.fields.guild'))
+                            ->url(fn (DiscordMember $record): string => DiscordGuildResource::getUrl('view', ['record' => $record->guild]))
+                            ->color('primary'),
+                    ]),
 
-                TextEntry::make('avatar')
-                    ->label('Avatar'),
+                Section::make(__('panel-admin::discord.members.sections.status'))
+                    ->columns(2)
+                    ->schema([
+                        IconEntry::make('is_bot')
+                            ->label(__('panel-admin::discord.members.fields.is_bot'))
+                            ->boolean(),
 
-                TextEntry::make('nickname')
-                    ->label('Nickname'),
+                        IconEntry::make('is_pending')
+                            ->label(__('panel-admin::discord.members.fields.is_pending'))
+                            ->boolean(),
 
-                TextEntry::make('is_bot')
-                    ->label('Is Bot'),
+                        TextEntry::make('joined_at')
+                            ->label(__('panel-admin::discord.members.fields.joined_at'))
+                            ->dateTime('d/m/Y H:i')
+                            ->timezone(config('app.display_timezone')),
 
-                TextEntry::make('is_pending')
-                    ->label('Is Pending'),
+                        TextEntry::make('premium_since')
+                            ->label(__('panel-admin::discord.members.fields.premium_since'))
+                            ->dateTime('d/m/Y H:i')
+                            ->timezone(config('app.display_timezone'))
+                            ->placeholder('—'),
 
-                TextEntry::make('joined_at')
-                    ->label('Joined At'),
+                        TextEntry::make('communication_disabled_until')
+                            ->label(__('panel-admin::discord.members.fields.communication_disabled_until'))
+                            ->dateTime('d/m/Y H:i')
+                            ->timezone(config('app.display_timezone'))
+                            ->placeholder('—'),
 
-                TextEntry::make('premium_since')
-                    ->label('Premium Since'),
+                        TextEntry::make('left_at')
+                            ->label(__('panel-admin::discord.members.fields.left_at'))
+                            ->dateTime('d/m/Y H:i')
+                            ->timezone(config('app.display_timezone'))
+                            ->placeholder('—'),
+                    ]),
 
-                TextEntry::make('communication_disabled_until')
-                    ->label('Communication Disabled Until'),
-
-                TextEntry::make('left_at')
-                    ->label('Left At'),
+                Section::make(__('panel-admin::discord.members.sections.roles'))
+                    ->schema([
+                        TextEntry::make('roles.name')
+                            ->label(__('panel-admin::discord.members.fields.roles'))
+                            ->badge()
+                            ->columnSpanFull()
+                            ->placeholder('—'),
+                    ]),
             ]);
     }
 }
