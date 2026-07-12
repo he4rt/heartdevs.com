@@ -7,6 +7,8 @@ namespace He4rt\PanelAdmin;
 use Filament\Navigation\NavigationBuilder;
 use Filament\Navigation\NavigationItem;
 use Filament\Panel;
+use He4rt\PanelAdmin\Discord\DiscordCluster;
+use He4rt\PanelAdmin\Filament\Resources\Discords\DiscordResource;
 use He4rt\PanelAdmin\Filament\Resources\ExternalIdentities\ExternalIdentityResource;
 use He4rt\PanelAdmin\Github\GithubCluster;
 use He4rt\PanelAdmin\Marketing\MarketingCluster;
@@ -31,7 +33,13 @@ class PanelAdminServiceProvider extends ServiceProvider
             }
 
             $panel
-                ->pages([ModerationCluster::class, MarketingCluster::class, TwitchCluster::class, GithubCluster::class])
+                ->pages([
+                    ModerationCluster::class,
+                    MarketingCluster::class,
+                    TwitchCluster::class,
+                    GithubCluster::class,
+                    DiscordCluster::class,
+                ])
                 ->navigation($this->buildNavigation(...))
                 ->resources([
                     ExternalIdentityResource::class,
@@ -59,6 +67,10 @@ class PanelAdminServiceProvider extends ServiceProvider
                 ->discoverResources(
                     in: __DIR__.'/Github/Resources',
                     for: 'He4rt\\PanelAdmin\\Github\\Resources',
+                )
+                ->discoverResources(
+                    in: __DIR__.'/Discord/Resources',
+                    for: 'He4rt\\PanelAdmin\\Discord\\Resources',
                 );
         });
     }
@@ -75,7 +87,6 @@ class PanelAdminServiceProvider extends ServiceProvider
 
     private function buildNavigation(NavigationBuilder $builder): NavigationBuilder
     {
-        request();
 
         $requestPath = str(request()->path());
         // Livewire update requests go to /livewire/update, so the
@@ -96,6 +107,7 @@ class PanelAdminServiceProvider extends ServiceProvider
             $requestPath->contains('mod/') => $this->moderationNavigation($builder),
             $requestPath->contains('marketing/') => $this->marketingNavigation($builder),
             $requestPath->contains('twitch/') => $this->twitchNavigation($builder),
+            $requestPath->contains('discord/') => $this->discordNavigation($builder),
             default => $this->defaultNavigation($builder),
         };
 
@@ -110,6 +122,7 @@ class PanelAdminServiceProvider extends ServiceProvider
             ...TwitchCluster::getNavigationItems(),
             ...GithubCluster::getNavigationItems(),
             ...ExternalIdentityResource::getNavigationItems(),
+            ...DiscordCluster::getNavigationItems(),
         ]);
     }
 
@@ -122,6 +135,16 @@ class PanelAdminServiceProvider extends ServiceProvider
                 ->url(Dashboard::getUrl()),
 
         ])->groups(resolve(ModerationCluster::class)->getCachedSubNavigation());
+    }
+    private function discordNavigation(NavigationBuilder $builder): NavigationBuilder
+    {
+        return $builder->items([
+            NavigationItem::make(__('panel-admin::marketing.navigation.back_to_admin'))
+                ->sort(0)
+                ->icon('heroicon-o-arrow-left')
+                ->url(Dashboard::getUrl()),
+
+        ])->groups(resolve(DiscordCluster::class)->getCachedSubNavigation());
     }
 
     private function marketingNavigation(NavigationBuilder $builder): NavigationBuilder
