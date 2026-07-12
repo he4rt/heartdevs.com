@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace He4rt\IntegrationTwitch\Transport;
 
+use He4rt\IntegrationTwitch\OAuth\TwitchAppTokenService;
 use Saloon\Http\Auth\TokenAuthenticator;
 use Saloon\Http\Connector;
 use Saloon\Traits\Plugins\HasTimeout;
@@ -17,7 +18,7 @@ final class TwitchHelixConnector extends Connector
     protected int $requestTimeout = 10;
 
     public function __construct(
-        private readonly string $appToken,
+        private readonly TwitchAppTokenService $tokenService,
         private readonly string $clientId,
     ) {}
 
@@ -28,7 +29,7 @@ final class TwitchHelixConnector extends Connector
 
     protected function defaultAuth(): TokenAuthenticator
     {
-        return new TokenAuthenticator($this->appToken);
+        return new TokenAuthenticator($this->tokenService->getToken());
     }
 
     /**

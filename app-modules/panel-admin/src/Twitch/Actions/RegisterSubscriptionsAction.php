@@ -88,7 +88,9 @@ class RegisterSubscriptionsAction extends Action
 
     private function resolveCallbackUrl(): string
     {
-        $configured = config()->string('services.twitch.eventsub_callback', '');
+        // Cast instead of config()->string(): the key may be present-but-null when
+        // TWITCH_EVENTSUB_CALLBACK is unset, and config()->string() throws on null.
+        $configured = (string) config('services.twitch.eventsub_callback', '');
 
         if ($configured !== '') {
             return $configured;

@@ -2,9 +2,29 @@
 
 declare(strict_types=1);
 
+use He4rt\IntegrationTwitch\OAuth\TwitchAppTokenService;
 use He4rt\IntegrationTwitch\Transport\TwitchHelixConnector;
+use He4rt\IntegrationTwitch\Transport\TwitchOAuthConnector;
+use Illuminate\Support\Facades\Cache;
 use Saloon\Http\Faking\MockClient;
 use Saloon\Http\Faking\MockResponse;
+
+function fakeTwitchHelixConnector(MockClient $mock): TwitchHelixConnector
+{
+    // The app token is resolved lazily by the connector; seed the cache so
+    // getToken() short-circuits without hitting the real Twitch OAuth endpoint.
+    Cache::put('twitch_app_access_token', 'fake-token', 3_600);
+
+    return tap(
+        new TwitchHelixConnector(
+            tokenService: new TwitchAppTokenService(
+                new TwitchOAuthConnector(clientId: 'fake-client-id', clientSecret: 'fake-secret'),
+            ),
+            clientId: 'fake-client-id',
+        ),
+        fn (TwitchHelixConnector $connector) => $connector->withMockClient($mock),
+    );
+}
 
 function mockHelixUsersResponse(string $id = '12345', string $login = 'danielhe4rt', string $displayName = 'danielhe4rt'): MockClient
 {
@@ -20,10 +40,7 @@ function mockHelixUsersResponse(string $id = '12345', string $login = 'danielhe4
         ]),
     ]);
 
-    app()->instance(TwitchHelixConnector::class, tap(
-        new TwitchHelixConnector(appToken: 'fake-token', clientId: 'fake-client-id'),
-        fn (TwitchHelixConnector $connector) => $connector->withMockClient($mock),
-    ));
+    app()->instance(TwitchHelixConnector::class, fakeTwitchHelixConnector($mock));
 
     return $mock;
 }
@@ -43,10 +60,7 @@ test('fails when twitch user is not found', function (): void {
         '*' => MockResponse::make(['data' => []]),
     ]);
 
-    app()->instance(TwitchHelixConnector::class, tap(
-        new TwitchHelixConnector(appToken: 'fake-token', clientId: 'fake-client-id'),
-        fn (TwitchHelixConnector $connector) => $connector->withMockClient($mock),
-    ));
+    app()->instance(TwitchHelixConnector::class, fakeTwitchHelixConnector($mock));
 
     $this->artisan('twitch:link-channel', ['login' => 'nonexistent'])
         ->assertFailed();
