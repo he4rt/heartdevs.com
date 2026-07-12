@@ -85,11 +85,6 @@ final class Profile extends Model
         return $this->belongsTo(User::class);
     }
 
-    protected static function newFactory(): ProfileFactory
-    {
-        return ProfileFactory::new();
-    }
-
     /**
      * @return HasMany<WorkExperience, $this>
      */
@@ -116,6 +111,11 @@ final class Profile extends Model
         return $this->belongsToMany(Skill::class, 'profile_skills')
             ->withPivot(['proficiency', 'years_experience'])
             ->withTimestamps();
+    }
+
+    protected static function newFactory(): ProfileFactory
+    {
+        return ProfileFactory::new();
     }
 
     /**
