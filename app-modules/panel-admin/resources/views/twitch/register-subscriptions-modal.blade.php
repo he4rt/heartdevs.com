@@ -15,8 +15,8 @@
         <div class="flex items-start gap-3 rounded-xl border border-red-500/30 bg-red-500/5 p-4">
             <x-filament::icon icon="heroicon-o-exclamation-triangle" class="mt-0.5 h-5 w-5 shrink-0 text-red-400" />
             <div>
-                <p class="text-sm font-medium text-red-400">No Twitch channel linked</p>
-                <p class="mt-1 text-xs text-red-400/70">Connect a Twitch channel to this tenant before registering subscriptions. Use the Tenant Settings page or run <code class="rounded bg-red-500/10 px-1 py-0.5 font-mono text-[10px]">twitch:link-channel</code>.</p>
+                <p class="text-sm font-medium text-red-400">No Twitch account connected</p>
+                <p class="mt-1 text-xs text-red-400/70">Connect your Twitch account with the <span class="font-medium">“Connect Twitch”</span> button on this page before registering subscriptions.</p>
             </div>
         </div>
     @else

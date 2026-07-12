@@ -50,8 +50,7 @@ test('resolves a twitch channel broadcaster id and prints the env config', funct
 
     $this->artisan('twitch:link-channel', ['login' => 'danielhe4rt'])
         ->expectsOutputToContain('Broadcaster ID: 12345')
-        ->expectsOutputToContain('TWITCH_BROADCASTER_LOGIN=danielhe4rt')
-        ->expectsOutputToContain('TWITCH_BROADCASTER_ID=12345')
+        ->expectsOutputToContain('php artisan twitch:subscribe 12345 --all')
         ->assertSuccessful();
 });
 

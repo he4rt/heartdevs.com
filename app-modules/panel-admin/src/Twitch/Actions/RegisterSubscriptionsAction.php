@@ -9,6 +9,7 @@ use Filament\Notifications\Notification;
 use Filament\Support\Enums\Width;
 use He4rt\Identity\ExternalIdentity\Enums\IdentityProvider;
 use He4rt\Identity\ExternalIdentity\Models\ExternalIdentity;
+use He4rt\Identity\User\Models\User;
 use He4rt\IntegrationTwitch\Actions\RegisterTwitchSubscriptionsAction;
 use He4rt\IntegrationTwitch\Enums\TwitchEventSubType;
 use He4rt\IntegrationTwitch\Models\TwitchSubscription;
@@ -33,19 +34,20 @@ class RegisterSubscriptionsAction extends Action
                 'groups' => $this->buildEventTypeGroups(),
                 'secret' => $this->maskSecret(),
             ]))
-            ->action(static function (): void {
-                $action = resolve(RegisterTwitchSubscriptionsAction::class);
-                $result = $action();
+            ->action(function (): void {
+                $broadcaster = $this->resolveBroadcaster();
 
-                if ($result['errors']['broadcaster'] ?? null) {
+                if ($broadcaster === null) {
                     Notification::make()
                         ->danger()
                         ->title(__('panel-admin::twitch.subscriptions.actions.register_failed'))
-                        ->body($result['errors']['broadcaster'])
+                        ->body(__('panel-admin::twitch.subscriptions.actions.no_broadcaster'))
                         ->send();
 
                     return;
                 }
+
+                $result = resolve(RegisterTwitchSubscriptionsAction::class)($broadcaster['id']);
 
                 Notification::make()
                     ->success()
@@ -66,17 +68,27 @@ class RegisterSubscriptionsAction extends Action
     }
 
     /**
+     * The broadcaster is the Twitch account connected to the authenticated
+     * admin — no config/env fallback. The admin connects it via the
+     * "Connect Twitch" action on this page.
+     *
      * @return array{id: string, login: string}|null
      */
     private function resolveBroadcaster(): ?array
     {
-        $identity = ExternalIdentity::query()
+        $user = filament()->auth()->user();
+
+        if (!$user instanceof User) {
+            return null;
+        }
+
+        $identity = $user->providers()
             ->where('provider', IdentityProvider::Twitch)
             ->whereNotNull('connected_at')
             ->whereNull('disconnected_at')
             ->first();
 
-        if (!$identity) {
+        if (!$identity instanceof ExternalIdentity) {
             return null;
         }
 
