@@ -5,6 +5,9 @@ declare(strict_types=1);
 namespace He4rt\IntegrationDiscord\Models;
 
 use Carbon\CarbonInterface;
+use He4rt\IntegrationDiscord\Database\Factories\DiscordEventLogFactory;
+use Illuminate\Database\Eloquent\Attributes\UseFactory;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 /**
@@ -17,8 +20,12 @@ use Illuminate\Database\Eloquent\Model;
  * @property CarbonInterface|null $created_at
  * @property CarbonInterface|null $updated_at
  */
+#[UseFactory(factoryClass: DiscordEventLogFactory::class)]
 final class DiscordEventLog extends Model
 {
+    /** @use HasFactory<DiscordEventLogFactory> */
+    use HasFactory;
+
     /**
      * @return array<string, string>
      */
