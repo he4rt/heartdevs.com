@@ -10,6 +10,7 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
+use He4rt\IntegrationDiscord\Enums\DiscordEventType;
 use He4rt\IntegrationDiscord\Models\DiscordEventLog;
 use Illuminate\Database\Eloquent\Builder;
 
@@ -25,15 +26,10 @@ class DiscordEventLogsTable
                 TextColumn::make('event_type')
                     ->label(__('panel-admin::discord.event_logs.fields.event_type'))
                     ->badge()
-                    ->color(fn (string $state): string => match (true) {
-                        str_starts_with($state, 'MESSAGE_') => 'info',
-                        str_starts_with($state, 'GUILD_MEMBER_') || str_starts_with($state, 'GUILD_JOIN_') => 'success',
-                        str_starts_with($state, 'GUILD_BAN_') || str_starts_with($state, 'AUTO_MODERATION_') => 'danger',
-                        str_starts_with($state, 'VOICE_') || str_starts_with($state, 'STAGE_') => 'warning',
-                        str_starts_with($state, 'GUILD_AUDIT_') => 'danger',
-                        str_starts_with($state, 'CHANNEL_') || str_starts_with($state, 'THREAD_') => 'primary',
-                        default => 'gray',
-                    })
+                    ->formatStateUsing(fn (string $state): string => DiscordEventType::tryFrom($state)?->getLabel() ?? $state)
+                    ->color(fn (string $state): string => DiscordEventType::tryFrom($state)?->getColor() ?? 'gray')
+                    ->icon(fn (string $state) => DiscordEventType::tryFrom($state)?->getIcon())
+                    ->tooltip(fn (string $state): string => $state)
                     ->searchable()
                     ->sortable(),
 
@@ -67,7 +63,8 @@ class DiscordEventLogsTable
                         ->select('event_type')
                         ->distinct()
                         ->orderBy('event_type')
-                        ->pluck('event_type', 'event_type')
+                        ->pluck('event_type')
+                        ->mapWithKeys(fn (string $type): array => [$type => DiscordEventType::tryFrom($type)?->getLabel() ?? $type])
                         ->all())
                     ->multiple()
                     ->searchable(),

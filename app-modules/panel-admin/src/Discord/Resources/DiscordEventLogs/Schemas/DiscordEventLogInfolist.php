@@ -8,6 +8,7 @@ use Filament\Infolists\Components\CodeEntry;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
+use He4rt\IntegrationDiscord\Enums\DiscordEventType;
 use He4rt\IntegrationDiscord\Models\DiscordEventLog;
 use He4rt\IntegrationDiscord\Models\DiscordMember;
 use He4rt\PanelAdmin\Discord\Resources\DiscordMembers\DiscordMemberResource;
@@ -25,15 +26,10 @@ class DiscordEventLogInfolist
                         TextEntry::make('event_type')
                             ->label(__('panel-admin::discord.event_logs.fields.event_type'))
                             ->badge()
-                            ->color(fn (string $state): string => match (true) {
-                                str_starts_with($state, 'MESSAGE_') => 'info',
-                                str_starts_with($state, 'GUILD_MEMBER_') || str_starts_with($state, 'GUILD_JOIN_') => 'success',
-                                str_starts_with($state, 'GUILD_BAN_') || str_starts_with($state, 'AUTO_MODERATION_') => 'danger',
-                                str_starts_with($state, 'VOICE_') || str_starts_with($state, 'STAGE_') => 'warning',
-                                str_starts_with($state, 'GUILD_AUDIT_') => 'danger',
-                                str_starts_with($state, 'CHANNEL_') || str_starts_with($state, 'THREAD_') => 'primary',
-                                default => 'gray',
-                            }),
+                            ->formatStateUsing(fn (string $state): string => DiscordEventType::tryFrom($state)?->getLabel() ?? $state)
+                            ->color(fn (string $state): string => DiscordEventType::tryFrom($state)?->getColor() ?? 'gray')
+                            ->icon(fn (string $state) => DiscordEventType::tryFrom($state)?->getIcon())
+                            ->tooltip(fn (string $state): string => $state),
 
                         TextEntry::make('created_at')
                             ->label(__('panel-admin::discord.event_logs.fields.created_at'))
