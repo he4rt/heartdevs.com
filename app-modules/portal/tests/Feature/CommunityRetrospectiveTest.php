@@ -192,6 +192,16 @@ it('agrupa PRs por repositório e lista destaques por linhas mudadas', function 
         ->and($data['highlights'][0]['repo'])->toBe('he4rt/heartdevs.com');
 });
 
+it('esconde da lista repos sem PR no recorte mas mantém suas contribuições nas stats', function (): void {
+    contribution(['actor_login' => 'maria', 'repo' => 'he4rt/com-pr', 'type' => ContributionType::Pr, 'external_ref' => 'pr:1', 'occurred_at' => '2026-06-02', 'metadata' => ['state' => 'merged', 'merged' => true, 'title' => 't', 'url' => 'u', 'additions' => 5, 'deletions' => 1, 'changed_files' => 1]]);
+    contribution(['actor_login' => 'joao', 'repo' => 'he4rt/so-review', 'type' => ContributionType::Review, 'external_ref' => 'review:1', 'occurred_at' => '2026-06-02']);
+
+    $data = ($this->build)();
+
+    expect(collect($data['repos'])->pluck('full_name')->all())->toBe(['he4rt/com-pr'])
+        ->and($data['meta']['reviews'])->toBe(1); // review segue contando nas stats gerais
+});
+
 it('aplica filtros de tipo, repo, desfecho e pessoa', function (): void {
     contribution(['actor_login' => 'maria', 'repo' => 'he4rt/a', 'type' => ContributionType::Pr, 'external_ref' => 'pr:1', 'occurred_at' => '2026-06-02', 'metadata' => ['state' => 'merged', 'merged' => true]]);
     contribution(['actor_login' => 'maria', 'repo' => 'he4rt/a', 'type' => ContributionType::Pr, 'external_ref' => 'pr:2', 'occurred_at' => '2026-06-02', 'metadata' => ['state' => 'open', 'merged' => false]]);

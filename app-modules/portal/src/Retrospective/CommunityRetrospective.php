@@ -269,6 +269,10 @@ final readonly class CommunityRetrospective
                     ],
                 ];
             })
+            // Só entram na retrospectiva repos com ao menos 1 PR no recorte;
+            // atividade só de review/issue/comentário some do card (mas segue
+            // contando em meta/people/highlights).
+            ->filter(fn (array $repo): bool => $repo['metrics']['prs'] > 0)
             ->values()
             ->all());
     }
