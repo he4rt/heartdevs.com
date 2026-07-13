@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace He4rt\Moderation\Appeals;
 
 use Carbon\CarbonInterface;
-use He4rt\Identity\Tenant\Models\Tenant;
 use He4rt\Identity\User\Models\User;
 use He4rt\Moderation\Database\Factories\ModerationAppealFactory;
 use He4rt\Moderation\Enforcement\ModerationAction;
@@ -28,7 +27,6 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property string|null $reviewer_notes
  * @property CarbonInterface|null $resolved_at
  * @property CarbonInterface $sla_deadline
- * @property string|null $tenant_id
  * @property CarbonInterface $created_at
  */
 #[Table(name: 'moderation_appeals', timestamps: false)]
@@ -38,12 +36,6 @@ final class ModerationAppeal extends Model
     /** @use HasFactory<ModerationAppealFactory> */
     use HasFactory;
     use HasUuids;
-
-    /** @return BelongsTo<Tenant, $this> */
-    public function tenant(): BelongsTo
-    {
-        return $this->belongsTo(Tenant::class);
-    }
 
     /** @return BelongsTo<ModerationAction, $this> */
     public function action(): BelongsTo

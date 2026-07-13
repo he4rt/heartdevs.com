@@ -24,7 +24,6 @@ final readonly class StartMeeting
         $externalIdentity = $this->findExternalIdentity->handle($provider, $providerId);
 
         $currentMeeting = Meeting::query()->create([
-            'tenant_id' => request()->input('tenant_id'),
             'meeting_type_id' => $meetingDTO->meetingTypeId,
             'admin_id' => $externalIdentity->model_id,
             'starts_at' => now(),

@@ -10,7 +10,6 @@ use Discord\WebSockets\Event as Events;
 use He4rt\Activity\Voice\Actions\RecordVoicePresence;
 use He4rt\Activity\Voice\DTOs\RecordVoicePresenceDTO;
 use He4rt\Activity\Voice\Queries\GetCurrentVoiceChannel;
-use He4rt\BotDiscord\Actions\ResolveDiscordTenant;
 use He4rt\BotDiscord\Actions\VoiceTransitionResolver;
 use He4rt\Identity\ExternalIdentity\Enums\IdentityProvider;
 use Illuminate\Support\Facades\Log;
@@ -41,10 +40,7 @@ class VoicePresenceEvent extends Event
         }
 
         try {
-            $tenant = resolve(ResolveDiscordTenant::class)->handle((string) $state->guild_id);
-
             $current = resolve(GetCurrentVoiceChannel::class)->handle(
-                $tenant->tenant_id,
                 IdentityProvider::Discord,
                 (string) $state->user_id,
             );
@@ -66,7 +62,6 @@ class VoicePresenceEvent extends Event
             // A move emits left+joined; persist them together so the log stays paired.
             resolve(RecordVoicePresence::class)->persistMany(
                 RecordVoicePresenceDTO::makeMany(
-                    tenantId: $tenant->tenant_id,
                     provider: IdentityProvider::Discord,
                     externalAccountId: (string) $state->user_id,
                     transitions: $transitions,

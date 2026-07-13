@@ -50,7 +50,6 @@ test('AI flags content above threshold and creates case', function (): void {
         mediaUrls: [],
         metadata: [],
         snapshot: ['text' => 'extremely toxic content here'],
-        tenantId: null,
     );
 
     $job = new ScreenContent($dto, CaseSource::AutoDetect);
@@ -92,7 +91,6 @@ test('AI clears content below threshold and no case is created', function (): vo
         mediaUrls: [],
         metadata: [],
         snapshot: ['text' => 'this is a normal message'],
-        tenantId: null,
     );
 
     $job = new ScreenContent($dto, CaseSource::AutoDetect);
@@ -128,7 +126,6 @@ test('CaseReadyForEnforcement is NOT emitted since classifier is aggregate/opena
         mediaUrls: [],
         metadata: [],
         snapshot: ['text' => 'very harassing content'],
-        tenantId: null,
     );
 
     $job = new ScreenContent($dto, CaseSource::AutoDetect);

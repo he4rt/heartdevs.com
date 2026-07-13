@@ -11,7 +11,6 @@ use He4rt\Activity\Tracking\Enums\ValueTier;
 use He4rt\Activity\Tracking\Events\InteractionTracked;
 use He4rt\Gamification\Character\Models\Character;
 use He4rt\Identity\ExternalIdentity\Enums\IdentityProvider;
-use He4rt\Identity\Tenant\Models\Tenant;
 use He4rt\Identity\User\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Event;
@@ -21,13 +20,11 @@ uses(RefreshDatabase::class);
 test('tracks high tier activity as pending without crediting economy', function (): void {
     Event::fake([InteractionTracked::class]);
 
-    $tenant = Tenant::factory()->create();
     $user = User::factory()->create();
-    $character = Character::factory()->recycle($user)->recycle($tenant)->create();
+    $character = Character::factory()->recycle($user)->create();
 
     $dto = new TrackActivityDTO(
         characterId: $character->id,
-        tenantId: $tenant->id,
         type: ActivityType::Article,
         provider: IdentityProvider::DevTo,
         occurredAt: CarbonImmutable::now(),
@@ -49,13 +46,11 @@ test('tracks high tier activity as pending without crediting economy', function 
 test('tracks low tier activity as auto approved and credits economy', function (): void {
     Event::fake([InteractionTracked::class]);
 
-    $tenant = Tenant::factory()->create();
     $user = User::factory()->create();
-    $character = Character::factory()->recycle($user)->recycle($tenant)->create();
+    $character = Character::factory()->recycle($user)->create();
 
     $dto = new TrackActivityDTO(
         characterId: $character->id,
-        tenantId: $tenant->id,
         type: ActivityType::Engagement,
         provider: IdentityProvider::DevTo,
         occurredAt: CarbonImmutable::now(),
@@ -76,13 +71,11 @@ test('tracks low tier activity as auto approved and credits economy', function (
 });
 
 test('deduplicates by external ref', function (): void {
-    $tenant = Tenant::factory()->create();
     $user = User::factory()->create();
-    $character = Character::factory()->recycle($user)->recycle($tenant)->create();
+    $character = Character::factory()->recycle($user)->create();
 
     $dto = new TrackActivityDTO(
         characterId: $character->id,
-        tenantId: $tenant->id,
         type: ActivityType::Article,
         provider: IdentityProvider::DevTo,
         occurredAt: CarbonImmutable::now(),

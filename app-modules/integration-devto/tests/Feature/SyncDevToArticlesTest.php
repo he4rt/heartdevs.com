@@ -7,7 +7,6 @@ use He4rt\Activity\Tracking\Models\Interaction;
 use He4rt\Gamification\Character\Models\Character;
 use He4rt\Identity\ExternalIdentity\Enums\IdentityProvider;
 use He4rt\Identity\ExternalIdentity\Models\ExternalIdentity;
-use He4rt\Identity\Tenant\Models\Tenant;
 use He4rt\Identity\User\Models\User;
 use Illuminate\Support\Facades\Http;
 
@@ -46,12 +45,10 @@ test('syncs articles and creates interactions for linked authors', function (): 
         ]),
     ]);
 
-    $tenant = Tenant::factory()->create();
     $user = User::factory()->create();
-    $character = Character::factory()->recycle($user)->recycle($tenant)->create();
+    $character = Character::factory()->recycle($user)->create();
 
     ExternalIdentity::factory()->create([
-        'tenant_id' => $tenant->id,
         'model_type' => User::class,
         'model_id' => $user->id,
         'provider' => IdentityProvider::DevTo,
@@ -94,19 +91,17 @@ test('updates engagement for existing interactions without creating duplicates',
         ]),
     ]);
 
-    $tenant = Tenant::factory()->create();
     $user = User::factory()->create();
-    $character = Character::factory()->recycle($user)->recycle($tenant)->create();
+    $character = Character::factory()->recycle($user)->create();
 
     ExternalIdentity::factory()->create([
-        'tenant_id' => $tenant->id,
         'model_type' => User::class,
         'model_id' => $user->id,
         'provider' => IdentityProvider::DevTo,
         'metadata' => ['email' => 'author@example.com', 'username' => 'author'],
     ]);
 
-    Interaction::factory()->recycle($character)->recycle($tenant)->create([
+    Interaction::factory()->recycle($character)->create([
         'external_ref' => 'devto:article:201',
         'metadata' => [
             'engagement_snapshot' => ['reactions' => 20, 'comments' => 5, 'bookmarks' => 1],

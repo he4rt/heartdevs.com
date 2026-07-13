@@ -9,7 +9,6 @@ use He4rt\Identity\ExternalIdentity\Enums\IdentityProvider;
 class ResolveUserProviderDTO
 {
     public function __construct(
-        public string $tenantId,
         public IdentityProvider $provider,
         public string $externalAccountId,
         public string $modelType,
@@ -24,7 +23,6 @@ class ResolveUserProviderDTO
     public static function make(array $data): self
     {
         return new self(
-            tenantId: $data['tenant_id'],
             provider: $data['provider'],
             externalAccountId: $data['external_account_id'],
             modelType: $data['model_type'],

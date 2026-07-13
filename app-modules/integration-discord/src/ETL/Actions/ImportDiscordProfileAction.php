@@ -17,16 +17,14 @@ use Ramsey\Uuid\Uuid;
 
 final class ImportDiscordProfileAction
 {
-    public function handle(DiscordProfileDTO $dto, string $tenantId): ExternalIdentity
+    public function handle(DiscordProfileDTO $dto): ExternalIdentity
     {
-        $user = $this->resolveUser($dto, $tenantId);
-        $user->tenants()->syncWithoutDetaching([$tenantId]);
+        $user = $this->resolveUser($dto);
 
         $discordIdentity = ExternalIdentity::query()->updateOrCreate(
             [
                 'provider' => IdentityProvider::Discord,
                 'external_account_id' => $dto->discordId,
-                'tenant_id' => $tenantId,
             ],
             [
                 'model_type' => (new User)->getMorphClass(),
@@ -40,18 +38,17 @@ final class ImportDiscordProfileAction
         );
 
         foreach ($dto->connectedAccounts as $account) {
-            $this->upsertConnectedAccount($account, $user, $tenantId, $dto);
+            $this->upsertConnectedAccount($account, $user, $dto);
         }
 
         return $discordIdentity;
     }
 
-    private function resolveUser(DiscordProfileDTO $dto, string $tenantId): User
+    private function resolveUser(DiscordProfileDTO $dto): User
     {
         $identity = ExternalIdentity::query()
             ->where('provider', IdentityProvider::Discord)
             ->where('external_account_id', $dto->discordId)
-            ->where('tenant_id', $tenantId)
             ->first();
 
         if ($identity instanceof ExternalIdentity) {
@@ -106,13 +103,11 @@ final class ImportDiscordProfileAction
     private function upsertConnectedAccount(
         ConnectedAccountDTO $account,
         User $user,
-        string $tenantId,
         DiscordProfileDTO $dto,
     ): void {
         $existing = ExternalIdentity::query()
             ->where('provider', $account->provider)
             ->where('external_account_id', $account->externalAccountId)
-            ->where('tenant_id', $tenantId)
             ->first();
 
         if ($existing instanceof ExternalIdentity && (string) $existing->model_id !== (string) $user->id) {
@@ -132,7 +127,6 @@ final class ImportDiscordProfileAction
             [
                 'provider' => $account->provider,
                 'external_account_id' => $account->externalAccountId,
-                'tenant_id' => $tenantId,
             ],
             [
                 'model_type' => (new User)->getMorphClass(),

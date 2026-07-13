@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 use Filament\Facades\Filament;
-use He4rt\Identity\Tenant\Models\Tenant;
+use Filament\Forms\Components\Select;
 use He4rt\Identity\User\Models\User;
 use He4rt\PanelApp\Pages\ProfilePage;
 use He4rt\Profile\Enums\EmploymentType;
@@ -40,17 +40,13 @@ beforeEach(function (): void {
     ]);
 
     $this->user = User::factory()->create();
-    $this->tenant = Tenant::factory()->create(['slug' => 'test-tenant']);
-    $this->tenant->members()->attach($this->user);
 
     $this->actingAs($this->user);
 
     Filament::setCurrentPanel(Filament::getPanel('app'));
-    Filament::setTenant($this->tenant);
 
     $this->profile = Profile::query()
         ->where('user_id', $this->user->id)
-        ->where('tenant_id', $this->tenant->id)
         ->first();
 });
 
@@ -135,6 +131,34 @@ test('profile page saves skills from repeater', function (): void {
 
     expect($pivot->proficiency)->toBe(SkillProficiency::Advanced)
         ->and($pivot->years_experience)->toBe(5);
+});
+
+test('skills repeater hides skills already chosen in other rows', function (): void {
+    $php = Skill::query()->where('slug', 'php')->sole();
+
+    $component = livewire(ProfilePage::class)
+        ->fillForm([
+            'skills' => [
+                ['skill_id' => $php->id, 'proficiency' => 'advanced', 'years_experience' => 5],
+                ['skill_id' => null, 'proficiency' => null, 'years_experience' => null],
+            ],
+        ]);
+
+    $instance = $component->instance();
+    [$firstRow, $secondRow] = array_keys($instance->data['skills']);
+
+    $searchIn = static function (int|string $rowKey) use ($instance, $php): array {
+        /** @var Select $select */
+        $select = $instance->form->getComponentByStatePath(
+            sprintf('data.skills.%s.skill_id', $rowKey),
+            withAbsoluteStatePath: true,
+        );
+
+        return array_keys($select->getSearchResults($php->slug));
+    };
+
+    expect($searchIn($secondRow))->not->toContain($php->id)
+        ->and($searchIn($firstRow))->toContain($php->id);
 });
 
 test('profile page saves availability toggle', function (): void {

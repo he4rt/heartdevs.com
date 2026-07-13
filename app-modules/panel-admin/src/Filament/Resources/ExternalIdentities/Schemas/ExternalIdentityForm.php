@@ -16,10 +16,6 @@ class ExternalIdentityForm
     {
         return $schema
             ->components([
-                TextInput::make('tenant_id')
-                    ->label('Tenant Id')
-                    ->required(),
-
                 TextInput::make('model_type')
                     ->label('Model Type')
                     ->required(),

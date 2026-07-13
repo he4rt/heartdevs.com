@@ -70,12 +70,8 @@ final class ReplyComposer extends Component implements HasSchemas
         /** @var User $user */
         $user = auth()->user();
 
-        /** @var string $tenantId */
-        $tenantId = filament()->getTenant()->getKey();
-
         resolve(CreateReply::class)->handle(new CreateReplyDTO(
             userId: $user->id,
-            tenantId: $tenantId,
             parentTimelineId: $this->timelineId,
             content: $state['content'],
             images: $state['images'] ?? [],

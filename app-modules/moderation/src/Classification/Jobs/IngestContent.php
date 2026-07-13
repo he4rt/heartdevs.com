@@ -35,7 +35,6 @@ final class IngestContent implements ShouldQueue
                 $identity = resolve(FindExternalIdentity::class)->handle(
                     provider: IdentityProvider::Discord->value,
                     providerId: $this->content->authorExternalId,
-                    tenantId: $this->content->tenantId,
                 );
                 $authorId = $identity->model_id;
             } catch (Throwable) {
@@ -52,7 +51,6 @@ final class IngestContent implements ShouldQueue
             'status' => CaseStatus::Pending,
             'priority' => 50,
             'author_id' => $authorId,
-            'tenant_id' => $this->content->tenantId,
         ]);
 
         event(new CaseCreated($case));

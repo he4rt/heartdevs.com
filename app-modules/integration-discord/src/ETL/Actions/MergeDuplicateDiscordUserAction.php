@@ -31,8 +31,6 @@ final class MergeDuplicateDiscordUserAction
 
             $this->mergeOneToOneRelations($oldUser, $newUser);
 
-            $this->mergePivotTable('tenant_users', 'tenant_id', $oldUser, $newUser);
-
             $newUser->delete();
 
             if ($oldUser->username !== $targetUsername) {
@@ -75,10 +73,6 @@ final class MergeDuplicateDiscordUserAction
             ->where('admin_id', $new->id)
             ->update(['admin_id' => $old->id]);
 
-        $stats['tenants'] = DB::table('tenants')
-            ->where('owner_id', $new->id)
-            ->update(['owner_id' => $old->id]);
-
         $stats['feedbacks_target'] = DB::table('feedbacks')
             ->where('target_id', $new->id)
             ->update(['target_id' => $old->id]);
@@ -106,24 +100,5 @@ final class MergeDuplicateDiscordUserAction
                 DB::table($table)->where('user_id', $new->id)->update(['user_id' => $old->id]);
             }
         }
-    }
-
-    private function mergePivotTable(string $table, string $otherKey, User $old, User $new): void
-    {
-        $oldKeys = DB::table($table)
-            ->where('user_id', $old->id)
-            ->pluck($otherKey)
-            ->all();
-
-        if ($oldKeys !== []) {
-            DB::table($table)
-                ->where('user_id', $new->id)
-                ->whereIn($otherKey, $oldKeys)
-                ->delete();
-        }
-
-        DB::table($table)
-            ->where('user_id', $new->id)
-            ->update(['user_id' => $old->id]);
     }
 }

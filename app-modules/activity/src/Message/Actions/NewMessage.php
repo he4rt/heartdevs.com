@@ -23,7 +23,6 @@ final readonly class NewMessage
     {
         try {
             $userDto = ResolveUserProviderDTO::make([
-                'tenant_id' => $messageDTO->tenantId,
                 'provider' => $messageDTO->provider,
                 'external_account_id' => $messageDTO->externalAccountId,
                 'model_type' => (new User)->getMorphClass(),
@@ -47,7 +46,6 @@ final readonly class NewMessage
         } catch (Throwable $throwable) {
             Log::channel('bot-discord')->error('NewMessage failed', [
                 'external_account_id' => $messageDTO->externalAccountId,
-                'tenant_id' => $messageDTO->tenantId,
                 'exception' => $throwable,
             ]);
         }

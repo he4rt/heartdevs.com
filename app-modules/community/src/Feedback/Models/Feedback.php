@@ -6,7 +6,6 @@ namespace He4rt\Community\Feedback\Models;
 
 use Carbon\CarbonInterface;
 use He4rt\Community\Database\Factories\FeedbackFactory;
-use He4rt\Identity\Tenant\Models\Tenant;
 use He4rt\Identity\User\Models\User;
 use Illuminate\Database\Eloquent\Attributes\Table;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
@@ -17,7 +16,6 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
 
 /**
  * @property string $id
- * @property string $tenant_id
  * @property string $sender_id
  * @property string $target_id
  * @property string $type
@@ -54,14 +52,6 @@ final class Feedback extends Model
     public function target(): BelongsTo
     {
         return $this->belongsTo(User::class, 'target_id');
-    }
-
-    /**
-     * @return BelongsTo<Tenant, $this>
-     */
-    public function tenant(): BelongsTo
-    {
-        return $this->belongsTo(Tenant::class, 'tenant_id');
     }
 
     protected static function newFactory(): FeedbackFactory

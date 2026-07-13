@@ -6,7 +6,6 @@ namespace He4rt\Gamification\Database\Factories;
 
 use He4rt\Gamification\Badge\Models\Badge;
 use He4rt\Identity\ExternalIdentity\Enums\IdentityProvider;
-use He4rt\Identity\Tenant\Models\Tenant;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -20,7 +19,6 @@ final class BadgeFactory extends Factory
     {
         return [
             'provider' => fake()->randomElement(IdentityProvider::cases()),
-            'tenant_id' => Tenant::factory(),
             'name' => fake()->name(),
             'description' => fake()->sentence(),
             'redeem_code' => fake()->slug(2),

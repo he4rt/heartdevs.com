@@ -8,7 +8,6 @@ use Discord\Parts\Channel\Message;
 use Discord\WebSockets\Event as Events;
 use He4rt\Activity\Message\Actions\NewMessage;
 use He4rt\Activity\Message\DTOs\NewMessageDTO;
-use He4rt\BotDiscord\Actions\ResolveDiscordTenant;
 use He4rt\BotDiscord\Moderation\DiscordModerationAdapter;
 use He4rt\Identity\ExternalIdentity\Enums\IdentityProvider;
 use He4rt\Moderation\Enums\CaseSource;
@@ -33,11 +32,8 @@ class MessageReceivedEvent extends Event
         }
 
         try {
-            $tenantProvider = resolve(ResolveDiscordTenant::class)->handle((string) $message->guild_id);
-
             // Activity tracking — records message for XP/gamification regardless of moderation outcome.
             resolve(NewMessage::class)->persist(new NewMessageDTO(
-                tenantId: $tenantProvider->tenant_id,
                 provider: IdentityProvider::Discord,
                 providerUsername: $message->author->username.'#'.$message->author->discriminator,
                 externalAccountId: $message->user_id,
@@ -57,7 +53,6 @@ class MessageReceivedEvent extends Event
                 'guild_id' => (string) $message->guild_id,
                 'username' => $message->author->username,
                 'attachments' => [],
-                'tenant_id' => (string) $tenantProvider->tenant_id,
             ]);
 
             resolve(SubmitForModeration::class)->execute($content, CaseSource::AutoDetect);

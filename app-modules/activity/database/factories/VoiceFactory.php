@@ -7,7 +7,6 @@ namespace He4rt\Activity\Database\Factories;
 use He4rt\Activity\Voice\Enums\VoicePresenceEnum;
 use He4rt\Activity\Voice\Models\Voice;
 use He4rt\Identity\ExternalIdentity\Models\ExternalIdentity;
-use He4rt\Identity\Tenant\Models\Tenant;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -20,7 +19,6 @@ final class VoiceFactory extends Factory
     public function definition(): array
     {
         return [
-            'tenant_id' => Tenant::factory(),
             'external_identity_id' => ExternalIdentity::factory(),
             'channel_name' => fake()->word(),
             'channel_id' => (string) fake()->randomNumber(9),

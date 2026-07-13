@@ -49,7 +49,6 @@ test('rule match creates case with rule data and dispatches ClassifyAndRoute', f
         mediaUrls: [],
         metadata: [],
         snapshot: ['text' => 'buy followers now at spam.com'],
-        tenantId: null,
     );
 
     $action = resolve(SubmitForModeration::class);
@@ -80,7 +79,6 @@ test('no rule match dispatches ScreenContent and returns null', function (): voi
         mediaUrls: [],
         metadata: [],
         snapshot: ['text' => 'hello everyone, how are you?'],
-        tenantId: null,
     );
 
     $action = resolve(SubmitForModeration::class);
@@ -105,7 +103,6 @@ test('empty text with no matching rules dispatches ScreenContent', function (): 
         mediaUrls: [],
         metadata: [],
         snapshot: ['text' => ''],
-        tenantId: null,
     );
 
     $action = resolve(SubmitForModeration::class);

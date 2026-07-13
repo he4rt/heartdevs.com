@@ -29,7 +29,6 @@ final readonly class PublishModerationEntry
 
         return Timeline::query()->create([
             'user_id' => $userId,
-            'tenant_id' => $event->tenant_id,
             'postable_type' => $event->getMorphClass(),
             'postable_id' => $event->id,
         ]);

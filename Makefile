@@ -95,6 +95,13 @@ import-db: ## Import a PostgreSQL dump file (usage: make import-db file=path/to/
 bot: ## Run the Discord bot
 	@php artisan bot:boot
 
+# Fixes the boot error "failed to initialize voice class /
+# LibDaveNotFoundException: libdave is required but could not be loaded" — since
+# 2026-03-01 Discord mandates the DAVE E2EE protocol for voice.
+.PHONY: libdave
+libdave: ## Link libdave (DAVE E2EE) into the Discord bot voice probe path
+	@mkdir -p "$(CURDIR)/.cache" && ln -sfn "$${LIBDAVE_HOME:-$$HOME/.local/lib/libdave}" "$(CURDIR)/.cache/libdave"
+
 .PHONY: truncate
 truncate: ## Truncate laravel.log file
 	@truncate -s 0 storage/logs/laravel.log

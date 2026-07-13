@@ -23,7 +23,6 @@ final class RecordAuditLog
                 'content_type' => $event->case->content_type,
             ],
             'platform' => $event->case->source_platform->value,
-            'tenant_id' => $event->case->tenant_id,
         ]);
     }
 
@@ -39,7 +38,6 @@ final class RecordAuditLog
                 'violation_type' => $event->case->violation_type?->value,
             ],
             'platform' => $event->case->source_platform->value,
-            'tenant_id' => $event->case->tenant_id,
         ]);
     }
 
@@ -57,7 +55,6 @@ final class RecordAuditLog
                 'execution_results' => $event->action->execution_results,
             ],
             'platform' => null,
-            'tenant_id' => $event->action->case?->tenant_id,
         ]);
     }
 }

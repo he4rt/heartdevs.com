@@ -27,10 +27,7 @@ class EventsPerDayChartWidget extends ChartWidget
     {
         $start = now()->subDays(29)->startOfDay();
 
-        $tenantId = filament()->getTenant()?->getKey();
-
         $events = TwitchEventLog::query()
-            ->when($tenantId, fn ($q) => $q->where('tenant_id', $tenantId))
             ->where('created_at', '>=', $start)
             ->selectRaw('DATE(created_at) as date, COUNT(*) as total')
             ->groupBy('date')

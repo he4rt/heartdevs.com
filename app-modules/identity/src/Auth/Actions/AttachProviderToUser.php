@@ -8,17 +8,15 @@ use He4rt\Identity\Auth\DTOs\OAuthAccessDTO;
 use He4rt\Identity\Auth\DTOs\OAuthUserDTO;
 use He4rt\Identity\ExternalIdentity\Enums\CredentialsType;
 use He4rt\Identity\ExternalIdentity\Models\ExternalIdentity;
-use He4rt\Identity\Tenant\Models\Tenant;
 use He4rt\Identity\User\Models\User;
 
 final class AttachProviderToUser
 {
-    public function execute(User|Tenant $owner, Tenant $tenant, OAuthUserDTO $oauthUser, OAuthAccessDTO $access): ExternalIdentity
+    public function execute(User $owner, OAuthUserDTO $oauthUser, OAuthAccessDTO $access): ExternalIdentity
     {
         /** @var ExternalIdentity */
         return $owner->providers()->updateOrCreate(
             [
-                'tenant_id' => $tenant->getKey(),
                 'provider' => $oauthUser->provider,
                 'external_account_id' => $oauthUser->providerId,
             ],

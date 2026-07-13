@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace He4rt\Moderation\Rules;
 
 use Carbon\CarbonInterface;
-use He4rt\Identity\Tenant\Models\Tenant;
 use He4rt\Moderation\Enums\ActionType;
 use He4rt\Moderation\Enums\Platform;
 use He4rt\Moderation\Enums\Severity;
@@ -13,7 +12,6 @@ use He4rt\Moderation\Enums\ViolationType;
 use Illuminate\Database\Eloquent\Attributes\Table;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 /**
  * @property string $id
@@ -25,7 +23,6 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property Severity $severity
  * @property ActionType $action_on_match
  * @property bool $is_active
- * @property string|null $tenant_id
  * @property CarbonInterface $created_at
  * @property CarbonInterface $updated_at
  */
@@ -41,12 +38,6 @@ final class ModerationRule extends Model
             'regex' => $this->matchesRegex($text),
             default => false,
         };
-    }
-
-    /** @return BelongsTo<Tenant, $this> */
-    public function tenant(): BelongsTo
-    {
-        return $this->belongsTo(Tenant::class);
     }
 
     /** @return array<string, mixed> */

@@ -4,16 +4,13 @@ declare(strict_types=1);
 
 namespace He4rt\Activity\Reaction\Models;
 
-use He4rt\Identity\Tenant\Models\Tenant;
 use Illuminate\Database\Eloquent\Attributes\Table;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 
 /**
  * @property string $id
- * @property string $tenant_id
  * @property string $reactable_type
  * @property string $reactable_id
  * @property string $emoji_key
@@ -32,12 +29,6 @@ final class Reaction extends Model
     public function reactable(): MorphTo
     {
         return $this->morphTo();
-    }
-
-    /** @return BelongsTo<Tenant, $this> */
-    public function tenant(): BelongsTo
-    {
-        return $this->belongsTo(Tenant::class);
     }
 
     public function isCustomEmoji(): bool

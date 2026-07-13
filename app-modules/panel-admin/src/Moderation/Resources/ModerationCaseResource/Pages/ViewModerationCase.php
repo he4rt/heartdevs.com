@@ -110,7 +110,6 @@ class ViewModerationCase extends ViewRecord
                         'duration' => $data['duration'],
                         'reason' => $data['reason'],
                         'automated' => false,
-                        'tenant_id' => $case->tenant_id,
                     ]);
 
                     if ($case->author) {

@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace He4rt\Moderation\Enforcement;
 
 use Carbon\CarbonInterface;
-use He4rt\Identity\Tenant\Models\Tenant;
 use He4rt\Identity\User\Models\User;
 use He4rt\Moderation\Appeals\ModerationAppeal;
 use He4rt\Moderation\Cases\Models\ModerationCase;
@@ -30,7 +29,6 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
  * @property array<string, mixed>|null $metadata
  * @property array<string, mixed>|null $execution_results
  * @property bool $automated
- * @property string|null $tenant_id
  * @property CarbonInterface $created_at
  */
 #[Table(name: 'moderation_actions', timestamps: false)]
@@ -51,12 +49,6 @@ final class ModerationAction extends Model
     public function moderator(): BelongsTo
     {
         return $this->belongsTo(User::class, 'moderator_id');
-    }
-
-    /** @return BelongsTo<Tenant, $this> */
-    public function tenant(): BelongsTo
-    {
-        return $this->belongsTo(Tenant::class);
     }
 
     /** @return HasOne<ModerationAppeal, $this> */

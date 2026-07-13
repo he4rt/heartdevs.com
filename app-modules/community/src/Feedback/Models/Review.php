@@ -16,7 +16,6 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 /**
  * @property string $id
- * @property string $tenant_id
  * @property string $feedback_id
  * @property string $staff_id
  * @property ReviewTypeEnum $status

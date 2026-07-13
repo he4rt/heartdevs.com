@@ -24,7 +24,6 @@ final readonly class ModerationContentDTO implements JsonSerializable
         public array $mediaUrls,
         public array $metadata,
         public array $snapshot,
-        public ?string $tenantId,
     ) {}
 
     public static function fromCase(ModerationCase $case): self
@@ -38,7 +37,6 @@ final readonly class ModerationContentDTO implements JsonSerializable
             mediaUrls: $case->content_snapshot['media_urls'] ?? [],
             metadata: $case->content_snapshot['metadata'] ?? [],
             snapshot: $case->content_snapshot ?? [],
-            tenantId: $case->tenant_id !== null ? (string) $case->tenant_id : null,
         );
     }
 
@@ -56,7 +54,6 @@ final readonly class ModerationContentDTO implements JsonSerializable
             mediaUrls: $rawPayload['media_urls'] ?? [],
             metadata: $rawPayload['metadata'] ?? [],
             snapshot: $rawPayload,
-            tenantId: $rawPayload['tenant_id'] ?? null,
         );
     }
 
@@ -74,7 +71,6 @@ final readonly class ModerationContentDTO implements JsonSerializable
             'media_urls' => $this->mediaUrls,
             'metadata' => $this->metadata,
             'snapshot' => $this->snapshot,
-            'tenant_id' => $this->tenantId,
         ];
     }
 }

@@ -33,6 +33,8 @@ class IntegrationDiscordServiceProvider extends ServiceProvider
 
     public function boot(): void
     {
+        $this->loadTranslationsFrom(__DIR__.'/../lang', 'integration-discord');
+
         DiscordEventLog::observe(DiscordEventLogObserver::class);
 
         if ($this->app->runningInConsole()) {

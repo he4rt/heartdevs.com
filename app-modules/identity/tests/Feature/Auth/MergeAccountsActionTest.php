@@ -7,16 +7,13 @@ use He4rt\Activity\Timeline\Timeline;
 use He4rt\Identity\Auth\Actions\MergeAccountsAction;
 use He4rt\Identity\ExternalIdentity\Enums\IdentityProvider;
 use He4rt\Identity\ExternalIdentity\Models\ExternalIdentity;
-use He4rt\Identity\Tenant\Models\Tenant;
 use He4rt\Identity\User\Models\User;
 
 test('moves external identities from current to old user', function (): void {
-    $tenant = Tenant::factory()->create();
     $oldUser = User::factory()->create(['first_login_at' => now()]);
     $currentUser = User::factory()->create();
 
     $identity = ExternalIdentity::factory()->create([
-        'tenant_id' => $tenant->id,
         'model_type' => (new User)->getMorphClass(),
         'model_id' => $currentUser->id,
         'provider' => IdentityProvider::GitHub,
@@ -30,20 +27,19 @@ test('moves external identities from current to old user', function (): void {
     expect($identity->model_id)->toBe($oldUser->id);
 });
 
-test('syncs tenant memberships from current to old user', function (): void {
-    $tenantA = Tenant::factory()->create();
-    $tenantB = Tenant::factory()->create();
+test('reassigns timeline posts from current to old user so they are not orphaned', function (): void {
     $oldUser = User::factory()->create(['first_login_at' => now()]);
     $currentUser = User::factory()->create();
 
-    $oldUser->tenants()->attach($tenantA);
-    $currentUser->tenants()->attach([$tenantA->id, $tenantB->id]);
+    $post = Timeline::factory()->for($currentUser)->create([
+        'postable_type' => (new PostEntry)->getMorphClass(),
+        'postable_id' => PostEntry::factory()->create()->id,
+    ]);
 
     $action = new MergeAccountsAction();
     $action->execute($currentUser, $oldUser);
 
-    expect($oldUser->tenants()->pluck('tenants.id')->sort()->values()->toArray())
-        ->toBe(collect([$tenantA->id, $tenantB->id])->sort()->values()->all());
+    expect($post->refresh()->user_id)->toBe($oldUser->id);
 });
 
 test('reassigns timeline posts from current to old user so they are not orphaned', function (): void {
@@ -75,12 +71,10 @@ test('deletes current user after merge', function (): void {
 });
 
 test('reassigns connected_by from current to old user', function (): void {
-    $tenant = Tenant::factory()->create();
     $oldUser = User::factory()->create(['first_login_at' => now()]);
     $currentUser = User::factory()->create();
 
     $identity = ExternalIdentity::factory()->create([
-        'tenant_id' => $tenant->id,
         'model_type' => (new User)->getMorphClass(),
         'model_id' => $oldUser->id,
         'provider' => IdentityProvider::GitHub,
@@ -96,12 +90,10 @@ test('reassigns connected_by from current to old user', function (): void {
 });
 
 test('reassigns connected_by on soft-deleted identities', function (): void {
-    $tenant = Tenant::factory()->create();
     $oldUser = User::factory()->create(['first_login_at' => now()]);
     $currentUser = User::factory()->create();
 
     $identity = ExternalIdentity::factory()->create([
-        'tenant_id' => $tenant->id,
         'model_type' => (new User)->getMorphClass(),
         'model_id' => $oldUser->id,
         'provider' => IdentityProvider::GitHub,

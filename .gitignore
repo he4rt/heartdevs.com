@@ -30,6 +30,7 @@
 /storage/debugbar
 /storage/pail
 /vendor
+/.cache
 Homestead.json
 Homestead.yaml
 *.local

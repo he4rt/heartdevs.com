@@ -8,11 +8,9 @@ use Carbon\CarbonInterface;
 use He4rt\Gamification\Character\Models\Character;
 use He4rt\Gamification\Database\Factories\BadgeFactory;
 use He4rt\Identity\ExternalIdentity\Enums\IdentityProvider;
-use He4rt\Identity\Tenant\Models\Tenant;
 use Illuminate\Database\Eloquent\Attributes\Table;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\Pivot;
 use Spatie\MediaLibrary\HasMedia;
@@ -20,7 +18,6 @@ use Spatie\MediaLibrary\InteractsWithMedia;
 
 /**
  * @property int $id
- * @property string $tenant_id
  * @property IdentityProvider $provider
  * @property string $name
  * @property string $description
@@ -35,14 +32,6 @@ final class Badge extends Model implements HasMedia
     /** @use HasFactory<BadgeFactory> */
     use HasFactory;
     use InteractsWithMedia;
-
-    /**
-     * @return BelongsTo<Tenant, $this>
-     */
-    public function tenant(): BelongsTo
-    {
-        return $this->belongsTo(Tenant::class);
-    }
 
     /**
      * @return BelongsToMany<Character, $this, Pivot>

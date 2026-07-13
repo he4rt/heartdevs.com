@@ -3,7 +3,6 @@
 declare(strict_types=1);
 
 use Filament\Facades\Filament;
-use He4rt\Identity\Tenant\Models\Tenant;
 use He4rt\Identity\User\Models\User;
 use He4rt\Moderation\Appeals\ModerationAppeal;
 use He4rt\Moderation\Cases\Models\ModerationCase;
@@ -14,15 +13,12 @@ use function Pest\Livewire\livewire;
 
 beforeEach(function (): void {
     $this->user = User::factory()->create(['username' => 'danielhe4rt']);
-    $this->tenant = Tenant::factory()->create(['slug' => 'he4rt-dev']);
-    $this->tenant->members()->attach($this->user);
 
     config(['he4rt.admins' => 'danielhe4rt']);
 
     $this->actingAs($this->user);
 
     Filament::setCurrentPanel(Filament::getPanel('admin'));
-    Filament::setTenant($this->tenant);
 });
 
 test('appeal queue renders with appeals ordered by sla_deadline', function (): void {

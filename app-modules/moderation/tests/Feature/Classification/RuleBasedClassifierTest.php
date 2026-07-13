@@ -2,7 +2,6 @@
 
 declare(strict_types=1);
 
-use He4rt\Identity\Tenant\Models\Tenant;
 use He4rt\Moderation\Classification\Actions\Classifiers\RuleBasedClassifier;
 use He4rt\Moderation\DTOs\ModerationContentDTO;
 use He4rt\Moderation\Enums\Platform;
@@ -10,7 +9,7 @@ use He4rt\Moderation\Enums\Severity;
 use He4rt\Moderation\Enums\ViolationType;
 use He4rt\Moderation\Rules\ModerationRule;
 
-function contentDTO(string $text, ?string $tenantId = null): ModerationContentDTO
+function contentDTO(string $text): ModerationContentDTO
 {
     return new ModerationContentDTO(
         contentId: 'msg-test',
@@ -21,7 +20,6 @@ function contentDTO(string $text, ?string $tenantId = null): ModerationContentDT
         mediaUrls: [],
         metadata: [],
         snapshot: ['text' => $text],
-        tenantId: $tenantId,
     );
 }
 
@@ -120,37 +118,6 @@ test('picks highest severity when multiple rules match', function (): void {
 
     expect($result->severity)->toBe(Severity::Critical)
         ->and($result->matchedRules)->toHaveCount(2);
-});
-
-test('tenant-scoped rules only match for correct tenant', function (): void {
-    $tenant = Tenant::factory()->create();
-    $otherTenant = Tenant::factory()->create();
-
-    ModerationRule::query()->create([
-        'name' => 'Tenant rule', 'type' => 'keyword', 'pattern' => 'specific',
-        'violation_type' => 'spam', 'severity' => 'medium', 'action_on_match' => 'warn',
-        'is_active' => true, 'tenant_id' => $tenant->id,
-    ]);
-
-    $matchResult = RuleBasedClassifier::make()->classify(contentDTO('something specific', (string) $tenant->id));
-    $noMatchResult = RuleBasedClassifier::make()->classify(contentDTO('something specific', (string) $otherTenant->id));
-
-    expect($matchResult->scores)->toHaveKey('spam')
-        ->and($noMatchResult->scores)->toBeEmpty();
-});
-
-test('global rules (null tenant) match for any tenant', function (): void {
-    $anyTenant = Tenant::factory()->create();
-
-    ModerationRule::query()->create([
-        'name' => 'Global', 'type' => 'keyword', 'pattern' => 'universal',
-        'violation_type' => 'harassment', 'severity' => 'high', 'action_on_match' => 'mute',
-        'is_active' => true, 'tenant_id' => null,
-    ]);
-
-    $result = RuleBasedClassifier::make()->classify(contentDTO('universal truth', (string) $anyTenant->id));
-
-    expect($result->primary)->toBe(ViolationType::Harassment);
 });
 
 test('returns empty when no rules exist', function (): void {

@@ -25,7 +25,6 @@ final readonly class TogglePinPost
             Timeline::withoutTimestamps(static function () use ($user, $timeline): void {
                 Timeline::query()
                     ->where('user_id', $user->id)
-                    ->where('tenant_id', $timeline->tenant_id)
                     ->where('pinned', operator: true)
                     ->update(['pinned' => false]);
 

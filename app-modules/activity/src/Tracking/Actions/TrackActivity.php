@@ -35,7 +35,6 @@ final readonly class TrackActivity
 
         $interaction = Interaction::query()->create([
             'character_id' => $dto->characterId,
-            'tenant_id' => $dto->tenantId,
             'type' => $dto->type,
             'provider' => $dto->provider,
             'value_tier' => $classification['tier'],

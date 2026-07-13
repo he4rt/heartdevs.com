@@ -21,7 +21,6 @@ test('ModerationContentDTO holds all fields', function (): void {
         mediaUrls: ['https://example.com/img.png'],
         metadata: ['channel_id' => '123', 'guild_id' => '456'],
         snapshot: ['raw' => 'full message data'],
-        tenantId: 'tenant-uuid',
     );
 
     expect($dto->contentId)->toBe('msg-123')
@@ -31,8 +30,7 @@ test('ModerationContentDTO holds all fields', function (): void {
         ->and($dto->textContent)->toBe('spam content here')
         ->and($dto->mediaUrls)->toBe(['https://example.com/img.png'])
         ->and($dto->metadata)->toBe(['channel_id' => '123', 'guild_id' => '456'])
-        ->and($dto->snapshot)->toBe(['raw' => 'full message data'])
-        ->and($dto->tenantId)->toBe('tenant-uuid');
+        ->and($dto->snapshot)->toBe(['raw' => 'full message data']);
 });
 
 test('ClassificationResultDTO holds scores and primary violation', function (): void {
@@ -103,7 +101,6 @@ test('ModerationContentDTO can be json_encoded', function (): void {
         mediaUrls: ['https://example.com/file.png'],
         metadata: ['channel_id' => 'ch-1'],
         snapshot: ['text' => 'test serialization'],
-        tenantId: 'tenant-1',
     );
 
     $json = json_encode($dto);
@@ -115,7 +112,6 @@ test('ModerationContentDTO can be json_encoded', function (): void {
         ->and($decoded['source_platform'])->toBe('discord')
         ->and($decoded['author_external_id'])->toBe('ext-123')
         ->and($decoded['text_content'])->toBe('test serialization')
-        ->and($decoded['tenant_id'])->toBe('tenant-1')
         ->and($decoded)->not->toHaveKey('author');
 });
 
@@ -129,7 +125,6 @@ test('ModerationContentDTO serialized output has no author key', function (): vo
         mediaUrls: [],
         metadata: [],
         snapshot: ['text' => 'content without author'],
-        tenantId: null,
     );
 
     $serialized = $dto->jsonSerialize();
@@ -147,12 +142,10 @@ test('ModerationContentDTO fromPlatform produces correct DTO without author', fu
         'text' => 'platform content',
         'media_urls' => [],
         'metadata' => ['guild_id' => 'g-1'],
-        'tenant_id' => 'tenant-2',
     ]);
 
     expect($dto->contentId)->toBe('msg-fp-1')
         ->and($dto->sourcePlatform)->toBe(Platform::Discord)
         ->and($dto->authorExternalId)->toBe('ext-789')
-        ->and($dto->textContent)->toBe('platform content')
-        ->and($dto->tenantId)->toBe('tenant-2');
+        ->and($dto->textContent)->toBe('platform content');
 });

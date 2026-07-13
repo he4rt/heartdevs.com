@@ -28,7 +28,6 @@ function makeContentDTO(string $text = 'hello world'): ModerationContentDTO
         mediaUrls: [],
         metadata: [],
         snapshot: ['text' => $text],
-        tenantId: null,
     );
 }
 

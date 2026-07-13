@@ -5,7 +5,6 @@ declare(strict_types=1);
 use He4rt\Activity\Timeline\Actions\TogglePinPost;
 use He4rt\Activity\Timeline\Delegated\PostEntry;
 use He4rt\Activity\Timeline\Timeline;
-use He4rt\Identity\Tenant\Models\Tenant;
 use He4rt\Identity\User\Models\User;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -13,14 +12,12 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 uses(RefreshDatabase::class);
 
 test('user can pin their own post', function (): void {
-    $tenant = Tenant::factory()->create();
     $user = User::factory()->create();
     $postEntry = PostEntry::factory()->create();
 
     $timeline = Timeline::factory()
         ->for($user)
         ->create([
-            'tenant_id' => $tenant->id,
             'postable_type' => (new PostEntry)->getMorphClass(),
             'postable_id' => $postEntry->id,
         ]);
@@ -31,14 +28,12 @@ test('user can pin their own post', function (): void {
 });
 
 test('pinning a post unpins the previously pinned post', function (): void {
-    $tenant = Tenant::factory()->create();
     $user = User::factory()->create();
 
     $firstEntry = PostEntry::factory()->create();
     $firstPost = Timeline::factory()
         ->for($user)
         ->create([
-            'tenant_id' => $tenant->id,
             'postable_type' => (new PostEntry)->getMorphClass(),
             'postable_id' => $firstEntry->id,
             'pinned' => true,
@@ -48,7 +43,6 @@ test('pinning a post unpins the previously pinned post', function (): void {
     $secondPost = Timeline::factory()
         ->for($user)
         ->create([
-            'tenant_id' => $tenant->id,
             'postable_type' => (new PostEntry)->getMorphClass(),
             'postable_id' => $secondEntry->id,
         ]);
@@ -60,14 +54,12 @@ test('pinning a post unpins the previously pinned post', function (): void {
 });
 
 test('user can unpin their own post', function (): void {
-    $tenant = Tenant::factory()->create();
     $user = User::factory()->create();
     $postEntry = PostEntry::factory()->create();
 
     $timeline = Timeline::factory()
         ->for($user)
         ->create([
-            'tenant_id' => $tenant->id,
             'postable_type' => (new PostEntry)->getMorphClass(),
             'postable_id' => $postEntry->id,
             'pinned' => true,
@@ -79,7 +71,6 @@ test('user can unpin their own post', function (): void {
 });
 
 test('user cannot pin another users post', function (): void {
-    $tenant = Tenant::factory()->create();
     $owner = User::factory()->create();
     $other = User::factory()->create();
     $postEntry = PostEntry::factory()->create();
@@ -87,7 +78,6 @@ test('user cannot pin another users post', function (): void {
     $timeline = Timeline::factory()
         ->for($owner)
         ->create([
-            'tenant_id' => $tenant->id,
             'postable_type' => (new PostEntry)->getMorphClass(),
             'postable_id' => $postEntry->id,
         ]);

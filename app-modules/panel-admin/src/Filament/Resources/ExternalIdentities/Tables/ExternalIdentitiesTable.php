@@ -23,9 +23,6 @@ class ExternalIdentitiesTable
     {
         return $table
             ->columns([
-                TextColumn::make('tenant_id')
-                    ->label('Tenant Id'),
-
                 TextColumn::make('model_type')
                     ->label('Model Type'),
 

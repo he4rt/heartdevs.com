@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
 
 return new class extends Migration
@@ -38,9 +39,14 @@ return new class extends Migration
                 ->where('external_identity_id', $dup->old_ei_id)
                 ->update(['external_identity_id' => $dup->new_ei_id]);
 
+            // `tenant_id` only exists on pre-teardown databases; select it
+            // conditionally so this migration still replays after the column
+            // has been dropped by the multi-tenancy removal.
+            $hasTenantColumn = Schema::hasColumn('characters', 'tenant_id');
+
             $oldCharacter = DB::table('characters')
                 ->where('user_id', $dup->old_user_id)
-                ->select(['experience', 'tenant_id'])
+                ->select($hasTenantColumn ? ['experience', 'tenant_id'] : ['experience'])
                 ->first();
 
             $oldXp = $oldCharacter->experience ?? 0;
@@ -57,15 +63,20 @@ return new class extends Migration
                 } else {
                     logger()->warning(sprintf('Migration: Creating missing character for user %s with %s XP from old user %s', $dup->new_user_id, $oldXp, $dup->old_user_id));
 
-                    DB::table('characters')->insert([
+                    $newCharacter = [
                         'id' => Str::uuid()->toString(),
                         'user_id' => $dup->new_user_id,
-                        'tenant_id' => $oldCharacter->tenant_id,
                         'experience' => $oldXp,
                         'reputation' => 0,
                         'created_at' => now(),
                         'updated_at' => now(),
-                    ]);
+                    ];
+
+                    if ($hasTenantColumn) {
+                        $newCharacter['tenant_id'] = $oldCharacter->tenant_id;
+                    }
+
+                    DB::table('characters')->insert($newCharacter);
                 }
             }
 

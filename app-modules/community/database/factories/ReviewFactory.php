@@ -7,7 +7,6 @@ namespace He4rt\Community\Database\Factories;
 use He4rt\Community\Feedback\Enums\ReviewTypeEnum;
 use He4rt\Community\Feedback\Models\Feedback;
 use He4rt\Community\Feedback\Models\Review;
-use He4rt\Identity\Tenant\Models\Tenant;
 use He4rt\Identity\User\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
@@ -22,7 +21,6 @@ final class ReviewFactory extends Factory
     {
         return [
             'id' => fake()->uuid(),
-            'tenant_id' => Tenant::factory(),
             'feedback_id' => Feedback::factory(),
             'staff_id' => User::factory(),
             'status' => fake()->randomElement(ReviewTypeEnum::cases()),

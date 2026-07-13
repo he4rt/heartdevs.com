@@ -20,12 +20,11 @@ final readonly class CreateReply
 
         $parentTimeline = Timeline::query()
             ->where('id', $dto->parentTimelineId)
-            ->where('tenant_id', $dto->tenantId)
             ->firstOrFail();
 
         $rootId = $parentTimeline->root_id ?? $parentTimeline->id;
 
-        return DB::transaction(static function () use ($dto, $content, $parentTimeline, $rootId): Timeline {
+        return DB::transaction(static function () use ($dto, $content, $rootId): Timeline {
             $postEntry = PostEntry::query()->create([
                 'content' => $content,
             ]);
@@ -36,7 +35,6 @@ final readonly class CreateReply
 
             return Timeline::query()->create([
                 'user_id' => $dto->userId,
-                'tenant_id' => $parentTimeline->tenant_id,
                 'postable_type' => $postEntry->getMorphClass(),
                 'postable_id' => $postEntry->id,
                 'root_id' => $rootId,

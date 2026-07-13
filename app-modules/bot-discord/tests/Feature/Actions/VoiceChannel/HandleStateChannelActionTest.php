@@ -83,6 +83,12 @@ describe('moving between different channels', function (): void {
 
         $action->execute($this->userId, $this->secondChannelId);
 
+        // re-read the cache: moving persists new DTO instances, so the pre-move
+        // snapshots above no longer reflect the current state.
+        $cachedChannels = cache()->tags(['voice_channels'])->get('active_voice_channels_keys');
+        $firstChannelFromCache = $cachedChannels[0];
+        $secondChannelFromCache = $cachedChannels[1];
+
         expect($cachedChannels)->not->toBeEmpty()
             ->and($firstChannelFromCache)->toBeInstanceOf(VoiceChannelDTO::class)
             ->and($firstChannelFromCache->guildId)->toBe($this->firstChannel->guildId)

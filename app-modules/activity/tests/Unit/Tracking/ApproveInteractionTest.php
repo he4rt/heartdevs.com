@@ -7,7 +7,6 @@ use He4rt\Activity\Tracking\Enums\ActivityStatus;
 use He4rt\Activity\Tracking\Events\InteractionApproved;
 use He4rt\Activity\Tracking\Models\Interaction;
 use He4rt\Gamification\Character\Models\Character;
-use He4rt\Identity\Tenant\Models\Tenant;
 use He4rt\Identity\User\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Event;
@@ -17,14 +16,12 @@ uses(RefreshDatabase::class);
 test('approves interaction and credits economy', function (): void {
     Event::fake([InteractionApproved::class]);
 
-    $tenant = Tenant::factory()->create();
     $user = User::factory()->create();
-    $character = Character::factory()->recycle($user)->recycle($tenant)->create(['experience' => 500]);
+    $character = Character::factory()->recycle($user)->create(['experience' => 500]);
 
     $interaction = Interaction::factory()
         ->withEngagement(reactions: 42, comments: 12, bookmarks: 8)
         ->recycle($character)
-        ->recycle($tenant)
         ->create([
             'coins_min' => 100,
             'coins_max' => 300,

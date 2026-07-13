@@ -10,7 +10,6 @@ use He4rt\Identity\ExternalIdentity\Enums\IdentityProvider;
 final class NewMessageDTO
 {
     public function __construct(
-        public string $tenantId,
         public IdentityProvider $provider,
         public string $providerUsername,
         public string $externalAccountId,
@@ -26,7 +25,6 @@ final class NewMessageDTO
     public static function make(array $payload): self
     {
         return new self(
-            tenantId: $payload['tenant_id'],
             provider: IdentityProvider::from($payload['provider']),
             providerUsername: $payload['provider_username'],
             externalAccountId: $payload['external_account_id'],

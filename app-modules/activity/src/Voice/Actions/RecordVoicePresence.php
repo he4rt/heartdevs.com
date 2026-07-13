@@ -39,7 +39,6 @@ final readonly class RecordVoicePresence
     private function record(RecordVoicePresenceDTO $dto): void
     {
         $userDto = ResolveUserProviderDTO::make([
-            'tenant_id' => $dto->tenantId,
             'provider' => $dto->provider,
             'external_account_id' => $dto->externalAccountId,
             'model_type' => (new User)->getMorphClass(),
@@ -49,7 +48,6 @@ final readonly class RecordVoicePresence
         $userContext = resolve(ResolveUserContext::class)->handle($userDto);
 
         Voice::query()->create([
-            'tenant_id' => $dto->tenantId,
             'external_identity_id' => $userContext->provider->id,
             'channel_name' => $dto->channelName,
             'channel_id' => $dto->channelId,

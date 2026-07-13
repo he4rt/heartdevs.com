@@ -7,7 +7,6 @@ namespace He4rt\Events\Database\Factories;
 use He4rt\Events\Enums\Talks\TalkStatusEnum;
 use He4rt\Events\Models\EventModel;
 use He4rt\Events\Models\EventSubmission;
-use He4rt\Identity\Tenant\Models\Tenant;
 use He4rt\Identity\User\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Facades\Date;
@@ -22,7 +21,6 @@ final class EventSubmissionFactory extends Factory
     public function definition(): array
     {
         return [
-            'tenant_id' => Tenant::factory(),
             'event_id' => EventModel::factory(),
             'user_id' => User::factory(),
             'status' => fake()->randomElement(TalkStatusEnum::cases()),

@@ -14,7 +14,7 @@ final class ImportDiscordReactionsAction
     /**
      * @param  list<DiscordMessageReactionDTO>  $reactions
      */
-    public function handle(Message $message, array $reactions, string $tenantId): void
+    public function handle(Message $message, array $reactions): void
     {
         if ($reactions === []) {
             return;
@@ -24,7 +24,6 @@ final class ImportDiscordReactionsAction
         $rows = array_map(
             static fn (DiscordMessageReactionDTO $r): array => $r->toDatabase([
                 'id' => (string) Str::uuid(),
-                'tenant_id' => $tenantId,
                 'reactable_type' => $message->getMorphClass(),
                 'reactable_id' => $message->id,
                 'created_at' => $now,

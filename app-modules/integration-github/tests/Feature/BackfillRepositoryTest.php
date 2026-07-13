@@ -68,7 +68,7 @@ function backfill(GithubRepository $repo): void
     resolve(BackfillRepository::class)->execute($repo);
 }
 
-it('faz backfill de PRs upsertando contributions com tamanho, autor e tenant', function (): void {
+it('faz backfill de PRs upsertando contributions com tamanho e autor', function (): void {
     mockGithub([
         ListPullRequests::class => MockResponse::make([prPayload(1, 'maria', 42)]),
         GetPullRequest::class => MockResponse::make(['additions' => 10, 'deletions' => 2, 'changed_files' => 3]),
@@ -79,7 +79,6 @@ it('faz backfill de PRs upsertando contributions com tamanho, autor e tenant', f
     $contribution = GithubContribution::query()->where('external_ref', 'pr:1')->sole();
 
     expect($contribution->type)->toBe(ContributionType::Pr)
-        ->and($contribution->tenant_id)->toBe($this->repo->tenant_id)
         ->and($contribution->actor_login)->toBe('maria')
         ->and($contribution->actor_id)->toBe(42)
         ->and($contribution->repo)->toBe('he4rt/heartdevs.com')

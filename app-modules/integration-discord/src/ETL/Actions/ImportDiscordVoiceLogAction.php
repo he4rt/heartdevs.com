@@ -14,12 +14,11 @@ final class ImportDiscordVoiceLogAction
     /**
      * @param  array<string, string>  $channelMap
      */
-    public function handle(DiscordVoiceLogDTO $dto, string $tenantId, array $channelMap): ?Voice
+    public function handle(DiscordVoiceLogDTO $dto, array $channelMap): ?Voice
     {
         $identity = ExternalIdentity::query()
             ->where('provider', IdentityProvider::Discord)
             ->where('external_account_id', $dto->userDiscordId)
-            ->where('tenant_id', $tenantId)
             ->first();
 
         if (!$identity) {
@@ -27,7 +26,6 @@ final class ImportDiscordVoiceLogAction
         }
 
         $attributes = $dto->toDatabase([
-            'tenant_id' => $tenantId,
             'external_identity_id' => $identity->id,
             'channel_name' => $channelMap[$dto->voiceChannelId] ?? $dto->voiceChannelId,
         ]);
@@ -40,7 +38,6 @@ final class ImportDiscordVoiceLogAction
 
         return Voice::query()->updateOrCreate(
             [
-                'tenant_id' => $tenantId,
                 'provider_message_id' => $providerMessageId,
             ],
             $attributes,

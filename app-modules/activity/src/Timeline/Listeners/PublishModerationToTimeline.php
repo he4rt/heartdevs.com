@@ -26,18 +26,11 @@ final class PublishModerationToTimeline
             return;
         }
 
-        $tenantId = $action->tenant_id ?? $action->case?->tenant_id;
-
-        if ($tenantId === null) {
-            return;
-        }
-
         $case = $action->case;
-        $subjectIdentityId = $this->resolveIdentity($case?->author_id, $tenantId);
-        $moderatorIdentityId = $this->resolveIdentity($action->moderator_id, $tenantId);
+        $subjectIdentityId = $this->resolveIdentity($case?->author_id);
+        $moderatorIdentityId = $this->resolveIdentity($action->moderator_id);
 
         ModerationEvent::query()->create([
-            'tenant_id' => $tenantId,
             'external_identity_id' => $subjectIdentityId,
             'moderator_identity_id' => $moderatorIdentityId,
             'type' => ModerationType::from($action->action_type->value),
@@ -54,7 +47,7 @@ final class PublishModerationToTimeline
         ]);
     }
 
-    private function resolveIdentity(?string $userId, string $tenantId): ?string
+    private function resolveIdentity(?string $userId): ?string
     {
         if ($userId === null) {
             return null;
@@ -63,7 +56,6 @@ final class PublishModerationToTimeline
         return ExternalIdentity::query()
             ->where('model_id', $userId)
             ->where('model_type', (new User)->getMorphClass())
-            ->where('tenant_id', $tenantId)
             ->value('id');
     }
 }

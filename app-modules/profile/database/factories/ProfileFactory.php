@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace He4rt\Profile\Database\Factories;
 
-use He4rt\Identity\Tenant\Models\Tenant;
 use He4rt\Identity\User\Models\User;
 use He4rt\Profile\Enums\SeniorityLevel;
 use He4rt\Profile\Enums\SocialPlatform;
@@ -24,7 +23,6 @@ final class ProfileFactory extends Factory
     {
         return [
             'user_id' => User::factory(),
-            'tenant_id' => Tenant::factory(),
             'nickname' => null,
             'birthdate' => null,
             'about' => null,
@@ -35,6 +33,28 @@ final class ProfileFactory extends Factory
             'available_for_proposals' => false,
             'start_availability' => null,
         ];
+    }
+
+    /**
+     * Reuse the profile that {@see \He4rt\Identity\User\Observers\UserObserver}
+     * already created for the user instead of inserting a second row, which
+     * would violate the (now tenant-free) unique constraint on `user_id`.
+     *
+     * @param  array<string, mixed>  $attributes
+     */
+    public function newModel(array $attributes = []): Profile
+    {
+        $userId = $attributes['user_id'] ?? null;
+
+        if ($userId !== null) {
+            $existing = Profile::query()->where('user_id', $userId)->first();
+
+            if ($existing !== null) {
+                return $existing->fill($attributes);
+            }
+        }
+
+        return parent::newModel($attributes);
     }
 
     public function complete(): self

@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace He4rt\IntegrationDiscord\ETL\Console;
 
-use He4rt\Identity\Tenant\Models\Tenant;
 use He4rt\IntegrationDiscord\ETL\Actions\ImportDiscordProfileAction;
 use He4rt\IntegrationDiscord\ETL\DTOs\DiscordProfileDTO;
 use Illuminate\Console\Attributes\Description;
@@ -41,14 +40,6 @@ class ImportDiscordProfilesCommand extends Command
             return self::FAILURE;
         }
 
-        $tenant = Tenant::query()->where('slug', 'he4rt')->first();
-
-        if (!$tenant) {
-            error('Tenant "he4rt" nao encontrado.');
-
-            return self::FAILURE;
-        }
-
         $basePath = $this->argument('path');
 
         if (!is_dir($basePath)) {
@@ -73,12 +64,11 @@ class ImportDiscordProfilesCommand extends Command
             ));
         }
 
-        $tenantId = $tenant->getKey();
         $stats = ['created' => 0, 'skipped' => 0, 'errors' => 0];
         /** @var list<array{chunk: string, discord_id: string, username: string, error: string}> */
         $errorSamples = [];
 
-        info(sprintf('Encontrados %d chunks para importar no tenant "%s".', count($chunks), $tenant->name));
+        info(sprintf('Encontrados %d chunks para importar.', count($chunks)));
 
         $output = $this->output->getOutput();
 
@@ -119,7 +109,7 @@ class ImportDiscordProfilesCommand extends Command
 
             foreach (array_chunk($profiles, 250) as $batch) {
                 DB::transaction(function () use (
-                    $batch, $action, $tenantId, $chunkName,
+                    $batch, $action, $chunkName,
                     &$stats, &$errorSamples, &$profileCurrent, $totalProfiles,
                     $profileSection, $statsSection, $profileTitle, &$lastStatsRender,
                 ): void {
@@ -127,7 +117,7 @@ class ImportDiscordProfilesCommand extends Command
                         $dto = DiscordProfileDTO::fromDump($profile);
 
                         try {
-                            $identity = $action->handle($dto, $tenantId);
+                            $identity = $action->handle($dto);
                             $identity->wasRecentlyCreated ? $stats['created']++ : $stats['skipped']++;
                         } catch (Throwable $e) {
                             $stats['errors']++;
@@ -207,7 +197,7 @@ class ImportDiscordProfilesCommand extends Command
     {
         $required = [
             'external_identities' => [
-                'id', 'tenant_id', 'provider', 'external_account_id', 'type',
+                'id', 'provider', 'external_account_id', 'type',
                 'model_type', 'model_id', 'credentials_type', 'credentials',
                 'connected_at', 'metadata', 'created_at', 'updated_at',
             ],

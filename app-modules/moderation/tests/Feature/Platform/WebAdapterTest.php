@@ -183,7 +183,6 @@ test('ingest creates DTO from raw payload', function (): void {
         'text' => 'Some post content',
         'media_urls' => ['https://example.com/img.jpg'],
         'metadata' => ['url' => '/posts/123'],
-        'tenant_id' => '1',
         'author_external_id' => 'user-uuid',
     ];
 
@@ -194,8 +193,7 @@ test('ingest creates DTO from raw payload', function (): void {
         ->and($dto->contentType)->toBe('post')
         ->and($dto->sourcePlatform)->toBe(Platform::Web)
         ->and($dto->textContent)->toBe('Some post content')
-        ->and($dto->mediaUrls)->toBe(['https://example.com/img.jpg'])
-        ->and($dto->tenantId)->toBe('1');
+        ->and($dto->mediaUrls)->toBe(['https://example.com/img.jpg']);
 });
 
 test('resolveUser finds user by ID', function (): void {

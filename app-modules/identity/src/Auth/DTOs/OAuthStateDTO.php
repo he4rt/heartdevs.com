@@ -16,7 +16,6 @@ final readonly class OAuthStateDTO implements JsonSerializable, Stringable
         public OAuthIntent $intent,
         public IdentityProvider $provider,
         public string $panel,
-        public string $tenant,
         public ?string $returnUrl = null,
     ) {}
 
@@ -33,7 +32,6 @@ final readonly class OAuthStateDTO implements JsonSerializable, Stringable
             intent: OAuthIntent::from($data['intent']),
             provider: IdentityProvider::from($data['provider']),
             panel: $data['panel'],
-            tenant: $data['tenant'],
             returnUrl: $data['return_url'] ?? null,
         );
     }
@@ -47,7 +45,6 @@ final readonly class OAuthStateDTO implements JsonSerializable, Stringable
             'intent' => $this->intent->value,
             'provider' => $this->provider->value,
             'panel' => $this->panel,
-            'tenant' => $this->tenant,
             'return_url' => $this->returnUrl,
         ];
     }

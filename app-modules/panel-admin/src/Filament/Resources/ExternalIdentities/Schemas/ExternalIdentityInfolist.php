@@ -16,9 +16,6 @@ class ExternalIdentityInfolist
                 TextEntry::make('id')
                     ->label('Id'),
 
-                TextEntry::make('tenant_id')
-                    ->label('Tenant Id'),
-
                 TextEntry::make('model_type')
                     ->label('Model Type'),
 

@@ -19,7 +19,6 @@ use He4rt\Identity\ExternalIdentity\Data\ClientAccessManager;
 use He4rt\Identity\ExternalIdentity\Enums\CredentialsType;
 use He4rt\Identity\ExternalIdentity\Enums\IdentityProvider;
 use He4rt\Identity\ExternalIdentity\Models\ExternalIdentity;
-use He4rt\Identity\Tenant\Models\Tenant;
 use He4rt\Identity\User\Models\User;
 use He4rt\IntegrationDiscord\ETL\Actions\ImportDiscordMessageAction;
 use He4rt\IntegrationDiscord\ETL\Actions\ImportDiscordModerationEventAction;
@@ -104,18 +103,16 @@ function heartdevsModerationLog(string $subjectId, string $moderatorId, string $
     ]);
 }
 
-function createTestIdentity(Tenant $tenant, string $discordId, string $username = 'testuser'): ExternalIdentity
+function createTestIdentity(string $discordId, string $username = 'testuser'): ExternalIdentity
 {
     $user = User::query()->firstOrCreate(
         ['username' => $username],
         ['id' => Uuid::uuid4()->toString(), 'name' => $username, 'is_donator' => false],
     );
-    $user->tenants()->syncWithoutDetaching([$tenant->getKey()]);
 
     return ExternalIdentity::query()->create([
         'provider' => IdentityProvider::Discord,
         'external_account_id' => $discordId,
-        'tenant_id' => $tenant->getKey(),
         'model_type' => (new User)->getMorphClass(),
         'model_id' => $user->id,
         'type' => IdentityProvider::Discord->getType(),
@@ -164,14 +161,14 @@ test('DiscordMessageDTO preserves entire message in metadata', function (): void
 
 test('DiscordMessageDTO::toDatabase maps fields and parses sent_at to Carbon', function (): void {
     $dto = DiscordMessageDTO::fromDump(discordMessage());
-    $result = $dto->toDatabase(['tenant_id' => 1, 'obtained_experience' => 0]);
+    $result = $dto->toDatabase(['external_identity_id' => 1, 'obtained_experience' => 0]);
 
     expect($result['provider_message_id'])->toBe('541468820355940381')
         ->and($result['channel_id'])->toBe('541443469642563585')
         ->and($result['content'])->toBe('Olá, mundo!')
         ->and($result['sent_at'])->toBeInstanceOf(CarbonInterface::class)
         ->and($result['metadata'])->toBeArray()
-        ->and($result['tenant_id'])->toBe(1)
+        ->and($result['external_identity_id'])->toBe(1)
         ->and($result['obtained_experience'])->toBe(0);
 });
 
@@ -371,11 +368,10 @@ test('DiscordModerationEventDTO::toDatabase exposes type and occurred_at without
 // ── ImportDiscordMessageAction Tests ─────────────────────────────
 
 test('it creates message linked to existing external identity', function (): void {
-    $tenant = Tenant::factory()->create(['slug' => 'he4rt']);
-    $identity = createTestIdentity($tenant, '253642464697516033', 'letsch1');
+    $identity = createTestIdentity('253642464697516033', 'letsch1');
 
     $action = resolve(ImportDiscordMessageAction::class);
-    $message = $action->handle(DiscordMessageDTO::fromDump(discordMessage()), $tenant->getKey());
+    $message = $action->handle(DiscordMessageDTO::fromDump(discordMessage()));
 
     expect($message)->toBeInstanceOf(Message::class)
         ->and($message->external_identity_id)->toBe($identity->id)
@@ -383,44 +379,35 @@ test('it creates message linked to existing external identity', function (): voi
 });
 
 test('it creates user and external identity for unknown author', function (): void {
-    $tenant = Tenant::factory()->create(['slug' => 'he4rt']);
-
     $action = resolve(ImportDiscordMessageAction::class);
-    $action->handle(DiscordMessageDTO::fromDump(discordMessage()), $tenant->getKey());
+    $action->handle(DiscordMessageDTO::fromDump(discordMessage()));
 
     $this->assertDatabaseHas('users', ['username' => 'letsch1']);
     $this->assertDatabaseHas('external_identities', [
         'provider' => 'discord',
         'external_account_id' => '253642464697516033',
-        'tenant_id' => $tenant->getKey(),
     ]);
 });
 
 test('it upserts message when provider_message_id already exists', function (): void {
-    $tenant = Tenant::factory()->create(['slug' => 'he4rt']);
-
     $action = resolve(ImportDiscordMessageAction::class);
-    $action->handle(DiscordMessageDTO::fromDump(discordMessage()), $tenant->getKey());
-    $action->handle(DiscordMessageDTO::fromDump(discordMessage(['content' => 'updated'])), $tenant->getKey());
+    $action->handle(DiscordMessageDTO::fromDump(discordMessage()));
+    $action->handle(DiscordMessageDTO::fromDump(discordMessage(['content' => 'updated'])));
 
     expect(Message::query()->count())->toBe(1)
         ->and(Message::query()->first()->content)->toBe('updated');
 });
 
 test('it sets obtained_experience to zero', function (): void {
-    $tenant = Tenant::factory()->create(['slug' => 'he4rt']);
-
     $action = resolve(ImportDiscordMessageAction::class);
-    $message = $action->handle(DiscordMessageDTO::fromDump(discordMessage()), $tenant->getKey());
+    $message = $action->handle(DiscordMessageDTO::fromDump(discordMessage()));
 
     expect($message->obtained_experience)->toBe(0);
 });
 
 test('it stores projected message metadata without redundant fields', function (): void {
-    $tenant = Tenant::factory()->create(['slug' => 'he4rt']);
-
     $action = resolve(ImportDiscordMessageAction::class);
-    $message = $action->handle(DiscordMessageDTO::fromDump(discordMessage()), $tenant->getKey());
+    $message = $action->handle(DiscordMessageDTO::fromDump(discordMessage()));
 
     expect($message->metadata)->toBeArray()
         ->toHaveKey('type')
@@ -433,10 +420,8 @@ test('it stores projected message metadata without redundant fields', function (
 });
 
 test('it preserves empty arrays and null fields in metadata', function (): void {
-    $tenant = Tenant::factory()->create(['slug' => 'he4rt']);
-
     $action = resolve(ImportDiscordMessageAction::class);
-    $message = $action->handle(DiscordMessageDTO::fromDump(discordMessage()), $tenant->getKey());
+    $message = $action->handle(DiscordMessageDTO::fromDump(discordMessage()));
 
     expect($message->metadata)
         ->toHaveKey('mentions', [])
@@ -447,8 +432,6 @@ test('it preserves empty arrays and null fields in metadata', function (): void 
 });
 
 test('it returns null metadata when projection leaves empty object', function (): void {
-    $tenant = Tenant::factory()->create(['slug' => 'he4rt']);
-
     $action = resolve(ImportDiscordMessageAction::class);
     $message = $action->handle(DiscordMessageDTO::fromDump([
         'id' => '999999999999',
@@ -457,14 +440,12 @@ test('it returns null metadata when projection leaves empty object', function ()
         'content' => '',
         'author' => ['id' => '253642464697516033', 'username' => 'letsch1'],
         'reactions' => [],
-    ]), $tenant->getKey());
+    ]));
 
     expect($message->metadata)->toBeNull();
 });
 
 test('it persists full author raw payload into external_identity metadata', function (): void {
-    $tenant = Tenant::factory()->create(['slug' => 'he4rt']);
-
     $action = resolve(ImportDiscordMessageAction::class);
     $action->handle(DiscordMessageDTO::fromDump(discordMessage([
         'author' => [
@@ -475,7 +456,7 @@ test('it persists full author raw payload into external_identity metadata', func
             'discriminator' => '0001',
             'public_flags' => 64,
         ],
-    ])), $tenant->getKey());
+    ])));
 
     $identity = ExternalIdentity::query()
         ->where('external_account_id', '253642464697516033')
@@ -488,10 +469,8 @@ test('it persists full author raw payload into external_identity metadata', func
 });
 
 test('it parses sent_at from discord timestamp', function (): void {
-    $tenant = Tenant::factory()->create(['slug' => 'he4rt']);
-
     $action = resolve(ImportDiscordMessageAction::class);
-    $message = $action->handle(DiscordMessageDTO::fromDump(discordMessage()), $tenant->getKey());
+    $message = $action->handle(DiscordMessageDTO::fromDump(discordMessage()));
 
     expect($message->sent_at)->toBeInstanceOf(CarbonInterface::class)
         ->and($message->sent_at->year)->toBe(2_019);
@@ -500,11 +479,10 @@ test('it parses sent_at from discord timestamp', function (): void {
 // ── ImportDiscordReactionsAction Tests ───────────────────────────
 
 test('it persists reactions with reactable_type message and reactable_id', function (): void {
-    $tenant = Tenant::factory()->create(['slug' => 'he4rt']);
-    createTestIdentity($tenant, '253642464697516033', 'letsch1');
+    createTestIdentity('253642464697516033', 'letsch1');
 
     $msgAction = resolve(ImportDiscordMessageAction::class);
-    $message = $msgAction->handle(DiscordMessageDTO::fromDump(discordMessage()), $tenant->getKey());
+    $message = $msgAction->handle(DiscordMessageDTO::fromDump(discordMessage()));
 
     $reactions = DiscordMessageReactionDTO::fromDumpMessage(discordMessage(['reactions' => [
         ['emoji' => ['id' => null, 'name' => '👍'], 'count' => 3, 'count_details' => ['burst' => 0, 'normal' => 3]],
@@ -512,7 +490,7 @@ test('it persists reactions with reactable_type message and reactable_id', funct
     ]]));
 
     $reactionsAction = resolve(ImportDiscordReactionsAction::class);
-    $reactionsAction->handle($message, $reactions, $tenant->getKey());
+    $reactionsAction->handle($message, $reactions);
 
     expect(Reaction::query()->count())->toBe(2);
 
@@ -532,30 +510,28 @@ test('it persists reactions with reactable_type message and reactable_id', funct
 });
 
 test('it is idempotent - re-running updates counts instead of duplicating', function (): void {
-    $tenant = Tenant::factory()->create(['slug' => 'he4rt']);
-    createTestIdentity($tenant, '253642464697516033', 'letsch1');
+    createTestIdentity('253642464697516033', 'letsch1');
 
     $msgAction = resolve(ImportDiscordMessageAction::class);
-    $message = $msgAction->handle(DiscordMessageDTO::fromDump(discordMessage()), $tenant->getKey());
+    $message = $msgAction->handle(DiscordMessageDTO::fromDump(discordMessage()));
 
     $reactionsAction = resolve(ImportDiscordReactionsAction::class);
 
     $reactions1 = [new DiscordMessageReactionDTO(emojiId: null, emojiName: '👍', count: 3, countBurst: 0, countNormal: 3)];
-    $reactionsAction->handle($message, $reactions1, $tenant->getKey());
+    $reactionsAction->handle($message, $reactions1);
 
     $reactions2 = [new DiscordMessageReactionDTO(emojiId: null, emojiName: '👍', count: 7, countBurst: 1, countNormal: 6)];
-    $reactionsAction->handle($message, $reactions2, $tenant->getKey());
+    $reactionsAction->handle($message, $reactions2);
 
     expect(Reaction::query()->count())->toBe(1)
         ->and(Reaction::query()->first()->count)->toBe(7);
 });
 
 test('it updates message reaction counters', function (): void {
-    $tenant = Tenant::factory()->create(['slug' => 'he4rt']);
-    createTestIdentity($tenant, '253642464697516033', 'letsch1');
+    createTestIdentity('253642464697516033', 'letsch1');
 
     $msgAction = resolve(ImportDiscordMessageAction::class);
-    $message = $msgAction->handle(DiscordMessageDTO::fromDump(discordMessage()), $tenant->getKey());
+    $message = $msgAction->handle(DiscordMessageDTO::fromDump(discordMessage()));
 
     $reactions = [
         new DiscordMessageReactionDTO(emojiId: null, emojiName: '👍', count: 3, countBurst: 0, countNormal: 3),
@@ -563,7 +539,7 @@ test('it updates message reaction counters', function (): void {
     ];
 
     $reactionsAction = resolve(ImportDiscordReactionsAction::class);
-    $reactionsAction->handle($message, $reactions, $tenant->getKey());
+    $reactionsAction->handle($message, $reactions);
 
     $message->refresh();
 
@@ -572,30 +548,28 @@ test('it updates message reaction counters', function (): void {
 });
 
 test('Message::reactions returns MorphMany relation', function (): void {
-    $tenant = Tenant::factory()->create(['slug' => 'he4rt']);
-    createTestIdentity($tenant, '253642464697516033', 'letsch1');
+    createTestIdentity('253642464697516033', 'letsch1');
 
     $msgAction = resolve(ImportDiscordMessageAction::class);
-    $message = $msgAction->handle(DiscordMessageDTO::fromDump(discordMessage()), $tenant->getKey());
+    $message = $msgAction->handle(DiscordMessageDTO::fromDump(discordMessage()));
 
     $reactions = [new DiscordMessageReactionDTO(emojiId: null, emojiName: '🔥', count: 1, countBurst: 0, countNormal: 1)];
 
     $reactionsAction = resolve(ImportDiscordReactionsAction::class);
-    $reactionsAction->handle($message, $reactions, $tenant->getKey());
+    $reactionsAction->handle($message, $reactions);
 
     expect($message->reactions()->count())->toBe(1)
         ->and($message->reactions()->first()->emoji_name)->toBe('🔥');
 });
 
 test('it does nothing when reactions list is empty', function (): void {
-    $tenant = Tenant::factory()->create(['slug' => 'he4rt']);
-    createTestIdentity($tenant, '253642464697516033', 'letsch1');
+    createTestIdentity('253642464697516033', 'letsch1');
 
     $msgAction = resolve(ImportDiscordMessageAction::class);
-    $message = $msgAction->handle(DiscordMessageDTO::fromDump(discordMessage()), $tenant->getKey());
+    $message = $msgAction->handle(DiscordMessageDTO::fromDump(discordMessage()));
 
     $reactionsAction = resolve(ImportDiscordReactionsAction::class);
-    $reactionsAction->handle($message, [], $tenant->getKey());
+    $reactionsAction->handle($message, []);
 
     expect(Reaction::query()->count())->toBe(0);
 });
@@ -603,14 +577,13 @@ test('it does nothing when reactions list is empty', function (): void {
 // ── ImportDiscordVoiceLogAction Tests ────────────────────────────
 
 test('it creates voice record from dyno join log', function (): void {
-    $tenant = Tenant::factory()->create(['slug' => 'he4rt']);
-    createTestIdentity($tenant, '529963308577456128', 'voiceuser');
+    createTestIdentity('529963308577456128', 'voiceuser');
 
     $dto = DiscordVoiceLogDTO::fromDump(dynoVoiceLog('529963308577456128', '452928009964355604', 'joined'));
     $channelMap = ['452928009964355604' => 'general-voice'];
 
     $action = resolve(ImportDiscordVoiceLogAction::class);
-    $voice = $action->handle($dto, $tenant->getKey(), $channelMap);
+    $voice = $action->handle($dto, $channelMap);
 
     expect($voice)->toBeInstanceOf(Voice::class)
         ->and($voice->state)->toBe('joined')
@@ -619,36 +592,32 @@ test('it creates voice record from dyno join log', function (): void {
 });
 
 test('it creates voice record from dyno leave log with left state', function (): void {
-    $tenant = Tenant::factory()->create(['slug' => 'he4rt']);
-    createTestIdentity($tenant, '529963308577456128', 'voiceuser');
+    createTestIdentity('529963308577456128', 'voiceuser');
 
     $dto = DiscordVoiceLogDTO::fromDump(dynoVoiceLog('529963308577456128', '452928009964355604', 'left'));
 
     $action = resolve(ImportDiscordVoiceLogAction::class);
-    $voice = $action->handle($dto, $tenant->getKey(), []);
+    $voice = $action->handle($dto, []);
 
     expect($voice->state)->toBe('left');
 });
 
 test('it skips when user has no external identity', function (): void {
-    $tenant = Tenant::factory()->create(['slug' => 'he4rt']);
-
     $dto = DiscordVoiceLogDTO::fromDump(dynoVoiceLog('999999999', '452928009964355604'));
 
     $action = resolve(ImportDiscordVoiceLogAction::class);
-    $voice = $action->handle($dto, $tenant->getKey(), []);
+    $voice = $action->handle($dto, []);
 
     expect($voice)->toBeNull();
 });
 
 test('it resolves channel name from channel map', function (): void {
-    $tenant = Tenant::factory()->create(['slug' => 'he4rt']);
-    createTestIdentity($tenant, '529963308577456128', 'voiceuser');
+    createTestIdentity('529963308577456128', 'voiceuser');
 
     $dto = DiscordVoiceLogDTO::fromDump(dynoVoiceLog('529963308577456128', '999'));
 
     $action = resolve(ImportDiscordVoiceLogAction::class);
-    $voice = $action->handle($dto, $tenant->getKey(), ['999' => 'music-channel']);
+    $voice = $action->handle($dto, ['999' => 'music-channel']);
 
     expect($voice->channel_name)->toBe('music-channel');
 });
@@ -656,15 +625,14 @@ test('it resolves channel name from channel map', function (): void {
 // ── ImportDiscordModerationEventAction Tests ─────────────────────
 
 test('it creates moderation event linked to subject identity (heartdevs)', function (): void {
-    $tenant = Tenant::factory()->create(['slug' => 'he4rt']);
-    $identity = createTestIdentity($tenant, '367487241171501076', 'punished_user');
-    $bot = createTestIdentity($tenant, '123456789', 'heartdevs_bot');
+    $identity = createTestIdentity('367487241171501076', 'punished_user');
+    $bot = createTestIdentity('123456789', 'heartdevs_bot');
 
     $raw = heartdevsModerationLog('367487241171501076', '237242679283548160', 'Banimento', 'motivo');
     $dto = DiscordModerationEventDTO::fromDump($raw);
 
     $action = resolve(ImportDiscordModerationEventAction::class);
-    $event = $action->handle($dto, $tenant->getKey());
+    $event = $action->handle($dto);
 
     expect($event)->toBeInstanceOf(ModerationEvent::class)
         ->and($event->type)->toBe(ModerationType::Ban)
@@ -673,93 +641,84 @@ test('it creates moderation event linked to subject identity (heartdevs)', funct
 });
 
 test('it creates moderation event with null subject when dyno username does not match', function (): void {
-    $tenant = Tenant::factory()->create(['slug' => 'he4rt']);
-
     $raw = dynoModerationLog('unknownuser', '9999', 'was banned');
     $dto = DiscordModerationEventDTO::fromDump($raw);
 
     $action = resolve(ImportDiscordModerationEventAction::class);
-    $event = $action->handle($dto, $tenant->getKey());
+    $event = $action->handle($dto);
 
     expect($event->external_identity_id)->toBeNull()
         ->and($event->type)->toBe(ModerationType::Ban);
 });
 
 test('it stores moderator identity from heartdevs embed', function (): void {
-    $tenant = Tenant::factory()->create(['slug' => 'he4rt']);
-    createTestIdentity($tenant, '367487241171501076', 'subject');
-    $moderator = createTestIdentity($tenant, '237242679283548160', 'moderator');
+    createTestIdentity('367487241171501076', 'subject');
+    $moderator = createTestIdentity('237242679283548160', 'moderator');
 
     $raw = heartdevsModerationLog('367487241171501076', '237242679283548160', 'Banimento', 'motivo');
     $dto = DiscordModerationEventDTO::fromDump($raw);
 
     $action = resolve(ImportDiscordModerationEventAction::class);
-    $event = $action->handle($dto, $tenant->getKey());
+    $event = $action->handle($dto);
 
     expect($event->moderator_identity_id)->toBe($moderator->id);
 });
 
 test('it stores reason and occurred_at from embed', function (): void {
-    $tenant = Tenant::factory()->create(['slug' => 'he4rt']);
-
     $raw = heartdevsModerationLog('111', '222', 'Advertência', 'comportamento inadequado');
     $dto = DiscordModerationEventDTO::fromDump($raw);
 
     $action = resolve(ImportDiscordModerationEventAction::class);
-    $event = $action->handle($dto, $tenant->getKey());
+    $event = $action->handle($dto);
 
     expect($event->reason)->toBe('comportamento inadequado')
         ->and($event->occurred_at)->toBeInstanceOf(CarbonInterface::class);
 });
 
 test('it links source_message_id when provided', function (): void {
-    $tenant = Tenant::factory()->create(['slug' => 'he4rt']);
-    createTestIdentity($tenant, '253642464697516033', 'letsch1');
+    createTestIdentity('253642464697516033', 'letsch1');
 
     $msgAction = resolve(ImportDiscordMessageAction::class);
-    $message = $msgAction->handle(DiscordMessageDTO::fromDump(discordMessage()), $tenant->getKey());
+    $message = $msgAction->handle(DiscordMessageDTO::fromDump(discordMessage()));
 
     $raw = heartdevsModerationLog('111', '222', 'Banimento', 'motivo');
     $dto = DiscordModerationEventDTO::fromDump($raw);
 
     $action = resolve(ImportDiscordModerationEventAction::class);
-    $event = $action->handle($dto, $tenant->getKey(), $message->id);
+    $event = $action->handle($dto, $message->id);
 
     expect($event->source_message_id)->toBe($message->id);
 });
 
 test('it is idempotent when re-importing the same source message', function (): void {
-    $tenant = Tenant::factory()->create(['slug' => 'he4rt']);
-    createTestIdentity($tenant, '253642464697516033', 'letsch1');
+    createTestIdentity('253642464697516033', 'letsch1');
 
     $msgAction = resolve(ImportDiscordMessageAction::class);
-    $message = $msgAction->handle(DiscordMessageDTO::fromDump(discordMessage()), $tenant->getKey());
+    $message = $msgAction->handle(DiscordMessageDTO::fromDump(discordMessage()));
 
     $raw = heartdevsModerationLog('111', '222', 'Banimento', 'motivo');
     $dto = DiscordModerationEventDTO::fromDump($raw);
 
     $action = resolve(ImportDiscordModerationEventAction::class);
-    $first = $action->handle($dto, $tenant->getKey(), $message->id);
-    $second = $action->handle($dto, $tenant->getKey(), $message->id);
+    $first = $action->handle($dto, $message->id);
+    $second = $action->handle($dto, $message->id);
 
     expect($first->id)->toBe($second->id)
         ->and(ModerationEvent::query()->where('source_message_id', $message->id)->count())->toBe(1);
 });
 
 test('it disambiguates user name when author global_name collides', function (): void {
-    $tenant = Tenant::factory()->create(['slug' => 'he4rt']);
-
     $action = resolve(ImportDiscordMessageAction::class);
 
     $action->handle(DiscordMessageDTO::fromDump(discordMessage([
         'id' => '900000000000000001',
         'author' => ['id' => '111', 'username' => 'user_a', 'global_name' => 'Joao', 'bot' => false],
-    ])), $tenant->getKey());
+    ])));
 
     $action->handle(DiscordMessageDTO::fromDump(discordMessage([
         'id' => '900000000000000002',
         'author' => ['id' => '222', 'username' => 'user_b', 'global_name' => 'Joao', 'bot' => false],
-    ])), $tenant->getKey());
+    ])));
 
     expect(User::query()->where('name', 'Joao')->count())->toBe(1)
         ->and(User::query()->where('username', 'user_a')->value('name'))->toBe('Joao')
@@ -769,13 +728,12 @@ test('it disambiguates user name when author global_name collides', function ():
 // ── Fase 1: canonical columns populated by adapter ───────────────
 
 test('it populates canonical kind + raw_message_type from adapter', function (): void {
-    $tenant = Tenant::factory()->create(['slug' => 'he4rt']);
-    createTestIdentity($tenant, '253642464697516033', 'letsch1');
+    createTestIdentity('253642464697516033', 'letsch1');
 
     $raw = discordMessage(['type' => 19, 'message_reference' => ['message_id' => 'parent-msg-1']]);
 
     $action = resolve(ImportDiscordMessageAction::class);
-    $message = $action->handle(DiscordMessageDTO::fromDump($raw), $tenant->getKey());
+    $message = $action->handle(DiscordMessageDTO::fromDump($raw));
 
     expect($message->kind)->toBe(MessageKind::Reply)
         ->and($message->raw_message_type)->toBe(19)
@@ -783,21 +741,18 @@ test('it populates canonical kind + raw_message_type from adapter', function ():
 });
 
 test('it populates source_kind based on author flags', function (): void {
-    $tenant = Tenant::factory()->create(['slug' => 'he4rt']);
-    createTestIdentity($tenant, '253642464697516033', 'letsch1');
+    createTestIdentity('253642464697516033', 'letsch1');
 
     $action = resolve(ImportDiscordMessageAction::class);
     $message = $action->handle(
         DiscordMessageDTO::fromDump(discordMessage(['author' => ['bot' => true]])),
-        $tenant->getKey(),
     );
 
     expect($message->source_kind)->toBe(MessageSourceKind::Bot);
 });
 
 test('it populates is_pinned, mentions_everyone and mention_role_count', function (): void {
-    $tenant = Tenant::factory()->create(['slug' => 'he4rt']);
-    createTestIdentity($tenant, '253642464697516033', 'letsch1');
+    createTestIdentity('253642464697516033', 'letsch1');
 
     $raw = discordMessage([
         'pinned' => true,
@@ -806,7 +761,7 @@ test('it populates is_pinned, mentions_everyone and mention_role_count', functio
     ]);
 
     $action = resolve(ImportDiscordMessageAction::class);
-    $message = $action->handle(DiscordMessageDTO::fromDump($raw), $tenant->getKey());
+    $message = $action->handle(DiscordMessageDTO::fromDump($raw));
 
     expect($message->is_pinned)->toBeTrue()
         ->and($message->mentions_everyone)->toBeTrue()
@@ -814,13 +769,12 @@ test('it populates is_pinned, mentions_everyone and mention_role_count', functio
 });
 
 test('it parses edited_at into a Carbon instance', function (): void {
-    $tenant = Tenant::factory()->create(['slug' => 'he4rt']);
-    createTestIdentity($tenant, '253642464697516033', 'letsch1');
+    createTestIdentity('253642464697516033', 'letsch1');
 
     $raw = discordMessage(['edited_timestamp' => '2024-05-01T10:00:00+00:00']);
 
     $action = resolve(ImportDiscordMessageAction::class);
-    $message = $action->handle(DiscordMessageDTO::fromDump($raw), $tenant->getKey());
+    $message = $action->handle(DiscordMessageDTO::fromDump($raw));
 
     expect($message->edited_at)->toBeInstanceOf(CarbonInterface::class)
         ->and($message->edited_at->year)->toBe(2_024);
@@ -836,19 +790,17 @@ test('Deleted User DTO namespaces authorUsername by Discord ID', function (): vo
 });
 
 test('it keeps deleted Discord users as separate rows', function (): void {
-    $tenant = Tenant::factory()->create(['slug' => 'he4rt']);
-
     $action = resolve(ImportDiscordMessageAction::class);
 
     $action->handle(DiscordMessageDTO::fromDump(discordMessage([
         'id' => '800000000000000001',
         'author' => ['id' => '111', 'username' => 'Deleted User', 'global_name' => null, 'bot' => false],
-    ])), $tenant->getKey());
+    ])));
 
     $action->handle(DiscordMessageDTO::fromDump(discordMessage([
         'id' => '800000000000000002',
         'author' => ['id' => '222', 'username' => 'Deleted User', 'global_name' => null, 'bot' => false],
-    ])), $tenant->getKey());
+    ])));
 
     expect(User::query()->where('username', 'deleted_user_111')->count())->toBe(1)
         ->and(User::query()->where('username', 'deleted_user_222')->count())->toBe(1)
@@ -858,30 +810,28 @@ test('it keeps deleted Discord users as separate rows', function (): void {
 
 // ── Fase 1: Voice upsert idempotency ─────────────────────────────
 
-test('it upserts voice events by (tenant_id, provider_message_id)', function (): void {
-    $tenant = Tenant::factory()->create(['slug' => 'he4rt']);
-    createTestIdentity($tenant, '529963308577456128', 'voiceuser');
+test('it upserts voice events by provider_message_id', function (): void {
+    createTestIdentity('529963308577456128', 'voiceuser');
 
     $raw = dynoVoiceLog('529963308577456128', '452928009964355604', 'joined');
     $dto = DiscordVoiceLogDTO::fromDump($raw);
 
     $action = resolve(ImportDiscordVoiceLogAction::class);
-    $action->handle($dto, $tenant->getKey(), []);
-    $action->handle($dto, $tenant->getKey(), []);
+    $action->handle($dto, []);
+    $action->handle($dto, []);
 
     expect(Voice::query()->count())->toBe(1)
         ->and(Voice::query()->first()->provider_message_id)->toBe($raw['id']);
 });
 
 test('it preserves the Dyno log timestamp in occurred_at', function (): void {
-    $tenant = Tenant::factory()->create(['slug' => 'he4rt']);
-    createTestIdentity($tenant, '529963308577456128', 'voiceuser');
+    createTestIdentity('529963308577456128', 'voiceuser');
 
     $raw = dynoVoiceLog('529963308577456128', '452928009964355604', 'joined');
     $dto = DiscordVoiceLogDTO::fromDump($raw);
 
     $action = resolve(ImportDiscordVoiceLogAction::class);
-    $voice = $action->handle($dto, $tenant->getKey(), []);
+    $voice = $action->handle($dto, []);
 
     expect($voice->occurred_at)->toBeInstanceOf(CarbonInterface::class)
         ->and($voice->occurred_at->toISOString())->toStartWith('2019-02-03');
@@ -899,15 +849,13 @@ test('moderation DTO stores parsed subject_username/discriminator in metadata', 
         ->and($result['metadata']['subject_discriminator'])->toBe('1234');
 });
 
-test('it upserts moderation events by (tenant_id, provider_message_id)', function (): void {
-    $tenant = Tenant::factory()->create(['slug' => 'he4rt']);
-
+test('it upserts moderation events by provider_message_id', function (): void {
     $raw = dynoModerationLog('someuser', '1234', 'was banned');
     $dto = DiscordModerationEventDTO::fromDump($raw);
 
     $action = resolve(ImportDiscordModerationEventAction::class);
-    $first = $action->handle($dto, $tenant->getKey());
-    $second = $action->handle($dto, $tenant->getKey());
+    $first = $action->handle($dto);
+    $second = $action->handle($dto);
 
     expect($first->id)->toBe($second->id)
         ->and(ModerationEvent::query()->count())->toBe(1);
@@ -916,9 +864,8 @@ test('it upserts moderation events by (tenant_id, provider_message_id)', functio
 // ── Fase 2: mentions / threads / resolved replies ────────────────
 
 test('it populates message_mentions with provider id, position and linked identity when known', function (): void {
-    $tenant = Tenant::factory()->create(['slug' => 'he4rt']);
-    createTestIdentity($tenant, '253642464697516033', 'letsch1');
-    $bob = createTestIdentity($tenant, '999', 'bob');
+    createTestIdentity('253642464697516033', 'letsch1');
+    $bob = createTestIdentity('999', 'bob');
 
     $raw = discordMessage([
         'id' => 'msg-with-mentions',
@@ -929,7 +876,7 @@ test('it populates message_mentions with provider id, position and linked identi
     ]);
 
     $action = resolve(ImportDiscordMessageAction::class);
-    $message = $action->handle(DiscordMessageDTO::fromDump($raw), $tenant->getKey());
+    $message = $action->handle(DiscordMessageDTO::fromDump($raw));
 
     $mentions = MessageMention::query()
         ->where('message_id', $message->id)
@@ -947,8 +894,7 @@ test('it populates message_mentions with provider id, position and linked identi
 });
 
 test('it upserts mentions idempotently on re-import', function (): void {
-    $tenant = Tenant::factory()->create(['slug' => 'he4rt']);
-    createTestIdentity($tenant, '253642464697516033', 'letsch1');
+    createTestIdentity('253642464697516033', 'letsch1');
 
     $raw = discordMessage([
         'id' => 'msg-dup-mentions',
@@ -956,15 +902,14 @@ test('it upserts mentions idempotently on re-import', function (): void {
     ]);
 
     $action = resolve(ImportDiscordMessageAction::class);
-    $action->handle(DiscordMessageDTO::fromDump($raw), $tenant->getKey());
-    $action->handle(DiscordMessageDTO::fromDump($raw), $tenant->getKey());
+    $action->handle(DiscordMessageDTO::fromDump($raw));
+    $action->handle(DiscordMessageDTO::fromDump($raw));
 
     expect(MessageMention::query()->count())->toBe(1);
 });
 
 test('it creates a message_thread when payload has a thread block', function (): void {
-    $tenant = Tenant::factory()->create(['slug' => 'he4rt']);
-    createTestIdentity($tenant, '253642464697516033', 'letsch1');
+    createTestIdentity('253642464697516033', 'letsch1');
 
     $raw = discordMessage([
         'id' => 'msg-with-thread',
@@ -976,7 +921,7 @@ test('it creates a message_thread when payload has a thread block', function ():
     ]);
 
     $action = resolve(ImportDiscordMessageAction::class);
-    $message = $action->handle(DiscordMessageDTO::fromDump($raw), $tenant->getKey());
+    $message = $action->handle(DiscordMessageDTO::fromDump($raw));
 
     $thread = MessageThread::query()->where('message_id', $message->id)->first();
 
@@ -988,13 +933,11 @@ test('it creates a message_thread when payload has a thread block', function ():
 });
 
 test('it resolves reply_to_message_id when parent message already exists', function (): void {
-    $tenant = Tenant::factory()->create(['slug' => 'he4rt']);
-    createTestIdentity($tenant, '253642464697516033', 'letsch1');
+    createTestIdentity('253642464697516033', 'letsch1');
 
     $action = resolve(ImportDiscordMessageAction::class);
     $parent = $action->handle(
         DiscordMessageDTO::fromDump(discordMessage(['id' => 'parent-1'])),
-        $tenant->getKey(),
     );
 
     $child = $action->handle(
@@ -1003,7 +946,6 @@ test('it resolves reply_to_message_id when parent message already exists', funct
             'type' => 19,
             'message_reference' => ['message_id' => 'parent-1'],
         ])),
-        $tenant->getKey(),
     );
 
     expect($child->reply_to_provider_message_id)->toBe('parent-1')
@@ -1011,8 +953,7 @@ test('it resolves reply_to_message_id when parent message already exists', funct
 });
 
 test('it leaves reply_to_message_id null when parent is out of order', function (): void {
-    $tenant = Tenant::factory()->create(['slug' => 'he4rt']);
-    createTestIdentity($tenant, '253642464697516033', 'letsch1');
+    createTestIdentity('253642464697516033', 'letsch1');
 
     $action = resolve(ImportDiscordMessageAction::class);
     $child = $action->handle(
@@ -1021,7 +962,6 @@ test('it leaves reply_to_message_id null when parent is out of order', function 
             'type' => 19,
             'message_reference' => ['message_id' => 'unseen-parent'],
         ])),
-        $tenant->getKey(),
     );
 
     expect($child->reply_to_provider_message_id)->toBe('unseen-parent')
@@ -1031,8 +971,7 @@ test('it leaves reply_to_message_id null when parent is out of order', function 
 // ── Fase 3: attachments / embeds / membership events ─────────────
 
 test('it persists attachments with content type, size and dimensions', function (): void {
-    $tenant = Tenant::factory()->create(['slug' => 'he4rt']);
-    createTestIdentity($tenant, '253642464697516033', 'letsch1');
+    createTestIdentity('253642464697516033', 'letsch1');
 
     $raw = discordMessage([
         'id' => 'msg-atts',
@@ -1048,7 +987,7 @@ test('it persists attachments with content type, size and dimensions', function 
     ]);
 
     $action = resolve(ImportDiscordMessageAction::class);
-    $message = $action->handle(DiscordMessageDTO::fromDump($raw), $tenant->getKey());
+    $message = $action->handle(DiscordMessageDTO::fromDump($raw));
 
     $attachment = MessageAttachment::query()->where('message_id', $message->id)->first();
 
@@ -1060,8 +999,7 @@ test('it persists attachments with content type, size and dimensions', function 
 });
 
 test('attachments are replaced on re-import (no duplicates)', function (): void {
-    $tenant = Tenant::factory()->create(['slug' => 'he4rt']);
-    createTestIdentity($tenant, '253642464697516033', 'letsch1');
+    createTestIdentity('253642464697516033', 'letsch1');
 
     $raw = discordMessage([
         'id' => 'msg-atts-dup',
@@ -1072,15 +1010,14 @@ test('attachments are replaced on re-import (no duplicates)', function (): void 
     ]);
 
     $action = resolve(ImportDiscordMessageAction::class);
-    $action->handle(DiscordMessageDTO::fromDump($raw), $tenant->getKey());
-    $action->handle(DiscordMessageDTO::fromDump($raw), $tenant->getKey());
+    $action->handle(DiscordMessageDTO::fromDump($raw));
+    $action->handle(DiscordMessageDTO::fromDump($raw));
 
     expect(MessageAttachment::query()->count())->toBe(2);
 });
 
 test('it persists embeds with derived source_domain and raw payload', function (): void {
-    $tenant = Tenant::factory()->create(['slug' => 'he4rt']);
-    createTestIdentity($tenant, '253642464697516033', 'letsch1');
+    createTestIdentity('253642464697516033', 'letsch1');
 
     $raw = discordMessage([
         'id' => 'msg-embed',
@@ -1094,7 +1031,7 @@ test('it persists embeds with derived source_domain and raw payload', function (
     ]);
 
     $action = resolve(ImportDiscordMessageAction::class);
-    $message = $action->handle(DiscordMessageDTO::fromDump($raw), $tenant->getKey());
+    $message = $action->handle(DiscordMessageDTO::fromDump($raw));
 
     $embed = MessageEmbed::query()->where('message_id', $message->id)->first();
 
@@ -1105,8 +1042,7 @@ test('it persists embeds with derived source_domain and raw payload', function (
 });
 
 test('it derives a membership_event for type=7 user joins', function (): void {
-    $tenant = Tenant::factory()->create(['slug' => 'he4rt']);
-    createTestIdentity($tenant, '253642464697516033', 'letsch1');
+    createTestIdentity('253642464697516033', 'letsch1');
 
     $raw = discordMessage([
         'id' => 'join-1',
@@ -1115,7 +1051,7 @@ test('it derives a membership_event for type=7 user joins', function (): void {
     ]);
 
     $action = resolve(ImportDiscordMessageAction::class);
-    $message = $action->handle(DiscordMessageDTO::fromDump($raw), $tenant->getKey());
+    $message = $action->handle(DiscordMessageDTO::fromDump($raw));
 
     $event = MembershipEvent::query()
         ->where('provider_message_id', $message->provider_message_id)
@@ -1127,8 +1063,7 @@ test('it derives a membership_event for type=7 user joins', function (): void {
 });
 
 test('it derives a boost_tier_2 membership_event for type=10', function (): void {
-    $tenant = Tenant::factory()->create(['slug' => 'he4rt']);
-    createTestIdentity($tenant, '253642464697516033', 'letsch1');
+    createTestIdentity('253642464697516033', 'letsch1');
 
     $raw = discordMessage([
         'id' => 'boost-t2',
@@ -1137,14 +1072,13 @@ test('it derives a boost_tier_2 membership_event for type=10', function (): void
     ]);
 
     $action = resolve(ImportDiscordMessageAction::class);
-    $action->handle(DiscordMessageDTO::fromDump($raw), $tenant->getKey());
+    $action->handle(DiscordMessageDTO::fromDump($raw));
 
     expect(MembershipEvent::query()->where('kind', 'boost_tier_2')->count())->toBe(1);
 });
 
 test('membership_events are idempotent on re-import', function (): void {
-    $tenant = Tenant::factory()->create(['slug' => 'he4rt']);
-    createTestIdentity($tenant, '253642464697516033', 'letsch1');
+    createTestIdentity('253642464697516033', 'letsch1');
 
     $raw = discordMessage([
         'id' => 'join-dup',
@@ -1153,15 +1087,13 @@ test('membership_events are idempotent on re-import', function (): void {
     ]);
 
     $action = resolve(ImportDiscordMessageAction::class);
-    $action->handle(DiscordMessageDTO::fromDump($raw), $tenant->getKey());
-    $action->handle(DiscordMessageDTO::fromDump($raw), $tenant->getKey());
+    $action->handle(DiscordMessageDTO::fromDump($raw));
+    $action->handle(DiscordMessageDTO::fromDump($raw));
 
     expect(MembershipEvent::query()->count())->toBe(1);
 });
 
 test('resolveOrCreateUser reuses existing legacy #0 user when no discord identity exists', function (): void {
-    $tenant = Tenant::factory()->create(['slug' => 'he4rt']);
-
     $existing = User::factory()->create(['username' => 'oldbie#0', 'name' => 'Oldbie']);
 
     $raw = discordMessage([
@@ -1170,7 +1102,7 @@ test('resolveOrCreateUser reuses existing legacy #0 user when no discord identit
     ]);
 
     $action = resolve(ImportDiscordMessageAction::class);
-    $message = $action->handle(DiscordMessageDTO::fromDump($raw), $tenant->getKey());
+    $message = $action->handle(DiscordMessageDTO::fromDump($raw));
 
     $identity = ExternalIdentity::query()
         ->where('provider', IdentityProvider::Discord)

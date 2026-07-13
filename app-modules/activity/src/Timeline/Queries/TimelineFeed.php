@@ -9,15 +9,10 @@ use Illuminate\Database\Eloquent\Builder;
 
 final readonly class TimelineFeed
 {
-    public function __construct(
-        private string $tenantId,
-    ) {}
-
     /** @return Builder<Timeline> */
     public function builder(): Builder
     {
         return Timeline::query()
-            ->where('tenant_id', $this->tenantId)
             ->where('is_ignored', operator: false)
             ->whereHas('user')
             ->whereNull('parent_id')->latest();

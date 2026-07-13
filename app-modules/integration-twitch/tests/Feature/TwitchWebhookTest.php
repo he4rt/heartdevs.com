@@ -2,7 +2,6 @@
 
 declare(strict_types=1);
 
-use He4rt\Identity\Tenant\Models\Tenant;
 use He4rt\IntegrationTwitch\Models\TwitchEventLog;
 use Illuminate\Support\Str;
 use Illuminate\Testing\TestResponse;
@@ -61,7 +60,7 @@ function postTwitchWebhook(array $payload, string $messageType = 'notification',
     $headers = signedTwitchHeaders($body, $messageType, $messageId);
 
     return test()->postJson(
-        '/api/webhooks/twitch/eventsub/'.test()->tenant->slug,
+        '/api/webhooks/twitch/eventsub',
         $payload,
         $headers,
     );
@@ -69,11 +68,10 @@ function postTwitchWebhook(array $payload, string $messageType = 'notification',
 
 beforeEach(function (): void {
     config()->set('services.twitch.eventsub_secret', 'test-secret-at-least-ten-chars');
-    test()->tenant = Tenant::factory()->create(['slug' => 'test-tenant']);
 });
 
 test('rejects request with missing twitch headers', function (): void {
-    $this->postJson('/api/webhooks/twitch/eventsub/'.$this->tenant->slug, ['foo' => 'bar'])
+    $this->postJson('/api/webhooks/twitch/eventsub', ['foo' => 'bar'])
         ->assertStatus(403);
 });
 
@@ -84,7 +82,7 @@ test('rejects request with invalid signature', function (): void {
     $headers = signedTwitchHeaders($body);
     $headers['Twitch-Eventsub-Message-Signature'] = 'sha256=invalid';
 
-    $this->postJson('/api/webhooks/twitch/eventsub/'.$this->tenant->slug, $payload, $headers)
+    $this->postJson('/api/webhooks/twitch/eventsub', $payload, $headers)
         ->assertStatus(403);
 });
 
@@ -95,7 +93,7 @@ test('rejects request with expired timestamp', function (): void {
 
     $headers = signedTwitchHeaders($body, 'notification', timestamp: $timestamp);
 
-    $this->postJson('/api/webhooks/twitch/eventsub/'.$this->tenant->slug, $payload, $headers)
+    $this->postJson('/api/webhooks/twitch/eventsub', $payload, $headers)
         ->assertStatus(403);
 });
 
@@ -117,7 +115,6 @@ test('stores notification event in twitch_event_logs', function (): void {
         ->and($log->event_type)->toBe('channel.follow')
         ->and($log->broadcaster_user_id)->toBe('12345')
         ->and($log->user_id)->toBe('67890')
-        ->and($log->tenant_id)->toBe($this->tenant->id)
         ->and($log->twitch_message_id)->not->toBeNull()
         ->and($log->payload)->toBeArray();
 });

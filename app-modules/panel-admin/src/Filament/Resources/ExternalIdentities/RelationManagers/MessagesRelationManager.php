@@ -54,12 +54,6 @@ class MessagesRelationManager extends RelationManager
                 DatePicker::make('sent_at')
                     ->label('Sent Date'),
 
-                Select::make('tenant_id')
-                    ->label('Tenant Id')
-                    ->relationship('tenant', 'name')
-                    ->searchable()
-                    ->required(),
-
                 TextInput::make('reactions_count')
                     ->label('Reactions Count')
                     ->required()
@@ -272,7 +266,6 @@ class MessagesRelationManager extends RelationManager
                             'author_external_id' => $identity->external_account_id ?? '',
                             'text' => $record->content,
                             'media_urls' => [],
-                            'tenant_id' => (string) $record->tenant_id,
                             'metadata' => [
                                 'channel_id' => $record->channel_id,
                             ],

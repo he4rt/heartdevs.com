@@ -6,7 +6,6 @@ namespace He4rt\Activity\Message\Models;
 
 use Carbon\CarbonInterface;
 use He4rt\Identity\ExternalIdentity\Models\ExternalIdentity;
-use He4rt\Identity\Tenant\Models\Tenant;
 use Illuminate\Database\Eloquent\Attributes\Table;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Model;
@@ -14,7 +13,6 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 /**
  * @property string $id
- * @property string $tenant_id
  * @property string $message_id
  * @property string|null $mentioned_identity_id
  * @property string $mentioned_provider_account_id
@@ -42,13 +40,5 @@ final class MessageMention extends Model
     public function mentionedIdentity(): BelongsTo
     {
         return $this->belongsTo(ExternalIdentity::class, 'mentioned_identity_id');
-    }
-
-    /**
-     * @return BelongsTo<Tenant, $this>
-     */
-    public function tenant(): BelongsTo
-    {
-        return $this->belongsTo(Tenant::class, 'tenant_id');
     }
 }

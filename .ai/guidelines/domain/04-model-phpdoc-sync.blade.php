@@ -26,7 +26,7 @@ When you **add, remove, rename, or change the type** of any database column (via
 <code-snippet name="Model PHPDoc block" lang="php">
 /**
  * @property string $id
- * @property int $tenant_id
+ * @property int $position
  * @property string $name
  * @property string|null $description
  * @property bool $active

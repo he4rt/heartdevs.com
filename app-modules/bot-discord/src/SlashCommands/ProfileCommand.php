@@ -90,7 +90,6 @@ class ProfileCommand extends AbstractSlashCommand
 
             $profile = Profile::query()
                 ->where('user_id', $this->memberProvider->user->id)
-                ->where('tenant_id', $this->memberProvider->tenant_id)
                 ->first();
 
             if (!$profile) {

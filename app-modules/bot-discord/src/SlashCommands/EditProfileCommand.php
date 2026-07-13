@@ -65,7 +65,6 @@ class EditProfileCommand extends AbstractSlashCommand
     {
         $profile = Profile::query()
             ->where('user_id', $this->memberProvider?->user?->id)
-            ->where('tenant_id', $this->memberProvider?->tenant_id)
             ->first();
 
         if (!$profile) {
@@ -135,7 +134,6 @@ class EditProfileCommand extends AbstractSlashCommand
 
             $profile = Profile::query()
                 ->where('user_id', $this->memberProvider->user->id)
-                ->where('tenant_id', $this->memberProvider->tenant_id)
                 ->firstOrFail();
 
             $dto = UpsertProfileDTO::fromArray([
@@ -165,7 +163,6 @@ class EditProfileCommand extends AbstractSlashCommand
                 'discord_user_id' => $interaction->user->id,
                 'guild_id' => $interaction->guild_id,
                 'user_id' => $this->memberProvider?->user?->id,
-                'tenant_id' => $this->memberProvider?->tenant_id,
                 'fields' => ['name' => $name, 'nickname' => $nickname, 'about' => $about],
                 'exception' => $throwable,
             ]);

@@ -17,7 +17,6 @@ use Illuminate\Support\Collection;
 final readonly class CommunityRetrospective
 {
     public function __construct(
-        private string $tenantId,
         private RetrospectiveFilters $filters,
     ) {}
 
@@ -34,7 +33,6 @@ final readonly class CommunityRetrospective
     {
         /** @var Collection<int, GithubContribution> $contributions */
         $contributions = GithubContribution::query()
-            ->where('tenant_id', $this->tenantId)
             ->whereBetween('occurred_at', [$this->filters->since, $this->filters->until])
             ->get()
             ->when(

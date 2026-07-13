@@ -60,7 +60,6 @@ final readonly class DiscordModerationAdapter implements ModerationPlatformContr
             'author_external_id' => $rawPayload['author_id'],
             'text' => $rawPayload['content'],
             'media_urls' => $rawPayload['attachments'] ?? [],
-            'tenant_id' => $rawPayload['tenant_id'] ?? null,
             'metadata' => [
                 'channel_id' => $rawPayload['channel_id'],
                 'guild_id' => $rawPayload['guild_id'],

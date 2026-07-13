@@ -32,9 +32,7 @@ final class ThreadReplies extends Component
         }
 
         $reply = Timeline::query()
-            ->where('id', $replyId)
-            ->where('tenant_id', filament()->getTenant()->getKey())
-            ->firstOrFail();
+            ->where('id', $replyId)->firstOrFail();
 
         resolve(DeleteReply::class)->handle($user, $reply);
 
@@ -44,9 +42,7 @@ final class ThreadReplies extends Component
     public function render(): View
     {
         $replies = Timeline::query()
-            ->where('root_id', $this->timelineId)
-            ->where('tenant_id', filament()->getTenant()->getKey())
-            ->whereNotNull('parent_id')
+            ->where('root_id', $this->timelineId)->whereNotNull('parent_id')
             ->with(['user', 'postable'])
             ->oldest()
             ->simplePaginate($this->perPage);

@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace He4rt\Profile\Models;
 
 use Carbon\CarbonInterface;
-use He4rt\Identity\Tenant\Models\Tenant;
 use He4rt\Identity\User\Models\User;
 use He4rt\Profile\Casts\AsWorkPreferences;
 use He4rt\Profile\Data\WorkPreferences;
@@ -27,7 +26,6 @@ use InvalidArgumentException;
 /**
  * @property string $id
  * @property string $user_id
- * @property string $tenant_id
  * @property string|null $nickname
  * @property CarbonInterface|null $birthdate
  * @property string|null $about
@@ -53,7 +51,6 @@ final class Profile extends Model
 
     protected $fillable = [
         'user_id',
-        'tenant_id',
         'nickname',
         'birthdate',
         'about',
@@ -68,12 +65,11 @@ final class Profile extends Model
         'preferences',
     ];
 
-    public static function ensureExists(string $userId, string $tenantId): self
+    public static function ensureExists(string $userId): self
     {
         /** @var Profile $profile */
         $profile = self::query()->firstOrCreate([
             'user_id' => $userId,
-            'tenant_id' => $tenantId,
         ], [
             'available_for_proposals' => false,
         ]);
@@ -90,11 +86,31 @@ final class Profile extends Model
     }
 
     /**
-     * @return BelongsTo<Tenant, $this>
+     * @return HasMany<WorkExperience, $this>
      */
-    public function tenant(): BelongsTo
+    public function workExperiences(): HasMany
     {
-        return $this->belongsTo(Tenant::class);
+        return $this->hasMany(WorkExperience::class)
+            ->orderByDesc('is_currently_working_here')
+            ->latest('start_date');
+    }
+
+    /**
+     * @return HasMany<ProfileSkill, $this>
+     */
+    public function profileSkills(): HasMany
+    {
+        return $this->hasMany(ProfileSkill::class);
+    }
+
+    /**
+     * @return BelongsToMany<Skill, $this>
+     */
+    public function skills(): BelongsToMany
+    {
+        return $this->belongsToMany(Skill::class, 'profile_skills')
+            ->withPivot(['proficiency', 'years_experience'])
+            ->withTimestamps();
     }
 
     /**

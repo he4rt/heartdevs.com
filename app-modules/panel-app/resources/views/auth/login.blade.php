@@ -82,7 +82,7 @@
                 {{-- OAuth --}}
                 <div class="grid gap-2.5">
                     <a
-                        href="{{ route('oauth.redirect', ['tenant' => request()->getHost(), 'panel' => 'app', 'provider' => 'discord']) }}"
+                        href="{{ route('oauth.redirect', ['panel' => 'app', 'provider' => 'discord']) }}"
                         class="flex items-center justify-center gap-2.5 rounded-lg bg-[#5865F2] px-4 py-2.5 text-sm font-medium text-white transition hover:bg-[#4752C4]"
                     >
                         @svg ('fab-discord', 'h-5 w-5')
@@ -90,7 +90,7 @@
                     </a>
 
                     <a
-                        href="{{ route('oauth.redirect', ['tenant' => request()->getHost(), 'panel' => 'app', 'provider' => 'github']) }}"
+                        href="{{ route('oauth.redirect', ['panel' => 'app', 'provider' => 'github']) }}"
                         class="flex items-center justify-center gap-2.5 rounded-lg bg-zinc-800 px-4 py-2.5 text-sm font-medium text-white ring-1 ring-zinc-700 transition hover:bg-zinc-700"
                     >
                         @svg ('fab-github', 'h-5 w-5')
@@ -98,7 +98,7 @@
                     </a>
 
                     <a
-                        href="{{ route('oauth.redirect', ['tenant' => request()->getHost(), 'panel' => 'app', 'provider' => 'twitch']) }}"
+                        href="{{ route('oauth.redirect', ['panel' => 'app', 'provider' => 'twitch']) }}"
                         class="flex items-center justify-center gap-2.5 rounded-lg bg-[#9146FF] px-4 py-2.5 text-sm font-medium text-white transition hover:bg-[#7B2FF0]"
                     >
                         @svg ('fab-twitch', 'h-5 w-5')

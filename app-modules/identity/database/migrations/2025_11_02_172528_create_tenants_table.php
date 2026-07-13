@@ -10,6 +10,10 @@ return new class extends Migration
 {
     public function up(): void
     {
+        if (Schema::hasTable('tenants')) {
+            return;
+        }
+
         Schema::create('tenants', static function (Blueprint $table): void {
             $table->uuid('id')->primary();
             $table->string('name');

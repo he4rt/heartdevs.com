@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace He4rt\Events\Database\Factories;
 
 use He4rt\Events\Models\Sponsor;
-use He4rt\Identity\Tenant\Models\Tenant;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Facades\Date;
 
@@ -19,7 +18,6 @@ final class SponsorFactory extends Factory
     public function definition(): array
     {
         return [
-            'tenant_id' => Tenant::factory(),
             'name' => fake()->name(),
             'homepage_url' => fake()->url(),
             'created_at' => Date::now(),

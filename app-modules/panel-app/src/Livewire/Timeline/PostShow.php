@@ -31,9 +31,7 @@ final class PostShow extends Component
         }
 
         $timeline = Timeline::query()
-            ->where('id', $this->timelineId)
-            ->where('tenant_id', filament()->getTenant()->getKey())
-            ->firstOrFail();
+            ->where('id', $this->timelineId)->firstOrFail();
 
         resolve(TogglePinPost::class)->handle($user, $timeline);
 
@@ -43,9 +41,7 @@ final class PostShow extends Component
     public function render(): View
     {
         $timeline = Timeline::query()
-            ->where('id', $this->timelineId)
-            ->where('tenant_id', filament()->getTenant()->getKey())
-            ->with([
+            ->where('id', $this->timelineId)->with([
                 'user',
                 'postable',
                 'reactions',

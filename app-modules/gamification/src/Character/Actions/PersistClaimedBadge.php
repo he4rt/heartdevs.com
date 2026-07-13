@@ -14,7 +14,6 @@ final readonly class PersistClaimedBadge
         $character->badges()
             ->attach($badgeId, [
                 'claimed_at' => now(),
-                'tenant_id' => $character->tenant_id,
             ]);
     }
 }

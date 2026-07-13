@@ -32,7 +32,6 @@ test('SubmitReport creates case and runs pipeline', function (): void {
             mediaUrls: [],
             metadata: [],
             snapshot: ['text' => 'some bad content'],
-            tenantId: null,
         ),
         reason: ViolationType::Toxicity,
         details: 'This user is being toxic',
@@ -70,7 +69,6 @@ test('SubmitReport deduplicates reports to same content', function (): void {
         mediaUrls: [],
         metadata: [],
         snapshot: ['text' => 'bad stuff'],
-        tenantId: null,
     );
 
     $case1 = $action->handle($reporter1, $dto, ViolationType::Spam, details: null, platform: Platform::Discord);

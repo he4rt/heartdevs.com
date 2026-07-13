@@ -40,7 +40,6 @@ class ListTwitchSubscriptions extends ListRecords
             /** @var array<int, array<string, mixed>> $remoteSubscriptions */
             $remoteSubscriptions = $response->json('data', []);
 
-            $tenantId = filament()->getTenant()?->getKey();
             $syncedIds = [];
 
             foreach ($remoteSubscriptions as $sub) {
@@ -57,9 +56,6 @@ class ListTwitchSubscriptions extends ListRecords
                         'callback_url' => $sub['transport']['callback'] ?? null,
                         'cost' => $sub['cost'] ?? 0,
                         'version' => $sub['version'] ?? '1',
-                        'tenant_id' => $tenantId ?? TwitchSubscription::query()
-                            ->where('subscription_id', $sub['id'])
-                            ->value('tenant_id') ?? 0,
                     ]
                 );
 
@@ -67,7 +63,6 @@ class ListTwitchSubscriptions extends ListRecords
             }
 
             TwitchSubscription::query()
-                ->where('tenant_id', $tenantId)
                 ->whereNotIn('subscription_id', $syncedIds)
                 ->delete();
 

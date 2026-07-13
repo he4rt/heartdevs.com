@@ -9,7 +9,6 @@ use Filament\Notifications\Notification;
 use Filament\Support\Enums\Width;
 use He4rt\Identity\ExternalIdentity\Enums\IdentityProvider;
 use He4rt\Identity\ExternalIdentity\Models\ExternalIdentity;
-use He4rt\Identity\Tenant\Models\Tenant;
 use He4rt\IntegrationTwitch\Actions\RegisterTwitchSubscriptionsAction;
 use He4rt\IntegrationTwitch\Enums\TwitchEventSubType;
 use He4rt\IntegrationTwitch\Models\TwitchSubscription;
@@ -28,27 +27,15 @@ class RegisterSubscriptionsAction extends Action
             ->modalHeading(__('panel-admin::twitch.subscriptions.actions.register'))
             ->modalSubmitActionLabel(__('panel-admin::twitch.subscriptions.actions.register_confirm_button'))
             ->modalWidth(Width::ThreeExtraLarge)
-            ->modalContent(function (): View {
-                /** @var Tenant|null $tenant */
-                $tenant = filament()->getTenant();
-
-                return view('panel-admin::twitch.register-subscriptions-modal', [
-                    'broadcaster' => $this->resolveBroadcaster($tenant),
-                    'callbackUrl' => $this->resolveCallbackUrl($tenant),
-                    'groups' => $this->buildEventTypeGroups($tenant),
-                    'secret' => $this->maskSecret(),
-                ]);
-            })
+            ->modalContent(fn (): View => view('panel-admin::twitch.register-subscriptions-modal', [
+                'broadcaster' => $this->resolveBroadcaster(),
+                'callbackUrl' => $this->resolveCallbackUrl(),
+                'groups' => $this->buildEventTypeGroups(),
+                'secret' => $this->maskSecret(),
+            ]))
             ->action(static function (): void {
-                /** @var Tenant|null $tenant */
-                $tenant = filament()->getTenant();
-
-                if (!$tenant instanceof Tenant) {
-                    return;
-                }
-
                 $action = resolve(RegisterTwitchSubscriptionsAction::class);
-                $result = $action($tenant);
+                $result = $action();
 
                 if ($result['errors']['broadcaster'] ?? null) {
                     Notification::make()
@@ -81,14 +68,9 @@ class RegisterSubscriptionsAction extends Action
     /**
      * @return array{id: string, login: string}|null
      */
-    private function resolveBroadcaster(?Tenant $tenant): ?array
+    private function resolveBroadcaster(): ?array
     {
-        if (!$tenant instanceof Tenant) {
-            return null;
-        }
-
         $identity = ExternalIdentity::query()
-            ->where('tenant_id', $tenant->getKey())
             ->where('provider', IdentityProvider::Twitch)
             ->whereNotNull('connected_at')
             ->whereNull('disconnected_at')
@@ -104,11 +86,15 @@ class RegisterSubscriptionsAction extends Action
         ];
     }
 
-    private function resolveCallbackUrl(?Tenant $tenant): string
+    private function resolveCallbackUrl(): string
     {
-        $slug = $tenant instanceof Tenant ? $tenant->slug : 'default';
+        $configured = config()->string('services.twitch.eventsub_callback', '');
 
-        return mb_rtrim(config('app.url'), '/').'/api/webhooks/twitch/eventsub/'.$slug;
+        if ($configured !== '') {
+            return $configured;
+        }
+
+        return mb_rtrim(config()->string('app.url'), '/').'/api/webhooks/twitch/eventsub';
     }
 
     private function maskSecret(): string
@@ -121,17 +107,12 @@ class RegisterSubscriptionsAction extends Action
     /**
      * @return array<string, array{label: string, types: array<int, array{value: string, name: string, version: string, exists: bool}>}>
      */
-    private function buildEventTypeGroups(?Tenant $tenant): array
+    private function buildEventTypeGroups(): array
     {
-        $existingTypes = [];
-
-        if ($tenant instanceof Tenant) {
-            $existingTypes = TwitchSubscription::query()
-                ->where('tenant_id', $tenant->getKey())
-                ->where('status', 'enabled')
-                ->pluck('type')
-                ->all();
-        }
+        $existingTypes = TwitchSubscription::query()
+            ->where('status', 'enabled')
+            ->pluck('type')
+            ->all();
 
         $groups = [
             'stream' => ['label' => 'Stream', 'types' => []],

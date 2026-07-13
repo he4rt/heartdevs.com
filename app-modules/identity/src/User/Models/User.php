@@ -8,12 +8,10 @@ use App\Concerns\HasAddress;
 use Carbon\CarbonInterface;
 use Filament\Models\Contracts\FilamentUser;
 use Filament\Models\Contracts\HasName;
-use Filament\Models\Contracts\HasTenants;
 use Filament\Panel;
 use He4rt\Gamification\Character\Models\Character;
 use He4rt\Identity\Database\Factories\UserFactory;
 use He4rt\Identity\ExternalIdentity\Models\ExternalIdentity;
-use He4rt\Identity\Tenant\Concerns\InteractsWithTenants;
 use He4rt\Identity\User\Observers\UserObserver;
 use Illuminate\Database\Eloquent\Attributes\Hidden;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
@@ -44,14 +42,13 @@ use Spatie\MediaLibrary\InteractsWithMedia;
 #[ObservedBy(classes: UserObserver::class)]
 #[Table(name: 'users')]
 #[Hidden('password', 'remember_token', 'email_verified_at')]
-final class User extends Authenticatable implements FilamentUser, HasMedia, HasName, HasTenants
+final class User extends Authenticatable implements FilamentUser, HasMedia, HasName
 {
     use HasAddress;
     /** @use HasFactory<UserFactory> */
     use HasFactory;
     use HasUuids;
     use InteractsWithMedia;
-    use InteractsWithTenants;
     use Notifiable;
 
     public function isAdmin(): bool

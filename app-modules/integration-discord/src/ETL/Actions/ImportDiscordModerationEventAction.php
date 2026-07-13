@@ -13,17 +13,15 @@ final class ImportDiscordModerationEventAction
 {
     public function handle(
         DiscordModerationEventDTO $dto,
-        string $tenantId,
         ?string $sourceMessageId = null,
     ): ModerationEvent {
-        $subjectIdentity = $this->resolveSubject($dto, $tenantId);
-        $moderatorIdentity = $this->resolveModerator($dto, $tenantId);
-        $botIdentity = $this->resolveBot($dto, $tenantId);
+        $subjectIdentity = $this->resolveSubject($dto);
+        $moderatorIdentity = $this->resolveModerator($dto);
+        $botIdentity = $this->resolveBot($dto);
 
         $providerMessageId = isset($dto->metadata['id']) ? (string) $dto->metadata['id'] : null;
 
         $attributes = $dto->toDatabase([
-            'tenant_id' => $tenantId,
             'external_identity_id' => $subjectIdentity?->id,
             'moderator_identity_id' => $moderatorIdentity?->id,
             'source_identity_id' => $botIdentity?->id,
@@ -34,7 +32,6 @@ final class ImportDiscordModerationEventAction
         if ($providerMessageId !== null) {
             return ModerationEvent::query()->updateOrCreate(
                 [
-                    'tenant_id' => $tenantId,
                     'provider_message_id' => $providerMessageId,
                 ],
                 $attributes,
@@ -51,29 +48,26 @@ final class ImportDiscordModerationEventAction
         return ModerationEvent::query()->create($attributes);
     }
 
-    private function resolveBot(DiscordModerationEventDTO $dto, string $tenantId): ?ExternalIdentity
+    private function resolveBot(DiscordModerationEventDTO $dto): ?ExternalIdentity
     {
         return ExternalIdentity::query()
             ->where('provider', IdentityProvider::Discord)
             ->where('external_account_id', $dto->botDiscordId)
-            ->where('tenant_id', $tenantId)
             ->first();
     }
 
-    private function resolveSubject(DiscordModerationEventDTO $dto, string $tenantId): ?ExternalIdentity
+    private function resolveSubject(DiscordModerationEventDTO $dto): ?ExternalIdentity
     {
         if ($dto->subjectDiscordId) {
             return ExternalIdentity::query()
                 ->where('provider', IdentityProvider::Discord)
                 ->where('external_account_id', $dto->subjectDiscordId)
-                ->where('tenant_id', $tenantId)
                 ->first();
         }
 
         if ($dto->subjectUsername && $dto->subjectDiscriminator) {
             return ExternalIdentity::query()
                 ->where('provider', IdentityProvider::Discord)
-                ->where('tenant_id', $tenantId)
                 ->whereJsonContains('metadata->user->username', $dto->subjectUsername)
                 ->whereJsonContains('metadata->user->discriminator', $dto->subjectDiscriminator)
                 ->first();
@@ -82,7 +76,7 @@ final class ImportDiscordModerationEventAction
         return null;
     }
 
-    private function resolveModerator(DiscordModerationEventDTO $dto, string $tenantId): ?ExternalIdentity
+    private function resolveModerator(DiscordModerationEventDTO $dto): ?ExternalIdentity
     {
         if (!$dto->moderatorDiscordId) {
             return null;
@@ -91,7 +85,6 @@ final class ImportDiscordModerationEventAction
         return ExternalIdentity::query()
             ->where('provider', IdentityProvider::Discord)
             ->where('external_account_id', $dto->moderatorDiscordId)
-            ->where('tenant_id', $tenantId)
             ->first();
     }
 }

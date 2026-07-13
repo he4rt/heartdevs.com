@@ -7,7 +7,6 @@ namespace He4rt\Gamification\Database\Factories;
 use He4rt\Gamification\Character\Models\Character;
 use He4rt\Gamification\Character\Models\PastSeason;
 use He4rt\Gamification\Season\Models\Season;
-use He4rt\Identity\Tenant\Models\Tenant;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -21,7 +20,6 @@ final class PastSeasonFactory extends Factory
     {
         return [
             'season_id' => Season::factory(),
-            'tenant_id' => Tenant::factory(),
             'character_id' => Character::factory(),
             'ranking_position' => fake()->numberBetween(1, 1_000),
             'experience' => fake()->numberBetween(1, 1_000),
