@@ -11,11 +11,11 @@ use He4rt\PanelAdmin\Twitch\Resources\TwitchSubscriptionResource\Pages\ListTwitc
 use function Pest\Livewire\livewire;
 
 beforeEach(function (): void {
-    $user = User::factory()->create(['username' => 'danielhe4rt']);
+    $this->user = User::factory()->create(['username' => 'danielhe4rt']);
 
     config(['he4rt.admins' => 'danielhe4rt']);
 
-    $this->actingAs($user);
+    $this->actingAs($this->user);
 
     Filament::setCurrentPanel(Filament::getPanel('admin'));
 });
@@ -31,6 +31,8 @@ test('botão de conectar aponta para o fluxo OAuth da twitch no painel admin', f
 
 test('quando já existe identidade twitch conectada, o botão mostra reconectar com o login', function (): void {
     ExternalIdentity::factory()->create([
+        'model_type' => (new User)->getMorphClass(),
+        'model_id' => $this->user->id,
         'provider' => IdentityProvider::Twitch,
         'connected_at' => now(),
         'disconnected_at' => null,

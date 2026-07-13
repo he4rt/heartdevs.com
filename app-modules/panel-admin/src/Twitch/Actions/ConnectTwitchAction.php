@@ -7,6 +7,7 @@ namespace He4rt\PanelAdmin\Twitch\Actions;
 use Filament\Actions\Action;
 use He4rt\Identity\ExternalIdentity\Enums\IdentityProvider;
 use He4rt\Identity\ExternalIdentity\Models\ExternalIdentity;
+use He4rt\Identity\User\Models\User;
 
 class ConnectTwitchAction extends Action
 {
@@ -33,11 +34,19 @@ class ConnectTwitchAction extends Action
 
     private function resolveConnectedIdentity(): ?ExternalIdentity
     {
-        return ExternalIdentity::query()
+        $user = filament()->auth()->user();
+
+        if (!$user instanceof User) {
+            return null;
+        }
+
+        $identity = $user->providers()
             ->where('provider', IdentityProvider::Twitch)
             ->whereNotNull('connected_at')
             ->whereNull('disconnected_at')
             ->first();
+
+        return $identity instanceof ExternalIdentity ? $identity : null;
     }
 
     private function resolveLogin(ExternalIdentity $identity): string

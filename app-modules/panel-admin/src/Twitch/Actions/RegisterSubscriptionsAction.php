@@ -49,16 +49,22 @@ class RegisterSubscriptionsAction extends Action
 
                 $result = resolve(RegisterTwitchSubscriptionsAction::class)($broadcaster['id']);
 
-                Notification::make()
-                    ->success()
-                    ->title(__('panel-admin::twitch.subscriptions.actions.registered'))
+                $hasFailures = $result['failed'] > 0;
+
+                $notification = Notification::make()
+                    ->title(__($hasFailures
+                        ? 'panel-admin::twitch.subscriptions.actions.register_partial'
+                        : 'panel-admin::twitch.subscriptions.actions.registered'))
                     ->body(sprintf(
                         '%d created, %d skipped, %d failed.',
                         $result['created'],
                         $result['skipped'],
                         $result['failed'],
-                    ))
-                    ->send();
+                    ));
+
+                $hasFailures ? $notification->warning() : $notification->success();
+
+                $notification->send();
             });
     }
 
@@ -113,7 +119,13 @@ class RegisterSubscriptionsAction extends Action
 
     private function maskSecret(): string
     {
-        $secret = config()->string('services.twitch.eventsub_secret');
+        // Read defensively: TWITCH_EVENTSUB_SECRET has no config default (it must
+        // fail loud on the security paths), so the display must tolerate it being unset.
+        $secret = config('services.twitch.eventsub_secret');
+
+        if (!is_string($secret) || $secret === '') {
+            return '—';
+        }
 
         return mb_substr($secret, 0, 4).str_repeat('*', max(mb_strlen($secret) - 4, 0));
     }

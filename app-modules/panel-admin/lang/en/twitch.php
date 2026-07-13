@@ -31,6 +31,7 @@ return [
             'register' => 'Register Subscriptions',
             'register_confirm_button' => 'Register All',
             'registered' => 'Subscriptions registered successfully.',
+            'register_partial' => 'Some subscriptions failed to register.',
             'register_failed' => 'Failed to register subscriptions.',
             'no_broadcaster' => 'Connect your Twitch account first — use the "Connect Twitch" button above.',
             'sync' => 'Sync from Twitch',
