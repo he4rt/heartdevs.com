@@ -5,6 +5,12 @@
 **Deciders:** danielhe4rt
 **Relates to:** [ADR-0001](0001-governanca-como-registro.md)
 
+> **Atualização (2026-07-13):** o multi-tenancy foi removido do projeto (#413). As menções a
+> `tenant_id` e a escopo por tenant abaixo refletem a decisão original e **não valem mais** para o
+> schema atual: os índices que eram compostos com `tenant_id` passaram a ser globais
+> (`UNIQUE (tenant_id, slug)` → `UNIQUE (slug)`; a exclusividade "1 por tenant" vira global).
+> Mantido como registro histórico — o estado atual está no `CONTEXT.md` e nas migrations.
+
 ## Contexto
 
 Sob o modelo de governança como registro (ADR-0001), o `squads` precisa de um esquema que seja a

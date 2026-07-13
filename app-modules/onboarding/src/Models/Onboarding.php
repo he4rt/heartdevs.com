@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace He4rt\Onboarding\Models;
 
 use Carbon\CarbonInterface;
-use He4rt\Identity\Tenant\Models\Tenant;
 use He4rt\Identity\User\Models\User;
 use He4rt\Onboarding\Database\Factories\OnboardingFactory;
 use He4rt\Onboarding\Enums\OnboardingStatus;
@@ -20,7 +19,6 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 /**
  * @property string $id
- * @property string $tenant_id
  * @property string $user_id
  * @property OnboardingType $type
  * @property OnboardingStatus $status
@@ -36,12 +34,6 @@ final class Onboarding extends Model
     /** @use HasFactory<OnboardingFactory> */
     use HasFactory;
     use HasUuids;
-
-    /** @return BelongsTo<Tenant, $this> */
-    public function tenant(): BelongsTo
-    {
-        return $this->belongsTo(Tenant::class);
-    }
 
     /** @return BelongsTo<User, $this> */
     public function user(): BelongsTo

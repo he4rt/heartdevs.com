@@ -42,23 +42,6 @@ test('reassigns timeline posts from current to old user so they are not orphaned
     expect($post->refresh()->user_id)->toBe($oldUser->id);
 });
 
-test('reassigns timeline posts from current to old user so they are not orphaned', function (): void {
-    $tenant = Tenant::factory()->create();
-    $oldUser = User::factory()->create(['first_login_at' => now()]);
-    $currentUser = User::factory()->create();
-
-    $post = Timeline::factory()->for($currentUser)->create([
-        'tenant_id' => $tenant->id,
-        'postable_type' => (new PostEntry)->getMorphClass(),
-        'postable_id' => PostEntry::factory()->create()->id,
-    ]);
-
-    $action = new MergeAccountsAction();
-    $action->execute($currentUser, $oldUser);
-
-    expect($post->refresh()->user_id)->toBe($oldUser->id);
-});
-
 test('deletes current user after merge', function (): void {
     $oldUser = User::factory()->create(['first_login_at' => now()]);
     $currentUser = User::factory()->create();

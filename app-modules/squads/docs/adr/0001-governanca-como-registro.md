@@ -5,6 +5,10 @@
 **Deciders:** danielhe4rt
 **Relates to:** `onboarding/docs/adr/0001` (o gate APTO que este módulo consome)
 
+> **Atualização (2026-07-13):** o multi-tenancy foi removido do projeto (#413). Menções a escopo
+> por tenant / `tenant_id` abaixo são da decisão original e **não valem mais** — o estado atual está
+> no `CONTEXT.md` e nas migrations. Mantido como registro histórico.
+
 ## Contexto
 
 Os Squads da He4rt rodam hoje no informal — grupos de WhatsApp, **sem liderança formal**

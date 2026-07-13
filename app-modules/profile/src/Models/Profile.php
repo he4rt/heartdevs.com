@@ -114,34 +114,6 @@ final class Profile extends Model
     }
 
     /**
-     * @return HasMany<WorkExperience, $this>
-     */
-    public function workExperiences(): HasMany
-    {
-        return $this->hasMany(WorkExperience::class)
-            ->orderByDesc('is_currently_working_here')
-            ->latest('start_date');
-    }
-
-    /**
-     * @return HasMany<ProfileSkill, $this>
-     */
-    public function profileSkills(): HasMany
-    {
-        return $this->hasMany(ProfileSkill::class);
-    }
-
-    /**
-     * @return BelongsToMany<Skill, $this>
-     */
-    public function skills(): BelongsToMany
-    {
-        return $this->belongsToMany(Skill::class, 'profile_skills')
-            ->withPivot(['proficiency', 'years_experience'])
-            ->withTimestamps();
-    }
-
-    /**
      * @return Attribute<never, array<string, string>|null>
      */
     protected function socialLinks(): Attribute

@@ -8,18 +8,18 @@ flow it actively conducts.
 
 ## Glossary
 
-| Term                          | Definition                                                                                                                                                                                      | Not to be confused with                                                           |
-| ----------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------- |
-| **Squad**                     | A tenant-scoped crew with a clear objective. Lifecycle `status`: `draft` → `active` → `inactive` → `archived`. Created by a super-admin (the bottom-up proposal/validation happens off-system). | A WhatsApp group (the informal precursor) — the Squad is the formalized record    |
-| **SquadMember**               | A row in the `squad_members` pivot: one person's standing in one squad. Carries `role`, `joined_at`, `left_at`.                                                                                 | A community member generally — this is squad-scoped standing                      |
-| **Role (in squad)**           | The `squad_members.role` enum: `Captain` · `SubCaptain` · `Member` · `ExMember`. Confers power on the platform: Captain/Sub manage their own squad.                                             | A governance role (super-admin) — that is platform-wide, config-driven            |
-| **Captain / SubCaptain**      | The squad's leadership. They conduct their own squad on the platform: approve/reject candidacy, promote a sub, mark an `ExMember`.                                                              | The Head dos Squads (an off-system human role; in software it is the super-admin) |
-| **ExMember**                  | A person who left (or was removed from) a squad. A role value, not a deletion. Does **not** count toward exclusivity. `left_at` dates the exit.                                                 | A `Member` on leave — there is no "paused membership" state                       |
-| **Application (candidatura)** | An APTO person's request to join a squad (`squad_applications`, `pending`/`approved`/`rejected`). The captain decides; approval creates the membership in a transaction.                        | An onboarding (community/program entry) — that is upstream, in `onboarding`       |
-| **Exclusivity**               | A person may hold at most one _active_ membership (role in `Captain`/`SubCaptain`/`Member`) across all squads. Enforced on join.                                                                | A hard unique DB constraint — `ExMember` rows are allowed to pile up              |
-| **Vacancy**                   | A squad with no active `Captain`. It is the **absence** of a Captain in the pivot, not a status of its own.                                                                                     | The `inactive` squad status (the whole squad is dormant)                          |
-| **Super-admin**               | Platform governance authority, sourced from `config('he4rt.admins')` via `User::isAdmin()`. Creates squads, sets captains, overrides any squad action. Stands in for the "Head/Gestão" roles.   | A Captain — a Captain's power is scoped to their own squad                        |
-| **APTO**                      | The gate this module consumes from `onboarding`: the person completed the `Squads` onboarding. Required to apply or to be in a squad.                                                           | An `active` Squad — APTO is about a person, not a squad                           |
+| Term                          | Definition                                                                                                                                                                                    | Not to be confused with                                                           |
+| ----------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------- |
+| **Squad**                     | A crew with a clear objective. Lifecycle `status`: `draft` → `active` → `inactive` → `archived`. Created by a super-admin (the bottom-up proposal/validation happens off-system).             | A WhatsApp group (the informal precursor) — the Squad is the formalized record    |
+| **SquadMember**               | A row in the `squad_members` pivot: one person's standing in one squad. Carries `role`, `joined_at`, `left_at`.                                                                               | A community member generally — this is squad-scoped standing                      |
+| **Role (in squad)**           | The `squad_members.role` enum: `Captain` · `SubCaptain` · `Member` · `ExMember`. Confers power on the platform: Captain/Sub manage their own squad.                                           | A governance role (super-admin) — that is platform-wide, config-driven            |
+| **Captain / SubCaptain**      | The squad's leadership. They conduct their own squad on the platform: approve/reject candidacy, promote a sub, mark an `ExMember`.                                                            | The Head dos Squads (an off-system human role; in software it is the super-admin) |
+| **ExMember**                  | A person who left (or was removed from) a squad. A role value, not a deletion. Does **not** count toward exclusivity. `left_at` dates the exit.                                               | A `Member` on leave — there is no "paused membership" state                       |
+| **Application (candidatura)** | An APTO person's request to join a squad (`squad_applications`, `pending`/`approved`/`rejected`). The captain decides; approval creates the membership in a transaction.                      | An onboarding (community/program entry) — that is upstream, in `onboarding`       |
+| **Exclusivity**               | A person may hold at most one _active_ membership (role in `Captain`/`SubCaptain`/`Member`) across all squads. Enforced on join.                                                              | A hard unique DB constraint — `ExMember` rows are allowed to pile up              |
+| **Vacancy**                   | A squad with no active `Captain`. It is the **absence** of a Captain in the pivot, not a status of its own.                                                                                   | The `inactive` squad status (the whole squad is dormant)                          |
+| **Super-admin**               | Platform governance authority, sourced from `config('he4rt.admins')` via `User::isAdmin()`. Creates squads, sets captains, overrides any squad action. Stands in for the "Head/Gestão" roles. | A Captain — a Captain's power is scoped to their own squad                        |
+| **APTO**                      | The gate this module consumes from `onboarding`: the person completed the `Squads` onboarding. Required to apply or to be in a squad.                                                         | An `active` Squad — APTO is about a person, not a squad                           |
 
 ## What this module records vs. conducts
 
@@ -39,7 +39,7 @@ not blocking.)
 
 ## State & audit
 
-- `squads` — squad state (`status`, `objective`, `slug`, tenant-scoped).
+- `squads` — squad state (`status`, `objective`, `slug`).
 - `squad_members` — current standing per (squad, user): `role`, `joined_at`, `left_at`.
 - `squad_membership_events` — append-only trail: `action` (`join`/`leave`/`promote`/`demote`/…),
   `actor_id`, `reason`, `occurred_at`, `metadata`. Answers "who held what, when, and why".
@@ -66,7 +66,7 @@ src/
 
 ### This module does NOT own:
 
-- The onboarding/APTO gate — it **reads** `Onboarding::isCompleted(user, tenant, Squads)` from `onboarding`.
+- The onboarding/APTO gate — it **reads** `Onboarding::isCompleted(user, Squads)` from `onboarding`.
 - UI — Filament lives in `panel-app` (captain/member) and `panel-admin` (super-admin).
 - Conducting elections/removals — those happen off-system; only outcomes are recorded.
 - The squad game core (all-or-nothing project, scoring, season, redemption) — deferred, not here yet.
@@ -74,7 +74,7 @@ src/
 ## Dependencies
 
 - **Onboarding** — reads the `Squads`-completion gate (APTO). Never the reverse.
-- **Identity** — users, tenants, and super-admin authority (`config('he4rt.admins')`).
+- **Identity** — users and super-admin authority (`config('he4rt.admins')`).
 - Presentation panels depend on this module, never the reverse.
 
 See `docs/adr/0001-governanca-como-registro.md`.

@@ -4,6 +4,12 @@
 **Date:** 2026-06-15
 **Deciders:** danielhe4rt
 
+> **Atualização (2026-07-13):** o multi-tenancy foi removido do projeto (#413). As menções a
+> `tenant_id` e a escopo por tenant abaixo refletem a decisão original e **não valem mais** para o
+> schema atual: a chave da tabela `onboardings` deixou de ser `(tenant_id, user_id, type)` e passou
+> a ser `UNIQUE (user_id, type)`. Mantido como registro histórico — o estado atual está no
+> `CONTEXT.md` e nas migrations.
+
 ## Contexto
 
 Os Squads da He4rt rodam hoje no informal (grupos de WhatsApp, sem liderança formal). A primeira

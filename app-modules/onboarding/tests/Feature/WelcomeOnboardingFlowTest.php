@@ -2,7 +2,6 @@
 
 declare(strict_types=1);
 
-use He4rt\Identity\Tenant\Models\Tenant;
 use He4rt\Identity\User\Models\User;
 use He4rt\Onboarding\Actions\StartOnboarding;
 use He4rt\Onboarding\Enums\OnboardingStatus;
@@ -13,7 +12,6 @@ use He4rt\Onboarding\Models\Onboarding;
 
 test('advancing the form step completes the Welcome onboarding', function (): void {
     $onboarding = resolve(StartOnboarding::class)->handle(
-        Tenant::factory()->create(),
         User::factory()->create(),
         OnboardingType::Welcome,
     );
@@ -29,7 +27,6 @@ test('advancing the form step completes the Welcome onboarding', function (): vo
 
 test('advancing an already-completed Welcome onboarding preserves the original completed_at', function (): void {
     $onboarding = resolve(StartOnboarding::class)->handle(
-        Tenant::factory()->create(),
         User::factory()->create(),
         OnboardingType::Welcome,
     );
@@ -56,10 +53,9 @@ test('Welcome has no prerequisites and a single form step', function (): void {
 });
 
 test('starting an onboarding type without a handler fails fast and persists nothing', function (): void {
-    $tenant = Tenant::factory()->create();
     $user = User::factory()->create();
 
-    expect(fn () => resolve(StartOnboarding::class)->handle($tenant, $user, OnboardingType::Squads))
+    expect(fn () => resolve(StartOnboarding::class)->handle($user, OnboardingType::Squads))
         ->toThrow(LogicException::class);
 
     expect(Onboarding::query()->count())->toBe(0);

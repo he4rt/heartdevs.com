@@ -14,7 +14,6 @@ return new class extends Migration
     {
         Schema::create('onboardings', static function (Blueprint $table): void {
             $table->uuid('id')->primary();
-            $table->foreignUuid('tenant_id')->constrained('tenants')->cascadeOnDelete();
             $table->foreignUuid('user_id')->constrained('users')->cascadeOnDelete();
             $table->string('type')->comment(OnboardingType::stringifyCases());
             $table->string('status')->comment(OnboardingStatus::stringifyCases());
@@ -22,7 +21,7 @@ return new class extends Migration
             $table->timestampTz('paused_at')->nullable();
             $table->timestampsTz();
 
-            $table->unique(['tenant_id', 'user_id', 'type']);
+            $table->unique(['user_id', 'type']);
         });
     }
 

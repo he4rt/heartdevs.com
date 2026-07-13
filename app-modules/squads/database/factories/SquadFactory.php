@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace He4rt\Squads\Database\Factories;
 
-use He4rt\Identity\Tenant\Models\Tenant;
 use He4rt\Squads\Enums\SquadStatus;
 use He4rt\Squads\Models\Squad;
 use Illuminate\Database\Eloquent\Factories\Factory;
@@ -25,7 +24,6 @@ final class SquadFactory extends Factory
         $name = fake()->unique()->words(2, asText: true);
 
         return [
-            'tenant_id' => Tenant::factory(),
             'name' => $name,
             'slug' => Str::slug($name),
             'objective' => fake()->sentence(),

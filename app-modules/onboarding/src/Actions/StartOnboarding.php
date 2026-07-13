@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace He4rt\Onboarding\Actions;
 
-use He4rt\Identity\Tenant\Models\Tenant;
 use He4rt\Identity\User\Models\User;
 use He4rt\Onboarding\Enums\OnboardingStatus;
 use He4rt\Onboarding\Enums\OnboardingStepStatus;
@@ -14,16 +13,15 @@ use Illuminate\Support\Facades\DB;
 
 final class StartOnboarding
 {
-    public function handle(Tenant $tenant, User $user, OnboardingType $type): Onboarding
+    public function handle(User $user, OnboardingType $type): Onboarding
     {
         // Resolve o flow antes de qualquer escrita: tipo sem handler falha alto,
         // sem deixar um onboarding órfão (em vez de persistir um estado travado).
         $flow = $type->handler();
 
-        return DB::transaction(static function () use ($tenant, $user, $type, $flow): Onboarding {
+        return DB::transaction(static function () use ($user, $type, $flow): Onboarding {
             $onboarding = Onboarding::query()->firstOrCreate(
                 [
-                    'tenant_id' => $tenant->getKey(),
                     'user_id' => $user->getKey(),
                     'type' => $type,
                 ],

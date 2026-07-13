@@ -5,6 +5,10 @@
 **Deciders:** danielhe4rt
 **Relates to:** [ADR-0001](0001-onboarding-polimorfico-por-tipo.md); `integration-github`
 
+> **Atualização (2026-07-13):** o multi-tenancy foi removido do projeto (#413). Menções a escopo
+> por tenant abaixo são da decisão original e **não valem mais** — o estado atual está no
+> `CONTEXT.md` e nas migrations. Mantido como registro histórico.
+
 ## Contexto
 
 O step `git_challenge` do `SquadsOnboarding` conclui quando um **revisor humano aprova, no GitHub, o

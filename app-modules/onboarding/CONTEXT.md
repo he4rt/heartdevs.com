@@ -9,7 +9,7 @@ but it is designed so new onboarding types are added without touching consumers.
 
 | Term               | Definition                                                                                                                                                                      | Not to be confused with                                                        |
 | ------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------ |
-| **Onboarding**     | One person's journey through one typed flow, scoped to a tenant. One row per `(tenant, user, type)`. Holds lifecycle `status`, not the per-step detail.                         | The UI wizard (presentation) — the Onboarding is the persisted state machine   |
+| **Onboarding**     | One person's journey through one typed flow. One row per `(user, type)`. Holds lifecycle `status`, not the per-step detail.                                                     | The UI wizard (presentation) — the Onboarding is the persisted state machine   |
 | **OnboardingType** | The discriminator enum (`Welcome`, `Squads`, …). Resolves the polymorphic behaviour via `handler(): OnboardingFlow` — same idiom as `IdentityProvider::getClient`.              | A step — a type _has_ steps                                                    |
 | **OnboardingFlow** | The per-type handler (a class behind the `OnboardingFlow` contract). Declares `steps()`, `prerequisites()`, `advance()`, `isComplete()`. All type-specific rules live here.     | The model — the Flow is stateless behaviour; the Onboarding is the state       |
 | **OnboardingStep** | One auditable stage of a flow, one row in `onboarding_steps`. Carries its own `status` + `data` (jsonb) + `completed_at`. Enables pause/resume and history.                     | A prerequisite (another _type_ that must be complete first)                    |
@@ -54,7 +54,7 @@ src/
 ### This module owns:
 
 - The onboarding state machines (one polymorphic model + steps) and their lifecycle.
-- The per-type **completion** status other modules read as a gate (`Onboarding::isCompleted(user, tenant, type)`).
+- The per-type **completion** status other modules read as a gate (`Onboarding::isCompleted(user, type)`).
 - The inter-type prerequisite chain.
 
 ### This module does NOT own:
@@ -66,7 +66,7 @@ src/
 
 ## Dependencies
 
-- **Identity** — `User`, tenant scoping, and the GitHub `ExternalIdentity` link (the `git_challenge` gate).
+- **Identity** — `User` and the GitHub `ExternalIdentity` link (the `git_challenge` gate).
 - **Integration GitHub** — consumes the `GithubPullRequestApproved` domain event and the `challenge`
   repo allowlist. Never the reverse.
 - Presentation (`panel-app`) drives the UI and calls the module's Actions.
