@@ -9,6 +9,7 @@ use Filament\Notifications\Notification;
 use Filament\Support\Enums\Width;
 use He4rt\Identity\ExternalIdentity\Enums\IdentityProvider;
 use He4rt\Identity\ExternalIdentity\Models\ExternalIdentity;
+use He4rt\Identity\User\Models\User;
 use He4rt\IntegrationTwitch\Actions\RegisterTwitchSubscriptionsAction;
 use He4rt\IntegrationTwitch\Enums\TwitchEventSubType;
 use He4rt\IntegrationTwitch\Models\TwitchSubscription;
@@ -33,30 +34,37 @@ class RegisterSubscriptionsAction extends Action
                 'groups' => $this->buildEventTypeGroups(),
                 'secret' => $this->maskSecret(),
             ]))
-            ->action(static function (): void {
-                $action = resolve(RegisterTwitchSubscriptionsAction::class);
-                $result = $action();
+            ->action(function (): void {
+                $broadcaster = $this->resolveBroadcaster();
 
-                if ($result['errors']['broadcaster'] ?? null) {
+                if ($broadcaster === null) {
                     Notification::make()
                         ->danger()
                         ->title(__('panel-admin::twitch.subscriptions.actions.register_failed'))
-                        ->body($result['errors']['broadcaster'])
+                        ->body(__('panel-admin::twitch.subscriptions.actions.no_broadcaster'))
                         ->send();
 
                     return;
                 }
 
-                Notification::make()
-                    ->success()
-                    ->title(__('panel-admin::twitch.subscriptions.actions.registered'))
+                $result = resolve(RegisterTwitchSubscriptionsAction::class)($broadcaster['id']);
+
+                $hasFailures = $result['failed'] > 0;
+
+                $notification = Notification::make()
+                    ->title(__($hasFailures
+                        ? 'panel-admin::twitch.subscriptions.actions.register_partial'
+                        : 'panel-admin::twitch.subscriptions.actions.registered'))
                     ->body(sprintf(
                         '%d created, %d skipped, %d failed.',
                         $result['created'],
                         $result['skipped'],
                         $result['failed'],
-                    ))
-                    ->send();
+                    ));
+
+                $hasFailures ? $notification->warning() : $notification->success();
+
+                $notification->send();
             });
     }
 
@@ -66,17 +74,27 @@ class RegisterSubscriptionsAction extends Action
     }
 
     /**
+     * The broadcaster is the Twitch account connected to the authenticated
+     * admin — no config/env fallback. The admin connects it via the
+     * "Connect Twitch" action on this page.
+     *
      * @return array{id: string, login: string}|null
      */
     private function resolveBroadcaster(): ?array
     {
-        $identity = ExternalIdentity::query()
+        $user = filament()->auth()->user();
+
+        if (!$user instanceof User) {
+            return null;
+        }
+
+        $identity = $user->providers()
             ->where('provider', IdentityProvider::Twitch)
             ->whereNotNull('connected_at')
             ->whereNull('disconnected_at')
             ->first();
 
-        if (!$identity) {
+        if (!$identity instanceof ExternalIdentity) {
             return null;
         }
 
@@ -88,7 +106,9 @@ class RegisterSubscriptionsAction extends Action
 
     private function resolveCallbackUrl(): string
     {
-        $configured = config()->string('services.twitch.eventsub_callback', '');
+        // Cast instead of config()->string(): the key may be present-but-null when
+        // TWITCH_EVENTSUB_CALLBACK is unset, and config()->string() throws on null.
+        $configured = (string) config('services.twitch.eventsub_callback', '');
 
         if ($configured !== '') {
             return $configured;
@@ -99,7 +119,13 @@ class RegisterSubscriptionsAction extends Action
 
     private function maskSecret(): string
     {
-        $secret = config()->string('services.twitch.eventsub_secret');
+        // Read defensively: TWITCH_EVENTSUB_SECRET has no config default (it must
+        // fail loud on the security paths), so the display must tolerate it being unset.
+        $secret = config('services.twitch.eventsub_secret');
+
+        if (!is_string($secret) || $secret === '') {
+            return '—';
+        }
 
         return mb_substr($secret, 0, 4).str_repeat('*', max(mb_strlen($secret) - 4, 0));
     }

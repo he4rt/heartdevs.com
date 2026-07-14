@@ -3,10 +3,13 @@
 declare(strict_types=1);
 
 use He4rt\IntegrationTwitch\Enums\TwitchEventSubType;
+use He4rt\IntegrationTwitch\OAuth\TwitchAppTokenService;
 use He4rt\IntegrationTwitch\Transport\Requests\EventSub\CreateSubscription;
 use He4rt\IntegrationTwitch\Transport\Requests\EventSub\DeleteSubscription;
 use He4rt\IntegrationTwitch\Transport\Requests\EventSub\ListSubscriptions;
 use He4rt\IntegrationTwitch\Transport\TwitchHelixConnector;
+use He4rt\IntegrationTwitch\Transport\TwitchOAuthConnector;
+use Illuminate\Support\Facades\Cache;
 use Saloon\Http\Faking\MockClient;
 use Saloon\Http\Faking\MockResponse;
 
@@ -24,8 +27,17 @@ function mockEventSubResponses(array $existingSubscriptions = []): MockClient
         DeleteSubscription::class => MockResponse::make([], 204),
     ]);
 
+    // The app token is resolved lazily by the connector; seed the cache so
+    // getToken() short-circuits without hitting the real Twitch OAuth endpoint.
+    Cache::put('twitch_app_access_token', 'fake-token', 3_600);
+
     app()->instance(TwitchHelixConnector::class, tap(
-        new TwitchHelixConnector(appToken: 'fake-token', clientId: 'fake-client-id'),
+        new TwitchHelixConnector(
+            tokenService: new TwitchAppTokenService(
+                new TwitchOAuthConnector(clientId: 'fake-client-id', clientSecret: 'fake-secret'),
+            ),
+            clientId: 'fake-client-id',
+        ),
         fn (TwitchHelixConnector $connector) => $connector->withMockClient($mock),
     ));
 

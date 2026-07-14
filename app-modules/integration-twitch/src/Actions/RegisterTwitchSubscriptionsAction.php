@@ -20,19 +20,8 @@ final readonly class RegisterTwitchSubscriptionsAction
      * @param  array<int, TwitchEventSubType>  $types
      * @return array{created: int, skipped: int, failed: int, errors: array<string, string>}
      */
-    public function __invoke(array $types = []): array
+    public function __invoke(string $broadcasterId, array $types = []): array
     {
-        $broadcasterId = $this->resolveBroadcasterId();
-
-        if ($broadcasterId === null) {
-            return [
-                'created' => 0,
-                'skipped' => 0,
-                'failed' => 0,
-                'errors' => ['broadcaster' => 'No Twitch broadcaster configured (set TWITCH_BROADCASTER_ID).'],
-            ];
-        }
-
         if ($types === []) {
             $types = TwitchEventSubType::cases();
         }
@@ -111,13 +100,6 @@ final readonly class RegisterTwitchSubscriptionsAction
         }
 
         return ['created' => $created, 'skipped' => $skipped, 'failed' => $failed, 'errors' => $errors];
-    }
-
-    private function resolveBroadcasterId(): ?string
-    {
-        $broadcasterId = config()->string('services.twitch.broadcaster_id', '');
-
-        return $broadcasterId === '' ? null : $broadcasterId;
     }
 
     private function resolveCallbackUrl(): string
