@@ -76,11 +76,19 @@ final class OAuthController extends Controller
             return redirect()->to($result->redirectUrl);
         }
 
+        $redirectUrl = $result->redirectUrl;
+
         if ($result->intent === OAuthIntent::Login) {
             Auth::login($result->user);
             filament()->setCurrentPanel(filament()->getPanel($state->panel));
+
+            if ($state->panel === 'app') {
+                $redirectUrl = url()->query($redirectUrl, [
+                    'oauth_provider' => $identityProvider->value,
+                ]);
+            }
         }
 
-        return redirect()->to($result->redirectUrl);
+        return redirect()->to($redirectUrl);
     }
 }

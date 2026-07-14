@@ -80,29 +80,63 @@
                 <p class="mb-6 text-sm text-zinc-400">Acesse sua conta He4rt Developers</p>
 
                 {{-- OAuth --}}
-                <div class="grid gap-2.5">
+                <div
+                    class="grid gap-2.5"
+                    x-data="{
+                        lastProvider: null,
+                        init() {
+                            try {
+                                const provider = window.localStorage.getItem('lastAuthProvider');
+                                this.lastProvider = ['discord', 'github', 'twitch'].includes(provider) ? provider : null;
+                            } catch (error) {
+                                this.lastProvider = null;
+                            }
+                        },
+                    }"
+                >
                     <a
                         href="{{ route('oauth.redirect', ['panel' => 'app', 'provider' => 'discord']) }}"
-                        class="flex items-center justify-center gap-2.5 rounded-lg bg-[#5865F2] px-4 py-2.5 text-sm font-medium text-white transition hover:bg-[#4752C4]"
+                        class="relative flex items-center justify-center gap-2.5 rounded-lg bg-[#5865F2] px-4 py-2.5 text-sm font-medium text-white transition hover:bg-[#4752C4]"
                     >
                         @svg ('fab-discord', 'h-5 w-5')
                         Continuar com Discord
+                        <span
+                            x-cloak
+                            x-show="lastProvider === 'discord'"
+                            class="absolute -top-2 right-2 z-10 rounded-full border border-zinc-600 bg-zinc-900/95 px-1.5 py-0.5 text-[9px] font-semibold uppercase tracking-wider text-zinc-300 shadow-sm"
+                        >
+                            Último acesso
+                        </span>
                     </a>
 
                     <a
                         href="{{ route('oauth.redirect', ['panel' => 'app', 'provider' => 'github']) }}"
-                        class="flex items-center justify-center gap-2.5 rounded-lg bg-zinc-800 px-4 py-2.5 text-sm font-medium text-white ring-1 ring-zinc-700 transition hover:bg-zinc-700"
+                        class="relative flex items-center justify-center gap-2.5 rounded-lg bg-zinc-800 px-4 py-2.5 text-sm font-medium text-white ring-1 ring-zinc-700 transition hover:bg-zinc-700"
                     >
                         @svg ('fab-github', 'h-5 w-5')
                         Continuar com GitHub
+                        <span
+                            x-cloak
+                            x-show="lastProvider === 'github'"
+                            class="absolute -top-2 right-2 z-10 rounded-full border border-zinc-600 bg-zinc-900/95 px-1.5 py-0.5 text-[9px] font-semibold uppercase tracking-wider text-zinc-300 shadow-sm"
+                        >
+                            Último acesso
+                        </span>
                     </a>
 
                     <a
                         href="{{ route('oauth.redirect', ['panel' => 'app', 'provider' => 'twitch']) }}"
-                        class="flex items-center justify-center gap-2.5 rounded-lg bg-[#9146FF] px-4 py-2.5 text-sm font-medium text-white transition hover:bg-[#7B2FF0]"
+                        class="relative flex items-center justify-center gap-2.5 rounded-lg bg-[#9146FF] px-4 py-2.5 text-sm font-medium text-white transition hover:bg-[#7B2FF0]"
                     >
                         @svg ('fab-twitch', 'h-5 w-5')
                         Continuar com Twitch
+                        <span
+                            x-cloak
+                            x-show="lastProvider === 'twitch'"
+                            class="absolute -top-2 right-2 z-10 rounded-full border border-zinc-600 bg-zinc-900/95 px-1.5 py-0.5 text-[9px] font-semibold uppercase tracking-wider text-zinc-300 shadow-sm"
+                        >
+                            Último acesso
+                        </span>
                     </a>
                 </div>
 
