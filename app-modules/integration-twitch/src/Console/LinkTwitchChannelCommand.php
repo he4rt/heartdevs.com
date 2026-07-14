@@ -10,7 +10,7 @@ use Illuminate\Console\Attributes\Description;
 use Illuminate\Console\Attributes\Signature;
 use Illuminate\Console\Command;
 
-#[Description(description: 'Resolve a Twitch channel broadcaster id for the fixed config-based integration')]
+#[Description(description: 'Resolve a Twitch channel broadcaster id for use with twitch:subscribe')]
 #[Signature(signature: 'twitch:link-channel {login? : Twitch channel login name (defaults to config broadcaster login)}')]
 final class LinkTwitchChannelCommand extends Command
 {
@@ -40,9 +40,8 @@ final class LinkTwitchChannelCommand extends Command
         $this->info(sprintf("Resolved Twitch channel '%s' (login: %s).", $displayName, $login));
         $this->line(sprintf('Broadcaster ID: %s', $broadcasterId));
         $this->newLine();
-        $this->comment('Set the following in your .env to activate the integration:');
-        $this->line(sprintf('  TWITCH_BROADCASTER_LOGIN=%s', $login));
-        $this->line(sprintf('  TWITCH_BROADCASTER_ID=%s', $broadcasterId));
+        $this->comment('Register EventSub subscriptions for this channel with:');
+        $this->line(sprintf('  php artisan twitch:subscribe %s --all', $broadcasterId));
 
         return self::SUCCESS;
     }
