@@ -17,6 +17,13 @@ interface OnboardingFlow
     public function steps(): array;
 
     /**
+     * The DTO class responsible for validating the given step's payload.
+     *
+     * @return class-string
+     */
+    public function stepDto(string $stepKey): string;
+
+    /**
      * The onboarding types that must be completed before this one can start.
      *
      * @return list<OnboardingType>
