@@ -37,6 +37,7 @@ use He4rt\Profile\Enums\SocialPlatform;
 use He4rt\Profile\Enums\StartAvailability;
 use He4rt\Profile\Models\Profile;
 use He4rt\Profile\Models\Skill;
+use Illuminate\Support\HtmlString;
 use Illuminate\Support\Str;
 use Livewire\Attributes\Computed;
 use Livewire\Attributes\Validate;
@@ -131,9 +132,10 @@ class ProfilePage extends Page
                                 Textarea::make('about')
                                     ->label(__('panel-app::profile.fields.about'))
                                     ->placeholder(__('panel-app::profile.placeholders.about'))
+                                    ->hint(fn (?string $state): HtmlString => $this->aboutCharacterCounterHint($state))
                                     ->maxLength(500)
                                     ->rows(4)
-                                    ->live(onBlur: true)
+                                    ->live()
                                     ->columnSpanFull(),
                             ]),
                         ]),
@@ -491,6 +493,26 @@ class ProfilePage extends Page
     {
         $this->coverUpload = null;
         auth()->user()->clearMediaCollection('cover');
+    }
+
+    private function aboutCharacterCounterHint(?string $state): HtmlString
+    {
+        return new HtmlString(sprintf(<<<'HTML'
+<span
+    wire:ignore
+    x-data="{ count: %d, countChars(value) { return Array.from(value ?? '').length } }"
+    x-init="
+        const wrapper = $el.closest('[data-field-wrapper]')
+        const field = wrapper?.querySelector('textarea')
+        count = countChars(field?.value ?? '')
+        wrapper?.addEventListener('input', (event) => {
+            if (event.target?.matches('textarea')) {
+                count = countChars(event.target.value)
+            }
+        })
+    "
+><span x-text="count"></span>/500</span>
+HTML, mb_strlen($state ?? '')));
     }
 
     private function saveMedia(): void
