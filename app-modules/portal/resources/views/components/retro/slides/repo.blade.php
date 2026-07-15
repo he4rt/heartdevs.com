@@ -44,11 +44,9 @@
             @endif
         </div>
         <div style="display: flex; flex-direction: column; gap: 10px">
-            @forelse ($repo['prs'] as $pr)
+            @foreach ($repo['prs'] as $pr)
                 <div data-anim><x-portal::retro.pr-row :pr="$pr" /></div>
-            @empty
-                <p class="sec-sub">Sem PRs nesse recorte — a atividade veio de reviews, issues e comentários.</p>
-            @endforelse
+            @endforeach
         </div>
     </div>
 </section>

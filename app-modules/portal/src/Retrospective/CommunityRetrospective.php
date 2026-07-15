@@ -63,6 +63,8 @@ final readonly class CommunityRetrospective
             ->values()
             ->all();
 
+        $repos = $this->repos($contributions);
+
         return [
             'period' => ['since' => $this->filters->since->toDateString(), 'until' => $this->filters->until->toDateString()],
             'meta' => [
@@ -78,10 +80,12 @@ final readonly class CommunityRetrospective
                 'additions' => $this->sumMeta($contributions, 'additions'),
                 'deletions' => $this->sumMeta($contributions, 'deletions'),
                 'changed_files' => $this->sumMeta($contributions, 'changed_files'),
+                // Repos exibidos = só os com PR no recorte (mesmo universo dos cards).
+                'repos' => count($repos),
                 'total' => $contributions->count(),
             ],
             'people' => $people,
-            'repos' => $this->repos($contributions),
+            'repos' => $repos,
             'highlights' => $this->highlights($contributions),
         ];
     }
@@ -269,6 +273,10 @@ final readonly class CommunityRetrospective
                     ],
                 ];
             })
+            // Só entram na retrospectiva repos com ao menos 1 PR no recorte;
+            // atividade só de review/issue/comentário some do card (mas segue
+            // contando em meta/people/highlights).
+            ->filter(fn (array $repo): bool => $repo['metrics']['prs'] > 0)
             ->values()
             ->all());
     }

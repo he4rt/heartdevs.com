@@ -6,7 +6,7 @@
         <p class="sec-sub" data-anim>
             <b style="color: var(--text)">{{ $meta['people'] }} pessoas</b> somaram
             <b style="color: var(--text)">{{ $meta['total'] }} interações</b>
-            em {{ number_format($meta['changed_files'], 0, ',', '.') }} arquivos tocados.
+            em {{ $meta['repos'] }} @choice('repositório|repositórios', $meta['repos']).
         </p>
         <div class="stats" data-anim style="margin-top: 24px">
             <div class="stat">
