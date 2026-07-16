@@ -8,7 +8,6 @@ use He4rt\Onboarding\Enums\OnboardingStatus;
 use He4rt\Onboarding\Enums\OnboardingStepStatus;
 use He4rt\Onboarding\Enums\OnboardingType;
 use He4rt\Onboarding\Flows\WelcomeOnboardingFlow;
-use He4rt\Onboarding\Models\Onboarding;
 
 test('advancing the form step completes the Welcome onboarding', function (): void {
     $onboarding = resolve(StartOnboarding::class)->handle(
