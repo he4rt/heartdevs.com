@@ -7,6 +7,7 @@ return [
     'channels' => [
         'auto-report' => env('HE4RT_AUTO_REPORT_CHANNEL_ID', '1045804587195576451'),
         'presentations' => env('HE4RT_PRESENTATIONS_CHANNEL_ID', '540993663468306433'),
+        'general' => env('HE4RT_GERAL_CHANNEL_ID', '541443469642563585'),
         'he4rt_delas' => env('HE4RT_DELAS_CHANNEL_ID', '1450492362416586845'),
     ],
     'roles' => [
