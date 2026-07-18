@@ -77,7 +77,7 @@ final class OAuthController extends Controller
         }
 
         if ($result->intent === OAuthIntent::Login) {
-            Auth::login($result->user);
+            Auth::login($result->user, remember: true);
             filament()->setCurrentPanel(filament()->getPanel($state->panel));
         }
 
