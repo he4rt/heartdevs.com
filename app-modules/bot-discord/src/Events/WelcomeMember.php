@@ -151,7 +151,7 @@ class WelcomeMember extends Event
      */
     private function buildWelcomeMessage(string $description, string $guildId, ?string $serverIconUrl): Message
     {
-        $presentationsChannelId = config()->string('bot-discord.channels.presentations');
+        $presentationsChannelId = config()->string('bot-discord.channels.general');
 
         $presentationDeepLink = sprintf(
             'https://discord.com/channels/%s/%s',
