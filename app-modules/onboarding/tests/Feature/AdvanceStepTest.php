@@ -2,7 +2,13 @@
 
 declare(strict_types=1);
 
+use He4rt\Identity\User\Models\User;
 use He4rt\Onboarding\Actions\AdvanceStep;
+use He4rt\Onboarding\Actions\StartOnboarding;
+use He4rt\Onboarding\Enums\OnboardingStatus;
+use He4rt\Onboarding\Enums\OnboardingStepStatus;
+use He4rt\Onboarding\Enums\OnboardingType;
+use Illuminate\Validation\ValidationException;
 
 test('conclude a welcome onboarding', function (): void {
     $onboarding = resolve(StartOnboarding::class)->handle(

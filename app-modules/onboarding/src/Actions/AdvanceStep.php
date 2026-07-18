@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace He4rt\Onboarding\Actions;
 
+use He4rt\Onboarding\Enums\OnboardingStepStatus;
 use He4rt\Onboarding\Models\Onboarding;
 
 final class AdvanceStep
@@ -15,7 +16,7 @@ final class AdvanceStep
             ->oldest()
             ->firstOrFail();
 
-        $flow = $onboarding->type->handle();
+        $flow = $onboarding->type->handler();
 
         $dtoClass = $flow->stepDto($step->step_key);
 
