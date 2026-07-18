@@ -24,7 +24,7 @@ class IntegrationTwitchServiceProvider extends ServiceProvider
         $this->app->singleton(TwitchAppTokenService::class);
 
         $this->app->singleton(TwitchHelixConnector::class, fn (): TwitchHelixConnector => new TwitchHelixConnector(
-            appToken: $this->app->make(TwitchAppTokenService::class)->getToken(),
+            tokenService: $this->app->make(TwitchAppTokenService::class),
             clientId: config()->string('services.twitch.client_id'),
         ));
 
