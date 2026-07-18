@@ -67,7 +67,7 @@ class DontAskCommand extends AbstractSlashCommand
             ->footerIcon($interaction->guild->icon)
             ->thumbnailUrl($targetUser->avatar)
             ->footerText(Date::now()->format('Y').' © He4rt Developers')
-            ->imageUrl('https://media.discordapp.net/attachments/546151895010508827/1046092564513701909/Frame_1282_1.png')
+            ->imageUrl(asset('images/assets/linus-dont-ask-to-ask.webp'))
             ->timestamp(now())
             ->content("Ei <@{$this->value('user')}>
 Explique a ideia
