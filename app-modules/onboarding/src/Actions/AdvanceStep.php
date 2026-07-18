@@ -9,6 +9,9 @@ use He4rt\Onboarding\Models\Onboarding;
 
 final class AdvanceStep
 {
+    /**
+     * @param  array<string, mixed>  $payload
+     */
     public function handle(Onboarding $onboarding, array $payload): void
     {
         $step = $onboarding->steps()
@@ -18,9 +21,9 @@ final class AdvanceStep
 
         $flow = $onboarding->type->handler();
 
-        $dtoClass = $flow->stepDto($step->step_key);
-
-        $dto = $dtoClass::validate($payload);
+        $dto = $flow
+            ->stepDto($step->step_key)
+            ->validate($payload);
 
         $step->update([
             'data' => $dto->toArray(),

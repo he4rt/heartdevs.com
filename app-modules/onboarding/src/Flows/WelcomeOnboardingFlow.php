@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace He4rt\Onboarding\Flows;
 
 use He4rt\Onboarding\Contracts\OnboardingFlow;
+use He4rt\Onboarding\Contracts\OnboardingStepDTO;
 use He4rt\Onboarding\DTOs\WelcomeFormDTO;
 use He4rt\Onboarding\Enums\OnboardingStatus;
 use He4rt\Onboarding\Enums\OnboardingStepStatus;
@@ -18,10 +19,10 @@ final class WelcomeOnboardingFlow implements OnboardingFlow
         return ['form'];
     }
 
-    public function stepDto(string $stepKey): string
+    public function stepDto(string $stepKey): OnboardingStepDTO
     {
         return match ($stepKey) {
-            'form' => WelcomeFormDTO::class,
+            'form' => new WelcomeFormDTO(),
             default => throw new InvalidArgumentException('Step não suportado: '.$stepKey),
         };
     }
