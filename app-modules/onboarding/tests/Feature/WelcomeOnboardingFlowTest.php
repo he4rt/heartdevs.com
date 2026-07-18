@@ -47,7 +47,6 @@ test('advancing an already-completed Welcome onboarding preserves the original c
 
 test('advancing a paused Welcome onboarding is rejected and leaves the step untouched', function (): void {
     $onboarding = resolve(StartOnboarding::class)->handle(
-        Tenant::factory()->create(),
         User::factory()->create(),
         OnboardingType::Welcome,
     );
