@@ -3,7 +3,6 @@
 declare(strict_types=1);
 
 use Carbon\CarbonImmutable;
-use He4rt\Identity\Tenant\Models\Tenant;
 use He4rt\Identity\User\Models\User;
 use He4rt\Squads\Actions\RecordMembershipEvent;
 use He4rt\Squads\Enums\MembershipAction;
@@ -12,8 +11,7 @@ use He4rt\Squads\Models\Squad;
 use He4rt\Squads\Models\SquadMembershipEvent;
 
 test('records a membership transition with action, roles, actor and occurred_at', function (): void {
-    $tenant = Tenant::factory()->create();
-    $squad = Squad::factory()->recycle($tenant)->create();
+    $squad = Squad::factory()->create();
     $subject = User::factory()->create();
     $actor = User::factory()->create();
     $occurredAt = CarbonImmutable::parse('2026-07-09 12:00:00');

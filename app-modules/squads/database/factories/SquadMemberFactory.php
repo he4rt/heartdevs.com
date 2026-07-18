@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace He4rt\Squads\Database\Factories;
 
-use He4rt\Identity\Tenant\Models\Tenant;
 use He4rt\Identity\User\Models\User;
 use He4rt\Squads\Enums\SquadRole;
 use He4rt\Squads\Models\Squad;
@@ -24,7 +23,6 @@ final class SquadMemberFactory extends Factory
     public function definition(): array
     {
         return [
-            'tenant_id' => Tenant::factory(),
             'squad_id' => Squad::factory(),
             'user_id' => User::factory(),
             'role' => SquadRole::Member,

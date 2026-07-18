@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace He4rt\Squads\Models;
 
 use Carbon\CarbonInterface;
-use He4rt\Identity\Tenant\Models\Tenant;
 use He4rt\Identity\User\Models\User;
 use He4rt\Squads\Database\Factories\SquadMembershipEventFactory;
 use He4rt\Squads\Enums\MembershipAction;
@@ -20,7 +19,6 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 /**
  * @property string $id
- * @property string $tenant_id
  * @property string $squad_id
  * @property string $user_id
  * @property string|null $actor_id
@@ -42,7 +40,6 @@ final class SquadMembershipEvent extends Model
     use HasUuids;
 
     protected $fillable = [
-        'tenant_id',
         'squad_id',
         'user_id',
         'actor_id',
@@ -80,14 +77,6 @@ final class SquadMembershipEvent extends Model
     public function actor(): BelongsTo
     {
         return $this->belongsTo(User::class, 'actor_id');
-    }
-
-    /**
-     * @return BelongsTo<Tenant, $this>
-     */
-    public function tenant(): BelongsTo
-    {
-        return $this->belongsTo(Tenant::class);
     }
 
     /**

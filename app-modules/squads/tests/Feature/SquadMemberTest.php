@@ -2,7 +2,6 @@
 
 declare(strict_types=1);
 
-use He4rt\Identity\Tenant\Models\Tenant;
 use He4rt\Identity\User\Models\User;
 use He4rt\Squads\Enums\SquadRole;
 use He4rt\Squads\Models\Squad;
@@ -10,11 +9,10 @@ use He4rt\Squads\Models\SquadMember;
 use Illuminate\Database\QueryException;
 
 test('a squad member persists with a uuid id, role cast and timestamps', function (): void {
-    $tenant = Tenant::factory()->create();
-    $squad = Squad::factory()->recycle($tenant)->create();
+    $squad = Squad::factory()->create();
     $user = User::factory()->create();
 
-    $member = SquadMember::factory()->recycle($tenant)->create([
+    $member = SquadMember::factory()->create([
         'squad_id' => $squad->id,
         'user_id' => $user->id,
         'role' => SquadRole::Captain,
@@ -31,16 +29,15 @@ test('a squad member persists with a uuid id, role cast and timestamps', functio
 });
 
 test('the same user cannot hold two rows in the same squad', function (): void {
-    $tenant = Tenant::factory()->create();
-    $squad = Squad::factory()->recycle($tenant)->create();
+    $squad = Squad::factory()->create();
     $user = User::factory()->create();
 
-    SquadMember::factory()->recycle($tenant)->create([
+    SquadMember::factory()->create([
         'squad_id' => $squad->id,
         'user_id' => $user->id,
     ]);
 
-    SquadMember::factory()->recycle($tenant)->create([
+    SquadMember::factory()->create([
         'squad_id' => $squad->id,
         'user_id' => $user->id,
     ]);

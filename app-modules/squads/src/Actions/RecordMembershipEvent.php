@@ -39,7 +39,6 @@ final class RecordMembershipEvent
     ): SquadMembershipEvent {
         /** @var SquadMembershipEvent $event */
         $event = SquadMembershipEvent::query()->create([
-            'tenant_id' => $squad->tenant_id,
             'squad_id' => $squad->id,
             'user_id' => $subject->id,
             'actor_id' => $actor?->id,

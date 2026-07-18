@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace He4rt\Squads\Models;
 
 use Carbon\CarbonInterface;
-use He4rt\Identity\Tenant\Models\Tenant;
 use He4rt\Identity\User\Models\User;
 use He4rt\Squads\Database\Factories\SquadMemberFactory;
 use He4rt\Squads\Enums\SquadRole;
@@ -18,7 +17,6 @@ use Illuminate\Database\Eloquent\Relations\Pivot;
 
 /**
  * @property string $id
- * @property string $tenant_id
  * @property string $squad_id
  * @property string $user_id
  * @property SquadRole $role
@@ -36,7 +34,6 @@ final class SquadMember extends Pivot
     use HasUuids;
 
     protected $fillable = [
-        'tenant_id',
         'squad_id',
         'user_id',
         'role',
@@ -58,14 +55,6 @@ final class SquadMember extends Pivot
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
-    }
-
-    /**
-     * @return BelongsTo<Tenant, $this>
-     */
-    public function tenant(): BelongsTo
-    {
-        return $this->belongsTo(Tenant::class);
     }
 
     /**

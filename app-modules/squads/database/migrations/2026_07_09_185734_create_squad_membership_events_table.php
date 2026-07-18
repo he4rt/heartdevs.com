@@ -12,7 +12,6 @@ return new class extends Migration
     {
         Schema::create('squad_membership_events', static function (Blueprint $table): void {
             $table->uuid('id')->primary();
-            $table->foreignUuid('tenant_id')->constrained('tenants')->cascadeOnDelete();
             $table->foreignUuid('squad_id')->constrained('squads')->cascadeOnDelete();
             $table->foreignUuid('user_id')->constrained('users')->cascadeOnDelete();
             $table->foreignUuid('actor_id')->nullable()->constrained('users')->nullOnDelete();
