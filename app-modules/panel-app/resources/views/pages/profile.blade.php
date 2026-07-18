@@ -1,6 +1,6 @@
 <x-filament::page>
     <div class="text-sm text-gray-500 dark:text-gray-400">
-        Preencha os campos e veja seu card sendo montado em tempo real
+        {{ __('panel-app::profile.page.subtitle') }}
     </div>
 
     <div class="grid grid-cols-1 items-start gap-8 xl:grid-cols-3">

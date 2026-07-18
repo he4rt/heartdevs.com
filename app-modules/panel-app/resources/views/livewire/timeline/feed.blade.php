@@ -12,7 +12,7 @@
             </div>
         @empty
             <div class="rounded-xl border border-gray-200 p-8 text-center dark:border-white/10">
-                <p class="text-sm text-gray-500 dark:text-gray-400">Nenhum post ainda. Seja o primeiro a compartilhar algo!</p>
+                <p class="text-sm text-gray-500 dark:text-gray-400">{{ __('panel-app::feed.empty') }}</p>
             </div>
         @endforelse
 

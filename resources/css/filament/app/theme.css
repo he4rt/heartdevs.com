@@ -48,6 +48,16 @@
     }
 }
 
+/* Force image editor save button to use primary (purple) instead of success (green) */
+.fi-fo-file-upload-editor-control-panel-footer .fi-btn.fi-color-success {
+    background-color: var(--primary-600) !important;
+    color: #fff !important;
+
+    &:hover {
+        background-color: var(--primary-500) !important;
+    }
+}
+
 /* Keep user avatar circle visible against dark sidebar
    (default ui-avatars uses gray-950, which blends into dark mode) */
 .fi-sidebar .fi-user-avatar {
