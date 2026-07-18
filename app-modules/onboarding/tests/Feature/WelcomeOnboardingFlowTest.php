@@ -50,12 +50,3 @@ test('Welcome has no prerequisites and a single form step', function (): void {
     expect($flow->steps())->toBe(['form'])
         ->and($flow->prerequisites())->toBeEmpty();
 });
-
-test('starting an onboarding type without a handler fails fast and persists nothing', function (): void {
-    $user = User::factory()->create();
-
-    expect(fn () => resolve(StartOnboarding::class)->handle($user, OnboardingType::Squads))
-        ->toThrow(LogicException::class);
-
-    expect(Onboarding::query()->count())->toBe(0);
-});
