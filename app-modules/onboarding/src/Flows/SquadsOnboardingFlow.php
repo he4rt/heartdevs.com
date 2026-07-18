@@ -24,15 +24,21 @@ final class SquadsOnboardingFlow implements OnboardingFlow
 
     public function advance(Onboarding $onboarding): void
     {
-        $advanced = $onboarding->steps()
-            ->where('status', OnboardingStepStatus::Pending)->oldest()
-            ->first()
-            ?->update([
-                'status' => OnboardingStepStatus::Done,
-                'completed_at' => now(),
-            ]);
+        $nextStep = $onboarding->steps()
+            ->where('status', OnboardingStepStatus::Pending)
+            ->oldest()
+            ->first();
 
-        if ($advanced && $onboarding->status !== OnboardingStatus::Completed && $this->isComplete($onboarding)) {
+        if (!$nextStep) {
+            return;
+        }
+
+        $nextStep->update([
+            'status' => OnboardingStepStatus::Done,
+            'completed_at' => now(),
+        ]);
+
+        if ($onboarding->status !== OnboardingStatus::Completed && $this->isComplete($onboarding)) {
             $onboarding->update([
                 'status' => OnboardingStatus::Completed,
                 'completed_at' => now(),
