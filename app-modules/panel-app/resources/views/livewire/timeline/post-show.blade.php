@@ -16,11 +16,20 @@
             @foreach ($timeline->children->take(3) as $reply)
                 @continue (!$reply->postable || !$reply->user)
                 <div class="flex gap-3">
-                    <div
-                        class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-purple-500 to-amber-500 text-xs font-semibold text-white"
-                    >
-                        {{ str($reply->user->name)->substr(0, 2)->upper() }}
-                    </div>
+                    @php($replyAvatarUrl = $reply->user->getFirstMediaUrl('avatar') ?: null)
+                    @if ($replyAvatarUrl)
+                        <img
+                            src="{{ $replyAvatarUrl }}"
+                            alt="{{ $reply->user->name }}"
+                            class="h-8 w-8 shrink-0 rounded-full object-cover"
+                        />
+                    @else
+                        <div
+                            class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-purple-500 to-amber-500 text-xs font-semibold text-white"
+                        >
+                            {{ str($reply->user->name)->substr(0, 2)->upper() }}
+                        </div>
+                    @endif
                     <div class="min-w-0 flex-1">
                         <div class="flex items-center gap-2 text-sm">
                             <span class="font-semibold text-gray-900 dark:text-white">{{ $reply->user->name }}</span>

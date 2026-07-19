@@ -13,6 +13,7 @@ use He4rt\Activity\Timeline\Actions\CreatePost;
 use He4rt\Activity\Timeline\DTOs\CreatePostDTO;
 use He4rt\Identity\User\Models\User;
 use Illuminate\View\View;
+use Livewire\Attributes\Computed;
 use Livewire\Component;
 
 /**
@@ -36,7 +37,7 @@ final class Composer extends Component implements HasSchemas
             ->components([
                 MarkdownEditor::make('content')
                     ->hiddenLabel()
-                    ->placeholder('O que está acontecendo?')
+                    ->placeholder(__('panel-app::feed.composer.placeholder'))
                     ->toolbarButtons([])
                     ->required()
                     ->maxLength(5_000),
@@ -73,6 +74,15 @@ final class Composer extends Component implements HasSchemas
 
         $this->form->fill();
         $this->dispatch('timeline.post-created');
+    }
+
+    #[Computed]
+    public function avatarUrl(): ?string
+    {
+        /** @var User $user */
+        $user = auth()->user();
+
+        return $user->getFirstMediaUrl('avatar') ?: null;
     }
 
     public function render(): View

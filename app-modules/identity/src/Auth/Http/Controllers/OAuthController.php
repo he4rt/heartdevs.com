@@ -79,7 +79,7 @@ final class OAuthController extends Controller
         $redirectUrl = $result->redirectUrl;
 
         if ($result->intent === OAuthIntent::Login) {
-            Auth::login($result->user);
+            Auth::login($result->user, remember: true);
             filament()->setCurrentPanel(filament()->getPanel($state->panel));
 
             if ($state->panel === 'app') {

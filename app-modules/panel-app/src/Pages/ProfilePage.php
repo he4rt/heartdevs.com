@@ -8,6 +8,7 @@ use App\Geo\Support\GeoLocation;
 use BackedEnum;
 use Filament\Actions\Action;
 use Filament\Forms\Components\DatePicker;
+use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
@@ -39,7 +40,6 @@ use He4rt\Profile\Models\Profile;
 use He4rt\Profile\Models\Skill;
 use Illuminate\Support\Str;
 use Livewire\Attributes\Computed;
-use Livewire\Attributes\Validate;
 use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
 use Livewire\WithFileUploads;
 
@@ -52,14 +52,6 @@ class ProfilePage extends Page
 
     /** @var array<string, mixed>|null */
     public ?array $data = [];
-
-    /** @var TemporaryUploadedFile|null */
-    #[Validate(rule: 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048')]
-    public $avatarUpload;
-
-    /** @var TemporaryUploadedFile|null */
-    #[Validate(rule: 'nullable|image|mimes:jpg,jpeg,png,webp|max:4096')]
-    public $coverUpload;
 
     protected static string|null|BackedEnum $navigationIcon = 'heroicon-o-user-circle';
 
@@ -415,13 +407,93 @@ class ProfilePage extends Page
 
         resolve(SyncProfileSkills::class)->handle($profile, $this->repeaterToSkills($formData['skills'] ?? []));
 
-        $this->saveMedia();
         $this->form->saveRelationships();
 
         Notification::make()
             ->success()
             ->title(__('panel-app::profile.notifications.saved'))
             ->send();
+    }
+
+    public function editAvatarAction(): Action
+    {
+        return Action::make('editAvatar')
+            ->label(__('panel-app::profile.actions.change_avatar'))
+            ->modalHeading(__('panel-app::profile.actions.change_avatar'))
+            ->modalSubmitActionLabel(__('panel-app::profile.actions.save_avatar'))
+            ->modalSubmitAction(fn (Action $action) => $action->color('primary'))
+            ->schema([
+                FileUpload::make('avatar')
+                    ->label(__('panel-app::profile.fields.avatar'))
+                    ->avatar()
+                    ->imageEditor()
+                    ->circleCropper()
+                    ->imageEditorAspectRatioOptions(['1:1'])
+                    ->storeFiles(condition: false)
+                    ->required()
+                    ->maxSize(2_048),
+            ])
+            ->action(function (array $data): void {
+                $avatar = $data['avatar'] ?? null;
+
+                if (is_string($avatar)) {
+                    $avatar = TemporaryUploadedFile::createFromLivewire($avatar);
+                }
+
+                if (!$avatar instanceof TemporaryUploadedFile) {
+                    return;
+                }
+
+                $this->replaceMedia('avatar', $avatar);
+
+                Notification::make()
+                    ->success()
+                    ->title(__('panel-app::profile.notifications.avatar_updated'))
+                    ->send();
+            });
+    }
+
+    public function editCoverAction(): Action
+    {
+        return Action::make('editCover')
+            ->label(__('panel-app::profile.actions.change_cover'))
+            ->modalHeading(__('panel-app::profile.actions.change_cover'))
+            ->modalSubmitActionLabel(__('panel-app::profile.actions.save_cover'))
+            ->modalSubmitAction(fn (Action $action) => $action->color('primary'))
+            ->schema([
+                FileUpload::make('cover')
+                    ->label(__('panel-app::profile.fields.cover'))
+                    ->image()
+                    ->panelAspectRatio('3:1')
+                    ->imageEditor()
+                    ->imageAspectRatio('3:1')
+                    ->imageEditorAspectRatioOptions(['3:1'])
+                    ->automaticallyCropImagesToAspectRatio()
+                    ->automaticallyResizeImagesMode('cover')
+                    ->automaticallyResizeImagesToWidth('1800')
+                    ->automaticallyResizeImagesToHeight('600')
+                    ->storeFiles(condition: false)
+                    ->required()
+                    ->maxSize(4_096),
+            ])
+            ->action(function (array $data): void {
+                $cover = $data['cover'] ?? null;
+
+                if (is_string($cover)) {
+                    $cover = TemporaryUploadedFile::createFromLivewire($cover);
+                }
+
+                if (!$cover instanceof TemporaryUploadedFile) {
+                    return;
+                }
+
+                $this->replaceMedia('cover', $cover);
+
+                Notification::make()
+                    ->success()
+                    ->title(__('panel-app::profile.notifications.cover_updated'))
+                    ->send();
+            });
     }
 
     public function getRecord(): Profile
@@ -456,13 +528,8 @@ class ProfilePage extends Page
     #[Computed]
     public function avatarPreviewUrl(): ?string
     {
-        if ($this->avatarUpload instanceof TemporaryUploadedFile) {
-            /** @var string */
-            return $this->avatarUpload->temporaryUrl();
-        }
-
         /** @var User $user */
-        $user = auth()->user();
+        $user = auth()->user()->fresh();
 
         return $user->getFirstMediaUrl('avatar') ?: null;
     }
@@ -470,49 +537,31 @@ class ProfilePage extends Page
     #[Computed]
     public function coverPreviewUrl(): ?string
     {
-        if ($this->coverUpload instanceof TemporaryUploadedFile) {
-            /** @var string */
-            return $this->coverUpload->temporaryUrl();
-        }
-
         /** @var User $user */
-        $user = auth()->user();
+        $user = auth()->user()->fresh();
 
         return $user->getFirstMediaUrl('cover') ?: null;
     }
 
     public function removeAvatar(): void
     {
-        $this->avatarUpload = null;
         auth()->user()->clearMediaCollection('avatar');
     }
 
     public function removeCover(): void
     {
-        $this->coverUpload = null;
         auth()->user()->clearMediaCollection('cover');
     }
 
-    private function saveMedia(): void
+    private function replaceMedia(string $collection, TemporaryUploadedFile $file): void
     {
         /** @var User $user */
         $user = auth()->user();
-
-        if ($this->avatarUpload instanceof TemporaryUploadedFile) {
-            $user->clearMediaCollection('avatar');
-            $user->addMedia($this->avatarUpload->getRealPath())
-                ->usingFileName(Str::uuid()->toString().'.'.$this->avatarUpload->getClientOriginalExtension())
-                ->toMediaCollection('avatar');
-            $this->avatarUpload = null;
-        }
-
-        if ($this->coverUpload instanceof TemporaryUploadedFile) {
-            $user->clearMediaCollection('cover');
-            $user->addMedia($this->coverUpload->getRealPath())
-                ->usingFileName(Str::uuid()->toString().'.'.$this->coverUpload->getClientOriginalExtension())
-                ->toMediaCollection('cover');
-            $this->coverUpload = null;
-        }
+        $extension = $file->getClientOriginalExtension() ?: $file->guessExtension() ?: 'jpg';
+        $user->clearMediaCollection($collection);
+        $user->addMedia($file->getRealPath())
+            ->usingFileName(Str::uuid()->toString().'.'.$extension)
+            ->toMediaCollection($collection);
     }
 
     /**
