@@ -12,7 +12,6 @@ use Filament\Http\Middleware\DispatchServingFilamentEvent;
 use Filament\Panel;
 use Filament\PanelProvider;
 use Filament\Support\Colors\Color;
-use Filament\View\PanelsRenderHook;
 use He4rt\PanelApp\Pages\LoginPage;
 use He4rt\PanelApp\Pages\ProfilePage;
 use He4rt\PanelApp\Pages\ThreadPage;
@@ -40,10 +39,6 @@ class AppPanelProvider extends PanelProvider
                 'gray' => Color::Zinc,
             ])
             ->viteTheme('resources/css/filament/app/theme.css')
-            ->renderHook(
-                PanelsRenderHook::BODY_END,
-                fn () => view('panel-app::auth.last-provider-script'),
-            )
             ->sidebarCollapsibleOnDesktop()
             ->discoverResources(in: app_path('Filament/App/Resources'), for: 'App\Filament\App\Resources')
             ->discoverPages(in: app_path('Filament/App/Pages'), for: 'App\Filament\App\Pages')
