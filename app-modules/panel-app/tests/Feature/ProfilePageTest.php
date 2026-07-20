@@ -5,6 +5,7 @@ declare(strict_types=1);
 use Filament\Facades\Filament;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
+use Filament\Schemas\JsContent;
 use He4rt\Identity\User\Models\User;
 use He4rt\PanelApp\Pages\ProfilePage;
 use He4rt\Profile\Enums\EmploymentType;
@@ -189,12 +190,12 @@ test('profile page validates about max length', function (): void {
 test('profile page shows about character counter in real time', function (): void {
     livewire(ProfilePage::class)
         ->fillForm([
-            'about' => 'áéí',
+            'about' => 'abc',
         ])
         ->assertFormFieldExists('about', function (Textarea $field): bool {
-            expect((string) $field->getHint())->toContain('count: 3')
-                ->toContain('wire:ignore')
-                ->toContain('<span x-text="count"></span>/500')
+            expect($field->getHint())->toBeInstanceOf(JsContent::class)
+                ->and($field->getHint()->toHtml())->toContain('Array.from($state')
+                ->toContain('500')
                 ->and($field->getStateBindingModifiers())->toBe(['live']);
 
             return true;
