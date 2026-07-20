@@ -82,7 +82,6 @@
                 {{-- OAuth --}}
                 <div
                     class="grid gap-2.5"
-                    x-load-js="[@js(\Filament\Support\Facades\FilamentAsset::getScriptSrc('last-auth-provider', package: 'he4rt/panel-app'))]"
                     x-data="{
                         lastProvider: null,
                         init() {
