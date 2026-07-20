@@ -1,4 +1,3 @@
-@props (['meta'])
 <section class="slide" data-label="Panorama">
     <div class="slide-inner">
         <span class="sec-tag" data-anim>O panorama</span>

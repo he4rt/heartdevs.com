@@ -6,6 +6,7 @@ namespace He4rt\Activity;
 
 use He4rt\Activity\Message\Models\Message;
 use He4rt\Activity\Moderation\Models\ModerationEvent;
+use He4rt\Activity\Retrospective\DiscordSource;
 use He4rt\Activity\Timeline\Delegated\PostEntry;
 use He4rt\Activity\Timeline\Listeners\PublishModerationToTimeline;
 use He4rt\Activity\Timeline\Listeners\ReassignTimelineOwnership;
@@ -23,6 +24,8 @@ class ActivityServiceProvider extends ServiceProvider
     {
         $this->mergeConfigFrom(__DIR__.'/../config/activity-tracking.php', 'activity-tracking');
 
+        // Fonte da retrospectiva, descoberta pelo portal via tagged services.
+        $this->app->tag([DiscordSource::class], 'retrospective.source');
     }
 
     public function boot(): void

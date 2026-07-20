@@ -4,6 +4,9 @@
     "type": "library",
     "version": "1.0.0",
     "license": "proprietary",
+    "require": {
+        "he4rt/community": "^1.0.0"
+    },
     "autoload": {
         "psr-4": {
             "He4rt\\IntegrationGithub\\": "src/",

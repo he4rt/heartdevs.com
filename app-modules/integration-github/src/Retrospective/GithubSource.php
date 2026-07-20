@@ -2,92 +2,134 @@
 
 declare(strict_types=1);
 
-namespace He4rt\Portal\Retrospective;
+namespace He4rt\IntegrationGithub\Retrospective;
 
+use He4rt\Community\Retrospective\Contracts\RetrospectiveSource;
+use He4rt\Community\Retrospective\Contracts\Slide;
+use He4rt\Community\Retrospective\DTOs\HeadlineMetrics;
+use He4rt\Community\Retrospective\DTOs\Metric;
+use He4rt\Community\Retrospective\DTOs\Period;
+use He4rt\Community\Retrospective\DTOs\SourceFilters;
+use He4rt\Community\Retrospective\DTOs\SourceResult;
 use He4rt\IntegrationGithub\Enums\ContributionType;
 use He4rt\IntegrationGithub\Models\GithubContribution;
+use He4rt\IntegrationGithub\Retrospective\Slides\GithubCommunitySlide;
+use He4rt\IntegrationGithub\Retrospective\Slides\GithubCoreSlide;
+use He4rt\IntegrationGithub\Retrospective\Slides\GithubHighlightsSlide;
+use He4rt\IntegrationGithub\Retrospective\Slides\GithubPanoramaSlide;
+use He4rt\IntegrationGithub\Retrospective\Slides\GithubRepoSlide;
 use Illuminate\Support\Collection;
 
 /**
- * Read model for the community presentation. Applies the "filter on read" rules
- * (decision #10): excludes only bots, counts by occurred_at within the period, and
- * groups by contributor login. Closed-unmerged PRs DO count as participation but are
- * broken out (prs_merged / prs_unmerged) so the view can distinguish their outcome.
+ * Fonte GitHub da retrospectiva. Preserva 1:1 o cálculo do antigo read model do
+ * portal (filtra bots, conta por occurred_at no período, agrupa por login,
+ * quebra PRs merged/unmerged) e o empacota em slides tipados. Repos só entram
+ * como card se tiverem PR no recorte; atividade só de review/issue/comentário
+ * segue contando em meta/people/highlights.
  */
-final readonly class CommunityRetrospective
+final class GithubSource implements RetrospectiveSource
 {
-    public function __construct(
-        private RetrospectiveFilters $filters,
-    ) {}
+    public function key(): string
+    {
+        return 'github';
+    }
 
-    /**
-     * @return array{
-     *     period: array{since: string, until: string},
-     *     meta: array<string, int>,
-     *     people: list<array<string, mixed>>,
-     *     repos: list<array<string, mixed>>,
-     *     highlights: list<array<string, mixed>>,
-     * }
-     */
-    public function build(): array
+    public function collect(Period $period, SourceFilters $filters): SourceResult
     {
         /** @var Collection<int, GithubContribution> $contributions */
         $contributions = GithubContribution::query()
-            ->whereBetween('occurred_at', [$this->filters->since, $this->filters->until])
+            ->whereBetween('occurred_at', [$period->since, $period->until])
             ->get()
             ->when(
-                $this->filters->hideBots,
+                $filters->hideBots,
                 fn (Collection $items): Collection => $items->reject(fn (GithubContribution $contribution): bool => $this->isBot($contribution)),
             )
-            ->when(
-                $this->filters->repos !== [],
-                fn (Collection $items): Collection => $items->filter(fn (GithubContribution $contribution): bool => in_array($contribution->repo, $this->filters->repos, strict: true)),
-            )
-            ->filter(fn (GithubContribution $contribution): bool => in_array($contribution->type, $this->filters->types, strict: true))
-            ->reject(fn (GithubContribution $contribution): bool => $this->filteredOutByOutcome($contribution))
-            ->when(
-                $this->filters->person !== null,
-                fn (Collection $items): Collection => $items->filter(fn (GithubContribution $contribution): bool => $contribution->actor_login === $this->filters->person),
-            )
             ->values();
+
+        if ($contributions->isEmpty()) {
+            return new SourceResult($this->key(), 'GitHub', new HeadlineMetrics(), []);
+        }
 
         /** @var list<array<string, mixed>> $people */
         $people = $contributions
             ->groupBy('actor_login')
             ->map(fn (Collection $items, string $login): array => $this->person($login, $items))
-            ->sortByDesc(fn (array $person): int => match ($this->filters->sort) {
-                'prs' => (int) $person['prs'] * 1_000 + (int) $person['total'],
-                'lines' => (int) $person['additions'] + (int) $person['deletions'],
-                default => (int) $person['total'],
-            })
+            ->sortByDesc(fn (array $person): int => (int) $person['total'])
             ->values()
             ->all();
 
         $repos = $this->repos($contributions);
+        $highlights = $this->highlights($contributions);
 
-        return [
-            'period' => ['since' => $this->filters->since->toDateString(), 'until' => $this->filters->until->toDateString()],
-            'meta' => [
-                'people' => count($people),
-                'prs' => $this->countType($contributions, ContributionType::Pr),
-                'prs_merged' => $this->countMergedPrs($contributions),
-                'prs_unmerged' => $this->countUnmergedPrs($contributions),
-                'reviews' => $this->countType($contributions, ContributionType::Review),
-                'issues' => $this->countType($contributions, ContributionType::Issue),
-                'comments' => $this->countType($contributions, ContributionType::Comment),
-                'review_comments' => $this->countType($contributions, ContributionType::ReviewComment),
-                'commits' => $this->countType($contributions, ContributionType::Commit),
-                'additions' => $this->sumMeta($contributions, 'additions'),
-                'deletions' => $this->sumMeta($contributions, 'deletions'),
-                'changed_files' => $this->sumMeta($contributions, 'changed_files'),
-                // Repos exibidos = só os com PR no recorte (mesmo universo dos cards).
-                'repos' => count($repos),
-                'total' => $contributions->count(),
-            ],
-            'people' => $people,
-            'repos' => $repos,
-            'highlights' => $this->highlights($contributions),
+        $meta = [
+            'people' => count($people),
+            'prs' => $this->countType($contributions, ContributionType::Pr),
+            'prs_merged' => $this->countMergedPrs($contributions),
+            'prs_unmerged' => $this->countUnmergedPrs($contributions),
+            'reviews' => $this->countType($contributions, ContributionType::Review),
+            'issues' => $this->countType($contributions, ContributionType::Issue),
+            'comments' => $this->countType($contributions, ContributionType::Comment),
+            'review_comments' => $this->countType($contributions, ContributionType::ReviewComment),
+            'commits' => $this->countType($contributions, ContributionType::Commit),
+            'additions' => $this->sumMeta($contributions, 'additions'),
+            'deletions' => $this->sumMeta($contributions, 'deletions'),
+            'changed_files' => $this->sumMeta($contributions, 'changed_files'),
+            // Repos exibidos = só os com PR no recorte (mesmo universo dos cards).
+            'repos' => count($repos),
+            'total' => $contributions->count(),
         ];
+
+        return new SourceResult(
+            key: $this->key(),
+            label: 'GitHub',
+            headline: $this->headline($meta),
+            slides: $this->slides($meta, $repos, $highlights, $people),
+        );
+    }
+
+    /**
+     * @param  array<string, int>  $meta
+     * @param  list<array<string, mixed>>  $repos
+     * @param  list<array<string, mixed>>  $highlights
+     * @param  list<array<string, mixed>>  $people
+     * @return list<Slide>
+     */
+    private function slides(array $meta, array $repos, array $highlights, array $people): array
+    {
+        $slides = [new GithubPanoramaSlide($meta)];
+
+        foreach ($repos as $i => $repo) {
+            $slides[] = new GithubRepoSlide($repo, $i + 1);
+        }
+
+        if ($highlights !== []) {
+            $slides[] = new GithubHighlightsSlide($highlights);
+        }
+
+        if ($people !== []) {
+            $slides[] = new GithubCoreSlide($people);
+
+            if (count($people) > 5) {
+                $slides[] = new GithubCommunitySlide($people);
+            }
+        }
+
+        return $slides;
+    }
+
+    /**
+     * @param  array<string, int>  $meta
+     */
+    private function headline(array $meta): HeadlineMetrics
+    {
+        return new HeadlineMetrics([
+            new Metric('Pessoas', $meta['people']),
+            new Metric('PRs', $meta['prs']),
+            new Metric('Reviews', $meta['reviews']),
+            new Metric('Issues', $meta['issues']),
+            new Metric('Commits', $meta['commits']),
+            new Metric('Linhas', $meta['additions'] + $meta['deletions']),
+        ]);
     }
 
     /**
@@ -198,23 +240,6 @@ final readonly class CommunityRetrospective
         return $actorId !== null
             ? 'https://avatars.githubusercontent.com/u/'.$actorId.'?v=4'
             : 'https://github.com/'.$login.'.png';
-    }
-
-    private function filteredOutByOutcome(GithubContribution $contribution): bool
-    {
-        if ($this->filters->outcome === null || $contribution->type !== ContributionType::Pr) {
-            return false;
-        }
-
-        $metadata = $contribution->metadata ?? [];
-        $merged = ($metadata['merged'] ?? false) === true;
-        $state = $metadata['state'] ?? null;
-
-        return match ($this->filters->outcome) {
-            'merged' => !$merged,
-            'open' => $state !== 'open',
-            'closed' => $state !== 'closed' || $merged,
-        };
     }
 
     /**

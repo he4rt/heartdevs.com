@@ -1,4 +1,3 @@
-@props (['people'])
 @php ($tail = array_slice($people, 5))
 <section class="slide" data-label="A comunidade">
     <div class="slide-inner">

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace He4rt\IntegrationGithub;
 
 use He4rt\IntegrationGithub\Console\BackfillGithubCommand;
+use He4rt\IntegrationGithub\Retrospective\GithubSource;
 use He4rt\IntegrationGithub\Transport\GitHubApiConnector;
 use He4rt\IntegrationGithub\Transport\GitHubOAuthConnector;
 use Illuminate\Support\ServiceProvider;
@@ -29,6 +30,9 @@ class IntegrationGithubServiceProvider extends ServiceProvider
         });
 
         $this->app->singleton(GitHubApiConnector::class, fn () => new GitHubApiConnector());
+
+        // Fonte da retrospectiva, descoberta pelo portal via tagged services.
+        $this->app->tag([GithubSource::class], 'retrospective.source');
     }
 
     public function boot(): void

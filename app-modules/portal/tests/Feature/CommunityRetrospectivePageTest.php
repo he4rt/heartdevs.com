@@ -3,6 +3,8 @@
 declare(strict_types=1);
 
 use Carbon\CarbonImmutable;
+use He4rt\Activity\Message\Models\Message;
+use He4rt\Identity\ExternalIdentity\Models\ExternalIdentity;
 use He4rt\IntegrationGithub\Enums\ContributionType;
 use He4rt\IntegrationGithub\Models\GithubContribution;
 use He4rt\Portal\Livewire\CommunityRetrospectivePage;
@@ -38,6 +40,22 @@ it('responde na rota pública /comunidade/retrospectiva', function (): void {
     test()->get('/comunidade/retrospectiva')->assertOk();
 });
 
+it('junta GitHub e Discord no mesmo deck', function (): void {
+    GithubContribution::factory()->create([
+        'actor_login' => 'maria', 'type' => ContributionType::Pr,
+        'external_ref' => 'pr:1', 'occurred_at' => '2026-06-02', 'metadata' => ['state' => 'open', 'merged' => false],
+    ]);
+
+    $identity = ExternalIdentity::factory()->create();
+    Message::factory()->create(['external_identity_id' => $identity->id, 'sent_at' => '2026-06-02']);
+
+    livewire(CommunityRetrospectivePage::class, ['since' => '2026-06-01', 'until' => '2026-06-07'])
+        ->assertOk()
+        ->assertSee('GitHub')
+        ->assertSee('Discord')
+        ->assertSee('O que rolou no chat');
+});
+
 it('inclui e marca contribuidor cujo único PR foi fechado sem merge', function (): void {
     GithubContribution::factory()->create([
         'actor_login' => 'rejeitada', 'actor_id' => 99, 'type' => ContributionType::Pr,
@@ -63,7 +81,7 @@ it('não renderiza o chrome do portal (sem navbar)', function (): void {
 });
 
 it('mostra o convite pra reunião quando não há nenhuma contribuição', function (): void {
-    // banco zerado: nenhum repositório/estatística → estado vazio com CTA, sem o deck normal
+    // banco zerado: nenhuma fonte com dado → estado vazio com CTA, sem o deck normal
     test()->get('/comunidade/retrospectiva')
         ->assertOk()
         ->assertSee('Métricas')
@@ -73,25 +91,13 @@ it('mostra o convite pra reunião quando não há nenhuma contribuição', funct
         ->assertDontSee('Filtros');
 });
 
-it('filtra por tipo ao alternar um tipo de contribuição', function (): void {
-    GithubContribution::factory()->create([
-        'actor_login' => 'soreview', 'type' => ContributionType::Review,
-        'external_ref' => 'review:1', 'occurred_at' => '2026-06-02',
-    ]);
-
-    livewire(CommunityRetrospectivePage::class, ['since' => '2026-06-01', 'until' => '2026-06-07'])
-        ->assertSee('soreview')
-        ->call('toggleType', 'review')
-        ->assertDontSee('soreview');
-});
-
-it('mantém o estado dos filtros (toggle de bots)', function (): void {
+it('mantém o estado do toggle de bots', function (): void {
     livewire(CommunityRetrospectivePage::class)
         ->set('hideBots', value: false)
         ->assertSet('hideBots', value: false);
 });
 
-it('preset "tudo" ancora o período na primeira contribuição e traz o histórico inteiro', function (): void {
+it('preset "tudo" traz o histórico inteiro', function (): void {
     $this->travelTo(CarbonImmutable::parse('2026-06-04 10:00:00'));
 
     GithubContribution::factory()->create([
@@ -105,27 +111,6 @@ it('preset "tudo" ancora o período na primeira contribuição e traz o históri
 
     livewire(CommunityRetrospectivePage::class)
         ->call('setPreset', 'tudo')
-        ->assertSet('since', '2020-03-30')
         ->assertSee('pioneira')
         ->assertSee('recente');
-});
-
-it('preset "tudo" com repos filtrados ancora na 1ª contribuição daqueles repos', function (): void {
-    $this->travelTo(CarbonImmutable::parse('2026-06-04 10:00:00'));
-
-    GithubContribution::factory()->create([
-        'repo' => 'he4rt/antigo', 'actor_login' => 'veterano', 'actor_id' => 1, 'type' => ContributionType::Commit,
-        'external_ref' => 'commit:old', 'occurred_at' => '2018-01-01 00:00:00',
-    ]);
-    GithubContribution::factory()->create([
-        'repo' => 'he4rt/4noobs', 'actor_login' => 'pioneira', 'actor_id' => 2, 'type' => ContributionType::Commit,
-        'external_ref' => 'commit:abc', 'occurred_at' => '2020-03-30 02:13:45',
-    ]);
-
-    livewire(CommunityRetrospectivePage::class)
-        ->set('repos', ['he4rt/4noobs'])
-        ->call('setPreset', 'tudo')
-        ->assertSet('since', '2020-03-30')
-        ->assertSee('pioneira')
-        ->assertDontSee('veterano');
 });

@@ -1,4 +1,3 @@
-@props (['repo', 'index' => 1])
 <section class="slide" data-label="{{ $repo['name'] }}">
     <div class="slide-inner">
         <div style="display: flex; align-items: center; gap: 14px; flex-wrap: wrap" data-anim>

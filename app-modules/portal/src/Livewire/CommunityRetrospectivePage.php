@@ -6,10 +6,9 @@ namespace He4rt\Portal\Livewire;
 
 use Carbon\CarbonImmutable;
 use Carbon\CarbonInterface;
-use He4rt\IntegrationGithub\Enums\ContributionType;
-use He4rt\IntegrationGithub\Models\GithubContribution;
-use He4rt\Portal\Retrospective\CommunityRetrospective;
-use He4rt\Portal\Retrospective\RetrospectiveFilters;
+use He4rt\Community\Retrospective\DTOs\Period;
+use He4rt\Community\Retrospective\DTOs\SourceFilters;
+use He4rt\Portal\Retrospective\RetrospectiveDeck;
 use Illuminate\Contracts\View\View;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
@@ -26,47 +25,16 @@ final class CommunityRetrospectivePage extends Component
     #[Url]
     public ?string $until = null;
 
-    /** @var list<string> */
-    #[Url]
-    public array $repos = [];
-
-    /** @var list<string> */
-    #[Url]
-    public array $types = [];
-
-    #[Url]
-    public ?string $outcome = null;
-
-    #[Url]
-    public ?string $person = null;
-
     #[Url]
     public bool $hideBots = true;
-
-    #[Url]
-    public string $sort = 'total';
-
-    #[Url]
-    public bool $byRepo = true;
-
-    #[Url]
-    public bool $showHighlights = true;
-
-    public function toggleType(string $type): void
-    {
-        $this->types = $this->toggleAware($this->types, $this->allTypes(), $type);
-    }
-
-    public function toggleRepo(string $repo): void
-    {
-        $this->repos = $this->toggleAware($this->repos, $this->allRepos(), $repo);
-    }
 
     public function setPreset(string $preset): void
     {
         $this->since = match ($preset) {
             'mes' => CarbonImmutable::now()->subMonth()->toDateString(),
-            'tudo' => $this->firstContributionDate(),
+            // "Tudo" = desde antes da fundação da comunidade; cobre todo o histórico
+            // sem acoplar o portal à menor data de nenhuma fonte específica.
+            'tudo' => CarbonImmutable::create(2_015, 1, 1)->toDateString(),
             default => CarbonImmutable::now()->startOfWeek(CarbonInterface::MONDAY)->subWeek()->toDateString(),
         };
 
@@ -83,78 +51,17 @@ final class CommunityRetrospectivePage extends Component
             ? CarbonImmutable::parse($this->until)->endOfDay()
             : CarbonImmutable::now();
 
-        $filters = RetrospectiveFilters::make($since, $until, $this->repos, $this->types, $this->outcome, $this->person, $this->hideBots, $this->sort);
-        $data = new CommunityRetrospective($filters)->build();
-
-        $repoOptions = collect($this->allRepos())
-            ->mapWithKeys(fn (string $repo): array => [$repo => (string) str($repo)->afterLast('/')])
-            ->all();
+        $sources = resolve(RetrospectiveDeck::class)->compose(
+            Period::of($since, $until),
+            new SourceFilters(hideBots: $this->hideBots),
+        );
 
         return view('portal::community-retrospective', [
-            'data' => $data,
-            'repoOptions' => $repoOptions,
-            'stateKey' => md5((string) json_encode([
-                $this->since, $this->until, $this->repos, $this->types, $this->outcome,
-                $this->person, $this->hideBots, $this->sort, $this->byRepo, $this->showHighlights,
-            ])),
+            'sources' => $sources,
+            'since' => $since,
+            'until' => $until,
+            'hideBots' => $this->hideBots,
+            'stateKey' => md5((string) json_encode([$this->since, $this->until, $this->hideBots])),
         ]);
-    }
-
-    /**
-     * @return list<string>
-     */
-    private function allTypes(): array
-    {
-        return array_map(fn (ContributionType $type): string => $type->value, ContributionType::cases());
-    }
-
-    /**
-     * Toggle "ciente de todos": com a lista vazia (= todos), clicar desliga apenas
-     * aquele item; voltar a ter todos selecionados normaliza de volta para vazio.
-     *
-     * @param  list<string>  $selected
-     * @param  list<string>  $all
-     * @return list<string>
-     */
-    private function toggleAware(array $selected, array $all, string $value): array
-    {
-        $current = $selected === [] ? $all : $selected;
-
-        $next = in_array($value, $current, strict: true)
-            ? array_values(array_diff($current, [$value]))
-            : array_values(array_unique([...$current, $value]));
-
-        return count($next) === count($all) ? [] : $next;
-    }
-
-    /**
-     * Data da contribuição mais antiga dentro do escopo atual (repos
-     * selecionados), para o preset "tudo" cobrir o histórico real do que está
-     * sendo apresentado. Sem registros, cai no mesmo default semanal do render().
-     */
-    private function firstContributionDate(): string
-    {
-        $first = GithubContribution::query()
-            ->when($this->repos !== [], fn ($query) => $query->whereIn('repo', $this->repos))
-            ->min('occurred_at');
-
-        return is_string($first) && $first !== ''
-            ? CarbonImmutable::parse($first)->toDateString()
-            : CarbonImmutable::now()->startOfWeek(CarbonInterface::MONDAY)->subWeek()->toDateString();
-    }
-
-    /**
-     * @return list<string>
-     */
-    private function allRepos(): array
-    {
-        /** @var list<string> $repos */
-        $repos = GithubContribution::query()
-            ->distinct()
-            ->orderBy('repo')
-            ->pluck('repo')
-            ->all();
-
-        return $repos;
     }
 }

@@ -1,4 +1,3 @@
-@props (['highlights'])
 @php ($stateColor = fn($state) => [ 'merged' => 'var(--st-merged)', 'open' => 'var(--st-open)', 'closed' => 'var(--st-closed)' ][$state ?? ''] ?? 'var(--st-open)')
 <section class="slide" data-label="Destaques">
     <div class="slide-inner">

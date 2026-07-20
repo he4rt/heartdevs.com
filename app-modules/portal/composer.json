@@ -4,7 +4,11 @@
     "type": "library",
     "version": "1.0",
     "license": "proprietary",
-    "require": {},
+    "require": {
+        "he4rt/activity": "^1.0.0",
+        "he4rt/community": "^1.0.0",
+        "he4rt/integration-github": "^1.0.0"
+    },
     "autoload": {
         "psr-4": {
             "He4rt\\Portal\\": "src/",

@@ -1,4 +1,3 @@
-@props (['people'])
 @php ($top = array_slice($people, 0, 5))
 <section class="slide" data-label="O núcleo">
     <div class="slide-inner">
