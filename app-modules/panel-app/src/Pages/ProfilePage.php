@@ -135,7 +135,7 @@ class ProfilePage extends Page
                                     ->hint(JsContent::make('`${Array.from($state ?? "").length}/500`'))
                                     ->maxLength(500)
                                     ->rows(4)
-                                    ->live()
+                                    ->live(onBlur: true)
                                     ->columnSpanFull(),
                             ]),
                         ]),
