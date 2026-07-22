@@ -76,3 +76,25 @@ O custo é proporcional à janela de datas, não ao total, porque há índice na
   `snapshot + config`), então "ver rascunho" bate com o publicado.
 - **Divergência consciente da spec-base:** ela era toda "per tenant" e centrada em `Cadence`. Aqui não há
   tenancy (removida no #413) e o período é datas livres.
+
+## Notas de implementação (Fase 2)
+
+Detalhes que emergiram na implementação, dentro do que foi decidido acima:
+
+- **`FrozenSlide` em vez de registro `kind -> classe`.** O snapshot reidrata cada slide como um `Slide`
+  genérico (`FrozenSlide`, dono no `community`, carrega `kind` + props). Um registro `kind -> classe`
+  exigiria o domínio `community` conhecer as classes de slide de `integration-github` (Domain -> Integration,
+  proibido). Como a renderização é por convenção `kind -> Blade` sobre `toArray()`, o contrato `Slide`
+  basta — o tipo concreto do slide só importa na produção do dado (no `collect()`), não no consumo do
+  snapshot.
+- **`label()` no contrato `RetrospectiveSource`.** A identidade da fonte (key + label) virou estática para
+  o CRUD listar/ordenar as fontes sem coletar dado. Antes o label era hardcoded dentro do `collect()`.
+- **Exclusions recompilam; ordem/on-off re-derivam.** Ordem e on/off (fonte/slide) são curadoria de
+  apresentação: aplicadas na composição (`ComposeDeck`) sobre o snapshot congelado, baratas. Exclusions
+  mexem no DADO (entram no `SourceFilters` do `collect`, ADR-0001), então alterá-las só reflete numa nova
+  publicação (recompila o snapshot) — não são reaplicadas na composição.
+- **`publishing` é um estado transitório do enum.** `RetrospectiveStatus` tem `draft | publishing |
+  published`; `publishing` cobre a janela em que o job congela o snapshot.
+- **Preview autenticado sem rota de login web.** O portal não tem rota `login` nomeada, então o guard do
+  preview vive no `mount()` do componente (`abort_unless(auth()->check(), 403)`), não num middleware `auth`
+  que dependeria da rota inexistente.

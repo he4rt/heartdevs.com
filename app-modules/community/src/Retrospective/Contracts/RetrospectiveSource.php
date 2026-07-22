@@ -23,5 +23,12 @@ interface RetrospectiveSource
 {
     public function key(): string;
 
+    /**
+     * Nome de exibição da fonte (ex.: "GitHub", "Discord"). Estático, resolvível
+     * sem coletar dado — o CRUD editorial lista/ordena as fontes por (key, label)
+     * antes de qualquer collect().
+     */
+    public function label(): string;
+
     public function collect(Period $period, SourceFilters $filters): SourceResult;
 }

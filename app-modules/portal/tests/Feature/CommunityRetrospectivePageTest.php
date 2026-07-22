@@ -3,114 +3,112 @@
 declare(strict_types=1);
 
 use Carbon\CarbonImmutable;
-use He4rt\Activity\Message\Models\Message;
-use He4rt\Identity\ExternalIdentity\Models\ExternalIdentity;
+use He4rt\Community\Retrospective\Actions\CompileSnapshot;
+use He4rt\Community\Retrospective\DTOs\DeckConfig;
+use He4rt\Community\Retrospective\DTOs\Period;
+use He4rt\Community\Retrospective\DTOs\SourceFilters;
+use He4rt\Community\Retrospective\Models\Retrospective;
+use He4rt\Identity\User\Models\User;
 use He4rt\IntegrationGithub\Enums\ContributionType;
 use He4rt\IntegrationGithub\Models\GithubContribution;
-use He4rt\Portal\Livewire\CommunityRetrospectivePage;
 
-use function Pest\Livewire\livewire;
+/**
+ * Congela o snapshot do período fixo (junho/2026) a partir das fontes vivas e cria
+ * uma edição publicada com ele. Como usa as fontes reais, os props dos slides
+ * batem com os partials — exercita todo o caminho congelar -> compor -> renderizar.
+ */
+function publishRetrospective(array $overrides = []): Retrospective
+{
+    $since = CarbonImmutable::parse('2026-06-01 00:00:00');
+    $until = CarbonImmutable::parse('2026-06-30 23:59:59');
 
-it('mostra os contribuidores do período informado', function (): void {
+    $snapshot = resolve(CompileSnapshot::class)->execute(
+        Period::of($since, $until),
+        new SourceFilters(),
+    );
+
+    return Retrospective::factory()->published($snapshot)->create(array_merge([
+        'since' => $since,
+        'until' => $until,
+    ], $overrides));
+}
+
+it('mostra o estado vazio quando não há edição publicada', function (): void {
+    test()->get('/comunidade/retrospectiva')
+        ->assertOk()
+        ->assertSee('Métricas')
+        ->assertSee('reunião')
+        ->assertSee('discord.gg/he4rt')
+        ->assertDontSee('Recorte');
+});
+
+it('renderiza o deck da edição publicada a partir do snapshot congelado', function (): void {
     GithubContribution::factory()->create([
         'actor_login' => 'maria', 'actor_id' => 42, 'type' => ContributionType::Pr,
         'external_ref' => 'pr:1', 'occurred_at' => '2026-06-02', 'metadata' => ['state' => 'open', 'merged' => false],
     ]);
 
-    livewire(CommunityRetrospectivePage::class, ['since' => '2026-06-01', 'until' => '2026-06-07'])
+    publishRetrospective(['cover_title' => 'Retro de Junho', 'closing_text' => 'Valeu, pessoal!']);
+
+    test()->get('/comunidade/retrospectiva')
         ->assertOk()
+        ->assertSee('GitHub')
         ->assertSee('maria')
-        ->assertSee('compbar');
-});
-
-it('usa a janela padrão (segunda passada → hoje) quando sem parâmetros', function (): void {
-    $this->travelTo(CarbonImmutable::parse('2026-06-04 10:00:00'));
-
-    GithubContribution::factory()->create([
-        'actor_login' => 'joao', 'actor_id' => 7, 'type' => ContributionType::Issue,
-        'external_ref' => 'issue:1', 'occurred_at' => '2026-06-02',
-    ]);
-
-    livewire(CommunityRetrospectivePage::class)
-        ->assertOk()
-        ->assertSee('joao');
+        ->assertSee('Retro de Junho')
+        ->assertSee('Valeu, pessoal!')
+        ->assertDontSee('Recorte');
 });
 
 it('responde na rota pública /comunidade/retrospectiva', function (): void {
     test()->get('/comunidade/retrospectiva')->assertOk();
 });
 
-it('junta GitHub e Discord no mesmo deck', function (): void {
-    GithubContribution::factory()->create([
-        'actor_login' => 'maria', 'type' => ContributionType::Pr,
-        'external_ref' => 'pr:1', 'occurred_at' => '2026-06-02', 'metadata' => ['state' => 'open', 'merged' => false],
-    ]);
-
-    $identity = ExternalIdentity::factory()->create();
-    Message::factory()->create(['external_identity_id' => $identity->id, 'sent_at' => '2026-06-02']);
-
-    livewire(CommunityRetrospectivePage::class, ['since' => '2026-06-01', 'until' => '2026-06-07'])
-        ->assertOk()
-        ->assertSee('GitHub')
-        ->assertSee('Discord')
-        ->assertSee('O que rolou no chat');
-});
-
-it('inclui e marca contribuidor cujo único PR foi fechado sem merge', function (): void {
-    GithubContribution::factory()->create([
-        'actor_login' => 'rejeitada', 'actor_id' => 99, 'type' => ContributionType::Pr,
-        'external_ref' => 'pr:5', 'occurred_at' => '2026-06-02', 'metadata' => ['state' => 'closed', 'merged' => false],
-    ]);
-
-    livewire(CommunityRetrospectivePage::class, ['since' => '2026-06-01', 'until' => '2026-06-07'])
-        ->assertOk()
-        ->assertSee('rejeitada')
-        ->assertSee('fechados');
-});
-
-it('não renderiza o chrome do portal (sem navbar)', function (): void {
-    GithubContribution::factory()->create([
-        'actor_login' => 'alguem', 'type' => ContributionType::Pr,
-        'external_ref' => 'pr:1', 'occurred_at' => '2026-06-02', 'metadata' => ['state' => 'open', 'merged' => false],
-    ]);
+it('não vaza rascunho na página pública', function (): void {
+    Retrospective::factory()->create(['cover_title' => 'Rascunho Secreto']);
 
     test()->get('/comunidade/retrospectiva')
         ->assertOk()
-        ->assertDontSee('Área do Usuário')
-        ->assertSee('Quem fez a He4rt');
+        ->assertDontSee('Rascunho Secreto')
+        ->assertSee('reunião');
 });
 
-it('mostra o convite pra reunião quando não há nenhuma contribuição', function (): void {
-    // banco zerado: nenhuma fonte com dado → estado vazio com CTA, sem o deck normal
+it('respeita o on/off de fonte do deck_config na edição publicada', function (): void {
+    GithubContribution::factory()->create([
+        'actor_login' => 'maria', 'actor_id' => 42, 'type' => ContributionType::Pr,
+        'external_ref' => 'pr:1', 'occurred_at' => '2026-06-02', 'metadata' => ['state' => 'open', 'merged' => false],
+    ]);
+
+    publishRetrospective([
+        'cover_title' => 'Sem GitHub',
+        'deck_config' => new DeckConfig(hiddenSources: ['github']),
+    ]);
+
+    // github era a única fonte com dado; oculta => deck fica sem fontes => estado vazio.
     test()->get('/comunidade/retrospectiva')
         ->assertOk()
-        ->assertSee('Métricas')
-        ->assertSee('reunião')
-        ->assertSee('discord.gg/he4rt')
-        ->assertDontSee('O panorama')
-        ->assertDontSee('Filtros');
+        ->assertDontSee('maria');
 });
 
-it('mantém o estado do toggle de bots', function (): void {
-    livewire(CommunityRetrospectivePage::class)
-        ->set('hideBots', value: false)
-        ->assertSet('hideBots', value: false);
+it('preview autenticado monta o rascunho coletado ao vivo', function (): void {
+    GithubContribution::factory()->create([
+        'actor_login' => 'maria', 'actor_id' => 42, 'type' => ContributionType::Pr,
+        'external_ref' => 'pr:1', 'occurred_at' => '2026-06-02', 'metadata' => ['state' => 'open', 'merged' => false],
+    ]);
+
+    $retrospective = Retrospective::factory()->create([
+        'since' => CarbonImmutable::parse('2026-06-01 00:00:00'),
+        'until' => CarbonImmutable::parse('2026-06-30 23:59:59'),
+    ]);
+
+    test()->actingAs(User::factory()->create())
+        ->get(route('community.retrospective.preview', $retrospective))
+        ->assertOk()
+        ->assertSee('maria');
 });
 
-it('preset "tudo" traz o histórico inteiro', function (): void {
-    $this->travelTo(CarbonImmutable::parse('2026-06-04 10:00:00'));
+it('preview nega acesso a visitante não autenticado', function (): void {
+    $retrospective = Retrospective::factory()->create();
 
-    GithubContribution::factory()->create([
-        'actor_login' => 'pioneira', 'actor_id' => 1, 'type' => ContributionType::Commit,
-        'external_ref' => 'commit:abc', 'occurred_at' => '2020-03-30 02:13:45',
-    ]);
-    GithubContribution::factory()->create([
-        'actor_login' => 'recente', 'actor_id' => 2, 'type' => ContributionType::Issue,
-        'external_ref' => 'issue:1', 'occurred_at' => '2026-06-02',
-    ]);
-
-    livewire(CommunityRetrospectivePage::class)
-        ->call('setPreset', 'tudo')
-        ->assertSee('pioneira')
-        ->assertSee('recente');
+    test()->get(route('community.retrospective.preview', $retrospective))
+        ->assertForbidden();
 });

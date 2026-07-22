@@ -1,4 +1,4 @@
-@props(['sources', 'since', 'until'])
+@props(['sources', 'since', 'until', 'closingText' => null])
 @php
     $fmt = fn ($d): string => $d instanceof \Carbon\CarbonInterface
         ? $d->timezone(config('app.display_timezone'))->format('d/m/Y')
@@ -9,7 +9,11 @@
     <div class="slide-inner" style="text-align: center; max-width: 940px">
         <h2 class="sec" data-anim>Obrigado a quem fez<br />o coração bater 💜</h2>
         <p class="sec-sub" data-anim style="margin: 0 auto">
-            Cada PR, cada mensagem, cada call e cada reação manteve a He4rt viva.
+            @if (filled($closingText))
+                {{ $closingText }}
+            @else
+                Cada PR, cada mensagem, cada call e cada reação manteve a He4rt viva.
+            @endif
         </p>
         <div data-anim style="display: flex; flex-wrap: wrap; gap: 12px; justify-content: center; margin-top: 30px">
             @foreach ($sources as $source)

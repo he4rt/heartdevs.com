@@ -51,6 +51,7 @@ Partimos de uma spec-base que foi destrinchada contra o projeto de hoje. Três p
 ```
 interface RetrospectiveSource {
     key(): string
+    label(): string                       // identidade estática (CRUD lista/ordena sem coletar)
     collect(Period, SourceFilters): SourceResult
 }
 
@@ -114,7 +115,10 @@ Retrospective   (community · tabela community_retrospectives)
 ```
 
 `deck_config` e `snapshot` são VOs tipados via cast dedicado (regra de typed-json do repo), nunca `array`
-solto. A reidratação dos `Slide` tipados usa um registro `kind -> classe` no cast do snapshot.
+solto. Ao reidratar o snapshot, cada slide volta como um `FrozenSlide` (Slide genérico do `community`
+que carrega `kind` + props) em vez de reinstanciar a classe concreta: o domínio `community` não pode
+importar as classes de slide de `integration-github` (Domain -> Integration é proibido), e a renderização
+por convenção `kind -> Blade` só precisa do contrato `Slide`, não do tipo original.
 
 ### Slides e shell
 

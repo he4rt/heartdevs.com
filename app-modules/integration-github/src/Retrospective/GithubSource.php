@@ -34,6 +34,11 @@ final class GithubSource implements RetrospectiveSource
         return 'github';
     }
 
+    public function label(): string
+    {
+        return 'GitHub';
+    }
+
     public function collect(Period $period, SourceFilters $filters): SourceResult
     {
         /** @var Collection<int, GithubContribution> $contributions */
@@ -47,7 +52,7 @@ final class GithubSource implements RetrospectiveSource
             ->values();
 
         if ($contributions->isEmpty()) {
-            return new SourceResult($this->key(), 'GitHub', new HeadlineMetrics(), []);
+            return new SourceResult($this->key(), $this->label(), new HeadlineMetrics(), []);
         }
 
         /** @var list<array<string, mixed>> $people */
@@ -81,7 +86,7 @@ final class GithubSource implements RetrospectiveSource
 
         return new SourceResult(
             key: $this->key(),
-            label: 'GitHub',
+            label: $this->label(),
             headline: $this->headline($meta),
             slides: $this->slides($meta, $repos, $highlights, $people),
         );

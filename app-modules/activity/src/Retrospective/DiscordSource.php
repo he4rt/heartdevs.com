@@ -42,6 +42,11 @@ final class DiscordSource implements RetrospectiveSource
         return 'discord';
     }
 
+    public function label(): string
+    {
+        return 'Discord';
+    }
+
     public function collect(Period $period, SourceFilters $filters): SourceResult
     {
         $totalMessages = $this->messages($period, $filters)->count();
@@ -73,7 +78,7 @@ final class DiscordSource implements RetrospectiveSource
 
         return new SourceResult(
             key: $this->key(),
-            label: 'Discord',
+            label: $this->label(),
             headline: $this->headline($totalMessages, $participants, $joins, $totalReactions),
             slides: $this->slides(
                 participants: $participants,
