@@ -17,6 +17,7 @@ return [
         'website' => 'Website',
         'youtube' => 'YouTube',
         'bluesky' => 'Bluesky',
+        'linkedin' => 'LinkedIn',
     ],
 
     'skill_category' => [

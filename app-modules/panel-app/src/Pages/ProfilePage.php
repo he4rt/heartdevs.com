@@ -147,13 +147,52 @@ class ProfilePage extends Page
                                             ->getOptionLabelUsing(fn (?string $value): ?string => $value === null ? null : (Skill::labelsById()[$value] ?? null))
                                             ->optionsLimit(50)
                                             ->distinct()
-                                            ->required()
+                                            ->required(fn (Get $get): bool => filled($get('proficiency')))
                                             ->columnSpan(1),
 
                                         Select::make('proficiency')
                                             ->label(__('panel-app::profile.fields.proficiency'))
                                             ->options(SkillProficiency::class)
-                                            ->required()
+                                            ->required(fn (Get $get): bool => filled($get('skill_id')))
+                                            ->live()
+                                            ->afterStateUpdated(function (Get $get, $component): void {
+                                                if (blank($get('skill_id')) || blank($get('proficiency'))) {
+                                                    return;
+                                                }
+
+                                                $repeater = $component->getParentRepeater();
+
+                                                if (!$repeater) {
+                                                    return;
+                                                }
+
+                                                $items = $repeater->getRawState();
+
+                                                if (blank($items)) {
+                                                    return;
+                                                }
+
+                                                // Only auto-add when filling the last row
+                                                $repeaterPath = $repeater->getStatePath();
+                                                $currentKey = explode('.', mb_substr((string) $component->getStatePath(), mb_strlen($repeaterPath) + 1))[0];
+
+                                                if ($currentKey !== array_key_last($items)) {
+                                                    return;
+                                                }
+
+                                                $newUuid = $repeater->generateUuid();
+
+                                                if ($newUuid) {
+                                                    $items[$newUuid] = [];
+                                                } else {
+                                                    $items[] = [];
+                                                }
+
+                                                $repeater->rawState($items);
+                                                $repeater->getChildSchema($newUuid ?? array_key_last($items))->fill();
+                                                $repeater->collapsed(false, shouldMakeComponentCollapsible: false);
+                                                $repeater->callAfterStateUpdated();
+                                            })
                                             ->columnSpan(1),
 
                                         TextInput::make('years_experience')
@@ -221,13 +260,51 @@ class ProfilePage extends Page
                                         Select::make('platform')
                                             ->label(__('panel-app::profile.fields.platform'))
                                             ->options(SocialPlatform::class)
-                                            ->required()
+                                            ->required(fn (Get $get): bool => filled($get('handle')))
                                             ->columnSpan(1),
 
                                         TextInput::make('handle')
                                             ->label(__('panel-app::profile.fields.handle'))
                                             ->placeholder(__('panel-app::profile.placeholders.handle'))
-                                            ->required()
+                                            ->required(fn (Get $get): bool => filled($get('platform')))
+                                            ->live(onBlur: true)
+                                            ->afterStateUpdated(function (Get $get, $component): void {
+                                                if (blank($get('platform')) || blank($get('handle'))) {
+                                                    return;
+                                                }
+
+                                                $repeater = $component->getParentRepeater();
+
+                                                if (!$repeater) {
+                                                    return;
+                                                }
+
+                                                $items = $repeater->getRawState();
+
+                                                if (blank($items)) {
+                                                    return;
+                                                }
+
+                                                $repeaterPath = $repeater->getStatePath();
+                                                $currentKey = explode('.', mb_substr((string) $component->getStatePath(), mb_strlen($repeaterPath) + 1))[0];
+
+                                                if ($currentKey !== array_key_last($items)) {
+                                                    return;
+                                                }
+
+                                                $newUuid = $repeater->generateUuid();
+
+                                                if ($newUuid) {
+                                                    $items[$newUuid] = [];
+                                                } else {
+                                                    $items[] = [];
+                                                }
+
+                                                $repeater->rawState($items);
+                                                $repeater->getChildSchema($newUuid ?? array_key_last($items))->fill();
+                                                $repeater->collapsed(false, shouldMakeComponentCollapsible: false);
+                                                $repeater->callAfterStateUpdated();
+                                            })
                                             ->columnSpan(1),
                                     ]),
                                 ])
@@ -301,18 +378,18 @@ class ProfilePage extends Page
                                     Grid::make(2)->schema([
                                         TextInput::make('company_name')
                                             ->label(__('panel-app::profile.fields.company_name'))
-                                            ->required()
+                                            ->required(fn (Get $get): bool => filled($get('position')) || filled($get('description')) || filled($get('start_date')))
                                             ->maxLength(255)
                                             ->columnSpan(1),
                                         TextInput::make('position')
                                             ->label(__('panel-app::profile.fields.position'))
-                                            ->required()
+                                            ->required(fn (Get $get): bool => filled($get('company_name')) || filled($get('description')) || filled($get('start_date')))
                                             ->maxLength(255)
                                             ->columnSpan(1),
                                     ]),
                                     Textarea::make('description')
                                         ->label(__('panel-app::profile.fields.experience_description'))
-                                        ->required()
+                                        ->required(fn (Get $get): bool => filled($get('company_name')) || filled($get('position')) || filled($get('start_date')))
                                         ->rows(3)
                                         ->maxLength(2_000)
                                         ->columnSpanFull(),
@@ -323,7 +400,7 @@ class ProfilePage extends Page
                                             ->displayFormat('M Y')
                                             ->format('Y-m-d')
                                             ->maxDate(now())
-                                            ->required()
+                                            ->required(fn (Get $get): bool => filled($get('company_name')) || filled($get('position')) || filled($get('description')))
                                             ->columnSpan(1),
                                         DatePicker::make('end_date')
                                             ->label(__('panel-app::profile.fields.end_date'))
@@ -332,7 +409,7 @@ class ProfilePage extends Page
                                             ->format('Y-m-d')
                                             ->maxDate(now())
                                             ->afterOrEqual('start_date')
-                                            ->required(fn (Get $get): bool => !$get('is_currently_working_here'))
+                                            ->required(fn (Get $get): bool => !$get('is_currently_working_here') && (filled($get('company_name')) || filled($get('position')) || filled($get('description')) || filled($get('start_date'))))
                                             ->hidden(fn (Get $get): bool => (bool) $get('is_currently_working_here'))
                                             ->columnSpan(1),
                                     ]),
@@ -606,10 +683,18 @@ class ProfilePage extends Page
 
     /**
      * @param  array<string, mixed>  $data
-     * @return array<string, mixed>
+     * @return array<string, mixed>|null null tells Filament to skip creating/saving this row
      */
-    private function normalizeWorkExperienceData(array $data): array
+    private function normalizeWorkExperienceData(array $data): ?array
     {
+        $keyFields = ['company_name', 'position', 'description', 'start_date'];
+
+        $hasAnyData = collect($keyFields)->contains(fn (string $field): bool => filled($data[$field] ?? null));
+
+        if (!$hasAnyData) {
+            return null;
+        }
+
         if ($data['is_currently_working_here'] ?? false) {
             $data['end_date'] = null;
         }

@@ -15,6 +15,7 @@ enum SocialPlatform: string implements HasIcon, HasLabel
     case Website = 'website';
     case YouTube = 'youtube';
     case Bluesky = 'bluesky';
+    case LinkedIn = 'linkedin';
 
     /**
      * @return array<int, string>
@@ -40,6 +41,25 @@ enum SocialPlatform: string implements HasIcon, HasLabel
             self::Website => Heroicon::GlobeAlt,
             self::YouTube => Heroicon::PlayCircle,
             self::Bluesky => Heroicon::Cloud,
+            self::LinkedIn => Heroicon::Link
+        };
+    }
+
+    public function getUrl(string $handle): string
+    {
+        if (str_starts_with($handle, 'http://') || str_starts_with($handle, 'https://')) {
+            return $handle;
+        }
+
+        $slug = mb_ltrim($handle, '@');
+
+        return match ($this) {
+            self::Instagram => 'https://instagram.com/'.$slug,
+            self::Twitter => 'https://x.com/'.$slug,
+            self::LinkedIn => 'https://linkedin.com/in/'.$slug,
+            self::YouTube => 'https://youtube.com/@'.$slug,
+            self::Bluesky => 'https://bsky.app/profile/'.$slug,
+            self::Website => 'https://'.$slug,
         };
     }
 }
