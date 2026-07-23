@@ -82,10 +82,10 @@ final class HeroSection extends Component
             ->where('provider', IdentityProvider::GitHub)
             ->whereIn('model_id', $activeUserIds)
             ->whereNotNull('external_account_id')
+            ->whereRaw("external_account_id ~ '^[0-9]+$'")
             ->inRandomOrder()
             ->limit(10)
             ->pluck('external_account_id')
-            ->filter(fn (?string $id): bool => is_string($id) && ctype_digit($id))
             ->map(fn (string $id) => sprintf('https://avatars.githubusercontent.com/u/%s?v=4', $id))
             ->values()
             ->all();
