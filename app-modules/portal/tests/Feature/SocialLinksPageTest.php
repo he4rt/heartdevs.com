@@ -32,8 +32,8 @@ it('renderiza os seis links com rótulos e URLs corretas', function (): void {
 it('abre cada link externo em nova aba com rel seguro', function (): void {
     $html = get('/redes')->getContent();
 
-    expect(mb_substr_count($html, 'target="_blank"'))->toBe(6);
-    expect(mb_substr_count($html, 'rel="noopener noreferrer"'))->toBe(6);
+    expect(mb_substr_count($html, 'target="_blank"'))->toBe(8);
+    expect(mb_substr_count($html, 'rel="noopener noreferrer"'))->toBe(8);
 });
 
 it('exibe o logo He4rt animado', function (): void {
