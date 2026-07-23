@@ -61,5 +61,6 @@ return [
         'whatsapp' => ['label' => 'WhatsApp', 'url' => 'https://chat.whatsapp.com/EBKjYxIodpe1x5LLExbTzK', 'icon' => 'fab-whatsapp', 'accent' => '#25D366'],
         'instagram' => ['label' => 'Instagram', 'url' => 'https://www.instagram.com/heartdevs/', 'icon' => 'fab-instagram', 'accent' => '#E4405F'],
         'github' => ['label' => 'GitHub', 'url' => 'https://github.com/he4rt', 'icon' => 'fab-github', 'accent' => '#111827', 'accent_dark' => '#FFFFFF'],
+        'loja' => ['label' => 'Loja', 'url' => 'https://loja.heartdevs.com/he4rt/', 'icon' => 'heroicon-s-shopping-bag', 'accent' => '#111827', 'accent_dark' => '#FFFFFF'],
     ],
 ];
