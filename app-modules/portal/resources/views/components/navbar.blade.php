@@ -84,7 +84,7 @@
                         iconOnly
                         aria-label="Loja"
                         target="_blank"
-                        rel="noopener noreferrer"
+                        rel="noopener"
                     />
                     <x-he4rt::button href="/app" size="sm" variant="outline"> Área do Usuário </x-he4rt::button>
                     <x-he4rt::button
@@ -191,7 +191,7 @@
                 icon="heroicon-s-shopping-bag"
                 iconPosition="leading"
                 target="_blank"
-                rel="noopener noreferrer"
+                rel="noopener"
             >
                 Compre na Loja
             </x-he4rt::button>
