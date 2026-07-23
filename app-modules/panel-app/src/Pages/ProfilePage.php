@@ -155,43 +155,12 @@ class ProfilePage extends Page
                                             ->options(SkillProficiency::class)
                                             ->required(fn (Get $get): bool => filled($get('skill_id')))
                                             ->live()
-                                            ->afterStateUpdated(function (Get $get, $component): void {
+                                            ->afterStateUpdated(function (Get $get, Select $component): void {
                                                 if (blank($get('skill_id')) || blank($get('proficiency'))) {
                                                     return;
                                                 }
 
-                                                $repeater = $component->getParentRepeater();
-
-                                                if (!$repeater) {
-                                                    return;
-                                                }
-
-                                                $items = $repeater->getRawState();
-
-                                                if (blank($items)) {
-                                                    return;
-                                                }
-
-                                                // Only auto-add when filling the last row
-                                                $repeaterPath = $repeater->getStatePath();
-                                                $currentKey = explode('.', mb_substr((string) $component->getStatePath(), mb_strlen($repeaterPath) + 1))[0];
-
-                                                if ($currentKey !== array_key_last($items)) {
-                                                    return;
-                                                }
-
-                                                $newUuid = $repeater->generateUuid();
-
-                                                if ($newUuid) {
-                                                    $items[$newUuid] = [];
-                                                } else {
-                                                    $items[] = [];
-                                                }
-
-                                                $repeater->rawState($items);
-                                                $repeater->getChildSchema($newUuid ?? array_key_last($items))->fill();
-                                                $repeater->collapsed(false, shouldMakeComponentCollapsible: false);
-                                                $repeater->callAfterStateUpdated();
+                                                $this->appendEmptyRepeaterItemIfLastRow($component);
                                             })
                                             ->columnSpan(1),
 
@@ -268,42 +237,12 @@ class ProfilePage extends Page
                                             ->placeholder(__('panel-app::profile.placeholders.handle'))
                                             ->required(fn (Get $get): bool => filled($get('platform')))
                                             ->live(onBlur: true)
-                                            ->afterStateUpdated(function (Get $get, $component): void {
+                                            ->afterStateUpdated(function (Get $get, TextInput $component): void {
                                                 if (blank($get('platform')) || blank($get('handle'))) {
                                                     return;
                                                 }
 
-                                                $repeater = $component->getParentRepeater();
-
-                                                if (!$repeater) {
-                                                    return;
-                                                }
-
-                                                $items = $repeater->getRawState();
-
-                                                if (blank($items)) {
-                                                    return;
-                                                }
-
-                                                $repeaterPath = $repeater->getStatePath();
-                                                $currentKey = explode('.', mb_substr((string) $component->getStatePath(), mb_strlen($repeaterPath) + 1))[0];
-
-                                                if ($currentKey !== array_key_last($items)) {
-                                                    return;
-                                                }
-
-                                                $newUuid = $repeater->generateUuid();
-
-                                                if ($newUuid) {
-                                                    $items[$newUuid] = [];
-                                                } else {
-                                                    $items[] = [];
-                                                }
-
-                                                $repeater->rawState($items);
-                                                $repeater->getChildSchema($newUuid ?? array_key_last($items))->fill();
-                                                $repeater->collapsed(false, shouldMakeComponentCollapsible: false);
-                                                $repeater->callAfterStateUpdated();
+                                                $this->appendEmptyRepeaterItemIfLastRow($component);
                                             })
                                             ->columnSpan(1),
                                     ]),
@@ -720,6 +659,53 @@ class ProfilePage extends Page
         return $skills;
     }
 
+    private function appendEmptyRepeaterItemIfLastRow(Select|TextInput $component): void
+    {
+        $repeater = $component->getParentRepeater();
+
+        if (!$repeater instanceof Repeater) {
+            return;
+        }
+
+        $items = $repeater->getRawState();
+
+        if (!is_array($items) || blank($items)) {
+            return;
+        }
+
+        $repeaterPath = $repeater->getStatePath();
+        $componentPath = $component->getStatePath();
+
+        if ($repeaterPath === null || $componentPath === null) {
+            return;
+        }
+
+        $currentKey = explode('.', mb_substr($componentPath, mb_strlen($repeaterPath) + 1))[0];
+
+        if ($currentKey !== array_key_last($items)) {
+            return;
+        }
+
+        $newUuid = $repeater->generateUuid();
+
+        if ($newUuid) {
+            $items[$newUuid] = [];
+        } else {
+            $items[] = [];
+        }
+
+        $repeater->rawState($items);
+
+        $childSchema = $repeater->getChildSchema($newUuid ?? array_key_last($items));
+
+        if ($childSchema instanceof Schema) {
+            $childSchema->fill();
+        }
+
+        $repeater->collapsed(condition: false, shouldMakeComponentCollapsible: false);
+        $repeater->callAfterStateUpdated();
+    }
+
     /**
      * Skill ids already chosen in the other rows of the skills repeater, so the
      * search can omit them and each skill is only pickable once.
@@ -729,12 +715,16 @@ class ProfilePage extends Page
     private function skillIdsInSiblingRows(Select $component): array
     {
         $repeater = $component->getParentRepeater();
-        if ($repeater === null) {
+
+        if (!$repeater instanceof Repeater) {
             return [];
         }
 
-        /** @var array<int|string, array<string, mixed>> $rows */
         $rows = $repeater->getRawState();
+
+        if (!is_array($rows)) {
+            return [];
+        }
 
         return array_values(
             collect($rows)
