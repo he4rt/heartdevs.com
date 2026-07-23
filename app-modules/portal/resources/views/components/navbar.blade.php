@@ -75,6 +75,15 @@
                         iconOnly
                         aria-label="Redes sociais"
                     />
+                    <x-he4rt::button
+                        href="https://loja.heartdevs.com/he4rt/"
+                        size="sm"
+                        variant="outline"
+                        icon="heroicon-s-shopping-bag"
+                        iconPosition="leading"
+                        iconOnly
+                        aria-label="Loja"
+                    />
                     <x-he4rt::button href="/app" size="sm" variant="outline"> Área do Usuário </x-he4rt::button>
                     <x-he4rt::button
                         href="https://discord.gg/he4rt"
@@ -172,6 +181,15 @@
                 iconPosition="leading"
             >
                 Redes sociais
+            </x-he4rt::button>
+            <x-he4rt::button
+                href="https://loja.heartdevs.com/he4rt/"
+                variant="outline"
+                block
+                icon="heroicon-s-shopping-bag"
+                iconPosition="leading"
+            >
+                Compre na Loja
             </x-he4rt::button>
             <x-he4rt::button href="/app" variant="outline" block> Área do Usuário </x-he4rt::button>
             <x-he4rt::button
