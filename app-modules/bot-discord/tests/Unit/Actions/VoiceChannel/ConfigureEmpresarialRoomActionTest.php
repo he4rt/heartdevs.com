@@ -41,8 +41,8 @@ it('approves a member privatizing their own /sala room', function (): void {
         ->and($decision->plan)->toBeInstanceOf(EmpresarialOverwritePlan::class)
         ->and($decision->plan->companySlug)->toBe('brd')
         ->and($decision->plan->partnerRoleId)->toBe('role-brd')
-        ->and($decision->plan->denyEveryone)->toBe(['connect', 'speak', 'use_vad', 'send_messages', 'read_message_history'])
-        ->and($decision->plan->allowPartnerRole)->toBe(['connect', 'speak', 'use_vad', 'send_messages', 'read_message_history']);
+        ->and($decision->plan->denyEveryone)->toBe(['view_channel', 'connect', 'speak', 'use_vad', 'send_messages', 'read_message_history'])
+        ->and($decision->plan->allowPartnerRole)->toBe(['view_channel', 'connect', 'speak', 'use_vad', 'send_messages', 'read_message_history']);
 });
 
 it('approves privatizing a room a teammate created (gate is role, not ownership)', function (): void {

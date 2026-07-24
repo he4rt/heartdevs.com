@@ -11,11 +11,12 @@ date: 2026-07-23
 Partner companies (**Empresa Parceira**) need private voice rooms on the guild. We add a
 separate `/sala-empresarial empresa:<slug>` slash command that **converts an existing
 `/sala`-tracked room** into a private one by stamping Discord permission overwrites: `deny`
-`@everyone` and `allow` the selected company's **Partner Role** for `CONNECT`, `SPEAK`,
-`USE_VAD`, `SEND_MESSAGES` and `READ_MESSAGE_HISTORY` (the last two lock the room's built-in
-text chat). `MENTION_EVERYONE` and `VIEW_CHANNEL` are left unchanged by the command — the
-former keeps whatever the category inherits (every `/sala` room already blocks it), the
-latter stays untouched — so the room is visible-but-locked.
+`@everyone` and `allow` the selected company's **Partner Role** for `VIEW_CHANNEL`,
+`CONNECT`, `SPEAK`, `USE_VAD`, `SEND_MESSAGES` and `READ_MESSAGE_HISTORY` (the last two lock
+the room's built-in text chat). `MENTION_EVERYONE` is left unchanged by the command — it
+keeps whatever the category inherits (every `/sala` room already blocks it). Because
+`VIEW_CHANNEL` is denied to `@everyone`, the room is **fully hidden**: non-members cannot see
+it in the channel list nor who is connected.
 
 ## Considered Options
 
@@ -44,6 +45,7 @@ latter stays untouched — so the room is visible-but-locked.
   set the channel's parent/user-limit and relied on category inheritance.
 - Gating is by Partner Role membership, **not** room ownership (unlike `/sala-limite`) — any
   member of the selected company may privatize the room.
-- Because `VIEW_CHANNEL` is not denied, empresarial rooms remain listed to everyone. A
-  non-member already connected at conversion time is not force-disconnected but is muted
-  (`deny SPEAK`/`USE_VAD`) until they leave. Both are accepted trade-offs for the MVP.
+- Because `VIEW_CHANNEL` is denied to `@everyone`, empresarial rooms disappear from the
+  channel list for non-members and their occupant list is hidden. Discord force-disconnects
+  any non-member connected at conversion time (losing view access ejects them from a voice
+  channel) — accepted, and consistent with a fully private room.
