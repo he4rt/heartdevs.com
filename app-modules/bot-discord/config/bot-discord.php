@@ -22,7 +22,6 @@ return [
          */
         'partners' => [
             'brd' => env('HE4RT_PARTNER_BRD_ROLE_ID', '1522599722370465904'),
-            '3p' => env('HE4RT_PARTNER_3P_ROLE_ID', '1405611374998061108'),
         ],
     ],
 ];
