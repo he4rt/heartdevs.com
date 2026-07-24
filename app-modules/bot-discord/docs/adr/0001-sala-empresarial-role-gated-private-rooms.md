@@ -13,8 +13,9 @@ separate `/sala-empresarial empresa:<slug>` slash command that **converts an exi
 `/sala`-tracked room** into a private one by stamping Discord permission overwrites: `deny`
 `@everyone` and `allow` the selected company's **Partner Role** for `CONNECT`, `SPEAK`,
 `USE_VAD`, `SEND_MESSAGES` and `READ_MESSAGE_HISTORY` (the last two lock the room's built-in
-text chat). `MENTION_EVERYONE` stays denied via category
-inheritance and `VIEW_CHANNEL` is left untouched, so the room is visible-but-locked.
+text chat). `MENTION_EVERYONE` and `VIEW_CHANNEL` are left unchanged by the command — the
+former keeps whatever the category inherits (every `/sala` room already blocks it), the
+latter stays untouched — so the room is visible-but-locked.
 
 ## Considered Options
 

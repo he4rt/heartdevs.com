@@ -104,13 +104,15 @@ class SalaEmpresarialCommand extends AbstractSlashCommand
         }
 
         try {
-            /** @var PromiseInterface<Channel> $denyEveryone */
-            $denyEveryone = $voiceChannel->setPermissions($everyoneRole, [], $plan->denyEveryone);
-            await($denyEveryone);
-
+            // Allow the partner role first: if the @everyone deny below fails, the room
+            // stays public rather than fully locked (deny-first would strand everyone out).
             /** @var PromiseInterface<Channel> $allowPartner */
             $allowPartner = $voiceChannel->setPermissions($partnerRole, $plan->allowPartnerRole, []);
             await($allowPartner);
+
+            /** @var PromiseInterface<Channel> $denyEveryone */
+            $denyEveryone = $voiceChannel->setPermissions($everyoneRole, [], $plan->denyEveryone);
+            await($denyEveryone);
 
             $this->message()
                 ->content(sprintf('✅ Sala configurada como privada para a empresa **%s**!', mb_strtoupper($plan->companySlug)))
