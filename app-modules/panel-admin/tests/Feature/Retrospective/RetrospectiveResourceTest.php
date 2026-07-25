@@ -71,8 +71,5 @@ test('publicar pelo painel marca publicando e enfileira o job', function (): voi
 
     expect($retrospective->fresh()->status)->toBe(RetrospectiveStatus::Publishing);
 
-    Bus::assertDispatched(
-        CompileRetrospectiveSnapshot::class,
-        fn (CompileRetrospectiveSnapshot $job): bool => $job->retrospective->is($retrospective),
-    );
+    Bus::assertDispatched(fn (CompileRetrospectiveSnapshot $job): bool => $job->retrospective->is($retrospective));
 });

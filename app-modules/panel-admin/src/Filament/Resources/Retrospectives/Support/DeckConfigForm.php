@@ -104,6 +104,7 @@ final class DeckConfigForm
             if ($source === null) {
                 continue;
             }
+
             if ($ref === '') {
                 continue;
             }

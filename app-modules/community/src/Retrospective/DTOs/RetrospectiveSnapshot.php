@@ -114,9 +114,11 @@ final readonly class RetrospectiveSnapshot
             if (!is_array($slide)) {
                 continue;
             }
+
             if (!isset($slide['kind'])) {
                 continue;
             }
+
             $props = [];
 
             foreach ((array) ($slide['props'] ?? []) as $propKey => $propValue) {
