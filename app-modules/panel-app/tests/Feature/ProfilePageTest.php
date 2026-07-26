@@ -74,19 +74,22 @@ test('profile page loads existing profile data', function (): void {
 
 test('profile page saves all fields', function (): void {
     livewire(ProfilePage::class)
-        ->set('data.nickname', 'Dan')
         ->fillForm([
+            'nickname' => 'Dan',
+            'birthdate' => '1996-02-15',
             'headline' => 'Backend Developer',
             'seniority_level' => 'mid',
             'years_experience' => 5,
             'about' => 'Dev PHP apaixonado por Laravel',
         ])
         ->call('save')
+        ->assertHasNoFormErrors()
         ->assertNotified();
 
     $this->profile->refresh();
 
     expect($this->profile->nickname)->toBe('Dan')
+        ->and($this->profile->birthdate?->format('Y-m-d'))->toBe('1996-02-15')
         ->and($this->profile->headline)->toBe('Backend Developer')
         ->and($this->profile->seniority_level)->toBe(SeniorityLevel::Mid)
         ->and($this->profile->years_experience)->toBe(5)

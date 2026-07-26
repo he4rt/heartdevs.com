@@ -97,6 +97,27 @@ class ProfilePage extends Page
         return $schema
             ->components([
                 Form::make([
+                    Section::make(__('panel-app::profile.sections.personal'))
+                        ->schema([
+                            Grid::make(2)->schema([
+                                TextInput::make('nickname')
+                                    ->label(__('panel-app::profile.fields.nickname'))
+                                    ->placeholder(__('panel-app::profile.placeholders.nickname'))
+                                    ->maxLength(100)
+                                    ->live(onBlur: true)
+                                    ->columnSpan(1),
+
+                                DatePicker::make('birthdate')
+                                    ->label(__('panel-app::profile.fields.birthdate'))
+                                    ->native(condition: false)
+                                    ->displayFormat('d/m/Y')
+                                    ->format('Y-m-d')
+                                    ->minDate(now()->subYears(120))
+                                    ->maxDate(now())
+                                    ->columnSpan(1),
+                            ]),
+                        ]),
+
                     Section::make(__('panel-app::profile.sections.professional'))
                         ->schema([
                             Grid::make(3)->schema([
