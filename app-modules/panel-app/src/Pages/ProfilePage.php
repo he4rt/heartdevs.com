@@ -7,6 +7,7 @@ namespace He4rt\PanelApp\Pages;
 use App\Geo\Support\GeoLocation;
 use BackedEnum;
 use Filament\Actions\Action;
+use Filament\Forms\Components\Builder;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Repeater;
@@ -382,18 +383,21 @@ class ProfilePage extends Page
     public function save(): void
     {
         $formData = $this->form->getState();
-        $formData['skills'] = array_values(array_filter(
-            $formData['skills'] ?? [],
-            fn (array $item) => filled($item['skill_id'] ?? null)
+
+        /** @var list<array<string, mixed>> $skills */
+        $skills = array_values(array_filter(
+            $formData['skills'],
+            fn (array $item): bool => filled($item['skill_id'] ?? null)
                 && filled($item['proficiency'] ?? null)
         ));
-        $formData['skills'][] = [
+        $skills[] = [
             'skill_id' => null,
             'proficiency' => null,
             'years_experience' => null,
         ];
 
-        $this->data['skills'] = $formData['skills'];
+        $formData['skills'] = $skills;
+        $this->data['skills'] = $skills;
 
         $profile = $this->getRecord();
 
@@ -430,7 +434,7 @@ class ProfilePage extends Page
 
         resolve(ToggleAvailability::class)->handle($profile, $available, $startAvailability);
 
-        resolve(SyncProfileSkills::class)->handle($profile, $this->repeaterToSkills($formData['skills'] ?? []));
+        resolve(SyncProfileSkills::class)->handle($profile, $this->repeaterToSkills($skills));
 
         $this->form->saveRelationships();
 
@@ -728,7 +732,7 @@ class ProfilePage extends Page
      * proficiency are both filled in, mirroring the Repeater's own
      * "add" action so the state mutation stays in sync with Livewire.
      */
-    private function addSkillRow(?Repeater $repeater): void
+    private function addSkillRow(Repeater|Builder|null $repeater): void
     {
         if (!$repeater instanceof Repeater) {
             return;
