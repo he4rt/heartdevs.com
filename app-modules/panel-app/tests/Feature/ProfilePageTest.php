@@ -330,7 +330,7 @@ test('profile page mount seeds an empty skill row when profile has no skills', f
         ->and($row['years_experience'] ?? null)->toBeNull();
 });
 
-test('profile page mount does not append an empty row when profile already has skills', function (): void {
+test('profile page mount appends a trailing empty row when profile already has skills', function (): void {
     $php = Skill::query()->where('slug', 'php')->sole();
 
     resolve(SyncProfileSkills::class)->handle($this->profile, [
@@ -339,7 +339,14 @@ test('profile page mount does not append an empty row when profile already has s
 
     $component = livewire(ProfilePage::class);
 
-    expect($component->instance()->data['skills'])->toHaveCount(1);
+    expect($component->instance()->data['skills'])->toHaveCount(2);
+
+    $persistedRow = Arr::first($component->instance()->data['skills']);
+    $trailingRow = Arr::last($component->instance()->data['skills']);
+
+    expect($persistedRow['skill_id'] ?? null)->toBe($php->id)
+        ->and($trailingRow['skill_id'] ?? null)->toBeNull()
+        ->and($trailingRow['proficiency'] ?? null)->toBeNull();
 });
 
 test('skill row does not require proficiency when skill_id is empty', function (): void {

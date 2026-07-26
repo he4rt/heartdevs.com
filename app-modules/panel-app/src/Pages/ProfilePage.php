@@ -71,13 +71,11 @@ class ProfilePage extends Page
 
         $skills = $this->skillsToRepeater($profile);
 
-        if ($skills === []) {
-            $skills[] = [
-                'skill_id' => null,
-                'proficiency' => null,
-                'years_experience' => null,
-            ];
-        }
+        $skills[] = [
+            'skill_id' => null,
+            'proficiency' => null,
+            'years_experience' => null,
+        ];
 
         $this->form->fill([
             'nickname' => $profile->nickname,
