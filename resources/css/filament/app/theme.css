@@ -74,3 +74,8 @@
 .fi-fo-date-time-picker-calendar-day.fi-fo-date-time-picker-calendar-day-today:not(.fi-selected):not(.fi-disabled) {
     @apply font-semibold text-primary-600 ring-1 ring-inset ring-primary-500/50 dark:text-primary-300 dark:ring-primary-400/60;
 }
+
+/* Calendar suffix icon should feel clickable */
+.fi-fo-date-time-picker .fi-input-wrp-suffix {
+    @apply cursor-pointer;
+}

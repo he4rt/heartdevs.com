@@ -24,6 +24,7 @@ use Filament\Schemas\Components\Utilities\Get;
 use Filament\Schemas\Components\Utilities\Set;
 use Filament\Schemas\Schema;
 use Filament\Support\Enums\Width;
+use Filament\Support\Icons\Heroicon;
 use He4rt\Gamification\Character\Models\Character;
 use He4rt\Identity\User\Models\User;
 use He4rt\Profile\Actions\SyncProfileSkills;
@@ -114,6 +115,15 @@ class ProfilePage extends Page
                                     ->format('Y-m-d')
                                     ->minDate(now()->subYears(120))
                                     ->maxDate(now())
+                                    ->suffixIcon(Heroicon::Calendar, isInline: true)
+                                    ->extraAttributes([
+                                        // Suffix icon sits outside the trigger button; open the panel on icon click.
+                                        'x-on:click' => <<<'JS'
+                                            if (! $event.target.closest('.fi-input-wrp-suffix')) return;
+                                            if ($event.target.closest('.fi-input-wrp-actions')) return;
+                                            $el.querySelector('button.fi-fo-date-time-picker-trigger')?.click();
+                                        JS,
+                                    ])
                                     ->columnSpan(1),
                             ]),
                         ]),
