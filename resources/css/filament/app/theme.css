@@ -69,3 +69,8 @@
 .fi-sidebar {
     @apply border-e border-gray-200 dark:border-white/10;
 }
+
+/* Make "today" stand out in date pickers (esp. dark mode) */
+.fi-fo-date-time-picker-calendar-day.fi-fo-date-time-picker-calendar-day-today:not(.fi-selected):not(.fi-disabled) {
+    @apply font-semibold text-primary-600 ring-1 ring-inset ring-primary-500/50 dark:text-primary-300 dark:ring-primary-400/60;
+}
