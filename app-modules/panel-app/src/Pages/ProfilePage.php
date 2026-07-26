@@ -7,7 +7,6 @@ namespace He4rt\PanelApp\Pages;
 use App\Geo\Support\GeoLocation;
 use BackedEnum;
 use Filament\Actions\Action;
-use Filament\Forms\Components\Builder;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Repeater;
@@ -70,14 +69,6 @@ class ProfilePage extends Page
     {
         $profile = $this->getRecord();
 
-        $skills = $this->skillsToRepeater($profile);
-
-        $skills[] = [
-            'skill_id' => null,
-            'proficiency' => null,
-            'years_experience' => null,
-        ];
-
         $this->form->fill([
             'nickname' => $profile->nickname,
             'birthdate' => $profile->birthdate?->format('Y-m-d'),
@@ -86,7 +77,7 @@ class ProfilePage extends Page
             'years_experience' => $profile->years_experience,
             'about' => $profile->about,
             'social_links' => $this->socialLinksToRepeater($profile->social_links),
-            'skills' => $skills,
+            'skills' => $this->skillsToRepeater($profile),
             'available_for_proposals' => $profile->available_for_proposals,
             'start_availability' => $profile->start_availability,
             'expected_salary_min' => $profile->expected_salary_min,
@@ -156,18 +147,14 @@ class ProfilePage extends Page
                                             ->getOptionLabelUsing(fn (?string $value): ?string => $value === null ? null : (Skill::labelsById()[$value] ?? null))
                                             ->optionsLimit(50)
                                             ->distinct()
-                                            ->required(fn (Get $get) => filled($get('proficiency')))
+                                            ->required()
                                             ->columnSpan(1),
 
                                         Select::make('proficiency')
                                             ->label(__('panel-app::profile.fields.proficiency'))
                                             ->options(SkillProficiency::class)
-                                            ->required(fn (Get $get) => filled($get('skill_id')))
-                                            ->columnSpan(1)
-                                            ->live()
-                                            ->afterStateUpdated(function (Select $component): void {
-                                                $this->addSkillRow($component->getParentRepeater());
-                                            }),
+                                            ->required()
+                                            ->columnSpan(1),
 
                                         TextInput::make('years_experience')
                                             ->label(__('panel-app::profile.fields.skill_years_experience'))
@@ -383,22 +370,6 @@ class ProfilePage extends Page
     public function save(): void
     {
         $formData = $this->form->getState();
-
-        /** @var list<array<string, mixed>> $skills */
-        $skills = array_values(array_filter(
-            $formData['skills'],
-            fn (array $item): bool => filled($item['skill_id'] ?? null)
-                && filled($item['proficiency'] ?? null)
-        ));
-        $skills[] = [
-            'skill_id' => null,
-            'proficiency' => null,
-            'years_experience' => null,
-        ];
-
-        $formData['skills'] = $skills;
-        $this->data['skills'] = $skills;
-
         $profile = $this->getRecord();
 
         $socialLinks = $this->repeaterToSocialLinks($formData['social_links'] ?? []);
@@ -434,11 +405,9 @@ class ProfilePage extends Page
 
         resolve(ToggleAvailability::class)->handle($profile, $available, $startAvailability);
 
-        resolve(SyncProfileSkills::class)->handle($profile, $this->repeaterToSkills($skills));
+        resolve(SyncProfileSkills::class)->handle($profile, $this->repeaterToSkills($formData['skills'] ?? []));
 
         $this->form->saveRelationships();
-
-        $this->dispatch('scroll-to-top');
 
         Notification::make()
             ->success()
@@ -725,41 +694,5 @@ class ProfilePage extends Page
         }
 
         return $skills;
-    }
-
-    /**
-     * Append a new empty skill row once the last row's skill and
-     * proficiency are both filled in, mirroring the Repeater's own
-     * "add" action so the state mutation stays in sync with Livewire.
-     */
-    private function addSkillRow(Repeater|Builder|null $repeater): void
-    {
-        if (!$repeater instanceof Repeater) {
-            return;
-        }
-
-        $rows = $repeater->getRawState() ?? [];
-
-        if ($rows === []) {
-            return;
-        }
-
-        $last = $rows[array_key_last($rows)];
-
-        if (blank($last['skill_id'] ?? null) || blank($last['proficiency'] ?? null)) {
-            return;
-        }
-
-        $newUuid = $repeater->generateUuid();
-
-        if ($newUuid) {
-            $rows[$newUuid] = [];
-        } else {
-            $rows[] = [];
-        }
-
-        $repeater->rawState($rows);
-
-        $repeater->getChildSchema($newUuid ?? array_key_last($rows))->fill();
     }
 }
