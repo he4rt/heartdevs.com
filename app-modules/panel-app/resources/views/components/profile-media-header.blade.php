@@ -47,7 +47,7 @@
         @endif
     </div>
 
-    {{-- Bottom section: avatar --}}
+    {{-- Bottom section: avatar + nickname --}}
     <div class="relative z-10 px-6 pt-16 pb-6 sm:pt-18">
         {{-- Avatar (overlapping cover) --}}
         <div
@@ -97,6 +97,21 @@
                     </button>
                 @endif
             </div>
+        </div>
+
+        {{-- Nickname --}}
+        <div class="max-w-md">
+            <label for="nickname" class="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">
+                {{ __('panel-app::profile.fields.nickname') }}
+            </label>
+            <input
+                id="nickname"
+                type="text"
+                wire:model.blur="data.nickname"
+                placeholder="{{ __('panel-app::profile.placeholders.nickname') }}"
+                maxlength="100"
+                class="fi-input block w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 shadow-sm transition-colors focus:border-purple-500 focus:ring-1 focus:ring-purple-500 dark:border-white/10 dark:bg-white/5 dark:text-white dark:focus:border-purple-500"
+            />
         </div>
     </div>
 </div>

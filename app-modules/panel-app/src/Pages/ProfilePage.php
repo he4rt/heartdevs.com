@@ -100,32 +100,22 @@ class ProfilePage extends Page
                 Form::make([
                     Section::make(__('panel-app::profile.sections.personal'))
                         ->schema([
-                            Grid::make(2)->schema([
-                                TextInput::make('nickname')
-                                    ->label(__('panel-app::profile.fields.nickname'))
-                                    ->placeholder(__('panel-app::profile.placeholders.nickname'))
-                                    ->maxLength(100)
-                                    ->live(onBlur: true)
-                                    ->columnSpan(1),
-
-                                DatePicker::make('birthdate')
-                                    ->label(__('panel-app::profile.fields.birthdate'))
-                                    ->native(condition: false)
-                                    ->displayFormat('d/m/Y')
-                                    ->format('Y-m-d')
-                                    ->minDate(now()->subYears(120))
-                                    ->maxDate(now())
-                                    ->suffixIcon(Heroicon::Calendar, isInline: true)
-                                    ->extraAttributes([
-                                        // Suffix icon sits outside the trigger button; open the panel on icon click.
-                                        'x-on:click' => <<<'JS'
-                                            if (! $event.target.closest('.fi-input-wrp-suffix')) return;
-                                            if ($event.target.closest('.fi-input-wrp-actions')) return;
-                                            $el.querySelector('button.fi-fo-date-time-picker-trigger')?.click();
-                                        JS,
-                                    ])
-                                    ->columnSpan(1),
-                            ]),
+                            DatePicker::make('birthdate')
+                                ->label(__('panel-app::profile.fields.birthdate'))
+                                ->native(condition: false)
+                                ->displayFormat('d/m/Y')
+                                ->format('Y-m-d')
+                                ->minDate(now()->subYears(120))
+                                ->maxDate(now())
+                                ->suffixIcon(Heroicon::Calendar, isInline: true)
+                                ->extraAttributes([
+                                    // Suffix icon sits outside the trigger button; open the panel on icon click.
+                                    'x-on:click' => <<<'JS'
+                                        if (! $event.target.closest('.fi-input-wrp-suffix')) return;
+                                        if ($event.target.closest('.fi-input-wrp-actions')) return;
+                                        $el.querySelector('button.fi-fo-date-time-picker-trigger')?.click();
+                                    JS,
+                                ]),
                         ]),
 
                     Section::make(__('panel-app::profile.sections.professional'))
