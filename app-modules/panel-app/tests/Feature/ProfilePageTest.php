@@ -97,9 +97,9 @@ test('profile page saves birthdate from date picker', function (): void {
     livewire(ProfilePage::class)
         ->fillForm([
             'birthdate' => '1996-02-15',
-        ])
+        ], 'birthdateForm')
         ->call('save')
-        ->assertHasNoFormErrors()
+        ->assertHasNoFormErrors([], 'birthdateForm')
         ->assertNotified();
 
     $this->profile->refresh();

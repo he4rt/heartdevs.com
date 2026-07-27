@@ -11,7 +11,8 @@
                     'avatarPreviewUrl' => $this->avatarPreviewUrl,
                     'coverPreviewUrl' => $this->coverPreviewUrl,
                     'initials' => $this->initials,
-                    'name' => auth()->user()->name
+                    'name' => auth()->user()->name,
+                    'birthdateForm' => $this->birthdateForm,
                 ])
 
             {{ $this->form }}

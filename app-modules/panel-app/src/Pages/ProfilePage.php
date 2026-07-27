@@ -46,6 +46,7 @@ use Livewire\WithFileUploads;
 
 /**
  * @property-read Schema $form
+ * @property-read Schema $birthdateForm
  */
 class ProfilePage extends Page
 {
@@ -72,7 +73,6 @@ class ProfilePage extends Page
 
         $this->form->fill([
             'nickname' => $profile->nickname,
-            'birthdate' => $profile->birthdate?->format('Y-m-d'),
             'headline' => $profile->headline,
             'seniority_level' => $profile->seniority_level,
             'years_experience' => $profile->years_experience,
@@ -91,6 +91,34 @@ class ProfilePage extends Page
                 $profile->preferences->employmentTypes,
             ),
         ]);
+
+        $this->birthdateForm->fill([
+            'birthdate' => $profile->birthdate?->format('Y-m-d'),
+        ]);
+    }
+
+    public function birthdateForm(Schema $schema): Schema
+    {
+        return $schema
+            ->components([
+                DatePicker::make('birthdate')
+                    ->label(__('panel-app::profile.fields.birthdate'))
+                    ->native(condition: false)
+                    ->displayFormat('d/m/Y')
+                    ->format('Y-m-d')
+                    ->minDate(now()->subYears(120))
+                    ->maxDate(now())
+                    ->suffixIcon(Heroicon::Calendar, isInline: true)
+                    ->extraAttributes([
+                        // Suffix icon sits outside the trigger button; open the panel on icon click.
+                        'x-on:click' => <<<'JS'
+                            if (! $event.target.closest('.fi-input-wrp-suffix')) return;
+                            if ($event.target.closest('.fi-input-wrp-actions')) return;
+                            $el.querySelector('button.fi-fo-date-time-picker-trigger')?.click();
+                        JS,
+                    ]),
+            ])
+            ->statePath('data');
     }
 
     public function form(Schema $schema): Schema
@@ -98,26 +126,6 @@ class ProfilePage extends Page
         return $schema
             ->components([
                 Form::make([
-                    Section::make(__('panel-app::profile.sections.personal'))
-                        ->schema([
-                            DatePicker::make('birthdate')
-                                ->label(__('panel-app::profile.fields.birthdate'))
-                                ->native(condition: false)
-                                ->displayFormat('d/m/Y')
-                                ->format('Y-m-d')
-                                ->minDate(now()->subYears(120))
-                                ->maxDate(now())
-                                ->suffixIcon(Heroicon::Calendar, isInline: true)
-                                ->extraAttributes([
-                                    // Suffix icon sits outside the trigger button; open the panel on icon click.
-                                    'x-on:click' => <<<'JS'
-                                        if (! $event.target.closest('.fi-input-wrp-suffix')) return;
-                                        if ($event.target.closest('.fi-input-wrp-actions')) return;
-                                        $el.querySelector('button.fi-fo-date-time-picker-trigger')?.click();
-                                    JS,
-                                ]),
-                        ]),
-
                     Section::make(__('panel-app::profile.sections.professional'))
                         ->schema([
                             Grid::make(3)->schema([
@@ -390,6 +398,7 @@ class ProfilePage extends Page
 
     public function save(): void
     {
+        $this->birthdateForm->getState();
         $formData = $this->form->getState();
         $profile = $this->getRecord();
 
