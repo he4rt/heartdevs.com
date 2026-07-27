@@ -76,11 +76,27 @@ test('profile page saves all fields', function (): void {
     livewire(ProfilePage::class)
         ->set('data.nickname', 'Dan')
         ->fillForm([
-            'birthdate' => '1996-02-15',
             'headline' => 'Backend Developer',
             'seniority_level' => 'mid',
             'years_experience' => 5,
             'about' => 'Dev PHP apaixonado por Laravel',
+        ])
+        ->call('save')
+        ->assertNotified();
+
+    $this->profile->refresh();
+
+    expect($this->profile->nickname)->toBe('Dan')
+        ->and($this->profile->headline)->toBe('Backend Developer')
+        ->and($this->profile->seniority_level)->toBe(SeniorityLevel::Mid)
+        ->and($this->profile->years_experience)->toBe(5)
+        ->and($this->profile->about)->toBe('Dev PHP apaixonado por Laravel');
+});
+
+test('profile page saves birthdate from date picker', function (): void {
+    livewire(ProfilePage::class)
+        ->fillForm([
+            'birthdate' => '1996-02-15',
         ])
         ->call('save')
         ->assertHasNoFormErrors()
@@ -88,12 +104,7 @@ test('profile page saves all fields', function (): void {
 
     $this->profile->refresh();
 
-    expect($this->profile->nickname)->toBe('Dan')
-        ->and($this->profile->birthdate?->format('Y-m-d'))->toBe('1996-02-15')
-        ->and($this->profile->headline)->toBe('Backend Developer')
-        ->and($this->profile->seniority_level)->toBe(SeniorityLevel::Mid)
-        ->and($this->profile->years_experience)->toBe(5)
-        ->and($this->profile->about)->toBe('Dev PHP apaixonado por Laravel');
+    expect($this->profile->birthdate?->format('Y-m-d'))->toBe('1996-02-15');
 });
 
 test('profile page saves social links from repeater', function (): void {
