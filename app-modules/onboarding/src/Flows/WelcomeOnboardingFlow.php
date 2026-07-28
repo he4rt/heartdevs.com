@@ -55,6 +55,8 @@ final class WelcomeOnboardingFlow implements OnboardingFlow
         }
     }
 
+    public function createNextStep(Onboarding $onboarding): void {}
+
     public function isComplete(Onboarding $onboarding): bool
     {
         return $onboarding->steps()

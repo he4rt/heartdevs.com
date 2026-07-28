@@ -30,5 +30,9 @@ final class AdvanceStep
         ]);
 
         $flow->advance($onboarding);
+
+        if (!$flow->isComplete($onboarding)) {
+            $flow->createNextStep($onboarding);
+        }
     }
 }

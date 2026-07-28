@@ -2,11 +2,14 @@
 
 declare(strict_types=1);
 
+use He4rt\Identity\ExternalIdentity\Enums\IdentityProvider;
+use He4rt\Identity\ExternalIdentity\Models\ExternalIdentity;
 use He4rt\Identity\User\Models\User;
 use He4rt\Onboarding\Actions\StartOnboarding;
 use He4rt\Onboarding\Enums\OnboardingStatus;
 use He4rt\Onboarding\Enums\OnboardingStepStatus;
 use He4rt\Onboarding\Enums\OnboardingType;
+use He4rt\Onboarding\Exceptions\GateBlockedException;
 use He4rt\Onboarding\Flows\SquadsOnboardingFlow;
 
 test('Squads resolves its flow and declares its steps', function (): void {
@@ -54,4 +57,46 @@ test('advancing the form step leaves the Squads onboarding in progress', functio
         ->and($step->completed_at)->not->toBeNull()
         ->and($onboarding->status)->toBe(OnboardingStatus::InProgress)
         ->and($onboarding->completed_at)->toBeNull();
+});
+
+test('gate blocks git_challenge when github is not linked', function (): void {
+    $user = User::factory()->create();
+    $onboarding = resolve(StartOnboarding::class)->handle(
+        $user,
+        OnboardingType::Squads,
+    );
+
+    $flow = OnboardingType::Squads->handler();
+    $flow->advance($onboarding);
+
+    expect(fn () => $flow->createNextStep($onboarding))
+        ->toThrow(GateBlockedException::class);
+
+    $onboarding->refresh();
+    expect($onboarding->steps()->where('step_key', 'git_challenge')->exists())
+        ->toBeFalse();
+});
+
+test('gate allows git_challenge when github is linked', function (): void {
+    $user = User::factory()->create();
+    $onboarding = resolve(StartOnboarding::class)->handle($user, OnboardingType::Squads);
+
+    // Vincula GitHub
+    ExternalIdentity::factory()->create([
+        'model_type' => $user->getMorphClass(),
+        'model_id' => $user->id,
+        'provider' => IdentityProvider::GitHub,
+        'connected_at' => now(),
+        'disconnected_at' => null,
+    ]);
+
+    $flow = OnboardingType::Squads->handler();
+    $flow->advance($onboarding);
+
+    $flow->createNextStep($onboarding);
+
+    $onboarding->refresh();
+    $step = $onboarding->steps()->where('step_key', 'git_challenge')->sole();
+
+    expect($step->status)->toBe(OnboardingStepStatus::Pending);
 });

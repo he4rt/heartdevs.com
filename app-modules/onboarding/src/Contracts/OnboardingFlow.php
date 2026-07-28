@@ -37,6 +37,12 @@ interface OnboardingFlow
     public function advance(Onboarding $onboarding): void;
 
     /**
+     * Create the next step defined by the flow, if any.
+     * Implementations may gate the creation (e.g. require a linked GitHub account).
+     */
+    public function createNextStep(Onboarding $onboarding): void;
+
+    /**
      * Whether every step of the flow has been completed.
      */
     public function isComplete(Onboarding $onboarding): bool;
