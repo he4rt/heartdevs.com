@@ -174,7 +174,7 @@
         </nav>
 
         {{-- CTAs full-width --}}
-        <div class="flex flex-col gap-3 border-zinc-950/10 pt-6 dark:border-white/10">
+        <div class="flex flex-col gap-3 border-t border-zinc-950/10 pt-6 dark:border-white/10">
             <x-he4rt::button
                 :href="route('social-links', absolute: false)"
                 variant="outline"
