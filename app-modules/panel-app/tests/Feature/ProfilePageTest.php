@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 use Filament\Facades\Filament;
 use Filament\Forms\Components\Select;
+use Filament\Forms\Components\Textarea;
+use Filament\Schemas\JsContent;
 use He4rt\Identity\User\Models\User;
 use He4rt\PanelApp\Pages\ProfilePage;
 use He4rt\Profile\Enums\EmploymentType;
@@ -186,6 +188,21 @@ test('profile page validates about max length', function (): void {
         ])
         ->call('save')
         ->assertHasFormErrors(['about']);
+});
+
+test('profile page shows about character counter in real time', function (): void {
+    livewire(ProfilePage::class)
+        ->fillForm([
+            'about' => 'abc'."\u{1F600}".'def',
+        ])
+        ->assertFormFieldExists('about', function (Textarea $field): bool {
+            expect($field->getHint())->toBeInstanceOf(JsContent::class)
+                ->and($field->getHint()->toHtml())->toContain('Array.from($state')
+                ->toContain('500')
+                ->and($field->getStateBindingModifiers())->toBe(['live', 'blur']);
+
+            return true;
+        });
 });
 
 test('profile page validates headline max length', function (): void {

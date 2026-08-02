@@ -22,6 +22,7 @@ use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Components\Utilities\Get;
 use Filament\Schemas\Components\Utilities\Set;
+use Filament\Schemas\JsContent;
 use Filament\Schemas\Schema;
 use Filament\Support\Enums\Width;
 use He4rt\Gamification\Character\Models\Character;
@@ -123,6 +124,7 @@ class ProfilePage extends Page
                                 Textarea::make('about')
                                     ->label(__('panel-app::profile.fields.about'))
                                     ->placeholder(__('panel-app::profile.placeholders.about'))
+                                    ->hint(JsContent::make('`${Array.from($state ?? "").length}/500`'))
                                     ->maxLength(500)
                                     ->rows(4)
                                     ->live(onBlur: true)
