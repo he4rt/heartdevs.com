@@ -11,6 +11,11 @@ return [
         'minimum_level_for_retro' => env('HE4RT_SEASON_MIN_LEVEL', 3),
     ],
     'server_key' => env('HE4RT_BOT_SECRET', 'he4rt'),
+
+    'features' => [
+        'timeline_pin' => env('HE4RT_FEATURE_TIMELINE_PIN', default: false),
+    ],
+
     'discord' => [
         'token' => env('DISCORD_TOKEN'),
         'voice_xp_interval' => (int) env('HE4RT_DISCORD_VOICE_XP_INTERVAL', 1_200),

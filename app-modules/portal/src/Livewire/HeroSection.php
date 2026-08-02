@@ -78,22 +78,15 @@ final class HeroSection extends Component
             return [];
         }
 
-        /** @param  array<string, mixed>  $metadata */
-        $githubHandle = static function (array $metadata): ?string {
-            $handle = $metadata['username'] ?? $metadata['name'] ?? null;
-
-            return is_string($handle) ? $handle : null;
-        };
-
         return ExternalIdentity::query()
             ->where('provider', IdentityProvider::GitHub)
             ->whereIn('model_id', $activeUserIds)
+            ->whereNotNull('external_account_id')
+            ->whereRaw("external_account_id ~ '^[0-9]+$'")
             ->inRandomOrder()
             ->limit(10)
-            ->pluck('metadata')
-            ->map(fn (array $metadata) => $githubHandle($metadata))
-            ->filter()
-            ->map(fn (string $handle) => sprintf('https://github.com/%s.png', $handle))
+            ->pluck('external_account_id')
+            ->map(fn (string $id) => sprintf('https://avatars.githubusercontent.com/u/%s?v=4', $id))
             ->values()
             ->all();
     }
