@@ -40,6 +40,7 @@ use He4rt\Profile\Enums\StartAvailability;
 use He4rt\Profile\Models\Profile;
 use He4rt\Profile\Models\Skill;
 use Illuminate\Support\Str;
+use Illuminate\Validation\ValidationException;
 use Livewire\Attributes\Computed;
 use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
 use Livewire\WithFileUploads;
@@ -53,6 +54,8 @@ class ProfilePage extends Page
 
     /** @var array<string, mixed>|null */
     public ?array $data = [];
+
+    public ?string $nicknameInput = null;
 
     protected static string|null|BackedEnum $navigationIcon = 'heroicon-o-user-circle';
 
@@ -91,6 +94,8 @@ class ProfilePage extends Page
                 $profile->preferences->employmentTypes,
             ),
         ]);
+
+        $this->nicknameInput = $profile->nickname;
     }
 
     public function form(Schema $schema): Schema
@@ -387,13 +392,14 @@ class ProfilePage extends Page
 
     public function save(): void
     {
+        $this->resetErrorBag();
+
         $formData = $this->form->getState();
         $profile = $this->getRecord();
 
         $socialLinks = $this->repeaterToSocialLinks($formData['social_links'] ?? []);
-
         $dto = UpsertProfileDTO::fromArray([
-            'nickname' => $this->data['nickname'] ?? null,
+            'nickname' => mb_trim($this->nicknameInput ?? ''),
             'birthdate' => $this->data['birthdate'] ?? null,
             'about' => $formData['about'] ?? null,
             'headline' => $formData['headline'] ?? null,
@@ -410,22 +416,30 @@ class ProfilePage extends Page
             ],
         ]);
 
-        resolve(UpsertProfile::class)->handle($profile, $dto);
+        try {
+            resolve(UpsertProfile::class)->handle($profile, $dto);
 
-        $available = (bool) ($formData['available_for_proposals'] ?? false);
-        $rawStartAvailability = $formData['start_availability'] ?? null;
-        $startAvailability = match (true) {
-            $rawStartAvailability instanceof StartAvailability => $rawStartAvailability,
-            is_string($rawStartAvailability) => StartAvailability::from($rawStartAvailability),
-            $available => StartAvailability::Negotiable,
-            default => null,
-        };
+            $available = (bool) ($formData['available_for_proposals'] ?? false);
+            $rawStartAvailability = $formData['start_availability'] ?? null;
+            $startAvailability = match (true) {
+                $rawStartAvailability instanceof StartAvailability => $rawStartAvailability,
+                is_string($rawStartAvailability) => StartAvailability::from($rawStartAvailability),
+                $available => StartAvailability::Negotiable,
+                default => null,
+            };
 
-        resolve(ToggleAvailability::class)->handle($profile, $available, $startAvailability);
+            resolve(ToggleAvailability::class)->handle($profile, $available, $startAvailability);
 
-        resolve(SyncProfileSkills::class)->handle($profile, $this->repeaterToSkills($formData['skills'] ?? []));
+            resolve(SyncProfileSkills::class)->handle($profile, $this->repeaterToSkills($formData['skills'] ?? []));
 
-        $this->form->saveRelationships();
+            $this->form->saveRelationships();
+        } catch (ValidationException $validationException) {
+            $this->surfaceValidationErrors($validationException);
+
+            return;
+        }
+
+        $this->data['nickname'] = mb_trim($this->nicknameInput ?? '') ?: null;
 
         Notification::make()
             ->success()
@@ -569,6 +583,53 @@ class ProfilePage extends Page
     public function removeCover(): void
     {
         auth()->user()->clearMediaCollection('cover');
+    }
+
+    /**
+     * Routes each domain validation error to its input: nickname has a dedicated
+     * field outside the Filament form, Filament fields get an inline error, and
+     * keys with no rendered input (e.g. birthdate) fall back to a danger toast.
+     */
+    private function surfaceValidationErrors(ValidationException $exception): void
+    {
+        $toastMessages = [];
+
+        foreach ($exception->errors() as $field => $messages) {
+            $fieldMessages = array_map(static fn (mixed $message): string => (string) $message, (array) $messages);
+
+            if ($field === 'nickname') {
+                foreach ($fieldMessages as $message) {
+                    $this->addError('nickname', $message);
+                }
+
+                $this->dispatch('scroll-to-nickname');
+
+                continue;
+            }
+
+            $statePath = 'data.'.$field;
+            $hasField = $this->form->getComponentByStatePath($statePath, withAbsoluteStatePath: true) !== null;
+
+            if ($hasField) {
+                foreach ($fieldMessages as $message) {
+                    $this->addError($statePath, $message);
+                }
+
+                continue;
+            }
+
+            $toastMessages = [...$toastMessages, ...$fieldMessages];
+        }
+
+        if ($toastMessages === []) {
+            return;
+        }
+
+        Notification::make()
+            ->danger()
+            ->title(__('panel-app::profile.notifications.validation_error'))
+            ->body(implode(' ', $toastMessages))
+            ->send();
     }
 
     private function replaceMedia(string $collection, TemporaryUploadedFile $file): void

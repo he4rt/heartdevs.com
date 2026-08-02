@@ -108,11 +108,15 @@
                 <input
                     id="nickname"
                     type="text"
-                    wire:model.blur="data.nickname"
+                    wire:model.blur="nicknameInput"
+                    x-on:scroll-to-nickname.window="$el.scrollIntoView({ behavior: 'smooth', block: 'center' }); $el.focus()"
                     placeholder="{{ __('panel-app::profile.placeholders.nickname') }}"
                     maxlength="100"
-                    class="fi-input block w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 shadow-sm transition-colors focus:border-purple-500 focus:ring-1 focus:ring-purple-500 dark:border-white/10 dark:bg-white/5 dark:text-white dark:focus:border-purple-500"
+                    class="fi-input block w-full rounded-lg border {{ $errors->has('nickname') ? 'border-red-500 focus:border-red-500 focus:ring-red-500' : 'border-gray-300 focus:border-purple-500 focus:ring-purple-500' }} bg-white px-3 py-2 text-sm text-gray-900 shadow-sm transition-colors focus:ring-1 dark:border-white/10 dark:bg-white/5 dark:text-white"
                 />
+                @error('nickname')
+                    <p class="mt-1 text-xs text-red-600 dark:text-red-400">{{ $message }}</p>
+                @enderror
             </div>
             <div>
                 <label for="birthdate" class="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">

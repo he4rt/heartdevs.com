@@ -53,4 +53,28 @@ final readonly class UpsertProfileDTO
                 : null,
         );
     }
+
+    /**
+     * Maps the set (non-null) fields to their persistence column names.
+     *
+     * @return array<string, mixed>
+     */
+    public function toDatabase(): array
+    {
+        return array_filter(
+            [
+                'nickname' => $this->nickname,
+                'birthdate' => $this->birthdate,
+                'about' => $this->about,
+                'headline' => $this->headline,
+                'seniority_level' => $this->seniorityLevel,
+                'years_experience' => $this->yearsExperience,
+                'social_links' => $this->socialLinks,
+                'expected_salary_min' => $this->expectedSalaryMin,
+                'expected_salary_max' => $this->expectedSalaryMax,
+                'preferences' => $this->preferences,
+            ],
+            static fn (mixed $value): bool => $value !== null,
+        );
+    }
 }

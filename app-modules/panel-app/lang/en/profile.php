@@ -82,6 +82,7 @@ return [
         'avatar_updated' => 'Photo updated successfully!',
         'cover_updated' => 'Cover updated successfully!',
         'no_profile' => 'Profile not found for this tenant.',
+        'validation_error' => 'We could not save your profile.',
     ],
 
     'page' => [

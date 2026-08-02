@@ -76,7 +76,7 @@ test('profile page loads existing profile data', function (): void {
 
 test('profile page saves all fields', function (): void {
     livewire(ProfilePage::class)
-        ->set('data.nickname', 'Dan')
+        ->set('nicknameInput', 'Dan')
         ->fillForm([
             'headline' => 'Backend Developer',
             'seniority_level' => 'mid',
@@ -212,6 +212,50 @@ test('profile page validates headline max length', function (): void {
         ])
         ->call('save')
         ->assertHasFormErrors(['headline']);
+});
+
+test('profile page shows domain validation inline when the field exists', function (): void {
+    // salary min > max only fails at the domain layer (no mirrored Filament rule),
+    // but expected_salary_max is a real field, so the error must land inline on it.
+    livewire(ProfilePage::class)
+        ->fillForm([
+            'available_for_proposals' => true,
+            'expected_salary_min' => 9_000,
+            'expected_salary_max' => 5_000,
+        ])
+        ->call('save')
+        ->assertHasFormErrors(['expected_salary_max']);
+
+    $this->profile->refresh();
+
+    expect($this->profile->expected_salary_min)->toBeNull()
+        ->and($this->profile->expected_salary_max)->toBeNull();
+});
+
+test('profile page shows nickname validation inline on its dedicated input', function (): void {
+    // nickname lives in its own input (nicknameInput) outside the Filament form,
+    // so its domain error must land inline under the 'nickname' key, not a toast.
+    livewire(ProfilePage::class)
+        ->set('nicknameInput', str_repeat('a', 101))
+        ->call('save')
+        ->assertHasErrors(['nickname']);
+
+    $this->profile->refresh();
+
+    expect($this->profile->nickname)->toBeNull();
+});
+
+test('profile page falls back to a danger toast for fields with no rendered input', function (): void {
+    // birthdate is persisted from $this->data and has no form field to attach to,
+    // so its domain error (a future date fails beforeToday) can only surface as a toast.
+    livewire(ProfilePage::class)
+        ->set('data.birthdate', '2999-12-31')
+        ->call('save')
+        ->assertNotified(__('panel-app::profile.notifications.validation_error'));
+
+    $this->profile->refresh();
+
+    expect($this->profile->birthdate)->toBeNull();
 });
 
 test('profile page does not show account fields', function (): void {
