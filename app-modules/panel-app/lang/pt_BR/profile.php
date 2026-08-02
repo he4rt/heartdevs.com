@@ -71,10 +71,29 @@ return [
         'add_social_link' => 'Adicionar link social',
         'add_work_experience' => 'Adicionar experiência',
         'add_skill' => 'Adicionar skill',
+        'change_avatar' => 'Alterar foto',
+        'change_cover' => 'Alterar capa',
+        'save_avatar' => 'Salvar foto',
+        'save_cover' => 'Salvar capa',
     ],
 
     'notifications' => [
         'saved' => 'Perfil salvo com sucesso!',
+        'avatar_updated' => 'Foto atualizada com sucesso!',
+        'cover_updated' => 'Capa atualizada com sucesso!',
         'no_profile' => 'Perfil não encontrado para este tenant.',
+    ],
+
+    'page' => [
+        'subtitle' => 'Preencha os campos e veja seu card sendo montado em tempo real',
+    ],
+
+    'preview' => [
+        'available' => 'Disponível',
+        'years_experience' => ':count ano de exp.|:count anos de exp.',
+        'skills' => 'Skills',
+        'experience' => 'Experiência',
+        'can_start' => 'Pode iniciar:',
+        'footer' => 'Esse card aparece na listagem de membros e no seu perfil público.',
     ],
 ];

@@ -123,7 +123,7 @@
                         class="inline-flex items-center gap-1 rounded-full bg-green-50 px-2 py-0.5 text-xs font-medium text-green-700 dark:bg-green-500/10 dark:text-green-400"
                     >
                         <span class="h-1.5 w-1.5 rounded-full bg-green-500"></span>
-                        Disponível
+                        {{ __('panel-app::profile.preview.available') }}
                     </span>
                 @endif
             </div>
@@ -165,7 +165,7 @@
                 @endif
                 @if ($yearsExperience)
                     <span class="text-xs text-gray-500 dark:text-gray-400">
-                        {{ $yearsExperience }} {{ $yearsExperience == 1 ? 'ano' : 'anos' }} de exp.
+                        {{ trans_choice('panel-app::profile.preview.years_experience', $yearsExperience, ['count' => $yearsExperience]) }}
                     </span>
                 @endif
             </div>
@@ -180,7 +180,7 @@
         @if ($skills->isNotEmpty())
             <div>
                 <span class="mb-1.5 block text-xs font-semibold tracking-wider text-gray-500 uppercase dark:text-gray-400">
-                    Skills
+                    {{ __('panel-app::profile.preview.skills') }}
                 </span>
                 <div class="flex flex-wrap gap-1.5">
                     @foreach ($skills as $skill)
@@ -203,7 +203,7 @@
             <div>
                 <div class="mb-1 flex items-center justify-between">
                     <span class="text-xs font-semibold tracking-wider text-gray-500 uppercase dark:text-gray-400"
-                        >Experiência</span
+                        >{{ __('panel-app::profile.preview.experience') }}</span
                     >
                     <span class="text-xs text-gray-500 dark:text-gray-400">
                         <span
@@ -246,9 +246,18 @@
                                 : \He4rt\Profile\Enums\SocialPlatform::tryFrom($link['platform']);
                     @endphp
                     @if ($platform)
-                        <span class="text-xs font-medium text-purple-600 dark:text-purple-400">
-                            {{ $platform->getLabel() }} {{ $link['handle'] }}
-                        </span>
+                        <a
+                            href="{{ $platform->getUrl($link['handle']) }}"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            class="inline-flex items-center gap-1 text-xs font-medium text-purple-600 hover:text-purple-800 dark:text-purple-400 dark:hover:text-purple-200 transition-colors"
+                        >
+                            <x-dynamic-component :component="'heroicon-m-'.\Illuminate\Support\Str::kebab($platform->getIcon()->name)" class="h-3.5 w-3.5 shrink-0" />
+                            {{ $platform->getLabel() }}
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 12" class="h-3 w-3 shrink-0" fill="none" stroke="currentColor" stroke-width="1.5">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M2.5 9.5 9.5 2.5M5 2.5h4.5V7" />
+                            </svg>
+                        </a>
                     @endif
                 @endforeach
             </div>
@@ -257,13 +266,13 @@
         {{-- Start availability --}}
         @if ($available && $startAvailability)
             <p class="text-xs font-medium text-green-600 dark:text-green-400">
-                Pode iniciar: {{ $startAvailability->getLabel() }}
+                {{ __('panel-app::profile.preview.can_start') }} {{ $startAvailability->getLabel() }}
             </p>
         @endif
     </div>
 
     {{-- Footer --}}
     <div class="border-t border-gray-100 px-6 py-3 dark:border-white/5">
-        <p class="text-center text-xs text-gray-400 dark:text-gray-500">Esse card aparece na listagem de membros e no seu perfil público.</p>
+        <p class="text-center text-xs text-gray-400 dark:text-gray-500">{{ __('panel-app::profile.preview.footer') }}</p>
     </div>
 </div>

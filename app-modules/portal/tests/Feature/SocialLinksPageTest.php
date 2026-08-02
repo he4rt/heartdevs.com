@@ -18,7 +18,7 @@ it('resolve a rota nomeada social-links para /redes', function (): void {
     expect(route('social-links', absolute: false))->toBe('/redes');
 });
 
-it('renderiza os seis links com rótulos e URLs corretas', function (): void {
+it('renderiza todos os links com rótulos e URLs corretas', function (): void {
     $assertion = get('/redes')
         ->assertOk();
 
@@ -32,8 +32,8 @@ it('renderiza os seis links com rótulos e URLs corretas', function (): void {
 it('abre cada link externo em nova aba com rel seguro', function (): void {
     $html = get('/redes')->getContent();
 
-    expect(mb_substr_count($html, 'target="_blank"'))->toBe(6);
-    expect(mb_substr_count($html, 'rel="noopener noreferrer"'))->toBe(6);
+    expect(mb_substr_count($html, 'target="_blank"'))->toBe(9);
+    expect(mb_substr_count($html, 'rel="noopener noreferrer"'))->toBe(7);
 });
 
 it('exibe o logo He4rt animado', function (): void {
@@ -44,8 +44,8 @@ it('exibe o título e o acento de marca de cada link', function (): void {
     $html = get('/redes')->getContent();
 
     expect($html)->toContain('Escolha seu canal');
-    expect(mb_substr_count($html, '--accent-light:'))->toBe(6);
-    expect(mb_substr_count($html, '--accent-dark:'))->toBe(6);
+    expect(mb_substr_count($html, '--accent-light:'))->toBe(7);
+    expect(mb_substr_count($html, '--accent-dark:'))->toBe(7);
     expect($html)->toContain('--accent-light: #0F172A; --accent-dark: #FFFFFF;')
         ->and($html)->toContain('--accent-light: #111827; --accent-dark: #FFFFFF;');
 });

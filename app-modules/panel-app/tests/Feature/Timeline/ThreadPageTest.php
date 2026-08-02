@@ -10,6 +10,8 @@ use He4rt\PanelApp\Livewire\Timeline\PostShow;
 use He4rt\PanelApp\Livewire\Timeline\ReplyComposer;
 use He4rt\PanelApp\Livewire\Timeline\ThreadReplies;
 use He4rt\PanelApp\Pages\ThreadPage;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Storage;
 
 use function Pest\Livewire\livewire;
 
@@ -75,6 +77,24 @@ test('thread replies shows all replies in chronological order', function (): voi
         ->assertSee('First reply')
         ->assertSee('Second reply')
         ->assertSeeInOrder(['First reply', 'Second reply']);
+});
+
+test('thread replies shows the author avatar when one exists', function (): void {
+    Storage::fake(config()->string('filesystems.default'));
+
+    $replier = User::factory()->create(['name' => 'Replier With Avatar']);
+    $replier->addMedia(UploadedFile::fake()->image('avatar.jpg'))->toMediaCollection('avatar');
+
+    $entry = PostEntry::factory()->create(['content' => 'Reply with avatar']);
+    Timeline::factory()->for($replier)->create([
+        'postable_type' => (new PostEntry)->getMorphClass(),
+        'postable_id' => $entry->id,
+        'root_id' => $this->rootPost->id,
+        'parent_id' => $this->rootPost->id,
+    ]);
+
+    livewire(ThreadReplies::class, ['timelineId' => $this->rootPost->id])
+        ->assertSee($replier->getFirstMediaUrl('avatar'), escape: false);
 });
 
 test('post renders without crashing when its author was deleted', function (): void {

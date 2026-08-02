@@ -14,13 +14,16 @@ use He4rt\Profile\Enums\SkillProficiency;
 use He4rt\Profile\Enums\StartAvailability;
 use He4rt\Profile\Models\Profile;
 use He4rt\Profile\Models\Skill;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Storage;
 
 use function Pest\Livewire\livewire;
 
 beforeEach(function (): void {
     Cache::flush();
+    Storage::fake(config()->string('filesystems.default'));
 
     Http::fake([
         'world.bmbc.cloud/api/countries*' => Http::response([
@@ -299,4 +302,32 @@ test('profile page nulls end_date when currently working here', function (): voi
 
     expect($experience->is_currently_working_here)->toBeTrue()
         ->and($experience->end_date)->toBeNull();
+});
+
+test('profile page uploads avatar through action modal', function (): void {
+    livewire(ProfilePage::class)
+        ->callAction('editAvatar', [
+            'avatar' => UploadedFile::fake()->image('avatar.jpg', 1_200, 1_200),
+        ])
+        ->assertHasNoActionErrors()
+        ->assertNotified();
+
+    $media = $this->user->fresh()->getFirstMedia('avatar');
+
+    expect($media)->not->toBeNull()
+        ->and($media?->collection_name)->toBe('avatar');
+});
+
+test('profile page uploads cover through action modal', function (): void {
+    livewire(ProfilePage::class)
+        ->callAction('editCover', [
+            'cover' => UploadedFile::fake()->image('cover.jpg', 1_800, 600),
+        ])
+        ->assertHasNoActionErrors()
+        ->assertNotified();
+
+    $media = $this->user->fresh()->getFirstMedia('cover');
+
+    expect($media)->not->toBeNull()
+        ->and($media?->collection_name)->toBe('cover');
 });

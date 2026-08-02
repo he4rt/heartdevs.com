@@ -71,10 +71,29 @@ return [
         'add_social_link' => 'Add social link',
         'add_work_experience' => 'Add experience',
         'add_skill' => 'Add skill',
+        'change_avatar' => 'Change photo',
+        'change_cover' => 'Change cover',
+        'save_avatar' => 'Save photo',
+        'save_cover' => 'Save cover',
     ],
 
     'notifications' => [
         'saved' => 'Profile saved successfully!',
+        'avatar_updated' => 'Photo updated successfully!',
+        'cover_updated' => 'Cover updated successfully!',
         'no_profile' => 'Profile not found for this tenant.',
+    ],
+
+    'page' => [
+        'subtitle' => 'Fill in the fields and watch your card being built in real time',
+    ],
+
+    'preview' => [
+        'available' => 'Available',
+        'years_experience' => ':count year of exp.|:count years of exp.',
+        'skills' => 'Skills',
+        'experience' => 'Experience',
+        'can_start' => 'Can start:',
+        'footer' => 'This card appears in the member listing and on your public profile.',
     ],
 ];
