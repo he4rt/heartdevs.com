@@ -87,4 +87,13 @@ return [
     'page' => [
         'subtitle' => 'Fill in the fields and watch your card being built in real time',
     ],
+
+    'preview' => [
+        'available' => 'Available',
+        'years_experience' => ':count year of exp.|:count years of exp.',
+        'skills' => 'Skills',
+        'experience' => 'Experience',
+        'can_start' => 'Can start:',
+        'footer' => 'This card appears in the member listing and on your public profile.',
+    ],
 ];
