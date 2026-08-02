@@ -87,4 +87,13 @@ return [
     'page' => [
         'subtitle' => 'Preencha os campos e veja seu card sendo montado em tempo real',
     ],
+
+    'preview' => [
+        'available' => 'Disponível',
+        'years_experience' => ':count ano de exp.|:count anos de exp.',
+        'skills' => 'Skills',
+        'experience' => 'Experiência',
+        'can_start' => 'Pode iniciar:',
+        'footer' => 'Esse card aparece na listagem de membros e no seu perfil público.',
+    ],
 ];

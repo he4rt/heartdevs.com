@@ -31,7 +31,7 @@
         </span>
     </div>
 
-    @if ($isOwner)
+    @if ($isOwner && config('he4rt.features.timeline_pin'))
         <button
             type="button"
             wire:click="togglePin"
