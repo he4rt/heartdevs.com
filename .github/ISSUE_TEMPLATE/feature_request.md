@@ -1,6 +1,6 @@
 ---
 name: Feature request
-about: Descreve uma feature a ser construída, com critérios de aceite e testes
+about: Descreva uma feature a ser construída, com critérios de aceite e testes
 title: ''
 labels: type:feat
 assignees: ''
@@ -8,12 +8,12 @@ type: Feature
 
 ---
 
-##  Parent
+## Parent
 <!-- Issue/épico ao qual esta feature pertence. Ex: #342. Caso não tenha deixa em branco -->
 #
 
 
-##  O que construir
+## O que construir
 <!-- O que precisa ser implementado, de forma objetiva. Cite Actions, papéis, transações
      e o comportamento esperado. Uma linha de contexto + os pontos técnicos. -->
 -
@@ -21,7 +21,7 @@ type: Feature
 -
 
 
-##  Critérios de aceite
+## Critérios de aceite
 <!-- Condições verificáveis para considerar a feature pronta. Cada item deve ser testável. -->
 - [ ]
 - [ ]
@@ -33,6 +33,7 @@ type: Feature
 ### BDD
 <!-- Cenários em Gherkin (pt). Cubra o caso feliz e as regras/invariantes importantes. -->
 ```gherkin
+# language: pt
 
 Funcionalidade: <nome da funcionalidade>
 
