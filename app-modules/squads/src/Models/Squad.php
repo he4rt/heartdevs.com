@@ -6,12 +6,14 @@ namespace He4rt\Squads\Models;
 
 use Carbon\CarbonInterface;
 use He4rt\Squads\Database\Factories\SquadFactory;
+use He4rt\Squads\Enums\SquadRole;
 use He4rt\Squads\Enums\SquadStatus;
 use Illuminate\Database\Eloquent\Attributes\Table;
 use Illuminate\Database\Eloquent\Attributes\UseFactory;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 /**
  * @property string $id
@@ -36,6 +38,18 @@ final class Squad extends Model
         'objective',
         'status',
     ];
+
+    /**
+     * The squad's captain seat, derived from the pivot — there is no
+     * denormalized `captain_id`. A vacant seat resolves to `null`.
+     *
+     * @return HasOne<SquadMember, $this>
+     */
+    public function captain(): HasOne
+    {
+        return $this->hasOne(SquadMember::class)
+            ->where('role', SquadRole::Captain);
+    }
 
     /**
      * @return array<string, string>

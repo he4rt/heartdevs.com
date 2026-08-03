@@ -42,3 +42,17 @@ test('the same user cannot hold two rows in the same squad', function (): void {
         'user_id' => $user->id,
     ]);
 })->throws(QueryException::class);
+
+test('a squad cannot hold two captains', function (): void {
+    $squad = Squad::factory()->create();
+
+    SquadMember::factory()->create([
+        'squad_id' => $squad->id,
+        'role' => SquadRole::Captain,
+    ]);
+
+    SquadMember::factory()->create([
+        'squad_id' => $squad->id,
+        'role' => SquadRole::Captain,
+    ]);
+})->throws(QueryException::class);

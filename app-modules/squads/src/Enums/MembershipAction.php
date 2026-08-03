@@ -10,4 +10,5 @@ enum MembershipAction: string
     case Leave = 'leave';
     case Promote = 'promote';
     case Demote = 'demote';
+    case CaptainAssigned = 'captain_assigned';
 }
