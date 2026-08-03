@@ -10,15 +10,11 @@ route-list: ## List all registered routes
 
 .PHONY: pint
 pint: ## Run Pint code style fixer
-	@export XDEBUG_MODE=off
-	@$(CURDIR)/vendor/bin/pint --parallel
-	@unset XDEBUG_MODE
+	@XDEBUG_MODE=off $(CURDIR)/vendor/bin/pint --parallel
 
 .PHONY: test-pint
 test-pint: ## Run Pint code style fixer in test mode
-	@export XDEBUG_MODE=off
-	@$(CURDIR)/vendor/bin/pint --test --parallel
-	@unset XDEBUG_MODE=off
+	@XDEBUG_MODE=off $(CURDIR)/vendor/bin/pint --test --parallel
 
 .PHONY: rector
 rector: ## Run Rector
@@ -37,7 +33,7 @@ p: phpstan ## Alias for phpstan
 
 .PHONY: test-phpstan
 test-phpstan: ## Run PHPStan in test mode
-	@$(CURDIR)/vendor/bin/phpstan analyse --ansi
+	@$(CURDIR)/vendor/bin/phpstan analyse --ansi --memory-limit=2G
 
 .PHONY: format
 format: rector pint ## Run Pint and Rector and try to fixes the source code
@@ -76,7 +72,7 @@ env-up: ## Start the development environment
 	@docker compose --file docker-compose.yml up --detach
 
 .PHONY: env-down
-env-down: ## Start the development environment
+env-down: ## Stop the development environment (removes images and volumes)
 	@docker compose --file docker-compose.yml down --rmi all --volumes
 
 .PHONY: dev
