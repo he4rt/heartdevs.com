@@ -9,8 +9,8 @@ type: Feature
 ---
 
 ## Parent
-<!-- Issue/épico ao qual esta feature pertence. Ex: #342. Caso não tenha deixa em branco -->
-#
+<!-- Issue/épico ao qual esta feature pertence. Ex: #342. Caso não tenha, deixe em branco -->
+
 
 
 ## O que construir
