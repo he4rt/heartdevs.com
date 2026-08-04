@@ -10,6 +10,7 @@ use He4rt\Onboarding\Contracts\OnboardingStepDTO;
 use He4rt\Onboarding\DTOs\WelcomeFormDTO;
 use He4rt\Onboarding\Enums\OnboardingStatus;
 use He4rt\Onboarding\Enums\OnboardingStepStatus;
+use He4rt\Onboarding\Enums\OnboardingType;
 use He4rt\Onboarding\Exceptions\GateBlockedException;
 use He4rt\Onboarding\Models\Onboarding;
 use InvalidArgumentException;
@@ -29,10 +30,12 @@ final class SquadsOnboardingFlow implements OnboardingFlow
         };
     }
 
+    /**
+     * @return list<OnboardingType>
+     */
     public function prerequisites(): array
     {
-        // TO-DO: #351
-        return [];
+        return [OnboardingType::Welcome];
     }
 
     public function advance(Onboarding $onboarding): void

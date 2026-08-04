@@ -11,17 +11,19 @@ use He4rt\Onboarding\Enums\OnboardingStepStatus;
 use He4rt\Onboarding\Enums\OnboardingType;
 use He4rt\Onboarding\Exceptions\GateBlockedException;
 use He4rt\Onboarding\Flows\SquadsOnboardingFlow;
+use He4rt\Onboarding\Models\Onboarding;
 
 test('Squads resolves its flow and declares its steps', function (): void {
     $flow = OnboardingType::Squads->handler();
 
     expect($flow)->toBeInstanceOf(SquadsOnboardingFlow::class)
         ->and($flow->steps())->toBe(['form', 'git_challenge'])
-        ->and($flow->prerequisites())->toBeEmpty();
+        ->and($flow->prerequisites())->toBe([OnboardingType::Welcome]);
 });
 
 test('starting Squads creates an in-progress onboarding with a pending form step', function (): void {
     $user = User::factory()->create();
+    Onboarding::factory()->for($user)->completed()->create();
 
     $onboarding = resolve(StartOnboarding::class)->handle(
         $user,
@@ -41,8 +43,11 @@ test('starting Squads creates an in-progress onboarding with a pending form step
 });
 
 test('advancing the form step leaves the Squads onboarding in progress', function (): void {
+    $user = User::factory()->create();
+    Onboarding::factory()->for($user)->completed()->create();
+
     $onboarding = resolve(StartOnboarding::class)->handle(
-        User::factory()->create(),
+        $user,
         OnboardingType::Squads,
     );
 
@@ -61,6 +66,8 @@ test('advancing the form step leaves the Squads onboarding in progress', functio
 
 test('gate blocks git_challenge when github is not linked', function (): void {
     $user = User::factory()->create();
+    Onboarding::factory()->for($user)->completed()->create();
+
     $onboarding = resolve(StartOnboarding::class)->handle(
         $user,
         OnboardingType::Squads,
@@ -79,6 +86,8 @@ test('gate blocks git_challenge when github is not linked', function (): void {
 
 test('gate allows git_challenge when github is linked', function (): void {
     $user = User::factory()->create();
+    Onboarding::factory()->for($user)->completed()->create();
+
     $onboarding = resolve(StartOnboarding::class)->handle($user, OnboardingType::Squads);
 
     // Vincula GitHub

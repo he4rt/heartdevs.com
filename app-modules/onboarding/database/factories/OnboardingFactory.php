@@ -25,4 +25,12 @@ final class OnboardingFactory extends Factory
             'paused_at' => null,
         ];
     }
+
+    public function completed(): static
+    {
+        return $this->state([
+            'status' => OnboardingStatus::Completed,
+            'completed_at' => now(),
+        ]);
+    }
 }
