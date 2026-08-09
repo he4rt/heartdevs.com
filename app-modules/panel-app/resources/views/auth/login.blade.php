@@ -72,7 +72,7 @@
                     <img
                         src="{{ asset('images/logo.svg') }}"
                         alt="He4rt Developers"
-                        class="h-12 w-auto text-purple-500"
+                        class="h-12 w-auto dark:brightness-0 dark:invert"
                     />
                 </div>
 
