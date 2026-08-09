@@ -24,7 +24,6 @@ use Filament\Schemas\Components\Utilities\Get;
 use Filament\Schemas\Components\Utilities\Set;
 use Filament\Schemas\Schema;
 use Filament\Support\Enums\Width;
-use Filament\Support\Icons\Heroicon;
 use He4rt\Gamification\Character\Models\Character;
 use He4rt\Identity\User\Models\User;
 use He4rt\Profile\Actions\SyncProfileSkills;
@@ -54,6 +53,9 @@ class ProfilePage extends Page
 
     /** @var array<string, mixed>|null */
     public ?array $data = [];
+
+    /** @var array<string, mixed>|null */
+    public ?array $birthdateData = [];
 
     protected static string|null|BackedEnum $navigationIcon = 'heroicon-o-user-circle';
 
@@ -107,18 +109,11 @@ class ProfilePage extends Page
                     ->displayFormat('d/m/Y')
                     ->format('Y-m-d')
                     ->minDate(now()->subYears(120))
-                    ->maxDate(now())
-                    ->suffixIcon(Heroicon::Calendar, isInline: true)
-                    ->extraAttributes([
-                        // Suffix icon sits outside the trigger button; open the panel on icon click.
-                        'x-on:click' => <<<'JS'
-                            if (! $event.target.closest('.fi-input-wrp-suffix')) return;
-                            if ($event.target.closest('.fi-input-wrp-actions')) return;
-                            $el.querySelector('button.fi-fo-date-time-picker-trigger')?.click();
-                        JS,
-                    ]),
+                    ->maxDate(now()),
             ])
-            ->statePath('data');
+            // Own state path: fill() replaces the whole path, so sharing `data` with
+            // the main form wiped headline/seniority/etc. on mount.
+            ->statePath('birthdateData');
     }
 
     public function form(Schema $schema): Schema
@@ -398,7 +393,7 @@ class ProfilePage extends Page
 
     public function save(): void
     {
-        $this->birthdateForm->getState();
+        $birthdateData = $this->birthdateForm->getState();
         $formData = $this->form->getState();
         $profile = $this->getRecord();
 
@@ -406,7 +401,7 @@ class ProfilePage extends Page
 
         $dto = UpsertProfileDTO::fromArray([
             'nickname' => $this->data['nickname'] ?? null,
-            'birthdate' => $this->data['birthdate'] ?? null,
+            'birthdate' => $birthdateData['birthdate'] ?? null,
             'about' => $formData['about'] ?? null,
             'headline' => $formData['headline'] ?? null,
             'seniority_level' => $formData['seniority_level'] ?? null,
