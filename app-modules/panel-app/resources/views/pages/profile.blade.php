@@ -38,4 +38,14 @@
             </div>
         </div>
     </div>
+    <script>
+        document.addEventListener('livewire:init', () => {
+            Livewire.on('scroll-to-top', () => {
+                window.scrollTo({
+                    top: 0,
+                    behavior: 'smooth',
+                });
+            });
+        });
+    </script>
 </x-filament::page>

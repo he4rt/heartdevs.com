@@ -145,49 +145,69 @@
 
     {{-- Merge Confirmation Modal --}}
     @if ($showMergeModal && $mergeTarget)
-        <div
-            x-data="{ open: true }"
-            x-show="open"
-            x-transition
-            class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4"
-        >
+        @teleport('body')
             <div
-                class="w-full max-w-sm rounded-xl border border-gray-200 bg-white p-6 shadow-2xl dark:border-gray-700 dark:bg-gray-900"
+                x-data="{ open: true }"
+                x-show="open"
+                x-transition
+                @keydown.escape.window="$wire.cancelMerge()"
+                role="dialog"
+                aria-modal="true"
+                class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4"
             >
-                <div class="mb-4 flex items-center gap-2">
-                    <x-filament::icon icon="heroicon-o-link" class="h-5 w-5 text-amber-400" />
-                    <h3 class="text-base font-semibold text-gray-900 dark:text-white">Conta existente encontrada</h3>
-                </div>
+                <div
+                    class="w-full max-w-sm rounded-xl border border-gray-200 bg-white p-6 shadow-2xl dark:border-gray-700 dark:bg-gray-900"
+                >
+                    <div class="mb-4 flex items-center gap-2">
+                        <x-filament::icon icon="heroicon-o-link" class="h-5 w-5 text-amber-400" />
+                        <h3 class="text-base font-semibold text-gray-900 dark:text-white">Conta existente encontrada</h3>
+                    </div>
 
-                <p class="mb-4 text-sm text-gray-600 dark:text-gray-300">Já existe uma conta vinculada a esse provedor:</p>
+                    <p class="mb-4 text-sm text-gray-600 dark:text-gray-300">Já existe uma conta vinculada a esse provedor:</p>
+
+                    <div
+                        class="mb-4 rounded-lg border border-gray-200 bg-gray-50 p-3 dark:border-gray-700/60 dark:bg-gray-800/50"
+                    >
+                        <div class="flex items-center justify-between">
+                            <span class="text-sm font-medium text-gray-900 dark:text-white"
+                                >@ {{ $mergeTarget['username'] }}</span
+                            >
+                            <span class="text-xs text-gray-500 dark:text-gray-400">{{ $mergeTarget['created_at'] }}</span>
+                        </div>
+                        @if ($mergeTarget['messages_count'] > 0)
+                            <div class="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                                {{ number_format($mergeTarget['messages_count']) }} mensagens
+                            </div>
+                        @endif
+                    </div>
 
                 <div
-                    class="mb-4 rounded-lg border border-gray-200 bg-gray-50 p-3 dark:border-gray-700/60 dark:bg-gray-800/50"
+                    class="mb-5 flex items-start gap-3 rounded-lg border border-amber-300/40 bg-amber-50/80 p-3 dark:border-amber-500/20 dark:bg-amber-500/5"
                 >
-                    <div class="flex items-center justify-between">
-                        <span class="text-sm font-medium text-gray-900 dark:text-white"
-                            >@ {{ $mergeTarget['username'] }}</span
-                        >
-                        <span class="text-xs text-gray-500 dark:text-gray-400">{{ $mergeTarget['created_at'] }}</span>
+                    <x-filament::icon
+                        icon="heroicon-o-exclamation-triangle"
+                        class="mt-0.5 h-4 w-4 shrink-0 text-amber-600 dark:text-amber-400"
+                    />
+                    <div>
+                        <p class="text-sm font-medium text-amber-800 dark:text-amber-300">
+                            A conta @ {{ $mergeTarget['username'] }} será mantida como principal.
+                        </p>
+                        <p class="mt-1 text-xs text-amber-700/80 dark:text-amber-400/70">
+                            Sua conta atual @ {{ auth()->user()->username }} será absorvida e removida. O histórico já associado à conta mantida será preservado. Ao finalizar, você será autenticado novamente na conta @ {{ $mergeTarget['username'] }}.
+                        </p>
                     </div>
-                    @if ($mergeTarget['messages_count'] > 0)
-                        <div class="mt-1 text-xs text-gray-500 dark:text-gray-400">
-                            {{ number_format($mergeTarget['messages_count']) }} mensagens
-                        </div>
-                    @endif
                 </div>
 
-                <p class="mb-5 text-xs text-gray-500 dark:text-gray-400">Ao unificar, sua conta atual será absorvida por essa conta e você será relogado automaticamente.</p>
-
-                <div class="flex gap-2">
-                    <x-filament::button wire:click="confirmMerge" color="warning" class="flex-1">
-                        Unificar
-                    </x-filament::button>
-                    <x-filament::button wire:click="cancelMerge" color="gray" class="flex-1">
-                        Cancelar
-                    </x-filament::button>
+                    <div class="flex gap-2">
+                        <x-filament::button wire:click="confirmMerge" color="warning" class="flex-1">
+                            Unificar
+                        </x-filament::button>
+                        <x-filament::button wire:click="cancelMerge" color="gray" class="flex-1">
+                            Cancelar
+                        </x-filament::button>
+                    </div>
                 </div>
             </div>
-        </div>
+        @endteleport
     @endif
 </div>

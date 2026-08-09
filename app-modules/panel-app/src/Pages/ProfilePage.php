@@ -22,6 +22,7 @@ use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Components\Utilities\Get;
 use Filament\Schemas\Components\Utilities\Set;
+use Filament\Schemas\JsContent;
 use Filament\Schemas\Schema;
 use Filament\Support\Enums\Width;
 use He4rt\Gamification\Character\Models\Character;
@@ -147,6 +148,7 @@ class ProfilePage extends Page
                                 Textarea::make('about')
                                     ->label(__('panel-app::profile.fields.about'))
                                     ->placeholder(__('panel-app::profile.placeholders.about'))
+                                    ->hint(JsContent::make('`${Array.from($state ?? "").length}/500`'))
                                     ->maxLength(500)
                                     ->rows(4)
                                     ->live(onBlur: true)
@@ -171,13 +173,21 @@ class ProfilePage extends Page
                                             ->getOptionLabelUsing(fn (?string $value): ?string => $value === null ? null : (Skill::labelsById()[$value] ?? null))
                                             ->optionsLimit(50)
                                             ->distinct()
-                                            ->required()
+                                            ->required(fn (Get $get): bool => filled($get('proficiency')))
                                             ->columnSpan(1),
 
                                         Select::make('proficiency')
                                             ->label(__('panel-app::profile.fields.proficiency'))
                                             ->options(SkillProficiency::class)
-                                            ->required()
+                                            ->required(fn (Get $get): bool => filled($get('skill_id')))
+                                            ->live()
+                                            ->afterStateUpdated(function (Get $get, Select $component): void {
+                                                if (blank($get('skill_id')) || blank($get('proficiency'))) {
+                                                    return;
+                                                }
+
+                                                $this->appendEmptyRepeaterItemIfLastRow($component);
+                                            })
                                             ->columnSpan(1),
 
                                         TextInput::make('years_experience')
@@ -245,13 +255,21 @@ class ProfilePage extends Page
                                         Select::make('platform')
                                             ->label(__('panel-app::profile.fields.platform'))
                                             ->options(SocialPlatform::class)
-                                            ->required()
+                                            ->required(fn (Get $get): bool => filled($get('handle')))
                                             ->columnSpan(1),
 
                                         TextInput::make('handle')
                                             ->label(__('panel-app::profile.fields.handle'))
                                             ->placeholder(__('panel-app::profile.placeholders.handle'))
-                                            ->required()
+                                            ->required(fn (Get $get): bool => filled($get('platform')))
+                                            ->live(onBlur: true)
+                                            ->afterStateUpdated(function (Get $get, TextInput $component): void {
+                                                if (blank($get('platform')) || blank($get('handle'))) {
+                                                    return;
+                                                }
+
+                                                $this->appendEmptyRepeaterItemIfLastRow($component);
+                                            })
                                             ->columnSpan(1),
                                     ]),
                                 ])
@@ -325,18 +343,18 @@ class ProfilePage extends Page
                                     Grid::make(2)->schema([
                                         TextInput::make('company_name')
                                             ->label(__('panel-app::profile.fields.company_name'))
-                                            ->required()
+                                            ->required(fn (Get $get): bool => filled($get('position')) || filled($get('description')) || filled($get('start_date')))
                                             ->maxLength(255)
                                             ->columnSpan(1),
                                         TextInput::make('position')
                                             ->label(__('panel-app::profile.fields.position'))
-                                            ->required()
+                                            ->required(fn (Get $get): bool => filled($get('company_name')) || filled($get('description')) || filled($get('start_date')))
                                             ->maxLength(255)
                                             ->columnSpan(1),
                                     ]),
                                     Textarea::make('description')
                                         ->label(__('panel-app::profile.fields.experience_description'))
-                                        ->required()
+                                        ->required(fn (Get $get): bool => filled($get('company_name')) || filled($get('position')) || filled($get('start_date')))
                                         ->rows(3)
                                         ->maxLength(2_000)
                                         ->columnSpanFull(),
@@ -347,7 +365,7 @@ class ProfilePage extends Page
                                             ->displayFormat('M Y')
                                             ->format('Y-m-d')
                                             ->maxDate(now())
-                                            ->required()
+                                            ->required(fn (Get $get): bool => filled($get('company_name')) || filled($get('position')) || filled($get('description')))
                                             ->columnSpan(1),
                                         DatePicker::make('end_date')
                                             ->label(__('panel-app::profile.fields.end_date'))
@@ -356,7 +374,7 @@ class ProfilePage extends Page
                                             ->format('Y-m-d')
                                             ->maxDate(now())
                                             ->afterOrEqual('start_date')
-                                            ->required(fn (Get $get): bool => !$get('is_currently_working_here'))
+                                            ->required(fn (Get $get): bool => !$get('is_currently_working_here') && (filled($get('company_name')) || filled($get('position')) || filled($get('description')) || filled($get('start_date'))))
                                             ->hidden(fn (Get $get): bool => (bool) $get('is_currently_working_here'))
                                             ->columnSpan(1),
                                     ]),
@@ -631,10 +649,18 @@ class ProfilePage extends Page
 
     /**
      * @param  array<string, mixed>  $data
-     * @return array<string, mixed>
+     * @return array<string, mixed>|null null tells Filament to skip creating/saving this row
      */
-    private function normalizeWorkExperienceData(array $data): array
+    private function normalizeWorkExperienceData(array $data): ?array
     {
+        $keyFields = ['company_name', 'position', 'description', 'start_date'];
+
+        $hasAnyData = collect($keyFields)->contains(fn (string $field): bool => filled($data[$field] ?? null));
+
+        if (!$hasAnyData) {
+            return null;
+        }
+
         if ($data['is_currently_working_here'] ?? false) {
             $data['end_date'] = null;
         }
@@ -660,6 +686,53 @@ class ProfilePage extends Page
         return $skills;
     }
 
+    private function appendEmptyRepeaterItemIfLastRow(Select|TextInput $component): void
+    {
+        $repeater = $component->getParentRepeater();
+
+        if (!$repeater instanceof Repeater) {
+            return;
+        }
+
+        $items = $repeater->getRawState();
+
+        if (!is_array($items) || blank($items)) {
+            return;
+        }
+
+        $repeaterPath = $repeater->getStatePath();
+        $componentPath = $component->getStatePath();
+
+        if ($repeaterPath === null || $componentPath === null) {
+            return;
+        }
+
+        $currentKey = explode('.', mb_substr($componentPath, mb_strlen($repeaterPath) + 1))[0];
+
+        if ($currentKey !== array_key_last($items)) {
+            return;
+        }
+
+        $newUuid = $repeater->generateUuid();
+
+        if ($newUuid) {
+            $items[$newUuid] = [];
+        } else {
+            $items[] = [];
+        }
+
+        $repeater->rawState($items);
+
+        $childSchema = $repeater->getChildSchema($newUuid ?? array_key_last($items));
+
+        if ($childSchema instanceof Schema) {
+            $childSchema->fill();
+        }
+
+        $repeater->collapsed(condition: false, shouldMakeComponentCollapsible: false);
+        $repeater->callAfterStateUpdated();
+    }
+
     /**
      * Skill ids already chosen in the other rows of the skills repeater, so the
      * search can omit them and each skill is only pickable once.
@@ -669,12 +742,16 @@ class ProfilePage extends Page
     private function skillIdsInSiblingRows(Select $component): array
     {
         $repeater = $component->getParentRepeater();
-        if ($repeater === null) {
+
+        if (!$repeater instanceof Repeater) {
             return [];
         }
 
-        /** @var array<int|string, array<string, mixed>> $rows */
         $rows = $repeater->getRawState();
+
+        if (!is_array($rows)) {
+            return [];
+        }
 
         return array_values(
             collect($rows)

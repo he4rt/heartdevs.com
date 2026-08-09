@@ -14,5 +14,14 @@ return [
         'presentation' => env('HE4RT_PRESENTATION_ROLE_ID', '546150872397119491'),
         'comite_delas' => env('HE4RT_COMITE_DELAS_ROLE_ID', '1014311739397001288'),
         'he4rt_delas' => env('HE4RT_DELAS_ROLE_ID', '1018009963903328308'),
+
+        /*
+         * Empresa Parceira registry: partner-company slug => Discord Partner Role id.
+         * Each entry enables `/sala-empresarial empresa:<slug>` for that company.
+         * Onboarding a new partner is one env + one line here — no code change.
+         */
+        'partners' => [
+            'brd' => env('HE4RT_PARTNER_BRD_ROLE_ID', '1522599722370465904'),
+        ],
     ],
 ];
