@@ -153,3 +153,25 @@ test('it includes messages sent during the selected end minute', function (): vo
         ->assertSet('loaded', value: true)
         ->assertSet('participants.0.username', 'last-minute-user');
 });
+
+test('it excludes messages sent after the selected end minute', function (): void {
+    $identity = ExternalIdentity::factory()->create([
+        'provider' => IdentityProvider::Discord,
+        'external_account_id' => '445',
+        'metadata' => ['username' => 'too-late-user'],
+    ]);
+
+    Message::factory()->create([
+        'external_identity_id' => $identity->id,
+        'channel_id' => 'meeting-channel',
+        'sent_at' => Date::parse('2026-08-03 23:41:00', 'America/Sao_Paulo')->utc(),
+    ]);
+
+    livewire(MeetingShowcasePage::class)
+        ->set('channelId', 'meeting-channel')
+        ->set('startDate', '2026-08-03T22:00')
+        ->set('endDate', '2026-08-03T23:40')
+        ->call('loadParticipants')
+        ->assertSet('loaded', value: true)
+        ->assertSet('participants', []);
+});
