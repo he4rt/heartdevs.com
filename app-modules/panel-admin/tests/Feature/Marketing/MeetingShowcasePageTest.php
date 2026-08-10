@@ -56,6 +56,14 @@ test('it loads Discord participant data from every supported metadata shape', fu
             'channel_id' => 'meeting-channel',
             'sent_at' => Date::parse('2026-08-03 22:30:00', 'America/Sao_Paulo')->utc(),
         ]);
+
+        if ((string) $accountId === '111') {
+            Message::factory()->create([
+                'external_identity_id' => $identity->id,
+                'channel_id' => 'meeting-channel',
+                'sent_at' => Date::parse('2026-08-03 22:31:00', 'America/Sao_Paulo')->utc(),
+            ]);
+        }
     }
 
     $linkedUser = User::factory()->create([
@@ -111,6 +119,7 @@ test('it loads Discord participant data from every supported metadata shape', fu
             'username' => 'root-user',
             'global_name' => 'Root User',
             'avatar_url' => 'https://cdn.example.com/root.png',
+            'total_messages' => 2,
         ])
         ->and($participantsByAccount->get('222'))->toMatchArray([
             'username' => 'profile-user',
