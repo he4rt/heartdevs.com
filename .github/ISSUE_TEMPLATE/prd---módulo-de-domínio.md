@@ -94,6 +94,9 @@ assignees: ''
 ## Subtarefas
 <!-- Quebra em tracer bullets, em ordem de dependência. Vincule as tasks criadas no git aqui. -->
 
+## Dúvidas/Incertezas
+<!-- Liste aqui todas as dúvidas que ainda ficaram em aberto ou ainda precisam de maiores esclarecimentos  -->
+
 ---
 
 ### 🔗 Referências
