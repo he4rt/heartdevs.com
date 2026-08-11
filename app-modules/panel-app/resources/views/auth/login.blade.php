@@ -76,7 +76,7 @@
                     />
                 </div>
 
-                <h2 class="mb-1 text-xl font-semibold text-white">Entrar</h2>
+                <h2 class="mb-1 text-xl font-semibold dark:text-white text-dark">Entrar</h2>
                 <p class="mb-6 text-sm text-zinc-400">Acesse sua conta He4rt Developers</p>
 
                 {{-- OAuth --}}
@@ -146,7 +146,7 @@
                         <div class="w-full border-t border-zinc-800"></div>
                     </div>
                     <div class="relative flex justify-center text-xs uppercase">
-                        <span class="bg-gray-950 px-3 text-zinc-500">ou</span>
+                        <span class="bg-white px-3 text-zinc-500 dark:bg-gray-950 dark:text-zinc-400">ou</span>
                     </div>
                 </div>
 
