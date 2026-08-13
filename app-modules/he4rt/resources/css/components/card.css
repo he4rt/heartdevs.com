@@ -17,6 +17,18 @@
     @apply hover:border-primary transition-all duration-500 hover:scale-[1.02];
 }
 
+.hp-card-cover {
+    @apply -mx-6 -mt-6 mb-1 overflow-hidden;
+    @apply rounded-t-lg;
+    @apply aspect-[3/1];
+    @apply bg-elevation-surface/32;
+}
+
+.hp-card-cover img {
+    @apply h-full w-full;
+    @apply object-cover;
+}
+
 .hp-card-icon {
     @apply flex w-full items-start justify-start;
 }

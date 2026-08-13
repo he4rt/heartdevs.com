@@ -7,6 +7,7 @@ namespace He4rt\PanelAdmin;
 use Filament\Navigation\NavigationBuilder;
 use Filament\Navigation\NavigationItem;
 use Filament\Panel;
+use He4rt\PanelAdmin\Agenda\AgendaCluster;
 use He4rt\PanelAdmin\Discord\DiscordCluster;
 use He4rt\PanelAdmin\Filament\Resources\ExternalIdentities\ExternalIdentityResource;
 use He4rt\PanelAdmin\Github\GithubCluster;
@@ -38,11 +39,16 @@ class PanelAdminServiceProvider extends ServiceProvider
                     TwitchCluster::class,
                     GithubCluster::class,
                     DiscordCluster::class,
+                    AgendaCluster::class,
                 ])
                 ->navigation($this->buildNavigation(...))
                 ->resources([
                     ExternalIdentityResource::class,
                 ])
+                ->discoverResources(
+                    in: __DIR__.'/Agenda/Resources',
+                    for: 'He4rt\\PanelAdmin\\Agenda\\Resources',
+                )
                 ->discoverResources(
                     in: __DIR__.'/Moderation/Resources',
                     for: 'He4rt\\PanelAdmin\\Moderation\\Resources',
@@ -111,6 +117,7 @@ class PanelAdminServiceProvider extends ServiceProvider
             $requestPath->contains('marketing/') => $this->marketingNavigation($builder),
             $requestPath->contains('twitch/') => $this->twitchNavigation($builder),
             $requestPath->contains('discord/') => $this->discordNavigation($builder),
+            $requestPath->contains('agenda/') => $this->agendaNavigation($builder),
             default => $this->defaultNavigation($builder),
         };
 
@@ -126,6 +133,7 @@ class PanelAdminServiceProvider extends ServiceProvider
             ...GithubCluster::getNavigationItems(),
             ...ExternalIdentityResource::getNavigationItems(),
             ...DiscordCluster::getNavigationItems(),
+            ...AgendaCluster::getNavigationItems(),
         ]);
     }
 
@@ -171,5 +179,16 @@ class PanelAdminServiceProvider extends ServiceProvider
                 ->url(Dashboard::getUrl()),
 
         ])->groups(resolve(TwitchCluster::class)->getCachedSubNavigation());
+    }
+
+    private function agendaNavigation(NavigationBuilder $builder): NavigationBuilder
+    {
+        return $builder->items([
+            NavigationItem::make(__('panel-admin::agenda.navigation.back_to_admin'))
+                ->sort(0)
+                ->icon('heroicon-o-arrow-left')
+                ->url(Dashboard::getUrl()),
+
+        ])->groups(resolve(AgendaCluster::class)->getCachedSubNavigation());
     }
 }

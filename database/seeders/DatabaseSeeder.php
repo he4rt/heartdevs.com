@@ -16,6 +16,7 @@ final class DatabaseSeeder extends Seeder
     {
         $this->call([
             BaseSeeder::class,
+            UpcomingEventSeeder::class,
         ]);
     }
 }
