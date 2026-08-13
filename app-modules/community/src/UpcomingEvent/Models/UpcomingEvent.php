@@ -24,6 +24,8 @@ use Spatie\MediaLibrary\InteractsWithMedia;
  * @property CarbonInterface|null $event_at
  * @property string|null $location
  * @property string|null $external_url
+ * @property string|null $host_name
+ * @property string|null $host_role
  * @property bool $is_active
  * @property bool $skip_next_occurrence
  * @property int $sort_order

@@ -44,13 +44,6 @@
 @endphp
 
 <{{ $tag }} {{ $attributes->merge(['class' => $classes])->merge($linkAttrs) }}>
-    {{-- Slot da Capa --}}
-    @isset($cover)
-        <div {{ $cover->attributes->class('hp-card-cover') }}>
-            {{ $cover }}
-        </div>
-    @endisset
-
     {{-- Slot do Ícone --}}
     @isset($icon)
         <div {{ $icon->attributes->class('hp-card-icon') }}>

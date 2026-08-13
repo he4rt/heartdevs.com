@@ -14,6 +14,7 @@ use function Pest\Livewire\livewire;
 
 beforeEach(function (): void {
     $this->withoutVite();
+    app()->setLocale('pt_BR');
 });
 
 it('exibe apenas eventos ativos com próxima ocorrência futura, ordenados por data', function (): void {
@@ -71,13 +72,78 @@ it('ordena os eventos pela próxima ocorrência', function (): void {
         ->and($events->pluck('event.title')->values()->all())->toBe(['Aula de Inglês', 'Encontro de Pub']);
 });
 
-it('não renderiza a seção quando não há eventos futuros', function (): void {
+it('renderiza a mensagem de fallback quando não há eventos futuros', function (): void {
     UpcomingEvent::factory()->oneOff()->create([
         'event_at' => CarbonImmutable::now()->subDay(),
     ]);
 
     livewire(UpcomingEventsSection::class)
-        ->assertDontSee('Próximos eventos da comunidade');
+        ->assertSee('Nenhum evento agendado no momento')
+        ->assertDontSee('events-carousel');
+});
+
+it('renderiza badge de data e placeholder He4rt quando o evento não tem capa', function (): void {
+    UpcomingEvent::factory()->create([
+        'title' => 'Aula de Inglês',
+        'week_day' => 6,
+        'time' => '15:00',
+    ]);
+
+    livewire(UpcomingEventsSection::class)
+        ->assertSee('Aula de Inglês')
+        ->assertSee('landingLogo.svg', escape: false)
+        ->assertSee('Online')
+        ->assertSee('id="agenda"', escape: false);
+});
+
+it('marca eventos recorrentes com badge e padrão de recorrência', function (): void {
+    UpcomingEvent::factory()->create([
+        'title' => 'Reunião Semanal',
+        'week_day' => 1,
+        'time' => '21:00',
+    ]);
+
+    livewire(UpcomingEventsSection::class)
+        ->assertSee('Recorrente')
+        ->assertSee('Toda Seg')
+        ->assertSee('21:00');
+});
+
+it('exibe badge Presencial quando o evento tem local', function (): void {
+    UpcomingEvent::factory()->oneOff()->create([
+        'title' => 'Encontro de Pub',
+        'category' => UpcomingEventCategory::Networking,
+        'event_at' => CarbonImmutable::now()->addDays(10),
+        'location' => 'Pub',
+    ]);
+
+    livewire(UpcomingEventsSection::class)
+        ->assertSee('Presencial')
+        ->assertDontSee('Online');
+});
+
+it('renderiza a linha do anfitrião com nome e cargo no card', function (): void {
+    UpcomingEvent::factory()->create([
+        'title' => 'Reunião Semanal',
+        'week_day' => 1,
+        'time' => '21:00',
+        'host_name' => 'Fernando',
+        'host_role' => 'Mentor',
+    ]);
+
+    livewire(UpcomingEventsSection::class)
+        ->assertSee('Fernando')
+        ->assertSee('Mentor');
+});
+
+it('renderiza o fallback quando não há eventos futuros', function (): void {
+    UpcomingEvent::factory()->oneOff()->create([
+        'event_at' => CarbonImmutable::now()->subDay(),
+    ]);
+
+    livewire(UpcomingEventsSection::class)
+        ->assertSee('Nenhum evento agendado no momento')
+        ->assertDontSee('events-carousel');
 });
 
 it('inclui dados estruturados JSON-LD na home quando existem eventos', function (): void {
