@@ -20,6 +20,7 @@ return [
         'category' => 'Categoria',
         'cover' => 'Imagem de capa',
         'cover_hint' => 'Imagem exibida no topo do card do evento na landing. Formato paisagem recomendado.',
+        'cover_dimension_hint' => 'A imagem será cortada e redimensionada automaticamente para 1200×400 px (proporção 3:1).',
         'week_day' => 'Dia da semana',
         'time' => 'Horário',
         'event_at' => 'Data do evento',

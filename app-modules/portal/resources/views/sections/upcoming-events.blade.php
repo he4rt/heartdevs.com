@@ -132,22 +132,15 @@
                                 <div class="relative h-40 shrink-0 overflow-hidden sm:h-44">
                                     <div class="absolute inset-0 h-full w-full">
                                         @if ($cover)
-                                            <div
-                                                class="h-full w-full"
-                                                x-data="{ shown: false }"
-                                                x-intersect.threshold.20.once="shown = true"
-                                            >
-                                                <img
-                                                    src="{{ $cover->getUrl() }}"
-                                                    alt="Capa do evento {{ $event->title }}"
-                                                    @if ($cover->width) width="{{ $cover->width }}" @endif
-                                                    @if ($cover->height) height="{{ $cover->height }}" @endif
-                                                    loading="lazy"
-                                                    fetchpriority="low"
-                                                    class="h-full w-full object-cover opacity-100 transition-opacity duration-1000 ease-in"
-                                                    :class="shown ? 'opacity-100' : 'opacity-0'"
-                                                />
-                                            </div>
+                                            <img
+                                                src="{{ $cover->getUrl() }}"
+                                                alt="Capa do evento {{ $event->title }}"
+                                                @if ($cover->width) width="{{ $cover->width }}" @endif
+                                                @if ($cover->height) height="{{ $cover->height }}" @endif
+                                                loading="lazy"
+                                                fetchpriority="low"
+                                                class="h-full w-full object-cover"
+                                            />
                                         @else
                                             <div
                                                 class="from-primary/12 to-primary/4 flex h-full w-full items-center justify-center bg-gradient-to-br"

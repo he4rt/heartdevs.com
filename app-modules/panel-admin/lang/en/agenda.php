@@ -20,6 +20,7 @@ return [
         'category' => 'Category',
         'cover' => 'Cover image',
         'cover_hint' => 'Image shown on top of the event card on the landing page. Landscape format recommended.',
+        'cover_dimension_hint' => 'The image will be cropped and resized to 1200×400 px (3:1 ratio) automatically.',
         'week_day' => 'Week day',
         'time' => 'Time',
         'event_at' => 'Event date',
