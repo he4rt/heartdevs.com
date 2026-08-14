@@ -50,7 +50,8 @@ class UpcomingEventForm
                                     ->options(collect(range(0, 6))->mapWithKeys(
                                         fn (int $day) => [$day => __('panel-admin::agenda.weekdays.'.$day)]
                                     ))
-                                    ->requiredWithout('event_at'),
+                                    ->requiredWithout('event_at')
+                                    ->prohibits('event_at'),
 
                                 TimePicker::make('time')
                                     ->label(__('panel-admin::agenda.form.time'))
@@ -58,7 +59,8 @@ class UpcomingEventForm
                                     ->native(condition: false)
                                     ->seconds(condition: false)
                                     ->format('H:i')
-                                    ->requiredWithout('event_at'),
+                                    ->requiredWithout('event_at')
+                                    ->prohibits('event_at'),
                             ])
                             ->columns(1),
 
@@ -69,7 +71,8 @@ class UpcomingEventForm
                                     ->hint(__('panel-admin::agenda.form.event_at_hint'))
                                     ->native(condition: false)
                                     ->seconds(condition: false)
-                                    ->requiredWithout('week_day'),
+                                    ->requiredWithout('week_day')
+                                    ->prohibits(['week_day', 'time']),
 
                                 TextInput::make('location')
                                     ->label(__('panel-admin::agenda.form.location'))

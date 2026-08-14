@@ -9,6 +9,10 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 
 uses(RefreshDatabase::class);
 
+afterEach(function (): void {
+    CarbonImmutable::setTestNow();
+});
+
 it('calcula a próxima ocorrência de um evento recorrente semanal', function (): void {
     CarbonImmutable::setTestNow(CarbonImmutable::parse('2026-08-12 10:00:00'));
 

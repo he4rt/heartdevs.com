@@ -19,6 +19,7 @@ class UpcomingEventsTable
     {
         return $table
             ->defaultSort('sort_order')
+            ->reorderable('sort_order')
             ->columns([
                 TextColumn::make('title')
                     ->label(__('panel-admin::agenda.form.title'))
