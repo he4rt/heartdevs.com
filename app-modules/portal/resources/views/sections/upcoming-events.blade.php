@@ -6,7 +6,7 @@
     <section class="hp-section" id="agenda">
         @if ($events->isNotEmpty())
             <script type="application/ld+json">
-                {!! json_encode($this->schemaOrg, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR) !!}
+                {!! json_encode($this->schemaOrg, JSON_HEX_TAG | JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR) !!}
             </script>
         @endif
 

@@ -54,6 +54,60 @@ it('pula uma semana quando skip_next_occurrence está ativo', function (): void 
     expect($event->nextOccurrence()->toDateTimeString())->toBe('2026-08-19 19:00:00');
 });
 
+it('consome o skip após a ocorrência pulada ter passado', function (): void {
+    CarbonImmutable::setTestNow(CarbonImmutable::parse('2026-08-12 10:00:00'));
+
+    $event = UpcomingEvent::factory()->create([
+        'week_day' => 3,
+        'time' => '19:00',
+        'skip_next_occurrence' => true,
+    ]);
+
+    expect($event->skip_until->toDateTimeString())->toBe('2026-08-12 19:00:00');
+
+    CarbonImmutable::setTestNow(CarbonImmutable::parse('2026-08-13 10:00:00'));
+
+    expect($event->nextOccurrence()->toDateTimeString())->toBe('2026-08-19 19:00:00');
+});
+
+it('limpa o skip na próxima gravação após a ocorrência ter passado', function (): void {
+    CarbonImmutable::setTestNow(CarbonImmutable::parse('2026-08-12 10:00:00'));
+
+    $event = UpcomingEvent::factory()->create([
+        'week_day' => 3,
+        'time' => '19:00',
+        'skip_next_occurrence' => true,
+    ]);
+
+    CarbonImmutable::setTestNow(CarbonImmutable::parse('2026-08-13 10:00:00'));
+
+    $event->save();
+
+    expect($event->skip_next_occurrence)->toBeFalse();
+    expect($event->skip_until)->toBeNull();
+});
+
+it('rearma o skip para uma nova ocorrência ao ativar novamente', function (): void {
+    CarbonImmutable::setTestNow(CarbonImmutable::parse('2026-08-12 10:00:00'));
+
+    $event = UpcomingEvent::factory()->create([
+        'week_day' => 3,
+        'time' => '19:00',
+        'skip_next_occurrence' => true,
+    ]);
+
+    CarbonImmutable::setTestNow(CarbonImmutable::parse('2026-08-13 10:00:00'));
+
+    $event->save();
+
+    CarbonImmutable::setTestNow(CarbonImmutable::parse('2026-08-20 10:00:00'));
+
+    $event->update(['skip_next_occurrence' => true]);
+
+    expect($event->skip_until->toDateTimeString())->toBe('2026-08-26 19:00:00');
+    expect($event->nextOccurrence()->toDateTimeString())->toBe('2026-09-02 19:00:00');
+});
+
 it('usa event_at para eventos pontuais', function (): void {
     $event = UpcomingEvent::factory()->oneOff()->create([
         'category' => UpcomingEventCategory::Networking,

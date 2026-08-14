@@ -7,6 +7,8 @@ namespace He4rt\Community\UpcomingEvent\Models;
 use Carbon\CarbonInterface;
 use He4rt\Community\Database\Factories\UpcomingEventFactory;
 use He4rt\Community\UpcomingEvent\Enums\UpcomingEventCategory;
+use He4rt\Community\UpcomingEvent\Observers\UpcomingEventObserver;
+use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Attributes\Table;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -28,10 +30,12 @@ use Spatie\MediaLibrary\InteractsWithMedia;
  * @property string|null $host_role
  * @property bool $is_active
  * @property bool $skip_next_occurrence
+ * @property CarbonInterface|null $skip_until
  * @property int $sort_order
  * @property CarbonInterface|null $created_at
  * @property CarbonInterface|null $updated_at
  */
+#[ObservedBy(classes: UpcomingEventObserver::class)]
 #[Table(name: 'upcoming_events')]
 final class UpcomingEvent extends Model implements HasMedia
 {
@@ -59,7 +63,7 @@ final class UpcomingEvent extends Model implements HasMedia
 
         $occurrence = $this->resolveRecurringOccurrence();
 
-        if ($this->skip_next_occurrence) {
+        if ($this->skip_until instanceof CarbonInterface && $occurrence->lessThanOrEqualTo($this->skip_until)) {
             return $occurrence->addWeek();
         }
 
@@ -78,6 +82,7 @@ final class UpcomingEvent extends Model implements HasMedia
             'week_day' => 'integer',
             'is_active' => 'boolean',
             'skip_next_occurrence' => 'boolean',
+            'skip_until' => 'datetime',
             'event_at' => 'datetime',
             'sort_order' => 'integer',
         ];

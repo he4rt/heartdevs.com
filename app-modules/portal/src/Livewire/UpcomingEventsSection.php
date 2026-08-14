@@ -20,11 +20,7 @@ final class UpcomingEventsSection extends Component
     #[Computed]
     public function upcomingEvents(): Collection
     {
-        if (!app()->isProduction()) {
-            return $this->fetchUpcomingEvents();
-        }
-
-        return Cache::remember('portal:upcoming-events', now()->addHour(), fn () => $this->fetchUpcomingEvents());
+        return $this->fetchUpcomingEvents();
     }
 
     /**
@@ -75,13 +71,30 @@ final class UpcomingEventsSection extends Component
     }
 
     /**
+     * @return Collection<int, UpcomingEvent>
+     */
+    private function activeEvents(): Collection
+    {
+        $query = fn (): Collection => UpcomingEvent::query()
+            ->where('is_active', operator: true)
+            ->orderBy('sort_order')
+            ->get();
+
+        if (!app()->isProduction()) {
+            return $query();
+        }
+
+        return Cache::remember('portal:upcoming-events', now()->addHour(), $query);
+    }
+
+    /**
      * @return Collection<int, array{event: UpcomingEvent, occurrence: CarbonInterface}>
      */
     private function fetchUpcomingEvents(): Collection
     {
         $events = [];
 
-        foreach (UpcomingEvent::query()->where('is_active', operator: true)->orderBy('sort_order')->get() as $event) {
+        foreach ($this->activeEvents() as $event) {
             $occurrence = $event->nextOccurrence();
             if ($occurrence === null) {
                 continue;
