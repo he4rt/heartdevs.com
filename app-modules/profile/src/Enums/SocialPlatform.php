@@ -45,6 +45,18 @@ enum SocialPlatform: string implements HasIcon, HasLabel
         };
     }
 
+    public function getBrandIcon(): string
+    {
+        return match ($this) {
+            self::Instagram => 'fab-instagram',
+            self::Twitter => 'fab-x-twitter',
+            self::Website => 'fas-globe',
+            self::YouTube => 'fab-youtube',
+            self::Bluesky => 'fab-bluesky',
+            self::LinkedIn => 'fab-linkedin',
+        };
+    }
+
     public function getUrl(string $handle): string
     {
         if (str_starts_with($handle, 'http://') || str_starts_with($handle, 'https://')) {

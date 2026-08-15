@@ -252,7 +252,7 @@
                             rel="noopener noreferrer"
                             class="inline-flex items-center gap-1 text-xs font-medium text-purple-600 hover:text-purple-800 dark:text-purple-400 dark:hover:text-purple-200 transition-colors"
                         >
-                            <x-dynamic-component :component="'heroicon-m-'.\Illuminate\Support\Str::kebab($platform->getIcon()->name)" class="h-3.5 w-3.5 shrink-0" />
+                            <x-filament::icon :icon="$platform->getBrandIcon()" class="h-3.5 w-3.5 shrink-0" />
                             {{ $platform->getLabel() }}
                             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 12" class="h-3 w-3 shrink-0" fill="none" stroke="currentColor" stroke-width="1.5">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M2.5 9.5 9.5 2.5M5 2.5h4.5V7" />
