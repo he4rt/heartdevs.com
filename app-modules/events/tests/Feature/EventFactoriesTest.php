@@ -71,7 +71,7 @@ test('when creating a qr token via factory, then it is linked to an enrollment w
 
     expect($token->id)->not->toBeNull()
         ->and($token->enrollment_id)->not->toBeNull()
-        ->and(mb_strlen($token->token))->toBe(64);
+        ->and($token->token)->toHaveLength(64);
 });
 
 test('when an event has an enrollment policy, then it is accessible via the relationship', function (): void {
