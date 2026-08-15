@@ -23,6 +23,7 @@ class BaseSeeder extends Seeder
                 'name' => 'Daniel Reis',
                 'email' => 'admin@admin.com',
                 'password' => Hash::make('admin'),
+                'role' => 'staff',
             ]);
 
         Character::factory()

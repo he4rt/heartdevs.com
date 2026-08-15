@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace He4rt\Identity\User\Models;
 
 use App\Concerns\HasAddress;
+use App\Enums\FilamentPanel;
 use Carbon\CarbonInterface;
 use Filament\Models\Contracts\FilamentUser;
 use Filament\Models\Contracts\HasName;
@@ -12,15 +13,21 @@ use Filament\Panel;
 use He4rt\Gamification\Character\Models\Character;
 use He4rt\Identity\Database\Factories\UserFactory;
 use He4rt\Identity\ExternalIdentity\Models\ExternalIdentity;
+use He4rt\Identity\User\Enums\Role;
 use He4rt\Identity\User\Observers\UserObserver;
+use He4rt\Profile\Models\Profile;
+use He4rt\Profile\Models\ProfileSkill;
+use He4rt\Profile\Models\WorkExperience;
 use Illuminate\Database\Eloquent\Attributes\Hidden;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Attributes\Table;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Spatie\MediaLibrary\HasMedia;
@@ -32,12 +39,14 @@ use Spatie\MediaLibrary\InteractsWithMedia;
  * @property string $username
  * @property string|null $email
  * @property bool $is_donator
+ * @property Role $role
  * @property CarbonInterface|null $suspended_until
  * @property CarbonInterface|null $banned_at
  * @property CarbonInterface|null $first_login_at
  * @property string|null $remember_token
  * @property CarbonInterface|null $created_at
  * @property CarbonInterface|null $updated_at
+ * @property CarbonInterface|null $deleted_at
  */
 #[ObservedBy(classes: UserObserver::class)]
 #[Table(name: 'users')]
@@ -50,10 +59,34 @@ final class User extends Authenticatable implements FilamentUser, HasMedia, HasN
     use HasUuids;
     use InteractsWithMedia;
     use Notifiable;
+    use SoftDeletes;
+
+    /**
+     * @return list<string>
+     */
+    public static function configuredAdminUsernames(): array
+    {
+        $usernames = array_map(
+            mb_trim(...),
+            explode(',', config()->string('he4rt.admins')),
+        );
+
+        return array_values(array_filter($usernames, static fn (string $username): bool => $username !== ''));
+    }
 
     public function isAdmin(): bool
     {
-        return in_array($this->username, str(config('he4rt.admins'))->explode(',')->toArray(), strict: true);
+        return in_array($this->username, self::configuredAdminUsernames(), strict: true);
+    }
+
+    public function isStaff(): bool
+    {
+        return $this->hasRole(Role::Staff);
+    }
+
+    public function hasRole(Role $role): bool
+    {
+        return $this->role === $role;
     }
 
     /**
@@ -70,6 +103,44 @@ final class User extends Authenticatable implements FilamentUser, HasMedia, HasN
     public function character(): HasOne
     {
         return $this->hasOne(Character::class);
+    }
+
+    /**
+     * @return HasOne<Profile, $this>
+     */
+    public function profile(): HasOne
+    {
+        return $this->hasOne(Profile::class);
+    }
+
+    /**
+     * @return HasManyThrough<WorkExperience, Profile, $this>
+     */
+    public function workExperiences(): HasManyThrough
+    {
+        return $this->hasManyThrough(
+            WorkExperience::class,
+            Profile::class,
+            'user_id',
+            'profile_id',
+            'id',
+            'id',
+        );
+    }
+
+    /**
+     * @return HasManyThrough<ProfileSkill, Profile, $this>
+     */
+    public function profileSkills(): HasManyThrough
+    {
+        return $this->hasManyThrough(
+            ProfileSkill::class,
+            Profile::class,
+            'user_id',
+            'profile_id',
+            'id',
+            'id',
+        );
     }
 
     public function getFilamentName(): string
@@ -91,7 +162,7 @@ final class User extends Authenticatable implements FilamentUser, HasMedia, HasN
     public function canAccessPanel(Panel $panel): bool
     {
         return match ($panel->getId()) {
-            'admin' => app()->isProduction() ? $this->isAdmin() : true,
+            FilamentPanel::Admin->value => $this->isAdmin() || $this->role->canViewUsers(),
             default => true
         };
     }
@@ -131,6 +202,7 @@ final class User extends Authenticatable implements FilamentUser, HasMedia, HasN
         return [
             'is_donator' => 'boolean',
             'password' => 'hashed',
+            'role' => Role::class,
             'suspended_until' => 'datetime',
             'banned_at' => 'datetime',
             'first_login_at' => 'datetime',

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace He4rt\Identity\User\Observers;
 
+use He4rt\Identity\User\Enums\Role;
 use He4rt\Identity\User\Models\User;
 use He4rt\Profile\Models\Profile;
 
@@ -14,6 +15,10 @@ class UserObserver
         if (blank($user->username)) {
             $user->username = str($user->name)->snake()->toString();
         }
+
+        if ($this->isConfiguredAdmin($user->username) && !in_array($user->role, [Role::Staff, Role::Compliance], strict: true)) {
+            $user->role = Role::Staff;
+        }
     }
 
     public function created(User $user): void
@@ -21,7 +26,7 @@ class UserObserver
         $this->ensureProfileExists($user);
     }
 
-    public function deleted(User $user): void
+    public function forceDeleted(User $user): void
     {
         $user->address()->delete();
     }
@@ -34,5 +39,10 @@ class UserObserver
     private function ensureProfileExists(User $user): void
     {
         Profile::ensureExists((string) $user->getKey());
+    }
+
+    private function isConfiguredAdmin(string $username): bool
+    {
+        return in_array($username, User::configuredAdminUsernames(), strict: true);
     }
 }

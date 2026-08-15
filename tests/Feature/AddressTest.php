@@ -30,7 +30,7 @@ it('user sem endereço retorna null', function (): void {
     expect($user->address)->toBeNull();
 });
 
-it('deletar user deleta address via cascade', function (): void {
+it('soft delete do user preserva o address', function (): void {
     $user = User::factory()->create();
 
     Address::factory()->forUser($user)->create();
@@ -38,6 +38,18 @@ it('deletar user deleta address via cascade', function (): void {
     expect(Address::query()->where('addressable_id', $user->id)->exists())->toBeTrue();
 
     $user->delete();
+
+    expect(Address::query()->where('addressable_id', $user->id)->exists())->toBeTrue();
+});
+
+it('force delete do user deleta address via cascade', function (): void {
+    $user = User::factory()->create();
+
+    Address::factory()->forUser($user)->create();
+
+    expect(Address::query()->where('addressable_id', $user->id)->exists())->toBeTrue();
+
+    $user->forceDelete();
 
     expect(Address::query()->where('addressable_id', $user->id)->exists())->toBeFalse();
 });
