@@ -266,6 +266,11 @@ class ProfilePage extends Page
                                             ->allowHtml()
                                             ->required(fn (Get $get): bool => filled($get('handle')))
                                             ->live()
+                                            ->afterStateUpdated(static function (Get $get, Set $set): void {
+                                                if (blank($get('platform'))) {
+                                                    $set('handle', null);
+                                                }
+                                            })
                                             ->columnSpan(1),
 
                                         TextInput::make('handle')
