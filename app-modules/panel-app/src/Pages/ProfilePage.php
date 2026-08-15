@@ -256,11 +256,13 @@ class ProfilePage extends Page
                                             ->label(__('panel-app::profile.fields.platform'))
                                             ->options(SocialPlatform::class)
                                             ->required(fn (Get $get): bool => filled($get('handle')))
+                                            ->live()
                                             ->columnSpan(1),
 
                                         TextInput::make('handle')
                                             ->label(__('panel-app::profile.fields.handle'))
                                             ->placeholder(__('panel-app::profile.placeholders.handle'))
+                                            ->disabled(fn (Get $get): bool => blank($get('platform')))
                                             ->required(fn (Get $get): bool => filled($get('platform')))
                                             ->live(onBlur: true)
                                             ->afterStateUpdated(function (Get $get, TextInput $component): void {
