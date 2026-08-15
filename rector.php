@@ -2,10 +2,13 @@
 
 declare(strict_types=1);
 
+use Pest\Rector\Rules\ChainExpectCallsRector;
+use Pest\Rector\Rules\Pest2ToPest3\UsesToExtendRector;
+use Pest\Rector\Set\PestSetList;
 use Rector\Caching\ValueObject\Storage\FileCacheStorage;
 use Rector\CodingStyle\Rector\PostInc\PostIncDecToPreIncDecRector;
 use Rector\Config\RectorConfig;
-use Rector\Php83\Rector\ClassMethod\AddOverrideAttributeToOverriddenMethodsRector;
+use Rector\Transform\Rector\ArrayDimFetch\ArrayDimFetchToMethodCallRector;
 use Rector\TypeDeclaration\Rector\ArrowFunction\AddArrowFunctionReturnTypeRector;
 use RectorLaravel\Rector\Class_\AddHasFactoryToModelsRector;
 use RectorLaravel\Rector\Class_\BackoffPropertyToBackoffAttributeRector;
@@ -31,8 +34,6 @@ use RectorLaravel\Rector\FuncCall\ConfigToTypedConfigMethodCallRector;
 use RectorLaravel\Rector\MethodCall\RefactorBlueprintGeometryColumnsRector;
 use RectorLaravel\Rector\PropertyFetch\ReplaceFakerInstanceWithHelperRector;
 use RectorLaravel\Set\LaravelSetList;
-use RectorPest\Rules\EnsureTypeChecksFirstRector;
-use RectorPest\Set\PestSetList;
 
 $laravel13Attributes = [
     // Eloquent
@@ -74,17 +75,15 @@ return RectorConfig::configure()
     ->withSkip([
         AddArrowFunctionReturnTypeRector::class,
         AddHasFactoryToModelsRector::class,
-        AddOverrideAttributeToOverriddenMethodsRector::class,
         PostIncDecToPreIncDecRector::class,
+        ArrayDimFetchToMethodCallRector::class,
+        UsesToExtendRector::class,
         __DIR__.'/bootstrap/cache',
-        // Verbatim copy of Pest's internal Shard plugin (only the discovery
-        // regex is patched) — keep it re-syncable with upstream.
-        __DIR__.'/app/Support/PestShardPlugin.php',
     ])
     ->withCache(cacheDirectory: __DIR__.'/.rector.result.cache', cacheClass: FileCacheStorage::class)
     ->withImportNames(removeUnusedImports: true)
     ->withRootFiles()
-    ->withPhpSets()
+    ->withPhpSets(php84: true)
     ->withComposerBased(laravel: true)
     ->withBootstrapFiles([__DIR__.'/vendor/larastan/larastan/bootstrap.php'])
     ->withPHPStanConfigs([__DIR__.'/phpstan.neon'])
@@ -110,7 +109,6 @@ return RectorConfig::configure()
         ReplaceExpectsMethodsInTestsRector::class,
         ReplaceFakerInstanceWithHelperRector::class,
         ConfigToTypedConfigMethodCallRector::class,
-        EnsureTypeChecksFirstRector::class,
         ...$laravel13Attributes,
     ])
     ->withSets([
@@ -125,8 +123,9 @@ return RectorConfig::configure()
         LaravelSetList::LARAVEL_IF_HELPERS,
         LaravelSetList::LARAVEL_TESTING,
         LaravelSetList::LARAVEL_TYPE_DECLARATIONS,
-        PestSetList::PEST_CODE_QUALITY,
-        PestSetList::PEST_LARAVEL,
-        PestSetList::PEST_40,
+        PestSetList::CODING_STYLE,
         LaravelSetList::LARAVEL_130_WITHOUT_ATTRIBUTES,
+    ])
+    ->withConfiguredRule(ChainExpectCallsRector::class, [
+        ChainExpectCallsRector::MERGE_DIFFERENT_VARIABLES => false,
     ]);
