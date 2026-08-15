@@ -23,9 +23,10 @@ export default defineConfig({
         cors: true,
     },
     build: {
-        minify: 'terser',
+        minify: 'oxc',
         cssMinify: true,
         chunkSizeWarningLimit: 1600,
+        reportCompressedSize: false,
         rolldownOptions: {
             output: {
                 manualChunks(id) {
