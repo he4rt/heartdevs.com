@@ -39,6 +39,7 @@
         "internachi/modular": "^3.0.2",
         "laracord/framework": "dev-next#e7b64d6",
         "laravel/framework": "^13.25.0",
+        "laravel/head": "^0.2.0",
         "laravel/nightwatch": "^1.28.7",
         "laravel/sanctum": "^4.3.3",
         "laravel/telescope": "^5.22.1",

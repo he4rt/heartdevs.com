@@ -68,4 +68,22 @@ return [
         'github' => ['label' => 'GitHub', 'url' => 'https://github.com/he4rt', 'icon' => 'fab-github', 'accent' => '#111827', 'accent_dark' => '#FFFFFF'],
         'loja' => ['label' => 'Loja', 'url' => 'https://loja.heartdevs.com/he4rt/', 'icon' => 'heroicon-s-shopping-bag', 'accent' => '#111827', 'accent_dark' => '#FFFFFF'],
     ],
+
+    /*
+     * Metadados do <head> público, consumidos por App\Support\Seo\SiteHead
+     * para montar os defaults do laravel/head (title, description, Open Graph,
+     * X/Twitter cards e o JSON-LD de Organization/WebSite).
+     *
+     * `og_image` precisa ser 1200x630 para render em card grande; trocar o
+     * arquivo exige atualizar `og_image_width`/`og_image_height` junto.
+     */
+    'seo' => [
+        'description' => 'Uma comunidade de desenvolvedores dedicada a ajudar iniciantes a se tornarem profissionais através de projetos, mentorias e networking.',
+        'og_image' => 'images/og-default.png',
+        'og_image_width' => 1_200,
+        'og_image_height' => 630,
+        'og_image_alt' => 'He4rt Developers — desenvolva seu potencial na comunidade',
+        'twitter_handle' => '@He4rtDevs',
+        'theme_color' => '#782bf1',
+    ],
 ];

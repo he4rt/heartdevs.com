@@ -8,11 +8,9 @@ use He4rt\Portal\DTOs\SocialLink;
 use Illuminate\Contracts\View\View;
 use InvalidArgumentException;
 use Livewire\Attributes\Layout;
-use Livewire\Attributes\Title;
 use Livewire\Component;
 
 #[Layout(name: 'portal::components.layouts.app')]
-#[Title(content: 'Nossas redes')]
 final class SocialLinksPage extends Component
 {
     /**

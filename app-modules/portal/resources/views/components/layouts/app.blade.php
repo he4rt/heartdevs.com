@@ -1,12 +1,9 @@
-@props (['title' => null])
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
 <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="color-scheme" content="light dark" />
-    <link rel="icon" href="{{ asset('favicon.ico') }}" />
-    <title>{{ $title ? $title . ' - ' : '' }}{{ config('app.name') }}</title>
+    {{-- title, viewport, description, canonical, Open Graph, favicon e JSON-LD: laravel/head (App\Support\Seo\SiteHead + metadata das rotas em PortalServiceProvider) --}}
+    @head
     @vite (['app-modules/he4rt/resources/css/theme.css'])
     @fluxAppearance
 </head>

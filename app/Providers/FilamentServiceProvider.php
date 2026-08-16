@@ -28,12 +28,14 @@ use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use Filament\View\PanelsRenderHook;
 use Illuminate\Contracts\View\View;
+use Illuminate\Support\HtmlString;
 use Illuminate\Support\ServiceProvider;
 
 class FilamentServiceProvider extends ServiceProvider
 {
     public function boot(): void
     {
+        $this->configureRobots();
         $this->configureFlux();
         $this->configureField();
         $this->configureColumn();
@@ -62,6 +64,20 @@ class FilamentServiceProvider extends ServiceProvider
 
             return FilamentPanel::from($panelId);
         });
+    }
+
+    /**
+     * Os painéis Filament (/admin e /app) são áreas autenticadas: nada ali deve
+     * entrar em índice de busca. O robots.txt já bloqueia o crawl, mas uma URL
+     * de painel linkada de fora ainda pode ser indexada sem ser rastreada — a
+     * meta robots é o que efetivamente barra isso.
+     */
+    private function configureRobots(): void
+    {
+        FilamentView::registerRenderHook(
+            PanelsRenderHook::HEAD_START,
+            fn (): HtmlString => new HtmlString('<meta name="robots" content="noindex, nofollow" />'),
+        );
     }
 
     private function configureFlux(): void
