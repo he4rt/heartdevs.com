@@ -1,147 +1,241 @@
 @php
+    use He4rt\Identity\ExternalIdentity\Enums\CredentialsType;
+    use He4rt\Identity\ExternalIdentity\Enums\IdentityProvider;
     use He4rt\Identity\ExternalIdentity\Models\ExternalIdentity;
 
-    /** @var \He4rt\Identity\ExternalIdentity\Enums\IdentityProvider[] $supportedProviders */
+    /** @var array<string, array<int, IdentityProvider>> $providerGroups */
     /** @var \Illuminate\Database\Eloquent\Collection<int, ExternalIdentity> $userProviders */
     /** @var string $panel */
     /** @var array<string, mixed>|null $mergeTarget */
 @endphp
 
-<div class="space-y-2">
-    @foreach ($supportedProviders as $provider)
+<div class="space-y-4">
+    @foreach ($providerGroups as $credentialsTypeValue => $providers)
         @php
-            $connected = $userProviders
-                ->filter(fn(ExternalIdentity $c) => $c->provider === $provider && $c->isConnected())
-                ->first();
-
-            $brandColor = match ($provider->value) {
-                'github' => '#8b949e',
-                'discord' => '#5865F2',
-                'twitch' => '#9146FF',
-                default => '#6b7280',
-            };
-
-            $scopes = $provider->getScopes($panel);
+            $credentialsType = CredentialsType::from($credentialsTypeValue);
+            $isApiKeyGroup = $credentialsType === CredentialsType::ApiKey;
         @endphp
-        <div
-            wire:key="provider-{{ $provider->value }}"
-            @class ([
-                'relative overflow-hidden rounded-lg border transition-all duration-200',
-                'border-gray-200 dark:border-gray-700/40' => !$connected
-            ])
-            @if ($connected) style="border-color: {{ $brandColor }}30;" @endif
-        >
-            <div class="flex items-center gap-2.5 p-2.5">
-                {{-- Provider icon --}}
-                <div class="relative shrink-0">
-                    <div
-                        class="flex h-8 w-8 items-center justify-center rounded-md"
-                        style="background-color: {{ $brandColor }}15"
-                    >
-                        <x-filament::icon
-                            :icon="$provider->getIcon()"
-                            class="h-4 w-4"
-                            style="color: {{ $brandColor }}"
-                        />
-                    </div>
-                    @if ($connected)
-                        <div
-                            class="absolute -right-0.5 -bottom-0.5 h-2.5 w-2.5 rounded-full border-2 border-white bg-emerald-400 dark:border-gray-900"
-                        ></div>
-                    @endif
-                </div>
+        <section wire:key="group-{{ $credentialsTypeValue }}" class="space-y-2">
+            <h3
+                class="px-0.5 text-[10px] font-medium tracking-wider text-gray-400 uppercase dark:text-gray-500"
+            >
+                {{ $credentialsType->getLabel() }}
+            </h3>
 
-                {{-- Content --}}
-                <div class="min-w-0 flex-1">
-                    <div class="flex items-baseline gap-2">
-                        <span
-                            class="truncate text-sm font-medium text-gray-900 dark:text-white"
-                            >{{ $provider->getLabel() }}</span
-                        >
+            @foreach ($providers as $provider)
+                @php
+                    $connected = $userProviders
+                        ->filter(fn(ExternalIdentity $c) => $c->provider === $provider && $c->isConnected())
+                        ->first();
+
+                    $brandColor = match ($provider->value) {
+                        'github' => '#8b949e',
+                        'discord' => '#5865F2',
+                        'twitch' => '#9146FF',
+                        'devto' => '#3b49df',
+                        default => '#6b7280',
+                    };
+
+                    $scopes = $provider->getScopes($panel);
+                @endphp
+                <div
+                    wire:key="provider-{{ $provider->value }}"
+                    @class ([
+                        'relative overflow-hidden rounded-lg border transition-all duration-200',
+                        'border-gray-200 dark:border-gray-700/40' => !$connected
+                    ])
+                    @if ($connected) style="border-color: {{ $brandColor }}30;" @endif
+                >
+                    <div class="flex items-center gap-2.5 p-2.5">
+                        {{-- Provider icon --}}
+                        <div class="relative shrink-0">
+                            <div
+                                class="flex h-8 w-8 items-center justify-center rounded-md"
+                                style="background-color: {{ $brandColor }}15"
+                            >
+                                <x-filament::icon
+                                    :icon="$provider->getIcon()"
+                                    class="h-4 w-4"
+                                    style="color: {{ $brandColor }}"
+                                />
+                            </div>
+                            @if ($connected)
+                                <div
+                                    class="absolute -right-0.5 -bottom-0.5 h-2.5 w-2.5 rounded-full border-2 border-white bg-emerald-400 dark:border-gray-900"
+                                ></div>
+                            @endif
+                        </div>
+
+                        {{-- Content --}}
+                        <div class="min-w-0 flex-1">
+                            <div class="flex items-baseline gap-2">
+                                <span
+                                    class="truncate text-sm font-medium text-gray-900 dark:text-white"
+                                    >{{ $provider->getLabel() }}</span
+                                >
+                                @if ($connected)
+                                    <span class="shrink-0 text-[10px] text-gray-400 dark:text-gray-500">
+                                        {{
+                                            $connected->connected_at
+                                                ->timezone(config('app.display_timezone'))
+                                                ->diffForHumans()
+                                        }}
+                                    </span>
+                                @endif
+                            </div>
+
+                            @if ($connected)
+                                <div class="mt-0.5 flex items-center gap-1.5 text-xs">
+                                    @if ($connected->metadata['avatar'] ?? null)
+                                        <img
+                                            src="{{ $connected->metadata['avatar'] }}"
+                                            alt=""
+                                            class="h-3.5 w-3.5 rounded-full"
+                                            loading="lazy"
+                                        />
+                                    @endif
+                                    <span class="truncate text-gray-500 dark:text-gray-300">{{
+                                        $connected->metadata['username'] ??
+                                            $connected->external_account_id
+                                    }}</span>
+                                </div>
+                            @endif
+                        </div>
+
+                        {{-- Action --}}
                         @if ($connected)
-                            <span class="shrink-0 text-[10px] text-gray-400 dark:text-gray-500">
-                                {{
-                                    $connected->connected_at
-                                        ->timezone(config('app.display_timezone'))
-                                        ->diffForHumans()
-                                }}
-                            </span>
+                            <button
+                                wire:click="disconnect('{{ $provider->value }}')"
+                                type="button"
+                                class="shrink-0 rounded-md px-2 py-0.5 text-[11px] font-medium text-gray-500 ring-1 ring-gray-300 transition-all hover:text-red-500 hover:ring-red-400/40 dark:text-gray-400 dark:ring-gray-700/60 dark:hover:text-red-400 dark:hover:ring-red-500/40"
+                            >
+                                Disconnect
+                            </button>
+                        @else
+                            <x-filament::button wire:click="connect('{{ $provider->value }}')" size="sm" class="shrink-0">
+                                Connect
+                            </x-filament::button>
                         @endif
                     </div>
 
-                    @if ($connected)
-                        <div class="mt-0.5 flex items-center gap-1.5 text-xs">
-                            @if ($connected->metadata['avatar'] ?? null)
-                                <img
-                                    src="{{ $connected->metadata['avatar'] }}"
-                                    alt=""
-                                    class="h-3.5 w-3.5 rounded-full"
-                                    loading="lazy"
-                                />
-                            @endif
-                            <span class="truncate text-gray-500 dark:text-gray-300">{{
-                                $connected->metadata['username'] ??
-                                    $connected->external_account_id
-                            }}</span>
+                    {{-- Permissions --}}
+                    @if (!$connected && count($scopes) > 0)
+                        <div x-data="{ open: false }" class="border-t border-gray-200 dark:border-gray-800/50">
+                            <button
+                                @click="open = !open"
+                                type="button"
+                                class="flex w-full items-center gap-1 px-2.5 py-1.5 text-[10px] font-medium tracking-wider text-gray-400 uppercase transition-colors hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-400"
+                            >
+                                <span class="transition-transform duration-200" :class="open && 'rotate-90'">
+                                    <x-filament::icon icon="heroicon-m-chevron-right" class="h-2.5 w-2.5" />
+                                </span>
+                                <span>Permissions</span>
+                                <span class="text-gray-300 dark:text-gray-600">({{ count($scopes) }})</span>
+                            </button>
+                            <div
+                                x-show="open"
+                                x-transition:enter="transition-all duration-200 ease-out"
+                                x-transition:enter-start="opacity-0 -translate-y-1"
+                                x-transition:enter-end="opacity-100 translate-y-0"
+                                x-transition:leave="transition-all duration-150 ease-in"
+                                x-transition:leave-start="opacity-100"
+                                x-transition:leave-end="opacity-0"
+                                class="px-2.5 pb-2"
+                                style="display: none"
+                            >
+                                <div class="flex flex-wrap gap-1">
+                                    @foreach ($scopes as $scope)
+                                        <code
+                                            class="rounded bg-gray-100 px-1 py-0.5 font-mono text-[9px] text-gray-500 ring-1 ring-gray-200 dark:bg-gray-800/80 dark:text-gray-400 dark:ring-gray-700/50"
+                                        >
+                                            {{ $scope }}
+                                        </code>
+                                    @endforeach
+                                </div>
+                            </div>
                         </div>
                     @endif
-                </div>
 
-                {{-- Action --}}
-                @if ($connected)
-                    <button
-                        wire:click="disconnect('{{ $provider->value }}')"
-                        type="button"
-                        class="shrink-0 rounded-md px-2 py-0.5 text-[11px] font-medium text-gray-500 ring-1 ring-gray-300 transition-all hover:text-red-500 hover:ring-red-400/40 dark:text-gray-400 dark:ring-gray-700/60 dark:hover:text-red-400 dark:hover:ring-red-500/40"
-                    >
-                        Disconnect
-                    </button>
-                @else
-                    <x-filament::button wire:click="connect('{{ $provider->value }}')" size="sm" class="shrink-0">
-                        Connect
-                    </x-filament::button>
-                @endif
-            </div>
-
-            {{-- Permissions --}}
-            @if (!$connected && count($scopes) > 0)
-                <div x-data="{ open: false }" class="border-t border-gray-200 dark:border-gray-800/50">
-                    <button
-                        @click="open = !open"
-                        type="button"
-                        class="flex w-full items-center gap-1 px-2.5 py-1.5 text-[10px] font-medium tracking-wider text-gray-400 uppercase transition-colors hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-400"
-                    >
-                        <span class="transition-transform duration-200" :class="open && 'rotate-90'">
-                            <x-filament::icon icon="heroicon-m-chevron-right" class="h-2.5 w-2.5" />
-                        </span>
-                        <span>Permissions</span>
-                        <span class="text-gray-300 dark:text-gray-600">({{ count($scopes) }})</span>
-                    </button>
-                    <div
-                        x-show="open"
-                        x-transition:enter="transition-all duration-200 ease-out"
-                        x-transition:enter-start="opacity-0 -translate-y-1"
-                        x-transition:enter-end="opacity-100 translate-y-0"
-                        x-transition:leave="transition-all duration-150 ease-in"
-                        x-transition:leave-start="opacity-100"
-                        x-transition:leave-end="opacity-0"
-                        class="px-2.5 pb-2"
-                        style="display: none"
-                    >
-                        <div class="flex flex-wrap gap-1">
-                            @foreach ($scopes as $scope)
-                                <code
-                                    class="rounded bg-gray-100 px-1 py-0.5 font-mono text-[9px] text-gray-500 ring-1 ring-gray-200 dark:bg-gray-800/80 dark:text-gray-400 dark:ring-gray-700/50"
-                                >
-                                    {{ $scope }}
-                                </code>
-                            @endforeach
-                        </div>
-                    </div>
+                    {{-- Hint: chave pessoal, so para providers de API key ainda desconectados --}}
+                    @if (!$connected && $isApiKeyGroup)
+                        <p class="px-2.5 pb-2 text-[10px] text-gray-400 dark:text-gray-500">
+                            Chave pessoal &mdash; fica criptografada e só é usada para ler seus artigos.
+                        </p>
+                    @endif
                 </div>
-            @endif
-        </div>
+            @endforeach
+        </section>
     @endforeach
+
+    {{-- API Key Modal --}}
+    @if ($showApiKeyModal && $apiKeyProvider)
+        @php
+            $apiKeyProviderEnum = IdentityProvider::from($apiKeyProvider);
+        @endphp
+        @teleport('body')
+            <div
+                x-data
+                @keydown.escape.window="$wire.closeApiKeyModal()"
+                role="dialog"
+                aria-modal="true"
+                aria-labelledby="api-key-modal-title"
+                class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4"
+            >
+                <form
+                    wire:submit="saveApiKey"
+                    class="w-full max-w-sm rounded-xl border border-gray-200 bg-white p-6 shadow-2xl dark:border-gray-700 dark:bg-gray-900"
+                >
+                    <div class="mb-4 flex items-center gap-2">
+                        <x-filament::icon :icon="$apiKeyProviderEnum->getIcon()" class="h-5 w-5 text-gray-400" />
+                        <h3
+                            id="api-key-modal-title"
+                            class="text-base font-semibold text-gray-900 dark:text-white"
+                        >
+                            Conectar {{ $apiKeyProviderEnum->getLabel() }}
+                        </h3>
+                    </div>
+
+                    <label
+                        for="api-key-input"
+                        class="mb-1.5 block text-xs font-medium text-gray-600 dark:text-gray-300"
+                    >
+                        API Key
+                    </label>
+
+                    <x-filament::input.wrapper :valid="! $errors->has('apiKey')">
+                        <x-filament::input
+                            id="api-key-input"
+                            type="password"
+                            wire:model="apiKey"
+                            autocomplete="off"
+                            autofocus
+                        />
+                    </x-filament::input.wrapper>
+
+                    @error('apiKey')
+                        <p class="mt-1.5 text-xs text-danger-600 dark:text-danger-400">{{ $message }}</p>
+                    @enderror
+
+                    <p class="mt-3 mb-5 text-xs text-gray-500 dark:text-gray-400">
+                        Gere a chave em dev.to &rarr; Settings &rarr; Extensions &rarr; DEV Community API Keys.
+                        Ela fica criptografada e nunca é exibida de volta.
+                    </p>
+
+                    <div class="flex gap-2">
+                        <x-filament::button type="submit" class="flex-1">Conectar</x-filament::button>
+                        <x-filament::button
+                            type="button"
+                            wire:click="closeApiKeyModal"
+                            color="gray"
+                            class="flex-1"
+                        >
+                            Cancelar
+                        </x-filament::button>
+                    </div>
+                </form>
+            </div>
+        @endteleport
+    @endif
 
     {{-- Merge Confirmation Modal --}}
     @if ($showMergeModal && $mergeTarget)

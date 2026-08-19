@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace He4rt\Identity\ExternalIdentity\Enums;
 
+use App\Contracts\ApiKeyClientContract;
 use App\Contracts\OAuthClientContract;
 use App\Enums\Concerns\StringifyEnum;
 use Filament\Support\Colors\Color;
@@ -12,6 +13,7 @@ use Filament\Support\Contracts\HasDescription;
 use Filament\Support\Contracts\HasIcon;
 use Filament\Support\Contracts\HasLabel;
 use He4rt\Activity\Message\Contracts\MessageActivityAdapter;
+use He4rt\IntegrationDevTo\ApiKey\DevToApiKeyClient;
 use He4rt\IntegrationDevTo\OAuth\DevToOAuthClient;
 use He4rt\IntegrationDiscord\ETL\Adapters\DiscordMessageAdapter;
 use He4rt\IntegrationDiscord\OAuth\DiscordOAuthClient;
@@ -57,7 +59,51 @@ enum IdentityProvider: string implements HasColor, HasDescription, HasIcon, HasL
             self::GitHub,
             self::Discord,
             self::Twitch,
+            self::DevTo,
         ];
+    }
+
+    /**
+     * Providers suportados agrupados pelo método de autenticação, na ordem de
+     * CredentialsType::cases(). Grupos sem nenhum provider são omitidos.
+     *
+     * @return array<string, array<int, self>>
+     */
+    public static function supportedProvidersByCredentialsType(): array
+    {
+        $grouped = [];
+
+        foreach (CredentialsType::cases() as $credentialsType) {
+            $providers = array_values(array_filter(
+                self::supportedProviders(),
+                fn (self $provider): bool => $provider->getCredentialsType() === $credentialsType,
+            ));
+
+            if ($providers !== []) {
+                $grouped[$credentialsType->value] = $providers;
+            }
+        }
+
+        return $grouped;
+    }
+
+    /**
+     * Método de autenticação que este provider usa. Um método fixo por provider.
+     */
+    public function getCredentialsType(): CredentialsType
+    {
+        return match ($this) {
+            self::DevTo => CredentialsType::ApiKey,
+            default => CredentialsType::OAuth2,
+        };
+    }
+
+    public function getApiKeyClient(): ?ApiKeyClientContract
+    {
+        return match ($this) {
+            self::DevTo => resolve(DevToApiKeyClient::class),
+            default => null,
+        };
     }
 
     public function getClient(): ?OAuthClientContract
@@ -183,7 +229,6 @@ enum IdentityProvider: string implements HasColor, HasDescription, HasIcon, HasL
         $scopes = match ($this) {
             self::Discord => config('services.discord.scopes'),
             self::Twitch => config('services.twitch.scopes.'.($panel ?? 'app'), config('services.twitch.scopes.app')),
-            self::DevTo => config('services.devto.scopes'),
             default => '',
         };
 

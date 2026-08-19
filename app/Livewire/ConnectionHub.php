@@ -6,12 +6,16 @@ namespace App\Livewire;
 
 use Filament\Notifications\Notification;
 use He4rt\Identity\Auth\Actions\MergeAccountsAction;
+use He4rt\Identity\ExternalIdentity\Actions\ConnectApiKeyIdentity;
+use He4rt\Identity\ExternalIdentity\Enums\CredentialsType;
 use He4rt\Identity\ExternalIdentity\Enums\IdentityProvider;
+use He4rt\Identity\ExternalIdentity\Exceptions\InvalidApiKeyException;
 use He4rt\Identity\ExternalIdentity\Models\ExternalIdentity;
 use He4rt\Identity\User\Models\User;
 use Illuminate\Contracts\View\View;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\Auth;
+use Livewire\Attributes\Validate;
 use Livewire\Component;
 
 class ConnectionHub extends Component
@@ -23,6 +27,13 @@ class ConnectionHub extends Component
     /** @var array<string, mixed>|null */
     public ?array $mergeData = null;
 
+    public bool $showApiKeyModal = false;
+
+    public ?string $apiKeyProvider = null;
+
+    #[Validate(rule: 'required|string|min:10')]
+    public string $apiKey = '';
+
     public function mount(): void
     {
         $this->panel = filament()->getCurrentPanel()?->getId() ?? 'app';
@@ -31,19 +42,17 @@ class ConnectionHub extends Component
 
     public function render(): View
     {
-        $supportedProviders = IdentityProvider::supportedProviders();
-
         if ($this->panel === 'admin') {
             return view('livewire.connection-hub-admin', [
                 'tenantProviders' => $this->getTenantProviders(),
-                'supportedProviders' => $supportedProviders,
+                'supportedProviders' => $this->getOAuthProviders(),
                 'panel' => $this->panel,
             ]);
         }
 
         return view('livewire.connection-hub', [
             'userProviders' => $this->getUserProviders(),
-            'supportedProviders' => $supportedProviders,
+            'providerGroups' => IdentityProvider::supportedProvidersByCredentialsType(),
             'panel' => $this->panel,
             'mergeTarget' => $this->getMergeTarget(),
         ]);
@@ -51,10 +60,58 @@ class ConnectionHub extends Component
 
     public function connect(IdentityProvider $provider): void
     {
+        $usesApiKey = $provider->getCredentialsType() === CredentialsType::ApiKey;
+
+        if ($usesApiKey) {
+            $this->apiKeyProvider = $provider->value;
+            $this->apiKey = '';
+            $this->resetValidation();
+            $this->showApiKeyModal = true;
+
+            return;
+        }
+
         $this->redirect(route('oauth.redirect', [
             'panel' => $this->panel,
             'provider' => $provider->value,
         ]));
+    }
+
+    public function saveApiKey(ConnectApiKeyIdentity $action): void
+    {
+        $this->validate();
+
+        if ($this->apiKeyProvider === null) {
+            return;
+        }
+
+        $provider = IdentityProvider::from($this->apiKeyProvider);
+
+        /** @var User $user */
+        $user = auth()->user();
+
+        try {
+            $action->execute($user, $provider, $this->apiKey);
+        } catch (InvalidApiKeyException) {
+            $this->addError('apiKey', 'Chave inválida ou sem permissão. Gere uma nova em dev.to → Settings → Extensions → DEV Community API Keys.');
+
+            return;
+        }
+
+        $this->closeApiKeyModal();
+
+        Notification::make()
+            ->title($provider->getLabel().' conectado com sucesso')
+            ->success()
+            ->send();
+    }
+
+    public function closeApiKeyModal(): void
+    {
+        $this->showApiKeyModal = false;
+        $this->apiKeyProvider = null;
+        $this->apiKey = '';
+        $this->resetValidation();
     }
 
     public function confirmMerge(MergeAccountsAction $action): void
@@ -187,6 +244,16 @@ class ConnectionHub extends Component
             'created_at' => $user->created_at?->format('d/m/Y'),
             'messages_count' => $messagesCount,
         ];
+    }
+
+    /**
+     * Providers de tenant são sempre OAuth: uma chave de API é pessoal.
+     *
+     * @return array<int, IdentityProvider>
+     */
+    private function getOAuthProviders(): array
+    {
+        return IdentityProvider::supportedProvidersByCredentialsType()[CredentialsType::OAuth2->value] ?? [];
     }
 
     /** @return Collection<int, ExternalIdentity> */
