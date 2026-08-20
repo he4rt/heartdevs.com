@@ -37,14 +37,35 @@ final class ArticleFeed
             return $this->articles;
         }
 
-        $articles = [];
+        $payload = $this->fetch();
 
-        foreach ($this->fetch() as $item) {
-            if (!is_array($item)) {
+        $articles = [];
+        $rejected = 0;
+
+        foreach ($payload as $item) {
+            $article = is_array($item) ? Article::fromApi($item) : null;
+
+            if (!$article instanceof Article) {
+                $rejected++;
+
                 continue;
             }
 
-            $articles[] = Article::fromApi($item);
+            $articles[] = $article;
+        }
+
+        if ($rejected > 0) {
+            Log::warning('Portal: itens do acervo do dev.to descartados por payload inválido', [
+                'descartados' => $rejected,
+                'aceitos' => count($articles),
+            ]);
+        }
+
+        // Payload com itens mas nenhum aproveitável é contrato quebrado, não acervo
+        // vazio. Sem descartar o cache, a janela obsoleta serviria o mesmo lixo por
+        // um dia inteiro — e a revalidação em segundo plano nunca o substituiria.
+        if ($articles === [] && $payload !== []) {
+            Cache::forget(self::CACHE_KEY);
         }
 
         usort($articles, fn (Article $a, Article $b): int => $b->publishedAt <=> $a->publishedAt);

@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use He4rt\Portal\Articles\Article;
 use He4rt\Portal\Articles\ArticleFeed;
 use He4rt\Portal\Livewire\ArticlesPage;
 use Illuminate\Support\Facades\Cache;
@@ -175,4 +176,68 @@ it('serve o acervo obsoleto quando o dev.to cai depois de um sucesso', function 
         ->assertOk()
         ->assertSee('Do cache')
         ->assertDontSee('Não deu para carregar o acervo agora.');
+});
+
+it('descarta artigo com data impossível de interpretar em vez de derrubar a página', function (): void {
+    Http::fake([
+        'dev.to/api/articles*' => Http::response([
+            devToArticle(['id' => 1, 'title' => 'Válido']),
+            devToArticle(['id' => 2, 'title' => 'Data podre', 'published_at' => 'amanhã cedo']),
+        ]),
+    ]);
+
+    $articles = resolve(ArticleFeed::class)->articles();
+
+    expect($articles)->toHaveCount(1)
+        ->and($articles[0]->title)->toBe('Válido');
+});
+
+it('descarta data vazia em vez de assumir hoje e jogar o artigo para o topo', function (): void {
+    Http::fake([
+        'dev.to/api/articles*' => Http::response([
+            devToArticle(['id' => 1, 'title' => 'Real', 'published_at' => now()->subMonth()->toIso8601String()]),
+            devToArticle(['id' => 2, 'title' => 'Sem data', 'published_at' => '']),
+        ]),
+    ]);
+
+    $articles = resolve(ArticleFeed::class)->articles();
+
+    expect($articles)->toHaveCount(1)
+        ->and($articles[0]->title)->toBe('Real');
+});
+
+it('não quebra com campo de texto que não é texto', function (): void {
+    Http::fake([
+        'dev.to/api/articles*' => Http::response([
+            devToArticle(['id' => 1, 'title' => ['isto' => 'é um array']]),
+            devToArticle(['id' => 2, 'title' => 'Sobrevivente']),
+        ]),
+    ]);
+
+    $titles = array_map(fn (Article $article): string => $article->title, resolve(ArticleFeed::class)->articles());
+
+    expect($titles)->toContain('Sobrevivente');
+});
+
+it('não deixa payload inteiro inválido envenenar a janela obsoleta do cache', function (): void {
+    Http::fake([
+        'dev.to/api/articles*' => Http::response([
+            devToArticle(['id' => 1, 'published_at' => 'lixo']),
+            devToArticle(['id' => 2, 'published_at' => 'mais lixo']),
+        ]),
+    ]);
+
+    expect(resolve(ArticleFeed::class)->articles())->toBeEmpty()
+        ->and(Cache::has('portal.articles.devto-org'))->toBeFalse();
+});
+
+it('mantém a página de pé quando um item do acervo está corrompido', function (): void {
+    Http::fake([
+        'dev.to/api/articles*' => Http::response([
+            devToArticle(['id' => 1, 'title' => 'Artigo bom']),
+            devToArticle(['id' => 2, 'published_at' => 'quebrado']),
+        ]),
+    ]);
+
+    $this->get('/artigos')->assertOk()->assertSee('Artigo bom');
 });
