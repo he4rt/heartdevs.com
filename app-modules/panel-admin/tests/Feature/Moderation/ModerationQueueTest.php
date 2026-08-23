@@ -3,16 +3,13 @@
 declare(strict_types=1);
 
 use Filament\Facades\Filament;
-use He4rt\Identity\User\Models\User;
 use He4rt\Moderation\Cases\Models\ModerationCase;
 use He4rt\PanelAdmin\Moderation\Livewire\ModerationQueue;
 
 use function Pest\Livewire\livewire;
 
 beforeEach(function (): void {
-    $this->user = User::factory()->create(['username' => 'danielhe4rt']);
-
-    config(['he4rt.admins' => 'danielhe4rt']);
+    $this->user = panelAdminUser();
 
     $this->actingAs($this->user);
 

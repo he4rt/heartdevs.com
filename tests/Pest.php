@@ -2,7 +2,10 @@
 
 declare(strict_types=1);
 
+use He4rt\Identity\User\Models\User;
 use Illuminate\Foundation\Testing\LazilyRefreshDatabase;
+use Spatie\Permission\Models\Permission;
+use Spatie\Permission\Models\Role;
 use Tests\TestCase;
 
 /*
@@ -52,4 +55,44 @@ expect()->extend('toBeOne', fn () => $this->toBe(1));
 function something(): void
 {
     // ..
+}
+
+/*
+|--------------------------------------------------------------------------
+| Panel access
+|--------------------------------------------------------------------------
+|
+| Admin panel access is granted by roles, so a bare factory user is locked out.
+| This builds a user carrying exactly the permissions a test needs.
+|
+*/
+
+function panelUserWith(string ...$permissions): User
+{
+    $user = User::factory()->create();
+
+    $role = Role::query()->firstOrCreate([
+        'name' => 'test:'.md5(implode(',', $permissions)),
+        'guard_name' => 'web',
+    ]);
+
+    $role->syncPermissions(
+        collect($permissions)->map(fn (string $permission): Permission => Permission::query()->firstOrCreate([
+            'name' => $permission,
+            'guard_name' => 'web',
+        ]))
+    );
+
+    return $user->assignRole($role);
+}
+
+/**
+ * A super admin, for panel tests that are not about authorisation themselves.
+ * Shield intercepts the gate for this role, so no permissions need to exist.
+ */
+function panelAdminUser(): User
+{
+    return User::factory()->create()->assignRole(
+        Role::query()->firstOrCreate(['name' => 'super_admin', 'guard_name' => 'web'])
+    );
 }

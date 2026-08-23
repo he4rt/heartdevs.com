@@ -28,6 +28,7 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
+use Spatie\Permission\Traits\HasRoles;
 
 /**
  * @property string $id
@@ -52,14 +53,10 @@ final class User extends Authenticatable implements FilamentUser, HasMedia, HasN
     use HasAddress;
     /** @use HasFactory<UserFactory> */
     use HasFactory;
+    use HasRoles;
     use HasUuids;
     use InteractsWithMedia;
     use Notifiable;
-
-    public function isAdmin(): bool
-    {
-        return in_array($this->username, str(config('he4rt.admins'))->explode(',')->toArray(), strict: true);
-    }
 
     /**
      * @return MorphMany<ExternalIdentity, $this>
@@ -104,8 +101,8 @@ final class User extends Authenticatable implements FilamentUser, HasMedia, HasN
     public function canAccessPanel(Panel $panel): bool
     {
         return match ($panel->getId()) {
-            'admin' => app()->isProduction() ? $this->isAdmin() : true,
-            default => true
+            'admin' => $this->roles()->exists(),
+            default => true,
         };
     }
 

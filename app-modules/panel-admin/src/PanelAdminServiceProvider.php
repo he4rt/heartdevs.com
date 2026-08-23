@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace He4rt\PanelAdmin;
 
+use BezhanSalleh\FilamentShield\Facades\FilamentShield;
 use Filament\Navigation\NavigationBuilder;
 use Filament\Navigation\NavigationGroup;
 use Filament\Navigation\NavigationItem;
@@ -24,7 +25,9 @@ use He4rt\PanelAdmin\Moderation\Livewire\ModerationQueue;
 use He4rt\PanelAdmin\Moderation\ModerationCluster;
 use He4rt\PanelAdmin\Pages\Dashboard;
 use He4rt\PanelAdmin\Twitch\TwitchCluster;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Support\Str;
 use Livewire\Livewire;
 
 class PanelAdminServiceProvider extends ServiceProvider
@@ -96,12 +99,39 @@ class PanelAdminServiceProvider extends ServiceProvider
 
     public function boot(): void
     {
+        $this->configureShield();
+
         $this->loadViewsFrom(__DIR__.'/../resources/views', 'panel-admin');
         $this->loadTranslationsFrom(__DIR__.'/../lang', 'panel-admin');
 
         Livewire::component('moderation-queue', ModerationQueue::class);
         Livewire::component('appeal-queue', AppealQueue::class);
         Livewire::component('moderation-dashboard', ModerationDashboardLivewire::class);
+    }
+
+    private function configureShield(): void
+    {
+        // Shield refuses the '_' separator alongside snake case, so the config carries a
+        // placeholder separator and this builder joins the parts itself.
+        FilamentShield::buildPermissionKeyUsing(
+            fn (string $affix, string $subject): string => Str::snake($affix).'_'.Str::snake($subject),
+        );
+
+        $this->registerPanelPolicies();
+    }
+
+    /**
+     * Authorising a panel screen is a presentation concern, so the policies live in this
+     * module instead of beside each domain model. Neither Laravel's discovery nor
+     * Shield's looks here, so teach the Gate where to look. Names that do not resolve
+     * are discarded by the Gate, and the framework default stays as a fallback.
+     */
+    private function registerPanelPolicies(): void
+    {
+        Gate::guessPolicyNamesUsing(fn (string $model): array => [
+            'He4rt\\PanelAdmin\\Policies\\'.class_basename($model).'Policy',
+            'App\\Policies\\'.class_basename($model).'Policy',
+        ]);
     }
 
     private function buildNavigation(NavigationBuilder $builder): NavigationBuilder

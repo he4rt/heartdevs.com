@@ -3,7 +3,6 @@
 declare(strict_types=1);
 
 use Filament\Facades\Filament;
-use He4rt\Identity\User\Models\User;
 use He4rt\IntegrationDiscord\Models\DiscordChannel;
 use He4rt\IntegrationDiscord\Models\DiscordEventLog;
 use He4rt\IntegrationDiscord\Models\DiscordGuild;
@@ -30,9 +29,7 @@ use He4rt\PanelAdmin\Discord\Widgets\MemberGrowthChartWidget;
 use function Pest\Livewire\livewire;
 
 beforeEach(function (): void {
-    $user = User::factory()->create(['username' => 'danielhe4rt']);
-
-    config(['he4rt.admins' => 'danielhe4rt']);
+    $user = panelAdminUser();
 
     $this->actingAs($user);
 

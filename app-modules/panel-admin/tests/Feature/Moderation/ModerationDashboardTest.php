@@ -13,9 +13,7 @@ use He4rt\PanelAdmin\Moderation\Pages\ModerationDashboard;
 use function Pest\Livewire\livewire;
 
 beforeEach(function (): void {
-    $user = User::factory()->create(['username' => 'danielhe4rt']);
-
-    config(['he4rt.admins' => 'danielhe4rt']);
+    $user = panelAdminUser();
 
     $this->actingAs($user);
 

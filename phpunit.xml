@@ -22,5 +22,8 @@
     <php>
         <ini name="memory_limit" value="2G"/>
         <env name="APP_ENV" value="testing"/>
+        <!-- The Cloudflare proxy list is fetched over HTTP and cached forever. Tests ban
+             stray requests, so a cold cache turns every routed test into a 500. -->
+        <env name="LARAVEL_CLOUDFLARE_ENABLED" value="false"/>
     </php>
 </phpunit>

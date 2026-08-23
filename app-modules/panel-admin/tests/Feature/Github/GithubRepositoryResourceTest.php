@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 use Filament\Actions\Testing\TestAction;
 use Filament\Facades\Filament;
-use He4rt\Identity\User\Models\User;
 use He4rt\IntegrationGithub\Backfill\Jobs\BackfillGithubRepository;
 use He4rt\IntegrationGithub\Models\GithubRepository;
 use He4rt\PanelAdmin\Github\Resources\GithubRepositoryResource\Pages\CreateGithubRepository;
@@ -14,9 +13,7 @@ use Illuminate\Support\Facades\Queue;
 use function Pest\Livewire\livewire;
 
 beforeEach(function (): void {
-    $user = User::factory()->create(['username' => 'danielhe4rt']);
-
-    config(['he4rt.admins' => 'danielhe4rt']);
+    $user = panelAdminUser();
 
     $this->actingAs($user);
 

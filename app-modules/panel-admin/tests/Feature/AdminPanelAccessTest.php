@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use Filament\Facades\Filament;
 use He4rt\Identity\User\Models\User;
+use Spatie\Permission\Models\Role;
 
 test('unauthenticated user is redirected to login', function (): void {
     $this
@@ -17,10 +18,9 @@ test('admin login page renders', function (): void {
         ->assertOk();
 });
 
-test('authenticated admin can access admin panel', function (): void {
-    $user = User::factory()->create(['username' => 'danielhe4rt']);
-
-    config(['he4rt.admins' => 'danielhe4rt']);
+test('a user holding any role can access the admin panel', function (): void {
+    $user = User::factory()->create();
+    $user->assignRole(Role::create(['name' => 'github:viewer', 'guard_name' => 'web']));
 
     $this
         ->actingAs($user)
@@ -28,24 +28,24 @@ test('authenticated admin can access admin panel', function (): void {
         ->assertOk();
 });
 
-test('admin user can access panel via canAccessPanel', function (): void {
-    $user = User::factory()->create(['username' => 'danielhe4rt']);
-
-    config(['he4rt.admins' => 'danielhe4rt']);
-
-    $panel = Filament::getPanel('admin');
-
-    expect($user->canAccessPanel($panel))->toBeTrue();
-});
-
-test('non-admin user cannot access admin panel in production', function (): void {
-    $user = User::factory()->create(['username' => 'regular-user']);
-
-    config(['he4rt.admins' => 'danielhe4rt']);
-
-    app()->detectEnvironment(fn () => 'production');
+test('a user without any role cannot access the admin panel', function (): void {
+    $user = User::factory()->create();
 
     $panel = Filament::getPanel('admin');
 
     expect($user->canAccessPanel($panel))->toBeFalse();
+});
+
+test('the role gate applies outside production too', function (): void {
+    app()->detectEnvironment(fn (): string => 'local');
+
+    $user = User::factory()->create();
+
+    expect($user->canAccessPanel(Filament::getPanel('admin')))->toBeFalse();
+});
+
+test('a username alone no longer grants access', function (): void {
+    $user = User::factory()->create(['username' => 'danielhe4rt']);
+
+    expect($user->canAccessPanel(Filament::getPanel('admin')))->toBeFalse();
 });

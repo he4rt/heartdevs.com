@@ -15,7 +15,6 @@ use He4rt\Events\Enrollment\Models\Enrollment;
 use He4rt\Events\Enrollment\Models\EnrollmentPolicy;
 use He4rt\Events\Event\Enums\EventType;
 use He4rt\Events\Event\Models\Event;
-use He4rt\Identity\User\Models\User;
 use He4rt\PanelAdmin\Filament\Resources\Events\EventResource;
 use He4rt\PanelAdmin\Filament\Resources\Events\Pages\CreateEvent;
 use He4rt\PanelAdmin\Filament\Resources\Events\Pages\EditEvent;
@@ -26,9 +25,8 @@ use He4rt\PanelAdmin\Filament\Resources\Events\RelationManagers\EnrollmentsRelat
 use function Pest\Livewire\livewire;
 
 beforeEach(function (): void {
-    $admin = User::factory()->create(['username' => 'events-test-admin']);
+    $admin = panelAdminUser();
 
-    config(['he4rt.admins' => 'events-test-admin']);
     $this->actingAs($admin);
 
     Filament::setCurrentPanel(Filament::getPanel('admin'));

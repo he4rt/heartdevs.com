@@ -42,16 +42,18 @@ function chartClicks(ClicksOverTimeChart $chart): array
  */
 function admin(): User
 {
-    return User::query()->where('username', 'danielhe4rt')->sole();
+    /** @var User $user */
+    $user = auth()->user();
+
+    return $user;
 }
 
 beforeEach(function (): void {
     config([
-        'he4rt.admins' => 'danielhe4rt',
         'app.display_timezone' => 'America/Sao_Paulo',
     ]);
 
-    $this->actingAs(User::factory()->create(['username' => 'danielhe4rt']));
+    $this->actingAs(panelAdminUser());
 
     Filament::setCurrentPanel(Filament::getPanel('admin'));
 });
