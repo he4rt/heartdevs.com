@@ -1,0 +1,18 @@
+.hp-tag {
+    @apply inline-flex items-center gap-2 rounded-xl px-2.5 py-1.5 text-xs font-medium;
+    @apply bg-primary/5 border-primary/32 border;
+    @apply text-text-high;
+    @apply hover:bg-primary/32 transition-all duration-300 hover:scale-[1.02] active:scale-95;
+    @apply disabled:pointer-events-none disabled:opacity-60;
+    &[aria-disabled='true'] {
+        @apply pointer-events-none opacity-60;
+    }
+}
+
+.hp-tag-icon {
+    @apply shrink-0;
+}
+
+.hp-tag-text {
+    @apply text-text-high font-semibold;
+}

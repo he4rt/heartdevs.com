@@ -1,0 +1,27 @@
+{
+    "name": "he4rt/squads",
+    "description": "",
+    "type": "library",
+    "version": "1.0.0",
+    "license": "proprietary",
+    "autoload": {
+        "psr-4": {
+            "He4rt\\Squads\\": "src/",
+            "He4rt\\Squads\\Database\\Factories\\": "database/factories/",
+            "He4rt\\Squads\\Database\\Seeders\\": "database/seeders/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "He4rt\\Squads\\Tests\\": "tests/"
+        }
+    },
+    "minimum-stability": "stable",
+    "extra": {
+        "laravel": {
+            "providers": [
+                "He4rt\\Squads\\SquadsServiceProvider"
+            ]
+        }
+    }
+}

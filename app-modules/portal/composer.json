@@ -1,0 +1,30 @@
+{
+    "name": "he4rt/portal",
+    "description": "",
+    "type": "library",
+    "version": "1.0",
+    "license": "proprietary",
+    "require": {
+        "he4rt/contents": "^1.0.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "He4rt\\Portal\\": "src/",
+            "He4rt\\Portal\\Database\\Factories\\": "database/factories/",
+            "He4rt\\Portal\\Database\\Seeders\\": "database/seeders/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "He4rt\\Portal\\Tests\\": "tests/"
+        }
+    },
+    "minimum-stability": "stable",
+    "extra": {
+        "laravel": {
+            "providers": [
+                "He4rt\\Portal\\PortalServiceProvider"
+            ]
+        }
+    }
+}

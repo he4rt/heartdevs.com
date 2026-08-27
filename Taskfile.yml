@@ -1,0 +1,115 @@
+version: '3'
+
+silent: true
+
+env:
+  WORK_DIR: $(pwd)
+
+tasks:
+  default:
+    aliases:
+      - help
+      - h
+    desc: Show available commands
+    cmds:
+      - task --list-all --sort none
+
+  route-list:
+    desc: List all registered routes
+    aliases: [rl]
+    cmd: 'php artisan route:list --except-vendor --ansi'
+
+  pint:
+    desc: Run Pint code style fixer
+    cmds:
+      - export XDEBUG_MODE=off
+      - '{{ .ROOT_DIR }}/vendor/bin/pint --parallel'
+      - unset XDEBUG_MODE
+
+  test-pint:
+    desc: Run Pint code style fixer in test mode
+    cmds:
+      - '{{ .ROOT_DIR }}/vendor/bin/pint --parallel --test'
+
+  rector:
+    desc: Run Rector
+    cmds:
+      - '{{ .ROOT_DIR }}/vendor/bin/rector process'
+
+  test-rector:
+    desc: Run Rector in test mode
+    cmds:
+      - '{{ .ROOT_DIR }}/vendor/bin/rector process --dry-run'
+
+  phpstan:
+    desc: Run PHPStan
+    aliases: [p]
+    cmds:
+      - '{{ .ROOT_DIR }}/vendor/bin/phpstan analyse --ansi'
+
+  test-phpstan:
+    desc: Run PHPStan in test mode
+    cmds:
+      - '{{ .ROOT_DIR }}/vendor/bin/phpstan analyse --ansi'
+
+  format:
+    desc: Run Pint and Rector and try to fixes the source code
+    aliases: [f]
+    cmds:
+      - task: rector
+      - task: pint
+
+  check:
+    desc: Run Pint, PHPStan with Rector in dry-run mode
+    aliases:
+      - c
+    cmds:
+      - task: test-rector
+      - task: test-pint
+      - task: test-phpstan
+
+  test:
+    desc: Run all tests
+    aliases: [t]
+    cmd: '{{ .ROOT_DIR }}/vendor/bin/pest --parallel --compact'
+
+  test-unit:
+    desc: Run unit tests
+    aliases: [tu]
+    cmd: '{{ .ROOT_DIR }}/vendor/bin/pest --parallel --compact --group=unit'
+
+  test-feature:
+    desc: Run feature tests
+    aliases: [tf]
+    cmd: '{{ .ROOT_DIR }}/vendor/bin/pest --parallel --compact --group=feature'
+
+  test-browser:
+    desc: Run browser tests
+    aliases: [tb]
+    cmd: '{{ .ROOT_DIR }}/vendor/bin/pest --parallel --compact --group=browser'
+
+  migrate-fresh:
+    desc: Run migrations and seed the database
+    aliases: [mf]
+    cmd: 'php artisan migrate:fresh --seed'
+
+  env-up:
+    desc: Start the development environment
+    aliases: [eu]
+    cmd: 'docker compose --file docker-compose.yml up --detach'
+
+  env-down:
+    desc: Stop the development environment
+    aliases: [ed]
+    cmd: 'docker compose --file docker-compose.yml down --rmi all --volumes'
+
+  dev:
+    desc: Start the server
+    aliases: [d]
+    cmd: 'composer run-script dev'
+
+  setup:
+    desc: Setup the project
+    aliases: [s]
+    cmds:
+      - 'composer run setup'

@@ -1,0 +1,21 @@
+.hp-avatar-stack {
+    @apply flex items-center gap-3;
+}
+
+.hp-avatar-stack-images {
+    @apply flex items-center;
+    @apply -space-x-2;
+}
+
+.hp-avatar-stack-images > .hp-avatar {
+    @apply ring-elevation-surface ring-2;
+    @apply transition-all duration-200 ease-in-out;
+}
+
+.hp-avatar-stack-images > .hp-avatar:hover {
+    @apply scale-105;
+}
+
+.hp-avatar-stack-label {
+    @apply text-text-medium text-sm;
+}

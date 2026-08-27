@@ -1,0 +1,12 @@
+User-agent: *
+
+# Áreas autenticadas e de infraestrutura: nada aqui deve ser rastreado.
+Disallow: /admin
+Disallow: /app
+Disallow: /auth
+Disallow: /telescope
+Disallow: /locale
+
+Allow: /
+
+Sitemap: https://heartdevs.com/sitemap.xml

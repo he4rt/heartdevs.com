@@ -1,0 +1,13 @@
+@layer base {
+    * {
+        @apply border-outline-high outline-outline-high/50;
+    }
+
+    body {
+        @apply bg-elevation-surface text-text-high;
+    }
+
+    html {
+        scroll-behavior: smooth;
+    }
+}

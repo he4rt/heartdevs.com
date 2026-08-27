@@ -1,0 +1,28 @@
+{
+    "name": "he4rt/events",
+    "description": "",
+    "type": "library",
+    "version": "1.0",
+    "license": "proprietary",
+    "require": {},
+    "autoload": {
+        "psr-4": {
+            "He4rt\\Events\\": "src/",
+            "He4rt\\Events\\Database\\Factories\\": "database/factories/",
+            "He4rt\\Events\\Database\\Seeders\\": "database/seeders/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "He4rt\\Events\\Tests\\": "tests/"
+        }
+    },
+    "minimum-stability": "stable",
+    "extra": {
+        "laravel": {
+            "providers": [
+                "He4rt\\Events\\EventsServiceProvider"
+            ]
+        }
+    }
+}

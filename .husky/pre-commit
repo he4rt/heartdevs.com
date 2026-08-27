@@ -1,0 +1,2 @@
+echo "#Lint Staged"
+npx lint-staged

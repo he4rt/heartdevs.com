@@ -1,0 +1,19 @@
+.hp-icon {
+    @apply bg-icon-high text-icon-dark rounded-md p-2;
+}
+
+.hp-icon-interactive {
+    @apply cursor-pointer transition-transform duration-200 ease-in-out hover:scale-105 active:scale-95;
+}
+
+.hp-icon-size-sm {
+    @apply h-4 w-4;
+}
+
+.hp-icon-size-md {
+    @apply h-5 w-5;
+}
+
+.hp-icon-size-lg {
+    @apply h-6 w-6;
+}

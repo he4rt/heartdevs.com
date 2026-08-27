@@ -1,0 +1,107 @@
+<?php
+
+declare(strict_types=1);
+
+namespace He4rt\Portal\Retrospective;
+
+use Carbon\CarbonImmutable;
+use He4rt\Community\Retrospective\Actions\CompileSnapshot;
+use He4rt\Community\Retrospective\Actions\ComposeDeck;
+use He4rt\Community\Retrospective\DTOs\RetrospectiveSnapshot;
+use He4rt\Community\Retrospective\DTOs\SourceResult;
+use He4rt\Community\Retrospective\Models\Retrospective;
+
+/**
+ * Monta as props da view do deck a partir de uma edição. Ponto único: a página
+ * pública, o preview e o builder do painel passam por aqui, então não existe um
+ * caminho de render que possa divergir do outro (ADR-0002).
+ *
+ * `live` é o modo rascunho: coleta as fontes na hora em vez de ler o snapshot
+ * congelado, para o operador ver o que SERÁ publicado.
+ */
+final class DeckPresentation
+{
+    /**
+     * @return array{sources: list<SourceResult>, since: CarbonImmutable, until: CarbonImmutable, coverTitle: string|null, coverIntro: string|null, closingText: string|null, stateKey: string}
+     */
+    public static function for(?Retrospective $retrospective, bool $live = false): array
+    {
+        if (!$retrospective instanceof Retrospective) {
+            return self::blank();
+        }
+
+        return self::fromSnapshot($retrospective, self::snapshotFor($retrospective, $live));
+    }
+
+    /**
+     * As mesmas props, a partir de um snapshot que quem chama já tem em mãos.
+     *
+     * Existe para o Deck Builder compor o deck e montar o filmstrip com UMA
+     * coleta: em rascunho o snapshot é coletado ao vivo, e resolvê-lo duas vezes
+     * por render pagaria a conta duas vezes para mostrar a mesma coisa.
+     *
+     * @return array{
+     *     sources: list<SourceResult>,
+     *     since: CarbonImmutable,
+     *     until: CarbonImmutable,
+     *     coverTitle: string|null,
+     *     coverIntro: string|null,
+     *     closingText: string|null,
+     *     stateKey: string,
+     * }
+     */
+    public static function fromSnapshot(Retrospective $retrospective, RetrospectiveSnapshot $snapshot): array
+    {
+        return [
+            'sources' => resolve(ComposeDeck::class)->execute(
+                $snapshot,
+                $retrospective->deck_config,
+            ),
+            'since' => $retrospective->since->toImmutable(),
+            'until' => $retrospective->until->toImmutable(),
+            'coverTitle' => $retrospective->cover_title,
+            'coverIntro' => $retrospective->cover_intro,
+            'closingText' => $retrospective->closing_text,
+            // Sem filtros do visitante: o deck só muda quando a edição muda.
+            'stateKey' => $retrospective->id,
+        ];
+    }
+
+    /**
+     * O snapshot que este deck deve usar, CRU — antes de o ComposeDeck aplicar
+     * ordem e on/off. O filmstrip do builder precisa dele inteiro: uma fonte
+     * desligada sai da composição, e se saísse também da tira o operador perderia
+     * o botão que a religa.
+     *
+     * Público para haver um dono só da regra live-vs-congelado. Se o painel
+     * repetisse esse `if`, um preview poderia ler o snapshot enquanto o outro
+     * coletava ao vivo.
+     */
+    public static function snapshotFor(Retrospective $retrospective, bool $live = false): RetrospectiveSnapshot
+    {
+        if ($live && !$retrospective->isPublished()) {
+            return resolve(CompileSnapshot::class)->execute(
+                $retrospective->period(),
+                $retrospective->filters(),
+            );
+        }
+
+        return $retrospective->snapshot ?? new RetrospectiveSnapshot();
+    }
+
+    /**
+     * @return array{sources: list<never>, since: CarbonImmutable, until: CarbonImmutable, coverTitle: null, coverIntro: null, closingText: null, stateKey: string}
+     */
+    private static function blank(): array
+    {
+        return [
+            'sources' => [],
+            'since' => CarbonImmutable::now(),
+            'until' => CarbonImmutable::now(),
+            'coverTitle' => null,
+            'coverIntro' => null,
+            'closingText' => null,
+            'stateKey' => 'empty',
+        ];
+    }
+}

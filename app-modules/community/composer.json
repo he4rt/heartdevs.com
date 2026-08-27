@@ -1,0 +1,28 @@
+{
+    "name": "he4rt/community",
+    "description": "",
+    "type": "library",
+    "version": "1.0",
+    "license": "proprietary",
+    "require": {},
+    "autoload": {
+        "psr-4": {
+            "He4rt\\Community\\": "src/",
+            "He4rt\\Community\\Database\\Factories\\": "database/factories/",
+            "He4rt\\Community\\Database\\Seeders\\": "database/seeders/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "He4rt\\Community\\Tests\\": "tests/"
+        }
+    },
+    "minimum-stability": "stable",
+    "extra": {
+        "laravel": {
+            "providers": [
+                "He4rt\\Community\\CommunityServiceProvider"
+            ]
+        }
+    }
+}

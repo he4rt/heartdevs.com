@@ -1,0 +1,32 @@
+parameters:
+    ignoreErrors:
+        -
+            message: '#^Method He4rt\\BotDiscord\\Tasks\\RichPresence::makeActivities\(\) should return array<Discord\\Parts\\User\\Activity> but returns array<int, Discord\\Parts\\Part\|Discord\\Repository\\AbstractRepository>\.$#'
+            identifier: return.type
+            count: 1
+            path: src/Tasks/RichPresence.php
+        -
+            message: '#^Unable to resolve the template type TKey in call to function collect$#'
+            identifier: argument.templateType
+            count: 1
+            path: src/SlashCommands/EditVoiceChannelLimitCommand.php
+        -
+            message: '#^Unable to resolve the template type TValue in call to function collect$#'
+            identifier: argument.templateType
+            count: 1
+            path: src/SlashCommands/EditVoiceChannelLimitCommand.php
+        -
+            message: '#^Using nullsafe property access "\?->user" on left side of \?\? is unnecessary. Use -> instead\.$#'
+            identifier: nullsafe.neverNull
+            count: 1
+            path: src/Tasks/VoiceExperienceTask.php
+        -
+            message: '#^Parameter \#1 \$roles of method Discord\\Parts\\User\\Member::setRoles\(\) expects#'
+            identifier: argument.type
+            count: 1
+            path: src/SlashCommands/CargoDelasCommand.php
+        -
+            message: '#^Parameter \#1 \$roles of method Discord\\Parts\\User\\Member::setRoles\(\) expects#'
+            identifier: argument.type
+            count: 1
+            path: src/SlashCommands/IntroductionCommand.php

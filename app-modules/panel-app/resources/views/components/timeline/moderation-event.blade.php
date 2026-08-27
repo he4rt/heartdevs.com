@@ -1,0 +1,91 @@
+@props (['timeline'])
+
+@php
+    $event = $timeline->postable;
+    $moderatorVisible = $event->metadata['moderator_visible'] ?? false;
+    $reportsCount = $event->metadata['reports_count'] ?? 0;
+    $violationType = $event->metadata['violation_type'] ?? null;
+    $isBan = $event->type === \He4rt\Activity\Moderation\Enums\ModerationType::Ban;
+@endphp
+
+<div
+    class="border-danger-300 ring-danger-500/10 dark:border-danger-500/30 overflow-hidden rounded-xl border bg-white shadow-sm ring-1 dark:bg-white/5"
+>
+    <div class="from-danger-500 to-danger-400 h-1 bg-gradient-to-r"></div>
+
+    <div class="flex items-center gap-3 px-3 pt-3 pb-2 sm:px-5 sm:pt-4">
+        <div
+            class="bg-danger-100 ring-danger-500/20 dark:bg-danger-500/15 flex h-9 w-9 shrink-0 items-center justify-center rounded-full ring-2 sm:h-11 sm:w-11"
+        >
+            <x-heroicon-s-shield-exclamation class="text-danger-500 h-4 w-4 sm:h-5 sm:w-5" />
+        </div>
+        <div class="min-w-0 flex-1">
+            <div class="flex flex-wrap items-center gap-1.5 sm:gap-2">
+                <span class="text-sm font-semibold text-gray-900 dark:text-white">Moderação</span>
+                <span
+                    class="bg-danger-500 rounded-full px-2 py-0.5 text-[9px] font-bold tracking-wider text-white uppercase"
+                >
+                    {{ $event->type->getLabel() }}
+                </span>
+                <span class="text-xs text-gray-400 dark:text-gray-600"
+                    >· {{ $event->occurred_at->diffForHumans(short: true) }}</span
+                >
+            </div>
+            @if ($moderatorVisible && $event->moderator)
+                <span class="text-xs text-gray-400 dark:text-gray-500">
+                    por {{ $event->moderator->display_name ?? $event->moderator->external_id }}
+                </span>
+            @endif
+        </div>
+    </div>
+
+    <div
+        class="border-danger-200 from-danger-50 to-danger-50/50 dark:border-danger-500/20 dark:from-danger-950/40 dark:to-danger-950/20 mx-3 mb-3 overflow-hidden rounded-xl border bg-gradient-to-br via-white sm:mx-5 sm:mb-4 dark:via-zinc-900"
+    >
+        <div class="px-4 py-4 text-center sm:px-5 sm:py-5">
+            <div
+                class="bg-danger-100 dark:bg-danger-500/15 mb-3 inline-flex h-12 w-12 items-center justify-center rounded-full sm:h-14 sm:w-14"
+            >
+                <x-heroicon-s-no-symbol class="text-danger-500 h-6 w-6 sm:h-7 sm:w-7" />
+            </div>
+            @if ($event->subject)
+                <p class="text-base font-bold text-gray-900 sm:text-lg dark:text-white">
+                    {{
+                        $event->subject->display_name ??
+                            $event->subject->external_id
+                    }}
+                </p>
+            @endif
+            <p class="mt-0.5 text-sm text-gray-500 dark:text-gray-400">foi {{ $isBan ? 'banido permanentemente' : 'removido' }} da comunidade</p>
+        </div>
+
+        @if ($event->reason)
+            <div
+                class="border-danger-100 bg-danger-50/50 dark:border-danger-500/10 dark:bg-danger-500/5 border-t px-3 py-3 sm:px-5"
+            >
+                <p class="text-sm text-gray-700 dark:text-gray-300">
+                    <span class="text-danger-600 dark:text-danger-400 font-semibold">Motivo:</span> {{ $event->reason }}
+                </p>
+            </div>
+        @endif
+
+        @if ($reportsCount > 0 || $violationType)
+            <div
+                class="border-danger-100 dark:border-danger-500/10 flex flex-wrap items-center justify-center gap-3 border-t px-3 py-2.5 text-xs text-gray-400 sm:gap-5 sm:px-5 dark:text-gray-500"
+            >
+                @if ($reportsCount > 0)
+                    <span class="flex items-center gap-1.5">
+                        <x-heroicon-o-flag class="text-danger-400 h-3.5 w-3.5" />
+                        {{ $reportsCount }} {{ str('denúncia')->plural($reportsCount) }}
+                    </span>
+                @endif
+                @if ($violationType)
+                    <span class="flex items-center gap-1.5">
+                        <x-heroicon-o-exclamation-triangle class="text-warning-500 h-3.5 w-3.5" />
+                        {{ $violationType }}
+                    </span>
+                @endif
+            </div>
+        @endif
+    </div>
+</div>

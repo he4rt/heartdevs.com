@@ -1,0 +1,26 @@
+{
+    "name": "he4rt/docs",
+    "description": "",
+    "type": "library",
+    "version": "1.0",
+    "license": "proprietary",
+    "require": {},
+    "autoload": {
+        "psr-4": {
+            "He4rt\\Docs\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "He4rt\\Docs\\Tests\\": "tests/"
+        }
+    },
+    "minimum-stability": "stable",
+    "extra": {
+        "laravel": {
+            "providers": [
+                "He4rt\\Docs\\DocsServiceProvider"
+            ]
+        }
+    }
+}

@@ -1,0 +1,82 @@
+@import '../../../../vendor/filament/filament/resources/css/theme.css';
+@import '../locale-switcher.css' layer(components);
+
+@source '../../../../app/Filament/**/*';
+@source '../../../../app/Filament/**/*';
+@source '../../../../resources/views/**/*';
+@source '../../../../app-modules/**/src/Filament/**/*';
+@source '../../../../app-modules/**/resources/views/**/*';
+
+/* Login split layout — strip Filament's card wrapper */
+.fi-simple-layout:has(.fi-login-split) {
+    .fi-simple-main-ctn {
+        align-items: stretch;
+    }
+
+    .fi-simple-main {
+        margin: 0;
+        padding: 0;
+        max-width: none;
+        background: transparent;
+        box-shadow: none;
+        border-radius: 0;
+        --tw-ring-shadow: 0 0 #0000;
+    }
+
+    .fi-simple-page,
+    .fi-simple-page-content {
+        display: contents;
+    }
+}
+
+@keyframes login-float {
+    0%,
+    100% {
+        transform: translateY(0);
+    }
+    50% {
+        transform: translateY(-12px);
+    }
+}
+
+@keyframes login-pulse-glow {
+    0%,
+    100% {
+        opacity: 0.2;
+    }
+    50% {
+        opacity: 0.35;
+    }
+}
+
+/* Force image editor save button to use primary (purple) instead of success (green) */
+.fi-fo-file-upload-editor-control-panel-footer .fi-btn.fi-color-success {
+    background-color: var(--primary-600) !important;
+    color: #fff !important;
+
+    &:hover {
+        background-color: var(--primary-500) !important;
+    }
+}
+
+/* Keep user avatar circle visible against dark sidebar
+   (default ui-avatars uses gray-950, which blends into dark mode) */
+.fi-sidebar .fi-user-avatar {
+    @apply ring-1 ring-gray-300 dark:ring-white/20;
+}
+
+/* Soft edge between sidebar navigation and main content
+   (same weight as Filament form input borders) */
+.fi-sidebar {
+    @apply border-e border-gray-200 dark:border-white/10;
+}
+
+/* Make "today" stand out in date pickers (esp. dark mode) */
+.fi-fo-date-time-picker-calendar-day.fi-fo-date-time-picker-calendar-day-today:not(.fi-selected):not(.fi-disabled) {
+    @apply font-semibold text-primary-600 ring-1 ring-inset ring-primary-500/50 dark:text-primary-300 dark:ring-primary-400/60;
+}
+
+/* Calendar suffix icon should feel clickable */
+.fi-fo-date-time-picker .fi-input-wrp-suffix {
+    @apply cursor-pointer;
+}

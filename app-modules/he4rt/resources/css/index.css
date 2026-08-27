@@ -1,0 +1,162 @@
+@import '../../../../vendor/filament/filament/resources/css/theme.css';
+
+@import './support/index.css';
+@import './base.css';
+
+@import './components/card.css' layer(components);
+@import './components/page.css' layer(components);
+@import './components/section.css' layer(components);
+@import './components/headline.css' layer(components);
+@import './components/button.css' layer(components);
+@import './components/avatar.css' layer(components);
+@import './components/avatar-stack.css' layer(components);
+@import './components/text-input.css' layer(components);
+@import './components/tag.css' layer(components);
+@import './components/badge.css' layer(components);
+@import './components/heading.css' layer(components);
+@import './components/text.css' layer(components);
+@import './components/icon.css' layer(components);
+@import './components/ticket.css' layer(components);
+@import './components/partials/author.css' layer(components);
+@import './components/partials/footer.css' layer(components);
+
+@source '../../../../resources/views/**/*.blade.php';
+@source '../../../../app-modules/**/resources/views/**/*.blade.php';
+@source '../../../../app/Filament/**/*';
+@source '../../../../vendor/filament/**/*.blade.php';
+@source '../**/*.blade.php';
+@source '../**/*.php';
+
+[x-cloak] {
+    display: none !important;
+}
+
+@keyframes spin-slow {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.spin-slow {
+    animation: spin-slow 40s linear infinite;
+}
+
+@keyframes infinite-scroll {
+    0% {
+        transform: translateX(0);
+    }
+    100% {
+        transform: translateX(-100%);
+    }
+}
+
+.animate-infinite-scroll {
+    display: flex;
+    width: max-content;
+    animation: infinite-scroll 25s linear infinite;
+    will-change: transform;
+}
+
+.fi-topbar {
+    @apply bg-elevation-surface p-4 px-12 shadow-none ring-0;
+}
+
+.fi-topbar-start {
+    margin-inline-end: unset;
+}
+
+.fi-topbar {
+    @apply justify-between;
+
+    & .fi-topbar-nav-groups {
+        @apply m-auto;
+
+        & .fi-topbar-item {
+            & .fi-topbar-item-btn {
+                @apply relative hover:bg-transparent;
+
+                & .fi-topbar-item-label {
+                    @apply text-text-high font-bold;
+                }
+
+                &::after {
+                    content: '';
+                    @apply bg-primary absolute bottom-0 left-0 h-0.5 w-full;
+                    @apply origin-left scale-x-0 transform;
+                    @apply transition-transform duration-200 ease-in-out;
+                }
+
+                &:hover::after {
+                    @apply scale-x-100;
+                }
+            }
+        }
+    }
+}
+
+.fi-sidebar-item {
+    & .fi-sidebar-item-btn {
+        @apply relative hover:bg-transparent;
+
+        & .fi-sidebar-item-label {
+            @apply text-text-high font-bold;
+        }
+
+        &::after {
+            content: '';
+            @apply bg-primary absolute bottom-0 left-0 h-0.5 w-full;
+            @apply origin-left scale-x-0 transform;
+            @apply transition-transform duration-200 ease-in-out;
+        }
+
+        &:hover::after {
+            @apply scale-x-100;
+        }
+    }
+}
+
+.fi-topbar-end {
+    margin-inline-start: unset;
+}
+
+.fi-page-content {
+    @apply from-primary/12 to-elevation-surface gap-0 bg-gradient-to-br;
+}
+
+.fi-page-header-main-ctn {
+    @apply p-0;
+}
+
+.fi-main {
+    @apply p-0;
+}
+
+@variant dark (&:where(.dark, .dark *));
+
+:root {
+    --gray-50: oklch(0.989 0.005 286.303) !important;
+    --gray-100: oklch(50.98 0.005 274.967) !important;
+    --gray-200: oklch(0.9673 0.0083 271.33) !important;
+    --gray-300: oklch(0.88 0.01 273.342) !important;
+    --gray-400: oklch(0.805 0.009 271.307) !important;
+    --gray-500: oklch(0.728 0.008 268.525) !important;
+    --gray-600: oklch(0.57 0.006 274.9) !important;
+    --gray-700: oklch(0.486 0.005 271.313) !important;
+    --gray-800: oklch(0.399 0.005 286.172) !important;
+    --gray-900: oklch(0.306 0.004 286.188) !important;
+    --gray-950: oklch(0.205 0.002 286.226) !important;
+}
+
+:root.dark {
+    --gray-50: oklch(0.928 0 89.876) !important;
+    --gray-100: oklch(0.858 0 89.876) !important;
+    --gray-200: oklch(0.783 0.001 286.368) !important;
+    --gray-300: oklch(0.709 0 89.876) !important;
+    --gray-400: oklch(0.633 0 89.876) !important;
+    --gray-500: oklch(0.552 0.002 286.35) !important;
+    --gray-600: oklch(0.471 0 89.876) !important;
+    --gray-700: oklch(0.383 0.002 286.321) !important;
+    --gray-800: oklch(0.187 0.002 286.205) !important;
+    --gray-900: oklch(0.169 0.002 286.177) !important;
+    --gray-950: oklch(0.14 0.002 286.109) !important;
+}

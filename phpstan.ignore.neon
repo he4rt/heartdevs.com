@@ -1,0 +1,8 @@
+parameters:
+    ignoreErrors:
+        -
+            message: '#^Call to an undefined method App\\Providers\\FilamentServiceProvider::getId\(\)\.$#'
+            identifier: method.notFound
+            count: 1
+            path: app/Providers/FilamentServiceProvider.php
+

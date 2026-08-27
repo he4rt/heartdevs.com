@@ -1,0 +1,12 @@
+@import '../../../../vendor/filament/filament/resources/css/theme.css';
+@import '../../../../vendor/livewire/flux/dist/flux.css';
+@import '../locale-switcher.css' layer(components);
+
+@source '../../../../app/Filament/**/*';
+@source '../../../../resources/views/**/*';
+@source '../../../../app-modules/**/resources/**/*';
+@source '../../../../app-modules/**/src/**/*';
+
+.fi-sidebar {
+    @apply bg-gray-100 dark:bg-gray-900;
+}

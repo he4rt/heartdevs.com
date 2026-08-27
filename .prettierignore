@@ -1,0 +1,11 @@
+node_modules
+dist
+.env*
+vendor/
+public/
+.git
+bun.lock
+package-lock.json
+composer.lock
+storage/
+.ai/guidelines/

@@ -1,0 +1,200 @@
+{
+    "name": "he4rt/he4rtdevs",
+    "type": "project",
+    "description": "The Laravel Framework.",
+    "keywords": [
+        "framework",
+        "laravel"
+    ],
+    "license": "MIT",
+    "require": {
+        "php": "^8.4",
+        "bacon/bacon-qr-code": "^2.0.8",
+        "calebporzio/sushi": "^2.5.4",
+        "dedoc/scramble": "^0.13.40",
+        "filament/filament": "^5.7.6",
+        "filament/spatie-laravel-media-library-plugin": "^5.7.6",
+        "guzzlehttp/guzzle": "^7.15.3",
+        "he4rt/activity": "^1.0.0",
+        "he4rt/bot-discord": "^1.0.0",
+        "he4rt/community": "^1.0.0",
+        "he4rt/contents": "^1.0.0",
+        "he4rt/docs": "^1.0.0",
+        "he4rt/economy": "^1.0.0",
+        "he4rt/events": "^1.0.0",
+        "he4rt/gamification": "^1.0.0",
+        "he4rt/he4rt-core": "^1.0.0",
+        "he4rt/identity": "^1.0.0",
+        "he4rt/integration-devto": "^1.0.0",
+        "he4rt/integration-discord": "^1.0.0",
+        "he4rt/integration-github": "^1.0.0",
+        "he4rt/integration-twitch": "^1.0.0",
+        "he4rt/integration-whatsapp": "^1.0.0",
+        "he4rt/marketing": "^1.0.0",
+        "he4rt/moderation": "^1.0.0",
+        "he4rt/onboarding": "^1.0.0",
+        "he4rt/panel-admin": "^1.0.0",
+        "he4rt/panel-app": "^1.0.0",
+        "he4rt/portal": "^1.0.0",
+        "he4rt/profile": "^1.0.0",
+        "he4rt/squads": "^1.0.0",
+        "internachi/modular": "^3.0.2",
+        "laracord/framework": "dev-next#e7b64d6",
+        "laravel/framework": "^13.25.0",
+        "laravel/head": "^0.2.0",
+        "laravel/nightwatch": "^1.28.7",
+        "laravel/sanctum": "^4.3.3",
+        "laravel/telescope": "^5.22.1",
+        "laravel/tinker": "^3.0.2",
+        "league/flysystem-sftp-v3": "^3.33.0",
+        "livewire/flux": "^2.16.0",
+        "marvinlabs/laravel-discord-logger": "^1.4.4",
+        "matomo/device-detector": "^6.5.1",
+        "monicahq/laravel-cloudflare": "^4.1",
+        "owenvoke/blade-fontawesome": "^3.3.1",
+        "phiki/phiki": "^2.2.1",
+        "ryangjchandler/commonmark-blade-block": "^1.1.1",
+        "saloonphp/saloon": "^4.0",
+        "spatie/laravel-backup": "^10.3.1",
+        "spatie/laravel-medialibrary": "^11.23.5",
+        "symfony/dom-crawler": "^8.1.1",
+        "symfony/yaml": "^8.1.2"
+    },
+    "require-dev": {
+        "driftingly/rector-laravel": "^2.5.0",
+        "fakerphp/faker": "^1.24.1",
+        "fruitcake/laravel-debugbar": "^4.4.1",
+        "larastan/larastan": "^3.10.0",
+        "laravel/boost": "^2.5.3",
+        "laravel/pail": "^1.2.7",
+        "laravel/pao": "^1.1.4",
+        "laravel/pint": "^1.30.5",
+        "mockery/mockery": "^1.6.13",
+        "nunomaduro/collision": "^8.9.5",
+        "pestphp/pest": "^5.1.1",
+        "pestphp/pest-plugin-faker": "^5.0.0",
+        "pestphp/pest-plugin-laravel": "^5.0.1",
+        "pestphp/pest-plugin-livewire": "^5.0.0",
+        "pestphp/pest-plugin-rector": "^5.0.3",
+        "phpstan/extension-installer": "^1.4.3",
+        "rector/rector": "^2.6.2"
+    },
+    "autoload": {
+        "psr-4": {
+            "App\\": "app/",
+            "Database\\Factories\\": "database/factories/",
+            "Database\\Seeders\\": "database/seeders/"
+        },
+        "files": [
+            "bootstrap/helpers.php"
+        ]
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Tests\\": "tests/"
+        }
+    },
+    "scripts": {
+        "post-autoload-dump": [
+            "Illuminate\\Foundation\\ComposerScripts::postAutoloadDump",
+            "@php artisan package:discover --ansi",
+            "@php artisan filament:upgrade",
+            "@php artisan modules:sync --no-phpunit --ansi"
+        ],
+        "post-update-cmd": [
+            "@php artisan vendor:publish --tag=laravel-assets --ansi --force"
+        ],
+        "pre-package-uninstall": [
+            "Illuminate\\Foundation\\ComposerScripts::prePackageUninstall"
+        ],
+        "post-root-package-install": [
+            "@php -r \"file_exists('.env') || copy('.env.example', '.env');\"",
+            "@php -r \"file_exists('.env.testing') || copy('.env.testing.example', '.env.testing');\""
+        ],
+        "key:generate": [
+            "@php artisan key:generate --ansi",
+            "@php artisan key:generate --ansi --env=testing"
+        ],
+        "post-create-project-cmd": [
+            "@php -r \"file_exists('database/database.sqlite') || touch('database/database.sqlite');\"",
+            "@php artisan migrate --graceful --ansi"
+        ],
+        "setup": [
+            "composer install",
+            "npm install",
+            "composer run-script post-root-package-install",
+            "composer run-script key:generate",
+            "composer run-script post-create-project-cmd",
+            "@php artisan storage:link --ansi"
+        ],
+        "bot": "@php artisan bot:boot",
+        "dev": [
+            "Composer\\Config::disableProcessTimeout",
+            "npx concurrently -c \"#93c5fd,#c4b5fd,#fb7185,#fdba74\" \"php artisan serve\" \"php artisan queue:listen --tries=1\" \"php artisan pail --timeout=0\" \"npm run dev\" --names=server,queue,logs,vite"
+        ],
+        "pint": "vendor/bin/pint --parallel",
+        "test:pint": "vendor/bin/pint --test --parallel",
+        "rector": "vendor/bin/rector",
+        "test:rector": "vendor/bin/rector --dry-run",
+        "phpstan": "vendor/bin/phpstan analyse --ansi",
+        "test:phpstan": "vendor/bin/phpstan analyse --ansi",
+        "test:unit": "vendor/bin/pest --compact --group=unit",
+        "test:feature": "vendor/bin/pest --compact --group=feature",
+        "test:cov": "vendor/bin/pest --compact --coverage",
+        "check": [
+            "@test:rector",
+            "@test:pint",
+            "@test:phpstan"
+        ],
+        "test": [
+            "@php artisan config:clear --ansi",
+            "vendor/bin/pest --compact"
+        ]
+    },
+    "extra": {
+        "laravel": {
+            "dont-discover": [
+                "barryvdh/laravel-debugbar",
+                "laravel/telescope"
+            ]
+        }
+    },
+    "config": {
+        "optimize-autoloader": true,
+        "bump-after-update": true,
+        "preferred-install": "dist",
+        "sort-packages": true,
+        "allow-plugins": {
+            "pestphp/pest-plugin": true,
+            "php-http/discovery": true,
+            "phpstan/extension-installer": true
+        },
+        "policy": {
+            "abandoned": {
+                "audit": "report"
+            },
+            "advisories": {
+                "block": true
+            }
+        }
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true,
+    "repositories": [
+        {
+            "type": "path",
+            "url": "app-modules/*",
+            "options": {
+                "symlink": true
+            }
+        },
+        {
+            "type": "vcs",
+            "url": "https://github.com/danielhe4rt/laracord-framework"
+        },
+        {
+            "type": "vcs",
+            "url": "https://github.com/danielhe4rt/tinker-zero"
+        }
+    ]
+}

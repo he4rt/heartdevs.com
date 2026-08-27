@@ -1,0 +1,58 @@
+name: Rector
+
+on:
+  workflow_call:
+    inputs:
+      PHP_VERSION:
+        required: true
+        type: string
+      PHP_EXTENSIONS:
+        required: true
+        type: string
+      PHP_INI_PROPERTIES:
+        required: true
+        type: string
+      COMPOSER_FLAGS:
+        required: true
+        type: string
+      CACHE_KEY:
+        required: true
+        type: string
+
+permissions: {}
+
+jobs:
+  run:
+    name: Run
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: read
+    concurrency:
+      group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}-rector
+      cancel-in-progress: true
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@f3e473d116dcccaddc5834248c87452386958240 # v2.37.2
+        with:
+          php-version: ${{ inputs.PHP_VERSION }}
+          extensions: ${{ inputs.PHP_EXTENSIONS }}
+          ini-values: ${{ inputs.PHP_INI_PROPERTIES }}
+          coverage: xdebug
+          tools: composer:v2
+
+      - name: Install composer dependencies
+        uses: ramsey/composer-install@65e4f84970763564f46a70b8a54b90d033b3bdda # v4.0.0
+        with:
+          composer-options: ${{ inputs.COMPOSER_FLAGS }}
+          custom-cache-key: ${{ inputs.CACHE_KEY }}
+
+      - name: Run Rector
+        run: |
+          vendor/bin/rector --dry-run --output-format=github

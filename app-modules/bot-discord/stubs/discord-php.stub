@@ -1,0 +1,154 @@
+<?php
+
+namespace Discord\Helpers;
+
+/**
+ * @template T
+ */
+interface CollectionInterface
+{
+    /**
+     * @return T|null
+     */
+    public function get(string $discrim, mixed $key);
+
+    /**
+     * @return T|null
+     */
+    public function find(callable $callback);
+
+    /**
+     * @return T|null
+     */
+    public function first();
+}
+
+namespace Discord\Parts\User;
+
+use Discord\Helpers\CollectionInterface;
+use Discord\Parts\Guild\Role;
+
+/**
+ * @property string $id
+ * @property string $username
+ * @property string $discriminator
+ * @property string|null $global_name
+ * @property string|null $avatar
+ * @property bool|null $bot
+ * @property string|null $email
+ * @property int|null $public_flags
+ */
+class User
+{
+}
+
+/**
+ * @property string $id
+ * @property User|null $user
+ * @property string|null $username
+ * @property string|null $nick
+ * @property string|null $avatar
+ * @property CollectionInterface<Role> $roles
+ * @property \DateTimeInterface|null $joined_at
+ * @property bool $deaf
+ * @property bool $mute
+ * @property string|null $guild_id
+ * @property \Discord\Parts\Guild\Guild|null $guild
+ * @property string $status
+ * @property iterable<Activity> $activities
+ */
+class Member
+{
+}
+
+/**
+ * @property string $name
+ * @property int $type
+ * @property string|null $url
+ * @property string|null $application_id
+ * @property string|null $details
+ * @property string|null $state
+ */
+class Activity
+{
+}
+
+namespace Discord\Parts\Guild;
+
+/**
+ * @property string $id
+ * @property string $name
+ * @property string|null $icon
+ * @property string|null $splash
+ * @property string|null $owner_id
+ * @property string|null $afk_channel_id
+ * @property int|null $afk_timeout
+ * @property int|null $member_count
+ * @property mixed $members
+ * @property mixed $channels
+ * @property \Discord\Helpers\CollectionInterface<Role> $roles
+ * @property-read mixed $voice_states
+ */
+class Guild
+{
+}
+
+/**
+ * @property string $id
+ * @property string $name
+ * @property int|null $color
+ * @property bool $hoist
+ * @property int $position
+ * @property bool $managed
+ * @property bool $mentionable
+ */
+class Role
+{
+}
+
+namespace Discord\Parts\Channel;
+
+/**
+ * @property string $id
+ * @property int $type
+ * @property string|null $guild_id
+ * @property string|null $name
+ * @property string|null $topic
+ * @property int|null $user_limit
+ * @property int|null $bitrate
+ */
+class Channel
+{
+}
+
+namespace Discord\Parts\WebSockets;
+
+/**
+ * @property string|null $guild_id
+ * @property \Discord\Parts\Guild\Guild|null $guild
+ * @property string|null $channel_id
+ * @property \Discord\Parts\Channel\Channel|null $channel
+ * @property string $user_id
+ * @property \Discord\Parts\User\User|null $user
+ * @property \Discord\Parts\User\Member|null $member
+ * @property string $session_id
+ * @property bool $deaf
+ * @property bool $mute
+ * @property bool $self_deaf
+ * @property bool $self_mute
+ */
+class VoiceStateUpdate
+{
+}
+
+namespace Discord\Parts\Interactions\Request;
+
+use Discord\Helpers\CollectionInterface;
+use Discord\Parts\User\User;
+
+/**
+ * @property CollectionInterface<User> $users
+ */
+class Resolved
+{
+}

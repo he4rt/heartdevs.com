@@ -1,0 +1,11 @@
+.hp-headline-title {
+    @apply font-family-secondary font-regular leading-[150%];
+}
+
+.hp-headline-highlight {
+    @apply text-text-medium;
+}
+
+.hp-headline-actions {
+    @apply mt-4;
+}

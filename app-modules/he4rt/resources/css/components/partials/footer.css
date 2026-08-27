@@ -1,0 +1,34 @@
+.hp-footer {
+    @apply py-8 sm:py-12 lg:py-16;
+}
+
+.hp-footer-container {
+    @apply space-y-8 px-4 sm:px-6 lg:px-8;
+}
+
+.hp-footer-col {
+    @apply flex flex-col gap-y-3 sm:gap-y-4;
+}
+
+.hp-footer-heading {
+    @apply text-lg font-semibold sm:text-xl;
+}
+
+.hp-footer-list {
+    @apply space-y-2 sm:space-y-6 sm:text-base;
+}
+
+.hp-footer-link {
+    @apply text-text-medium text-sm;
+}
+
+.hp-footer-text {
+    @apply text-sm sm:text-base;
+}
+.hp-footer-text-medium {
+    @apply font-medium;
+}
+
+.hp-footer-bottom {
+    @apply text-text-high flex w-full flex-col items-center justify-between gap-2 font-bold sm:flex-row;
+}

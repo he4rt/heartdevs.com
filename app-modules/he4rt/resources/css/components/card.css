@@ -1,0 +1,58 @@
+.hp-card {
+    @apply flex h-full flex-col rounded-lg;
+    @apply gap-4;
+    @apply p-6;
+    @apply border-outline-low border;
+}
+
+.hp-card-density-compact {
+    @apply p-4;
+}
+
+.hp-card-variant-solid {
+    @apply bg-transparent;
+}
+
+.hp-card-interactive {
+    @apply hover:border-primary transition-all duration-500 hover:scale-[1.02];
+}
+
+.hp-card-icon {
+    @apply flex w-full items-start justify-start;
+}
+
+.hp-card-header {
+    @apply border-outline-low border-b pb-4;
+}
+
+.hp-card-body {
+    @apply flex flex-col gap-y-2;
+    @apply min-w-0;
+}
+
+.hp-card-title {
+    @apply font-semibold tracking-tight lg:text-xl;
+    @apply break-words;
+}
+
+.hp-card-description {
+    @apply text-text-medium;
+    @apply break-words;
+}
+
+.hp-card-tags {
+    @apply flex gap-2;
+    @apply flex-wrap;
+}
+
+.hp-card-actions {
+    @apply mt-auto w-full;
+}
+
+.hp-card-footer {
+    @apply border-outline-low border-t pt-4;
+}
+
+.hp-card-disabled {
+    @apply pointer-events-none cursor-not-allowed opacity-60;
+}

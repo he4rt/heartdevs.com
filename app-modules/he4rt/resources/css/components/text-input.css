@@ -1,0 +1,18 @@
+.hp-input-field {
+    @apply flex w-full flex-col gap-2;
+}
+
+.hp-input-label {
+    @apply text-text-high font-medium;
+    @apply text-sm;
+}
+
+.hp-input {
+    @apply w-full;
+    @apply border-outline-low rounded-md border p-2;
+    @apply bg-transparent;
+    @apply text-text-high;
+    @apply transition-all duration-200 ease-in-out;
+    @apply focus:border-primary focus:ring-primary focus:ring-1;
+    @apply disabled:cursor-not-allowed disabled:bg-gray-50 disabled:opacity-60 dark:disabled:bg-gray-800;
+}

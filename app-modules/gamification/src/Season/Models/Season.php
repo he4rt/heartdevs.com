@@ -1,0 +1,71 @@
+<?php
+
+declare(strict_types=1);
+
+namespace He4rt\Gamification\Season\Models;
+
+use He4rt\Community\Meeting\Models\Meeting;
+use He4rt\Gamification\Badge\Models\Badge;
+use He4rt\Gamification\Character\Models\PastSeason;
+use He4rt\Gamification\Database\Factories\SeasonFactory;
+use Illuminate\Database\Eloquent\Attributes\Table;
+use Illuminate\Database\Eloquent\Concerns\HasUuids;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Facades\Date;
+
+/**
+ * @property string $name
+ * @property string $description
+ * @property int $messages_count
+ * @property int $participants_count
+ * @property int $meetings_count
+ * @property int $badges_count
+ * @property Date $started_at
+ * @property Date $ended_at
+ */
+#[Table(name: 'seasons')]
+final class Season extends Model
+{
+    /** @use HasFactory<SeasonFactory> */
+    use HasFactory;
+    use HasUuids;
+
+    /**
+     * @return HasMany<Badge, $this>
+     */
+    public function badges(): HasMany
+    {
+        return $this->hasMany(Badge::class);
+    }
+
+    /**
+     * @return HasMany<Meeting, $this>
+     */
+    public function meetings(): HasMany
+    {
+        return $this->hasMany(Meeting::class);
+    }
+
+    /**
+     * @return HasMany<PastSeason, $this>
+     */
+    public function rankings(): HasMany
+    {
+        return $this->hasMany(PastSeason::class, 'season_id');
+    }
+
+    protected static function newFactory(): SeasonFactory
+    {
+        return SeasonFactory::new();
+    }
+
+    protected function casts(): array
+    {
+        return [
+            'started_at' => 'datetime',
+            'ended_at' => 'datetime',
+        ];
+    }
+}

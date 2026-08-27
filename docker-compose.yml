@@ -1,0 +1,78 @@
+services:
+  heartdevs-db:
+    build:
+      dockerfile: docker/postgres.Dockerfile
+      context: .
+    image: postgres.local:18
+    container_name: heartdevs-db
+    restart: no
+    hostname: dev
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: dev_heartdevs
+      TZ: Etc/UTC
+      PGTZ: Etc/UTC
+    ports:
+      - '5432:5432'
+    volumes:
+      - heartdevs-db:/var/lib/postgresql
+    networks:
+      - dev-heartdevs
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready --quiet --username=postgres --dbname=postgres || exit 1']
+      interval: 10s
+      retries: 5
+      timeout: 10s
+      start_period: 15s
+
+  heartdevs-redis:
+    build:
+      dockerfile: docker/redis.Dockerfile
+      context: .
+    image: redis.local:8
+    container_name: heartdevs-redis
+    restart: no
+    hostname: dev
+    ports:
+      - '6379:6379'
+    networks:
+      - dev-heartdevs
+    healthcheck:
+      test: ['CMD-SHELL', 'redis-cli --raw incr ping || exit 1']
+      interval: 10s
+      retries: 5
+      timeout: 10s
+      start_period: 15s
+
+  heartdevs-mailpit:
+    build:
+      dockerfile: docker/mailpit.Dockerfile
+      context: .
+    image: mailpit.local:1
+    container_name: heartdevs-mailpit
+    restart: no
+    hostname: dev
+    ports:
+      - '1025:1025'
+      - '8025:8025'
+    networks:
+      - dev-heartdevs
+    healthcheck:
+      test: ['CMD', '/mailpit', 'readyz']
+      interval: 10s
+      retries: 5
+      timeout: 10s
+      start_period: 10s
+
+volumes:
+  heartdevs-db:
+    name: heartdevs-db
+
+networks:
+  dev-heartdevs:
+    name: dev-heartdevs
+    driver: bridge
+    driver_opts:
+      com.docker.network.bridge.name: dev-heartdevs
+      com.docker.network.bridge.host_binding_ipv4: '127.0.0.1'

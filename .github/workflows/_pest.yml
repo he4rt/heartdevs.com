@@ -1,0 +1,109 @@
+name: Pest Tests
+
+on:
+  workflow_call:
+    inputs:
+      PHP_VERSION:
+        required: true
+        type: string
+      PHP_EXTENSIONS:
+        required: true
+        type: string
+      PHP_INI_PROPERTIES:
+        required: true
+        type: string
+      COMPOSER_FLAGS:
+        required: true
+        type: string
+      CACHE_KEY:
+        required: true
+        type: string
+
+permissions: {}
+
+jobs:
+  tests:
+    name: 'Shard ${{ matrix.shard }}/2'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+    concurrency:
+      group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}-tests-${{ matrix.shard }}
+      cancel-in-progress: true
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: [1, 2]
+
+    services:
+      postgres:
+        image: postgres:18-alpine # zizmor: ignore[unpinned-images] — ephemeral CI test DB; tracking the patch tag keeps it updated (dependabot doesn't bump service-container images)
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: test_heartdevs
+        ports:
+          - 5432/tcp
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 3s
+          --health-timeout 3s
+          --health-retries 10
+          --health-start-period 5s
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@f3e473d116dcccaddc5834248c87452386958240 # v2.37.2
+        with:
+          php-version: ${{ inputs.PHP_VERSION }}
+          extensions: ${{ inputs.PHP_EXTENSIONS }}
+          ini-values: ${{ inputs.PHP_INI_PROPERTIES }}
+          coverage: none
+          tools: composer:v2
+
+      - name: Setup Problem Matches
+        shell: bash
+        env:
+          RUNNER_TOOL_CACHE: ${{ runner.tool_cache }}
+        run: |
+          echo "::add-matcher::${RUNNER_TOOL_CACHE}/php.json"
+          echo "::add-matcher::${RUNNER_TOOL_CACHE}/phpunit.json"
+
+      - name: Install composer dependencies
+        uses: ramsey/composer-install@65e4f84970763564f46a70b8a54b90d033b3bdda # v4.0.0
+        with:
+          composer-options: ${{ inputs.COMPOSER_FLAGS }}
+          custom-cache-key: ${{ inputs.CACHE_KEY }}
+
+      - name: Install Node.js
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          package-manager-cache: false
+          node-version-file: '.nvmrc'
+          cache: 'npm'
+
+      - name: Install node dependencies
+        run: |
+          npm ci
+
+      - name: Build Assets
+        run: npm run build
+
+      - name: Prepare test env
+        run: |
+          composer run-script post-root-package-install
+          composer run-script key:generate
+
+      - name: Run Tests
+        env:
+          DB_PORT: ${{ job.services.postgres.ports['5432'] }}
+          SHARD: ${{ matrix.shard }}
+        run: |
+          vendor/bin/pest --ci --parallel --shard="${SHARD}"/2

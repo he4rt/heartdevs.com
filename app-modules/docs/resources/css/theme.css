@@ -1,0 +1,101 @@
+@import 'tailwindcss' source(none);
+@import '../../../../vendor/livewire/flux/dist/flux.css';
+
+@plugin '@tailwindcss/typography';
+@source '../../../../app-modules/**/resources/views/**/*.blade.php';
+
+/* Dark mode é controlado pela CLASSE .dark (Flux/toggle), não pelo prefers-color-scheme do SO. */
+@custom-variant dark (&:where(.dark, .dark *));
+
+:root {
+    --gray-50: oklch(0.985 0.002 286.3) !important;
+    --gray-100: oklch(0.967 0.003 286.3) !important;
+    --gray-200: oklch(0.92 0.004 286.32) !important;
+    --gray-300: oklch(0.871 0.006 286.29) !important;
+    --gray-400: oklch(0.705 0.015 286.07) !important;
+    --gray-500: oklch(0.552 0.016 285.94) !important;
+    --gray-600: oklch(0.442 0.017 285.79) !important;
+    --gray-700: oklch(0.37 0.012 285.8) !important;
+    --gray-800: oklch(0.274 0.006 286.03) !important;
+    --gray-900: oklch(0.21 0.006 285.9) !important;
+    --gray-950: oklch(0.141 0.005 285.8) !important;
+}
+
+:root.dark {
+    --gray-50: oklch(0.928 0 89.876) !important;
+    --gray-100: oklch(0.858 0 89.876) !important;
+    --gray-200: oklch(0.783 0.001 286.368) !important;
+    --gray-300: oklch(0.709 0 89.876) !important;
+    --gray-400: oklch(0.633 0 89.876) !important;
+    --gray-500: oklch(0.552 0.002 286.35) !important;
+    --gray-600: oklch(0.471 0 89.876) !important;
+    --gray-700: oklch(0.383 0.002 286.321) !important;
+    --gray-800: oklch(0.187 0.002 286.205) !important;
+    --gray-900: oklch(0.169 0.002 286.177) !important;
+    --gray-950: oklch(0.14 0.002 286.109) !important;
+    /* Texto roxo legível sobre fundo escuro (item ativo em dark). */
+    --color-accent-content: #a78bfa !important;
+}
+
+@theme {
+    --color-zinc-50: var(--gray-50);
+    --color-zinc-100: var(--gray-100);
+    --color-zinc-200: var(--gray-200);
+    --color-zinc-300: var(--gray-300);
+    --color-zinc-400: var(--gray-400);
+    --color-zinc-500: var(--gray-500);
+    --color-zinc-600: var(--gray-600);
+    --color-zinc-700: var(--gray-700);
+    --color-zinc-800: var(--gray-800);
+    --color-zinc-900: var(--gray-900);
+    --color-zinc-950: var(--gray-950);
+
+    /* Roxo da marca He4rt — accent do Flux (item ativo da sidebar, controles) + escala primary. */
+    --color-accent: #782bf1;
+    --color-accent-content: #6d28d9;
+    --color-accent-foreground: #ffffff;
+
+    --color-primary-50: #f3f0fe;
+    --color-primary-100: #e9e3fd;
+    --color-primary-200: #d6ccfb;
+    --color-primary-300: #bba6f7;
+    --color-primary-400: #9b76f1;
+    --color-primary-500: #8149ea;
+    --color-primary-600: #782bf1;
+    --color-primary-700: #6420c8;
+    --color-primary-800: #531ca3;
+    --color-primary-900: #451a82;
+    --color-primary-950: #2b0e58;
+}
+
+/* ---- Acessibilidade base (WCAG 2.2 AA) ---- */
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+    }
+}
+
+a:focus-visible,
+button:focus-visible,
+summary:focus-visible,
+input:focus-visible,
+[tabindex]:focus-visible {
+    outline: 2px solid var(--color-primary-600, #782bf1);
+    outline-offset: 2px;
+    border-radius: 0.25rem;
+}
+
+/* ---- Parágrafo-lead: o primeiro parágrafo do conteúdo, maior e mais respirado ---- */
+.prose > p:first-of-type {
+    font-size: 1.0625rem;
+    line-height: 1.7;
+    color: var(--gray-600);
+}
+:root.dark .prose > p:first-of-type {
+    color: var(--gray-300);
+}

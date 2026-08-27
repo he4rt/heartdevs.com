@@ -1,0 +1,87 @@
+.hp-headline {
+    @apply mx-auto flex max-w-2xl flex-col md:max-w-3xl lg:max-w-7xl;
+}
+
+.hp-headline-container {
+    @apply flex w-full flex-col gap-4;
+}
+
+.hp-headline-align-center .hp-headline-container {
+    @apply items-center text-center sm:items-center sm:text-center;
+}
+
+.hp-headline-align-left .hp-headline-container {
+    @apply items-center text-center sm:items-start sm:text-left;
+}
+
+.hp-headline-content {
+    @apply flex flex-col gap-6;
+}
+
+.hp-headline-title {
+    @apply font-bold drop-shadow-lg;
+}
+
+.hp-headline-subtitle {
+    @apply flex flex-col;
+}
+
+.hp-headline-description {
+    @apply text-text-medium max-w-full font-medium delay-200;
+}
+
+.hp-headline-size-sm .hp-headline-description {
+    @apply text-sm;
+}
+
+.hp-headline-size-sm .hp-headline-title {
+    @apply text-lg sm:text-xl md:text-2xl;
+}
+
+.hp-headline-size-md .hp-headline-title {
+    @apply text-xl sm:text-2xl md:text-3xl lg:text-4xl;
+}
+
+.hp-headline-size-lg .hp-headline-title {
+    @apply text-2xl sm:text-4xl md:text-3xl lg:text-4xl xl:text-5xl;
+}
+
+.hp-headline-size-xl .hp-headline-title {
+    @apply text-2xl sm:text-3xl md:text-3xl lg:text-4xl xl:text-5xl;
+}
+
+.hp-headline-size-2xl .hp-headline-title {
+    @apply text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl;
+}
+
+.hp-headline-size-3xl .hp-headline-title {
+    @apply text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl;
+}
+
+.hp-headline-size-4xl .hp-headline-title {
+    @apply text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl;
+}
+
+.hp-headline-size-2xl .hp-headline-description {
+    @apply text-text-medium max-w-full text-base font-medium delay-200 md:text-lg lg:text-lg;
+}
+
+.hp-headline-highlight {
+    @apply text-primary;
+}
+
+.hp-headline-actions {
+    @apply mt-2 flex w-full flex-col items-center justify-center gap-6 sm:flex-row sm:gap-x-8;
+}
+
+.hp-headline-align-left .hp-headline-actions {
+    @apply justify-center sm:justify-start;
+}
+
+/*.hp-headline-badge {*/
+/*    @apply bg-primary/5 border-primary/32 flex w-fit items-center justify-center gap-2 rounded-full border px-4 py-2 text-xs font-medium sm:text-sm;*/
+/*}*/
+
+/*.hp-headline-badge:hover {*/
+/*    @apply bg-primary/32;*/
+/*}*/
