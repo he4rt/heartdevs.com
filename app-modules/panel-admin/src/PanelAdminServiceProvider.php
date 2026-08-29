@@ -22,6 +22,7 @@ use He4rt\PanelAdmin\Filament\Resources\Retrospectives\RetrospectiveResource;
 use He4rt\PanelAdmin\Filament\Resources\Skills\SkillResource;
 use He4rt\PanelAdmin\Filament\Resources\Users\UserResource;
 use He4rt\PanelAdmin\Github\GithubCluster;
+use He4rt\PanelAdmin\Live\Resources\LiveResource;
 use He4rt\PanelAdmin\Marketing\MarketingCluster;
 use He4rt\PanelAdmin\Moderation\Livewire\AppealQueue;
 use He4rt\PanelAdmin\Moderation\Livewire\ModerationDashboardLivewire;
@@ -164,6 +165,7 @@ class PanelAdminServiceProvider extends ServiceProvider
                 ...GithubCluster::getNavigationItems(),
                 ...DiscordCluster::getNavigationItems(),
                 ...EventResource::getNavigationItems(),
+                ...LiveResource::getNavigationItems(),
             ])
             ->groups([
                 NavigationGroup::make(NavGroup::People->getLabel())
