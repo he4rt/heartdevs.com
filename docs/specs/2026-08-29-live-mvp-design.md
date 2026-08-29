@@ -43,6 +43,8 @@ stream key, transmitir, e qualquer navegador assistir em `/live`.
   para o endpoint do Laravel via `host.docker.internal` (com `extra_hosts:
 host-gateway`, pois o app roda no host via `php artisan serve`, porta 8000).
 - Serviço `mediamtx` no `docker-compose.yml` expondo 1935 (ingest) e 8888 (HLS).
+- Para publicar (OBS), suba o Laravel com `php artisan serve --host=0.0.0.0`: o
+  bind padrão (`127.0.0.1`) não é alcançável pelo container via `host.docker.internal`.
 
 ### Módulo `app-modules/live/`
 
