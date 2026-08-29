@@ -30,6 +30,7 @@ enum IdentityProvider: string implements HasColor, HasDescription, HasIcon, HasL
     case Spotify = 'spotify';
     case Steam = 'steam';
     case GitHub = 'github';
+    case He4rtLives = 'he4rt-lives';
     case Xbox = 'xbox';
     case YouTube = 'youtube';
     case Twitter = 'twitter';
@@ -126,6 +127,7 @@ enum IdentityProvider: string implements HasColor, HasDescription, HasIcon, HasL
             self::Spotify => Color::hex('#1DB954'),
             self::Steam => Color::Slate,
             self::GitHub => Color::Neutral,
+            self::He4rtLives => Color::Rose,
             self::Xbox => Color::Green,
             self::YouTube => Color::Red,
             self::Twitter => Color::Sky,
@@ -159,6 +161,7 @@ enum IdentityProvider: string implements HasColor, HasDescription, HasIcon, HasL
             self::Spotify => 'fab-spotify',
             self::Steam => 'fab-steam',
             self::GitHub => 'fab-github',
+            self::He4rtLives => 'heroicon-o-video-camera',
             self::Xbox => 'fab-xbox',
             self::YouTube => 'fab-youtube',
             self::Twitter => 'fab-twitter',
@@ -197,6 +200,7 @@ enum IdentityProvider: string implements HasColor, HasDescription, HasIcon, HasL
             self::Spotify => 'Conecte sua conta do Spotify para rastrear músicas ouvidas.',
             self::Steam => 'Conecte sua conta da Steam para rastrear jogos.',
             self::GitHub => 'Conecte sua conta do GitHub para rastrear contribuições.',
+            self::He4rtLives => 'Identidade nativa da plataforma he4rt, usada pelo chat das lives.',
             self::Xbox => 'Conecte sua conta do Xbox para gameficações.',
             self::YouTube => 'Conecte sua conta do YouTube para rastrear vídeos.',
             self::Twitter => 'Conecte sua conta do Twitter/X para interações sociais.',
