@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "c727200d90be2502d5887fe983f97e3c",
+    "content-hash": "e47d22c4d02a0cd189b157815ae2c217",
     "packages": [
         {
             "name": "anourvalar/eloquent-serialize",
@@ -3762,6 +3762,40 @@
             "autoload-dev": {
                 "psr-4": {
                     "He4rt\\IntegrationWhatsapp\\Tests\\": "tests/"
+                }
+            },
+            "license": [
+                "proprietary"
+            ],
+            "transport-options": {
+                "symlink": true,
+                "relative": true
+            }
+        },
+        {
+            "name": "he4rt/live",
+            "version": "1.0",
+            "dist": {
+                "type": "path",
+                "url": "app-modules/live",
+                "reference": "62ae5a209cc7dd04c65de10644c7c222772e8597"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "He4rt\\Live\\LiveServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "He4rt\\Live\\": "src/"
+                }
+            },
+            "autoload-dev": {
+                "psr-4": {
+                    "He4rt\\Live\\Tests\\": "tests/"
                 }
             },
             "license": [

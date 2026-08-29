@@ -30,6 +30,7 @@
         "he4rt/integration-github": "^1.0.0",
         "he4rt/integration-twitch": "^1.0.0",
         "he4rt/integration-whatsapp": "^1.0.0",
+        "he4rt/live": "^1.0.0",
         "he4rt/marketing": "^1.0.0",
         "he4rt/moderation": "^1.0.0",
         "he4rt/onboarding": "^1.0.0",

@@ -1,0 +1,26 @@
+{
+    "name": "he4rt/live",
+    "description": "",
+    "type": "library",
+    "version": "1.0",
+    "license": "proprietary",
+    "require": {},
+    "autoload": {
+        "psr-4": {
+            "He4rt\\Live\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "He4rt\\Live\\Tests\\": "tests/"
+        }
+    },
+    "minimum-stability": "stable",
+    "extra": {
+        "laravel": {
+            "providers": [
+                "He4rt\\Live\\LiveServiceProvider"
+            ]
+        }
+    }
+}
