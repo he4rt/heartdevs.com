@@ -85,3 +85,15 @@ it('modera mensagem do chat a partir da view da live', function (): void {
 
     expect(Message::query()->count())->toBe(0);
 });
+
+it('exibe o ingest nos dois campos do OBS com a chave mascarada por padrão', function (): void {
+    $live = Live::factory()->create();
+
+    livewire(ViewLive::class, ['record' => $live->id])
+        ->assertSee('Servidor')
+        ->assertSee(config()->string('live.rtmp_server'))
+        ->assertSee('Chave de stream')
+        ->assertSee(str_repeat('•', 12))
+        ->set('revealStreamKey', value: true)
+        ->assertSee(sprintf('live?user=he4rt&pass=%s', $live->stream_key));
+});

@@ -65,28 +65,27 @@ class ViewLive extends ViewRecord
                         ->numeric(),
                 ]),
 
-            Section::make('Ingest')
+            Section::make('Ingest (OBS)')
+                ->description('Copie cada campo para o lugar correspondente em Configurações → Transmissão do OBS.')
                 ->columns(1)
                 ->schema([
-                    TextEntry::make('rtmp_url')
-                        ->label('URL RTMP')
-                        ->state(fn (Live $record): string => sprintf(
-                            'rtmp://localhost:1935/live?user=he4rt&pass=%s',
-                            $record->stream_key,
-                        ))
+                    TextEntry::make('rtmp_server')
+                        ->label('Servidor')
+                        ->state(fn (): string => config()->string('live.rtmp_server'))
                         ->copyable()
                         ->fontFamily(FontFamily::Mono),
 
-                    TextEntry::make('stream_key')
-                        ->label('Stream key')
-                        ->formatStateUsing(fn (string $state): string => $this->revealStreamKey
-                            ? $state
+                    TextEntry::make('obs_stream_key')
+                        ->label('Chave de stream')
+                        ->state(fn (Live $record): string => $this->revealStreamKey
+                            ? $record->obsStreamKey()
                             : str_repeat('•', 12))
                         ->copyable()
+                        ->copyableState(fn (Live $record): string => $record->obsStreamKey())
                         ->fontFamily(FontFamily::Mono)
                         ->suffixAction(
                             Action::make('toggleStreamKeyVisibility')
-                                ->label('Mostrar/ocultar stream key')
+                                ->label('Mostrar/ocultar chave de stream')
                                 ->icon(fn (): Heroicon => $this->revealStreamKey
                                     ? Heroicon::OutlinedEyeSlash
                                     : Heroicon::OutlinedEye)

@@ -72,3 +72,9 @@ it('rotaciona a stream key', function (): void {
 
     expect($live->stream_key)->toHaveLength(40)->not->toBe($original);
 });
+
+it('monta a chave de stream no formato do OBS', function (): void {
+    $live = resolve(CreateLive::class)->execute('Retrô', description: null);
+
+    expect($live->obsStreamKey())->toBe(sprintf('live?user=he4rt&pass=%s', $live->stream_key));
+});

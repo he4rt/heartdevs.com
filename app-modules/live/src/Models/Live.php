@@ -39,6 +39,17 @@ final class Live extends Model
         'peak_viewers' => 0,
     ];
 
+    /** Chave de stream no formato que o OBS espera no campo "Chave de stream". */
+    public function obsStreamKey(): string
+    {
+        return sprintf(
+            '%s?user=%s&pass=%s',
+            config()->string('live.path'),
+            config()->string('live.ingest_user'),
+            $this->stream_key,
+        );
+    }
+
     /** @param Builder<$this> $query */
     protected function scopeCurrent(Builder $query): void
     {

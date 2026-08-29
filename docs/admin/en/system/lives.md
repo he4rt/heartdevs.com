@@ -14,10 +14,11 @@ From the lives list, use the **Criar live** action and fill in a title and an op
 
 ## Wiring up OBS
 
-Open the live you just created. The **Ingest** section shows the RTMP URL and the stream key:
+Open the live you just created. The **Ingest (OBS)** section shows the two values in the exact format OBS expects, under Settings → Stream (service: Custom):
 
-- Paste the full RTMP URL (`rtmp://localhost:1935/live?user=he4rt&pass=<stream key>`) into OBS's "Server" field, or split it into the server address and the stream key field, matching your OBS setup.
-- The stream key is masked by default. Use the eye icon next to it to reveal it, and the copy icon to copy either value to the clipboard.
+- **Server** — paste into OBS's "Server" field (e.g. `rtmp://localhost:1935`).
+- **Stream key** — paste into OBS's "Stream Key" field. It already carries the path and credentials (`live?user=he4rt&pass=<key>`); don't edit it.
+- The stream key is masked by default. The eye icon reveals it; the copy icon always copies the real value, even while masked.
 
 ## Ending a live
 
