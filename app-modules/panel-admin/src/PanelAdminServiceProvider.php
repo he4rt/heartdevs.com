@@ -100,6 +100,10 @@ class PanelAdminServiceProvider extends ServiceProvider
                 ->discoverResources(
                     in: __DIR__.'/Discord/Resources',
                     for: 'He4rt\\PanelAdmin\\Discord\\Resources',
+                )
+                ->discoverResources(
+                    in: __DIR__.'/Live/Resources',
+                    for: 'He4rt\\PanelAdmin\\Live\\Resources',
                 );
         });
     }

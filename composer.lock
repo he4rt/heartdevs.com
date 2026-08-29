@@ -4059,7 +4059,10 @@
             "dist": {
                 "type": "path",
                 "url": "app-modules/panel-admin",
-                "reference": "24bad248d7ef6e839a58fbc1cb4d64dee2200f9f"
+                "reference": "256b014d375e9ba3b05ebc873aff51c805ccaa68"
+            },
+            "require": {
+                "he4rt/live": "^1.0.0"
             },
             "type": "library",
             "extra": {
