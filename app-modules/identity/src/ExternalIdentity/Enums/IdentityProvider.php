@@ -95,6 +95,7 @@ enum IdentityProvider: string implements HasColor, HasDescription, HasIcon, HasL
     {
         return match ($this) {
             self::DevTo => CredentialsType::ApiKey,
+            self::He4rtLives => CredentialsType::OAuth2,
             default => CredentialsType::OAuth2,
         };
     }
@@ -103,6 +104,7 @@ enum IdentityProvider: string implements HasColor, HasDescription, HasIcon, HasL
     {
         return match ($this) {
             self::DevTo => resolve(DevToApiKeyClient::class),
+            self::He4rtLives => null,
             default => null,
         };
     }
@@ -114,6 +116,7 @@ enum IdentityProvider: string implements HasColor, HasDescription, HasIcon, HasL
             self::Discord => resolve(DiscordOAuthClient::class),
             self::GitHub => resolve(GitHubOAuthClient::class),
             self::DevTo => resolve(DevToOAuthClient::class),
+            self::He4rtLives => null,
             default => null,
         };
     }
@@ -233,6 +236,7 @@ enum IdentityProvider: string implements HasColor, HasDescription, HasIcon, HasL
         $scopes = match ($this) {
             self::Discord => config('services.discord.scopes'),
             self::Twitch => config('services.twitch.scopes.'.($panel ?? 'app'), config('services.twitch.scopes.app')),
+            self::He4rtLives => '',
             default => '',
         };
 
@@ -255,6 +259,7 @@ enum IdentityProvider: string implements HasColor, HasDescription, HasIcon, HasL
     public function getType(): IdentityType
     {
         return match ($this) {
+            self::He4rtLives => IdentityType::External,
             default => IdentityType::External,
         };
     }
@@ -263,6 +268,7 @@ enum IdentityProvider: string implements HasColor, HasDescription, HasIcon, HasL
     {
         return match ($this) {
             self::Discord => resolve(DiscordMessageAdapter::class),
+            self::He4rtLives => null,
             default => null,
         };
     }
