@@ -7,6 +7,7 @@ namespace He4rt\Portal;
 use He4rt\Portal\Articles\ArticlesPage;
 use He4rt\Portal\Home\HeroSection;
 use He4rt\Portal\Home\Homepage;
+use He4rt\Portal\Live\LivePage;
 use He4rt\Portal\Retrospective\CommunityRetrospectivePage;
 use He4rt\Portal\ShortLink\ShortLinkRedirectController;
 use He4rt\Portal\Sitemap\SitemapController;
@@ -63,6 +64,13 @@ class PortalServiceProvider extends ServiceProvider
                 ->withHead(
                     title: 'Artigos da comunidade',
                     description: 'Os artigos publicados pela organização He4rt Developers no dev.to, por tema e por quem escreveu.',
+                );
+
+            Route::get('/live', LivePage::class)
+                ->name('portal.live')
+                ->withHead(
+                    title: 'Live da comunidade',
+                    description: 'Acompanhe ao vivo as transmissões da comunidade He4rt Developers.',
                 );
 
             Route::get('/comunidade/retrospectiva', CommunityRetrospectivePage::class)
