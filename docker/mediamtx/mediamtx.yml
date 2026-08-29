@@ -1,0 +1,25 @@
+logLevel: info
+
+authMethod: http
+authHTTPAddress: http://host.docker.internal:8000/live/ingest/auth
+authHTTPExclude:
+  - action: api
+  - action: metrics
+  - action: pprof
+
+api: yes
+apiAddress: :9997
+
+rtsp: no
+webrtc: no
+srt: no
+
+rtmp: yes
+rtmpAddress: :1935
+
+hls: yes
+hlsAddress: :8888
+hlsVariant: lowLatency
+
+paths:
+  live: {}

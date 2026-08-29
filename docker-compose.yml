@@ -65,6 +65,23 @@ services:
       timeout: 10s
       start_period: 10s
 
+  heartdevs-mediamtx:
+    build:
+      dockerfile: docker/mediamtx.Dockerfile
+      context: .
+    image: mediamtx.local:1
+    container_name: heartdevs-mediamtx
+    restart: no
+    hostname: dev
+    extra_hosts:
+      - 'host.docker.internal:host-gateway'
+    ports:
+      - '1935:1935'
+      - '8888:8888'
+      - '9997:9997'
+    networks:
+      - dev-heartdevs
+
 volumes:
   heartdevs-db:
     name: heartdevs-db
