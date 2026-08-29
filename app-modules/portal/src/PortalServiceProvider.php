@@ -7,6 +7,7 @@ namespace He4rt\Portal;
 use He4rt\Portal\Articles\ArticlesPage;
 use He4rt\Portal\Home\HeroSection;
 use He4rt\Portal\Home\Homepage;
+use He4rt\Portal\Live\LiveChat;
 use He4rt\Portal\Live\LivePage;
 use He4rt\Portal\Retrospective\CommunityRetrospectivePage;
 use He4rt\Portal\ShortLink\ShortLinkRedirectController;
@@ -120,5 +121,6 @@ class PortalServiceProvider extends ServiceProvider
         });
 
         Livewire::component('hero-section', HeroSection::class);
+        Livewire::component('portal.live-chat', LiveChat::class);
     }
 }
