@@ -4001,10 +4001,11 @@
             "dist": {
                 "type": "path",
                 "url": "app-modules/portal",
-                "reference": "c50d51f0b4816e44c79c5b3a086d5234c95eef9b"
+                "reference": "ab9c2ac7e6e301ef54953226429d35680bf8182d"
             },
             "require": {
-                "he4rt/contents": "^1.0.0"
+                "he4rt/contents": "^1.0.0",
+                "he4rt/live": "^1.0.0"
             },
             "type": "library",
             "extra": {
