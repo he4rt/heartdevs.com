@@ -12,4 +12,9 @@ class LiveServiceProvider extends ServiceProvider
     {
         $this->mergeConfigFrom(__DIR__.'/../config/live.php', 'live');
     }
+
+    public function boot(): void
+    {
+        $this->loadMigrationsFrom(__DIR__.'/../database/migrations');
+    }
 }

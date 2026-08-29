@@ -3778,7 +3778,7 @@
             "dist": {
                 "type": "path",
                 "url": "app-modules/live",
-                "reference": "62ae5a209cc7dd04c65de10644c7c222772e8597"
+                "reference": "843267965d00cbc39f2b994b7b613de82cf3ae08"
             },
             "type": "library",
             "extra": {
@@ -3790,7 +3790,8 @@
             },
             "autoload": {
                 "psr-4": {
-                    "He4rt\\Live\\": "src/"
+                    "He4rt\\Live\\": "src/",
+                    "He4rt\\Live\\Database\\Factories\\": "database/factories/"
                 }
             },
             "autoload-dev": {
