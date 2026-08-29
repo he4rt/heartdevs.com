@@ -1,6 +1,6 @@
-@vite('app-modules/portal/resources/js/live-player.js')
-
 <main class="hp-page py-16">
+    @vite('app-modules/portal/resources/js/live-player.js')
+
     <div class="mx-auto flex w-full max-w-4xl flex-col gap-6" @if (! $status->onAir) wire:poll.10s @endif>
         <div class="flex items-center justify-between gap-4">
             <h1 class="text-text-high text-2xl font-bold text-balance sm:text-3xl">Live da He4rt</h1>
