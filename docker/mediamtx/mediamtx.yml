@@ -22,4 +22,8 @@ hlsAddress: :8888
 hlsVariant: lowLatency
 
 paths:
-  live: {}
+  live:
+    runOnOnline: |
+      wget -q -O- --header="Content-Type: application/json" --header="X-Live-Webhook-Secret: $LIVE_WEBHOOK_SECRET" --post-data="{\"event\":\"online\",\"path\":\"$MTX_PATH\"}" http://host.docker.internal:8000/live/ingest/webhook
+    runOnOffline: |
+      wget -q -O- --header="Content-Type: application/json" --header="X-Live-Webhook-Secret: $LIVE_WEBHOOK_SECRET" --post-data="{\"event\":\"offline\",\"path\":\"$MTX_PATH\"}" http://host.docker.internal:8000/live/ingest/webhook
