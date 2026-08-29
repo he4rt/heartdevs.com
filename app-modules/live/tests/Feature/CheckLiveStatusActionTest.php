@@ -41,3 +41,12 @@ it('mantém no ar com startedAt nulo quando readyTime é inválido', function ()
     expect($status->onAir)->toBeTrue()
         ->and($status->startedAt)->toBeNull();
 });
+
+it('cacheia o status por alguns segundos', function (): void {
+    Http::fake(['localhost:9997/*' => Http::response(['ready' => true, 'readyTime' => '2026-08-29T20:00:00Z'])]);
+
+    resolve(CheckLiveStatusAction::class)->execute();
+    resolve(CheckLiveStatusAction::class)->execute();
+
+    Http::assertSentCount(1);
+});

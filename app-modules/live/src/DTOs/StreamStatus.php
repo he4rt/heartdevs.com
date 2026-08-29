@@ -6,8 +6,8 @@ namespace He4rt\Live\DTOs;
 
 use Carbon\CarbonImmutable;
 
-/** Estado atual da transmissão segundo a Control API do mediamtx. */
-final readonly class LiveStatus
+/** Estado atual do stream segundo a Control API do mediamtx. */
+final readonly class StreamStatus
 {
     public function __construct(
         public bool $onAir,
