@@ -3778,7 +3778,11 @@
             "dist": {
                 "type": "path",
                 "url": "app-modules/live",
-                "reference": "843267965d00cbc39f2b994b7b613de82cf3ae08"
+                "reference": "2b21e79dbeac43b5a845f2e90728dc4d93dc5d00"
+            },
+            "require": {
+                "he4rt/activity": "^1.0.0",
+                "he4rt/identity": "^1.0.0"
             },
             "type": "library",
             "extra": {
