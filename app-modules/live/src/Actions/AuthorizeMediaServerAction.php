@@ -11,10 +11,15 @@ final readonly class AuthorizeMediaServerAction
 {
     public function execute(IngestAuthPayload $payload): bool
     {
-        if ($payload->action !== 'publish') {
-            return true;
-        }
+        return match ($payload->action) {
+            'read', 'playback' => true,
+            'publish' => $this->authorizePublish($payload),
+            default => false,
+        };
+    }
 
+    private function authorizePublish(IngestAuthPayload $payload): bool
+    {
         $streamKey = config()->string('live.stream_key');
 
         if ($streamKey === '') {

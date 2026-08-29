@@ -32,3 +32,12 @@ it('reporta offline quando a Control API está fora do ar', function (): void {
 
     expect(resolve(CheckLiveStatusAction::class)->execute()->onAir)->toBeFalse();
 });
+
+it('mantém no ar com startedAt nulo quando readyTime é inválido', function (): void {
+    Http::fake(['localhost:9997/*' => Http::response(['ready' => true, 'readyTime' => 'not-a-date'])]);
+
+    $status = resolve(CheckLiveStatusAction::class)->execute();
+
+    expect($status->onAir)->toBeTrue()
+        ->and($status->startedAt)->toBeNull();
+});

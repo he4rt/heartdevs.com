@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace He4rt\Live\Actions;
 
 use Carbon\CarbonImmutable;
+use Carbon\Exceptions\InvalidFormatException;
 use He4rt\Live\DTOs\LiveStatus;
 use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Support\Facades\Http;
@@ -32,7 +33,16 @@ final readonly class CheckLiveStatusAction
 
         return new LiveStatus(
             onAir: true,
-            startedAt: is_string($readyTime) ? CarbonImmutable::parse($readyTime) : null,
+            startedAt: is_string($readyTime) ? $this->parseReadyTime($readyTime) : null,
         );
+    }
+
+    private function parseReadyTime(string $readyTime): ?CarbonImmutable
+    {
+        try {
+            return CarbonImmutable::parse($readyTime);
+        } catch (InvalidFormatException) {
+            return null;
+        }
     }
 }

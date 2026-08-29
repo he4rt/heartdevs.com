@@ -57,3 +57,17 @@ it('recusa publish quando a stream key não está configurada', function (): voi
         'query' => '',
     ])->assertForbidden();
 });
+
+it('recusa ação desconhecida', function (): void {
+    config()->set('live.stream_key', 'chave-super-secreta');
+
+    postJson('/live/ingest/auth', [
+        'user' => 'he4rt',
+        'password' => 'chave-super-secreta',
+        'ip' => '172.18.0.1',
+        'action' => 'api',
+        'path' => 'live',
+        'protocol' => 'rtmp',
+        'query' => '',
+    ])->assertForbidden();
+});
