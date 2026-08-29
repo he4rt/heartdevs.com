@@ -18,7 +18,7 @@ final readonly class MarkLiveOnline
             'started_at' => $live->started_at ?? now(),
         ]);
 
-        event(new LiveStarted($live->id));
+        rescue(fn () => event(new LiveStarted($live->id)), report: true);
 
         return $live->refresh();
     }

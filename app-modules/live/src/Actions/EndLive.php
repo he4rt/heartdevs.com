@@ -15,7 +15,7 @@ final readonly class EndLive
     {
         $live->update(['status' => LiveStatus::Ended, 'ended_at' => now()]);
 
-        event(new LiveEnded($live->id));
+        rescue(fn () => event(new LiveEnded($live->id)), report: true);
 
         return $live->refresh();
     }

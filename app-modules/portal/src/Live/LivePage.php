@@ -18,11 +18,13 @@ final class LivePage extends Component
 
     public function pulse(): void
     {
-        $live = Live::query()->current()->first();
+        rescue(function (): void {
+            $live = Live::query()->current()->first();
 
-        if ($live !== null) {
-            $this->viewers = resolve(RecordViewerHeartbeat::class)->execute($live, session()->getId());
-        }
+            if ($live !== null) {
+                $this->viewers = resolve(RecordViewerHeartbeat::class)->execute($live, session()->getId());
+            }
+        }, report: true);
     }
 
     public function render(CheckLiveStatusAction $status): View

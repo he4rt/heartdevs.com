@@ -57,7 +57,7 @@ final readonly class SendChatMessage
 
         $data = ChatMessageData::fromMessage($message, $user);
 
-        event(new ChatMessageSent($live->id, $data->toArray()));
+        rescue(fn () => event(new ChatMessageSent($live->id, $data->toArray())), report: true);
 
         return $data;
     }

@@ -57,6 +57,28 @@ it('registra heartbeat e expõe o contador no poll', function (): void {
     expect(resolve(ViewerPresenceContract::class)->countActive($live->id))->toBe(1);
 });
 
+it('mantém o último valor de viewers quando o presence falha (ex.: redis fora do ar)', function (): void {
+    Http::fake(['localhost:9997/*' => Http::response(['ready' => false, 'readyTime' => null])]);
+    Live::factory()->onAir()->create();
+
+    $this->app->singleton(ViewerPresenceContract::class, fn (): ViewerPresenceContract => new class implements ViewerPresenceContract
+    {
+        public function touch(string $liveId, string $visitorId): void
+        {
+            throw new RuntimeException('redis indisponível');
+        }
+
+        public function countActive(string $liveId): int
+        {
+            return 0;
+        }
+    });
+
+    Livewire::test(LivePage::class)
+        ->call('pulse')
+        ->assertSet('viewers', 0);
+});
+
 it('carrega o entry do player pelo vite dentro do main', function (): void {
     Live::factory()->onAir()->create();
     Http::fake(['localhost:9997/*' => Http::response(['ready' => true, 'readyTime' => '2026-08-29T20:00:00Z'])]);

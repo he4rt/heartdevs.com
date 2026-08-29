@@ -34,6 +34,6 @@ final readonly class DeleteChatMessage
             $message->delete();
         });
 
-        event(new ChatMessageDeleted($liveId, $messageId));
+        rescue(fn () => event(new ChatMessageDeleted($liveId, $messageId)), report: true);
     }
 }
