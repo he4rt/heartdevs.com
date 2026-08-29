@@ -4136,10 +4136,12 @@
             "dist": {
                 "type": "path",
                 "url": "app-modules/portal",
-                "reference": "ab9c2ac7e6e301ef54953226429d35680bf8182d"
+                "reference": "1a094fb6b81b16718e958473f1b3f34d201382ab"
             },
             "require": {
+                "he4rt/activity": "^1.0.0",
                 "he4rt/contents": "^1.0.0",
+                "he4rt/identity": "^1.0.0",
                 "he4rt/live": "^1.0.0"
             },
             "type": "library",
