@@ -4,15 +4,18 @@ declare(strict_types=1);
 
 namespace He4rt\Portal;
 
+use App\Http\Middleware\PrepareDiscordActivityContext;
 use He4rt\Portal\Articles\ArticlesPage;
 use He4rt\Portal\Home\HeroSection;
 use He4rt\Portal\Home\Homepage;
+use He4rt\Portal\Live\LiveActivityPage;
 use He4rt\Portal\Live\LiveChat;
 use He4rt\Portal\Live\LivePage;
 use He4rt\Portal\Retrospective\CommunityRetrospectivePage;
 use He4rt\Portal\ShortLink\ShortLinkRedirectController;
 use He4rt\Portal\Sitemap\SitemapController;
 use He4rt\Portal\SocialLinks\SocialLinksPage;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
 use Laravel\Head\HeadServiceProvider;
@@ -46,7 +49,15 @@ class PortalServiceProvider extends ServiceProvider
              * semi-estáticas cujo título/description são conhecidos de antemão.
              * Os defaults (App\Support\Seo\SiteHead) preenchem o resto.
              */
-            Route::get('/', Homepage::class)
+            // O ponto de entrada de uma Discord Activity é sempre `/` — o Discord não
+            // permite apontar pra outra rota. `frame_id` é o query param que o SDK
+            // sempre injeta na Activity; quando presente, serve LiveActivityPage.
+            Route::get('/', function (Request $request) {
+                $component = $request->filled('frame_id') ? LiveActivityPage::class : Homepage::class;
+
+                return resolve($component)->__invoke();
+            })
+                ->middleware(PrepareDiscordActivityContext::class)
                 ->name('home')
                 ->withHead(
                     // `exact` evita o sufixo " - He4rt Developers" duplicar a marca na home.
