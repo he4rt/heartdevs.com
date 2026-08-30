@@ -4,9 +4,7 @@
     "type": "library",
     "version": "1.0",
     "license": "proprietary",
-    "require": {
-        "he4rt/identity": "^1.0.0"
-    },
+    "require": {},
     "autoload": {
         "psr-4": {
             "He4rt\\IntegrationDiscord\\": "src/",
