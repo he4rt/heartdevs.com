@@ -6,6 +6,11 @@ authHTTPExclude:
   - action: api
   - action: metrics
   - action: pprof
+  # Leitura já é sempre pública em AuthorizeMediaServerAction — chamar o hook aqui só
+  # cria round-trip redundante e, no servidor de dev single-threaded, um deadlock
+  # quando algo já está ocupando a única thread do Laravel esperando o mediamtx.
+  - action: read
+  - action: playback
 
 api: yes
 apiAddress: :9997
