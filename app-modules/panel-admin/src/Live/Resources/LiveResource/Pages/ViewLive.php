@@ -14,11 +14,13 @@ use Filament\Support\Enums\FontFamily;
 use Filament\Support\Icons\Heroicon;
 use He4rt\Live\Actions\EndLive;
 use He4rt\Live\Actions\RotateStreamKey;
+use He4rt\Live\Console\SimulateLiveChatCommand;
 use He4rt\Live\Enums\LiveStatus;
 use He4rt\Live\Models\Live;
 use He4rt\PanelAdmin\Live\Resources\LiveResource;
 use He4rt\PanelAdmin\Live\Resources\LiveResource\Widgets\LiveAudienceChart;
 use He4rt\PanelAdmin\Live\Resources\LiveResource\Widgets\LiveChatMessages;
+use Illuminate\Support\Facades\Process;
 
 /**
  * @property Live $record
@@ -132,6 +134,46 @@ class ViewLive extends ViewRecord
                         ->title('Stream key rotacionada')
                         ->send();
                 }),
+
+            Action::make('simulateChat')
+                ->label(fn (Live $record): string => $this->chatSimulationActive($record)
+                    ? 'Parar simulação de comentários'
+                    : 'Simular comentários')
+                ->icon(fn (Live $record): Heroicon => $this->chatSimulationActive($record)
+                    ? Heroicon::OutlinedStopCircle
+                    : Heroicon::OutlinedChatBubbleLeftRight)
+                ->color(fn (Live $record): string => $this->chatSimulationActive($record)
+                    ? 'danger'
+                    : 'gray')
+                ->visible(fn (): bool => app()->isLocal())
+                ->disabled(fn (Live $record): bool => $record->status === LiveStatus::Ended)
+                ->action(function (Live $record): void {
+                    $cacheKey = SimulateLiveChatCommand::cacheKey($record);
+
+                    if ($this->chatSimulationActive($record)) {
+                        SimulateLiveChatCommand::cacheStore()->put($cacheKey, value: false);
+
+                        Notification::make()
+                            ->success()
+                            ->title('Simulação de comentários parada')
+                            ->send();
+
+                        return;
+                    }
+
+                    SimulateLiveChatCommand::cacheStore()->put($cacheKey, value: true);
+
+                    Process::path(base_path())->run(sprintf(
+                        'nohup php artisan live:simulate-chat %s >> %s 2>&1 &',
+                        escapeshellarg($record->id),
+                        escapeshellarg(storage_path('logs/chat-simulation.log')),
+                    ));
+
+                    Notification::make()
+                        ->success()
+                        ->title('Simulação de comentários iniciada')
+                        ->send();
+                }),
         ];
     }
 
@@ -144,5 +186,10 @@ class ViewLive extends ViewRecord
             LiveAudienceChart::class,
             LiveChatMessages::class,
         ];
+    }
+
+    private function chatSimulationActive(Live $record): bool
+    {
+        return SimulateLiveChatCommand::cacheStore()->get(SimulateLiveChatCommand::cacheKey($record)) === true;
     }
 }

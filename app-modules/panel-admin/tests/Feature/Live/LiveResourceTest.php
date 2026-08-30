@@ -7,11 +7,13 @@ use Filament\Facades\Filament;
 use He4rt\Activity\Message\Models\Message;
 use He4rt\Identity\User\Models\User;
 use He4rt\Live\Chat\Actions\SendChatMessage;
+use He4rt\Live\Console\SimulateLiveChatCommand;
 use He4rt\Live\Enums\LiveStatus;
 use He4rt\Live\Models\Live;
 use He4rt\PanelAdmin\Live\Resources\LiveResource\Pages\ListLives;
 use He4rt\PanelAdmin\Live\Resources\LiveResource\Pages\ViewLive;
 use He4rt\PanelAdmin\Live\Resources\LiveResource\Widgets\LiveChatMessages;
+use Illuminate\Support\Facades\Process;
 
 use function Pest\Livewire\livewire;
 
@@ -84,6 +86,63 @@ it('modera mensagem do chat a partir da view da live', function (): void {
         ->assertNotified();
 
     expect(Message::query()->count())->toBe(0);
+});
+
+it('esconde a action de simular comentários fora do ambiente local', function (): void {
+    $live = Live::factory()->onAir()->create();
+
+    livewire(ViewLive::class, ['record' => $live->id])
+        ->assertActionHidden('simulateChat');
+});
+
+it('liga a simulação de comentários e dispara o comando em background', function (): void {
+    app()->detectEnvironment(fn (): string => 'local');
+    Process::fake();
+    $live = Live::factory()->onAir()->create();
+
+    livewire(ViewLive::class, ['record' => $live->id])
+        ->assertActionVisible('simulateChat')
+        ->callAction('simulateChat')
+        ->assertNotified();
+
+    expect(SimulateLiveChatCommand::cacheStore()->get(SimulateLiveChatCommand::cacheKey($live)))->toBeTrue();
+    Process::assertRan(fn ($process): bool => str_contains($process->command, 'live:simulate-chat')
+        && str_contains($process->command, $live->id)
+        && $process->path === base_path());
+});
+
+it('desliga a simulação já ativa', function (): void {
+    app()->detectEnvironment(fn (): string => 'local');
+    Process::fake();
+    $live = Live::factory()->onAir()->create();
+    SimulateLiveChatCommand::cacheStore()->put(SimulateLiveChatCommand::cacheKey($live), value: true);
+
+    livewire(ViewLive::class, ['record' => $live->id])
+        ->callAction('simulateChat')
+        ->assertNotified();
+
+    expect(SimulateLiveChatCommand::cacheStore()->get(SimulateLiveChatCommand::cacheKey($live)))->toBeFalsy();
+});
+
+it('mantém a action como "parar" ao recarregar a página com a simulação ativa', function (): void {
+    app()->detectEnvironment(fn (): string => 'local');
+    Process::fake();
+    $live = Live::factory()->onAir()->create();
+
+    livewire(ViewLive::class, ['record' => $live->id])
+        ->callAction('simulateChat');
+
+    // Um novo mount simula a página sendo recarregada num novo request.
+    livewire(ViewLive::class, ['record' => $live->id])
+        ->assertActionHasLabel('simulateChat', 'Parar simulação de comentários');
+});
+
+it('desabilita a action de simular comentários em live encerrada', function (): void {
+    app()->detectEnvironment(fn (): string => 'local');
+    $live = Live::factory()->ended()->create();
+
+    livewire(ViewLive::class, ['record' => $live->id])
+        ->assertActionDisabled('simulateChat');
 });
 
 it('exibe o ingest nos dois campos do OBS com a chave mascarada por padrão', function (): void {
