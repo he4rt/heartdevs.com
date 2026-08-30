@@ -41,6 +41,7 @@
         ]
     },
     "dependencies": {
+        "@discord/embedded-app-sdk": "^2.5.0",
         "laravel-echo": "^2.4.0",
         "pusher-js": "^8.6.0"
     }

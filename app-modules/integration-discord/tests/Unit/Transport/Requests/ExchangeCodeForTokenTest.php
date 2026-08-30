@@ -33,3 +33,17 @@ it('includes oauth parameters as form body', function (): void {
         'client_secret' => 'client-secret',
     ]);
 });
+
+it('omits redirect_uri from the body when null (Discord Activity flow)', function (): void {
+    $request = new ExchangeCodeForToken('code-123', 'client-id', 'client-secret');
+
+    $connector = new DiscordOAuthConnector('client-id', 'client-secret', 'https://example.com/callback');
+    $pendingRequest = new PendingRequest($connector, $request);
+
+    expect($pendingRequest->body()->all())->toBe([
+        'grant_type' => 'authorization_code',
+        'code' => 'code-123',
+        'client_id' => 'client-id',
+        'client_secret' => 'client-secret',
+    ]);
+});

@@ -15,6 +15,7 @@ export default defineConfig({
                 'app-modules/docs/resources/css/theme.css',
                 'app-modules/portal/resources/css/retrospective.css',
                 'app-modules/portal/resources/js/live-player.js',
+                'app-modules/portal/resources/js/discord-activity.js',
             ],
             refresh: true,
         }),
