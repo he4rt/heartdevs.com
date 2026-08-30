@@ -1,9 +1,18 @@
-<section class="border-outline-low bg-elevation-01dp flex h-[32rem] flex-col rounded-lg border">
-    <header class="border-outline-low border-b px-4 py-3">
+<section class="border-outline-low bg-elevation-01dp flex h-[26rem] flex-col rounded-lg border lg:h-full">
+    <header class="border-outline-low flex items-center justify-between border-b px-4 py-3">
         <h2 class="text-text-high text-sm font-semibold">Chat da live</h2>
+
+        <button
+            type="button"
+            @click="chatCollapsed = !chatCollapsed"
+            class="text-text-medium hover:text-text-high rounded-full p-1 transition"
+            aria-label="Esconder chat"
+        >
+            <x-filament::icon icon="heroicon-o-chevron-right" class="h-4 w-4" />
+        </button>
     </header>
 
-    <div wire:ignore data-chat-list class="flex-1 space-y-3 overflow-y-auto p-4">
+    <div wire:ignore data-chat-list class="min-h-0 flex-1 space-y-3 overflow-y-auto p-4">
         @foreach ($history as $message)
             <div data-chat-message data-message-id="{{ $message['id'] }}" class="flex items-start gap-2">
                 <img src="{{ $message['authorAvatarUrl'] }}" alt="" class="h-6 w-6 rounded-full" />
