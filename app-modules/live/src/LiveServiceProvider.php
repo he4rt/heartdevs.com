@@ -6,6 +6,7 @@ namespace He4rt\Live;
 
 use He4rt\Live\Audience\RedisViewerPresence;
 use He4rt\Live\Console\SampleLiveViewersCommand;
+use He4rt\Live\Console\SimulateLiveChatCommand;
 use He4rt\Live\Contracts\ViewerPresenceContract;
 use Illuminate\Support\ServiceProvider;
 
@@ -23,7 +24,10 @@ class LiveServiceProvider extends ServiceProvider
         $this->loadMigrationsFrom(__DIR__.'/../database/migrations');
 
         if ($this->app->runningInConsole()) {
-            $this->commands([SampleLiveViewersCommand::class]);
+            $this->commands([
+                SampleLiveViewersCommand::class,
+                SimulateLiveChatCommand::class,
+            ]);
         }
     }
 }
