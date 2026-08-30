@@ -19,7 +19,7 @@ final class ExchangeCodeForToken extends Request implements HasBody
         private readonly string $code,
         private readonly string $clientId,
         private readonly string $clientSecret,
-        private readonly string $redirectUri,
+        private readonly ?string $redirectUri = null,
     ) {}
 
     public function resolveEndpoint(): string
@@ -32,12 +32,12 @@ final class ExchangeCodeForToken extends Request implements HasBody
      */
     protected function defaultBody(): array
     {
-        return [
+        return array_filter([
             'grant_type' => 'authorization_code',
             'code' => $this->code,
             'redirect_uri' => $this->redirectUri,
             'client_id' => $this->clientId,
             'client_secret' => $this->clientSecret,
-        ];
+        ]);
     }
 }
