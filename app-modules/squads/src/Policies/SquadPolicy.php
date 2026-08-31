@@ -29,4 +29,22 @@ final class SquadPolicy
     {
         throw_unless($this->canManage($actor, $squad), AuthorizationException::class);
     }
+
+    public function canManageSubCaptains(User $actor, Squad $squad): bool
+    {
+        if ($actor->isAdmin()) {
+            return true;
+        }
+
+        return SquadMember::query()
+            ->where('squad_id', $squad->id)
+            ->where('user_id', $actor->id)
+            ->where('role', SquadRole::Captain)
+            ->exists();
+    }
+
+    public function authorizeSubCaptainManagement(User $actor, Squad $squad): void
+    {
+        throw_unless($this->canManageSubCaptains($actor, $squad), AuthorizationException::class);
+    }
 }

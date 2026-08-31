@@ -13,7 +13,7 @@ flow it actively conducts.
 | **Squad**                     | A crew with a clear objective. Lifecycle `status`: `draft` → `active` → `inactive` → `archived`. Created by a super-admin (the bottom-up proposal/validation happens off-system).             | A WhatsApp group (the informal precursor) — the Squad is the formalized record    |
 | **SquadMember**               | A row in the `squad_members` pivot: one person's standing in one squad. Carries `role`, `joined_at`, `left_at`.                                                                               | A community member generally — this is squad-scoped standing                      |
 | **Role (in squad)**           | The `squad_members.role` enum: `Captain` · `SubCaptain` · `Member` · `ExMember`. Confers power on the platform: Captain/Sub manage their own squad.                                           | A governance role (super-admin) — that is platform-wide, config-driven            |
-| **Captain / SubCaptain**      | The squad's leadership. They conduct their own squad on the platform: approve/reject candidacy, promote a sub, mark an `ExMember`.                                                            | The Head dos Squads (an off-system human role; in software it is the super-admin) |
+| **Captain / SubCaptain**      | The squad's leadership. Both can use general squad-management capabilities; only the Captain or a super-admin can promote or demote a SubCaptain.                                             | The Head dos Squads (an off-system human role; in software it is the super-admin) |
 | **ExMember**                  | A person who left (or was removed from) a squad. A role value, not a deletion. Does **not** count toward exclusivity. `left_at` dates the exit.                                               | A `Member` on leave — there is no "paused membership" state                       |
 | **Application (candidatura)** | An APTO person's request to join a squad (`squad_applications`, `pending`/`approved`/`rejected`). The captain decides; approval creates the membership in a transaction.                      | An onboarding (community/program entry) — that is upstream, in `onboarding`       |
 | **Exclusivity**               | A person may hold at most one _active_ membership (role in `Captain`/`SubCaptain`/`Member`) across all squads. Enforced on join.                                                              | A hard unique DB constraint — `ExMember` rows are allowed to pile up              |
@@ -21,14 +21,28 @@ flow it actively conducts.
 | **Super-admin**               | Platform governance authority, sourced from `config('he4rt.admins')` via `User::isAdmin()`. Creates squads, sets captains, overrides any squad action. Stands in for the "Head/Gestão" roles. | A Captain — a Captain's power is scoped to their own squad                        |
 | **APTO**                      | The gate this module consumes from `onboarding`: the person completed the `Squads` onboarding. Required to apply or to be in a squad.                                                         | An `active` Squad — APTO is about a person, not a squad                           |
 
+### Leadership capabilities
+
+| Capability                                | Captain        | SubCaptain     | Super-admin |
+| ----------------------------------------- | -------------- | -------------- | ----------- |
+| Promote `Member` -> `SubCaptain`          | Yes, own squad | No             | Yes         |
+| Demote `SubCaptain` -> `Member`           | Yes, own squad | No             | Yes         |
+| General `SquadPolicy::canManage()` action | Yes, own squad | Yes, own squad | Yes         |
+| Assign or replace `Captain`               | No             | No             | Yes         |
+
+More than one `SubCaptain` is allowed. Neither the product requirements nor the schema define a
+single-SubCaptain invariant. A vacancy remains the absence of a `Captain` row. `MarkExMember` is the
+current implemented path that can vacate the seat, while `PromoteToSubCaptain` never changes a
+`Captain` row.
+
 ## What this module records vs. conducts
 
 | Flow (P.O. doc)             | In this module (model B — record-keeping)                                                                      |
 | --------------------------- | -------------------------------------------------------------------------------------------------------------- |
 | Candidacy to existing squad | **Conducted**: application → captain decides → membership created (exclusivity checked).                       |
 | Squad creation (bottom-up)  | **Recorded**: super-admin registers the squad (draft→active) with its captain. Proposal/validation off-system. |
-| Captain election            | **Recorded**: runs off-system; the outcome is registered (set captain/sub via promote).                        |
-| Captain exit                | **Recorded**: mark `ExMember` / promote the sub (sub assumes) or leave the seat vacant.                        |
+| Captain election            | **Recorded**: runs off-system; the outcome is registered through `AssignCaptain`.                              |
+| Captain exit                | **Recorded**: `MarkExMember` vacates the seat; `AssignCaptain` can record a later replacement.                 |
 | Captain removal             | **Recorded**: runs off-system (moderator→management→Head); outcome registered (mark ExMember).                 |
 | Leadership reallocation     | **Recorded**: super-admin moves a leader to another squad.                                                     |
 

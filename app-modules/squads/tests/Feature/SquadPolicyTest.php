@@ -94,3 +94,67 @@ describe('SquadPolicy', static function (): void {
         $policy->authorize($member, $squad);
     })->throws(AuthorizationException::class);
 });
+
+describe('SquadPolicy sub-captain management', static function (): void {
+    test('a captain can manage sub-captains in their own squad', function (): void {
+        $squad = Squad::factory()->create();
+        $captain = User::factory()->create();
+
+        SquadMember::factory()->create([
+            'squad_id' => $squad->id,
+            'user_id' => $captain->id,
+            'role' => SquadRole::Captain,
+        ]);
+
+        expect(resolve(SquadPolicy::class)->canManageSubCaptains($captain, $squad))->toBeTrue();
+    });
+
+    test('a super-admin can manage sub-captains in any squad', function (): void {
+        config(['he4rt.admins' => 'guisaliba']);
+
+        $squad = Squad::factory()->create();
+        $admin = User::factory()->create(['username' => 'guisaliba']);
+
+        expect(resolve(SquadPolicy::class)->canManageSubCaptains($admin, $squad))->toBeTrue();
+    });
+
+    test('a sub-captain cannot manage sub-captains', function (): void {
+        $squad = Squad::factory()->create();
+        $subCaptain = User::factory()->create();
+
+        SquadMember::factory()->create([
+            'squad_id' => $squad->id,
+            'user_id' => $subCaptain->id,
+            'role' => SquadRole::SubCaptain,
+        ]);
+
+        expect(resolve(SquadPolicy::class)->canManageSubCaptains($subCaptain, $squad))->toBeFalse();
+    });
+
+    test('a common member cannot manage sub-captains', function (): void {
+        $squad = Squad::factory()->create();
+        $member = User::factory()->create();
+
+        SquadMember::factory()->create([
+            'squad_id' => $squad->id,
+            'user_id' => $member->id,
+            'role' => SquadRole::Member,
+        ]);
+
+        expect(resolve(SquadPolicy::class)->canManageSubCaptains($member, $squad))->toBeFalse();
+    });
+
+    test('a captain cannot manage sub-captains in another squad', function (): void {
+        $ownSquad = Squad::factory()->create();
+        $otherSquad = Squad::factory()->create();
+        $captain = User::factory()->create();
+
+        SquadMember::factory()->create([
+            'squad_id' => $ownSquad->id,
+            'user_id' => $captain->id,
+            'role' => SquadRole::Captain,
+        ]);
+
+        expect(resolve(SquadPolicy::class)->canManageSubCaptains($captain, $otherSquad))->toBeFalse();
+    });
+});
