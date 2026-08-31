@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use He4rt\Identity\User\Models\User;
+use He4rt\Profile\Support\PublicProfileCache;
 
 beforeEach(function (): void {
     $this->withoutVite();
@@ -19,6 +20,14 @@ it('renders a public profile without authentication', function (): void {
         ->assertSee('Daniel Reis')
         ->assertSee('@danielhe4rt');
     $this->assertGuest();
+});
+
+it('lets the browser cache the page for the same window as the server', function (): void {
+    User::factory()->create(['username' => 'danielhe4rt']);
+
+    $this->get('/@danielhe4rt')
+        ->assertOk()
+        ->assertHeader('Cache-Control', 'max-age='.PublicProfileCache::TTL_SECONDS.', private');
 });
 
 it('returns 404 for an unknown username', function (): void {

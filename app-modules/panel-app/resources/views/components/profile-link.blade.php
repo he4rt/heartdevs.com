@@ -1,5 +1,7 @@
 @props (['user' => null])
 
+@use('He4rt\Profile\Support\PublicProfileCache')
+
 @php
     $isLinkable = $user !== null && $user->banned_at === null && filled($user->username);
 @endphp
@@ -9,6 +11,7 @@
         class="contents"
         x-data="{
             url: @js(route('profile.card', $user->username)),
+            ttl: @js(PublicProfileCache::TTL_SECONDS * 1000),
             open: false,
             loading: false,
             html: null,
@@ -59,6 +62,55 @@
                 this.$nextTick(() => this.position())
             },
 
+            cards() {
+                window.__profileCards ??= new Map()
+
+                return window.__profileCards
+            },
+
+            cached() {
+                const entry = this.cards().get(this.url)
+
+                if (entry === undefined) return null
+
+                if (entry.expiresAt <= Date.now()) {
+                    this.cards().delete(this.url)
+
+                    return null
+                }
+
+                return entry
+            },
+
+            request() {
+                const cached = this.cached()
+
+                if (cached !== null) return cached
+
+                const entry = { expiresAt: Date.now() + this.ttl, html: null, promise: null }
+
+                entry.promise = fetch(this.url, {
+                    headers: { 'X-Requested-With': 'XMLHttpRequest' },
+                })
+                    .then((response) => (response.ok ? response.text() : null))
+                    .catch(() => null)
+                    .then((html) => {
+                        if (html === null) {
+                            this.cards().delete(this.url)
+
+                            return null
+                        }
+
+                        entry.html = html
+
+                        return html
+                    })
+
+                this.cards().set(this.url, entry)
+
+                return entry
+            },
+
             async show() {
                 if (! this.hoverable) return
 
@@ -67,21 +119,28 @@
 
                 if (this.html !== null) return
 
+                const entry = this.request()
+
+                if (entry.html !== null) {
+                    this.html = entry.html
+                    this.reposition()
+
+                    return
+                }
+
                 this.loading = true
 
-                const response = await fetch(this.url, {
-                    headers: { 'X-Requested-With': 'XMLHttpRequest' },
-                }).catch(() => null)
+                const html = await entry.promise
 
                 this.loading = false
 
-                if (! response || ! response.ok) {
+                if (html === null) {
                     this.open = false
 
                     return
                 }
 
-                this.html = await response.text()
+                this.html = html
                 this.reposition()
             },
         }"

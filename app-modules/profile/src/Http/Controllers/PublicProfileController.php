@@ -9,7 +9,8 @@ use He4rt\Identity\User\Models\User;
 use He4rt\Profile\Actions\BuildPublicProfile;
 use He4rt\Profile\Queries\FindPublicProfileUser;
 use He4rt\Profile\Seo\PublicProfileHead;
-use Illuminate\Contracts\View\View;
+use He4rt\Profile\Support\PublicProfileCache;
+use Illuminate\Http\Response;
 
 final class PublicProfileController extends Controller
 {
@@ -18,7 +19,7 @@ final class PublicProfileController extends Controller
         private readonly FindPublicProfileUser $findPublicProfileUser,
     ) {}
 
-    public function __invoke(string $username): View
+    public function __invoke(string $username): Response
     {
         $user = $this->findPublicProfileUser->handle($username);
 
@@ -28,6 +29,8 @@ final class PublicProfileController extends Controller
 
         PublicProfileHead::apply($profile);
 
-        return view('profile::public', ['profile' => $profile]);
+        return response()
+            ->view('profile::public', ['profile' => $profile])
+            ->header('Cache-Control', 'private, max-age='.PublicProfileCache::TTL_SECONDS);
     }
 }

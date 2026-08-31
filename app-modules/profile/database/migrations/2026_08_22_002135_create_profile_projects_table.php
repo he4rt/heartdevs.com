@@ -21,4 +21,9 @@ return new class extends Migration
             $table->index(['profile_id', 'created_at']);
         });
     }
+
+    public function down(): void
+    {
+        Schema::dropIfExists('profile_projects');
+    }
 };

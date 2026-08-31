@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use He4rt\Identity\User\Models\User;
+use He4rt\Profile\Support\PublicProfileCache;
 use Illuminate\Support\Facades\Blade;
 
 function renderLink(?User $user): string
@@ -26,6 +27,14 @@ it('points the hovercard at the card endpoint', function (): void {
 
     expect(str_replace('\\/', '/', renderLink($user)))
         ->toContain(route('profile.card', 'danielhe4rt'));
+});
+
+it('shares one card cache across every link on the page', function (): void {
+    $user = User::factory()->create(['username' => 'danielhe4rt']);
+
+    expect(renderLink($user))
+        ->toContain('window.__profileCards')
+        ->toContain('ttl: '.PublicProfileCache::TTL_SECONDS * 1_000);
 });
 
 it('does not link a banned author', function (): void {

@@ -335,7 +335,11 @@ final class BuildPublicProfile
 
         $scheme = parse_url($url, PHP_URL_SCHEME);
 
-        return in_array($scheme, ['http', 'https'], strict: true) ? $url : null;
+        if (!is_string($scheme)) {
+            return null;
+        }
+
+        return in_array(mb_strtolower($scheme), ['http', 'https'], strict: true) ? $url : null;
     }
 
     private function githubHandle(User $user): ?string

@@ -2,7 +2,11 @@
 
 declare(strict_types=1);
 
+use App\Models\Address;
 use App\Support\ApplicationLocale;
+use He4rt\Gamification\Character\Models\Character;
+use He4rt\Identity\ExternalIdentity\Enums\IdentityProvider;
+use He4rt\Identity\ExternalIdentity\Models\ExternalIdentity;
 use He4rt\Identity\User\Models\User;
 use He4rt\Profile\Enums\SeniorityLevel;
 use He4rt\Profile\Models\Profile;
@@ -12,7 +16,9 @@ use He4rt\Profile\Support\PublicProfileCache;
 use Illuminate\Database\Events\QueryExecuted;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Testing\TestResponse;
+use Ramsey\Uuid\Uuid;
 
 beforeEach(function (): void {
     $this->withoutVite();
@@ -161,4 +167,118 @@ it('drops every locale entry when the profile changes', function (): void {
         expect(Cache::has(PublicProfileCache::key((string) $user->getKey(), $locale)))
             ->toBeFalse("a entrada de {$locale} sobreviveu ao forget()");
     }
+});
+
+it('drops the cache when the user is renamed', function (): void {
+    $user = User::factory()->create([
+        'name' => 'Nome Antigo',
+        'username' => 'antigo',
+    ]);
+
+    Profile::factory()->for($user)->create();
+
+    visitProfile('antigo')->assertOk()->assertSee('Nome Antigo');
+
+    $user->update(['name' => 'Nome Novo', 'username' => 'novo']);
+
+    visitProfile('novo')
+        ->assertOk()
+        ->assertSee('Nome Novo')
+        ->assertSee('@novo')
+        ->assertDontSee('Nome Antigo');
+});
+
+it('drops the cache when the address changes', function (): void {
+    $user = User::factory()->create(['username' => 'viajante']);
+    Profile::factory()->for($user)->create();
+
+    $address = Address::factory()->forUser($user)->create([
+        'city' => 'Recife',
+        'state' => 'PE',
+        'country' => 'BR',
+    ]);
+
+    visitProfile('viajante')->assertOk()->assertSee('Recife, PE, BR');
+
+    $address->update(['city' => 'Olinda']);
+
+    visitProfile('viajante')
+        ->assertOk()
+        ->assertSee('Olinda, PE, BR')
+        ->assertDontSee('Recife');
+});
+
+it('drops the cache when a connected account changes', function (): void {
+    $user = User::factory()->create(['username' => 'conectado']);
+    Profile::factory()->for($user)->create();
+
+    $identity = ExternalIdentity::factory()->create([
+        'model_type' => $user->getMorphClass(),
+        'model_id' => $user->getKey(),
+        'provider' => IdentityProvider::GitHub,
+        'metadata' => ['username' => 'handle-antigo'],
+        'connected_at' => now(),
+        'disconnected_at' => null,
+    ]);
+
+    visitProfile('conectado')->assertOk()->assertSee('https://github.com/handle-antigo');
+
+    $identity->update(['metadata' => ['username' => 'handle-novo']]);
+
+    visitProfile('conectado')
+        ->assertOk()
+        ->assertSee('https://github.com/handle-novo')
+        ->assertDontSee('handle-antigo');
+});
+
+it('drops the cache when the user avatar changes', function (): void {
+    Storage::fake('public');
+
+    $user = User::factory()->create(['username' => 'retratado']);
+
+    visitProfile('retratado')->assertOk();
+
+    expect(Cache::has(PublicProfileCache::key((string) $user->getKey())))->toBeTrue();
+
+    $user->addMediaFromString('fake-png')
+        ->usingFileName('avatar.png')
+        ->toMediaCollection('avatar');
+
+    expect(Cache::has(PublicProfileCache::key((string) $user->getKey())))->toBeFalse();
+});
+
+it('keeps the cache when the character only gains experience', function (): void {
+    $user = User::factory()->create(['username' => 'jogador']);
+
+    $character = Character::factory()->create([
+        'user_id' => $user->getKey(),
+        'experience' => 100,
+    ]);
+
+    visitProfile('jogador')->assertOk();
+
+    expect(Cache::has(PublicProfileCache::key((string) $user->getKey())))->toBeTrue();
+
+    $character->increment('experience', 25);
+
+    expect(Cache::has(PublicProfileCache::key((string) $user->getKey())))->toBeTrue();
+});
+
+it('survives a morph id that arrives as a uuid object', function (): void {
+    $user = User::factory()->create(['username' => 'uuidzeiro']);
+
+    visitProfile('uuidzeiro')->assertOk();
+
+    expect(Cache::has(PublicProfileCache::key((string) $user->getKey())))->toBeTrue();
+
+    ExternalIdentity::factory()->create([
+        'model_type' => $user->getMorphClass(),
+        'model_id' => Uuid::fromString((string) $user->getKey()),
+        'provider' => IdentityProvider::GitHub,
+        'metadata' => ['username' => 'handle'],
+        'connected_at' => now(),
+        'disconnected_at' => null,
+    ]);
+
+    expect(Cache::has(PublicProfileCache::key((string) $user->getKey())))->toBeFalse();
 });

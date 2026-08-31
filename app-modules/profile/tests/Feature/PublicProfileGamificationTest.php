@@ -146,7 +146,7 @@ it('shows only the total at the level cap, where there is no next level', functi
 it('tells how long the person has been a member', function (): void {
     $user = User::factory()->create([
         'username' => 'veterano',
-        'created_at' => now()->subMonths(16),
+        'created_at' => now()->subMonthsNoOverflow(16),
     ]);
 
     characterFor($user);

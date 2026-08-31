@@ -74,6 +74,26 @@ it('drops a url whose scheme is not http', function (): void {
         ->assertDontSee('javascript:alert(1)');
 });
 
+it('judges the url scheme regardless of case', function (string $url, ?string $expected): void {
+    $user = User::factory()->create(['username' => 'caixa-alta']);
+    $profile = Profile::factory()->for($user)->create();
+
+    ProfileProject::factory()->for($profile)->create([
+        'name' => 'Projeto Gritado',
+        'url' => $url,
+    ]);
+
+    $data = resolve(BuildPublicProfile::class)->handle($user->refresh());
+
+    expect($data->projects[0]->url)->toBe($expected);
+})->with([
+    'https maiusculo' => ['HTTPS://he4rt.dev', 'HTTPS://he4rt.dev'],
+    'http misto' => ['HtTp://he4rt.dev', 'HtTp://he4rt.dev'],
+    'javascript maiusculo' => ['JAVASCRIPT:alert(1)', null],
+    'javascript misto' => ['JavaScript:alert(1)', null],
+    'sem esquema' => ['he4rt.dev/projeto', null],
+]);
+
 it('lists the newest project first', function (): void {
     $user = User::factory()->create(['username' => 'cronologico']);
     $profile = Profile::factory()->for($user)->create();
