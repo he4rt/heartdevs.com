@@ -54,6 +54,13 @@
             'text' => 'Coraçãozinho com a mão e a placa da He4rt: o jeito de se encontrar no meio de milhares de campuseiros.',
             'image' => 'campus-party-2022-coracao.webp',
         ],
+        [
+            'title' => 'He4rt Conf',
+            'year' => 2026,
+            'place' => 'Chácara',
+            'text' => 'Save the date: 12/dez. Três dias, uma chácara e só os dedicados.',
+            'image' => 'he4rt-conf-save-the-date.webp',
+        ],
     ])->filter(fn (array $event): bool => $event['year'] <= $until->year)->values();
 @endphp
 <section class="slide" data-label="Eventos">
