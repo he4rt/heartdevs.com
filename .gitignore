@@ -66,6 +66,7 @@ QWEN.md
 .ai/*
 .ai/mcp/mcp.json
 !.ai/guidelines/
+!.ai/rules/
 
 # Claude Code
 .claude/
@@ -120,3 +121,6 @@ CRUSH.md
 .superpowers/
 
 /poc
+
+.codex
+/.codex

@@ -2,6 +2,9 @@
 
 declare(strict_types=1);
 
+/**
+ * Only recurring contributors belong here — see .ai/rules/config.md.
+ */
 return [
     [
         'name' => 'Daniel Reis',
