@@ -181,6 +181,10 @@ it('apresenta a He4rt entre a capa e os números', function (): void {
         ->assertSee('A He4rt bate desde 2018')
         ->assertSee('4noobs')
         ->assertSee('class="tl-ecg"', escape: false)
+        // Eventos presenciais: fotos fixas num carrossel, logo depois do manifesto.
+        ->assertSee('Não somos só uma comunidade online')
+        ->assertSee('images/retro/events/')
+        ->assertSeeInOrder(['A He4rt bate desde 2018', 'Não somos só uma comunidade online', 'Reunião Semanal'])
         // Iniciativas, com a órbita ligada à lista pela cor.
         ->assertSee('Reunião Semanal')
         ->assertSee('Spaces')
@@ -218,5 +222,8 @@ it('não anuncia marco que ainda não tinha acontecido no recorte', function ():
         ->assertOk()
         ->assertSee('He4rt Conf')
         ->assertDontSee('Primeiro meetup presencial')
-        ->assertDontSee('LaravelDaySP');
+        ->assertDontSee('LaravelDaySP')
+        // O slide de eventos segue a mesma régua: sem foto de evento futuro.
+        ->assertDontSee('images/retro/events/')
+        ->assertSee('ainda era só online');
 });
