@@ -7,8 +7,11 @@ namespace He4rt\Portal\Retrospective;
 use Carbon\CarbonImmutable;
 use He4rt\Community\Retrospective\Actions\CompileSnapshot;
 use He4rt\Community\Retrospective\Actions\ComposeDeck;
+use He4rt\Community\Retrospective\Contracts\PersonDirectory;
+use He4rt\Community\Retrospective\DTOs\PersonIdentity;
 use He4rt\Community\Retrospective\DTOs\RetrospectiveSnapshot;
 use He4rt\Community\Retrospective\DTOs\SourceResult;
+use He4rt\Community\Retrospective\Enums\CoverKind;
 use He4rt\Community\Retrospective\Models\Retrospective;
 
 /**
@@ -22,7 +25,7 @@ use He4rt\Community\Retrospective\Models\Retrospective;
 final class DeckPresentation
 {
     /**
-     * @return array{sources: list<SourceResult>, promotions: list<PromotionSlide>, since: CarbonImmutable, until: CarbonImmutable, coverTitle: string|null, coverIntro: string|null, closingText: string|null, stateKey: string}
+     * @return array{sources: list<SourceResult>, promotions: list<PromotionSlide>, since: CarbonImmutable, until: CarbonImmutable, coverKind: CoverKind, edition: int|null, host: PersonIdentity|null, coverTitle: string|null, coverIntro: string|null, closingText: string|null, stateKey: string}
      */
     public static function for(?Retrospective $retrospective, bool $live = false): array
     {
@@ -45,6 +48,9 @@ final class DeckPresentation
      *     promotions: list<PromotionSlide>,
      *     since: CarbonImmutable,
      *     until: CarbonImmutable,
+     *     coverKind: CoverKind,
+     *     edition: int|null,
+     *     host: PersonIdentity|null,
      *     coverTitle: string|null,
      *     coverIntro: string|null,
      *     closingText: string|null,
@@ -64,6 +70,12 @@ final class DeckPresentation
             'promotions' => PromotionSection::slides($snapshot->promotions, $retrospective->deck_config),
             'since' => $retrospective->since->toImmutable(),
             'until' => $retrospective->until->toImmutable(),
+            'coverKind' => $retrospective->cover_kind,
+            // Edição e apresentador só existem no onboarding. Ficam fora do
+            // snapshot de propósito: são editoriais como o título, e o número
+            // da edição é derivado da ordem das edições (ADR-0002).
+            'edition' => $retrospective->cover_kind->isOnboarding() ? $retrospective->editionNumber() : null,
+            'host' => $retrospective->cover_kind->isOnboarding() ? self::host($retrospective->host_user_id) : null,
             'coverTitle' => $retrospective->cover_title,
             'coverIntro' => $retrospective->cover_intro,
             'closingText' => $retrospective->closing_text,
@@ -96,7 +108,7 @@ final class DeckPresentation
     }
 
     /**
-     * @return array{sources: list<never>, promotions: list<never>, since: CarbonImmutable, until: CarbonImmutable, coverTitle: null, coverIntro: null, closingText: null, stateKey: string}
+     * @return array{sources: list<never>, promotions: list<never>, since: CarbonImmutable, until: CarbonImmutable, coverKind: CoverKind, edition: null, host: null, coverTitle: null, coverIntro: null, closingText: null, stateKey: string}
      */
     private static function blank(): array
     {
@@ -105,10 +117,26 @@ final class DeckPresentation
             'promotions' => [],
             'since' => CarbonImmutable::now(),
             'until' => CarbonImmutable::now(),
+            'coverKind' => CoverKind::Retrospective,
+            'edition' => null,
+            'host' => null,
             'coverTitle' => null,
             'coverIntro' => null,
             'closingText' => null,
             'stateKey' => 'empty',
         ];
+    }
+
+    /**
+     * Resolve o apresentador pelo mesmo diretório que resolve as pessoas da tag:
+     * um lugar só decide nome e avatar, e a capa não inventa outra regra.
+     */
+    private static function host(?string $userId): ?PersonIdentity
+    {
+        if ($userId === null) {
+            return null;
+        }
+
+        return resolve(PersonDirectory::class)->execute([$userId])[$userId] ?? null;
     }
 }

@@ -12,13 +12,16 @@ use He4rt\Community\Retrospective\DTOs\DeckConfig;
 use He4rt\Community\Retrospective\DTOs\Period;
 use He4rt\Community\Retrospective\DTOs\RetrospectiveSnapshot;
 use He4rt\Community\Retrospective\DTOs\SourceFilters;
+use He4rt\Community\Retrospective\Enums\CoverKind;
 use He4rt\Community\Retrospective\Enums\RetrospectiveStatus;
+use He4rt\Identity\User\Models\User;
 use Illuminate\Database\Eloquent\Attributes\Table;
 use Illuminate\Database\Eloquent\Attributes\UseFactory;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 /**
  * @property string $id
@@ -26,8 +29,10 @@ use Illuminate\Database\Eloquent\Model;
  * @property CarbonInterface $since
  * @property CarbonInterface $until
  * @property RetrospectiveStatus $status
+ * @property CoverKind $cover_kind
  * @property string|null $cover_title
  * @property string|null $cover_intro
+ * @property string|null $host_user_id
  * @property string|null $closing_text
  * @property bool $hide_bots
  * @property DeckConfig $deck_config
@@ -35,6 +40,7 @@ use Illuminate\Database\Eloquent\Model;
  * @property CarbonInterface|null $published_at
  * @property CarbonInterface|null $created_at
  * @property CarbonInterface|null $updated_at
+ * @property-read User|null $host
  */
 #[UseFactory(factoryClass: RetrospectiveFactory::class)]
 #[Table(name: 'community_retrospectives')]
@@ -49,8 +55,10 @@ final class Retrospective extends Model
         'since',
         'until',
         'status',
+        'cover_kind',
         'cover_title',
         'cover_intro',
+        'host_user_id',
         'closing_text',
         'hide_bots',
         'deck_config',
@@ -82,6 +90,37 @@ final class Retrospective extends Model
     public function isPublished(): bool
     {
         return $this->status->isPublished();
+    }
+
+    /**
+     * Quem apresenta o onboarding. Só faz sentido na capa de onboarding; na de
+     * retrospectiva o campo fica de lado e não é exibido.
+     *
+     * @return BelongsTo<User, $this>
+     */
+    public function host(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'host_user_id');
+    }
+
+    /**
+     * Que edição do onboarding é esta: a posição entre as edições de onboarding,
+     * na ordem do início do período. Derivada e não digitada: um número que o
+     * operador esquece de atualizar mente no telão, e a ordem das edições já
+     * está no banco.
+     *
+     * Ancorada no `since` e não em "hoje": reabrir a 3ª edição em 2030 continua
+     * mostrando "3ª edição".
+     */
+    public function editionNumber(): int
+    {
+        $earlierEditions = self::query()
+            ->where('cover_kind', CoverKind::Onboarding->value)
+            ->whereKeyNot($this->getKey())
+            ->where('since', '<', $this->since)
+            ->count();
+
+        return $earlierEditions + 1;
     }
 
     /**
@@ -126,6 +165,7 @@ final class Retrospective extends Model
             'until' => 'datetime',
             'published_at' => 'datetime',
             'status' => RetrospectiveStatus::class,
+            'cover_kind' => CoverKind::class,
             'hide_bots' => 'boolean',
             'deck_config' => AsDeckConfig::class,
             'snapshot' => AsRetrospectiveSnapshot::class,

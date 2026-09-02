@@ -395,6 +395,48 @@
         transform: scale(1.08);
     }
 }
+/* apresentador da capa de onboarding */
+.retro .cover-host {
+    display: inline-flex;
+    align-items: center;
+    gap: 14px;
+    margin: 26px auto 0;
+    padding: 10px 18px 10px 10px;
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    background: var(--surface);
+    text-align: left;
+}
+.retro .cover-host img {
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    object-fit: cover;
+    box-shadow:
+        0 0 0 2px var(--surface),
+        0 0 0 4px rgba(120, 43, 241, 0.45);
+}
+.retro .cover-host-text {
+    display: flex;
+    flex-direction: column;
+    line-height: 1.2;
+}
+.retro .cover-host-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.66rem;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--brand-soft);
+}
+.retro .cover-host-name {
+    font-weight: 600;
+    color: var(--text);
+    margin-top: 3px;
+}
+.retro .cover-host-handle {
+    font-size: 0.86rem;
+    color: var(--muted);
+}
 .retro .hint {
     font-family: 'JetBrains Mono', monospace;
     font-size: 0.78rem;

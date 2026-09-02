@@ -8,6 +8,7 @@ use Filament\Actions\Action;
 use Filament\Actions\DeleteAction;
 use Filament\Forms\Components\CheckboxList;
 use Filament\Forms\Components\DateTimePicker;
+use Filament\Forms\Components\Radio;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
@@ -20,6 +21,7 @@ use Filament\Schemas\Components\Actions as SchemaActions;
 use Filament\Schemas\Components\Form;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Components\Text;
+use Filament\Schemas\Components\Utilities\Get;
 use Filament\Schemas\Schema;
 use Filament\Support\Enums\Width;
 use Filament\Support\Icons\Heroicon;
@@ -27,6 +29,7 @@ use He4rt\Community\Retrospective\Contracts\CuratableSource;
 use He4rt\Community\Retrospective\DTOs\PromotionEntry;
 use He4rt\Community\Retrospective\DTOs\RetrospectiveSnapshot;
 use He4rt\Community\Retrospective\DTOs\SourceResult;
+use He4rt\Community\Retrospective\Enums\CoverKind;
 use He4rt\Community\Retrospective\Enums\ExclusionKind;
 use He4rt\Community\Retrospective\Enums\PromotionStage;
 use He4rt\Community\Retrospective\Models\Retrospective;
@@ -344,7 +347,7 @@ class BuildDeck extends Page
      */
     public function viewPath(): ?string
     {
-        return InspectorViewPath::for($this->selection());
+        return InspectorViewPath::for($this->selection(), $this->getRetrospective()->cover_kind);
     }
 
     /**
@@ -512,6 +515,19 @@ class BuildDeck extends Page
                 ->record(fn (): Retrospective => $this->getRetrospective())
                 ->successRedirectUrl(RetrospectiveResource::getUrl('index')),
         ];
+    }
+
+    /**
+     * O Radio devolve o enum quando o estado veio do fill e a string quando veio
+     * da wire; os dois caminhos passam por aqui para o resto não decidir.
+     */
+    private function coverKindFrom(mixed $state): CoverKind
+    {
+        if ($state instanceof CoverKind) {
+            return $state;
+        }
+
+        return CoverKind::tryFrom((string) $state) ?? CoverKind::Retrospective;
     }
 
     /**
@@ -852,6 +868,20 @@ class BuildDeck extends Page
                         ->label('Ocultar bots')
                         ->helperText('Mexe nos números: republique para valer.'),
 
+                    Radio::make('cover_kind')
+                        ->label('Tipo de capa')
+                        ->options(CoverKind::class)
+                        ->required()
+                        ->live(),
+
+                    Select::make('host_user_id')
+                        ->label('Quem apresenta')
+                        ->searchable()
+                        ->helperText('Aparece na capa com nome e avatar. Só quem tem Discord ou GitHub vinculado, para o avatar existir.')
+                        ->getSearchResultsUsing(fn (string $search): array => PromotablePeople::search($search))
+                        ->getOptionLabelUsing(fn (?string $value): ?string => PromotablePeople::labelFor($value))
+                        ->visible(fn (Get $get): bool => $this->coverKindFrom($get('cover_kind'))->isOnboarding()),
+
                     TextInput::make('cover_title')
                         ->label('Título da capa')
                         ->maxLength(255),
@@ -978,6 +1008,8 @@ class BuildDeck extends Page
                 'since' => $record->since,
                 'until' => $record->until,
                 'hide_bots' => $record->hide_bots,
+                'cover_kind' => $record->cover_kind->value,
+                'host_user_id' => $record->host_user_id,
                 'cover_title' => $record->cover_title,
                 'cover_intro' => $record->cover_intro,
             ],
@@ -1031,11 +1063,17 @@ class BuildDeck extends Page
      */
     private function saveCover(Retrospective $record, array $data): void
     {
+        $coverKind = $this->coverKindFrom($data['cover_kind'] ?? null);
+
         $record->update([
             'title' => $data['title'],
             'since' => $data['since'],
             'until' => $data['until'],
             'hide_bots' => (bool) ($data['hide_bots'] ?? false),
+            'cover_kind' => $coverKind,
+            // Apresentador só faz sentido no onboarding: trocar a capa de volta
+            // limpa o campo em vez de deixar um nome escondido esperando.
+            'host_user_id' => $coverKind->isOnboarding() ? ($data['host_user_id'] ?? null) : null,
             'cover_title' => $data['cover_title'] ?? null,
             'cover_intro' => $data['cover_intro'] ?? null,
         ]);
