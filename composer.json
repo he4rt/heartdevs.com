@@ -104,6 +104,9 @@
         "post-update-cmd": [
             "@php artisan vendor:publish --tag=laravel-assets --ansi --force"
         ],
+        "post-install-cmd": [
+            "composer run-script boost:reminder"
+        ],
         "pre-package-uninstall": [
             "Illuminate\\Foundation\\ComposerScripts::prePackageUninstall"
         ],
@@ -125,8 +128,10 @@
             "composer run-script post-root-package-install",
             "composer run-script key:generate",
             "composer run-script post-create-project-cmd",
-            "@php artisan storage:link --ansi"
+            "@php artisan storage:link --ansi",
+            "composer run-script boost:reminder"
         ],
+        "boost:reminder": "@php -r \"fwrite(STDOUT, PHP_EOL.'>> Rode \\'php artisan boost:install\\' antes de usar agentes de IA neste projeto.'.PHP_EOL.'   Ele configura o MCP do Laravel Boost, sem o qual os agentes nao devem executar tarefas.'.PHP_EOL.PHP_EOL);\"",
         "bot": "@php artisan bot:boot",
         "dev": [
             "Composer\\Config::disableProcessTimeout",
