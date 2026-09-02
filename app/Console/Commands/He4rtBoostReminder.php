@@ -8,8 +8,10 @@ use Illuminate\Console\Attributes\Description;
 use Illuminate\Console\Attributes\Signature;
 use Illuminate\Console\Command;
 use Illuminate\Support\Arr;
+use Laravel\Prompts\Elements\BulletedList;
 
-use function Laravel\Prompts\note;
+use function Laravel\Prompts\callout;
+use function Laravel\Prompts\intro;
 use function Laravel\Prompts\warning;
 
 #[Description(description: 'Informative reminder to run php artisan boost:install after setup')]
@@ -23,13 +25,20 @@ final class He4rtBoostReminder extends Command
     {
         $this->displayLogo();
 
+        intro('✦ He4rt Developers :: Antes de começar ✦');
+
         warning('O Laravel Boost ainda não foi configurado neste ambiente.');
 
-        note('Rode `php artisan boost:install` para habilitar o MCP e as guidelines de IA deste projeto.');
-
-        $this->line('  Agentes de IA (Claude, Cursor, Copilot, etc.) não devem executar tarefas neste');
-        $this->line('  repositório enquanto esse comando não for executado — veja CLAUDE.md / AGENTS.md.');
-        $this->newLine();
+        callout(
+            'Antes de usar agentes de IA',
+            [
+                'Rode `php artisan boost:install` para habilitar o MCP e as guidelines do projeto.',
+                new BulletedList([
+                    'Claude, Cursor, Copilot e outros agentes não devem executar tarefas até esse comando rodar.',
+                    'As regras completas estão em `CLAUDE.md` e `AGENTS.md`.',
+                ]),
+            ],
+        );
 
         $this->displayFunFact();
     }
@@ -51,22 +60,20 @@ final class He4rtBoostReminder extends Command
             : Arr::first($contributors, fn (array $c): bool => strcasecmp($c['github'], $who) === 0);
 
         if (!$contributor) {
-            $this->line("  Nenhum contribuidor encontrado no config/fun-facts.php com o GitHub '{$who}'.");
+            warning("Nenhum contribuidor encontrado no config/fun-facts.php com o GitHub '{$who}'.");
 
             return;
         }
 
         if ($contributor['facts'] === []) {
-            $this->line("  {$contributor['name']} (@{$contributor['github']}) ainda não tem fun facts cadastrados.");
+            warning("{$contributor['name']} (@{$contributor['github']}) ainda não tem fun facts cadastrados.");
 
             return;
         }
 
         $fact = Arr::random($contributor['facts']);
 
-        $this->line(sprintf('  <fg=%s;options=bold>Você sabia? — %s (@%s)</>', self::COLOR, $contributor['name'], $contributor['github']));
-        $this->line("  • {$fact}");
-        $this->newLine();
+        callout("Você sabia? — {$contributor['name']} (@{$contributor['github']})", $fact);
     }
 
     private function displayLogo(): void
@@ -85,8 +92,5 @@ final class He4rtBoostReminder extends Command
         foreach ($lines as $line) {
             $this->line(sprintf('<fg=%s>%s</>', self::COLOR, $line));
         }
-
-        $this->line(sprintf('  <fg=%s;options=bold> ✦ He4rt Developers :: Antes de começar ✦ </>', self::COLOR));
-        $this->newLine();
     }
 }
