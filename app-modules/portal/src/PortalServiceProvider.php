@@ -7,6 +7,7 @@ namespace He4rt\Portal;
 use He4rt\Portal\Articles\ArticlesPage;
 use He4rt\Portal\Home\HeroSection;
 use He4rt\Portal\Home\Homepage;
+use He4rt\Portal\Livewire\UpcomingEventsSection;
 use He4rt\Portal\Retrospective\CommunityRetrospectivePage;
 use He4rt\Portal\ShortLink\ShortLinkRedirectController;
 use He4rt\Portal\Sitemap\SitemapController;
@@ -112,5 +113,6 @@ class PortalServiceProvider extends ServiceProvider
         });
 
         Livewire::component('hero-section', HeroSection::class);
+        Livewire::component('upcoming-events-section', UpcomingEventsSection::class);
     }
 }
