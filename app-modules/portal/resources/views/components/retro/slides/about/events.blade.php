@@ -55,11 +55,11 @@
             'image' => 'campus-party-2022-coracao.webp',
         ],
         [
-            'title' => 'He4rt Conf',
+            'title' => 'He4rt Pub',
             'year' => 2026,
-            'place' => 'Chácara',
-            'text' => 'Save the date: 12/dez. Três dias, uma chácara e só os dedicados.',
-            'image' => 'he4rt-conf-save-the-date.webp',
+            'place' => 'São Paulo',
+            'text' => 'Fevereiro de 2026: uma mesa de bar não bastou, e a comunidade tomou o pub inteiro.',
+            'image' => 'he4rt-pub-2026.webp',
         ],
     ])->filter(fn (array $event): bool => $event['year'] <= $until->year)->values();
 @endphp
