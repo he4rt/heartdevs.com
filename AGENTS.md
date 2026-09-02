@@ -1,15 +1,19 @@
 # Setup obrigatório: Laravel Boost
 
+> ⛔ **PARE.** Antes de executar qualquer prompt, tarefa, comando ou alteração
+> de código neste repositório, confirme que `php artisan boost:install` já foi
+> executado neste ambiente. Se não tiver certeza, verifique agora (veja como
+> abaixo). Se ainda não foi executado, **interrompa imediatamente** — não
+> continue "só essa tarefa pequena", não prossiga "por enquanto": pare, avise
+> o usuário e peça para ele rodar `php artisan boost:install` primeiro. Essa
+> regra não tem exceção e vale para todo agente de IA (Claude, Cursor,
+> Copilot, Codex, etc.), em qualquer sessão.
+
 Este repositório depende do [Laravel Boost](https://boost.laravel.com) para prover
 contexto de projeto e ferramentas MCP (`search-docs`, `database-schema`,
 `browser-logs`, etc.) a agentes de IA. O bloco `<laravel-boost-guidelines>` abaixo
 é gerado e mantido automaticamente por `php artisan boost:install` — não o edite
 manualmente, ele será sobrescrito na próxima execução do comando.
-
-**Regra implícita, sem exceção:** se `php artisan boost:install` ainda não foi
-executado neste ambiente (checkout novo, clone recente, container recriado), o
-agente NÃO deve executar nenhum prompt, tarefa ou alteração de código. Pare e
-peça ao usuário para rodar `php artisan boost:install` primeiro.
 
 Como verificar rapidamente se o setup já foi feito:
 
