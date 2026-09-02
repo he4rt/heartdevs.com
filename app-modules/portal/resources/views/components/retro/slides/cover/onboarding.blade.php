@@ -1,9 +1,9 @@
 {{--
     A capa do onboarding mensal: o deck é o material do evento, então abre
-    recebendo quem chegou, não fazendo balanço. Edição e apresentador vêm da
-    edição (derivada e coluna); só o texto é editorial, como na outra capa.
+    recebendo quem chegou, não fazendo balanço. A edição é derivada e os
+    apresentadores vêm da curadoria; só o texto é editorial, como na outra capa.
 --}}
-@props(['since', 'until', 'edition', 'host' => null, 'coverTitle' => null, 'coverIntro' => null])
+@props(['since', 'until', 'edition', 'hosts' => [], 'coverTitle' => null, 'coverIntro' => null])
 @php
     $month = $since->timezone(config('app.display_timezone'))->translatedFormat('F Y');
 @endphp
@@ -32,20 +32,26 @@
                 Nos próximos minutos você vai ver <b>quem somos</b>, <b>o que a gente faz</b> e <b>onde entrar</b>.
             @endif
         </p>
-        @if ($host)
-            <div class="cover-host" data-anim>
-                <img
-                    class="mini"
-                    src="{{ $host->avatar }}"
-                    onerror="this.onerror=null;this.src='https://github.com/{{ $host->username }}.png'"
-                    width="52"
-                    height="52"
-                    alt="{{ $host->username }}"
-                />
-                <div class="cover-host-text">
-                    <span class="cover-host-label">Quem apresenta</span>
-                    <span class="cover-host-name">{{ $host->name }}</span>
-                    <span class="cover-host-handle">{{ '@' . $host->username }}</span>
+        @if (count($hosts))
+            <div class="cover-hosts" data-anim>
+                <span class="cover-host-label">{{ count($hosts) === 1 ? 'Quem apresenta' : 'Quem apresenta hoje' }}</span>
+                <div class="cover-host-list">
+                    @foreach ($hosts as $host)
+                        <div class="cover-host">
+                            <img
+                                class="mini"
+                                src="{{ $host->avatar }}"
+                                onerror="this.onerror=null;this.src='https://github.com/{{ $host->username }}.png'"
+                                width="52"
+                                height="52"
+                                alt="{{ $host->username }}"
+                            />
+                            <div class="cover-host-text">
+                                <span class="cover-host-name">{{ $host->name }}</span>
+                                <span class="cover-host-handle">{{ '@' . $host->username }}</span>
+                            </div>
+                        </div>
+                    @endforeach
                 </div>
             </div>
         @endif

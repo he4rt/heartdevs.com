@@ -36,17 +36,22 @@ function publishRetrospective(array $overrides = []): Retrospective
     ], $overrides));
 }
 
-it('abre como onboarding quando a edição pede, com edição e apresentador', function (): void {
+it('abre como onboarding quando a edição pede, com edição e apresentadores', function (): void {
     GithubContribution::factory()->create([
         'actor_login' => 'maria', 'actor_id' => 42, 'type' => ContributionType::Pr,
         'external_ref' => 'pr:1', 'occurred_at' => '2026-06-02', 'metadata' => ['state' => 'open', 'merged' => false],
     ]);
-    $host = User::factory()->create(['name' => 'Daniel Reis', 'username' => 'hostdev']);
-    ExternalIdentity::factory()->create([
-        'model_id' => $host->id,
-        'provider' => IdentityProvider::GitHub,
-        'metadata' => ['username' => 'hostdev'],
-    ]);
+    $hosts = collect(['hostdev' => 'Daniel Reis', 'cohost' => 'Maria Silva'])
+        ->map(function (string $name, string $username): User {
+            $user = User::factory()->create(['name' => $name, 'username' => $username]);
+            ExternalIdentity::factory()->create([
+                'model_id' => $user->id,
+                'provider' => IdentityProvider::GitHub,
+                'metadata' => ['username' => $username],
+            ]);
+
+            return $user;
+        });
 
     // Uma edição de onboarding anterior: a publicada vira a 2ª.
     Retrospective::factory()->onboarding()->create([
@@ -56,7 +61,7 @@ it('abre como onboarding quando a edição pede, com edição e apresentador', f
 
     publishRetrospective([
         'cover_kind' => CoverKind::Onboarding,
-        'host_user_id' => $host->id,
+        'deck_config' => new DeckConfig()->withHosts([$hosts['hostdev']->id, $hosts['cohost']->id]),
         'cover_title' => null,
     ]);
 
@@ -65,9 +70,8 @@ it('abre como onboarding quando a edição pede, com edição e apresentador', f
         ->assertSee('data-label="Boas-vindas"', escape: false)
         ->assertSee('2ª EDIÇÃO')
         ->assertSee('Bem-vindo à He4rt')
-        ->assertSee('Quem apresenta')
-        ->assertSee('Daniel Reis')
-        ->assertSee('@hostdev')
+        ->assertSee('Quem apresenta hoje')
+        ->assertSeeInOrder(['Daniel Reis', '@hostdev', 'Maria Silva', '@cohost'])
         ->assertSee('https://github.com/hostdev.png')
         ->assertDontSee('data-label="Abertura"', escape: false);
 });

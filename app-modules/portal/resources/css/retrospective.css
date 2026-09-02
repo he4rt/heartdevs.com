@@ -395,13 +395,22 @@
         transform: scale(1.08);
     }
 }
-/* apresentador da capa de onboarding */
+/* apresentadores da capa de onboarding */
+.retro .cover-hosts {
+    margin-top: 26px;
+}
+.retro .cover-host-list {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 10px;
+}
 .retro .cover-host {
     display: inline-flex;
     align-items: center;
-    gap: 14px;
-    margin: 26px auto 0;
-    padding: 10px 18px 10px 10px;
+    gap: 12px;
+    padding: 8px 18px 8px 8px;
     border: 1px solid var(--border);
     border-radius: 999px;
     background: var(--surface);
@@ -431,7 +440,6 @@
 .retro .cover-host-name {
     font-weight: 600;
     color: var(--text);
-    margin-top: 3px;
 }
 .retro .cover-host-handle {
     font-size: 0.86rem;

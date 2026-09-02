@@ -212,6 +212,6 @@ it('abre como retrospectiva por padrão e persiste o tipo de capa como enum', fu
     $onboarding = Retrospective::factory()->onboarding()->create();
 
     expect($default->fresh()->cover_kind)->toBe(CoverKind::Retrospective)
-        ->and($default->fresh()->host_user_id)->toBeNull()
+        ->and($default->fresh()->deck_config->hosts)->toBeEmpty()
         ->and($onboarding->fresh()->cover_kind)->toBe(CoverKind::Onboarding);
 });

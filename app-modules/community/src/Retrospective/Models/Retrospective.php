@@ -14,14 +14,12 @@ use He4rt\Community\Retrospective\DTOs\RetrospectiveSnapshot;
 use He4rt\Community\Retrospective\DTOs\SourceFilters;
 use He4rt\Community\Retrospective\Enums\CoverKind;
 use He4rt\Community\Retrospective\Enums\RetrospectiveStatus;
-use He4rt\Identity\User\Models\User;
 use Illuminate\Database\Eloquent\Attributes\Table;
 use Illuminate\Database\Eloquent\Attributes\UseFactory;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 /**
  * @property string $id
@@ -32,7 +30,6 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property CoverKind $cover_kind
  * @property string|null $cover_title
  * @property string|null $cover_intro
- * @property string|null $host_user_id
  * @property string|null $closing_text
  * @property bool $hide_bots
  * @property DeckConfig $deck_config
@@ -40,7 +37,6 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property CarbonInterface|null $published_at
  * @property CarbonInterface|null $created_at
  * @property CarbonInterface|null $updated_at
- * @property-read User|null $host
  */
 #[UseFactory(factoryClass: RetrospectiveFactory::class)]
 #[Table(name: 'community_retrospectives')]
@@ -58,7 +54,6 @@ final class Retrospective extends Model
         'cover_kind',
         'cover_title',
         'cover_intro',
-        'host_user_id',
         'closing_text',
         'hide_bots',
         'deck_config',
@@ -90,17 +85,6 @@ final class Retrospective extends Model
     public function isPublished(): bool
     {
         return $this->status->isPublished();
-    }
-
-    /**
-     * Quem apresenta o onboarding. Só faz sentido na capa de onboarding; na de
-     * retrospectiva o campo fica de lado e não é exibido.
-     *
-     * @return BelongsTo<User, $this>
-     */
-    public function host(): BelongsTo
-    {
-        return $this->belongsTo(User::class, 'host_user_id');
     }
 
     /**

@@ -230,7 +230,7 @@
                             'since' => $deck['since'],
                             'until' => $deck['until'],
                             'edition' => $deck['edition'],
-                            'host' => $deck['host'],
+                            'hosts' => $deck['hosts'],
                             'coverTitle' => $deck['coverTitle'],
                             'coverIntro' => $deck['coverIntro'],
                         ]"

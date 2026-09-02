@@ -285,32 +285,38 @@ test('salva capa e período nas colunas da edição', function (): void {
         ->and($fresh->hide_bots)->toBeFalse();
 });
 
-test('salva a capa de onboarding com apresentador e limpa o apresentador ao voltar', function (): void {
-    $host = User::factory()->create(['name' => 'Daniel Reis', 'username' => 'hostdev']);
-    ExternalIdentity::factory()->create([
-        'model_id' => $host->id,
-        'provider' => IdentityProvider::GitHub,
-        'metadata' => ['username' => 'hostdev'],
-    ]);
+test('salva a capa de onboarding com apresentadores em ordem e limpa a lista ao voltar', function (): void {
+    $hosts = collect(['hostdev' => 'Daniel Reis', 'cohost' => 'Maria Silva'])
+        ->map(function (string $name, string $username): User {
+            $user = User::factory()->create(['name' => $name, 'username' => $username]);
+            ExternalIdentity::factory()->create([
+                'model_id' => $user->id,
+                'provider' => IdentityProvider::GitHub,
+                'metadata' => ['username' => $username],
+            ]);
+
+            return $user;
+        });
     $retrospective = Retrospective::factory()->create();
 
     $page = livewire(BuildDeck::class, ['record' => $retrospective->id])
         ->call('select', 'cover')
         ->fillForm([
             'cover_kind' => CoverKind::Onboarding->value,
-            'host_user_id' => $host->id,
+            'hosts' => [$hosts['cohost']->id, $hosts['hostdev']->id],
         ])
         ->call('save')
         ->assertHasNoFormErrors();
 
     $fresh = $retrospective->fresh();
+    $deck = $page->instance()->deck();
 
     expect($fresh->cover_kind)->toBe(CoverKind::Onboarding)
-        ->and($fresh->host_user_id)->toBe($host->id)
+        ->and($fresh->deck_config->hosts)->toBe([$hosts['cohost']->id, $hosts['hostdev']->id])
         ->and($page->instance()->viewPath())
         ->toBe('app-modules/portal/resources/views/components/retro/slides/cover/onboarding.blade.php')
-        ->and($page->instance()->deck()['host']?->name)->toBe('Daniel Reis')
-        ->and($page->instance()->deck()['edition'])->toBe(1);
+        ->and(array_map(fn ($host): string => $host->name, $deck['hosts']))->toBe(['Maria Silva', 'Daniel Reis'])
+        ->and($deck['edition'])->toBe(1);
 
     $page
         ->fillForm(['cover_kind' => CoverKind::Retrospective->value])
@@ -320,7 +326,7 @@ test('salva a capa de onboarding com apresentador e limpa o apresentador ao volt
     $fresh = $retrospective->fresh();
 
     expect($fresh->cover_kind)->toBe(CoverKind::Retrospective)
-        ->and($fresh->host_user_id)->toBeNull();
+        ->and($fresh->deck_config->hosts)->toBeEmpty();
 });
 
 test('a capa exige título', function (): void {

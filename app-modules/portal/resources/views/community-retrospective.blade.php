@@ -11,7 +11,7 @@
             'since' => $since,
             'until' => $until,
             'edition' => $edition ?? null,
-            'host' => $host ?? null,
+            'hosts' => $hosts ?? [],
             'coverTitle' => $coverTitle ?? null,
             'coverIntro' => $coverIntro ?? null,
         ])

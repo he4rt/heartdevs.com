@@ -31,7 +31,6 @@ final class RetrospectiveFactory extends Factory
             'until' => CarbonImmutable::now(),
             'status' => RetrospectiveStatus::Draft,
             'cover_kind' => CoverKind::Retrospective,
-            'host_user_id' => null,
             'cover_title' => fake()->sentence(3),
             'cover_intro' => fake()->sentence(),
             'closing_text' => fake()->sentence(),
@@ -51,11 +50,16 @@ final class RetrospectiveFactory extends Factory
         ]);
     }
 
-    public function onboarding(?User $host = null): self
+    /**
+     * @param  list<User>  $hosts
+     */
+    public function onboarding(array $hosts = []): self
     {
         return $this->state(fn (): array => [
             'cover_kind' => CoverKind::Onboarding,
-            'host_user_id' => $host?->id,
+            'deck_config' => new DeckConfig()->withHosts(
+                array_map(static fn (User $host): string => $host->id, $hosts),
+            ),
         ]);
     }
 }

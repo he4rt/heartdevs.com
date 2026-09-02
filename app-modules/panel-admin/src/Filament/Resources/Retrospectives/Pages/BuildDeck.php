@@ -518,6 +518,18 @@ class BuildDeck extends Page
     }
 
     /**
+     * @return list<string>
+     */
+    private function stringList(mixed $value): array
+    {
+        if (!is_array($value)) {
+            return [];
+        }
+
+        return array_values(array_filter($value, static fn (mixed $item): bool => is_string($item) && $item !== ''));
+    }
+
+    /**
      * O Radio devolve o enum quando o estado veio do fill e a string quando veio
      * da wire; os dois caminhos passam por aqui para o resto não decidir.
      */
@@ -874,12 +886,13 @@ class BuildDeck extends Page
                         ->required()
                         ->live(),
 
-                    Select::make('host_user_id')
+                    Select::make('hosts')
                         ->label('Quem apresenta')
+                        ->multiple()
                         ->searchable()
-                        ->helperText('Aparece na capa com nome e avatar. Só quem tem Discord ou GitHub vinculado, para o avatar existir.')
+                        ->helperText('Aparecem na capa, nesta ordem, com nome e avatar. Só quem tem Discord ou GitHub vinculado, para o avatar existir.')
                         ->getSearchResultsUsing(fn (string $search): array => PromotablePeople::search($search))
-                        ->getOptionLabelUsing(fn (?string $value): ?string => PromotablePeople::labelFor($value))
+                        ->getOptionLabelsUsing(fn (array $values): array => PromotablePeople::labelsFor($values))
                         ->visible(fn (Get $get): bool => $this->coverKindFrom($get('cover_kind'))->isOnboarding()),
 
                     TextInput::make('cover_title')
@@ -1009,7 +1022,7 @@ class BuildDeck extends Page
                 'until' => $record->until,
                 'hide_bots' => $record->hide_bots,
                 'cover_kind' => $record->cover_kind->value,
-                'host_user_id' => $record->host_user_id,
+                'hosts' => $config->hosts,
                 'cover_title' => $record->cover_title,
                 'cover_intro' => $record->cover_intro,
             ],
@@ -1071,11 +1084,13 @@ class BuildDeck extends Page
             'until' => $data['until'],
             'hide_bots' => (bool) ($data['hide_bots'] ?? false),
             'cover_kind' => $coverKind,
-            // Apresentador só faz sentido no onboarding: trocar a capa de volta
-            // limpa o campo em vez de deixar um nome escondido esperando.
-            'host_user_id' => $coverKind->isOnboarding() ? ($data['host_user_id'] ?? null) : null,
             'cover_title' => $data['cover_title'] ?? null,
             'cover_intro' => $data['cover_intro'] ?? null,
+            // Apresentadores só fazem sentido no onboarding: trocar a capa de
+            // volta limpa a lista em vez de deixar nomes escondidos esperando.
+            'deck_config' => $record->deck_config->withHosts(
+                $coverKind->isOnboarding() ? $this->stringList($data['hosts'] ?? []) : [],
+            ),
         ]);
     }
 
