@@ -29,12 +29,3 @@ Se nenhuma dessas condições for verdadeira, interrompa o trabalho e oriente o
 usuário a rodar `php artisan boost:install` (ou `composer run-script setup`,
 que já exibe esse lembrete ao final).
 </laravel-boost-guidelines>
-
-# Fim das guidelines do Laravel Boost
-
-> ⛔ Lembrete: o bloco de guidelines acima é gerado por
-> `php artisan boost:install`. Se ele mostrar apenas o placeholder pedindo
-> para rodar o comando (em vez de regras reais de Filament, Modular, Pest
-> etc.), o setup não foi feito neste ambiente — pare o trabalho e peça para
-> o usuário rodar `php artisan boost:install` antes de continuar. Veja o
-> topo deste arquivo para o procedimento completo de verificação.
