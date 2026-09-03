@@ -29,9 +29,16 @@ final readonly class MarkExMember
 
     public function handle(User $actor, Squad $squad, User $subject, ?string $reason = null): SquadMember
     {
-        $this->squadPolicy->authorize($actor, $squad);
-
         return DB::transaction(function () use ($squad, $subject, $actor, $reason): SquadMember {
+            Squad::query()
+                ->whereKey($squad->id)
+                ->lockForUpdate()
+                ->firstOrFail();
+
+            // Squad authority can change while waiting. Check the latest committed role;
+            // denied actors briefly hold this lock until the transaction rolls back.
+            $this->squadPolicy->authorize($actor, $squad);
+
             $member = SquadMember::query()
                 ->where('squad_id', $squad->id)
                 ->where('user_id', $subject->id)
