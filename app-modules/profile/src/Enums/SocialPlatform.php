@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace He4rt\Profile\Enums;
 
+use App\Support\ProfileHandle;
 use Filament\Support\Contracts\HasIcon;
 use Filament\Support\Contracts\HasLabel;
 use Filament\Support\Icons\Heroicon;
@@ -59,19 +60,15 @@ enum SocialPlatform: string implements HasIcon, HasLabel
 
     public function getUrl(string $handle): string
     {
-        if (str_starts_with($handle, 'http://') || str_starts_with($handle, 'https://')) {
-            return $handle;
-        }
-
-        $slug = mb_ltrim($handle, '@');
-
-        return match ($this) {
-            self::Instagram => 'https://instagram.com/'.$slug,
-            self::Twitter => 'https://x.com/'.$slug,
-            self::LinkedIn => 'https://linkedin.com/in/'.$slug,
-            self::YouTube => 'https://youtube.com/@'.$slug,
-            self::Bluesky => 'https://bsky.app/profile/'.$slug,
-            self::Website => 'https://'.$slug,
+        $base = match ($this) {
+            self::Instagram => 'https://instagram.com/',
+            self::Twitter => 'https://x.com/',
+            self::LinkedIn => 'https://linkedin.com/in/',
+            self::YouTube => 'https://youtube.com/@',
+            self::Bluesky => 'https://bsky.app/profile/',
+            self::Website => 'https://',
         };
+
+        return ProfileHandle::url($base, $handle);
     }
 }

@@ -104,6 +104,14 @@ final class Profile extends Model
     }
 
     /**
+     * @return HasMany<ProfileProject, $this>
+     */
+    public function projects(): HasMany
+    {
+        return $this->hasMany(ProfileProject::class)->latest('created_at');
+    }
+
+    /**
      * @return BelongsToMany<Skill, $this>
      */
     public function skills(): BelongsToMany
@@ -119,7 +127,7 @@ final class Profile extends Model
     }
 
     /**
-     * @return Attribute<never, array<string, string>|null>
+     * @return Attribute<array<string, string>|null, array<string, string>|null>
      */
     protected function socialLinks(): Attribute
     {

@@ -12,33 +12,27 @@
                     @continue (!$reply->postable)
                     <div wire:key="reply-{{ $reply->id }}" class="px-3 py-3 sm:px-4">
                         <div class="flex gap-2 sm:gap-3">
-                            @php($replyAvatarUrl = $reply->user->getFirstMediaUrl('avatar') ?: null)
-                            @if ($replyAvatarUrl)
-                                <img
-                                    src="{{ $replyAvatarUrl }}"
-                                    alt="{{ $reply->user->name }}"
-                                    class="h-7 w-7 shrink-0 rounded-full object-cover sm:h-8 sm:w-8"
-                                />
-                            @else
-                                <div
-                                    class="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-purple-500 to-amber-500 text-[10px] font-semibold text-white sm:h-8 sm:w-8 sm:text-xs"
-                                >
-                                    {{ str($reply->user->name)->substr(0, 2)->upper() }}
-                                </div>
-                            @endif
+                            <x-panel-app::profile-link :user="$reply->user" class="shrink-0">
+                                <x-panel-app::user-avatar :user="$reply->user" size="sm" />
+                            </x-panel-app::profile-link>
                             <div class="min-w-0 flex-1">
                                 <div class="flex items-center justify-between gap-2">
                                     <div class="flex min-w-0 flex-wrap items-center gap-x-2 gap-y-0.5 text-sm">
-                                        <span
-                                            class="truncate font-semibold text-gray-900 dark:text-white"
-                                            >{{ $reply->user->name }}</span
+                                        <x-panel-app::profile-link
+                                            :user="$reply->user"
+                                            class="group flex min-w-0 items-center gap-x-2"
                                         >
-                                        @if ($reply->user->username)
                                             <span
-                                                class="hidden text-gray-500 sm:inline dark:text-gray-400"
-                                                >{{ '@' . $reply->user->username }}</span
+                                                class="truncate font-semibold text-gray-900 group-hover:underline dark:text-white"
+                                                >{{ $reply->user->name }}</span
                                             >
-                                        @endif
+                                            @if ($reply->user->username)
+                                                <span
+                                                    class="hidden text-gray-500 sm:inline dark:text-gray-400"
+                                                    >{{ '@' . $reply->user->username }}</span
+                                                >
+                                            @endif
+                                        </x-panel-app::profile-link>
                                         <span
                                             class="text-xs text-gray-400 dark:text-gray-500"
                                             >{{ $reply->created_at->diffForHumans(short: true) }}</span

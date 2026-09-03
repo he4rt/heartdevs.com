@@ -7,6 +7,7 @@ namespace He4rt\Identity\ExternalIdentity\Enums;
 use App\Contracts\ApiKeyClientContract;
 use App\Contracts\OAuthClientContract;
 use App\Enums\Concerns\StringifyEnum;
+use App\Support\ProfileHandle;
 use Filament\Support\Colors\Color;
 use Filament\Support\Contracts\HasColor;
 use Filament\Support\Contracts\HasDescription;
@@ -102,6 +103,20 @@ enum IdentityProvider: string implements HasColor, HasDescription, HasIcon, HasL
     {
         return match ($this) {
             self::DevTo => resolve(DevToApiKeyClient::class),
+            default => null,
+        };
+    }
+
+    public function profileUrl(?string $handle): ?string
+    {
+        if (blank($handle)) {
+            return null;
+        }
+
+        return match ($this) {
+            self::GitHub => ProfileHandle::url('https://github.com/', $handle),
+            self::Twitch => ProfileHandle::url('https://twitch.tv/', $handle),
+            self::DevTo => ProfileHandle::url('https://dev.to/', $handle),
             default => null,
         };
     }

@@ -39,6 +39,7 @@ use He4rt\Profile\Enums\SocialPlatform;
 use He4rt\Profile\Enums\StartAvailability;
 use He4rt\Profile\Models\Profile;
 use He4rt\Profile\Models\Skill;
+use He4rt\Profile\Support\ProfileInitials;
 use Illuminate\Support\Str;
 use Livewire\Attributes\Computed;
 use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
@@ -579,11 +580,7 @@ class ProfilePage extends Page
     #[Computed]
     public function initials(): string
     {
-        return Str::of(auth()->user()->name)
-            ->explode(' ')
-            ->map(fn (string $part): string => Str::upper(Str::substr($part, 0, 1)))
-            ->take(2)
-            ->implode('');
+        return ProfileInitials::for(auth()->user()->name, auth()->user()->username);
     }
 
     #[Computed]
