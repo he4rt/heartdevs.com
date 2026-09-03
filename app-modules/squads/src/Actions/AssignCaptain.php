@@ -31,10 +31,10 @@ final readonly class AssignCaptain
 
     public function handle(User $actor, Squad $squad, User $subject, ?string $reason = null): SquadMember
     {
+        // Admin authority is global, so waiting for a squad lock cannot make this check stale.
         throw_unless($actor->isAdmin(), AuthorizationException::class);
 
         return DB::transaction(function () use ($squad, $subject, $actor, $reason): SquadMember {
-            // Captain-seat mutations lock the squad before any membership row.
             Squad::query()
                 ->whereKey($squad->id)
                 ->lockForUpdate()

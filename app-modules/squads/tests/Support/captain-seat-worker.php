@@ -5,6 +5,7 @@ declare(strict_types=1);
 use He4rt\Identity\User\Models\User;
 use He4rt\Squads\Actions\AssignCaptain;
 use He4rt\Squads\Actions\MarkExMember;
+use He4rt\Squads\Actions\PromoteToSubCaptain;
 use He4rt\Squads\Models\Squad;
 use Illuminate\Contracts\Console\Kernel;
 use Illuminate\Support\Facades\DB;
@@ -32,6 +33,7 @@ try {
     match ($payload['action']) {
         'assign' => resolve(AssignCaptain::class)->handle($actor, $squad, $subject),
         'mark_ex' => resolve(MarkExMember::class)->handle($actor, $squad, $subject),
+        'promote' => resolve(PromoteToSubCaptain::class)->handle($actor, $squad, $subject),
         default => throw new InvalidArgumentException('Unsupported action: '.$payload['action']),
     };
 

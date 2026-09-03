@@ -30,12 +30,13 @@ final readonly class MarkExMember
     public function handle(User $actor, Squad $squad, User $subject, ?string $reason = null): SquadMember
     {
         return DB::transaction(function () use ($squad, $subject, $actor, $reason): SquadMember {
-            // Captain-seat mutations lock the squad before any membership row.
             Squad::query()
                 ->whereKey($squad->id)
                 ->lockForUpdate()
                 ->firstOrFail();
 
+            // Squad authority can change while waiting. Check the latest committed role;
+            // denied actors briefly hold this lock until the transaction rolls back.
             $this->squadPolicy->authorize($actor, $squad);
 
             $member = SquadMember::query()
