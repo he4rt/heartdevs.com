@@ -8,6 +8,7 @@ use He4rt\Activity\Timeline\Timeline;
 use He4rt\Identity\User\Models\User;
 use Illuminate\Database\QueryException;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\DB;
 
 uses(RefreshDatabase::class);
 
@@ -55,8 +56,9 @@ it('rejeita segunda reação do mesmo usuário no mesmo post', function (): void
 
     UserReaction::factory()->for($user)->for($timeline)->create();
 
-    expect(fn () => UserReaction::factory()->for($user)->for($timeline)->create())
-        ->toThrow(QueryException::class);
+    expect(fn () => DB::transaction(
+        fn () => UserReaction::factory()->for($user)->for($timeline)->create(),
+    ))->toThrow(QueryException::class);
 
     $this->assertDatabaseCount('activity_user_reactions', 1);
 });
