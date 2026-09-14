@@ -76,8 +76,6 @@ return [
         'username_rule_format' => 'Must start and end with a letter or number (no symbols at edges).',
         'username_rule_consecutive' => 'No consecutive special characters allowed (e.g. .. or --).',
         'username_rule_cooldown' => 'Regular members can change once every 7 days (admins are exempt).',
-        'admin_warning_title' => 'Administrator Notice',
-        'admin_warning_body' => 'If your production admin permissions rely on HE4RT_ADMINS_USERNAMES on the server, remember to update the environment variable after changing your handle.',
     ],
 
     'validation' => [

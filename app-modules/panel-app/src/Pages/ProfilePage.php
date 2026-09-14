@@ -521,10 +521,6 @@ class ProfilePage extends Page
             ->modalSubmitAction(fn (Action $action) => $action->color('primary'))
             ->modalWidth(Width::Medium)
             ->schema([
-                Placeholder::make('admin_warning')
-                    ->hiddenLabel()
-                    ->visible(fn (): bool => auth()->user()?->isAdmin() ?? false)
-                    ->content(new HtmlString(view('panel-app::components.username-admin-warning')->render())),
                 TextInput::make('username')
                     ->label(__('panel-app::profile.fields.username'))
                     ->prefix('@')

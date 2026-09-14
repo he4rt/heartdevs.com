@@ -76,8 +76,6 @@ return [
         'username_rule_format' => 'Deve começar e terminar com letra ou número (sem símbolos nas extremidades).',
         'username_rule_consecutive' => 'Proibido símbolos especiais consecutivos (ex: .. ou --).',
         'username_rule_cooldown' => 'Usuários comuns podem alterar apenas a cada 7 dias (administradores têm alteração livre).',
-        'admin_warning_title' => 'Aviso para Administradores',
-        'admin_warning_body' => 'Se suas permissões administrativas em produção dependerem de HE4RT_ADMINS_USERNAMES no servidor, lembre-se de atualizar a variável de ambiente após a alteração.',
     ],
 
     'validation' => [
