@@ -14,12 +14,15 @@ use He4rt\Identity\User\Models\User;
 use He4rt\PanelAdmin\Filament\Resources\Users\Pages\EditUser;
 use He4rt\PanelAdmin\Filament\Resources\Users\Pages\ListUsers;
 use He4rt\PanelAdmin\Filament\Resources\Users\Pages\ViewUser;
+use He4rt\PanelAdmin\Filament\Resources\Users\RelationManagers\ProfileSkillsRelationManager;
 use He4rt\PanelAdmin\Filament\Resources\Users\RelationManagers\ProvidersRelationManager;
+use He4rt\PanelAdmin\Filament\Resources\Users\RelationManagers\WorkExperiencesRelationManager;
 use He4rt\PanelAdmin\Filament\Resources\Users\Schemas\UserForm;
 use He4rt\PanelAdmin\Filament\Resources\Users\Schemas\UserInfolist;
 use He4rt\PanelAdmin\Filament\Resources\Users\Tables\UsersTable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 class UserResource extends Resource
 {
@@ -59,7 +62,43 @@ class UserResource extends Resource
     {
         return [
             ProvidersRelationManager::class,
+            ProfileSkillsRelationManager::class,
+            WorkExperiencesRelationManager::class,
         ];
+    }
+
+    public static function canEdit(Model $record): bool
+    {
+        return auth()->user()?->canManageUsers() ?? false;
+    }
+
+    public static function canDelete(Model $record): bool
+    {
+        return auth()->user()?->canManageUsers() ?? false;
+    }
+
+    public static function canForceDelete(Model $record): bool
+    {
+        return auth()->user()?->canHardDeleteUsers() ?? false;
+    }
+
+    public static function canRestore(Model $record): bool
+    {
+        return auth()->user()?->canManageUsers() ?? false;
+    }
+
+    public static function getEloquentQuery(): Builder
+    {
+        $query = parent::getEloquentQuery()
+            ->with(['profile', 'address', 'character', 'providers', 'roles']);
+
+        if (auth()->user()?->canManageUsers()) {
+            $query->withoutGlobalScopes([
+                SoftDeletingScope::class,
+            ]);
+        }
+
+        return $query;
     }
 
     /**
@@ -72,15 +111,6 @@ class UserResource extends Resource
             'view' => ViewUser::route('/{record}'),
             'edit' => EditUser::route('/{record}/edit'),
         ];
-    }
-
-    public static function getEloquentQuery(): Builder
-    {
-        // `external_identities.model_id` é varchar e `users.id` é uuid: uma
-        // subquery correlacionada (withCount) falha no Postgres por falta de
-        // cast. O eager load compara por valor bindado e funciona.
-        return parent::getEloquentQuery()
-            ->with(['profile', 'providers', 'roles']);
     }
 
     /**

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace He4rt\Identity\Auth\Actions;
 
 use He4rt\Identity\Auth\DTOs\OAuthUserDTO;
+use He4rt\Identity\Auth\Exceptions\AccountSoftDeletedException;
 use He4rt\Identity\ExternalIdentity\Models\ExternalIdentity;
 use He4rt\Identity\User\Models\User;
 use Illuminate\Database\UniqueConstraintViolationException;
@@ -36,17 +37,23 @@ final readonly class FindOrCreateUserByProvider
             ->where('model_type', (new User)->getMorphClass())
             ->first();
 
-        if ($identity?->model instanceof User) {
-            return $identity->model;
+        $user = $identity !== null
+            ? User::query()->withTrashed()->find($identity->model_id)
+            : null;
+
+        if (!$user instanceof User && $oauthUser->email !== null) {
+            $user = User::query()->withTrashed()->where('email', $oauthUser->email)->first();
         }
 
-        if ($oauthUser->email !== null) {
-            return User::query()
-                ->where('email', $oauthUser->email)
-                ->first();
+        if ($user === null) {
+            return null;
         }
 
-        return null;
+        if ($user->trashed()) {
+            throw AccountSoftDeletedException::make();
+        }
+
+        return $user;
     }
 
     private function createUser(OAuthUserDTO $oauthUser): User
