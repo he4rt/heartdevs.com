@@ -2,19 +2,29 @@
     'avatarPreviewUrl' => null,
     'coverPreviewUrl' => null,
     'initials' => '',
-    'name' => ''
+    'name' => '',
+    'birthdateForm' => null,
+    'coverAspectRatio',
+    'coverFocalY' => 50,
+    'avatarFocalY' => 50,
 ])
 
 <div class="relative rounded-xl border border-gray-200 bg-white dark:border-white/10 dark:bg-gray-900">
-    {{-- Cover --}}
+    {{-- Cover: a proporcao vem do enum, para o recorte nao depender da viewport --}}
     <div
-        class="group relative h-40 overflow-hidden rounded-t-xl sm:h-48"
+        class="group relative overflow-hidden rounded-t-xl"
+        style="aspect-ratio: {{ $coverAspectRatio }}"
         x-data="{ hover: false }"
         @mouseenter="hover = true"
         @mouseleave="hover = false"
     >
         @if ($coverPreviewUrl)
-            <img src="{{ $coverPreviewUrl }}" alt="" class="absolute inset-0 h-full w-full object-cover" />
+            <img
+                src="{{ $coverPreviewUrl }}"
+                alt=""
+                class="absolute inset-0 h-full w-full object-cover"
+                style="object-position: center {{ $coverFocalY }}%"
+            />
         @else
             <div class="absolute inset-0 bg-gradient-to-br from-purple-600 via-purple-500 to-indigo-600"></div>
         @endif
@@ -38,8 +48,18 @@
         @if ($coverPreviewUrl)
             <button
                 type="button"
+                wire:click="mountAction('adjustCover')"
+                title="{{ __('panel-app::profile.actions.adjust_cover') }}"
+                class="absolute top-3 right-12 z-20 rounded-full bg-black/60 p-1.5 text-white transition-opacity hover:bg-black/80 focus-visible:opacity-100"
+                :class="hover ? 'opacity-100' : 'opacity-0'"
+            >
+                <x-heroicon-m-arrows-up-down class="h-4 w-4" />
+            </button>
+
+            <button
+                type="button"
                 wire:click="removeCover"
-                class="absolute top-3 right-3 z-20 rounded-full bg-black/60 p-1.5 text-white transition-opacity hover:bg-black/80"
+                class="absolute top-3 right-3 z-20 rounded-full bg-black/60 p-1.5 text-white transition-opacity hover:bg-black/80 focus-visible:opacity-100"
                 :class="hover ? 'opacity-100' : 'opacity-0'"
             >
                 <x-heroicon-m-x-mark class="h-4 w-4" />
@@ -62,6 +82,7 @@
                         src="{{ $avatarPreviewUrl }}"
                         alt="{{ $name }}"
                         class="h-full w-full rounded-full border-4 border-white object-cover shadow-lg dark:border-gray-800"
+                        style="object-position: center {{ $avatarFocalY }}%"
                     />
                 @else
                     <div
@@ -90,7 +111,7 @@
                     <button
                         type="button"
                         wire:click="removeAvatar"
-                        class="absolute -top-1 -right-1 z-20 rounded-full bg-red-500 p-1 text-white shadow-md transition-opacity hover:bg-red-600"
+                        class="absolute -top-1 -right-1 z-20 rounded-full bg-red-500 p-1 text-white shadow-md transition-opacity hover:bg-red-600 focus-visible:opacity-100"
                         :class="hover ? 'opacity-100' : 'opacity-0'"
                     >
                         <x-heroicon-m-x-mark class="h-3.5 w-3.5" />
@@ -100,7 +121,7 @@
         </div>
 
         {{-- Nickname + Birthdate --}}
-        <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+        <div class="grid grid-cols-1 items-start gap-4 sm:grid-cols-2">
             <div>
                 <label for="nickname" class="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">
                     {{ __('panel-app::profile.fields.nickname') }}
@@ -115,15 +136,7 @@
                 />
             </div>
             <div>
-                <label for="birthdate" class="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">
-                    {{ __('panel-app::profile.fields.birthdate') }}
-                </label>
-                <input
-                    id="birthdate"
-                    type="date"
-                    wire:model.blur="data.birthdate"
-                    class="fi-input block w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 shadow-sm transition-colors focus:border-purple-500 focus:ring-1 focus:ring-purple-500 dark:border-white/10 dark:bg-white/5 dark:text-white dark:focus:border-purple-500"
-                />
+                {{ $birthdateForm }}
             </div>
         </div>
     </div>

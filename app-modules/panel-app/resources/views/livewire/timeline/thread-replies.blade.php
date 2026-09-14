@@ -12,11 +12,20 @@
                     @continue (!$reply->postable)
                     <div wire:key="reply-{{ $reply->id }}" class="px-3 py-3 sm:px-4">
                         <div class="flex gap-2 sm:gap-3">
-                            <div
-                                class="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-purple-500 to-amber-500 text-[10px] font-semibold text-white sm:h-8 sm:w-8 sm:text-xs"
-                            >
-                                {{ str($reply->user->name)->substr(0, 2)->upper() }}
-                            </div>
+                            @php($replyAvatarUrl = $reply->user->getFirstMediaUrl('avatar') ?: null)
+                            @if ($replyAvatarUrl)
+                                <img
+                                    src="{{ $replyAvatarUrl }}"
+                                    alt="{{ $reply->user->name }}"
+                                    class="h-7 w-7 shrink-0 rounded-full object-cover sm:h-8 sm:w-8"
+                                />
+                            @else
+                                <div
+                                    class="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-purple-500 to-amber-500 text-[10px] font-semibold text-white sm:h-8 sm:w-8 sm:text-xs"
+                                >
+                                    {{ str($reply->user->name)->substr(0, 2)->upper() }}
+                                </div>
+                            @endif
                             <div class="min-w-0 flex-1">
                                 <div class="flex items-center justify-between gap-2">
                                     <div class="flex min-w-0 flex-wrap items-center gap-x-2 gap-y-0.5 text-sm">

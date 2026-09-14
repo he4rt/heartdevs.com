@@ -5,12 +5,24 @@ declare(strict_types=1);
 use Illuminate\Support\Facades\Date;
 
 return [
-    'admins' => env('HE4RT_ADMINS_USERNAMES', 'danielhe4rt,kaster'),
     'season' => [
         'id' => (int) env('HE4RT_SEASON_ID', 2),
         'minimum_level_for_retro' => env('HE4RT_SEASON_MIN_LEVEL', 3),
     ],
     'server_key' => env('HE4RT_BOT_SECRET', 'he4rt'),
+
+    /*
+     * Quando a He4rt começou. Data única para qualquer lugar que precise contar a
+     * idade da comunidade — hoje a seção "A He4rt" da retrospectiva. A primeira
+     * temporada ('seasons') herda o mesmo marco, mas dizer a idade a partir de um
+     * array de temporadas seria derivar identidade de calendário.
+     */
+    'founded_at' => '2018-08-01',
+
+    'features' => [
+        'timeline_pin' => env('HE4RT_FEATURE_TIMELINE_PIN', default: false),
+    ],
+
     'discord' => [
         'token' => env('DISCORD_TOKEN'),
         'voice_xp_interval' => (int) env('HE4RT_DISCORD_VOICE_XP_INTERVAL', 1_200),
@@ -62,5 +74,23 @@ return [
         'instagram' => ['label' => 'Instagram', 'url' => 'https://www.instagram.com/heartdevs/', 'icon' => 'fab-instagram', 'accent' => '#E4405F'],
         'github' => ['label' => 'GitHub', 'url' => 'https://github.com/he4rt', 'icon' => 'fab-github', 'accent' => '#111827', 'accent_dark' => '#FFFFFF'],
         'loja' => ['label' => 'Loja', 'url' => 'https://loja.heartdevs.com/he4rt/', 'icon' => 'heroicon-s-shopping-bag', 'accent' => '#111827', 'accent_dark' => '#FFFFFF'],
+    ],
+
+    /*
+     * Metadados do <head> público, consumidos por App\Support\Seo\SiteHead
+     * para montar os defaults do laravel/head (title, description, Open Graph,
+     * X/Twitter cards e o JSON-LD de Organization/WebSite).
+     *
+     * `og_image` precisa ser 1200x630 para render em card grande; trocar o
+     * arquivo exige atualizar `og_image_width`/`og_image_height` junto.
+     */
+    'seo' => [
+        'description' => 'Uma comunidade de desenvolvedores dedicada a ajudar iniciantes a se tornarem profissionais através de projetos, mentorias e networking.',
+        'og_image' => 'images/og-default.png',
+        'og_image_width' => 1_200,
+        'og_image_height' => 630,
+        'og_image_alt' => 'He4rt Developers — desenvolva seu potencial na comunidade',
+        'twitter_handle' => '@He4rtDevs',
+        'theme_color' => '#782bf1',
     ],
 ];

@@ -1,0 +1,82 @@
+<?php
+
+declare(strict_types=1);
+
+namespace He4rt\PanelAdmin\Filament\Resources\Events;
+
+use BackedEnum;
+use Filament\Resources\Pages\PageRegistration;
+use Filament\Resources\Resource;
+use Filament\Schemas\Schema;
+use Filament\Support\Icons\Heroicon;
+use Filament\Tables\Table;
+use He4rt\Events\Event\Models\Event;
+use He4rt\PanelAdmin\Filament\Resources\Events\Pages\CreateEvent;
+use He4rt\PanelAdmin\Filament\Resources\Events\Pages\EditEvent;
+use He4rt\PanelAdmin\Filament\Resources\Events\Pages\ListEvents;
+use He4rt\PanelAdmin\Filament\Resources\Events\RelationManagers\CheckInCodesRelationManager;
+use He4rt\PanelAdmin\Filament\Resources\Events\RelationManagers\EnrollmentsRelationManager;
+use He4rt\PanelAdmin\Filament\Resources\Events\Schemas\EventForm;
+use He4rt\PanelAdmin\Filament\Resources\Events\Schemas\EventInfolist;
+use He4rt\PanelAdmin\Filament\Resources\Events\Tables\EventsTable;
+
+final class EventResource extends Resource
+{
+    protected static ?string $model = Event::class;
+
+    protected static ?string $slug = 'events';
+
+    protected static ?string $recordTitleAttribute = 'title';
+
+    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedCalendarDays;
+
+    public static function getNavigationLabel(): string
+    {
+        return __('panel-admin::events.plural');
+    }
+
+    public static function getModelLabel(): string
+    {
+        return __('panel-admin::events.label');
+    }
+
+    public static function getPluralModelLabel(): string
+    {
+        return __('panel-admin::events.plural');
+    }
+
+    public static function form(Schema $schema): Schema
+    {
+        return EventForm::configure($schema);
+    }
+
+    public static function infolist(Schema $schema): Schema
+    {
+        return EventInfolist::configure($schema);
+    }
+
+    public static function table(Table $table): Table
+    {
+        return EventsTable::table($table);
+    }
+
+    public static function getRelations(): array
+    {
+        return [
+            EnrollmentsRelationManager::class,
+            CheckInCodesRelationManager::class,
+        ];
+    }
+
+    /**
+     * @return array<string, PageRegistration>
+     */
+    public static function getPages(): array
+    {
+        return [
+            'index' => ListEvents::route('/'),
+            'create' => CreateEvent::route('/create'),
+            'edit' => EditEvent::route('/{record}/edit'),
+        ];
+    }
+}

@@ -41,4 +41,32 @@ final class GithubContributionFactory extends Factory
             'metadata' => [...$attributes['metadata'] ?? [], 'is_bot' => true],
         ]);
     }
+
+    /**
+     * PR mesclado. Sem $at, ainda simula a lacuna pré-backfill (merged=true sem merged_at).
+     */
+    public function merged(?string $at = null): self
+    {
+        return $this->state(fn (array $attributes): array => [
+            'type' => ContributionType::Pr,
+            'metadata' => [
+                ...$attributes['metadata'] ?? [],
+                'state' => 'closed',
+                'merged' => true,
+                'merged_at' => $at,
+            ],
+        ]);
+    }
+
+    /**
+     * Contribuição pendurada num PR (review/review_comment/comment) via target_ref = pr:N.
+     */
+    public function targetingPr(int $number, ContributionType $type = ContributionType::Review): self
+    {
+        return $this->state(fn (array $attributes): array => [
+            'type' => $type,
+            'external_ref' => $type->ref(fake()->unique()->numberBetween(1, 1_000_000)),
+            'target_ref' => ContributionType::Pr->ref($number),
+        ]);
+    }
 }

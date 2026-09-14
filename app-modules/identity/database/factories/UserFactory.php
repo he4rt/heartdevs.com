@@ -4,10 +4,11 @@ declare(strict_types=1);
 
 namespace He4rt\Identity\Database\Factories;
 
-use He4rt\Identity\User\Enums\Role;
+use He4rt\Identity\Authorization\Enums\UserRole;
 use He4rt\Identity\User\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Facades\Hash;
+use Spatie\Permission\Models\Role;
 
 /**
  * @extends Factory<User>
@@ -25,32 +26,15 @@ final class UserFactory extends Factory
             'email' => fake()->email(),
             'password' => Hash::make('password'),
             'is_donator' => false,
-            'role' => Role::Member,
         ];
     }
 
-    public function member(): static
+    public function superAdmin(): static
     {
-        return $this->state(['role' => Role::Member]);
-    }
+        return $this->afterCreating(function (User $user): void {
+            Role::findOrCreate(UserRole::SuperAdmin->value, UserRole::GUARD);
 
-    public function staff(): static
-    {
-        return $this->state(['role' => Role::Staff]);
-    }
-
-    public function compliance(): static
-    {
-        return $this->state(['role' => Role::Compliance]);
-    }
-
-    public function recruiter(): static
-    {
-        return $this->state(['role' => Role::Recruiter]);
-    }
-
-    public function squadCaptain(): static
-    {
-        return $this->state(['role' => Role::SquadCaptain]);
+            $user->assignRole(UserRole::SuperAdmin);
+        });
     }
 }

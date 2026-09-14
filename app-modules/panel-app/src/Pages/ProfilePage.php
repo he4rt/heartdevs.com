@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace He4rt\PanelApp\Pages;
 
 use App\Geo\Support\GeoLocation;
+use App\Support\UploadLimit;
 use BackedEnum;
 use Filament\Actions\Action;
 use Filament\Forms\Components\DatePicker;
@@ -14,6 +15,7 @@ use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
+use Filament\Forms\Components\ViewField;
 use Filament\Notifications\Notification;
 use Filament\Pages\Page;
 use Filament\Schemas\Components\Actions;
@@ -22,10 +24,13 @@ use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Components\Utilities\Get;
 use Filament\Schemas\Components\Utilities\Set;
+use Filament\Schemas\JsContent;
 use Filament\Schemas\Schema;
 use Filament\Support\Enums\Width;
 use He4rt\Gamification\Character\Models\Character;
+use He4rt\Identity\User\Enums\ProfileImage;
 use He4rt\Identity\User\Models\User;
+use He4rt\PanelApp\Rules\UnconvertedImageSize;
 use He4rt\Profile\Actions\SyncProfileSkills;
 use He4rt\Profile\Actions\ToggleAvailability;
 use He4rt\Profile\Actions\UpsertProfile;
@@ -38,6 +43,7 @@ use He4rt\Profile\Enums\SocialPlatform;
 use He4rt\Profile\Enums\StartAvailability;
 use He4rt\Profile\Models\Profile;
 use He4rt\Profile\Models\Skill;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Str;
 use Livewire\Attributes\Computed;
 use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
@@ -45,6 +51,11 @@ use Livewire\WithFileUploads;
 
 /**
  * @property-read Schema $form
+ * @property-read Schema $birthdateForm
+ * @property-read string|null $avatarPreviewUrl
+ * @property-read string|null $coverPreviewUrl
+ * @property-read int $avatarFocalY
+ * @property-read int $coverFocalY
  */
 class ProfilePage extends Page
 {
@@ -52,6 +63,9 @@ class ProfilePage extends Page
 
     /** @var array<string, mixed>|null */
     public ?array $data = [];
+
+    /** @var array<string, mixed>|null */
+    public ?array $birthdateData = [];
 
     protected static string|null|BackedEnum $navigationIcon = 'heroicon-o-user-circle';
 
@@ -71,7 +85,6 @@ class ProfilePage extends Page
 
         $this->form->fill([
             'nickname' => $profile->nickname,
-            'birthdate' => $profile->birthdate?->format('Y-m-d'),
             'headline' => $profile->headline,
             'seniority_level' => $profile->seniority_level,
             'years_experience' => $profile->years_experience,
@@ -90,6 +103,27 @@ class ProfilePage extends Page
                 $profile->preferences->employmentTypes,
             ),
         ]);
+
+        $this->birthdateForm->fill([
+            'birthdate' => $profile->birthdate?->format('Y-m-d'),
+        ]);
+    }
+
+    public function birthdateForm(Schema $schema): Schema
+    {
+        return $schema
+            ->components([
+                DatePicker::make('birthdate')
+                    ->label(__('panel-app::profile.fields.birthdate'))
+                    ->native(condition: false)
+                    ->displayFormat('d/m/Y')
+                    ->format('Y-m-d')
+                    ->minDate(now()->subYears(120))
+                    ->maxDate(now()),
+            ])
+            // Own state path: fill() replaces the whole path, so sharing `data` with
+            // the main form wiped headline/seniority/etc. on mount.
+            ->statePath('birthdateData');
     }
 
     public function form(Schema $schema): Schema
@@ -123,6 +157,7 @@ class ProfilePage extends Page
                                 Textarea::make('about')
                                     ->label(__('panel-app::profile.fields.about'))
                                     ->placeholder(__('panel-app::profile.placeholders.about'))
+                                    ->hint(JsContent::make('`${Array.from($state ?? "").length}/500`'))
                                     ->maxLength(500)
                                     ->rows(4)
                                     ->live(onBlur: true)
@@ -147,13 +182,21 @@ class ProfilePage extends Page
                                             ->getOptionLabelUsing(fn (?string $value): ?string => $value === null ? null : (Skill::labelsById()[$value] ?? null))
                                             ->optionsLimit(50)
                                             ->distinct()
-                                            ->required()
+                                            ->required(fn (Get $get): bool => filled($get('proficiency')))
                                             ->columnSpan(1),
 
                                         Select::make('proficiency')
                                             ->label(__('panel-app::profile.fields.proficiency'))
                                             ->options(SkillProficiency::class)
-                                            ->required()
+                                            ->required(fn (Get $get): bool => filled($get('skill_id')))
+                                            ->live()
+                                            ->afterStateUpdated(function (Get $get, Select $component): void {
+                                                if (blank($get('skill_id')) || blank($get('proficiency'))) {
+                                                    return;
+                                                }
+
+                                                $this->appendEmptyRepeaterItemIfLastRow($component);
+                                            })
                                             ->columnSpan(1),
 
                                         TextInput::make('years_experience')
@@ -220,14 +263,38 @@ class ProfilePage extends Page
                                     Grid::make(2)->schema([
                                         Select::make('platform')
                                             ->label(__('panel-app::profile.fields.platform'))
-                                            ->options(SocialPlatform::class)
-                                            ->required()
+                                            ->options(fn (): array => collect(SocialPlatform::cases())
+                                                ->mapWithKeys(fn (SocialPlatform $platform): array => [
+                                                    $platform->value => sprintf(
+                                                        '<span class="flex items-center gap-2">%s %s</span>',
+                                                        svg($platform->getBrandIcon(), 'h-4 w-4')->toHtml(),
+                                                        e($platform->getLabel()),
+                                                    ),
+                                                ])
+                                                ->all())
+                                            ->allowHtml()
+                                            ->required(fn (Get $get): bool => filled($get('handle')))
+                                            ->live()
+                                            ->afterStateUpdated(static function (Get $get, Set $set): void {
+                                                if (blank($get('platform'))) {
+                                                    $set('handle', null);
+                                                }
+                                            })
                                             ->columnSpan(1),
 
                                         TextInput::make('handle')
                                             ->label(__('panel-app::profile.fields.handle'))
                                             ->placeholder(__('panel-app::profile.placeholders.handle'))
-                                            ->required()
+                                            ->disabled(fn (Get $get): bool => blank($get('platform')))
+                                            ->required(fn (Get $get): bool => filled($get('platform')))
+                                            ->live(onBlur: true)
+                                            ->afterStateUpdated(function (Get $get, TextInput $component): void {
+                                                if (blank($get('platform')) || blank($get('handle'))) {
+                                                    return;
+                                                }
+
+                                                $this->appendEmptyRepeaterItemIfLastRow($component);
+                                            })
                                             ->columnSpan(1),
                                     ]),
                                 ])
@@ -301,18 +368,18 @@ class ProfilePage extends Page
                                     Grid::make(2)->schema([
                                         TextInput::make('company_name')
                                             ->label(__('panel-app::profile.fields.company_name'))
-                                            ->required()
+                                            ->required(fn (Get $get): bool => filled($get('position')) || filled($get('description')) || filled($get('start_date')))
                                             ->maxLength(255)
                                             ->columnSpan(1),
                                         TextInput::make('position')
                                             ->label(__('panel-app::profile.fields.position'))
-                                            ->required()
+                                            ->required(fn (Get $get): bool => filled($get('company_name')) || filled($get('description')) || filled($get('start_date')))
                                             ->maxLength(255)
                                             ->columnSpan(1),
                                     ]),
                                     Textarea::make('description')
                                         ->label(__('panel-app::profile.fields.experience_description'))
-                                        ->required()
+                                        ->required(fn (Get $get): bool => filled($get('company_name')) || filled($get('position')) || filled($get('start_date')))
                                         ->rows(3)
                                         ->maxLength(2_000)
                                         ->columnSpanFull(),
@@ -323,7 +390,7 @@ class ProfilePage extends Page
                                             ->displayFormat('M Y')
                                             ->format('Y-m-d')
                                             ->maxDate(now())
-                                            ->required()
+                                            ->required(fn (Get $get): bool => filled($get('company_name')) || filled($get('position')) || filled($get('description')))
                                             ->columnSpan(1),
                                         DatePicker::make('end_date')
                                             ->label(__('panel-app::profile.fields.end_date'))
@@ -332,7 +399,7 @@ class ProfilePage extends Page
                                             ->format('Y-m-d')
                                             ->maxDate(now())
                                             ->afterOrEqual('start_date')
-                                            ->required(fn (Get $get): bool => !$get('is_currently_working_here'))
+                                            ->required(fn (Get $get): bool => !$get('is_currently_working_here') && (filled($get('company_name')) || filled($get('position')) || filled($get('description')) || filled($get('start_date'))))
                                             ->hidden(fn (Get $get): bool => (bool) $get('is_currently_working_here'))
                                             ->columnSpan(1),
                                     ]),
@@ -369,6 +436,7 @@ class ProfilePage extends Page
 
     public function save(): void
     {
+        $birthdateData = $this->birthdateForm->getState();
         $formData = $this->form->getState();
         $profile = $this->getRecord();
 
@@ -376,7 +444,7 @@ class ProfilePage extends Page
 
         $dto = UpsertProfileDTO::fromArray([
             'nickname' => $this->data['nickname'] ?? null,
-            'birthdate' => $this->data['birthdate'] ?? null,
+            'birthdate' => $birthdateData['birthdate'] ?? null,
             'about' => $formData['about'] ?? null,
             'headline' => $formData['headline'] ?? null,
             'seniority_level' => $formData['seniority_level'] ?? null,
@@ -407,6 +475,8 @@ class ProfilePage extends Page
 
         resolve(SyncProfileSkills::class)->handle($profile, $this->repeaterToSkills($formData['skills'] ?? []));
 
+        $this->dispatch('scroll-to-top');
+
         $this->form->saveRelationships();
 
         Notification::make()
@@ -417,83 +487,22 @@ class ProfilePage extends Page
 
     public function editAvatarAction(): Action
     {
-        return Action::make('editAvatar')
-            ->label(__('panel-app::profile.actions.change_avatar'))
-            ->modalHeading(__('panel-app::profile.actions.change_avatar'))
-            ->modalSubmitActionLabel(__('panel-app::profile.actions.save_avatar'))
-            ->modalSubmitAction(fn (Action $action) => $action->color('primary'))
-            ->schema([
-                FileUpload::make('avatar')
-                    ->label(__('panel-app::profile.fields.avatar'))
-                    ->avatar()
-                    ->imageEditor()
-                    ->circleCropper()
-                    ->imageEditorAspectRatioOptions(['1:1'])
-                    ->storeFiles(condition: false)
-                    ->required()
-                    ->maxSize(2_048),
-            ])
-            ->action(function (array $data): void {
-                $avatar = $data['avatar'] ?? null;
-
-                if (is_string($avatar)) {
-                    $avatar = TemporaryUploadedFile::createFromLivewire($avatar);
-                }
-
-                if (!$avatar instanceof TemporaryUploadedFile) {
-                    return;
-                }
-
-                $this->replaceMedia('avatar', $avatar);
-
-                Notification::make()
-                    ->success()
-                    ->title(__('panel-app::profile.notifications.avatar_updated'))
-                    ->send();
-            });
+        return $this->imageUploadAction('editAvatar', ProfileImage::Avatar);
     }
 
     public function editCoverAction(): Action
     {
-        return Action::make('editCover')
-            ->label(__('panel-app::profile.actions.change_cover'))
-            ->modalHeading(__('panel-app::profile.actions.change_cover'))
-            ->modalSubmitActionLabel(__('panel-app::profile.actions.save_cover'))
-            ->modalSubmitAction(fn (Action $action) => $action->color('primary'))
-            ->schema([
-                FileUpload::make('cover')
-                    ->label(__('panel-app::profile.fields.cover'))
-                    ->image()
-                    ->panelAspectRatio('3:1')
-                    ->imageEditor()
-                    ->imageAspectRatio('3:1')
-                    ->imageEditorAspectRatioOptions(['3:1'])
-                    ->automaticallyCropImagesToAspectRatio()
-                    ->automaticallyResizeImagesMode('cover')
-                    ->automaticallyResizeImagesToWidth('1800')
-                    ->automaticallyResizeImagesToHeight('600')
-                    ->storeFiles(condition: false)
-                    ->required()
-                    ->maxSize(4_096),
-            ])
-            ->action(function (array $data): void {
-                $cover = $data['cover'] ?? null;
+        return $this->imageUploadAction('editCover', ProfileImage::Cover);
+    }
 
-                if (is_string($cover)) {
-                    $cover = TemporaryUploadedFile::createFromLivewire($cover);
-                }
+    public function adjustAvatarAction(): Action
+    {
+        return $this->imageFramingAction('adjustAvatar', ProfileImage::Avatar);
+    }
 
-                if (!$cover instanceof TemporaryUploadedFile) {
-                    return;
-                }
-
-                $this->replaceMedia('cover', $cover);
-
-                Notification::make()
-                    ->success()
-                    ->title(__('panel-app::profile.notifications.cover_updated'))
-                    ->send();
-            });
+    public function adjustCoverAction(): Action
+    {
+        return $this->imageFramingAction('adjustCover', ProfileImage::Cover);
     }
 
     public function getRecord(): Profile
@@ -526,12 +535,36 @@ class ProfilePage extends Page
     }
 
     #[Computed]
+    public function coverAspectRatio(): string
+    {
+        return ProfileImage::Cover->cssAspectRatio();
+    }
+
+    #[Computed]
+    public function coverFocalY(): int
+    {
+        /** @var User $user */
+        $user = auth()->user()->fresh();
+
+        return $user->imageFocalY(ProfileImage::Cover);
+    }
+
+    #[Computed]
+    public function avatarFocalY(): int
+    {
+        /** @var User $user */
+        $user = auth()->user()->fresh();
+
+        return $user->imageFocalY(ProfileImage::Avatar);
+    }
+
+    #[Computed]
     public function avatarPreviewUrl(): ?string
     {
         /** @var User $user */
         $user = auth()->user()->fresh();
 
-        return $user->getFirstMediaUrl('avatar') ?: null;
+        return $user->imageUrl(ProfileImage::Avatar);
     }
 
     #[Computed]
@@ -540,28 +573,241 @@ class ProfilePage extends Page
         /** @var User $user */
         $user = auth()->user()->fresh();
 
-        return $user->getFirstMediaUrl('cover') ?: null;
+        return $user->imageUrl(ProfileImage::Cover);
     }
 
     public function removeAvatar(): void
     {
-        auth()->user()->clearMediaCollection('avatar');
+        $this->removeImage(ProfileImage::Avatar);
     }
 
     public function removeCover(): void
     {
-        auth()->user()->clearMediaCollection('cover');
+        $this->removeImage(ProfileImage::Cover);
     }
 
-    private function replaceMedia(string $collection, TemporaryUploadedFile $file): void
+    /**
+     * Escolhe qual faixa vertical da imagem aparece no recorte da tela.
+     *
+     * Existe para o que nao passa pelo editor: recortar um GIF achataria a
+     * animacao, entao ele e servido inteiro e o enquadramento vira CSS.
+     */
+    private function imageFramingAction(string $name, ProfileImage $image): Action
+    {
+        return Action::make($name)
+            ->label(__('panel-app::profile.actions.adjust_'.$image->value))
+            ->modalHeading(__('panel-app::profile.actions.adjust_'.$image->value))
+            ->modalDescription(__('panel-app::profile.hints.adjust_framing'))
+            ->modalSubmitActionLabel(__('panel-app::profile.actions.save_framing'))
+            ->modalSubmitAction(fn (Action $action) => $action->color('primary'))
+            ->modalWidth(Width::TwoExtraLarge)
+            ->visible(fn (): bool => filled($this->imagePreviewUrl($image)))
+            ->schema([
+                ViewField::make('focal_y')
+                    ->hiddenLabel()
+                    ->view('panel-app::components.image-focal-picker')
+                    ->viewData([
+                        'imageUrl' => $this->imagePreviewUrl($image),
+                        'aspectRatio' => $image->cssAspectRatio(),
+                        'isCircle' => $image === ProfileImage::Avatar,
+                    ])
+                    ->default(function () use ($image): int {
+                        /** @var User $user */
+                        $user = auth()->user();
+
+                        return $user->imageFocalY($image);
+                    }),
+            ])
+            ->action(function (array $data) use ($image): void {
+                $focalY = $data['focal_y'] ?? null;
+
+                /** @var User $user */
+                $user = auth()->user();
+                $user->setImageFocalY($image, is_numeric($focalY) ? (int) $focalY : ProfileImage::DEFAULT_FOCAL_Y);
+
+                $this->refreshImageComputeds();
+
+                Notification::make()
+                    ->success()
+                    ->title(__('panel-app::profile.notifications.framing_updated'))
+                    ->send();
+            });
+    }
+
+    /**
+     * Upload com recorte na proporcao da imagem. O editor do Filament roda no
+     * browser antes do upload, entao a validacao de dimensao abaixo mede o
+     * resultado do recorte, e nao o arquivo bruto.
+     */
+    private function imageUploadAction(string $name, ProfileImage $image): Action
+    {
+        $limits = $this->imageLimits($image);
+
+        return Action::make($name)
+            ->label(__('panel-app::profile.actions.change_'.$image->value))
+            ->modalHeading(__('panel-app::profile.actions.change_'.$image->value))
+            ->modalSubmitActionLabel(__('panel-app::profile.actions.save_'.$image->value))
+            ->modalSubmitAction(fn (Action $action) => $action->color('primary'))
+            // O autofocus do modal cai no input do FilePond, que responde ao
+            // foco abrindo o seletor de arquivos; com o focus trap reaplicando
+            // o foco, o dialogo do sistema reabre em loop.
+            ->modalAutofocus(condition: false)
+            ->schema([
+                $this->imageUploadField($image, $limits),
+            ])
+            ->action(function (array $data) use ($image): void {
+                $file = $data[$image->value] ?? null;
+
+                if (is_string($file)) {
+                    $file = TemporaryUploadedFile::createFromLivewire($file);
+                }
+
+                if (!$file instanceof UploadedFile) {
+                    return;
+                }
+
+                /** @var User $user */
+                $user = auth()->user();
+                $user->putImage($image, $file);
+
+                $this->refreshImageComputeds();
+
+                Notification::make()
+                    ->success()
+                    ->title(__('panel-app::profile.notifications.'.$image->value.'_updated'))
+                    ->send();
+
+                // Sem conversao a imagem vai inteira para a tela, e ai o
+                // enquadramento e que decide o que aparece. Emenda o ajuste no
+                // mesmo fluxo em vez de exigir que o usuario ache o botao.
+                if ($user->imageNeedsFraming($image)) {
+                    $this->replaceMountedAction($this->framingActionName($image));
+                }
+            });
+    }
+
+    /**
+     * Limites de upload da imagem, em KB para as regras e em MB para o texto.
+     *
+     * O teto anunciado nunca passa do que o php.ini aceita, senao o PHP recusa
+     * o arquivo antes da validacao e o que sobra na tela e "failed to upload".
+     *
+     * @return array{width: int, height: int, min_width: int, min_height: int, max_kb: int, unconverted_max_kb: int, max_mb: float, gif_mb: float, formats: string}
+     */
+    private function imageLimits(ProfileImage $image): array
+    {
+        $maxKilobytes = UploadLimit::kilobytes($image->maxKilobytes());
+        $unconvertedMaxKilobytes = min($maxKilobytes, ProfileImage::unconvertedMaxKilobytes());
+
+        return [
+            'width' => $image->width(),
+            'height' => $image->height(),
+            'min_width' => $image->minWidth(),
+            'min_height' => $image->minHeight(),
+            'max_kb' => $maxKilobytes,
+            'unconverted_max_kb' => $unconvertedMaxKilobytes,
+            'max_mb' => round($maxKilobytes / 1_024, 1),
+            'gif_mb' => round($unconvertedMaxKilobytes / 1_024, 1),
+            'formats' => ProfileImage::formatLabels(),
+        ];
+    }
+
+    /**
+     * @param  array{width: int, height: int, min_width: int, min_height: int, max_kb: int, unconverted_max_kb: int, max_mb: float, gif_mb: float, formats: string}  $limits
+     */
+    private function imageUploadField(ProfileImage $image, array $limits): FileUpload
+    {
+        $field = match ($image) {
+            ProfileImage::Avatar => FileUpload::make($image->value)->avatar(),
+            ProfileImage::Cover => FileUpload::make($image->value)
+                ->image()
+                ->panelAspectRatio($image->aspectRatio()),
+        };
+
+        return $field
+            ->label(__('panel-app::profile.fields.'.$image->value))
+            // O teto do GIF só entra no texto quando ele é de fato menor: no
+            // ambiente onde o limite geral já é o mesmo, repetir confunde.
+            ->helperText(__(
+                $limits['unconverted_max_kb'] < $limits['max_kb']
+                    ? 'panel-app::profile.hints.image_upload_with_gif_limit'
+                    : 'panel-app::profile.hints.image_upload',
+                $limits,
+            ))
+            // imageAspectRatio() fica desligado de proposito. Ele instala uma
+            // regra Rule::dimensions()->ratio() que exige a proporcao exata,
+            // com tolerancia menor que um pixel. Como o editor recorta no
+            // canvas e arredonda, o arquivo chega fora da razao por 1px e a
+            // validacao reprova com "invalid image dimensions", que e o erro
+            // generico da issue #458. Quem enquadra e a conversion.
+            ->imageAspectRatio(ratio: null)
+            ->automaticallyCropImagesToAspectRatio(condition: false)
+            ->imageEditor()
+            // Sem imageAspectRatio, e o viewport que trava o recorte na
+            // proporcao certa dentro do editor.
+            ->imageEditorViewportWidth($image->width())
+            ->imageEditorViewportHeight($image->height())
+            ->imageEditorAspectRatioOptions([$image->aspectRatio()])
+            // Sem alvo de redimensionamento: o editor usa esses valores no
+            // getCroppedCanvas(), entao com eles o recorte sairia sempre no
+            // tamanho alvo, esticado no canvas do browser, e a validacao de
+            // dimensao minima nunca falharia. Quem estica e a conversion.
+            ->automaticallyResizeImagesToWidth(width: null)
+            ->automaticallyResizeImagesToHeight(height: null)
+            ->acceptedFileTypes(ProfileImage::mimeTypes())
+            ->maxSize($limits['max_kb'])
+            ->rules([
+                sprintf(
+                    'dimensions:min_width=%d,min_height=%d',
+                    $image->minWidth(),
+                    $image->minHeight(),
+                ),
+                new UnconvertedImageSize($limits['unconverted_max_kb']),
+            ])
+            ->validationMessages([
+                'dimensions' => __('panel-app::profile.validation.image_dimensions', $limits),
+                // O GIF chega ate aqui quando o usuario burla o filtro do
+                // seletor de arquivos. Sem esta mensagem, o erro que aparece
+                // e o generico do Laravel.
+                'mimetypes' => __('panel-app::profile.validation.image_mimetypes', $limits),
+            ])
+            ->storeFiles(condition: false)
+            ->required();
+    }
+
+    private function removeImage(ProfileImage $image): void
     {
         /** @var User $user */
         $user = auth()->user();
-        $extension = $file->getClientOriginalExtension() ?: $file->guessExtension() ?: 'jpg';
-        $user->clearMediaCollection($collection);
-        $user->addMedia($file->getRealPath())
-            ->usingFileName(Str::uuid()->toString().'.'.$extension)
-            ->toMediaCollection($collection);
+        $user->removeImage($image);
+
+        $this->refreshImageComputeds();
+    }
+
+    private function framingActionName(ProfileImage $image): string
+    {
+        return match ($image) {
+            ProfileImage::Avatar => 'adjustAvatar',
+            ProfileImage::Cover => 'adjustCover',
+        };
+    }
+
+    private function imagePreviewUrl(ProfileImage $image): ?string
+    {
+        return match ($image) {
+            ProfileImage::Avatar => $this->avatarPreviewUrl,
+            ProfileImage::Cover => $this->coverPreviewUrl,
+        };
+    }
+
+    private function refreshImageComputeds(): void
+    {
+        unset(
+            $this->avatarPreviewUrl,
+            $this->coverPreviewUrl,
+            $this->avatarFocalY,
+            $this->coverFocalY,
+        );
     }
 
     /**
@@ -606,10 +852,18 @@ class ProfilePage extends Page
 
     /**
      * @param  array<string, mixed>  $data
-     * @return array<string, mixed>
+     * @return array<string, mixed>|null null tells Filament to skip creating/saving this row
      */
-    private function normalizeWorkExperienceData(array $data): array
+    private function normalizeWorkExperienceData(array $data): ?array
     {
+        $keyFields = ['company_name', 'position', 'description', 'start_date'];
+
+        $hasAnyData = collect($keyFields)->contains(fn (string $field): bool => filled($data[$field] ?? null));
+
+        if (!$hasAnyData) {
+            return null;
+        }
+
         if ($data['is_currently_working_here'] ?? false) {
             $data['end_date'] = null;
         }
@@ -635,6 +889,53 @@ class ProfilePage extends Page
         return $skills;
     }
 
+    private function appendEmptyRepeaterItemIfLastRow(Select|TextInput $component): void
+    {
+        $repeater = $component->getParentRepeater();
+
+        if (!$repeater instanceof Repeater) {
+            return;
+        }
+
+        $items = $repeater->getRawState();
+
+        if (!is_array($items) || blank($items)) {
+            return;
+        }
+
+        $repeaterPath = $repeater->getStatePath();
+        $componentPath = $component->getStatePath();
+
+        if ($repeaterPath === null || $componentPath === null) {
+            return;
+        }
+
+        $currentKey = explode('.', mb_substr($componentPath, mb_strlen($repeaterPath) + 1))[0];
+
+        if ($currentKey !== array_key_last($items)) {
+            return;
+        }
+
+        $newUuid = $repeater->generateUuid();
+
+        if ($newUuid) {
+            $items[$newUuid] = [];
+        } else {
+            $items[] = [];
+        }
+
+        $repeater->rawState($items);
+
+        $childSchema = $repeater->getChildSchema($newUuid ?? array_key_last($items));
+
+        if ($childSchema instanceof Schema) {
+            $childSchema->fill();
+        }
+
+        $repeater->collapsed(condition: false, shouldMakeComponentCollapsible: false);
+        $repeater->callAfterStateUpdated();
+    }
+
     /**
      * Skill ids already chosen in the other rows of the skills repeater, so the
      * search can omit them and each skill is only pickable once.
@@ -644,12 +945,16 @@ class ProfilePage extends Page
     private function skillIdsInSiblingRows(Select $component): array
     {
         $repeater = $component->getParentRepeater();
-        if ($repeater === null) {
+
+        if (!$repeater instanceof Repeater) {
             return [];
         }
 
-        /** @var array<int|string, array<string, mixed>> $rows */
         $rows = $repeater->getRawState();
+
+        if (!is_array($rows)) {
+            return [];
+        }
 
         return array_values(
             collect($rows)

@@ -58,7 +58,7 @@ class MeetingShowcasePage extends Page
 
         $tz = config('app.display_timezone');
         $start = Date::parse($this->startDate, $tz)->utc();
-        $end = Date::parse($this->endDate, $tz)->utc();
+        $end = Date::parse($this->endDate, $tz)->endOfMinute()->utc();
 
         /** @var Collection<int, Message> $messageStats */
         $messageStats = Message::query()
@@ -73,6 +73,8 @@ class MeetingShowcasePage extends Page
         $identityIds = $messageStats->pluck('external_identity_id');
 
         $identities = ExternalIdentity::query()
+            ->withTrashed()
+            ->with('user')
             ->whereIn('id', $identityIds)
             ->get()
             ->keyBy('id');
@@ -102,24 +104,17 @@ class MeetingShowcasePage extends Page
         }
 
         $metadata = $identity->metadata ?? [];
+        $discordUser = $metadata['user'] ?? $metadata['author'] ?? [];
 
-        $username = $metadata['username'] ?? null;
-        $avatar = $metadata['avatar'] ?? null;
-        $globalName = $metadata['global_name'] ?? null;
-
-        if (isset($metadata['user'])) {
-            $discordUser = $metadata['user'];
-            $username ??= $discordUser['username'] ?? null;
-            $globalName ??= $discordUser['global_name'] ?? null;
-
-            if (!$avatar && isset($discordUser['avatar'])) {
-                $avatar = sprintf(
-                    'https://cdn.discordapp.com/avatars/%s/%s.png?size=128',
-                    $identity->external_account_id,
-                    $discordUser['avatar'],
-                );
-            }
+        if (!is_array($discordUser)) {
+            $discordUser = [];
         }
+
+        $linkedUser = $identity->user;
+
+        $username = $metadata['username'] ?? $discordUser['username'] ?? $linkedUser?->username;
+        $avatar = $metadata['avatar'] ?? $discordUser['avatar'] ?? null;
+        $globalName = $metadata['global_name'] ?? $discordUser['global_name'] ?? $linkedUser?->name;
 
         if ($avatar && !str_starts_with((string) $avatar, 'http')) {
             $avatar = sprintf(

@@ -9,6 +9,7 @@ use App\Geo\WorldApiClient;
 use App\Providers\Tools\DebugbarServiceProvider;
 use App\Providers\Tools\TelescopeServiceProvider;
 use App\Support\Paginator;
+use App\Support\Seo\SiteHead;
 use Carbon\CarbonImmutable;
 use He4rt\Identity\User\Models\User;
 use Illuminate\Database\Eloquent\Model;
@@ -49,6 +50,7 @@ final class AppServiceProvider extends ServiceProvider
         $this->configureVite();
         $this->configureUrl();
         $this->configureMorphMap();
+        $this->configureHead();
     }
 
     private function configureCommands(): void
@@ -104,5 +106,10 @@ final class AppServiceProvider extends ServiceProvider
         Relation::morphMap([
             'user' => User::class,
         ]);
+    }
+
+    private function configureHead(): void
+    {
+        SiteHead::register();
     }
 }

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Providers;
 
 use App\Enums\FilamentPanel;
+use App\Support\ApplicationLocale;
 use Filament\Actions\Action;
 use Filament\Forms\Components\Builder;
 use Filament\Forms\Components\DateTimePicker;
@@ -12,6 +13,7 @@ use Filament\Forms\Components\Field;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Select;
 use Filament\Panel;
+use Filament\Schemas\Schema;
 use Filament\Support\Enums\Alignment;
 use Filament\Support\Enums\VerticalAlignment;
 use Filament\Support\Enums\Width;
@@ -26,12 +28,14 @@ use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use Filament\View\PanelsRenderHook;
 use Illuminate\Contracts\View\View;
+use Illuminate\Support\HtmlString;
 use Illuminate\Support\ServiceProvider;
 
 class FilamentServiceProvider extends ServiceProvider
 {
     public function boot(): void
     {
+        $this->configureRobots();
         $this->configureFlux();
         $this->configureField();
         $this->configureColumn();
@@ -44,6 +48,7 @@ class FilamentServiceProvider extends ServiceProvider
         $this->configureBuilder();
         $this->configureSelectFilter();
         $this->configureTable();
+        $this->configureSchema();
     }
 
     public function register(): void
@@ -59,6 +64,20 @@ class FilamentServiceProvider extends ServiceProvider
 
             return FilamentPanel::from($panelId);
         });
+    }
+
+    /**
+     * Os painéis Filament (/admin e /app) são áreas autenticadas: nada ali deve
+     * entrar em índice de busca. O robots.txt já bloqueia o crawl, mas uma URL
+     * de painel linkada de fora ainda pode ser indexada sem ser rastreada — a
+     * meta robots é o que efetivamente barra isso.
+     */
+    private function configureRobots(): void
+    {
+        FilamentView::registerRenderHook(
+            PanelsRenderHook::HEAD_START,
+            fn (): HtmlString => new HtmlString('<meta name="robots" content="noindex, nofollow" />'),
+        );
     }
 
     private function configureFlux(): void
@@ -123,7 +142,18 @@ class FilamentServiceProvider extends ServiceProvider
             ->defaultPaginationPageOption(10)
             ->filtersFormWidth(Width::Medium)
             ->paginated([10, 25, 50])
-            ->emptyStateIcon(Heroicon::OutlinedExclamationTriangle));
+            ->emptyStateIcon(Heroicon::OutlinedExclamationTriangle)
+            ->defaultDateDisplayFormat(fn (): string => ApplicationLocale::dateFormat())
+            ->defaultDateTimeDisplayFormat(fn (): string => ApplicationLocale::dateTimeFormat())
+            ->defaultTimeDisplayFormat('H:i:s'));
+    }
+
+    private function configureSchema(): void
+    {
+        Schema::configureUsing(fn (Schema $schema): Schema => $schema
+            ->defaultDateDisplayFormat(fn (): string => ApplicationLocale::dateFormat())
+            ->defaultDateTimeDisplayFormat(fn (): string => ApplicationLocale::dateTimeFormat())
+            ->defaultTimeDisplayFormat('H:i:s'));
     }
 
     private function configureSelect(): void
@@ -143,6 +173,8 @@ class FilamentServiceProvider extends ServiceProvider
             ->seconds(condition: false)
             ->minDate(now()->subYears(25))
             ->maxDate(now()->addYears(25))
+            ->defaultDateDisplayFormat(fn (): string => ApplicationLocale::dateFormat())
+            ->defaultDateTimeDisplayFormat(fn (): string => ApplicationLocale::dateTimeFormat())
             ->translateLabel());
     }
 

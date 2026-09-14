@@ -4,132 +4,129 @@ declare(strict_types=1);
 
 namespace He4rt\PanelAdmin\Filament\Resources\Users\Tables;
 
-use Filament\Actions\BulkActionGroup;
-use Filament\Actions\DeleteAction;
-use Filament\Actions\DeleteBulkAction;
+use Filament\Actions\Action;
 use Filament\Actions\EditAction;
-use Filament\Actions\ForceDeleteAction;
-use Filament\Actions\ForceDeleteBulkAction;
-use Filament\Actions\RestoreAction;
-use Filament\Actions\RestoreBulkAction;
 use Filament\Actions\ViewAction;
+use Filament\Support\Enums\FontWeight;
+use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
-use Filament\Tables\Filters\TrashedFilter;
 use Filament\Tables\Table;
-use He4rt\Identity\User\Enums\Role;
+use He4rt\Identity\Authorization\Enums\UserRole;
+use He4rt\Identity\User\Enums\UserSituation;
 use He4rt\Identity\User\Models\User;
-use He4rt\Profile\Enums\SeniorityLevel;
+use He4rt\PanelAdmin\Moderation\Resources\ModerationCaseResource;
 use Illuminate\Database\Eloquent\Builder;
+use Spatie\Permission\Models\Role;
 
 class UsersTable
 {
-    public static function table(Table $table): Table
+    public static function configure(Table $table): Table
     {
         return $table
+            ->defaultSort('created_at', 'desc')
             ->columns([
                 TextColumn::make('username')
                     ->label('Username')
                     ->searchable()
-                    ->sortable(),
+                    ->sortable()
+                    ->weight(FontWeight::Medium),
 
                 TextColumn::make('name')
-                    ->label('Name')
-                    ->searchable()
-                    ->sortable(),
-
-                TextColumn::make('email')
-                    ->label('Email')
+                    ->label('Nome')
                     ->searchable()
                     ->sortable()
+                    ->description(fn (User $record): ?string => $record->email),
+
+                TextColumn::make('situation')
+                    ->label('Situação')
+                    ->badge()
+                    ->state(fn (User $record): UserSituation => $record->situation),
+
+                TextColumn::make('roles.name')
+                    ->label('Papéis')
+                    ->badge()
+                    ->formatStateUsing(fn (string $state): string => UserRole::from($state)->getLabel())
+                    ->color(fn (string $state): array => UserRole::from($state)->getColor())
+                    ->placeholder('—'),
+
+                TextColumn::make('suspended_until')
+                    ->label('Suspenso até')
+                    ->dateTime('d/m/Y H:i')
+                    ->timezone(config('app.display_timezone'))
+                    ->sortable()
+                    ->placeholder('—')
                     ->toggleable(isToggledHiddenByDefault: true),
 
-                TextColumn::make('role')
-                    ->label('Role')
-                    ->badge(),
+                IconColumn::make('is_donator')
+                    ->label('Apoiador')
+                    ->boolean()
+                    ->sortable(),
 
-                TextColumn::make('profile.seniority_level')
-                    ->label('Senioridade')
-                    ->badge()
-                    ->placeholder('—'),
+                TextColumn::make('providers_count')
+                    ->label('Identidades')
+                    ->state(static fn (User $record): int => $record->providers->count())
+                    ->numeric(0),
 
-                IconColumn::make('profile.available_for_proposals')
-                    ->label('Disponível')
-                    ->boolean(),
+                TextColumn::make('first_login_at')
+                    ->label('Primeiro login')
+                    ->dateTime('d/m/Y H:i')
+                    ->timezone(config('app.display_timezone'))
+                    ->sortable()
+                    ->placeholder('Nunca')
+                    ->toggleable(isToggledHiddenByDefault: true),
 
-                TextColumn::make('address.city')
-                    ->label('Cidade')
-                    ->placeholder('—'),
-
-                TextColumn::make('character.level')
-                    ->label('Nível')
-                    ->badge()
-                    ->placeholder('—'),
-
-                TextColumn::make('status')
-                    ->label('Status')
-                    ->state(static fn (User $record): string => match (true) {
-                        $record->trashed() => 'removed',
-                        $record->banned_at !== null => 'banned',
-                        $record->suspended_until?->isFuture() => 'suspended',
-                        default => 'active',
-                    })
-                    ->badge()
-                    ->color(static fn (string $state): string => match ($state) {
-                        'removed' => 'gray',
-                        'banned' => 'danger',
-                        'suspended' => 'warning',
-                        default => 'success',
-                    })
-                    ->formatStateUsing(static fn (string $state): string => match ($state) {
-                        'removed' => 'Removido',
-                        'banned' => 'Banido',
-                        'suspended' => 'Suspenso',
-                        default => 'Ativo',
+                TextColumn::make('created_at')
+                    ->label('Criado em')
+                    ->dateTime('d/m/Y H:i')
+                    ->timezone(config('app.display_timezone'))
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
+            ])
+            ->filters([
+                SelectFilter::make('situation')
+                    ->label('Situação')
+                    ->options(UserSituation::class)
+                    ->query(static fn (Builder $query, array $data): Builder => match ($data['value'] ?? null) {
+                        UserSituation::Banned->value => $query->whereNotNull('banned_at'),
+                        UserSituation::Suspended->value => $query
+                            ->whereNull('banned_at')
+                            ->where('suspended_until', '>', now()),
+                        UserSituation::Active->value => $query
+                            ->whereNull('banned_at')
+                            ->where(static fn (Builder $inner): Builder => $inner
+                                ->whereNull('suspended_until')
+                                ->orWhere('suspended_until', '<=', now())),
+                        default => $query,
                     }),
 
-                IconColumn::make('is_donator')
-                    ->label('Donator')
-                    ->boolean(),
-            ])
-            ->paginated([25, 50, 100])
-            ->filters([
-                SelectFilter::make('role')
-                    ->label('Role')
-                    ->options(Role::class),
+                SelectFilter::make('roles')
+                    ->label('Papel')
+                    ->relationship('roles', 'name')
+                    ->getOptionLabelFromRecordUsing(fn (Role $record): string => UserRole::from($record->name)->getLabel()),
 
-                SelectFilter::make('seniority_level')
-                    ->label('Senioridade')
-                    ->options(SeniorityLevel::class)
-                    ->query(static fn (Builder $query, array $data): Builder => $query->when(
-                        $data['value'] ?? null,
-                        static fn (Builder $q, mixed $value): Builder => $q->whereRelation('profile', 'seniority_level', $value),
-                    )),
+                TernaryFilter::make('is_donator')
+                    ->label('Apoiador'),
 
-                TernaryFilter::make('available_for_proposals')
-                    ->label('Disponível para Propostas')
-                    ->queries(
-                        true: static fn (Builder $query): Builder => $query->whereRelation('profile', 'available_for_proposals', operator: true),
-                        false: static fn (Builder $query): Builder => $query->whereRelation('profile', 'available_for_proposals', operator: false),
-                    ),
-
-                TrashedFilter::make(),
+                Filter::make('never_logged_in')
+                    ->label('Nunca logou')
+                    ->query(static fn (Builder $query): Builder => $query->whereNull('first_login_at')),
             ])
             ->recordActions([
                 ViewAction::make(),
                 EditAction::make(),
-                DeleteAction::make(),
-                RestoreAction::make(),
-                ForceDeleteAction::make(),
-            ])
-            ->toolbarActions([
-                BulkActionGroup::make([
-                    DeleteBulkAction::make(),
-                    RestoreBulkAction::make(),
-                    ForceDeleteBulkAction::make(),
-                ]),
+                Action::make('moderationCases')
+                    ->label('Casos de moderação')
+                    ->icon(Heroicon::OutlinedShieldExclamation)
+                    ->color('gray')
+                    ->url(static fn (User $record): string => ModerationCaseResource::getUrl('index', [
+                        'tableFilters' => [
+                            'author' => ['value' => $record->getKey()],
+                        ],
+                    ])),
             ]);
     }
 }

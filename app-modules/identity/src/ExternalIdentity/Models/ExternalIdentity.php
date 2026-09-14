@@ -14,7 +14,10 @@ use He4rt\Identity\ExternalIdentity\Enums\IdentityProvider;
 use He4rt\Identity\ExternalIdentity\Enums\IdentityType;
 use He4rt\Identity\User\Models\User;
 use Illuminate\Database\Eloquent\Attributes\Appends;
+use Illuminate\Database\Eloquent\Attributes\Scope;
 use Illuminate\Database\Eloquent\Attributes\Table;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -92,9 +95,28 @@ final class ExternalIdentity extends Model
         return ExternalIdentityFactory::new();
     }
 
-    protected function getMessagesCountAttribute(): int
+    /**
+     * Identidade que uma pessoa realmente conectou, e não um registro criado por
+     * ingestão. As datas sozinhas não separam os dois: a ETL também preenche
+     * connected_at. O que só existe no fluxo OAuth é a credencial.
+     *
+     * @param  Builder<self>  $query
+     */
+    #[Scope]
+    protected function activelyConnected(Builder $query): void
     {
-        return $this->messages()->count();
+        $query
+            ->whereNotNull('connected_at')
+            ->whereNull('disconnected_at')
+            ->whereRaw("coalesce(credentials::jsonb->>'access_token', '') <> ''");
+    }
+
+    /**
+     * @return Attribute<int, never>
+     */
+    protected function messagesCount(): Attribute
+    {
+        return Attribute::make(get: fn () => $this->messages()->count());
     }
 
     protected function casts(): array

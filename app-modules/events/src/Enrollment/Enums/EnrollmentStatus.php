@@ -1,0 +1,94 @@
+<?php
+
+declare(strict_types=1);
+
+namespace He4rt\Events\Enrollment\Enums;
+
+use App\Enums\Concerns\StringifyEnum;
+use Filament\Support\Colors\Color;
+use Filament\Support\Contracts\HasColor;
+use Filament\Support\Contracts\HasLabel;
+use He4rt\Events\Enrollment\Exceptions\EnrollmentException;
+
+enum EnrollmentStatus: string implements HasColor, HasLabel
+{
+    use StringifyEnum;
+
+    case Pending = 'pending';
+    case Confirmed = 'confirmed';
+    case Waitlisted = 'waitlisted';
+    case CheckedIn = 'checked_in';
+    case Attended = 'attended';
+    case Cancelled = 'cancelled';
+    case Rejected = 'rejected';
+    case NoShow = 'no_show';
+
+    public function getLabel(): string
+    {
+        return __('events::enums.enrollment_status.'.$this->value);
+    }
+
+    public function getColor(): array
+    {
+        return match ($this) {
+            self::Pending => Color::Gray,
+            self::Confirmed => Color::Blue,
+            self::Waitlisted => Color::Amber,
+            self::CheckedIn => Color::Teal,
+            self::Attended => Color::Green,
+            self::Cancelled => Color::Gray,
+            self::Rejected => Color::Red,
+            self::NoShow => Color::Orange,
+        };
+    }
+
+    public function canTransitionTo(self $target): bool
+    {
+        return match ($this) {
+            self::Pending => in_array($target, [self::Confirmed, self::Waitlisted, self::Rejected, self::Cancelled], strict: true),
+            self::Waitlisted => in_array($target, [self::Confirmed, self::Cancelled], strict: true),
+            self::Confirmed => in_array($target, [self::CheckedIn, self::Cancelled, self::NoShow], strict: true),
+            self::CheckedIn => in_array($target, [self::Attended, self::NoShow], strict: true),
+            self::Attended, self::Cancelled, self::Rejected, self::NoShow => false,
+        };
+    }
+
+    public function timestampColumn(): ?string
+    {
+        return match ($this) {
+            self::Confirmed, self::CheckedIn, self::Attended, self::Cancelled => $this->value.'_at',
+            default => null,
+        };
+    }
+
+    public function isTerminal(): bool
+    {
+        return in_array($this, [self::Attended, self::Cancelled, self::Rejected, self::NoShow], strict: true);
+    }
+
+    public function is(self ...$statuses): bool
+    {
+        return in_array($this, $statuses, strict: true);
+    }
+
+    public function isConfirmed(): bool
+    {
+        return $this->is(self::Confirmed);
+    }
+
+    public function isWaitlisted(): bool
+    {
+        return $this->is(self::Waitlisted);
+    }
+
+    public function getResponseMessage(?int $waitlistPosition = null): string
+    {
+        return match ($this) {
+            self::Confirmed => __('events::pages.confirm_presence_success'),
+            self::Waitlisted => __('events::pages.waitlist_success', [
+                'position' => $waitlistPosition,
+            ]),
+            default => throw EnrollmentException::responseMessageNotImplemented($this),
+        };
+    }
+}

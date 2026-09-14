@@ -1,5 +1,6 @@
 @import '../../../../vendor/filament/filament/resources/css/theme.css';
 @import '../../../../vendor/livewire/flux/dist/flux.css';
+@import '../locale-switcher.css' layer(components);
 
 @source '../../../../app/Filament/**/*';
 @source '../../../../resources/views/**/*';

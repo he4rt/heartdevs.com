@@ -17,4 +17,9 @@ return new class extends Migration
         Schema::dropIfExists('sponsors');
         Schema::dropIfExists('events');
     }
+
+    public function down(): void
+    {
+        // Irreversible: removes legacy events module tables replaced by the new schema.
+    }
 };

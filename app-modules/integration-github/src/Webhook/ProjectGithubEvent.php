@@ -78,6 +78,7 @@ final readonly class ProjectGithubEvent
                 'title' => data_get($pr, 'title'),
                 'state' => data_get($pr, 'state'),
                 'merged' => data_get($pr, 'merged_at') !== null,
+                'merged_at' => data_get($pr, 'merged_at'),
                 'url' => data_get($pr, 'html_url'),
                 'additions' => $this->intFrom($pr, 'additions') ?? 0,
                 'deletions' => $this->intFrom($pr, 'deletions') ?? 0,

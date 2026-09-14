@@ -13,7 +13,7 @@ class ViewUser extends ViewRecord
     protected static string $resource = UserResource::class;
 
     /**
-     * @return EditAction[]
+     * @return array<int, EditAction>
      */
     protected function getHeaderActions(): array
     {

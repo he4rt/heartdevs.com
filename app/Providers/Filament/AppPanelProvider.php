@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Providers\Filament;
 
 use App\Enums\FilamentPanel;
+use App\Http\Middleware\SetApplicationLocale;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
@@ -12,7 +13,10 @@ use Filament\Http\Middleware\DispatchServingFilamentEvent;
 use Filament\Panel;
 use Filament\PanelProvider;
 use Filament\Support\Colors\Color;
+use He4rt\PanelApp\Pages\EventPage;
+use He4rt\PanelApp\Pages\EventsPage;
 use He4rt\PanelApp\Pages\LoginPage;
+use He4rt\PanelApp\Pages\MyEventsPage;
 use He4rt\PanelApp\Pages\ProfilePage;
 use He4rt\PanelApp\Pages\ThreadPage;
 use He4rt\PanelApp\Pages\TimelinePage;
@@ -45,6 +49,9 @@ class AppPanelProvider extends PanelProvider
             ->discoverWidgets(in: app_path('Filament/App/Widgets'), for: 'App\Filament\App\Widgets')
             ->pages([
                 TimelinePage::class,
+                EventsPage::class,
+                MyEventsPage::class,
+                EventPage::class,
                 ThreadPage::class,
                 ProfilePage::class,
             ])
@@ -52,6 +59,7 @@ class AppPanelProvider extends PanelProvider
                 EncryptCookies::class,
                 AddQueuedCookiesToResponse::class,
                 StartSession::class,
+                SetApplicationLocale::class,
                 AuthenticateSession::class,
                 ShareErrorsFromSession::class,
                 PreventRequestForgery::class,

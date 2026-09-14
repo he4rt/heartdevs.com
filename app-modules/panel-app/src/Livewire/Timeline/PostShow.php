@@ -26,7 +26,7 @@ final class PostShow extends Component
 
     public function togglePin(#[CurrentUser] ?User $user): void
     {
-        if (!$user instanceof User) {
+        if (!config('he4rt.features.timeline_pin') || !$user instanceof User) {
             return;
         }
 

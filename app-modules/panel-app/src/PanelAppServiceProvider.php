@@ -4,6 +4,12 @@ declare(strict_types=1);
 
 namespace He4rt\PanelApp;
 
+use Filament\Support\Assets\Js;
+use Filament\Support\Facades\FilamentAsset;
+use He4rt\PanelApp\Livewire\Events\EventDetail;
+use He4rt\PanelApp\Livewire\Events\EventsList;
+use He4rt\PanelApp\Livewire\Events\MyEventsList;
+use He4rt\PanelApp\Livewire\Events\NumericCodeCheckIn;
 use He4rt\PanelApp\Livewire\Timeline\Composer;
 use He4rt\PanelApp\Livewire\Timeline\Feed;
 use He4rt\PanelApp\Livewire\Timeline\PostShow;
@@ -20,6 +26,15 @@ class PanelAppServiceProvider extends ServiceProvider
     {
         $this->loadViewsFrom(__DIR__.'/../resources/views', 'panel-app');
         $this->loadTranslationsFrom(__DIR__.'/../lang', 'panel-app');
+
+        Livewire::component('events-list', EventsList::class);
+        Livewire::component('my-events-list', MyEventsList::class);
+        Livewire::component('event-detail', EventDetail::class);
+        Livewire::component('numeric-code-check-in', NumericCodeCheckIn::class);
+        FilamentAsset::register([
+            Js::make('last-auth-provider', __DIR__.'/../resources/js/last-auth-provider.js')
+                ->loadedOnRequest(),
+        ], package: 'he4rt/panel-app');
 
         Livewire::component('timeline-composer', Composer::class);
         Livewire::component('timeline-feed', Feed::class);

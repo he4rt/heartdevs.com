@@ -32,7 +32,7 @@
         </div>
     </div>
 
-    @if ($pinned)
+    @if ($pinned && config('he4rt.features.timeline_pin'))
         <div class="flex shrink-0 items-center gap-1 text-xs text-amber-500">
             <x-heroicon-s-map-pin class="h-3.5 w-3.5" />
             <span class="hidden sm:inline">Fixado</span>

@@ -85,7 +85,23 @@ it('faz backfill de PRs upsertando contributions com tamanho e autor', function 
         ->and($contribution->occurred_at->toIso8601String())->toBe('2026-06-01T12:00:00+00:00')
         ->and($contribution->metadata['additions'])->toBe(10)
         ->and($contribution->metadata['deletions'])->toBe(2)
-        ->and($contribution->metadata['is_bot'])->toBeFalse();
+        ->and($contribution->metadata['is_bot'])->toBeFalse()
+        ->and($contribution->metadata['merged'])->toBeFalse()
+        ->and($contribution->metadata['merged_at'])->toBeNull();
+});
+
+it('persiste merged_at no metadata de PR mesclado', function (): void {
+    mockGithub([
+        ListPullRequests::class => MockResponse::make([prPayload(2, 'maria', 42, '2026-06-02T15:30:00Z')]),
+        GetPullRequest::class => MockResponse::make(['additions' => 1, 'deletions' => 0, 'changed_files' => 1]),
+    ]);
+
+    backfill($this->repo);
+
+    $contribution = GithubContribution::query()->where('external_ref', 'pr:2')->sole();
+
+    expect($contribution->metadata['merged'])->toBeTrue()
+        ->and($contribution->metadata['merged_at'])->toBe('2026-06-02T15:30:00Z');
 });
 
 it('ignora reviews PENDING (sem submitted_at) sem quebrar o backfill', function (): void {
@@ -260,10 +276,10 @@ it('faz backfill de issues ignorando os PRs retornados pelo endpoint de issues',
         ->toBe(['issue:10']);
 });
 
-it('faz backfill de comentários de issue com target_ref derivado da issue_url', function (): void {
+it('faz backfill de comentários de issue com target_ref derivado do html_url', function (): void {
     mockGithub([
         ListIssueComments::class => MockResponse::make([
-            ['id' => 900, 'created_at' => '2026-06-03T10:00:00Z', 'html_url' => 'u', 'issue_url' => 'https://api.github.com/repos/he4rt/heartdevs.com/issues/10', 'user' => ['login' => 'ana', 'id' => 3]],
+            ['id' => 900, 'created_at' => '2026-06-03T10:00:00Z', 'html_url' => 'https://github.com/he4rt/heartdevs.com/issues/10#issuecomment-900', 'issue_url' => 'https://api.github.com/repos/he4rt/heartdevs.com/issues/10', 'user' => ['login' => 'ana', 'id' => 3]],
         ]),
     ]);
 
@@ -273,7 +289,23 @@ it('faz backfill de comentários de issue com target_ref derivado da issue_url',
 
     expect($comment->external_ref)->toBe('comment:900')
         ->and($comment->target_ref)->toBe('issue:10')
+        ->and($comment->metadata['kind'])->toBe('issue')
         ->and($comment->actor_login)->toBe('ana');
+});
+
+it('aponta comentário de PR para pr:N usando o html_url (/pull/)', function (): void {
+    mockGithub([
+        ListIssueComments::class => MockResponse::make([
+            ['id' => 901, 'created_at' => '2026-06-03T10:05:00Z', 'html_url' => 'https://github.com/he4rt/heartdevs.com/pull/20#issuecomment-901', 'issue_url' => 'https://api.github.com/repos/he4rt/heartdevs.com/issues/20', 'user' => ['login' => 'ana', 'id' => 3]],
+        ]),
+    ]);
+
+    backfill($this->repo);
+
+    $comment = GithubContribution::query()->where('external_ref', 'comment:901')->sole();
+
+    expect($comment->target_ref)->toBe('pr:20')
+        ->and($comment->metadata['kind'])->toBe('pr');
 });
 
 it('faz backfill de comentários de review de PR com target_ref para o PR', function (): void {

@@ -34,14 +34,14 @@ function postGithubWebhook(string $event, array $payload, ?string $delivery = nu
 /**
  * @return array<string, mixed>
  */
-function prWebhookPayload(string $repo = 'he4rt/heartdevs.com', int $number = 1, string $login = 'maria', int $id = 42): array
+function prWebhookPayload(string $repo = 'he4rt/heartdevs.com', int $number = 1, string $login = 'maria', int $id = 42, ?string $merged = null): array
 {
     return [
         'action' => 'opened',
         'repository' => ['full_name' => $repo],
         'sender' => ['login' => $login, 'id' => $id],
         'pull_request' => [
-            'number' => $number, 'title' => 'feat: x', 'state' => 'open', 'merged_at' => null,
+            'number' => $number, 'title' => 'feat: x', 'state' => 'open', 'merged_at' => $merged,
             'created_at' => '2026-06-01T12:00:00Z', 'html_url' => 'u',
             'additions' => 5, 'deletions' => 1, 'changed_files' => 2,
             'user' => ['login' => $login, 'id' => $id],
@@ -103,7 +103,9 @@ it('grava no lake e projeta a contribuição para repo na allowlist, emitindo o 
 
     expect($contribution->type)->toBe(ContributionType::Pr)
         ->and($contribution->actor_login)->toBe('maria')
-        ->and($contribution->metadata['additions'])->toBe(5);
+        ->and($contribution->metadata['additions'])->toBe(5)
+        ->and($contribution->metadata['merged'])->toBeFalse()
+        ->and($contribution->metadata['merged_at'])->toBeNull();
 
     Event::assertDispatched(GithubContributionRecorded::class);
 });
@@ -180,7 +182,23 @@ it('grava no lake e projeta a contribuição para repo de contributions, emitind
 
     expect($contribution->type)->toBe(ContributionType::Pr)
         ->and($contribution->actor_login)->toBe('maria')
-        ->and($contribution->metadata['additions'])->toBe(5);
+        ->and($contribution->metadata['additions'])->toBe(5)
+        ->and($contribution->metadata['merged'])->toBeFalse()
+        ->and($contribution->metadata['merged_at'])->toBeNull();
 
     Event::assertDispatched(GithubContributionRecorded::class);
+});
+
+it('persiste merged_at do payload de PR mesclado', function (): void {
+    GithubRepository::factory()->create([
+        'full_name' => 'he4rt/heartdevs.com',
+        'purpose' => PurposeType::Contributions,
+    ]);
+
+    postGithubWebhook('pull_request', prWebhookPayload(merged: '2026-06-02T15:30:00Z'))->assertSuccessful();
+
+    $contribution = GithubContribution::query()->where('external_ref', 'pr:1')->sole();
+
+    expect($contribution->metadata['merged'])->toBeTrue()
+        ->and($contribution->metadata['merged_at'])->toBe('2026-06-02T15:30:00Z');
 });
