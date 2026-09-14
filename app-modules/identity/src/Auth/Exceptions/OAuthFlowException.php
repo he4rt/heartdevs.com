@@ -7,7 +7,7 @@ namespace He4rt\Identity\Auth\Exceptions;
 use He4rt\Identity\ExternalIdentity\Enums\IdentityProvider;
 use RuntimeException;
 
-final class OAuthFlowException extends RuntimeException
+class OAuthFlowException extends RuntimeException
 {
     public static function providerNotSupported(string $provider): self
     {
@@ -32,6 +32,11 @@ final class OAuthFlowException extends RuntimeException
     public static function tokenExchangeFailed(string $provider, string $error): self
     {
         return new self(sprintf('Token exchange failed for "%s": %s', $provider, $error));
+    }
+
+    public static function accountSoftDeleted(): self
+    {
+        return new self('This account was deleted and cannot be reactivated by logging in again.');
     }
 
     public static function emailUnavailable(string $provider): self
