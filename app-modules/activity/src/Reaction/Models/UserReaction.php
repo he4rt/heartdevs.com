@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace He4rt\Activity\Reaction\Models;
 
 use Carbon\CarbonInterface;
-use He4rt\Activity\Database\Factories\ReactionFactory;
+use He4rt\Activity\Database\Factories\UserReactionFactory;
 use He4rt\Activity\Reaction\Enums\TimelineReaction;
 use He4rt\Activity\Timeline\Timeline;
 use He4rt\Identity\User\Models\User;
@@ -26,11 +26,11 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property-read User $user
  * @property-read Timeline $timeline
  */
-#[UseFactory(factoryClass: ReactionFactory::class)]
+#[UseFactory(factoryClass: UserReactionFactory::class)]
 #[Table(name: 'activity_user_reactions')]
 final class UserReaction extends Model
 {
-    /** @use HasFactory<ReactionFactory> */
+    /** @use HasFactory<UserReactionFactory> */
     use HasFactory;
     use HasUuids;
 

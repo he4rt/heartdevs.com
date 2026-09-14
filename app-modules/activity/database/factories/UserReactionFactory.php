@@ -11,7 +11,7 @@ use He4rt\Identity\User\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /** @extends Factory<UserReaction> */
-final class ReactionFactory extends Factory
+final class UserReactionFactory extends Factory
 {
     protected $model = UserReaction::class;
 
