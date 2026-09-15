@@ -9,18 +9,15 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
 
 /**
- * Payload da conclusão do desafio do Git.
- *
- * TODO: #353 aperta o contrato com os campos do PR aprovado
- * (repo, pr_number, approved_at) quando o evento GithubPullRequestApproved existir.
+ * Payload da conclusão do desafio do Git: os dados do PR aprovado que
+ * completou o step (ver He4rt\IntegrationGithub\Events\GithubPullRequestApproved).
  */
 final readonly class GitChallengeDTO implements OnboardingStepDTO
 {
-    /**
-     * @param  array<array-key, mixed>  $data
-     */
     public function __construct(
-        public array $data = [],
+        public string $repo = '',
+        public int $prNumber = 0,
+        public string $approvedAt = '',
     ) {}
 
     /**
@@ -29,13 +26,19 @@ final readonly class GitChallengeDTO implements OnboardingStepDTO
     public function validate(array $payload): static
     {
         $validated = Validator::make($payload, [
-            'data' => ['sometimes', 'array'],
+            'repo' => ['required', 'string'],
+            'pr_number' => ['required', 'integer', 'min:1'],
+            'approved_at' => ['required', 'date'],
         ])->validate();
 
-        $data = $validated['data'] ?? [];
+        $repo = $validated['repo'];
+        $prNumber = $validated['pr_number'];
+        $approvedAt = $validated['approved_at'];
 
         return new self(
-            data: is_array($data) ? $data : [],
+            repo: is_string($repo) ? $repo : '',
+            prNumber: is_numeric($prNumber) ? (int) $prNumber : 0,
+            approvedAt: is_string($approvedAt) ? $approvedAt : '',
         );
     }
 
@@ -44,6 +47,10 @@ final readonly class GitChallengeDTO implements OnboardingStepDTO
      */
     public function toArray(): array
     {
-        return $this->data;
+        return [
+            'repo' => $this->repo,
+            'pr_number' => $this->prNumber,
+            'approved_at' => $this->approvedAt,
+        ];
     }
 }
