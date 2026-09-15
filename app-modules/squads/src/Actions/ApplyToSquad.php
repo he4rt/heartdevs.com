@@ -13,6 +13,7 @@ use He4rt\Squads\Exceptions\NotAptForSquads;
 use He4rt\Squads\Models\Squad;
 use He4rt\Squads\Models\SquadApplication;
 use Illuminate\Database\UniqueConstraintViolationException;
+use Illuminate\Support\Facades\DB;
 
 /**
  * Opens a candidacy to a squad, the one flow this module conducts.
@@ -43,13 +44,21 @@ final readonly class ApplyToSquad
             // read "none pending" and both insert. The insert decides; a rejected
             // one falls out of the index, so re-applying later is allowed.
             /** @var SquadApplication $application */
-            $application = SquadApplication::query()->create([
+            $application = DB::transaction(fn () => SquadApplication::query()->create([
                 'squad_id' => $squad->id,
                 'user_id' => $applicant->id,
                 'status' => ApplicationStatus::Pending,
                 'message' => $message,
-            ]);
-        } catch (UniqueConstraintViolationException) {
+            ]));
+        } catch (UniqueConstraintViolationException $uniqueConstraintViolationException) {
+            $alreadyPending = SquadApplication::query()
+                ->where('squad_id', $squad->id)
+                ->where('user_id', $applicant->id)
+                ->where('status', ApplicationStatus::Pending)
+                ->exists();
+
+            throw_unless($alreadyPending, $uniqueConstraintViolationException);
+
             throw ApplicationAlreadyPending::for($squad, $applicant);
         }
 
