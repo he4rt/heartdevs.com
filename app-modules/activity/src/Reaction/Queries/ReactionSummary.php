@@ -59,10 +59,16 @@ final readonly class ReactionSummary
 
         if ($userId !== null) {
             $mine = UserReaction::query()
+                ->toBase()
+                ->select(['timeline_id', 'reaction'])
                 ->whereIn('timeline_id', $ids)
                 ->where('user_id', $userId)
-                ->get(['timeline_id', 'reaction'])
-                ->mapWithKeys(static fn (UserReaction $row): array => [$row->timeline_id => $row->reaction])
+                ->get()
+                ->mapWithKeys(fn ($row): array => [
+                    $this->stringOf($row->timeline_id) => TimelineReaction::from(
+                        $this->stringOf($row->reaction)
+                    ),
+                ])
                 ->all();
         }
 
