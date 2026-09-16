@@ -8,6 +8,7 @@ use He4rt\Activity\Reaction\DTOs\TimelineReactionSummary;
 use He4rt\Activity\Reaction\Enums\TimelineReaction;
 use He4rt\Activity\Reaction\Models\UserReaction;
 use Illuminate\Support\Collection;
+use UnexpectedValueException;
 
 /**
  * Resume as reações de um conjunto de posts da timeline web em número fixo de
@@ -36,7 +37,11 @@ final readonly class ReactionSummary
         /** @var array<string, array<string, int>> $counts */
         $counts = [];
 
+        // toBase(): a linha é um agregado, não um UserReaction — hidratar o model
+        // aqui produziria registros parciais (sem id) fáceis de confundir com
+        // linhas reais.
         $rows = UserReaction::query()
+            ->toBase()
             ->select(['timeline_id', 'reaction'])
             ->selectRaw('count(*) as total')
             ->whereIn('timeline_id', $ids)
@@ -44,7 +49,9 @@ final readonly class ReactionSummary
             ->get();
 
         foreach ($rows as $row) {
-            $counts[$row->timeline_id][$row->reaction->value] = (int) $row->getAttribute('total');
+            $reaction = TimelineReaction::from($this->stringOf($row->reaction));
+
+            $counts[$this->stringOf($row->timeline_id)][$reaction->value] = $this->countOf($row->total);
         }
 
         /** @var array<string, TimelineReaction> $mine */
@@ -66,5 +73,21 @@ final readonly class ReactionSummary
                 mine: $mine[$id] ?? null,
             )],
         );
+    }
+
+    /**
+     * Linhas de agregado chegam sem tipo; as colunas lidas aqui são NOT NULL
+     * no schema, então qualquer outra coisa é um bug e não um caso a tratar.
+     */
+    private function stringOf(mixed $value): string
+    {
+        return is_string($value)
+            ? $value
+            : throw new UnexpectedValueException('Esperava string na linha do agregado de reações.');
+    }
+
+    private function countOf(mixed $value): int
+    {
+        return is_numeric($value) ? (int) $value : 0;
     }
 }

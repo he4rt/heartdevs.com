@@ -18,7 +18,7 @@ use Illuminate\Support\Facades\DB;
  * @param  EloquentCollection<int, User>  $users
  * @return EloquentCollection<int, Timeline>
  */
-function seedReactedPosts(int $count, EloquentCollection $users): EloquentCollection
+function seedReactionSummaryPosts(int $count, EloquentCollection $users): EloquentCollection
 {
     $posts = Timeline::factory()->count($count)->create();
     $cases = TimelineReaction::cases();
@@ -36,19 +36,28 @@ function seedReactedPosts(int $count, EloquentCollection $users): EloquentCollec
 }
 
 /**
- * Conta as consultas executadas durante $callback.
+ * Executa $callback com o query log ligado e devolve o resultado dele junto
+ * com o número de consultas executadas.
+ *
+ * @template TResult
+ *
+ * @param  Closure(): TResult  $callback
+ * @return array{0: TResult, 1: int}
  */
-function countQueries(Closure $callback): int
+function reactionSummaryQueries(Closure $callback): array
 {
-    $queries = 0;
+    $connection = DB::connection();
+    $connection->flushQueryLog();
+    $connection->enableQueryLog();
 
-    DB::listen(static function () use (&$queries): void {
-        $queries++;
-    });
+    try {
+        $result = $callback();
 
-    $callback();
-
-    return $queries;
+        return [$result, count($connection->getQueryLog())];
+    } finally {
+        $connection->disableQueryLog();
+        $connection->flushQueryLog();
+    }
 }
 
 beforeEach(function (): void {
@@ -108,24 +117,24 @@ test('ignora reações de posts que não foram pedidos', function (): void {
 });
 
 test('sem userId, mine é sempre null e a segunda consulta não roda', function (): void {
-    $posts = seedReactedPosts(3, User::factory()->count(2)->create());
+    $posts = seedReactionSummaryPosts(3, User::factory()->count(2)->create());
 
-    $queries = countQueries(function () use ($posts, &$summary): void {
-        $summary = new ReactionSummary()->forTimelines($posts->pluck('id'), userId: null);
-    });
+    [$summary, $queries] = reactionSummaryQueries(
+        fn () => new ReactionSummary()->forTimelines($posts->pluck('id'), userId: null),
+    );
 
     expect($queries)->toBe(1)
         ->and($summary)->toHaveCount(3)
-        ->and($summary->every(fn (TimelineReactionSummary $item): bool => !$item->mine instanceof TimelineReaction))->toBeTrue()
+        ->and($summary->pluck('mine')->filter())->toBeEmpty()
         ->and($summary->every(fn (TimelineReactionSummary $item): bool => $item->total() === 2))->toBeTrue();
 });
 
 test('com userId usa no máximo duas consultas', function (): void {
-    $posts = seedReactedPosts(3, User::factory()->count(2)->create()->push($this->me));
+    $posts = seedReactionSummaryPosts(3, User::factory()->count(2)->create()->push($this->me));
 
-    $queries = countQueries(function () use ($posts, &$summary): void {
-        $summary = new ReactionSummary()->forTimelines($posts->pluck('id'), $this->me->id);
-    });
+    [$summary, $queries] = reactionSummaryQueries(
+        fn () => new ReactionSummary()->forTimelines($posts->pluck('id'), $this->me->id),
+    );
 
     expect($queries)->toBeLessThanOrEqual(2)
         ->and($summary->every(fn (TimelineReactionSummary $item): bool => $item->mine instanceof TimelineReaction))->toBeTrue();
@@ -134,20 +143,20 @@ test('com userId usa no máximo duas consultas', function (): void {
 test('o número de consultas não cresce com a quantidade de posts', function (): void {
     $users = User::factory()->count(4)->create()->push($this->me);
 
-    $few = seedReactedPosts(3, $users);
-    $many = seedReactedPosts(30, $users);
+    $few = seedReactionSummaryPosts(3, $users);
+    $many = seedReactionSummaryPosts(30, $users);
 
-    $queriesForFew = countQueries(fn () => new ReactionSummary()->forTimelines($few->pluck('id'), $this->me->id));
-    $queriesForMany = countQueries(fn () => new ReactionSummary()->forTimelines($many->pluck('id'), $this->me->id));
+    [, $queriesForFew] = reactionSummaryQueries(fn () => new ReactionSummary()->forTimelines($few->pluck('id'), $this->me->id));
+    [, $queriesForMany] = reactionSummaryQueries(fn () => new ReactionSummary()->forTimelines($many->pluck('id'), $this->me->id));
 
     expect($queriesForFew)->toBeLessThanOrEqual(2)
         ->and($queriesForMany)->toBe($queriesForFew);
 });
 
 test('lista vazia de ids devolve coleção vazia sem consultar o banco', function (): void {
-    $queries = countQueries(function () use (&$summary): void {
-        $summary = new ReactionSummary()->forTimelines([], $this->me->id);
-    });
+    [$summary, $queries] = reactionSummaryQueries(
+        fn () => new ReactionSummary()->forTimelines([], $this->me->id),
+    );
 
     expect($queries)->toBe(0)
         ->and($summary)->toBeEmpty();
