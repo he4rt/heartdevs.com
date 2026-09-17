@@ -7,6 +7,7 @@ namespace He4rt\BotDiscord\Events;
 use Discord\Discord;
 use Discord\Parts\User\Member;
 use Discord\WebSockets\Event as Events;
+use He4rt\BotDiscord\Enums\DiscordErrorCode;
 use He4rt\Identity\ExternalIdentity\DTOs\ResolveUserProviderDTO;
 use He4rt\Identity\ExternalIdentity\Enums\IdentityProvider;
 use He4rt\Identity\User\Actions\ResolveUserContext;
@@ -125,21 +126,33 @@ class WelcomeMember extends Event
             ->buildWelcomeMessage($dmDescription, $guildId, $serverIconUrl)
             ->sendTo($member->user)
             ?->catch(function (Throwable $throwable) use ($userId, $guildId, $serverIconUrl, $fallbackDescription): void {
-                Log::channel('bot-discord')->warning('WelcomeMember: failed to deliver welcome DM', [
-                    'external_account_id' => $userId,
-                    'exception' => $throwable,
-                ]);
+                $errorCode = DiscordErrorCode::fromThrowable($throwable);
 
-                $geralChannelId = config('bot-discord.channels.geral');
+                match ($errorCode) {
+                    null => Log::channel('bot-discord')->warning('WelcomeMember: failed to deliver welcome DM', [
+                        'external_account_id' => $userId,
+                        'exception' => $throwable,
+                    ]),
+                    default => Log::channel('bot-discord')->info('WelcomeMember: welcome DM not delivered', [
+                        'external_account_id' => $userId,
+                        'reason' => $errorCode->name,
+                    ]),
+                };
 
-                if (blank($geralChannelId)) {
+                if ($errorCode === DiscordErrorCode::NoMutualGuilds) {
+                    return;
+                }
+
+                $generalChannelId = config('bot-discord.channels.general');
+
+                if (blank($generalChannelId)) {
                     return;
                 }
 
                 $this
                     ->buildWelcomeMessage($fallbackDescription, $guildId, $serverIconUrl)
                     ->body(sprintf('<@%s> 👋', $userId))
-                    ->send($geralChannelId);
+                    ->send($generalChannelId);
             });
     }
 
@@ -151,12 +164,12 @@ class WelcomeMember extends Event
      */
     private function buildWelcomeMessage(string $description, string $guildId, ?string $serverIconUrl): Message
     {
-        $presentationsChannelId = config()->string('bot-discord.channels.general');
+        $generalChannelId = config()->string('bot-discord.channels.general');
 
         $presentationDeepLink = sprintf(
             'https://discord.com/channels/%s/%s',
             $guildId,
-            $presentationsChannelId
+            $generalChannelId
         );
 
         $callToAction = <<<'MD'
