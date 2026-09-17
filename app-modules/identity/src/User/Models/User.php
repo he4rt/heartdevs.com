@@ -44,6 +44,8 @@ use Spatie\Permission\Traits\HasRoles;
  * @property CarbonInterface|null $suspended_until
  * @property CarbonInterface|null $banned_at
  * @property CarbonInterface|null $first_login_at
+ * @property CarbonInterface|null $username_manually_set_at
+ * @property CarbonInterface|null $username_updated_at
  * @property string|null $remember_token
  * @property CarbonInterface|null $created_at
  * @property CarbonInterface|null $updated_at
@@ -154,6 +156,8 @@ final class User extends Authenticatable implements FilamentUser, HasMedia, HasN
             'suspended_until' => 'datetime',
             'banned_at' => 'datetime',
             'first_login_at' => 'datetime',
+            'username_manually_set_at' => 'datetime',
+            'username_updated_at' => 'datetime',
         ];
     }
 
