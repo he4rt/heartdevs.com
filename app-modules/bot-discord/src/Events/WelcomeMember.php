@@ -7,6 +7,7 @@ namespace He4rt\BotDiscord\Events;
 use Discord\Discord;
 use Discord\Parts\User\Member;
 use Discord\WebSockets\Event as Events;
+use He4rt\BotDiscord\Enums\DiscordErrorCode;
 use He4rt\Identity\ExternalIdentity\DTOs\ResolveUserProviderDTO;
 use He4rt\Identity\ExternalIdentity\Enums\IdentityProvider;
 use He4rt\Identity\User\Actions\ResolveUserContext;
@@ -125,10 +126,22 @@ class WelcomeMember extends Event
             ->buildWelcomeMessage($dmDescription, $guildId, $serverIconUrl)
             ->sendTo($member->user)
             ?->catch(function (Throwable $throwable) use ($userId, $guildId, $serverIconUrl, $fallbackDescription): void {
-                Log::channel('bot-discord')->warning('WelcomeMember: failed to deliver welcome DM', [
-                    'external_account_id' => $userId,
-                    'exception' => $throwable,
-                ]);
+                $errorCode = DiscordErrorCode::fromThrowable($throwable);
+
+                match ($errorCode) {
+                    null => Log::channel('bot-discord')->warning('WelcomeMember: failed to deliver welcome DM', [
+                        'external_account_id' => $userId,
+                        'exception' => $throwable,
+                    ]),
+                    default => Log::channel('bot-discord')->info('WelcomeMember: welcome DM not delivered', [
+                        'external_account_id' => $userId,
+                        'reason' => $errorCode->name,
+                    ]),
+                };
+
+                if ($errorCode === DiscordErrorCode::NoMutualGuilds) {
+                    return;
+                }
 
                 $geralChannelId = config('bot-discord.channels.geral');
 
