@@ -143,7 +143,7 @@ class WelcomeMember extends Event
                     return;
                 }
 
-                $geralChannelId = config('bot-discord.channels.geral');
+                $geralChannelId = config('bot-discord.channels.general');
 
                 if (blank($geralChannelId)) {
                     return;
