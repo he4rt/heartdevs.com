@@ -394,3 +394,79 @@ test('o relation manager de experiências cria e remove uma experiência do usu�
 
     expect($target->fresh()->workExperiences()->whereKey($workExperience->getKey())->exists())->toBeFalse();
 });
+
+test('Staff não consegue conceder super admin a outro usuário', function (): void {
+    $staff = User::factory()->staff()->create();
+    $other = User::factory()->create();
+    $superAdminRole = Role::findByName(UserRole::SuperAdmin->value, UserRole::GUARD);
+
+    $this->actingAs($staff);
+
+    livewire(EditUser::class, ['record' => $other->getKey()])
+        ->fillForm(['roles' => [$superAdminRole->getKey()]])
+        ->call('save')
+        ->assertHasFormErrors(['roles.0']);
+
+    expect($other->fresh()?->hasRole(UserRole::SuperAdmin))->toBeFalse();
+});
+
+test('Staff não consegue conceder compliance a outro usuário', function (): void {
+    $staff = User::factory()->staff()->create();
+    $other = User::factory()->create();
+    $complianceRole = Role::findOrCreate(UserRole::Compliance->value, UserRole::GUARD);
+
+    $this->actingAs($staff);
+
+    livewire(EditUser::class, ['record' => $other->getKey()])
+        ->fillForm(['roles' => [$complianceRole->getKey()]])
+        ->call('save')
+        ->assertHasFormErrors(['roles.0']);
+
+    expect($other->fresh()?->hasRole(UserRole::Compliance))->toBeFalse();
+});
+
+test('Staff consegue conceder recruiter a outro usuário', function (): void {
+    $staff = User::factory()->staff()->create();
+    $other = User::factory()->create();
+    $recruiterRole = Role::findOrCreate(UserRole::Recruiter->value, UserRole::GUARD);
+
+    $this->actingAs($staff);
+
+    livewire(EditUser::class, ['record' => $other->getKey()])
+        ->fillForm(['roles' => [$recruiterRole->getKey()]])
+        ->call('save')
+        ->assertHasNoFormErrors();
+
+    expect($other->fresh()?->hasRole(UserRole::Recruiter))->toBeTrue();
+});
+
+test('Staff não consegue remover compliance de um usuário já compliance', function (): void {
+    $staff = User::factory()->staff()->create();
+    $other = User::factory()->compliance()->create();
+
+    $this->actingAs($staff);
+
+    livewire(EditUser::class, ['record' => $other->getKey()])
+        ->fillForm(['roles' => []])
+        ->call('save')
+        ->assertHasNoFormErrors();
+
+    expect($other->fresh()?->hasRole(UserRole::Compliance))->toBeTrue();
+});
+
+test('o form de papéis não lista compliance nem super admin pra Staff', function (): void {
+    $staff = User::factory()->staff()->create();
+    $other = User::factory()->create();
+    $superAdminRole = Role::findByName(UserRole::SuperAdmin->value, UserRole::GUARD);
+    $complianceRole = Role::findOrCreate(UserRole::Compliance->value, UserRole::GUARD);
+
+    $this->actingAs($staff);
+
+    livewire(EditUser::class, ['record' => $other->getKey()])
+        ->assertSchemaComponentExists('roles', checkComponentUsing: function (CheckboxList $field) use ($superAdminRole, $complianceRole): bool {
+            $optionIds = array_keys($field->getOptions());
+
+            return !in_array((string) $superAdminRole->getKey(), $optionIds, strict: true)
+                && !in_array((string) $complianceRole->getKey(), $optionIds, strict: true);
+        });
+});

@@ -19,6 +19,7 @@ use He4rt\Profile\Data\WorkPreferences;
 use He4rt\Profile\Enums\EmploymentType;
 use He4rt\Profile\Enums\SeniorityLevel;
 use He4rt\Profile\Enums\StartAvailability;
+use Illuminate\Database\Eloquent\Builder;
 use Spatie\Permission\Models\Role;
 
 class UserForm
@@ -66,11 +67,30 @@ class UserForm
                     ->schema([
                         CheckboxList::make('roles')
                             ->label('Papéis')
-                            ->relationship('roles', 'name')
+                            ->relationship(
+                                'roles',
+                                'name',
+                                modifyQueryUsing: fn (Builder $query): Builder => $query->whereIn('name', self::assignableRoleNames()),
+                            )
                             ->getOptionLabelFromRecordUsing(fn (Role $record): string => UserRole::from($record->name)->getLabel())
                             ->descriptions(self::roleDescriptions(...))
                             ->disabled(self::isEditingSelf(...))
-                            ->helperText(fn (?User $record): ?string => self::isEditingSelf($record) ? 'Você não pode alterar os próprios papéis.' : null),
+                            ->helperText(fn (?User $record): ?string => self::isEditingSelf($record) ? 'Você não pode alterar os próprios papéis.' : null)
+                            ->saveRelationshipsUsing(static function (User $record, ?array $state): void {
+                                $assignable = self::assignableRoleNames();
+
+                                $keptRoleIds = $record->roles()
+                                    ->whereNotIn('name', $assignable)
+                                    ->pluck('roles.id');
+
+                                $selectedRoleIds = Role::query()
+                                    ->where('guard_name', UserRole::GUARD)
+                                    ->whereIn('name', $assignable)
+                                    ->whereIn('id', $state ?? [])
+                                    ->pluck('id');
+
+                                $record->roles()->sync($keptRoleIds->merge($selectedRoleIds));
+                            }),
                     ]),
 
                 Section::make('Perfil')
@@ -173,6 +193,17 @@ class UserForm
     private static function isEditingSelf(?User $record): bool
     {
         return $record?->is(auth()->user()) ?? false;
+    }
+
+    /**
+     * @return array<int, string>
+     */
+    private static function assignableRoleNames(): array
+    {
+        return array_map(
+            static fn (UserRole $role): string => $role->value,
+            auth()->user()?->assignableRoles() ?? [],
+        );
     }
 
     /**

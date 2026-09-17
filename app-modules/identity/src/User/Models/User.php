@@ -112,6 +112,25 @@ final class User extends Authenticatable implements FilamentUser, HasMedia, HasN
     }
 
     /**
+     * @return array<int, UserRole>
+     */
+    public function assignableRoles(): array
+    {
+        if ($this->isSuperAdmin()) {
+            return UserRole::cases();
+        }
+
+        if (!$this->canManageUsers()) {
+            return [];
+        }
+
+        return array_values(array_filter(
+            UserRole::cases(),
+            static fn (UserRole $role): bool => !in_array($role, [UserRole::SuperAdmin, UserRole::Compliance], strict: true),
+        ));
+    }
+
+    /**
      * @return MorphMany<ExternalIdentity, $this>
      */
     public function providers(): MorphMany
