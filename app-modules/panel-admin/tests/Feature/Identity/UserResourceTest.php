@@ -186,6 +186,33 @@ test('o filtro de papel separa super admin de usuário comum', function (): void
         ->assertCanNotSeeTableRecords([$regular]);
 });
 
+test('Staff vê o filtro de usuários removidos', function (): void {
+    $staff = User::factory()->staff()->create();
+    $this->actingAs($staff);
+
+    livewire(ListUsers::class)
+        ->loadTable()
+        ->assertTableFilterExists('trashed');
+});
+
+test('Recruiter não vê o filtro de usuários removidos', function (): void {
+    $recruiter = User::factory()->recruiter()->create();
+    $this->actingAs($recruiter);
+
+    $table = livewire(ListUsers::class)->loadTable()->instance()->getTable();
+
+    expect($table->getFilter('trashed'))->toBeNull();
+});
+
+test('SquadCaptain não vê o filtro de usuários removidos', function (): void {
+    $captain = User::factory()->squadCaptain()->create();
+    $this->actingAs($captain);
+
+    $table = livewire(ListUsers::class)->loadTable()->instance()->getTable();
+
+    expect($table->getFilter('trashed'))->toBeNull();
+});
+
 test('Staff pode editar usuário', function (): void {
     $staff = User::factory()->staff()->create();
     $target = User::factory()->create();

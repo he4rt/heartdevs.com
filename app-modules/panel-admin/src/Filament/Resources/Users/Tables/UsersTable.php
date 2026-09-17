@@ -126,7 +126,7 @@ class UsersTable
                         blank: static fn (Builder $query): Builder => $query,
                     ),
 
-                TrashedFilter::make(),
+                ...(auth()->user()?->canManageUsers() ? [TrashedFilter::make()] : []),
 
                 SelectFilter::make('situation')
                     ->label('Situação')
