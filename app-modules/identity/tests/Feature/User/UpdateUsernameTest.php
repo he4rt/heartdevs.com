@@ -149,40 +149,26 @@ test('rejects reserved system usernames', function (string $reservedName): void 
     'api',
 ]);
 
-test('prevents ordinary users from claiming admin username from config', function (): void {
-    config()->set('he4rt.admins', 'adminmaster,he4rtfounder');
-
-    $user = User::factory()->create(['username' => 'regularuser']);
-    $action = resolve(UpdateUsername::class);
-
-    expect(fn () => $action->handle($user, 'adminmaster'))
-        ->toThrow(UsernameException::class, 'O @adminmaster está reservado para o sistema e não pode ser utilizado.');
-});
-
-test('allows admin user to change their username', function (): void {
-    config()->set('he4rt.admins', 'danielhe4rt');
-
-    $admin = User::factory()->superAdmin()->create(['username' => 'danielhe4rt']);
-    expect($admin->isAdmin())->toBeTrue();
+test('allows super admin user to change their username', function (): void {
+    $admin = User::factory()->superAdmin()->create(['username' => 'superadminuser']);
+    expect($admin->isSuperAdmin())->toBeTrue();
 
     $action = resolve(UpdateUsername::class);
-    $updated = $action->handle($admin, 'daniel.reis');
+    $updated = $action->handle($admin, 'superadmin.new');
 
-    expect($updated->username)->toBe('daniel.reis');
+    expect($updated->username)->toBe('superadmin.new');
 });
 
-test('admin is exempt from 7 days cooldown and can change username repeatedly', function (): void {
-    config()->set('he4rt.admins', 'danielhe4rt');
-
+test('super admin is exempt from 7 days cooldown and can change username repeatedly', function (): void {
     $admin = User::factory()->superAdmin()->create([
-        'username' => 'danielhe4rt',
+        'username' => 'superadminuser',
         'username_updated_at' => now()->subMinutes(5),
     ]);
 
-    expect($admin->isAdmin())->toBeTrue();
+    expect($admin->isSuperAdmin())->toBeTrue();
 
     $action = resolve(UpdateUsername::class);
-    $updated = $action->handle($admin, 'daniel.reis');
+    $updated = $action->handle($admin, 'superadmin.new');
 
-    expect($updated->username)->toBe('daniel.reis');
+    expect($updated->username)->toBe('superadmin.new');
 });

@@ -534,11 +534,8 @@ class ProfilePage extends Page
                                 return;
                             }
 
-                            /** @var User|null $user */
-                            $user = auth()->user();
-
                             try {
-                                UsernameValidator::validate($value, $user);
+                                UsernameValidator::validate($value);
                             } catch (UsernameException $usernameException) {
                                 $fail($usernameException->getLocalizedMessage());
                             }

@@ -17,13 +17,13 @@ final class UpdateUsername
      */
     public function handle(User $user, string $newUsername): User
     {
-        $normalized = UsernameValidator::normalizeAndValidate($newUsername, $user);
+        $normalized = UsernameValidator::normalizeAndValidate($newUsername);
 
         if ($normalized === mb_strtolower($user->username)) {
             throw UsernameException::sameAsCurrent();
         }
 
-        if ($user->username_updated_at !== null && !$user->isAdmin()) {
+        if ($user->username_updated_at !== null && !$user->isSuperAdmin()) {
             $cooldownDays = (int) config('he4rt.username_cooldown_days', 7);
             $availableAt = $user->username_updated_at->copy()->addDays($cooldownDays);
 

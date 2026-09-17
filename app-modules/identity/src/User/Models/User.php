@@ -73,15 +73,6 @@ final class User extends Authenticatable implements FilamentUser, HasMedia, HasN
         return $this->hasRole(UserRole::SuperAdmin);
     }
 
-    public function isAdmin(): bool
-    {
-        $admins = array_filter(explode(',', (string) config('he4rt.admins', '')));
-
-        return $this->isSuperAdmin()
-            || in_array($this->username, $admins, strict: true)
-            || in_array($this->id, $admins, strict: true);
-    }
-
     /**
      * @return MorphMany<ExternalIdentity, $this>
      */
