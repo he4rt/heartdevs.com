@@ -21,6 +21,20 @@ return new class extends Migration
 
     public function down(): void
     {
+        DB::statement(<<<'SQL'
+            WITH ranked AS (
+                SELECT id, ROW_NUMBER() OVER (
+                    PARTITION BY username
+                    ORDER BY (deleted_at IS NULL) DESC, created_at ASC
+                ) AS rn
+                FROM users
+            )
+            UPDATE users
+            SET username = users.username || '_dup_' || users.id
+            FROM ranked
+            WHERE users.id = ranked.id AND ranked.rn > 1
+            SQL);
+
         DB::statement('DROP INDEX users_username_unique');
         DB::statement('ALTER TABLE users ADD CONSTRAINT users_username_unique UNIQUE (username)');
     }
