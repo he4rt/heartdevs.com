@@ -143,16 +143,16 @@ class WelcomeMember extends Event
                     return;
                 }
 
-                $geralChannelId = config('bot-discord.channels.general');
+                $generalChannelId = config('bot-discord.channels.general');
 
-                if (blank($geralChannelId)) {
+                if (blank($generalChannelId)) {
                     return;
                 }
 
                 $this
                     ->buildWelcomeMessage($fallbackDescription, $guildId, $serverIconUrl)
                     ->body(sprintf('<@%s> 👋', $userId))
-                    ->send($geralChannelId);
+                    ->send($generalChannelId);
             });
     }
 
@@ -164,12 +164,12 @@ class WelcomeMember extends Event
      */
     private function buildWelcomeMessage(string $description, string $guildId, ?string $serverIconUrl): Message
     {
-        $presentationsChannelId = config()->string('bot-discord.channels.general');
+        $generalChannelId = config()->string('bot-discord.channels.general');
 
         $presentationDeepLink = sprintf(
             'https://discord.com/channels/%s/%s',
             $guildId,
-            $presentationsChannelId
+            $generalChannelId
         );
 
         $callToAction = <<<'MD'
