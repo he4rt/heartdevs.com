@@ -139,7 +139,13 @@ test('rejects reserved system usernames', function (string $reservedName): void 
     'root',
     'he4rt',
     'system',
+    'sistema',
     'support',
+    'suporte',
+    'administrador',
+    'moderador',
+    'equipe',
+    'ajuda',
     'api',
 ]);
 

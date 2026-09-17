@@ -381,6 +381,7 @@ test('profile page shows validation error when username has invalid format', fun
     'consecutive special characters' => 'teste..teste',
     'too short' => 'a',
     'reserved word' => 'admin',
+    'reserved word pt' => 'sistema',
 ]);
 
 test('profile page localizes username error in english', function (): void {
