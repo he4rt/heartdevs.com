@@ -13,11 +13,9 @@ class EditUser extends EditRecord
 {
     protected static string $resource = UserResource::class;
 
-    public function mount(string|int $record): void
+    protected function beforeFill(): void
     {
-        parent::mount($record);
-
-        Profile::ensureExists((string) $record);
+        Profile::ensureExists((string) $this->getRecord()->getKey());
     }
 
     /**

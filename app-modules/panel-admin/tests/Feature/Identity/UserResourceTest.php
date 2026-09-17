@@ -553,3 +553,18 @@ test('social_links aceita uma plataforma válida', function (): void {
 
     expect($other->fresh()?->profile?->social_links)->toBe([SocialPlatform::LinkedIn->value => 'meu-usuario']);
 });
+
+test('o form de edição cria o perfil de um usuário legado antes de hidratar', function (): void {
+    $legacy = User::factory()->create();
+    $legacy->profile()->delete();
+
+    expect($legacy->fresh()->profile)->toBeNull();
+
+    livewire(EditUser::class, ['record' => $legacy->getKey()])
+        ->assertOk()
+        ->fillForm(['profile' => ['nickname' => 'Legado']])
+        ->call('save')
+        ->assertHasNoFormErrors();
+
+    expect($legacy->fresh()->profile?->nickname)->toBe('Legado');
+});
