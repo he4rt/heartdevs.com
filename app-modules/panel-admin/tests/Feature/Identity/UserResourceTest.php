@@ -15,6 +15,7 @@ use He4rt\PanelAdmin\Filament\Resources\Users\RelationManagers\ProvidersRelation
 use He4rt\PanelAdmin\Filament\Resources\Users\RelationManagers\WorkExperiencesRelationManager;
 use He4rt\PanelAdmin\Filament\Resources\Users\UserResource;
 use He4rt\Profile\Enums\SkillProficiency;
+use He4rt\Profile\Enums\SocialPlatform;
 use He4rt\Profile\Models\Profile;
 use He4rt\Profile\Models\Skill;
 use Illuminate\Support\Str;
@@ -529,4 +530,26 @@ test('o form de papéis não lista compliance nem super admin pra Staff', functi
             return !in_array((string) $superAdminRole->getKey(), $optionIds, strict: true)
                 && !in_array((string) $complianceRole->getKey(), $optionIds, strict: true);
         });
+});
+
+test('social_links rejeita chave de plataforma inválida', function (): void {
+    $other = User::factory()->create();
+    Profile::ensureExists($other->getKey());
+
+    livewire(EditUser::class, ['record' => $other->getKey()])
+        ->fillForm(['profile' => ['social_links' => ['nao-e-plataforma' => 'x']]])
+        ->call('save')
+        ->assertHasFormErrors(['profile.social_links']);
+});
+
+test('social_links aceita uma plataforma válida', function (): void {
+    $other = User::factory()->create();
+    Profile::ensureExists($other->getKey());
+
+    livewire(EditUser::class, ['record' => $other->getKey()])
+        ->fillForm(['profile' => ['social_links' => [SocialPlatform::LinkedIn->value => 'meu-usuario']]])
+        ->call('save')
+        ->assertHasNoFormErrors();
+
+    expect($other->fresh()?->profile?->social_links)->toBe([SocialPlatform::LinkedIn->value => 'meu-usuario']);
 });

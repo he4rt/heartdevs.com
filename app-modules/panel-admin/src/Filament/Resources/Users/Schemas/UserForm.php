@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace He4rt\PanelAdmin\Filament\Resources\Users\Schemas;
 
+use Closure;
 use Filament\Forms\Components\CheckboxList;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\KeyValue;
@@ -18,6 +19,7 @@ use He4rt\Identity\User\Models\User;
 use He4rt\Profile\Data\WorkPreferences;
 use He4rt\Profile\Enums\EmploymentType;
 use He4rt\Profile\Enums\SeniorityLevel;
+use He4rt\Profile\Enums\SocialPlatform;
 use He4rt\Profile\Enums\StartAvailability;
 use Illuminate\Database\Eloquent\Builder;
 use Spatie\Permission\Models\Role;
@@ -153,7 +155,14 @@ class UserForm
                             ->label('Redes sociais')
                             ->keyLabel('Plataforma')
                             ->valueLabel('Handle/URL')
-                            ->columnSpanFull(),
+                            ->columnSpanFull()
+                            ->rule(static fn (): Closure => static function (string $attribute, mixed $value, Closure $fail): void {
+                                $invalidPlatforms = array_diff(array_keys((array) $value), SocialPlatform::values());
+
+                                if ($invalidPlatforms !== []) {
+                                    $fail(sprintf('Invalid social platform keys: %s.', implode(', ', $invalidPlatforms)));
+                                }
+                            }),
 
                         Toggle::make('preferences.has_disability')
                             ->label('Possui deficiência'),
