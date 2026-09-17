@@ -167,6 +167,7 @@ class UsersTable
                     ->label('Casos de moderação')
                     ->icon(Heroicon::OutlinedShieldExclamation)
                     ->color('gray')
+                    ->visible(fn (): bool => auth()->user()?->canViewModeration() ?? false)
                     ->url(static fn (User $record): string => ModerationCaseResource::getUrl('index', [
                         'tableFilters' => [
                             'author' => ['value' => $record->getKey()],

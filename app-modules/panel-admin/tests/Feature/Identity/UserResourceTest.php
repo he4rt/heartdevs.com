@@ -340,6 +340,39 @@ test('Staff não vê a ação de force-delete na tabela', function (): void {
         ->assertTableActionHidden('forceDelete', $target);
 });
 
+test('Staff vê a ação de casos de moderação na tabela', function (): void {
+    $staff = User::factory()->staff()->create();
+    $target = User::factory()->create();
+
+    $this->actingAs($staff);
+
+    livewire(ListUsers::class)
+        ->loadTable()
+        ->assertTableActionVisible('moderationCases', $target);
+});
+
+test('Recruiter não vê a ação de casos de moderação na tabela', function (): void {
+    $recruiter = User::factory()->recruiter()->create();
+    $target = User::factory()->create();
+
+    $this->actingAs($recruiter);
+
+    livewire(ListUsers::class)
+        ->loadTable()
+        ->assertTableActionHidden('moderationCases', $target);
+});
+
+test('SquadCaptain não vê a ação de casos de moderação na tabela', function (): void {
+    $captain = User::factory()->squadCaptain()->create();
+    $target = User::factory()->create();
+
+    $this->actingAs($captain);
+
+    livewire(ListUsers::class)
+        ->loadTable()
+        ->assertTableActionHidden('moderationCases', $target);
+});
+
 test('Compliance force-deleta um usuário soft-deletado pela tabela', function (): void {
     $compliance = User::factory()->compliance()->create();
     $target = User::factory()->create();
