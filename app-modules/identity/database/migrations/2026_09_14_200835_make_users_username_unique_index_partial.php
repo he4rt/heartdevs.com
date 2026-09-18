@@ -30,7 +30,7 @@ return new class extends Migration
                 FROM users
             )
             UPDATE users
-            SET username = users.username || '_dup_' || users.id
+            SET username = LEFT(users.username, 214) || '_dup_' || users.id
             FROM ranked
             WHERE users.id = ranked.id AND ranked.rn > 1
             SQL);
