@@ -9,6 +9,7 @@ use App\Http\Controllers\Controller;
 use He4rt\Identity\Auth\Actions\HandleOAuthCallbackAction;
 use He4rt\Identity\Auth\DTOs\OAuthStateDTO;
 use He4rt\Identity\Auth\Enums\OAuthIntent;
+use He4rt\Identity\Auth\Exceptions\AccountSoftDeletedException;
 use He4rt\Identity\Auth\Exceptions\OAuthFlowException;
 use He4rt\Identity\ExternalIdentity\Enums\IdentityProvider;
 use Illuminate\Http\RedirectResponse;
@@ -64,6 +65,10 @@ final class OAuthController extends Controller
 
         try {
             $result = $action->execute($state, $identityProvider, $code);
+        } catch (AccountSoftDeletedException) {
+            session()->flash('error', 'Esta conta foi excluída e não pode ser reativada fazendo login novamente.');
+
+            return redirect()->to($state->returnUrl ?? '/');
         } catch (OAuthFlowException $oAuthFlowException) {
             Log::warning('OAuth flow failed', ['provider' => $provider, 'error' => $oAuthFlowException->getMessage()]);
 

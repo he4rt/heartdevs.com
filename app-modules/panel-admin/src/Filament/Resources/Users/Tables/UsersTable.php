@@ -5,7 +5,10 @@ declare(strict_types=1);
 namespace He4rt\PanelAdmin\Filament\Resources\Users\Tables;
 
 use Filament\Actions\Action;
+use Filament\Actions\DeleteAction;
 use Filament\Actions\EditAction;
+use Filament\Actions\ForceDeleteAction;
+use Filament\Actions\RestoreAction;
 use Filament\Actions\ViewAction;
 use Filament\Support\Enums\FontWeight;
 use Filament\Support\Icons\Heroicon;
@@ -14,11 +17,13 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
+use Filament\Tables\Filters\TrashedFilter;
 use Filament\Tables\Table;
 use He4rt\Identity\Authorization\Enums\UserRole;
 use He4rt\Identity\User\Enums\UserSituation;
 use He4rt\Identity\User\Models\User;
 use He4rt\PanelAdmin\Moderation\Resources\ModerationCaseResource;
+use He4rt\Profile\Enums\SeniorityLevel;
 use Illuminate\Database\Eloquent\Builder;
 use Spatie\Permission\Models\Role;
 
@@ -37,9 +42,26 @@ class UsersTable
 
                 TextColumn::make('name')
                     ->label('Nome')
-                    ->searchable()
+                    ->searchable(['name', 'email'])
                     ->sortable()
                     ->description(fn (User $record): ?string => $record->email),
+
+                TextColumn::make('profile.seniority_level')
+                    ->label('Senioridade')
+                    ->badge()
+                    ->placeholder('—'),
+
+                IconColumn::make('profile.available_for_proposals')
+                    ->label('Aberto a propostas')
+                    ->boolean(),
+
+                TextColumn::make('address.city')
+                    ->label('Cidade')
+                    ->placeholder('—'),
+
+                TextColumn::make('character.level')
+                    ->label('Nível')
+                    ->placeholder('—'),
 
                 TextColumn::make('situation')
                     ->label('Situação')
@@ -86,7 +108,26 @@ class UsersTable
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
+            ->paginated([25, 50, 100])
             ->filters([
+                SelectFilter::make('seniority_level')
+                    ->label('Senioridade')
+                    ->options(SeniorityLevel::class)
+                    ->query(static fn (Builder $query, array $data): Builder => match ($data['value'] ?? null) {
+                        null, '' => $query,
+                        default => $query->whereHas('profile', static fn (Builder $profile): Builder => $profile->where('seniority_level', $data['value'])),
+                    }),
+
+                TernaryFilter::make('available_for_proposals')
+                    ->label('Aberto a propostas')
+                    ->queries(
+                        true: static fn (Builder $query): Builder => $query->whereHas('profile', static fn (Builder $profile): Builder => $profile->where('available_for_proposals', operator: true)),
+                        false: static fn (Builder $query): Builder => $query->whereHas('profile', static fn (Builder $profile): Builder => $profile->where('available_for_proposals', operator: false)),
+                        blank: static fn (Builder $query): Builder => $query,
+                    ),
+
+                ...(auth()->user()?->canManageUsers() ? [TrashedFilter::make()] : []),
+
                 SelectFilter::make('situation')
                     ->label('Situação')
                     ->options(UserSituation::class)
@@ -118,10 +159,15 @@ class UsersTable
             ->recordActions([
                 ViewAction::make(),
                 EditAction::make(),
+                DeleteAction::make(),
+                RestoreAction::make(),
+                ForceDeleteAction::make()
+                    ->requiresConfirmation(),
                 Action::make('moderationCases')
                     ->label('Casos de moderação')
                     ->icon(Heroicon::OutlinedShieldExclamation)
                     ->color('gray')
+                    ->visible(fn (): bool => auth()->user()?->canViewModeration() ?? false)
                     ->url(static fn (User $record): string => ModerationCaseResource::getUrl('index', [
                         'tableFilters' => [
                             'author' => ['value' => $record->getKey()],

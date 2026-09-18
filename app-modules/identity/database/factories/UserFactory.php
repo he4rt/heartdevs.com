@@ -31,10 +31,35 @@ final class UserFactory extends Factory
 
     public function superAdmin(): static
     {
-        return $this->afterCreating(function (User $user): void {
-            Role::findOrCreate(UserRole::SuperAdmin->value, UserRole::GUARD);
+        return $this->withRole(UserRole::SuperAdmin);
+    }
 
-            $user->assignRole(UserRole::SuperAdmin);
+    public function staff(): static
+    {
+        return $this->withRole(UserRole::Staff);
+    }
+
+    public function compliance(): static
+    {
+        return $this->withRole(UserRole::Compliance);
+    }
+
+    public function recruiter(): static
+    {
+        return $this->withRole(UserRole::Recruiter);
+    }
+
+    public function squadCaptain(): static
+    {
+        return $this->withRole(UserRole::SquadCaptain);
+    }
+
+    private function withRole(UserRole $role): static
+    {
+        return $this->afterCreating(function (User $user) use ($role): void {
+            Role::findOrCreate($role->value, UserRole::GUARD);
+
+            $user->assignRole($role);
         });
     }
 }

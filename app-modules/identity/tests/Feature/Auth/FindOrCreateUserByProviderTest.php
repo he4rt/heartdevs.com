@@ -5,6 +5,7 @@ declare(strict_types=1);
 use He4rt\Identity\Auth\Actions\FindOrCreateUserByProvider;
 use He4rt\Identity\Auth\DTOs\OAuthAccessDTO;
 use He4rt\Identity\Auth\DTOs\OAuthUserDTO;
+use He4rt\Identity\Auth\Exceptions\AccountSoftDeletedException;
 use He4rt\Identity\ExternalIdentity\Enums\IdentityProvider;
 use He4rt\Identity\ExternalIdentity\Models\ExternalIdentity;
 use He4rt\Identity\User\Models\User;
@@ -110,4 +111,30 @@ test('increments suffix when previous suffixed usernames exist', function (): vo
     );
 
     expect($result->username)->toBe('danielhe4rt-4');
+});
+
+test('throws AccountSoftDeletedException when user is soft-deleted', function (): void {
+    $user = User::factory()->create();
+
+    ExternalIdentity::factory()->create([
+        'model_type' => (new User)->getMorphClass(),
+        'model_id' => $user->id,
+        'provider' => IdentityProvider::GitHub,
+        'external_account_id' => '12345',
+    ]);
+
+    $user->delete();
+
+    expect($user->trashed())->toBeTrue();
+
+    $action = resolve(FindOrCreateUserByProvider::class);
+
+    $threw = false;
+    try {
+        $action->execute(makeOAuthUser(providerId: '12345', provider: IdentityProvider::GitHub));
+    } catch (AccountSoftDeletedException) {
+        $threw = true;
+    }
+
+    expect($threw)->toBeTrue();
 });

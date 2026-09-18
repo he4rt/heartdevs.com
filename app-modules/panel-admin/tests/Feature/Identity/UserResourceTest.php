@@ -10,8 +10,14 @@ use He4rt\Identity\ExternalIdentity\Models\ExternalIdentity;
 use He4rt\Identity\User\Models\User;
 use He4rt\PanelAdmin\Filament\Resources\Users\Pages\EditUser;
 use He4rt\PanelAdmin\Filament\Resources\Users\Pages\ListUsers;
+use He4rt\PanelAdmin\Filament\Resources\Users\RelationManagers\ProfileSkillsRelationManager;
 use He4rt\PanelAdmin\Filament\Resources\Users\RelationManagers\ProvidersRelationManager;
+use He4rt\PanelAdmin\Filament\Resources\Users\RelationManagers\WorkExperiencesRelationManager;
 use He4rt\PanelAdmin\Filament\Resources\Users\UserResource;
+use He4rt\Profile\Enums\SkillProficiency;
+use He4rt\Profile\Enums\SocialPlatform;
+use He4rt\Profile\Models\Profile;
+use He4rt\Profile\Models\Skill;
 use Illuminate\Support\Str;
 use Spatie\Permission\Models\Role;
 
@@ -179,4 +185,386 @@ test('o filtro de papel separa super admin de usuário comum', function (): void
         ->filterTable('roles', $role->getKey())
         ->assertCanSeeTableRecords([$this->admin])
         ->assertCanNotSeeTableRecords([$regular]);
+});
+
+test('Staff vê o filtro de usuários removidos', function (): void {
+    $staff = User::factory()->staff()->create();
+    $this->actingAs($staff);
+
+    livewire(ListUsers::class)
+        ->loadTable()
+        ->assertTableFilterExists('trashed');
+});
+
+test('Recruiter não vê o filtro de usuários removidos', function (): void {
+    $recruiter = User::factory()->recruiter()->create();
+    $this->actingAs($recruiter);
+
+    $table = livewire(ListUsers::class)->loadTable()->instance()->getTable();
+
+    expect($table->getFilter('trashed'))->toBeNull();
+});
+
+test('SquadCaptain não vê o filtro de usuários removidos', function (): void {
+    $captain = User::factory()->squadCaptain()->create();
+    $this->actingAs($captain);
+
+    $table = livewire(ListUsers::class)->loadTable()->instance()->getTable();
+
+    expect($table->getFilter('trashed'))->toBeNull();
+});
+
+test('Staff pode editar usuário', function (): void {
+    $staff = User::factory()->staff()->create();
+    $target = User::factory()->create();
+
+    expect(UserResource::canEdit($staff))->toBeTrue();
+});
+
+test('Recruiter não pode editar usuário', function (): void {
+    $recruiter = User::factory()->recruiter()->create();
+    $target = User::factory()->create();
+
+    $this->actingAs($recruiter);
+
+    expect(UserResource::canEdit($recruiter))->toBeFalse();
+});
+
+test('SquadCaptain não pode editar usuário', function (): void {
+    $captain = User::factory()->squadCaptain()->create();
+    $target = User::factory()->create();
+
+    $this->actingAs($captain);
+
+    expect(UserResource::canEdit($captain))->toBeFalse();
+});
+
+test('Compliance pode force-deletar', function (): void {
+    $compliance = User::factory()->compliance()->create();
+    $target = User::factory()->create();
+
+    $this->actingAs($compliance);
+
+    expect(UserResource::canForceDelete($compliance))->toBeTrue();
+});
+
+test('Staff não pode force-deletar', function (): void {
+    $staff = User::factory()->staff()->create();
+    $this->actingAs($staff);
+
+    expect(UserResource::canForceDelete($staff))->toBeFalse();
+});
+
+test('a tabela tem coluna senioridade', function (): void {
+    livewire(ListUsers::class)->loadTable()->assertTableColumnExists('profile.seniority_level');
+});
+
+test('a tabela tem coluna de cidade', function (): void {
+    livewire(ListUsers::class)->loadTable()->assertTableColumnExists('address.city');
+});
+
+test('a tabela tem coluna de nível do character', function (): void {
+    livewire(ListUsers::class)->loadTable()->assertTableColumnExists('character.level');
+});
+
+test('o method canDelete retorna verdadeiro para Staff', function (): void {
+    $staff = User::factory()->staff()->create();
+    $this->actingAs($staff);
+
+    expect(UserResource::canDelete($staff))->toBeTrue();
+});
+
+test('o method canDelete retorna falso para Recruiter', function (): void {
+    $recruiter = User::factory()->recruiter()->create();
+    $this->actingAs($recruiter);
+
+    expect(UserResource::canDelete($recruiter))->toBeFalse();
+});
+
+test('o relation manager de skills existe', function (): void {
+    expect(UserResource::getRelations())->toContain(ProfileSkillsRelationManager::class);
+});
+
+test('o relation manager de experiências existe', function (): void {
+    expect(UserResource::getRelations())->toContain(WorkExperiencesRelationManager::class);
+});
+
+test('canEdit retorna falso para Recruiter', function (): void {
+    $recruiter = User::factory()->recruiter()->create();
+    $this->actingAs($recruiter);
+
+    expect(UserResource::canEdit($recruiter))->toBeFalse();
+});
+
+test('canEdit retorna verdadeiro para Staff', function (): void {
+    $staff = User::factory()->staff()->create();
+    $this->actingAs($staff);
+
+    expect(UserResource::canEdit($staff))->toBeTrue();
+});
+
+test('canForceDelete retorna verdadeiro para Compliance', function (): void {
+    $compliance = User::factory()->compliance()->create();
+    $this->actingAs($compliance);
+
+    expect(UserResource::canForceDelete($compliance))->toBeTrue();
+});
+
+test('canForceDelete retorna falso para Staff', function (): void {
+    $staff = User::factory()->staff()->create();
+    $this->actingAs($staff);
+
+    expect(UserResource::canForceDelete($staff))->toBeFalse();
+});
+
+test('Staff soft-deleta um usuário pela tabela', function (): void {
+    $staff = User::factory()->staff()->create();
+    $target = User::factory()->create();
+
+    $this->actingAs($staff);
+
+    livewire(ListUsers::class)
+        ->loadTable()
+        ->callTableAction('delete', $target);
+
+    expect($target->fresh()?->trashed())->toBeTrue();
+});
+
+test('Staff não vê a ação de force-delete na tabela', function (): void {
+    $staff = User::factory()->staff()->create();
+    $target = User::factory()->create();
+
+    $this->actingAs($staff);
+
+    livewire(ListUsers::class)
+        ->loadTable()
+        ->assertTableActionHidden('forceDelete', $target);
+});
+
+test('Staff vê a ação de casos de moderação na tabela', function (): void {
+    $staff = User::factory()->staff()->create();
+    $target = User::factory()->create();
+
+    $this->actingAs($staff);
+
+    livewire(ListUsers::class)
+        ->loadTable()
+        ->assertTableActionVisible('moderationCases', $target);
+});
+
+test('Recruiter não vê a ação de casos de moderação na tabela', function (): void {
+    $recruiter = User::factory()->recruiter()->create();
+    $target = User::factory()->create();
+
+    $this->actingAs($recruiter);
+
+    livewire(ListUsers::class)
+        ->loadTable()
+        ->assertTableActionHidden('moderationCases', $target);
+});
+
+test('SquadCaptain não vê a ação de casos de moderação na tabela', function (): void {
+    $captain = User::factory()->squadCaptain()->create();
+    $target = User::factory()->create();
+
+    $this->actingAs($captain);
+
+    livewire(ListUsers::class)
+        ->loadTable()
+        ->assertTableActionHidden('moderationCases', $target);
+});
+
+test('Compliance force-deleta um usuário soft-deletado pela tabela', function (): void {
+    $compliance = User::factory()->compliance()->create();
+    $target = User::factory()->create();
+    $target->delete();
+
+    $this->actingAs($compliance);
+
+    livewire(ListUsers::class)
+        ->loadTable()
+        ->filterTable('trashed')
+        ->callTableAction('forceDelete', $target);
+
+    expect(User::withTrashed()->find($target->getKey()))->toBeNull();
+});
+
+test('Compliance restaura um usuário soft-deletado pela tabela', function (): void {
+    $compliance = User::factory()->compliance()->create();
+    $target = User::factory()->create();
+    $target->delete();
+
+    $this->actingAs($compliance);
+
+    livewire(ListUsers::class)
+        ->loadTable()
+        ->filterTable('trashed')
+        ->callTableAction('restore', $target);
+
+    expect($target->fresh()?->trashed())->toBeFalse();
+});
+
+test('o relation manager de skills anexa e remove uma skill do usuário', function (): void {
+    $target = User::factory()->create();
+    Profile::ensureExists($target->getKey());
+    $skill = Skill::factory()->create();
+
+    $manager = livewire(ProfileSkillsRelationManager::class, [
+        'ownerRecord' => $target,
+        'pageClass' => EditUser::class,
+    ])->loadTable()->assertOk();
+
+    $manager->callTableAction('create', data: [
+        'skill_id' => $skill->getKey(),
+        'proficiency' => SkillProficiency::cases()[0]->value,
+        'years_experience' => 3,
+    ])->assertHasNoTableActionErrors();
+
+    expect($target->fresh()->profileSkills()->where('skill_id', $skill->getKey())->exists())->toBeTrue();
+
+    $profileSkill = $target->fresh()->profileSkills()->where('skill_id', $skill->getKey())->first();
+
+    $manager->callTableAction('delete', $profileSkill);
+
+    expect($target->fresh()->profileSkills()->where('skill_id', $skill->getKey())->exists())->toBeFalse();
+});
+
+test('o relation manager de experiências cria e remove uma experiência do usuário', function (): void {
+    $target = User::factory()->create();
+    Profile::ensureExists($target->getKey());
+
+    $manager = livewire(WorkExperiencesRelationManager::class, [
+        'ownerRecord' => $target,
+        'pageClass' => EditUser::class,
+    ])->loadTable()->assertOk();
+
+    $manager->callTableAction('create', data: [
+        'company_name' => 'He4rt Developers',
+        'position' => 'Engenheiro de Software',
+        'description' => 'Trabalhando em projetos open source.',
+        'start_date' => now()->subYear()->format('Y-m-d'),
+        'is_currently_working_here' => true,
+        'end_date' => null,
+    ])->assertHasNoTableActionErrors();
+
+    $workExperience = $target->fresh()->workExperiences()->where('company_name', 'He4rt Developers')->first();
+
+    expect($workExperience)->not->toBeNull();
+
+    $manager->callTableAction('delete', $workExperience);
+
+    expect($target->fresh()->workExperiences()->whereKey($workExperience->getKey())->exists())->toBeFalse();
+});
+
+test('Staff não consegue conceder super admin a outro usuário', function (): void {
+    $staff = User::factory()->staff()->create();
+    $other = User::factory()->create();
+    $superAdminRole = Role::findByName(UserRole::SuperAdmin->value, UserRole::GUARD);
+
+    $this->actingAs($staff);
+
+    livewire(EditUser::class, ['record' => $other->getKey()])
+        ->fillForm(['roles' => [$superAdminRole->getKey()]])
+        ->call('save')
+        ->assertHasFormErrors(['roles.0']);
+
+    expect($other->fresh()?->hasRole(UserRole::SuperAdmin))->toBeFalse();
+});
+
+test('Staff não consegue conceder compliance a outro usuário', function (): void {
+    $staff = User::factory()->staff()->create();
+    $other = User::factory()->create();
+    $complianceRole = Role::findOrCreate(UserRole::Compliance->value, UserRole::GUARD);
+
+    $this->actingAs($staff);
+
+    livewire(EditUser::class, ['record' => $other->getKey()])
+        ->fillForm(['roles' => [$complianceRole->getKey()]])
+        ->call('save')
+        ->assertHasFormErrors(['roles.0']);
+
+    expect($other->fresh()?->hasRole(UserRole::Compliance))->toBeFalse();
+});
+
+test('Staff consegue conceder recruiter a outro usuário', function (): void {
+    $staff = User::factory()->staff()->create();
+    $other = User::factory()->create();
+    $recruiterRole = Role::findOrCreate(UserRole::Recruiter->value, UserRole::GUARD);
+
+    $this->actingAs($staff);
+
+    livewire(EditUser::class, ['record' => $other->getKey()])
+        ->fillForm(['roles' => [$recruiterRole->getKey()]])
+        ->call('save')
+        ->assertHasNoFormErrors();
+
+    expect($other->fresh()?->hasRole(UserRole::Recruiter))->toBeTrue();
+});
+
+test('Staff não consegue remover compliance de um usuário já compliance', function (): void {
+    $staff = User::factory()->staff()->create();
+    $other = User::factory()->compliance()->create();
+
+    $this->actingAs($staff);
+
+    livewire(EditUser::class, ['record' => $other->getKey()])
+        ->fillForm(['roles' => []])
+        ->call('save')
+        ->assertHasNoFormErrors();
+
+    expect($other->fresh()?->hasRole(UserRole::Compliance))->toBeTrue();
+});
+
+test('o form de papéis não lista compliance nem super admin pra Staff', function (): void {
+    $staff = User::factory()->staff()->create();
+    $other = User::factory()->create();
+    $superAdminRole = Role::findByName(UserRole::SuperAdmin->value, UserRole::GUARD);
+    $complianceRole = Role::findOrCreate(UserRole::Compliance->value, UserRole::GUARD);
+
+    $this->actingAs($staff);
+
+    livewire(EditUser::class, ['record' => $other->getKey()])
+        ->assertSchemaComponentExists('roles', checkComponentUsing: function (CheckboxList $field) use ($superAdminRole, $complianceRole): bool {
+            $optionIds = array_keys($field->getOptions());
+
+            return !in_array((string) $superAdminRole->getKey(), $optionIds, strict: true)
+                && !in_array((string) $complianceRole->getKey(), $optionIds, strict: true);
+        });
+});
+
+test('social_links rejeita chave de plataforma inválida', function (): void {
+    $other = User::factory()->create();
+    Profile::ensureExists($other->getKey());
+
+    livewire(EditUser::class, ['record' => $other->getKey()])
+        ->fillForm(['profile' => ['social_links' => ['nao-e-plataforma' => 'x']]])
+        ->call('save')
+        ->assertHasFormErrors(['profile.social_links']);
+});
+
+test('social_links aceita uma plataforma válida', function (): void {
+    $other = User::factory()->create();
+    Profile::ensureExists($other->getKey());
+
+    livewire(EditUser::class, ['record' => $other->getKey()])
+        ->fillForm(['profile' => ['social_links' => [SocialPlatform::LinkedIn->value => 'meu-usuario']]])
+        ->call('save')
+        ->assertHasNoFormErrors();
+
+    expect($other->fresh()?->profile?->social_links)->toBe([SocialPlatform::LinkedIn->value => 'meu-usuario']);
+});
+
+test('o form de edição cria o perfil de um usuário legado antes de hidratar', function (): void {
+    $legacy = User::factory()->create();
+    $legacy->profile()->delete();
+
+    expect($legacy->fresh()->profile)->toBeNull();
+
+    livewire(EditUser::class, ['record' => $legacy->getKey()])
+        ->assertOk()
+        ->fillForm(['profile' => ['nickname' => 'Legado']])
+        ->call('save')
+        ->assertHasNoFormErrors();
+
+    expect($legacy->fresh()->profile?->nickname)->toBe('Legado');
 });

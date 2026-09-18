@@ -7,10 +7,16 @@ namespace He4rt\PanelAdmin\Filament\Resources\Users\Pages;
 use Filament\Actions\ViewAction;
 use Filament\Resources\Pages\EditRecord;
 use He4rt\PanelAdmin\Filament\Resources\Users\UserResource;
+use He4rt\Profile\Models\Profile;
 
 class EditUser extends EditRecord
 {
     protected static string $resource = UserResource::class;
+
+    protected function beforeFill(): void
+    {
+        Profile::ensureExists((string) $this->getRecord()->getKey());
+    }
 
     /**
      * @return array<int, ViewAction>
