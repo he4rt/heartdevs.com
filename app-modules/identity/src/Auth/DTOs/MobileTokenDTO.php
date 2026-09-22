@@ -13,7 +13,7 @@ final readonly class MobileTokenDTO
     ) {}
 
     /**
-     * @return array<string, mixed>
+     * @return array{access_token: string, token_type: string, expires_in: int}
      */
     public function toArray(): array
     {

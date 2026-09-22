@@ -11,6 +11,11 @@ use Illuminate\Http\Request;
 
 final class MobileMeController extends Controller
 {
+    /**
+     * Usuário autenticado
+     *
+     * Retorna os dados básicos do usuário dono do token JWT atual.
+     */
     public function __invoke(Request $request): JsonResponse
     {
         /** @var User $user */

@@ -17,6 +17,13 @@ use PHPOpenSourceSaver\JWTAuth\JWTGuard;
 
 final class MobileAuthController extends Controller
 {
+    /**
+     * Trocar código de login por token
+     *
+     * Troca o código de uso único devolvido no deep link do OAuth (ver
+     * MobileOAuthController::redirect) por um par de token de acesso JWT.
+     * O código expira em 60s e só pode ser usado uma vez.
+     */
     public function exchange(Request $request, ExchangeMobileCodeAction $exchangeCode, IssueMobileTokenAction $issueToken): JsonResponse
     {
         $request->validate([
@@ -32,12 +39,20 @@ final class MobileAuthController extends Controller
         return response()->json($issueToken->execute($user)->toArray());
     }
 
+    /**
+     * Renovar token de acesso
+     *
+     * Emite um novo token a partir do token atual do header Authorization,
+     * mesmo que já tenha expirado — desde que dentro da janela de refresh
+     * (jwt.refresh_ttl) e não esteja na blacklist.
+     */
     public function refresh(): JsonResponse
     {
         /** @var JWTGuard $guard */
         $guard = Auth::guard('api');
 
         try {
+            /** @var string $token */
             $token = $guard->refresh();
         } catch (JWTException $jwtException) {
             return response()->json(['message' => $jwtException->getMessage()], 401);
@@ -52,6 +67,12 @@ final class MobileAuthController extends Controller
         return response()->json($refreshed->toArray());
     }
 
+    /**
+     * Encerrar sessão
+     *
+     * Invalida o token de acesso atual (blacklist) — o mesmo token não
+     * autentica nem renova depois disso.
+     */
     public function logout(): JsonResponse
     {
         Auth::guard('api')->logout();

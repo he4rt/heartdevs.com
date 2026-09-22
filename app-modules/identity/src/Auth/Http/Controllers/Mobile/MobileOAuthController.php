@@ -24,6 +24,14 @@ final class MobileOAuthController extends Controller
         IdentityProvider::Twitch,
     ];
 
+    /**
+     * Iniciar login OAuth
+     *
+     * Redireciona pro provider (discord, github ou twitch). O provider
+     * devolve o usuário pro callback web fixo, que redireciona de volta
+     * pro app via deep link com um código de troca de uso único — ver
+     * POST /api/mobile/auth/exchange.
+     */
     public function redirect(string $provider): RedirectResponse
     {
         $identityProvider = $this->resolveSupportedProvider($provider);

@@ -16,6 +16,7 @@ final readonly class IssueMobileTokenAction
         /** @var JWTGuard $guard */
         $guard = Auth::guard('api');
 
+        /** @var string $token */
         $token = $guard->login($user);
 
         return new MobileTokenDTO(
