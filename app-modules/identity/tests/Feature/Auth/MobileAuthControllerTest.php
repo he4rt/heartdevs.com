@@ -5,6 +5,7 @@ declare(strict_types=1);
 use He4rt\Identity\Auth\Actions\IssueMobileExchangeCodeAction;
 use He4rt\Identity\User\Models\User;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cache;
 
 test('exchange trades a valid code for a token pair', function (): void {
     $user = User::factory()->create();
@@ -22,6 +23,20 @@ test('exchange consumes the code, so it cannot be reused', function (): void {
 
     $this->postJson('/api/mobile/auth/exchange', ['code' => $code])->assertOk();
     $this->postJson('/api/mobile/auth/exchange', ['code' => $code])->assertUnauthorized();
+});
+
+test('exchange rejects a concurrent redemption of the same code', function (): void {
+    $user = User::factory()->create();
+    $code = resolve(IssueMobileExchangeCodeAction::class)->execute($user);
+
+    // Simula um segundo request concorrente já segurando o lock antes do
+    // primeiro conseguir ler+apagar o código — prova que a troca é atômica.
+    $lock = Cache::lock('identity:mobile-oauth-exchange-lock:'.$code, 10);
+    $lock->get();
+
+    $this->postJson('/api/mobile/auth/exchange', ['code' => $code])->assertUnauthorized();
+
+    $lock->release();
 });
 
 test('exchange rejects an unknown code', function (): void {

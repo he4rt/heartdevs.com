@@ -12,15 +12,33 @@ final readonly class ExchangeMobileCodeAction
 {
     public function execute(string $code): User
     {
-        /** @var string|null $userId */
-        $userId = Cache::pull(IssueMobileExchangeCodeAction::cacheKey($code));
+        $cacheKey = IssueMobileExchangeCodeAction::cacheKey($code);
 
-        throw_if($userId === null, MobileAuthException::invalidExchangeCode());
+        // Cache::pull() é get()+forget() como duas chamadas separadas — sob
+        // concorrência, dois requests podem ler o mesmo código antes de
+        // qualquer um apagar e mintar dois tokens da mesma autorização. O
+        // lock serializa get+forget num bloco atômico por código.
+        $lock = Cache::lock('identity:mobile-oauth-exchange-lock:'.$code, 10);
 
-        $user = User::query()->find($userId);
+        if (!$lock->get()) {
+            throw MobileAuthException::invalidExchangeCode();
+        }
 
-        throw_if($user === null, MobileAuthException::invalidExchangeCode());
+        try {
+            /** @var string|null $userId */
+            $userId = Cache::get($cacheKey);
 
-        return $user;
+            throw_if($userId === null, MobileAuthException::invalidExchangeCode());
+
+            Cache::forget($cacheKey);
+
+            $user = User::query()->find($userId);
+
+            throw_if($user === null, MobileAuthException::invalidExchangeCode());
+
+            return $user;
+        } finally {
+            $lock->release();
+        }
     }
 }

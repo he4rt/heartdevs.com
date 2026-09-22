@@ -58,27 +58,28 @@ Se alguma feature futura precisar compor dois domínios num único payload (ex.:
 O login web hoje (`OAuthController::getAuthenticate`) termina em `Auth::login()` (sessão) + redirect pro painel Filament. Isso não serve pro mobile — o app não tem sessão, e o controller depende de `filament()->setCurrentPanel()`. Em vez de reescrever esse fluxo, ele nasce **paralelo**, reaproveitando a resolução de usuário:
 
 1. App abre `Browser::auth()` (plugin do NativePHP) apontando pra `GET /api/mobile/auth/{provider}/redirect` (novo endpoint em `identity`, análogo ao `OAuthController::getRedirect` mas sem depender de painel Filament).
-2. Provider (Discord/GitHub/Twitch — os três já suportados via `IdentityProvider::supportedProviders()`) redireciona pro callback padrão do OAuth.
-3. Novo `MobileOAuthController::callback` reaproveita `HandleOAuthCallbackAction::execute()` (mesma Action do fluxo web) pra resolver/criar o `User` — mas em vez de `Auth::login()`, gera um **código de troca de uso único** (curto, ~60s de TTL, guardado em cache) e redireciona pro deep link do app: `NATIVEPHP_DEEPLINK_SCHEME://oauth/callback?code=...`.
-4. App recebe o deep link, extrai o `code`, faz `POST /api/mobile/auth/exchange` com esse código.
-5. Endpoint valida o código (uso único, expira, invalida-se após o uso), emite `{ access_token, refresh_token, expires_in }` via `php-open-source-saver/jwt-auth`.
+2. Provider (Discord/GitHub/Twitch — os três já suportados via `IdentityProvider::supportedProviders()`) redireciona pro callback do OAuth.
+3. **Implementado diferente do rascunho inicial**: Discord/GitHub/Twitch só aceitam UMA `redirect_uri` fixa por app, cadastrada apontando pro callback web (`/auth/oauth/{provider}` → `OAuthController::getAuthenticate`) — não dava pra ter uma rota de callback mobile própria. O callback web compartilhado passou a distinguir por `OAuthIntent::MobileLogin` (lido do `state`) e, quando é esse o caso, gera um **código de troca de uso único** (curto, ~60s de TTL, guardado em cache) e redireciona pro deep link do app em vez de fazer `Auth::login()`.
+4. App recebe o deep link (`he4rtapp://oauth/callback?code=...`), extrai o `code`, faz `POST /api/mobile/auth/exchange` com esse código.
+5. Endpoint valida o código (uso único, expira, invalida-se após o uso — troca é atômica via `Cache::lock()`, não só `Cache::pull()`), emite `{ access_token, token_type, expires_in }` via `php-open-source-saver/jwt-auth`.
 
 **Por que um código de troca em vez do JWT direto no deep link:** deep links (e o histórico de URLs do SO) não são um lugar seguro pra um token de longa duração passar. O código de troca é de uso único e vive segundos — se vazar, não serve pra nada depois do primeiro uso.
 
 ### Refresh
 
-`POST /api/mobile/auth/refresh` — refresh token válido troca por um novo par de access/refresh. `POST /api/mobile/auth/logout` invalida o refresh token atual (blacklist do próprio pacote).
+**Implementado diferente do rascunho inicial**: não existe um `refresh_token` separado — `php-open-source-saver/jwt-auth` renova o próprio access token via `JWTGuard::refresh()`, aceitando um token já expirado desde que dentro da janela `jwt.refresh_ttl` e fora da blacklist. `POST /api/mobile/auth/refresh` manda o token atual no header `Authorization` (sem middleware `auth:api`, que rejeitaria um token expirado antes mesmo do controller rodar) e devolve um novo `{ access_token, token_type, expires_in }`. `POST /api/mobile/auth/logout` invalida o token atual via blacklist.
 
 ### Endpoints da Feature 0
 
 | Método | Rota                                   | Descrição                                                                       |
 | ------ | -------------------------------------- | ------------------------------------------------------------------------------- |
 | GET    | `/api/mobile/auth/{provider}/redirect` | Inicia OAuth (Discord/GitHub/Twitch)                                            |
-| GET    | `/api/mobile/auth/{provider}/callback` | Callback do provider → gera código de troca → deep link                         |
-| POST   | `/api/mobile/auth/exchange`            | Código de troca → par de tokens JWT                                             |
-| POST   | `/api/mobile/auth/refresh`             | Refresh token → novo par                                                        |
-| POST   | `/api/mobile/auth/logout`              | Invalida o refresh token atual                                                  |
+| POST   | `/api/mobile/auth/exchange`            | Código de troca → token JWT                                                     |
+| POST   | `/api/mobile/auth/refresh`             | Token atual (mesmo expirado, dentro da janela) → token novo                     |
+| POST   | `/api/mobile/auth/logout`              | Invalida o token atual (blacklist)                                              |
 | GET    | `/api/mobile/me`                       | Usuário autenticado (id, username, avatar) — já existe no PoC, só troca o guard |
+
+Não existe rota de callback mobile própria — o callback do provider bate direto em `/auth/oauth/{provider}` (rota web já existente), ver passo 3 acima.
 
 ---
 
@@ -166,3 +167,12 @@ v1 é só leitura (o PRD explicitamente escopa "visualização do próprio perfi
 4. **Feature 2 (Eventos)** — a mais complexa (enrollment + dois métodos de check-in); decisão do gap de QR (seção acima) deveria estar fechada antes de começar.
 
 Cada feature vira sua própria branch/PR neste repo (`heartdevs.com`), seguindo a convenção `feature/<slug>` ou `story/531-<slug>` já documentada em `.ai/rules`. O client (`he4rt-app`) consome cada endpoint conforme ele fica pronto — não precisa esperar a API inteira pra começar a integrar a Feature 0/3.
+
+---
+
+## PS: achados da revisão de segurança (CodeRabbit)
+
+A implementação da Feature 0 passou por revisão automática de segurança antes do merge, que achou dois pontos reais no fluxo de troca de código:
+
+- **Race condition na troca do código** (corrigido): `Cache::pull()` do Laravel é `get()` + `forget()` como duas chamadas separadas, não atômicas — duas requisições concorrentes com o mesmo código podiam ler o valor antes de qualquer uma apagar, mintando dois tokens da mesma autorização. `ExchangeMobileCodeAction` passou a usar `Cache::lock()` pra serializar leitura+remoção por código.
+- **Deep link com custom scheme pode ser sequestrado** (débito técnico conhecido, não fechado nesta PR): `he4rtapp://oauth/callback?code=...` usa um esquema de URL customizado, que não é exclusivo do app — outro app instalado no mesmo aparelho pode registrar o mesmo scheme e interceptar o código antes do app legítimo (TTL curto e uso único não impedem isso, já que o atacante só precisa ser o primeiro a usar). A correção correta é **PKCE** (o app mobile gera um `code_verifier` local, manda só o hash `code_challenge` no redirect, e precisa do verifier original pra completar a troca depois) ou um HTTPS App Link verificado em vez do scheme customizado. Não implementado agora porque depende do `he4rt-app` (ainda só um scaffold) também mudar o lado dele — fica registrado aqui pra não ser esquecido antes do app mobile começar a consumir esse fluxo de verdade.
