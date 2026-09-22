@@ -10,6 +10,7 @@ use He4rt\Identity\Auth\Enums\OAuthIntent;
 use He4rt\Identity\ExternalIdentity\Enums\IdentityProvider;
 use He4rt\Identity\User\Models\User;
 use He4rt\IntegrationGithub\OAuth\GitHubOAuthClient;
+use Illuminate\Support\Facades\Auth;
 
 function bindMobileGithubClient(): void
 {
@@ -77,15 +78,18 @@ test('redirect forwards to the provider authorize URL', function (): void {
         ->assertRedirect('https://github.test/oauth');
 });
 
-test('callback with a denied authorization redirects to the app deep link with an error', function (): void {
+test('a denied mobile authorization on the shared web callback redirects to the app deep link with an error', function (): void {
+    // Discord/GitHub/Twitch só conhecem UMA redirect_uri por app: a rota web
+    // /auth/oauth/{provider} (OAuthController::getAuthenticate). O login mobile
+    // é distinguido pelo intent codificado no state, não por uma rota própria.
     $state = new OAuthStateDTO(
-        intent: OAuthIntent::Login,
+        intent: OAuthIntent::MobileLogin,
         provider: IdentityProvider::GitHub,
         panel: 'mobile',
         returnUrl: 'mobile',
     );
 
-    $response = $this->get('/api/mobile/auth/github/callback?'.http_build_query([
+    $response = $this->get('/auth/oauth/github?'.http_build_query([
         'state' => (string) $state,
         'error' => 'access_denied',
     ]));
@@ -96,17 +100,17 @@ test('callback with a denied authorization redirects to the app deep link with a
         ->toContain('error=access_denied');
 });
 
-test('successful callback redirects to the app deep link with a one-time exchange code', function (): void {
+test('a successful mobile login on the shared web callback redirects to the app deep link with an exchange code, without starting a web session', function (): void {
     bindMobileGithubClient();
 
     $state = new OAuthStateDTO(
-        intent: OAuthIntent::Login,
+        intent: OAuthIntent::MobileLogin,
         provider: IdentityProvider::GitHub,
         panel: 'mobile',
         returnUrl: 'mobile',
     );
 
-    $response = $this->get('/api/mobile/auth/github/callback?'.http_build_query([
+    $response = $this->get('/auth/oauth/github?'.http_build_query([
         'state' => (string) $state,
         'code' => 'auth-code',
     ]));
@@ -116,5 +120,6 @@ test('successful callback redirects to the app deep link with a one-time exchang
     $location = (string) $response->headers->get('Location');
 
     expect($location)->toStartWith('he4rtapp://oauth/callback?code=')
-        ->and(User::query()->where('username', 'mobile-user')->exists())->toBeTrue();
+        ->and(User::query()->where('username', 'mobile-user')->exists())->toBeTrue()
+        ->and(Auth::check())->toBeFalse();
 });

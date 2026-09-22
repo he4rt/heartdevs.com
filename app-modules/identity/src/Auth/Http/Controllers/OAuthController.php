@@ -7,9 +7,11 @@ namespace He4rt\Identity\Auth\Http\Controllers;
 use App\Contracts\OAuthClientContract;
 use App\Http\Controllers\Controller;
 use He4rt\Identity\Auth\Actions\HandleOAuthCallbackAction;
+use He4rt\Identity\Auth\Actions\IssueMobileExchangeCodeAction;
 use He4rt\Identity\Auth\DTOs\OAuthStateDTO;
 use He4rt\Identity\Auth\Enums\OAuthIntent;
 use He4rt\Identity\Auth\Exceptions\OAuthFlowException;
+use He4rt\Identity\Auth\Support\MobileOAuthDeepLink;
 use He4rt\Identity\ExternalIdentity\Enums\IdentityProvider;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Auth;
@@ -57,6 +59,10 @@ final class OAuthController extends Controller
         $oauthDenied = $code === null || request()->has('error');
 
         if ($oauthDenied) {
+            if ($state->intent === OAuthIntent::MobileLogin) {
+                return redirect()->to(MobileOAuthDeepLink::build('error', 'access_denied'));
+            }
+
             $fallbackUrl = $state->returnUrl ?? '/';
 
             return redirect()->to($fallbackUrl);
@@ -67,7 +73,17 @@ final class OAuthController extends Controller
         } catch (OAuthFlowException $oAuthFlowException) {
             Log::warning('OAuth flow failed', ['provider' => $provider, 'error' => $oAuthFlowException->getMessage()]);
 
+            if ($state->intent === OAuthIntent::MobileLogin) {
+                return redirect()->to(MobileOAuthDeepLink::build('error', 'oauth_flow_failed'));
+            }
+
             return redirect()->to($state->returnUrl ?? '/');
+        }
+
+        if ($result->intent === OAuthIntent::MobileLogin) {
+            $exchangeCode = resolve(IssueMobileExchangeCodeAction::class)->execute($result->user);
+
+            return redirect()->to(MobileOAuthDeepLink::build('callback', code: $exchangeCode));
         }
 
         if ($result->hasMergeConflict()) {
