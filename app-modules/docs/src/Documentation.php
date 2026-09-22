@@ -40,7 +40,7 @@ class Documentation
     public static function getDocVersions(): array
     {
         return [
-            '3.x' => '3.x',
+            '4.x' => '4.x',
         ];
     }
 

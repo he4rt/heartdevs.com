@@ -27,7 +27,7 @@ return [
         /*
          * API version.
          */
-        'version' => '3.x',
+        'version' => '4.x',
 
         /*
          * Description rendered on the home page of the API documentation (`/docs/api`).

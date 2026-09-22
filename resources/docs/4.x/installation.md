@@ -14,7 +14,7 @@ order: 1
 
 ## Versioning Scheme
 
-A documentação do portal é versionada por linha de release (por exemplo, `3.x`).
+A documentação do portal é versionada por linha de release (por exemplo, `4.x`).
 Os arquivos vivem em `resources/docs/{version}/` e os links internos usam o
 placeholder `{{version}}` para apontar sempre para a versão corrente — assim a
 mesma página funciona em qualquer linha de release.
