@@ -52,6 +52,8 @@ class BotDiscordServiceProvider extends LaracordServiceProvider
 
     public function bot(Laracord $bot): Laracord
     {
+        $this->app->setLocale(config()->string('bot-discord.locale'));
+
         return $bot
             ->disableHttpServer()
             ->discoverEvents(__DIR__.'/Events', 'He4rt\BotDiscord\Events')
