@@ -46,15 +46,10 @@ final class MobileOAuthController extends Controller
 
         throw_unless($client instanceof OAuthClientContract, NotFoundHttpException::class);
 
-        // Discord/GitHub/Twitch têm UMA redirect_uri fixa cadastrada (o callback
-        // web em /auth/oauth/{provider} — ver *OAuthClient::callbackUrl()). Por
-        // isso o retorno do provider sempre bate em OAuthController::getAuthenticate,
-        // nunca aqui; é ele quem finaliza o login mobile lendo intent=MobileLogin.
         $state = new OAuthStateDTO(
             intent: OAuthIntent::MobileLogin,
             provider: $identityProvider,
             panel: 'mobile',
-            returnUrl: 'mobile',
         );
 
         return redirect()->to($client->redirectUrl($state));

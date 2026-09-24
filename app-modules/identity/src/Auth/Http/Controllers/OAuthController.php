@@ -54,18 +54,15 @@ final class OAuthController extends Controller
         throw_if($identityProvider === null, NotFoundHttpException::class);
 
         $state = OAuthStateDTO::fromEncryptedString(request()->input('state'));
+        $isMobile = $state->intent === OAuthIntent::MobileLogin;
 
         $code = request()->input('code');
         $oauthDenied = $code === null || request()->has('error');
 
         if ($oauthDenied) {
-            if ($state->intent === OAuthIntent::MobileLogin) {
-                return redirect()->to(MobileOAuthDeepLink::build('error', 'access_denied'));
-            }
-
-            $fallbackUrl = $state->returnUrl ?? '/';
-
-            return redirect()->to($fallbackUrl);
+            return $isMobile
+                ? redirect()->to(MobileOAuthDeepLink::build('error', 'access_denied'))
+                : redirect()->to($state->returnUrl ?? '/');
         }
 
         try {
@@ -73,14 +70,12 @@ final class OAuthController extends Controller
         } catch (OAuthFlowException $oAuthFlowException) {
             Log::warning('OAuth flow failed', ['provider' => $provider, 'error' => $oAuthFlowException->getMessage()]);
 
-            if ($state->intent === OAuthIntent::MobileLogin) {
-                return redirect()->to(MobileOAuthDeepLink::build('error', 'oauth_flow_failed'));
-            }
-
-            return redirect()->to($state->returnUrl ?? '/');
+            return $isMobile
+                ? redirect()->to(MobileOAuthDeepLink::build('error', 'oauth_flow_failed'))
+                : redirect()->to($state->returnUrl ?? '/');
         }
 
-        if ($result->intent === OAuthIntent::MobileLogin) {
+        if ($isMobile) {
             $exchangeCode = resolve(IssueMobileExchangeCodeAction::class)->execute($result->user);
 
             return redirect()->to(MobileOAuthDeepLink::build('callback', code: $exchangeCode));
