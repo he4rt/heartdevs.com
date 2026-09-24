@@ -34,7 +34,7 @@ final readonly class HandleOAuthCallbackAction
         $oauthUser = $client->getAuthenticatedUser($access);
 
         $user = match ($state->intent) {
-            OAuthIntent::Login => $this->findOrCreateUser->execute($oauthUser),
+            OAuthIntent::Login, OAuthIntent::MobileLogin => $this->findOrCreateUser->execute($oauthUser),
             OAuthIntent::Link => $this->resolveAuthenticatedUser(),
         };
 

@@ -14,7 +14,7 @@ $sections = implode('|', array_map(
 Route::get('docs', [DocsController::class, 'index'])->name('docs.index');
 
 // The section is constrained to known document types so Scramble's
-// `docs/3.x/api` (and any other prefix) falls through to its own route.
+// `docs/4.x/api` (and any other prefix) falls through to its own route.
 Route::get('docs/{section}/{path?}', [DocsController::class, 'show'])
     ->where('section', $sections)
     ->where('path', '.*')

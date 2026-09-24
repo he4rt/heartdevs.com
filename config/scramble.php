@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use Dedoc\Scramble\Http\Middleware\RestrictedDocsAccess;
+use Dedoc\Scramble\SecurityDocumentation\MiddlewareAuthSecurityStrategy;
 
 return [
     /*
@@ -26,7 +27,7 @@ return [
         /*
          * API version.
          */
-        'version' => '3.x',
+        'version' => '4.x',
 
         /*
          * Description rendered on the home page of the API documentation (`/docs/api`).
@@ -133,6 +134,13 @@ return [
         'web',
         RestrictedDocsAccess::class,
     ],
+
+    /*
+     * Marca como "bearer" as rotas protegidas por qualquer guard "auth:*"
+     * (ex.: auth:api, o guard JWT da API mobile) — sem isso, os endpoints
+     * protegidos aparecem na doc como se não precisassem de autenticação.
+     */
+    'security_strategy' => MiddlewareAuthSecurityStrategy::class,
 
     'extensions' => [],
 ];
