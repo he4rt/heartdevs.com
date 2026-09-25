@@ -138,6 +138,8 @@ Domínio: `He4rt\Profile\*`.
 
 v1 é só leitura (o PRD explicitamente escopa "visualização do próprio perfil" — editar fica de fora). Um `ProfileResource` serializa os campos públicos do model (nickname, headline, seniority, social_links, etc.) — sem gap de domínio, `UpsertProfile`/`SyncProfileSkills` já existem se a edição entrar em escopo depois.
 
+**Status: implementado** (`He4rt\Profile\Http\Controllers\Mobile\MobileProfileController` + `Http\Resources\ProfileResource`, também inclui `profileSkills.skill` e `workExperiences`). Rota registrada em `app-modules/profile/routes/api-mobile-routes.php`.
+
 ---
 
 ## Fora de escopo (herdado do PRD, sem mudança)
