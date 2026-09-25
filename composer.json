@@ -53,6 +53,7 @@
         "monicahq/laravel-cloudflare": "^4.1",
         "owenvoke/blade-fontawesome": "^3.3.1",
         "phiki/phiki": "^2.2.1",
+        "php-open-source-saver/jwt-auth": "^2.9",
         "ryangjchandler/commonmark-blade-block": "^1.1.1",
         "saloonphp/saloon": "^4.0.1",
         "spatie/laravel-backup": "^10.3.2",

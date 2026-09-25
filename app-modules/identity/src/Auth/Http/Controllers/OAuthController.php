@@ -7,9 +7,11 @@ namespace He4rt\Identity\Auth\Http\Controllers;
 use App\Contracts\OAuthClientContract;
 use App\Http\Controllers\Controller;
 use He4rt\Identity\Auth\Actions\HandleOAuthCallbackAction;
+use He4rt\Identity\Auth\Actions\IssueMobileExchangeCodeAction;
 use He4rt\Identity\Auth\DTOs\OAuthStateDTO;
 use He4rt\Identity\Auth\Enums\OAuthIntent;
 use He4rt\Identity\Auth\Exceptions\OAuthFlowException;
+use He4rt\Identity\Auth\Support\MobileOAuthDeepLink;
 use He4rt\Identity\ExternalIdentity\Enums\IdentityProvider;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Auth;
@@ -52,14 +54,15 @@ final class OAuthController extends Controller
         throw_if($identityProvider === null, NotFoundHttpException::class);
 
         $state = OAuthStateDTO::fromEncryptedString(request()->input('state'));
+        $isMobile = $state->intent === OAuthIntent::MobileLogin;
 
         $code = request()->input('code');
         $oauthDenied = $code === null || request()->has('error');
 
         if ($oauthDenied) {
-            $fallbackUrl = $state->returnUrl ?? '/';
-
-            return redirect()->to($fallbackUrl);
+            return $isMobile
+                ? redirect()->to(MobileOAuthDeepLink::build('error', 'access_denied'))
+                : redirect()->to($state->returnUrl ?? '/');
         }
 
         try {
@@ -67,7 +70,15 @@ final class OAuthController extends Controller
         } catch (OAuthFlowException $oAuthFlowException) {
             Log::warning('OAuth flow failed', ['provider' => $provider, 'error' => $oAuthFlowException->getMessage()]);
 
-            return redirect()->to($state->returnUrl ?? '/');
+            return $isMobile
+                ? redirect()->to(MobileOAuthDeepLink::build('error', 'oauth_flow_failed'))
+                : redirect()->to($state->returnUrl ?? '/');
+        }
+
+        if ($isMobile) {
+            $exchangeCode = resolve(IssueMobileExchangeCodeAction::class)->execute($result->user);
+
+            return redirect()->to(MobileOAuthDeepLink::build('callback', code: $exchangeCode));
         }
 
         if ($result->hasMergeConflict()) {
