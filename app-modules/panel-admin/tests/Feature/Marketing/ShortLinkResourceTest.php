@@ -223,7 +223,7 @@ test('the clicks tile counts humans only until the bots toggle is on', function 
 
     $page->assertSee($humans)->assertDontSee($everyone);
 
-    $page->set('filters.'.ViewShortLink::INCLUDE_BOTS, true)
+    $page->set('filters.'.ViewShortLink::INCLUDE_BOTS, value: true)
         ->assertSee($everyone)
         ->assertDontSee($humans);
 });
@@ -242,7 +242,7 @@ test('flipping the bots toggle changes the island keys, which is what remounts t
         $page->assertSeeHtml($key);
     }
 
-    $page->set('filters.'.ViewShortLink::INCLUDE_BOTS, true);
+    $page->set('filters.'.ViewShortLink::INCLUDE_BOTS, value: true);
 
     $withBots = array_map($page->instance()->islandKey(...), $islands);
 
