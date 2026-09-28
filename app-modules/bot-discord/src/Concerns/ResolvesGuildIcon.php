@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace He4rt\BotDiscord\Concerns;
 
-use Discord\Parts\User\Member;
+use Discord\Parts\Guild\Member\Member;
 
 trait ResolvesGuildIcon
 {

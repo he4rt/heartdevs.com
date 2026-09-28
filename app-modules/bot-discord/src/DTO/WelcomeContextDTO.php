@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace He4rt\BotDiscord\DTO;
 
-use Discord\Parts\User\Member;
+use Discord\Parts\Guild\Member\Member;
 
 final readonly class WelcomeContextDTO
 {

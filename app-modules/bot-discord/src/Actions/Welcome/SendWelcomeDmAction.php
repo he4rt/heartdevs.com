@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace He4rt\BotDiscord\Actions\Welcome;
 
-use Discord\Parts\User\Member;
+use Discord\Parts\Guild\Member\Member;
 use He4rt\BotDiscord\DTO\WelcomeContextDTO;
 use He4rt\BotDiscord\Enums\DiscordErrorCode;
 use He4rt\BotDiscord\Welcome\WelcomeEmbedBuilder;
