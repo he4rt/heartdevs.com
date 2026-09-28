@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace He4rt\BotDiscord\SlashCommands;
 
 use Discord\Parts\Channel\Channel;
-use Discord\Parts\Guild\Role;
+use Discord\Parts\Guild\Role\Role;
 use Discord\Parts\Interactions\Command\Option;
 use Discord\Parts\Interactions\Interaction;
 use Exception;

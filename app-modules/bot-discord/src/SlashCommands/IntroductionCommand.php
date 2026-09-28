@@ -6,7 +6,7 @@ namespace He4rt\BotDiscord\SlashCommands;
 
 use Discord\Builders\Components\TextInput;
 use Discord\Helpers\Collection;
-use Discord\Parts\Guild\Role;
+use Discord\Parts\Guild\Role\Role;
 use Discord\Parts\Interactions\Interaction;
 use He4rt\Identity\ExternalIdentity\DTOs\ResolveUserProviderDTO;
 use He4rt\Identity\ExternalIdentity\Enums\IdentityProvider;

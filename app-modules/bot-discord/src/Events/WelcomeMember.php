@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace He4rt\BotDiscord\Events;
 
 use Discord\Discord;
-use Discord\Parts\User\Member;
+use Discord\Parts\Guild\Member\Member;
 use Discord\WebSockets\Event as Events;
 use He4rt\BotDiscord\Actions\Welcome\AnnounceNewMemberAction;
 use He4rt\BotDiscord\Actions\Welcome\SendWelcomeDmAction;
