@@ -17,24 +17,10 @@ final readonly class DiscordIdentityMetadata
      */
     public static function mergeProfile(array $current, DiscordProfileDTO $profile): self
     {
-        /** @var array<string, mixed> $user */
-        $user = is_array($profile->metadata['user'] ?? null)
-            ? $profile->metadata['user']
-            : [];
-
-        $publicFields = [
-            'username' => $profile->username,
-            'global_name' => $profile->name,
-        ];
-
-        if (array_key_exists('avatar', $user)) {
-            $publicFields['avatar'] = $user['avatar'];
-        }
-
         return new self(array_replace(
             $current,
             $profile->metadata,
-            $publicFields,
+            DiscordUserSnapshot::fromProfile($profile)->toArray(),
         ));
     }
 
@@ -48,22 +34,14 @@ final readonly class DiscordIdentityMetadata
      */
     public static function mergeMessage(array $current, DiscordMessageDTO $message): self
     {
-        $nestedUser = $current['user'] ?? $current['author'] ?? [];
+        $storedUser = $current['user'] ?? $current['author'] ?? [];
+        $existing = DiscordUserSnapshot::fromArray(is_array($storedUser) ? $storedUser : []);
+        $canonical = $existing->fillMissingFrom(DiscordUserSnapshot::fromMessage($message));
 
-        if (!is_array($nestedUser)) {
-            $nestedUser = [];
-        }
-
-        $defaults = [
-            'author' => $message->authorRaw,
-            'username' => $nestedUser['username'] ?? $message->authorUsername,
-            'global_name' => $nestedUser['global_name'] ?? $message->authorName,
-            'avatar' => array_key_exists('avatar', $nestedUser)
-                ? $nestedUser['avatar']
-                : ($message->authorRaw['avatar'] ?? null),
-        ];
-
-        return new self(array_replace($defaults, $current));
+        return new self(array_replace(
+            ['author' => $message->authorRaw, ...$canonical->toArray()],
+            $current,
+        ));
     }
 
     /** @return array<string, mixed> */
