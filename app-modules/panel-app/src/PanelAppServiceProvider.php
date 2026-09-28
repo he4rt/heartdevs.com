@@ -13,6 +13,7 @@ use He4rt\PanelApp\Livewire\Events\NumericCodeCheckIn;
 use He4rt\PanelApp\Livewire\Timeline\Composer;
 use He4rt\PanelApp\Livewire\Timeline\Feed;
 use He4rt\PanelApp\Livewire\Timeline\PostShow;
+use He4rt\PanelApp\Livewire\Timeline\Reactions;
 use He4rt\PanelApp\Livewire\Timeline\ReplyComposer;
 use He4rt\PanelApp\Livewire\Timeline\ThreadReplies;
 use Illuminate\Support\ServiceProvider;
@@ -41,5 +42,6 @@ class PanelAppServiceProvider extends ServiceProvider
         Livewire::component('timeline-post-show', PostShow::class);
         Livewire::component('timeline-reply-composer', ReplyComposer::class);
         Livewire::component('timeline-thread-replies', ThreadReplies::class);
+        Livewire::component('timeline-reactions', Reactions::class);
     }
 }
