@@ -72,4 +72,8 @@ return [
     'openai' => [
         'api_key' => env('OPENAI_API_KEY'),
     ],
+
+    'he4rt_app' => [
+        'deeplink_scheme' => env('HE4RT_APP_DEEPLINK_SCHEME', 'he4rtapp'),
+    ],
 ];

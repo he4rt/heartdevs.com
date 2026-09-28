@@ -16,6 +16,8 @@ use Tests\TestCase;
 |
 */
 
+pest()->printer()->compact();
+
 pest()->extend(TestCase::class)
     ->group('unit')
     ->in('Unit', '../app-modules/*/tests/Unit');
@@ -24,6 +26,10 @@ pest()->extend(TestCase::class)
     ->use(LazilyRefreshDatabase::class)
     ->group('feature')
     ->in('Feature', '../app-modules/*/tests/Feature');
+
+pest()->extend(TestCase::class)
+    ->group('arch')
+    ->in('Arch', '../app-modules/*/tests/Arch');
 
 /*
 |--------------------------------------------------------------------------
@@ -49,7 +55,13 @@ expect()->extend('toBeOne', fn () => $this->toBe(1));
 |
 */
 
-function something(): void
+/**
+ * O media library despacha as conversões para a conexão de fila do ambiente e
+ * só depois do commit. Num teste, a fila é a real e a transação nunca comita,
+ * então as conversões precisam rodar na hora para existirem.
+ */
+function runMediaConversionsInline(): void
 {
-    // ..
+    config()->set('media-library.queue_connection_name', 'sync');
+    config()->set('media-library.queue_conversions_after_database_commit', value: false);
 }

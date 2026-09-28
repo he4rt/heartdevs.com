@@ -11,9 +11,7 @@ use He4rt\PanelAdmin\Enums\NavigationGroup as NavGroup;
 use function Pest\Laravel\actingAs;
 
 beforeEach(function (): void {
-    config(['he4rt.admins' => 'danielhe4rt']);
-
-    actingAs(User::factory()->create(['username' => 'danielhe4rt']));
+    actingAs(User::factory()->superAdmin()->create());
 
     Filament::setCurrentPanel(Filament::getPanel('admin'));
 });
@@ -65,7 +63,7 @@ test('o grupo Pessoas reúne as quatro telas da aba', function (): void {
 test('a navegação padrão expõe o grupo Conteúdo com o que a comunidade publica', function (): void {
     $content = adminNavigationGroup(NavGroup::Content->getLabel());
 
-    expect(navigationItemLabels($content))->toBe(['Artigos', 'Contribuições', 'Retrospectivas']);
+    expect(navigationItemLabels($content))->toBe(['Artigos', 'Contribuições', 'Retrospectivas', 'Photo albums']);
 });
 
 test('os clusters seguem como itens de topo, fora de grupo', function (): void {
