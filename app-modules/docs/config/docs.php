@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 return [
-    'default_version' => '3.x',
+    'default_version' => '4.x',
 
     'cache' => [
         'enabled' => env('DOCS_CACHE_ENABLED', default: true),

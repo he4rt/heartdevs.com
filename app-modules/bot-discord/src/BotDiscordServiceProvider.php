@@ -37,6 +37,8 @@ class BotDiscordServiceProvider extends LaracordServiceProvider
     {
         parent::boot();
 
+        $this->loadTranslationsFrom(__DIR__.'/../lang', 'bot-discord');
+
         // Domain event listeners: moderation module emits events, bot-discord reacts with Discord-specific behavior.
         Event::listen(CaseQueued::class, [NotifyModerationChannel::class, 'handle']);
         Event::listen(CaseReadyForEnforcement::class, [AutoExecuteAction::class, 'handle']);
@@ -50,6 +52,8 @@ class BotDiscordServiceProvider extends LaracordServiceProvider
 
     public function bot(Laracord $bot): Laracord
     {
+        $this->app->setLocale(config()->string('bot-discord.locale'));
+
         return $bot
             ->disableHttpServer()
             ->discoverEvents(__DIR__.'/Events', 'He4rt\BotDiscord\Events')
