@@ -128,7 +128,11 @@ test('concluding git_challenge completes the Squads onboarding and opens the APT
 
     resolve(AdvanceStep::class)->handle($onboarding, ['data' => ['terms' => true]]);
 
-    resolve(AdvanceStep::class)->handle($onboarding, []);
+    resolve(AdvanceStep::class)->handle($onboarding, [
+        'repo' => 'he4rt/git-challenge',
+        'pr_number' => 42,
+        'approved_at' => now()->toIso8601String(),
+    ]);
 
     $onboarding->refresh();
     $step = $onboarding->steps()->where('step_key', 'git_challenge')->sole();
