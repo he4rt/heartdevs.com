@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 use He4rt\Identity\Auth\Actions\ConfirmOAuthMerge;
-use He4rt\Identity\Auth\Actions\ResolvePendingOAuthMerge;
+use He4rt\Identity\Auth\DTOs\OAuthConnectionDTO;
 use He4rt\Identity\Auth\DTOs\PendingOAuthMergeDTO;
 use He4rt\Identity\ExternalIdentity\Data\ClientAccessManager;
 use He4rt\Identity\ExternalIdentity\Enums\IdentityProvider;
@@ -33,14 +33,16 @@ test('rolls back the account merge when the oauth connection cannot finish', fun
     ]);
     $pending = new PendingOAuthMergeDTO(
         conflictingUserId: $targetUser->id,
-        provider: IdentityProvider::Discord,
-        providerId: 'discord-rollback',
-        credentials: ClientAccessManager::make(
-            accessToken: Crypt::encrypt('access-token'),
-            refreshToken: Crypt::encrypt('refresh-token'),
-            expiresIn: Crypt::encrypt('3600'),
+        connection: new OAuthConnectionDTO(
+            provider: IdentityProvider::Discord,
+            providerId: 'discord-rollback',
+            credentials: ClientAccessManager::make(
+                accessToken: Crypt::encrypt('access-token'),
+                refreshToken: Crypt::encrypt('refresh-token'),
+                expiresIn: Crypt::encrypt('3600'),
+            ),
+            metadata: ['username' => 'oauth-user'],
         ),
-        metadata: ['username' => 'oauth-user'],
     );
 
     Event::listen(
@@ -64,7 +66,7 @@ test('rolls back the account merge when the oauth connection cannot finish', fun
 });
 
 test('rejects an incomplete pending oauth merge payload', function (): void {
-    expect(resolve(ResolvePendingOAuthMerge::class)->execute([
+    expect(PendingOAuthMergeDTO::fromSession([
         'conflicting_user_id' => 'target-user',
         'provider' => IdentityProvider::Discord->value,
         'credentials' => ['access_token' => 'missing-refresh-token'],
@@ -74,7 +76,7 @@ test('rejects an incomplete pending oauth merge payload', function (): void {
 });
 
 test('resolves the pending oauth merge session payload', function (): void {
-    $pending = resolve(ResolvePendingOAuthMerge::class)->execute([
+    $pending = PendingOAuthMergeDTO::fromSession([
         'conflicting_user_id' => 'target-user',
         'provider' => IdentityProvider::Discord->value,
         'credentials' => [
@@ -90,10 +92,10 @@ test('resolves the pending oauth merge session payload', function (): void {
     ]);
 
     expect($pending)->toBeInstanceOf(PendingOAuthMergeDTO::class)
-        ->and($pending?->credentials->getAccessToken())->toBe('access-token')
-        ->and($pending?->credentials->getRefreshToken())->toBe('refresh-token')
-        ->and($pending?->credentials->getExpiresIn())->toBe(3_600)
-        ->and($pending?->metadata)->toBe([
+        ->and($pending?->connection->credentials->getAccessToken())->toBe('access-token')
+        ->and($pending?->connection->credentials->getRefreshToken())->toBe('refresh-token')
+        ->and($pending?->connection->credentials->getExpiresIn())->toBe(3_600)
+        ->and($pending?->connection->metadata)->toBe([
             'username' => 'discord-user',
             'global_name' => 'Discord User',
         ]);

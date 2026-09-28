@@ -6,7 +6,6 @@ namespace App\Livewire;
 
 use Filament\Notifications\Notification;
 use He4rt\Identity\Auth\Actions\ConfirmOAuthMerge;
-use He4rt\Identity\Auth\Actions\ResolvePendingOAuthMerge;
 use He4rt\Identity\Auth\DTOs\PendingOAuthMergeDTO;
 use He4rt\Identity\ExternalIdentity\Actions\ConnectApiKeyIdentity;
 use He4rt\Identity\ExternalIdentity\Enums\CredentialsType;
@@ -117,11 +116,9 @@ class ConnectionHub extends Component
         $this->resetValidation();
     }
 
-    public function confirmMerge(
-        ConfirmOAuthMerge $action,
-        ResolvePendingOAuthMerge $resolvePendingMerge,
-    ): void {
-        $pending = $resolvePendingMerge->execute(session()->get('oauth_merge_pending'));
+    public function confirmMerge(ConfirmOAuthMerge $action): void
+    {
+        $pending = PendingOAuthMergeDTO::fromSession(session()->get('oauth_merge_pending'));
 
         if (!$pending instanceof PendingOAuthMergeDTO) {
             $this->cancelMerge();

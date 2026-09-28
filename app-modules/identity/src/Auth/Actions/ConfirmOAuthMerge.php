@@ -30,8 +30,8 @@ final readonly class ConfirmOAuthMerge
             $conflictingIdentity = ExternalIdentity::query()
                 ->where('model_type', (new User)->getMorphClass())
                 ->where('model_id', $targetUser->id)
-                ->where('provider', $pending->provider)
-                ->where('external_account_id', $pending->providerId)
+                ->where('provider', $pending->connection->provider)
+                ->where('external_account_id', $pending->connection->providerId)
                 ->lockForUpdate()
                 ->first();
 
@@ -43,10 +43,7 @@ final readonly class ConfirmOAuthMerge
 
             $this->persistConnection->execute(
                 owner: $targetUser,
-                provider: $pending->provider,
-                providerId: $pending->providerId,
-                credentials: $pending->credentials,
-                metadata: $pending->metadata,
+                connection: $pending->connection,
                 connectedBy: $targetUser->id,
             );
 

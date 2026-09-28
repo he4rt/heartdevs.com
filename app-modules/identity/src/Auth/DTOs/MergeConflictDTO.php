@@ -15,23 +15,19 @@ final readonly class MergeConflictDTO
         public OAuthUserDTO $oauthUser,
     ) {}
 
+    public function toPending(): PendingOAuthMergeDTO
+    {
+        return new PendingOAuthMergeDTO(
+            conflictingUserId: $this->conflictingUserId,
+            connection: OAuthConnectionDTO::fromOAuth($this->oauthUser, $this->credentials),
+        );
+    }
+
     /**
      * @return array<string, mixed>
      */
     public function toSession(): array
     {
-        $credentials = $this->credentials->toClientAccessManager();
-
-        return [
-            'conflicting_user_id' => $this->conflictingUserId,
-            'provider' => $this->provider->value,
-            'credentials' => [
-                'access_token' => $credentials->accessToken,
-                'refresh_token' => $credentials->refreshToken,
-                'expires_in' => $credentials->expiresIn,
-            ],
-            'provider_id' => $this->oauthUser->providerId,
-            'metadata' => $this->oauthUser->toMetadata(),
-        ];
+        return $this->toPending()->toSession();
     }
 }
