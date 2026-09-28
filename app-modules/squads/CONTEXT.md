@@ -53,6 +53,10 @@ not blocking.)
 
 ## State & audit
 
+Every role mutation locks its `squads` row with `FOR UPDATE` before any `squad_members` row. This
+per-squad mutex serializes role changes and prevents reverse lock ordering with membership-event
+foreign keys, while mutations in different squads remain independent.
+
 - `squads` — squad state (`status`, `objective`, `slug`).
 - `squad_members` — current standing per (squad, user): `role`, `joined_at`, `left_at`.
 - `squad_membership_events` — append-only trail: `action` (`join`/`leave`/`promote`/`demote`/…),

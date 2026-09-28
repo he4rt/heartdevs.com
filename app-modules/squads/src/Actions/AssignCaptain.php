@@ -31,12 +31,15 @@ final readonly class AssignCaptain
 
     public function handle(User $actor, Squad $squad, User $subject, ?string $reason = null): SquadMember
     {
+        // Admin authority is global, so waiting for a squad lock cannot make this check stale.
         throw_unless($actor->isAdmin(), AuthorizationException::class);
 
         return DB::transaction(function () use ($squad, $subject, $actor, $reason): SquadMember {
-            // Locking the subject's row serializes concurrent assignments of the same
-            // person: the loser re-reads the incumbent after the winner commits and
-            // short-circuits below, instead of appending a phantom pair of events.
+            Squad::query()
+                ->whereKey($squad->id)
+                ->lockForUpdate()
+                ->firstOrFail();
+
             $member = SquadMember::query()
                 ->where('squad_id', $squad->id)
                 ->where('user_id', $subject->id)
@@ -46,7 +49,9 @@ final readonly class AssignCaptain
 
             throw_if($member === null, NotAnActiveSquadMember::for($squad, $subject));
 
-            $incumbent = $squad->captain()->first();
+            $incumbent = $squad->captain()
+                ->lockForUpdate()
+                ->first();
 
             if ($incumbent?->is($member)) {
                 return $member;

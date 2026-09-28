@@ -77,6 +77,11 @@ final readonly class PromoteToSubCaptain
             $action,
             $reason,
         ): SquadMember {
+            Squad::query()
+                ->whereKey($squad->id)
+                ->lockForUpdate()
+                ->firstOrFail();
+
             $member = SquadMember::query()
                 ->where('squad_id', $squad->id)
                 ->where('user_id', $subject->id)
