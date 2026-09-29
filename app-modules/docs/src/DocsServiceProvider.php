@@ -58,9 +58,9 @@ class DocsServiceProvider extends ServiceProvider
     {
         $this->commands([CacheDocsCommand::class]);
 
-        Scramble::registerApi('3.x');
+        Scramble::registerApi('4.x');
 
-        Scramble::registerUiRoute(path: 'docs/3.x/api', api: '3.x');
-        Scramble::registerJsonSpecificationRoute(path: 'docs/3.x/swagger.json', api: '3.x');
+        Scramble::registerUiRoute(path: 'docs/4.x/api', api: '4.x');
+        Scramble::registerJsonSpecificationRoute(path: 'docs/4.x/swagger.json', api: '4.x');
     }
 }

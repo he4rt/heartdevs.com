@@ -19,7 +19,7 @@ linha de release (`MAJOR.MINOR.PATCH`):
 - **MINOR** — funcionalidades novas retrocompatíveis.
 - **PATCH** — correções de bug retrocompatíveis.
 
-A documentação acompanha a linha **MAJOR.x** (por exemplo, `3.x`). Os links entre
+A documentação acompanha a linha **MAJOR.x** (por exemplo, `4.x`). Os links entre
 páginas usam o placeholder `{{version}}` para resolver sempre a versão corrente.
 
 <a name="support-policy"></a>

@@ -30,6 +30,7 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use PHPOpenSourceSaver\JWTAuth\Contracts\JWTSubject;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
 use Spatie\Permission\Models\Role;
@@ -54,7 +55,7 @@ use Spatie\Permission\Traits\HasRoles;
 #[UseFactory(factoryClass: UserFactory::class)]
 #[Table(name: 'users')]
 #[Hidden('password', 'remember_token', 'email_verified_at')]
-final class User extends Authenticatable implements FilamentUser, HasMedia, HasName
+final class User extends Authenticatable implements FilamentUser, HasMedia, HasName, JWTSubject
 {
     use HasAddress;
     /** @use HasFactory<UserFactory> */
@@ -69,6 +70,19 @@ final class User extends Authenticatable implements FilamentUser, HasMedia, HasN
     public function isSuperAdmin(): bool
     {
         return $this->hasRole(UserRole::SuperAdmin);
+    }
+
+    public function getJWTIdentifier(): string
+    {
+        return $this->getKey();
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    public function getJWTCustomClaims(): array
+    {
+        return [];
     }
 
     /**
