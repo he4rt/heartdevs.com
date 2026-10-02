@@ -1,4 +1,10 @@
-@props (['timeline', 'isOwner' => false, 'allowReplies' => true])
+@props ([
+    'timeline',
+    'isOwner' => false,
+    'allowReplies' => true,
+    'reactionCounts' => [],
+    'reactionMine' => null,
+])
 
 <div
     class="flex items-center justify-between border-t border-gray-100 px-3 py-2 text-sm text-gray-500 sm:px-4 dark:border-white/5 dark:text-gray-400"
@@ -23,12 +29,12 @@
             </span>
         @endif
 
-        <span class="flex items-center gap-1.5">
-            <x-heroicon-o-face-smile class="h-4 w-4" />
-            @if ($timeline->reactions_count > 0)
-                <span>{{ Number::abbreviate($timeline->reactions_count) }}</span>
-            @endif
-        </span>
+        <livewire:timeline-reactions
+            :timeline-id="$timeline->id"
+            :counts="$reactionCounts ?? []"
+            :mine="$reactionMine ?? null"
+            :key="'rx-'.$timeline->id"
+        />
     </div>
 
     @if ($isOwner && config('he4rt.features.timeline_pin'))

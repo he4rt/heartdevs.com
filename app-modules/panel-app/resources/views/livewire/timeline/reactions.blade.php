@@ -2,20 +2,28 @@
     use He4rt\Activity\Reaction\Enums\TimelineReaction;
 @endphp
 
-<div x-data="{ open: false }" class="relative" @click.outside="open = false">
+<div
+    x-data="{ open: false }"
+    class="relative"
+    @mouseenter="open = true"
+    @mouseleave="open = false"
+    @click.outside="open = false"
+>
     <button
         type="button"
-        @click="open = !open"
+        @click="open = true"
+        @focus="open = true"
         class="hover:text-primary-500 flex items-center gap-1.5 transition {{ $mine !== null ? 'text-primary-500' : '' }}"
     >
-        @if ($mine !== null)
-            <span class="text-sm leading-none">{{ TimelineReaction::from($mine)->getEmoji() }}</span>
-        @else
+        @if (empty($counts))
             <x-heroicon-o-face-smile class="h-4 w-4" />
-        @endif
-
-        @if (array_sum($counts) > 0)
-            <span>{{ Number::abbreviate(array_sum($counts)) }}</span>
+        @else
+            @foreach ($counts as $key => $count)
+                <span class="flex items-center gap-0.5 {{ $mine === $key ? 'font-semibold text-primary-500' : '' }}">
+                    <span class="text-sm leading-none">{{ TimelineReaction::from($key)->getEmoji() }}</span>
+                    <span>{{ Number::abbreviate($count) }}</span>
+                </span>
+            @endforeach
         @endif
     </button>
 
@@ -30,7 +38,7 @@
                 type="button"
                 wire:click="reactWith('{{ $reaction->value }}')"
                 @click="open = false"
-                title="{{ $reaction->getLabel() }}"
+                aria-label="{{ $reaction->getLabel() }}"
                 class="flex h-7 w-7 items-center justify-center rounded-full text-base transition hover:scale-125 {{ $mine === $reaction->value ? 'bg-primary-500/10' : '' }}"
             >
                 {{ $reaction->getEmoji() }}
