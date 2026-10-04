@@ -2,7 +2,11 @@
 
 declare(strict_types=1);
 
+use He4rt\IntegrationTwitch\Enums\TwitchSubscriptionStatus;
+use He4rt\IntegrationTwitch\Events\TwitchEventReceived;
 use He4rt\IntegrationTwitch\Models\TwitchEventLog;
+use He4rt\IntegrationTwitch\Models\TwitchSubscription;
+use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Str;
 use Illuminate\Testing\TestResponse;
 
@@ -30,6 +34,24 @@ function twitchWebhookPayload(string $eventType = 'stream.online', string $messa
             'broadcaster_user_login' => 'danielhe4rt',
             'broadcaster_user_name' => 'danielhe4rt',
             'user_id' => '67890',
+        ],
+    ];
+}
+
+/**
+ * @return array<string, array<string, mixed>>
+ */
+function twitchRevocationPayload(string $status = 'authorization_revoked'): array
+{
+    return [
+        'subscription' => [
+            'id' => 'sub-revoked',
+            'type' => 'stream.online',
+            'version' => '1',
+            'status' => $status,
+            'cost' => 0,
+            'condition' => ['broadcaster_user_id' => '12345'],
+            'transport' => ['method' => 'webhook', 'callback' => 'https://example.com'],
         ],
     ];
 }
@@ -119,24 +141,46 @@ test('stores notification event in twitch_event_logs', function (): void {
         ->and($log->payload)->toBeArray();
 });
 
-test('stores revocation event in twitch_event_logs', function (): void {
-    $payload = [
-        'subscription' => [
-            'id' => 'sub-revoked',
-            'type' => 'stream.online',
-            'version' => '1',
-            'status' => 'authorization_revoked',
-            'condition' => ['broadcaster_user_id' => '12345'],
-            'transport' => ['method' => 'webhook', 'callback' => 'https://example.com'],
-        ],
-    ];
+test('dispatches TwitchEventReceived for notifications', function (): void {
+    Event::fake([TwitchEventReceived::class]);
 
-    postTwitchWebhook($payload, 'revocation')->assertNoContent();
+    postTwitchWebhook(twitchWebhookPayload('channel.follow'))->assertNoContent();
 
-    $log = TwitchEventLog::query()->first();
+    Event::assertDispatched(fn (TwitchEventReceived $event): bool => $event->eventLog->event_type === 'channel.follow');
+});
 
-    expect($log)->not->toBeNull()
-        ->and($log->event_type)->toBe('stream.online');
+test('revocation updates the local subscription status instead of logging an event', function (): void {
+    Event::fake([TwitchEventReceived::class]);
+
+    TwitchSubscription::query()->create([
+        'subscription_id' => 'sub-revoked',
+        'type' => 'stream.online',
+        'status' => TwitchSubscriptionStatus::Enabled,
+        'broadcaster_user_id' => '12345',
+        'condition' => ['broadcaster_user_id' => '12345'],
+        'transport' => 'webhook',
+        'callback_url' => 'https://example.com',
+        'cost' => 0,
+        'version' => '1',
+    ]);
+
+    postTwitchWebhook(twitchRevocationPayload(), 'revocation')->assertNoContent();
+
+    expect(TwitchSubscription::query()->sole()->status)->toBe(TwitchSubscriptionStatus::AuthorizationRevoked)
+        ->and(TwitchEventLog::query()->count())->toBe(0);
+
+    Event::assertNotDispatched(TwitchEventReceived::class);
+});
+
+test('revocation of a subscription missing locally creates its mirror', function (): void {
+    postTwitchWebhook(twitchRevocationPayload(status: 'user_removed'), 'revocation')->assertNoContent();
+
+    $subscription = TwitchSubscription::query()->sole();
+
+    expect($subscription->subscription_id)->toBe('sub-revoked')
+        ->and($subscription->status)->toBe(TwitchSubscriptionStatus::UserRemoved)
+        ->and($subscription->broadcaster_user_id)->toBe('12345')
+        ->and($subscription->type)->toBe('stream.online');
 });
 
 test('handles duplicate twitch_message_id gracefully', function (): void {
