@@ -6,6 +6,7 @@ namespace He4rt\PanelAdmin\Twitch\Resources;
 
 use BackedEnum;
 use Filament\Actions\DeleteAction;
+use Filament\Notifications\Notification;
 use Filament\Resources\Pages\PageRegistration;
 use Filament\Resources\Resource;
 use Filament\Support\Icons\Heroicon;
@@ -87,12 +88,24 @@ class TwitchSubscriptionResource extends Resource
             ])
             ->recordActions([
                 DeleteAction::make()
-                    ->before(static function (TwitchSubscription $record): void {
+                    ->before(static function (DeleteAction $action, TwitchSubscription $record): void {
                         try {
                             $helix = resolve(TwitchHelixConnector::class);
                             $helix->send(new DeleteSubscription(subscriptionId: $record->subscription_id));
-                        } catch (RequestException) {
-                            // Subscription may already be gone on Twitch side
+                        } catch (RequestException $requestException) {
+                            $alreadyGoneOnTwitch = $requestException->getResponse()->status() === 404;
+
+                            if ($alreadyGoneOnTwitch) {
+                                return;
+                            }
+
+                            Notification::make()
+                                ->danger()
+                                ->title(__('panel-admin::twitch.subscriptions.actions.delete_failed'))
+                                ->body($requestException->getMessage())
+                                ->send();
+
+                            $action->cancel();
                         }
                     }),
             ]);

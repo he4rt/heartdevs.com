@@ -57,13 +57,6 @@ final readonly class RegisterTwitchSubscriptionsAction
                     secret: $secret,
                 ));
 
-                if (!$response->successful()) {
-                    $errors[$type->value] = sprintf('error_%d', $response->status());
-                    $failed++;
-
-                    continue;
-                }
-
                 $data = $response->json('data.0');
 
                 if (!is_array($data) || !isset($data['id'])) {

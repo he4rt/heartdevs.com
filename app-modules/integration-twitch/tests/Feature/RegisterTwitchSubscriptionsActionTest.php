@@ -64,6 +64,23 @@ test('registra a subscription usando o broadcaster id informado, sem tocar em co
     ]);
 });
 
+test('classifica a recusa da Twitch como falha, sem gravar a subscription', function (int $status, string $reason): void {
+    bindMockedHelix(new MockClient([
+        CreateSubscription::class => MockResponse::make(['message' => 'rejected'], $status),
+    ]));
+
+    $result = resolve(RegisterTwitchSubscriptionsAction::class)('999888', [TwitchEventSubType::ChannelFollow]);
+
+    expect($result['created'])->toBe(0)
+        ->and($result['failed'])->toBe(1)
+        ->and($result['errors'])->toBe(['channel.follow' => $reason])
+        ->and(TwitchSubscription::query()->count())->toBe(0);
+})->with([
+    'sem escopo' => [403, 'missing_scope'],
+    'já existe na Twitch' => [409, 'already_exists'],
+    'erro da Twitch' => [500, 'error_500'],
+]);
+
 test('pula subscriptions já existentes para o mesmo broadcaster', function (): void {
     TwitchSubscription::query()->create([
         'subscription_id' => 'existing-1',

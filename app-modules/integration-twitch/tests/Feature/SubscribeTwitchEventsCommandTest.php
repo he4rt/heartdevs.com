@@ -13,14 +13,14 @@ use Illuminate\Support\Facades\Cache;
 use Saloon\Http\Faking\MockClient;
 use Saloon\Http\Faking\MockResponse;
 
-function mockEventSubResponses(array $existingSubscriptions = []): MockClient
+function mockEventSubResponses(array $existingSubscriptions = [], ?MockResponse $createResponse = null): MockClient
 {
     $mock = new MockClient([
         ListSubscriptions::class => MockResponse::make([
             'data' => $existingSubscriptions,
             'total' => count($existingSubscriptions),
         ]),
-        CreateSubscription::class => MockResponse::make([
+        CreateSubscription::class => $createResponse ?? MockResponse::make([
             'data' => [['id' => 'sub-123', 'status' => 'webhook_callback_verification_pending']],
             'total' => 1,
         ], 202),
@@ -86,6 +86,17 @@ test('skips already existing subscriptions', function (): void {
         '--type' => 'stream.online',
     ])->assertSuccessful()
         ->expectsOutputToContain('already_exists');
+});
+
+test('reports a rejected creation instead of counting it as created', function (): void {
+    mockEventSubResponses(createResponse: MockResponse::make(['message' => 'missing scope'], 403));
+
+    $this->artisan('twitch:subscribe', [
+        'broadcaster_user_id' => '12345',
+        '--type' => 'channel.follow',
+    ])->assertSuccessful()
+        ->expectsOutputToContain('missing_scope')
+        ->expectsOutputToContain('0 subscription(s) created.');
 });
 
 test('fails without type, all, or clear-all flag', function (): void {

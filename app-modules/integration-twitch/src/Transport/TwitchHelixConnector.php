@@ -7,10 +7,12 @@ namespace He4rt\IntegrationTwitch\Transport;
 use He4rt\IntegrationTwitch\OAuth\TwitchAppTokenService;
 use Saloon\Http\Auth\TokenAuthenticator;
 use Saloon\Http\Connector;
+use Saloon\Traits\Plugins\AlwaysThrowOnErrors;
 use Saloon\Traits\Plugins\HasTimeout;
 
 final class TwitchHelixConnector extends Connector
 {
+    use AlwaysThrowOnErrors;
     use HasTimeout;
 
     protected int $connectTimeout = 5;
