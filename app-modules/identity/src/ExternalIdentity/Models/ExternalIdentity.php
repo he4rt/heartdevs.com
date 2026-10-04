@@ -90,6 +90,21 @@ final class ExternalIdentity extends Model
         return $this->connected_at !== null && $this->disconnected_at === null;
     }
 
+    /**
+     * Conexões feitas antes de guardar `granted_scopes` contam como o conjunto
+     * padrão de login do provider.
+     *
+     * @param  array<int, string>  $requiredScopes
+     * @return array<int, string>
+     */
+    public function missingScopes(array $requiredScopes): array
+    {
+        $storedScopes = $this->metadata['granted_scopes'] ?? null;
+        $grantedScopes = is_array($storedScopes) ? $storedScopes : $this->provider->getScopes();
+
+        return array_values(array_diff($requiredScopes, $grantedScopes));
+    }
+
     protected static function newFactory(): ExternalIdentityFactory
     {
         return ExternalIdentityFactory::new();

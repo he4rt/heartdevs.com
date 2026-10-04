@@ -21,11 +21,17 @@ final readonly class OAuthConnectionDTO
 
     public static function fromOAuth(OAuthUserDTO $oauthUser, OAuthAccessDTO $access): self
     {
+        $metadata = $oauthUser->toMetadata();
+
+        if ($access->grantedScopes !== []) {
+            $metadata['granted_scopes'] = $access->grantedScopes;
+        }
+
         return new self(
             provider: $oauthUser->provider,
             providerId: $oauthUser->providerId,
             credentials: $access->toClientAccessManager(),
-            metadata: $oauthUser->toMetadata(),
+            metadata: $metadata,
         );
     }
 }

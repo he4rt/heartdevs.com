@@ -379,3 +379,36 @@ test('o card da Twitch lista os escopos de broadcaster só para streamer', funct
     'streamer' => ['streamer', true],
     'membro' => ['membro', false],
 ]);
+
+test('o botão de reautorizar aparece só quando faltam escopos para quem conectou', function (string $factoryState, ?array $grantedScopes, bool $seesReauthorize): void {
+    config()->set('services.twitch.scopes.app', 'user:read:email');
+    config()->set('services.twitch.scopes.streamer', 'user:read:email moderator:read:followers channel:read:subscriptions bits:read');
+
+    $user = $factoryState === 'streamer'
+        ? User::factory()->streamer()->create()
+        : User::factory()->create();
+
+    ExternalIdentity::factory()->create([
+        'model_id' => $user->getKey(),
+        'provider' => IdentityProvider::Twitch,
+        'connected_at' => now(),
+        'disconnected_at' => null,
+        'metadata' => array_filter([
+            'username' => 'twitch-user',
+            'granted_scopes' => $grantedScopes,
+        ]),
+    ]);
+
+    $this->actingAs($user);
+
+    $component = livewire(ConnectionHub::class);
+
+    $seesReauthorize
+        ? $component->assertSee('Reautorizar')->assertSee('moderator:read:followers')
+        : $component->assertDontSee('Reautorizar');
+})->with([
+    'streamer com conexão antiga, sem escopos guardados' => ['streamer', null, true],
+    'streamer que concedeu só o login' => ['streamer', ['user:read:email'], true],
+    'streamer que já concedeu tudo' => ['streamer', ['user:read:email', 'moderator:read:followers', 'channel:read:subscriptions', 'bits:read'], false],
+    'membro com conexão antiga' => ['membro', null, false],
+]);
