@@ -2,7 +2,7 @@
 
 @php
     $displayName = $user?->name ?? 'Usuário removido';
-    $avatarUrl   = $user?->getFirstMediaUrl('avatar') ?: null;
+    $avatarUrl   = $user?->getFilamentAvatarUrl();
 @endphp
 
 <div class="flex items-center gap-3 px-3 pt-3 pb-2 sm:px-4 sm:pt-4">

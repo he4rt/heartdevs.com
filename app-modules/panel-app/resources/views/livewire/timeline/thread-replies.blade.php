@@ -12,7 +12,7 @@
                     @continue (!$reply->postable)
                     <div wire:key="reply-{{ $reply->id }}" class="px-3 py-3 sm:px-4">
                         <div class="flex gap-2 sm:gap-3">
-                            @php($replyAvatarUrl = $reply->user->getFirstMediaUrl('avatar') ?: null)
+                            @php($replyAvatarUrl = $reply->user->getFilamentAvatarUrl())
                             @if ($replyAvatarUrl)
                                 <img
                                     src="{{ $replyAvatarUrl }}"
