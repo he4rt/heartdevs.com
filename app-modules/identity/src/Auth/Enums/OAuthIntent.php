@@ -8,4 +8,5 @@ enum OAuthIntent: string
 {
     case Login = 'login';
     case Link = 'link';
+    case MobileLogin = 'mobile_login';
 }
