@@ -52,7 +52,7 @@ final readonly class PromotionCard
             userId: $userId,
             name: (string) ($payload['name'] ?? ''),
             username: (string) ($payload['username'] ?? ''),
-            avatar: is_string($avatar) && $avatar !== '' ? $avatar : null,
+            avatar: filled($avatar) ? $avatar : null,
             stage: $stage,
             reason: is_string($reason) && $reason !== '' ? $reason : null,
             groups: self::groups($payload['groups'] ?? []),
