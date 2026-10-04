@@ -143,11 +143,13 @@ it('projeta issues e pushes (commits)', function (): void {
         'sender' => ['login' => 'maria', 'id' => 42],
         'commits' => [
             ['id' => 'sha1', 'url' => 'u', 'timestamp' => '2026-06-04T08:00:00Z', 'author' => ['username' => 'maria', 'name' => 'Maria']],
+            ['id' => 'sha2', 'url' => 'u', 'timestamp' => '2026-06-04T09:00:00Z', 'author' => ['name' => 'Sem Conta']],
         ],
     ])->assertSuccessful();
 
     expect(GithubContribution::query()->where('external_ref', 'issue:10')->exists())->toBeTrue()
-        ->and(GithubContribution::query()->where('external_ref', 'commit:sha1')->exists())->toBeTrue();
+        ->and(GithubContribution::query()->where('external_ref', 'commit:sha1')->sole()->metadata['author_linked'])->toBeTrue()
+        ->and(GithubContribution::query()->where('external_ref', 'commit:sha2')->sole()->metadata['author_linked'])->toBeFalse();
 });
 
 it('grava no lake mas NÃO projeta contribuição para repo de challenge', function (): void {

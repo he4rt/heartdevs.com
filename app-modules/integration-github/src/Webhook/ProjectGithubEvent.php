@@ -216,6 +216,7 @@ final readonly class ProjectGithubEvent
                 targetRef: null,
                 metadata: [
                     'url' => data_get($commit, 'url'),
+                    'author_linked' => $username !== '',
                     'is_bot' => $this->isBot($login),
                 ],
             ), emit: true);

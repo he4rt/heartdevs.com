@@ -361,6 +361,8 @@ it('faz backfill de commits dedup por sha, com fallback de autor', function (): 
         ->and($linked->actor_login)->toBe('maria')
         ->and($linked->actor_id)->toBe(42)
         ->and($linked->occurred_at->toIso8601String())->toBe('2026-06-04T08:00:00+00:00')
+        ->and($linked->metadata['author_linked'])->toBeTrue()
         ->and($unlinked->actor_login)->toBe('Sem Conta')
-        ->and($unlinked->actor_id)->toBeNull();
+        ->and($unlinked->actor_id)->toBeNull()
+        ->and($unlinked->metadata['author_linked'])->toBeFalse();
 });

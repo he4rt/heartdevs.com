@@ -252,6 +252,7 @@ final readonly class BackfillRepository
                     targetRef: null,
                     metadata: [
                         'url' => data_get($commit, 'html_url'),
+                        'author_linked' => $this->stringFrom($commit, 'author.login') !== '',
                         'is_bot' => $this->isBot($login, $this->stringFrom($commit, 'author.type')),
                     ],
                 ), $onProgress);
