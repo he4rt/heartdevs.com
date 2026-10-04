@@ -6,7 +6,7 @@ namespace He4rt\PanelApp\Clusters\Streaming;
 
 use Carbon\CarbonInterface;
 use He4rt\Identity\User\Models\User;
-use He4rt\PanelApp\Clusters\Streaming\Enums\StreamAlertType;
+use He4rt\Streaming\Enums\StreamEventType;
 
 /**
  * Dados de exemplo da área "Minha Live", até existir o modelo de overlay e alertas.
@@ -14,29 +14,29 @@ use He4rt\PanelApp\Clusters\Streaming\Enums\StreamAlertType;
 final class StreamingPreviewData
 {
     /**
-     * @return array<int, array{type: StreamAlertType, value: string}>
+     * @return array<int, array{type: StreamEventType, value: string}>
      */
     public static function stats(): array
     {
         return [
-            ['type' => StreamAlertType::Follow, 'value' => '128'],
-            ['type' => StreamAlertType::Sub, 'value' => '14'],
-            ['type' => StreamAlertType::Cheer, 'value' => '3.250'],
-            ['type' => StreamAlertType::Raid, 'value' => '3'],
+            ['type' => StreamEventType::Follow, 'value' => '128'],
+            ['type' => StreamEventType::Sub, 'value' => '14'],
+            ['type' => StreamEventType::Cheer, 'value' => '3.250'],
+            ['type' => StreamEventType::Raid, 'value' => '3'],
         ];
     }
 
     /**
-     * @return array<int, array{type: StreamAlertType, username: string, detail: string, at: CarbonInterface}>
+     * @return array<int, array{type: StreamEventType, username: string, detail: string, at: CarbonInterface}>
      */
     public static function recentActivity(): array
     {
         return [
-            ['type' => StreamAlertType::Follow, 'username' => 'devlucasdev', 'detail' => '', 'at' => now()->subMinutes(2)],
-            ['type' => StreamAlertType::Cheer, 'username' => 'mariacoda', 'detail' => '500 bits', 'at' => now()->subMinutes(9)],
-            ['type' => StreamAlertType::Sub, 'username' => 'pedroterminal', 'detail' => '3 meses', 'at' => now()->subMinutes(25)],
-            ['type' => StreamAlertType::Raid, 'username' => 'canaldoze', 'detail' => '+42 viewers', 'at' => now()->subHour()],
-            ['type' => StreamAlertType::GiftSub, 'username' => 'anabackend', 'detail' => '5 subs', 'at' => now()->subHours(3)],
+            ['type' => StreamEventType::Follow, 'username' => 'devlucasdev', 'detail' => '', 'at' => now()->subMinutes(2)],
+            ['type' => StreamEventType::Cheer, 'username' => 'mariacoda', 'detail' => '500 bits', 'at' => now()->subMinutes(9)],
+            ['type' => StreamEventType::Sub, 'username' => 'pedroterminal', 'detail' => '3 meses', 'at' => now()->subMinutes(25)],
+            ['type' => StreamEventType::Raid, 'username' => 'canaldoze', 'detail' => '+42 viewers', 'at' => now()->subHour()],
+            ['type' => StreamEventType::GiftSub, 'username' => 'anabackend', 'detail' => '5 subs', 'at' => now()->subHours(3)],
         ];
     }
 

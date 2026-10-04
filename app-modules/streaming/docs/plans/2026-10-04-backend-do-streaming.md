@@ -472,12 +472,12 @@ Feature: Listar inscrições de um broadcaster
 
 ## Fase 1 — Núcleo do streaming
 
-- [ ] 1.1 Enums do domínio
-- [ ] 1.2 `StreamerSettings` e os VOs de cena
-- [ ] 1.3 Tabelas `streamers` e `streamer_sources`
-- [ ] 1.4 Token da overlay e nome do canal
-- [ ] 1.5 Ciclo de vida do streamer
-- [ ] 1.6 Fontes do streamer
+- [x] 1.1 Enums do domínio
+- [x] 1.2 `StreamerSettings` e os VOs de cena
+- [x] 1.3 Tabelas `streamers` e `streamer_sources`
+- [x] 1.4 Token da overlay e nome do canal
+- [x] 1.5 Ciclo de vida do streamer
+- [x] 1.6 Fontes do streamer
 
 ### 1.1 Enums do domínio
 
@@ -605,8 +605,8 @@ final readonly class AlertSettings
 ```
 
 `StartingSoonSettings` tem `title: ?string` e `startsAt: ?string`. Um horário fora do formato
-`HH:MM` vira `null`. `VoiceSettings` e `CoworkingSettings` começam com os campos que a sessão da
-overlay confirmar.
+`HH:MM` vira `null`. `VoiceSettings` tem `layout: VoiceLayout` (`col` ou `row`), o mesmo parâmetro
+que a overlay de voz lê hoje. `CoworkingSettings` não tem campos, porque a cena não lê nenhum.
 
 **Comportamento esperado.**
 
@@ -704,8 +704,9 @@ final class Streamer extends Model
 }
 ```
 
-`User` ganha `streamer(): HasOne`. O `streaming` registra o relacionamento com
-`User::resolveRelationUsing()` no ServiceProvider, para o `identity` não importar o `streaming`.
+O `User` não ganha relacionamento com o `Streamer`. Um relacionamento registrado com
+`User::resolveRelationUsing()` fica invisível para o PHPStan. O `streaming` consulta o streamer com
+`Streamer::query()->whereBelongsTo($user)`, e o `identity` não importa o `streaming`.
 
 **Comportamento esperado.**
 
@@ -860,8 +861,10 @@ lê o estado final com `hasRole`.
 // Antes: UserForm.php:71
 $component->saveStateToRelationship();
 
-// Depois
-$record?->syncRoles($component->getState());
+// Depois: o CheckboxList devolve os ids como string, e o spatie lê string como nome de role
+$roleIds = array_map(intval(...), $component->getState() ?? []);
+
+DB::transaction(fn (): ?User => $record?->syncRoles($roleIds));
 ```
 
 ```php
@@ -885,27 +888,41 @@ public function handle(User $user): Streamer
 
 ```php
 // streaming/src/Streamer/Listeners/SyncStreamerWithRole.php
-final class SyncStreamerWithRole implements ShouldQueue, ShouldHandleEventsAfterCommit
+final readonly class SyncStreamerWithRole implements ShouldQueueAfterCommit
 {
     public function handle(RoleAttachedEvent|RoleDetachedEvent $event): void
     {
         $user = $event->model;
 
-        if (!$user instanceof User || !$user->streamer instanceof Streamer) {
+        if (!$user instanceof User) {
             return;
         }
 
-        $hasStreamerRole = $user->hasRole(UserRole::Streamer);
+        $streamer = Streamer::query()->whereBelongsTo($user)->first();
 
-        $hasStreamerRole
-            ? $this->activateStreamer->handle($user->streamer)
-            : $this->disableStreamer->handle($user->streamer);
+        if (!$streamer instanceof Streamer) {
+            return;
+        }
+
+        $user->can('use-streamer-tools')
+            ? $this->activateStreamer->handle($streamer)
+            : $this->disableStreamer->handle($streamer);
     }
 }
 ```
 
 `ActivateStreamer` e `DisableStreamer` só emitem `StreamerActivated` ou `StreamerDisabled` quando o
 status muda de fato. Chamar de novo não emite nada.
+
+Três detalhes apareceram na implementação:
+
+- Listener enfileirado só herda o after-commit com `ShouldQueueAfterCommit`. O
+  `ShouldHandleEventsAfterCommit` vale só para listener síncrono.
+- O `syncRoles` desanexa tudo antes de anexar. Com a fila `sync`, o listener veria o usuário sem
+  role no meio da troca. A transação no `UserForm` faz o listener rodar depois do commit, com as
+  roles finais.
+- O listener pergunta ao gate `use-streamer-tools`, e não ao `hasRole`. Assim o super-admin, que
+  passa pelo `Gate::before`, não perde o streamer quando as roles dele mudam.
 
 **Comportamento esperado.**
 

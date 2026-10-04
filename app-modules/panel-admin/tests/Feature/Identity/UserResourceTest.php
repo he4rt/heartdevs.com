@@ -12,6 +12,11 @@ use He4rt\PanelAdmin\Filament\Resources\Users\Pages\EditUser;
 use He4rt\PanelAdmin\Filament\Resources\Users\Pages\ListUsers;
 use He4rt\PanelAdmin\Filament\Resources\Users\RelationManagers\ProvidersRelationManager;
 use He4rt\PanelAdmin\Filament\Resources\Users\UserResource;
+use He4rt\Streaming\Enums\StreamerStatus;
+use He4rt\Streaming\Streamer\Events\StreamerActivated;
+use He4rt\Streaming\Streamer\Events\StreamerDisabled;
+use He4rt\Streaming\Streamer\Models\Streamer;
+use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Str;
 use Spatie\Permission\Models\Role;
 
@@ -155,6 +160,54 @@ test('salvar o form concede a role streamer a outro usuário', function (): void
         ->assertHasNoFormErrors();
 
     expect($other->fresh()?->hasRole(UserRole::Streamer))->toBeTrue();
+});
+
+test('tirar a role streamer pelo form desativa o streamer sem apagar nada', function (): void {
+    Event::fake([StreamerDisabled::class, StreamerActivated::class]);
+    $streamer = Streamer::factory()->create();
+
+    livewire(EditUser::class, ['record' => $streamer->user_id])
+        ->fillForm(['roles' => []])
+        ->call('save')
+        ->assertHasNoFormErrors();
+
+    expect($streamer->refresh()->status)->toBe(StreamerStatus::Disabled)
+        ->and($streamer->trashed())->toBeFalse();
+    Event::assertDispatchedTimes(StreamerDisabled::class, 1);
+    Event::assertNotDispatched(StreamerActivated::class);
+});
+
+test('devolver a role streamer pelo form reativa o streamer com o mesmo token', function (): void {
+    Event::fake([StreamerDisabled::class, StreamerActivated::class]);
+    $streamer = Streamer::factory()->disabled()->create();
+    $streamer->user->removeRole(UserRole::Streamer);
+
+    $token = $streamer->overlay_token;
+    $role = Role::findByName(UserRole::Streamer->value, UserRole::GUARD);
+
+    livewire(EditUser::class, ['record' => $streamer->user_id])
+        ->fillForm(['roles' => [$role->getKey()]])
+        ->call('save')
+        ->assertHasNoFormErrors();
+
+    expect($streamer->refresh()->status)->toBe(StreamerStatus::Active)
+        ->and($streamer->overlay_token)->toBe($token);
+    Event::assertDispatchedTimes(StreamerActivated::class, 1);
+});
+
+test('salvar o form com as mesmas roles não mexe no streamer', function (): void {
+    Event::fake([StreamerDisabled::class, StreamerActivated::class]);
+    $streamer = Streamer::factory()->create();
+    $role = Role::findByName(UserRole::Streamer->value, UserRole::GUARD);
+
+    livewire(EditUser::class, ['record' => $streamer->user_id])
+        ->fillForm(['roles' => [$role->getKey()]])
+        ->call('save')
+        ->assertHasNoFormErrors();
+
+    expect($streamer->refresh()->status)->toBe(StreamerStatus::Active);
+    Event::assertNotDispatched(StreamerDisabled::class);
+    Event::assertNotDispatched(StreamerActivated::class);
 });
 
 test('a listagem e o form de edição renderizam a role streamer', function (): void {

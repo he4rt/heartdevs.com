@@ -11,6 +11,7 @@ use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 use He4rt\Identity\Authorization\Enums\UserRole;
 use He4rt\Identity\User\Models\User;
+use Illuminate\Support\Facades\DB;
 use Spatie\Permission\Models\Role;
 
 class UserForm
@@ -68,7 +69,9 @@ class UserForm
                                     $component->state(self::keepOwnSuperAdmin($component->getState(), $record));
                                 }
 
-                                $component->saveStateToRelationship();
+                                $roleIds = array_map(intval(...), $component->getState() ?? []);
+
+                                DB::transaction(fn (): ?User => $record?->syncRoles($roleIds));
                             })
                             ->helperText(fn (?User $record): ?string => self::isEditingSelf($record) ? 'Você não pode alterar o próprio super admin.' : null),
                     ]),

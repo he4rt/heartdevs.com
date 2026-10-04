@@ -10,9 +10,10 @@ use Filament\Notifications\Notification;
 use Filament\Pages\Page;
 use Filament\Support\Icons\Heroicon;
 use He4rt\Identity\User\Models\User;
-use He4rt\PanelApp\Clusters\Streaming\Enums\OverlayScene;
 use He4rt\PanelApp\Clusters\Streaming\StreamingCluster;
 use He4rt\PanelApp\Clusters\Streaming\StreamingPreviewData;
+use He4rt\Streaming\Enums\OverlayScene;
+use He4rt\Streaming\Streamer\Actions\EnsureStreamer;
 use Illuminate\Support\Str;
 use Livewire\Attributes\Locked;
 
@@ -20,6 +21,7 @@ class StreamOverlaysPage extends Page
 {
     #[Locked]
     public string $overlayToken = '';
+
     protected static ?string $cluster = StreamingCluster::class;
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
@@ -39,11 +41,13 @@ class StreamOverlaysPage extends Page
         return auth()->user()?->can('use-streamer-tools') ?? false;
     }
 
-    public function mount(): void
+    public function mount(EnsureStreamer $ensureStreamer): void
     {
         $user = auth()->user();
 
         abort_unless($user instanceof User, 403);
+
+        $ensureStreamer->handle($user);
 
         $this->overlayToken = StreamingPreviewData::overlayToken($user);
     }

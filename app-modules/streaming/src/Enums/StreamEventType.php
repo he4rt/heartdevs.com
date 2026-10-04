@@ -2,15 +2,17 @@
 
 declare(strict_types=1);
 
-namespace He4rt\PanelApp\Clusters\Streaming\Enums;
+namespace He4rt\Streaming\Enums;
 
+use Filament\Support\Contracts\HasColor;
+use Filament\Support\Contracts\HasDescription;
 use Filament\Support\Contracts\HasLabel;
 
-enum StreamAlertType: string implements HasLabel
+enum StreamEventType: string implements HasColor, HasDescription, HasLabel
 {
     case Follow = 'follow';
     case Sub = 'sub';
-    case GiftSub = 'gift-sub';
+    case GiftSub = 'gift_sub';
     case Cheer = 'cheer';
     case Raid = 'raid';
 
@@ -22,6 +24,26 @@ enum StreamAlertType: string implements HasLabel
             self::GiftSub => 'Gift sub',
             self::Cheer => 'Bits',
             self::Raid => 'Raid',
+        };
+    }
+
+    public function getDescription(): string
+    {
+        return match ($this) {
+            self::Follow => 'Alguém começou a seguir o canal.',
+            self::Sub => 'Alguém assinou o canal ou renovou a assinatura.',
+            self::GiftSub => 'Alguém deu assinaturas de presente.',
+            self::Cheer => 'Alguém mandou bits.',
+            self::Raid => 'Outro canal trouxe a audiência para cá.',
+        };
+    }
+
+    public function getColor(): string
+    {
+        return match ($this) {
+            self::Follow => 'info',
+            self::Sub, self::GiftSub => 'primary',
+            self::Cheer, self::Raid => 'warning',
         };
     }
 

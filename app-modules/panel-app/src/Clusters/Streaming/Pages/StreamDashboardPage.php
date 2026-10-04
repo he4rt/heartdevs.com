@@ -15,9 +15,10 @@ use He4rt\Identity\ExternalIdentity\Enums\IdentityProvider;
 use He4rt\Identity\ExternalIdentity\Models\ExternalIdentity;
 use He4rt\Identity\User\Models\User;
 use He4rt\IntegrationTwitch\OAuth\TwitchScopes;
-use He4rt\PanelApp\Clusters\Streaming\Enums\StreamAlertType;
 use He4rt\PanelApp\Clusters\Streaming\StreamingCluster;
 use He4rt\PanelApp\Clusters\Streaming\StreamingPreviewData;
+use He4rt\Streaming\Enums\StreamEventType;
+use He4rt\Streaming\Streamer\Actions\EnsureStreamer;
 use Livewire\Attributes\Computed;
 
 /**
@@ -43,6 +44,11 @@ class StreamDashboardPage extends Page
     public static function canAccess(): bool
     {
         return auth()->user()?->can('use-streamer-tools') ?? false;
+    }
+
+    public function mount(EnsureStreamer $ensureStreamer): void
+    {
+        $ensureStreamer->handle($this->streamer());
     }
 
     #[Computed]
@@ -113,7 +119,7 @@ class StreamDashboardPage extends Page
 
     public function sendTestAlert(string $type): void
     {
-        $alertType = StreamAlertType::tryFrom($type);
+        $alertType = StreamEventType::tryFrom($type);
 
         if ($alertType === null) {
             return;
@@ -132,7 +138,7 @@ class StreamDashboardPage extends Page
     protected function getViewData(): array
     {
         return [
-            'alertTypes' => StreamAlertType::cases(),
+            'alertTypes' => StreamEventType::cases(),
             'stats' => StreamingPreviewData::stats(),
             'recentActivity' => StreamingPreviewData::recentActivity(),
         ];
