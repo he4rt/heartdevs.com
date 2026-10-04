@@ -90,6 +90,11 @@ final class ExternalIdentity extends Model
         return $this->connected_at !== null && $this->disconnected_at === null;
     }
 
+    public function avatarUrl(): ?string
+    {
+        return $this->provider->getAvatarUrl($this->external_account_id, $this->metadata ?? []);
+    }
+
     protected static function newFactory(): ExternalIdentityFactory
     {
         return ExternalIdentityFactory::new();

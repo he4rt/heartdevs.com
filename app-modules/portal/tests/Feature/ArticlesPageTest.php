@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 use He4rt\Contents\Articles\Models\Article as CatalogueArticle;
 use He4rt\Contents\Models\ContentEntry;
+use He4rt\Identity\ExternalIdentity\Enums\IdentityProvider;
+use He4rt\Identity\ExternalIdentity\Models\ExternalIdentity;
 use He4rt\Identity\User\Models\User;
 use He4rt\Portal\Articles\ArticleFeed;
 use He4rt\Portal\Articles\ArticlesPage;
@@ -42,6 +44,12 @@ it('lista os artigos do catálogo com autores e temas', function (): void {
 
 it('credita o nome do usuário quando a identidade está vinculada', function (): void {
     $user = User::factory()->create(['name' => 'Cherry Ramatis', 'username' => 'cherry']);
+    ExternalIdentity::factory()->create([
+        'model_type' => $user->getMorphClass(),
+        'model_id' => $user->id,
+        'provider' => IdentityProvider::GitHub,
+        'metadata' => ['username' => 'cherry'],
+    ]);
 
     catalogueEntry(['author_handle' => 'cherryramatis', 'author_id' => $user->id]);
 

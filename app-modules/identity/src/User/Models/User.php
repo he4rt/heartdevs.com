@@ -14,6 +14,7 @@ use He4rt\Activity\Tracking\Concerns\HasInteractions;
 use He4rt\Gamification\Character\Models\Character;
 use He4rt\Identity\Authorization\Enums\UserRole;
 use He4rt\Identity\Database\Factories\UserFactory;
+use He4rt\Identity\ExternalIdentity\Enums\IdentityProvider;
 use He4rt\Identity\ExternalIdentity\Models\ExternalIdentity;
 use He4rt\Identity\User\Concerns\HasProfileImages;
 use He4rt\Identity\User\Enums\UserSituation;
@@ -128,9 +129,14 @@ final class User extends Authenticatable implements FilamentUser, HasAvatar, Has
         };
     }
 
+    /**
+     * The site username comes from the first OAuth provider (usually Discord), so it is never used to build an avatar URL.
+     */
     public function getFilamentAvatarUrl(): ?string
     {
-        return $this->getFirstMediaUrl('avatar') ?: null;
+        return $this->getFirstMediaUrl('avatar')
+            ?: $this->linkedIdentity(IdentityProvider::GitHub)?->avatarUrl()
+            ?: $this->linkedIdentity(IdentityProvider::Discord)?->avatarUrl();
     }
 
     /**
@@ -169,6 +175,15 @@ final class User extends Authenticatable implements FilamentUser, HasAvatar, Has
             'banned_at' => 'datetime',
             'first_login_at' => 'datetime',
         ];
+    }
+
+    private function linkedIdentity(IdentityProvider $provider): ?ExternalIdentity
+    {
+        return $this->providers
+            ->where('provider', $provider)
+            ->filter->isConnected()
+            ->sortByDesc('connected_at')
+            ->first();
     }
 
     private function resolveSituation(): UserSituation
