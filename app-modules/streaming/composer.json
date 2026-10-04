@@ -1,0 +1,27 @@
+{
+    "name": "he4rt/streaming",
+    "description": "",
+    "type": "library",
+    "version": "1.0.0",
+    "license": "proprietary",
+    "autoload": {
+        "psr-4": {
+            "He4rt\\Streaming\\": "src/",
+            "He4rt\\Streaming\\Database\\Factories\\": "database/factories/",
+            "He4rt\\Streaming\\Database\\Seeders\\": "database/seeders/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "He4rt\\Streaming\\Tests\\": "tests/"
+        }
+    },
+    "minimum-stability": "stable",
+    "extra": {
+        "laravel": {
+            "providers": [
+                "He4rt\\Streaming\\StreamingServiceProvider"
+            ]
+        }
+    }
+}

@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "85fa3f08e7b6b719d40f6466ff4e631e",
+    "content-hash": "9347c30b3573d7a2ad524778eb98fcee",
     "packages": [
         {
             "name": "anourvalar/eloquent-serialize",
@@ -4135,6 +4135,42 @@
             "autoload-dev": {
                 "psr-4": {
                     "He4rt\\Squads\\Tests\\": "tests/"
+                }
+            },
+            "license": [
+                "proprietary"
+            ],
+            "transport-options": {
+                "symlink": true,
+                "relative": true
+            }
+        },
+        {
+            "name": "he4rt/streaming",
+            "version": "1.0.0",
+            "dist": {
+                "type": "path",
+                "url": "app-modules/streaming",
+                "reference": "a76addc6681257da1cbe7e780c62d152410a8b70"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "He4rt\\Streaming\\StreamingServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "He4rt\\Streaming\\": "src/",
+                    "He4rt\\Streaming\\Database\\Factories\\": "database/factories/",
+                    "He4rt\\Streaming\\Database\\Seeders\\": "database/seeders/"
+                }
+            },
+            "autoload-dev": {
+                "psr-4": {
+                    "He4rt\\Streaming\\Tests\\": "tests/"
                 }
             },
             "license": [

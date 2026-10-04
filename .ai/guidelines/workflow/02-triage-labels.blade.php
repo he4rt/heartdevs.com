@@ -58,6 +58,7 @@ Every issue must be tagged with the module(s) it affects. Labels follow the patt
 | `mod:panel-overlays`     | `panel-overlays`         | OBS overlays (Inertia)   |
 | `mod:portal`             | `portal`                 | Public portal / homepage |
 | `mod:profile`            | `profile`                | User profiles            |
+| `mod:streaming`          | `streaming`              | Streamer live data       |
 | `mod:docs`               | `docs`                   | Knowledge base docs      |
 
 When creating an issue for a new module that has no label yet, create the label first (`gh label create "mod:<name>" --description "<short description>" --color "c2e0c6"`) and add a row to this table.
