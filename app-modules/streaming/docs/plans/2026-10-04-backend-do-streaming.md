@@ -1987,7 +1987,7 @@ Feature: Escopos conforme a escolha
 - [x] 5.1 Reverb e Echo
 - [x] 5.2 Página da overlay com dados reais
 - [x] 5.3 Auth do canal privado pelo token
-- [ ] 5.4 Adaptador do `useOverlayFeed`
+- [x] 5.4 Adaptador do `useOverlayFeed`
 
 ### 5.1 Reverb e Echo
 
@@ -2215,6 +2215,8 @@ As props iniciais da página seguem o mesmo formato:
 
 | Prop           | Conteúdo                                                          |
 | -------------- | ----------------------------------------------------------------- |
+| `scene`        | cena aberta (`coworking`, `starting` ou `voice`)                  |
+| `handle`       | usuário do streamer, mostrado na barra do topo                    |
 | `channel`      | nome do canal privado, sem o prefixo `private-`                   |
 | `authEndpoint` | `POST /overlay/{token}/broadcasting/auth`                         |
 | `settings`     | configurações da cena aberta                                      |
@@ -2230,6 +2232,14 @@ useEffect(() => subscribeOverlayChannel(channel, (dto) => dispatch(dto, handlers
 ```
 
 O feed de exemplo continua disponível para a prévia da Minha Live.
+
+Na implementação, a página passou a receber também `scene` e `handle`. Antes, a barra do topo
+mostrava o `channel`, que desde a 5.2 é o nome do canal privado. Agora ela mostra o `handle`. O
+chat recente e as configurações da cena entram como estado inicial dos hooks, e não pelo feed,
+para a cena não abrir um frame com o título e o horário padrão. A tradução dos payloads fica em
+`lib/overlayEvents.ts`, e a conexão do Echo em `lib/overlayChannel.ts`. Com `?demo` na URL, a
+overlay usa o feed de exemplo. `session.started` e `session.ended` chegam, mas nenhuma cena usa
+esse estado ainda.
 
 **Comportamento esperado.**
 

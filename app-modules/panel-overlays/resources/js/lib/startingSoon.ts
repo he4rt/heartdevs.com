@@ -113,3 +113,15 @@ export function configFromServer(
         totalMs,
     };
 }
+
+export function withServerValues(
+    fallback: StartingSoonConfig,
+    values: Record<string, string>,
+    since: number,
+    now: number = Date.now(),
+): StartingSoonConfig {
+    const title = values.title?.trim() || fallback.title;
+    const scheduled = configFromServer(values, since, now);
+
+    return scheduled ? { ...scheduled, title } : { ...fallback, title };
+}

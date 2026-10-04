@@ -5,6 +5,7 @@ import { useNowPlaying } from '../../hooks/useNowPlaying';
 import { useOverlayFeed } from '../../hooks/useOverlayFeed';
 import { useStartingSoonConfig } from '../../hooks/useStartingSoonConfig';
 import { toChatBubble } from '../../lib/chat';
+import { toChatMessage, toOverlayConfig } from '../../lib/overlayEvents';
 import { Stage } from '../../ui/Stage';
 import TopBar from '../../ui/TopBar';
 import ChatPanel from '../../ui/chat/ChatPanel';
@@ -15,27 +16,37 @@ import LevelBar from '../../ui/footer/LevelBar';
 import DiscordCallout from '../../ui/starting/DiscordCallout';
 import StartingBackdrop from '../../ui/starting/StartingBackdrop';
 import StartingHero from '../../ui/starting/StartingHero';
-import type { OverlayPageProps } from '../../types';
+import type { OverlayPageProps, StartingSoonSettings } from '../../types';
 
-export default function StartingSoonOverlay({ channel }: OverlayPageProps) {
-    const { config, onDto: onOverlayConfig } = useStartingSoonConfig();
+export default function StartingSoonOverlay({
+    scene,
+    handle,
+    channel,
+    authEndpoint,
+    settings,
+    recentChat,
+}: OverlayPageProps<StartingSoonSettings>) {
+    const { config, onDto: onOverlayConfig } = useStartingSoonConfig(toOverlayConfig(scene, settings, Date.now()));
     const { remainingMs, done } = useCountdown(config.deadline);
-    const chat = useChatMessages();
+    const chat = useChatMessages(recentChat.map(toChatMessage));
     const np = useNowPlaying();
     const leveling = useLevelProgress();
 
-    useOverlayFeed({
-        onChatMessage: chat.push,
-        onChatDeleted: chat.remove,
-        onNowPlaying: np.onDto,
-        onOverlayConfig,
-        onLevelProgress: leveling.onDto,
-    });
+    useOverlayFeed(
+        { channel, authEndpoint },
+        {
+            onChatMessage: chat.push,
+            onChatDeleted: chat.remove,
+            onNowPlaying: np.onDto,
+            onOverlayConfig,
+            onLevelProgress: leveling.onDto,
+        },
+    );
 
     return (
         <Stage>
             <StartingBackdrop done={done} />
-            <TopBar channel={channel} />
+            <TopBar channel={handle} />
 
             <ChatPanel title="CHAT AO VIVO">
                 {chat.messages.map((m) => (

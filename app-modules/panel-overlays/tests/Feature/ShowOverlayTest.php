@@ -36,6 +36,8 @@ test('cada cena abre com o canal privado e as configurações do streamer', func
         ->assertOk()
         ->assertInertia(fn (AssertableInertia $page): AssertableInertia => $page
             ->component($component)
+            ->where('scene', $scene->value)
+            ->where('handle', $this->streamer->user->username)
             ->where('channel', $this->streamer->overlayChannel())
             ->where('authEndpoint', route('overlays.broadcasting.auth', ['token' => OVERLAY_TOKEN]))
             ->where('settings', $this->streamer->settings->forScene($scene)->toArray())
@@ -46,6 +48,13 @@ test('cada cena abre com o canal privado e as configurações do streamer', func
     'a live vai começar' => [OverlayScene::StartingSoon, 'Overlays/StartingSoon'],
     'sala de voz' => [OverlayScene::Voice, 'Overlays/Voice'],
 ]);
+
+test('a barra da overlay mostra o usuário do streamer, não o canal privado', function (): void {
+    $this->get('/overlay/'.OVERLAY_TOKEN.'/coworking')
+        ->assertInertia(fn (AssertableInertia $page): AssertableInertia => $page
+            ->where('handle', fn (string $handle): bool => $handle === $this->streamer->user->username
+                && !str_contains($handle, 'overlay.')));
+});
 
 test('a overlay abre sem login, como uma fonte de navegador do OBS', function (): void {
     $this->assertGuest();

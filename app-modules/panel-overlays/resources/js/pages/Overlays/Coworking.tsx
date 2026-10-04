@@ -8,6 +8,7 @@ import { useVoiceRoster } from '../../hooks/useVoiceRoster';
 import { useVoicePresence } from '../../hooks/useVoicePresence';
 import { toChatBubble } from '../../lib/chat';
 import { toEventAlert } from '../../lib/eventAlert';
+import { toChatMessage } from '../../lib/overlayEvents';
 import { Stage } from '../../ui/Stage';
 import TopBar from '../../ui/TopBar';
 import ChatPanel from '../../ui/chat/ChatPanel';
@@ -21,22 +22,25 @@ import type { OverlayPageProps } from '../../types';
 
 const ALERT_DURATION_MS = 6000;
 
-export default function CoworkingOverlay({ channel }: OverlayPageProps) {
-    const chat = useChatMessages();
+export default function CoworkingOverlay({ handle, channel, authEndpoint, recentChat }: OverlayPageProps) {
+    const chat = useChatMessages(recentChat.map(toChatMessage));
     const footer = useFooterBar();
     const leveling = useLevelProgress();
     const np = useNowPlaying();
     const voice = useVoiceRoster();
     const presence = useVoicePresence(voice.roster);
 
-    useOverlayFeed({
-        onChatMessage: chat.push,
-        onChatDeleted: chat.remove,
-        onStreamEvent: footer.pushEvent,
-        onNowPlaying: np.onDto,
-        onVoiceRoster: voice.onDto,
-        onLevelProgress: leveling.onDto,
-    });
+    useOverlayFeed(
+        { channel, authEndpoint },
+        {
+            onChatMessage: chat.push,
+            onChatDeleted: chat.remove,
+            onStreamEvent: footer.pushEvent,
+            onNowPlaying: np.onDto,
+            onVoiceRoster: voice.onDto,
+            onLevelProgress: leveling.onDto,
+        },
+    );
 
     const currentEvent = footer.state.current;
     useEffect(() => {
@@ -49,7 +53,7 @@ export default function CoworkingOverlay({ channel }: OverlayPageProps) {
 
     return (
         <Stage>
-            <TopBar channel={channel} />
+            <TopBar channel={handle} />
 
             <ChatPanel title="CHAT AO VIVO">
                 {chat.messages.map((m) => (

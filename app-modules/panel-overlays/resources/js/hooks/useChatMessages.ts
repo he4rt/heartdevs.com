@@ -9,8 +9,8 @@ export interface ChatMessages {
     remove(msgId: string): void;
 }
 
-export function useChatMessages(): ChatMessages {
-    const [messages, setMessages] = useState<ChatMessageDto[]>([]);
+export function useChatMessages(initial: ChatMessageDto[] = []): ChatMessages {
+    const [messages, setMessages] = useState<ChatMessageDto[]>(() => initial.slice(-MAX));
 
     const push = useCallback((dto: ChatMessageDto) => {
         setMessages((prev) => [...prev, dto].slice(-MAX));

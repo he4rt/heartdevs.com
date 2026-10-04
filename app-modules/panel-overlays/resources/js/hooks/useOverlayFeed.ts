@@ -9,6 +9,8 @@ import type {
     VoiceRosterDto,
 } from '../feed';
 import { subscribeDemoFeed } from '../lib/demoFeed';
+import { subscribeOverlayChannel } from '../lib/overlayChannel';
+import type { OverlayChannelSource } from '../types';
 
 export interface OverlayFeedHandlers {
     onChatMessage?(dto: ChatMessageDto): void;
@@ -20,11 +22,16 @@ export interface OverlayFeedHandlers {
     onLevelProgress?(dto: LevelProgressDto): void;
 }
 
-export function useOverlayFeed(handlers: OverlayFeedHandlers): void {
+export function useOverlayFeed({ channel, authEndpoint }: OverlayChannelSource, handlers: OverlayFeedHandlers): void {
     const handlersRef = useRef(handlers);
     handlersRef.current = handlers;
 
-    useEffect(() => subscribeDemoFeed((dto) => dispatch(dto, handlersRef.current)), []);
+    useEffect(() => {
+        const listener = (dto: FeedEventDto) => dispatch(dto, handlersRef.current);
+        const isDemo = new URLSearchParams(window.location.search).has('demo');
+
+        return isDemo ? subscribeDemoFeed(listener) : subscribeOverlayChannel({ channel, authEndpoint }, listener);
+    }, [channel, authEndpoint]);
 }
 
 function dispatch(dto: FeedEventDto, handlers: OverlayFeedHandlers): void {

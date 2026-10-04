@@ -102,8 +102,11 @@ A conta bot precisa autorizar o app uma vez com `user:read:chat user:bot`.
 
 ## Limites conhecidos
 
-- O adaptador do `useOverlayFeed` (passo 5.4 do plano) é do front da overlay. Até ele entrar, a
-  overlay mostra o feed de exemplo, e os broadcasts aparecem só no `reverb:start --debug`.
+- O painel do usuário vive em `/app`, o mesmo prefixo do WebSocket do Reverb (`/app/{key}`). Se o
+  Reverb ficar no mesmo host do painel, o proxy precisa mandar só o upgrade de WebSocket para o
+  Reverb. A outra saída é servir o Reverb num host próprio.
 - A sincronização das inscrições EventSub precisa de um callback HTTPS público. Localmente, use o
   twitch-cli.
-- XP de live, doações e "tocando agora" ficam fora deste módulo por enquanto.
+- XP da live, doações, "tocando agora" e sala de voz ficam fora deste módulo por enquanto. Essas
+  partes da overlay ficam no estado vazio. Para ver a cena completa com dados de exemplo, abra a
+  URL com `?demo`.

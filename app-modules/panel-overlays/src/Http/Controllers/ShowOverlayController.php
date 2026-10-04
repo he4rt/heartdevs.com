@@ -27,6 +27,8 @@ class ShowOverlayController
         abort_unless($streamer instanceof Streamer, HttpResponse::HTTP_NOT_FOUND);
 
         return Inertia::render($this->component($scene), [
+            'scene' => $scene->value,
+            'handle' => $streamer->user->username,
             'channel' => $streamer->overlayChannel(),
             'authEndpoint' => route('overlays.broadcasting.auth', ['token' => $token]),
             'settings' => $streamer->settings->forScene($scene)->toArray(),
