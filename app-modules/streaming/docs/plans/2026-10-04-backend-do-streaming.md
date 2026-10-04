@@ -1984,9 +1984,9 @@ Feature: Escopos conforme a escolha
 > alinhar o estado da branch e dividir os passos: os passos 5.2 e 5.3 são backend, e o 5.4 é do
 > front da overlay.
 
-- [ ] 5.1 Reverb e Echo
-- [ ] 5.2 Página da overlay com dados reais
-- [ ] 5.3 Auth do canal privado pelo token
+- [x] 5.1 Reverb e Echo
+- [x] 5.2 Página da overlay com dados reais
+- [x] 5.3 Auth do canal privado pelo token
 - [ ] 5.4 Adaptador do `useOverlayFeed`
 
 ### 5.1 Reverb e Echo
@@ -2016,6 +2016,12 @@ VITE_REVERB_SCHEME="${REVERB_SCHEME}"
 
 Dependências: `laravel/reverb` (Composer) e `laravel-echo` + `pusher-js` com versão fixa (npm).
 O worker `reverb:start` roda no ambiente local e no deploy.
+
+Na implementação, só a config do Reverb foi publicada (`vendor:publish --tag=reverb-config`). O
+`install:broadcasting` também mexeria no `bootstrap/app.php` e no front. O `.env.example` traz
+`REVERB_HOST=localhost`, porta 8080 e `http` para o ambiente local. A criação do Echo fica para a
+5.4, dentro da entrada Vite do `panel-overlays`. Os testes continuam com `BROADCAST_CONNECTION=null`
+pelo `.env.testing`.
 
 **Comportamento esperado.**
 
@@ -2067,6 +2073,12 @@ public function __invoke(string $token, OverlayScene $scene, ResolveOverlayToken
 
 `OverlayInitialState` fica no `streaming`. Ele lê as 30 últimas mensagens das fontes ligadas com
 leitor de chat, sem as apagadas, em ordem cronológica.
+
+Na implementação, `OverlayInitialState` fica em `streaming/src/Overlay/`. Cada mensagem e a sessão
+saem pelo `broadcastWith()` dos broadcasts `ChatMessageReceived` e `StreamSessionStarted`. Assim o
+estado inicial e os eventos ao vivo têm o mesmo formato. A consulta do chat usa o índice
+`(channel_id, sent_at)` que `messages` já tem. A página também manda `authEndpoint`, a URL da 5.3
+com o token, para o Echo não montar a URL no front.
 
 **Comportamento esperado.**
 
@@ -2148,6 +2160,12 @@ return response()->json(
 );
 ```
 
+Na implementação, a rota fica fora do grupo `web`, então não tem sessão nem CSRF. Isso substitui o
+`withoutMiddleware(ValidateCsrfToken::class)`. A assinatura sai do
+`Broadcast::validAuthenticationResponse()` do broadcaster padrão. O `authorizeChannel()` do Pusher
+devolve uma string JSON, e o `response()->json()` do esboço acima a codificaria duas vezes. Um
+`socket_id` fora do formato do Pusher também recebe 403, em vez do erro 500 do SDK.
+
 **Comportamento esperado.**
 
 ```gherkin
@@ -2192,6 +2210,16 @@ front da overlay. A tabela abaixo é o contrato que o backend entrega.
 | `settings.updated`     | `{scene, settings}`                                            | `overlayConfig`      |
 | `session.started`      | `{title, category, startedAt}`                                 | — (estado da cena)   |
 | `session.ended`        | `{endedAt}`                                                    | — (estado da cena)   |
+
+As props iniciais da página seguem o mesmo formato:
+
+| Prop           | Conteúdo                                                          |
+| -------------- | ----------------------------------------------------------------- |
+| `channel`      | nome do canal privado, sem o prefixo `private-`                   |
+| `authEndpoint` | `POST /overlay/{token}/broadcasting/auth`                         |
+| `settings`     | configurações da cena aberta                                      |
+| `recentChat`   | até 30 itens no formato do `chat.message`, do mais antigo ao novo |
+| `session`      | formato do `session.started`, ou `null` sem live aberta           |
 
 ```ts
 // Antes

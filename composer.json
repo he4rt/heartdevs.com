@@ -46,6 +46,7 @@
         "laravel/framework": "^13.34.0",
         "laravel/head": "^0.2.2",
         "laravel/nightwatch": "^1.30.2",
+        "laravel/reverb": "^1.12",
         "laravel/sanctum": "^4.3.3",
         "laravel/telescope": "^5.25.0",
         "laravel/tinker": "^3.0.2",
