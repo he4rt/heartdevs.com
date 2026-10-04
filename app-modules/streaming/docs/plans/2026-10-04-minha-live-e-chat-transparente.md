@@ -834,9 +834,21 @@ Feature: Página Chat
 
 ## Fase 4 — Saúde da integração
 
-- [ ] 4.1 Reconciliar as inscrições com a Twitch
-- [ ] 4.2 Relatório de saúde
-- [ ] 4.3 Seção de saúde no Painel
+- [x] 4.1 Reconciliar as inscrições com a Twitch
+- [x] 4.2 Relatório de saúde
+- [x] 4.3 Seção de saúde no Painel
+
+> **Nota de implementação.**
+>
+> - O token do streamer vence em cerca de 4 h e nada o renovava. Um `/validate` puro daria alarme
+>   falso a cada 4 h. O `TwitchUserAuthorization` tenta renovar no 401 e só acusa "autorização
+>   recusada" quando a renovação também falha. O token novo fica gravado na identidade.
+> - O reparo adota as inscrições da Twitch com o nosso callback que faltam no banco. As de outro
+>   callback (outro ambiente com o mesmo app) não são adotadas nem apagadas.
+> - A seção carrega com `wire:init`. O selo do menu usa só endereço e inscrições, sem rede. Ele
+>   aparece também no item **Minha Live**, porque a barra lateral só mostra o cluster.
+> - "Overlays conectadas" diz "1 overlay aberta", e não "no OBS": o servidor não sabe se é o OBS
+>   ou uma aba do navegador.
 
 ```text
  Status da inscrição na Twitch          O que o painel diz e faz

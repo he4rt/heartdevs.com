@@ -8,6 +8,7 @@ use Carbon\CarbonInterface;
 use He4rt\Identity\User\Models\User;
 use He4rt\Streaming\Database\Factories\StreamerFactory;
 use He4rt\Streaming\Enums\StreamerStatus;
+use He4rt\Streaming\Session\Models\StreamSession;
 use He4rt\Streaming\Streamer\Casts\AsStreamerSettings;
 use He4rt\Streaming\Streamer\Data\StreamerSettings;
 use He4rt\Streaming\StreamEvent\Models\StreamEvent;
@@ -71,6 +72,11 @@ final class Streamer extends Model
     public function isActive(): bool
     {
         return $this->status === StreamerStatus::Active;
+    }
+
+    public function isLive(): bool
+    {
+        return StreamSession::query()->open()->whereBelongsTo($this)->exists();
     }
 
     public function overlayChannel(): string

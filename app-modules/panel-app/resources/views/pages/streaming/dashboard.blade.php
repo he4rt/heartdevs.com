@@ -63,6 +63,63 @@
         @endif
     </x-filament::section>
 
+    @if ($connection && $this->twitchSource)
+        @php
+            $healthChecks = $this->healthChecks;
+            $needingAttention = collect($healthChecks)->filter(fn ($check) => $check->status->needsAttention())->count();
+            $hasError = collect($healthChecks)->contains(fn ($check) => $check->status === \He4rt\Streaming\Health\HealthStatus::Error);
+        @endphp
+
+        <x-filament::section heading="Saúde da integração" wire:init="loadHealth">
+            @if ($this->healthRequested)
+                <x-slot name="afterHeader">
+                    @if ($needingAttention === 0)
+                        <x-filament::badge color="success" icon="heroicon-m-check-circle">Tudo certo</x-filament::badge>
+                    @else
+                        <x-filament::badge :color="$hasError ? 'danger' : 'warning'" icon="heroicon-m-exclamation-triangle">
+                            {{ $needingAttention === 1 ? '1 item precisa de atenção' : $needingAttention . ' itens precisam de atenção' }}
+                        </x-filament::badge>
+                    @endif
+                </x-slot>
+
+                <ul class="divide-y divide-gray-950/5 dark:divide-white/10">
+                    @foreach ($healthChecks as $check)
+                        <li wire:key="health-{{ $check->key }}" class="flex flex-wrap items-center gap-x-3 gap-y-1 py-2.5">
+                            <x-filament::icon
+                                :icon="$check->status->getIcon()"
+                                @class([
+                                    'size-5 shrink-0',
+                                    'text-success-500' => $check->status === \He4rt\Streaming\Health\HealthStatus::Ok,
+                                    'text-info-500' => $check->status === \He4rt\Streaming\Health\HealthStatus::Waiting,
+                                    'text-warning-500' => $check->status === \He4rt\Streaming\Health\HealthStatus::Warning,
+                                    'text-danger-500' => $check->status === \He4rt\Streaming\Health\HealthStatus::Error,
+                                ])
+                            />
+                            <p class="w-40 shrink-0 text-sm font-medium text-gray-950 dark:text-white">{{ $check->title }}</p>
+                            <p class="min-w-0 flex-1 text-sm break-words text-gray-500 dark:text-gray-400">{{ $check->detail }}</p>
+
+                            @if ($check->fix === \He4rt\Streaming\Health\HealthFix::RepairSubscriptions)
+                                {{ $this->repairSubscriptionsAction }}
+                            @elseif ($check->fix === \He4rt\Streaming\Health\HealthFix::Reconnect)
+                                {{ $this->reconnectTwitchAction }}
+                            @endif
+                        </li>
+                    @endforeach
+                </ul>
+
+                <div class="mt-3 flex items-center justify-end gap-3 text-xs text-gray-400 dark:text-gray-500">
+                    <span>Verificado às {{ now()->format('H:i:s') }}</span>
+                    {{ $this->recheckHealthAction }}
+                </div>
+            @else
+                <p class="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400">
+                    <x-filament::loading-indicator class="size-4" />
+                    Verificando a integração…
+                </p>
+            @endif
+        </x-filament::section>
+    @endif
+
     @if ($this->sources->isNotEmpty())
         <x-filament::section heading="Fontes" description="Canais que mandam alertas e chat para as suas overlays.">
             <ul class="divide-y divide-gray-950/5 dark:divide-white/10">

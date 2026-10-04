@@ -17,12 +17,19 @@ use He4rt\Identity\ExternalIdentity\Actions\DisconnectExternalIdentity;
 use He4rt\Identity\ExternalIdentity\Enums\IdentityProvider;
 use He4rt\Identity\ExternalIdentity\Models\ExternalIdentity;
 use He4rt\Identity\User\Models\User;
+use He4rt\IntegrationTwitch\Actions\RepairStreamerTwitchSubscriptions;
+use He4rt\IntegrationTwitch\Exceptions\TwitchUnreachable;
+use He4rt\IntegrationTwitch\Health\TwitchHealthReport;
 use He4rt\IntegrationTwitch\OAuth\TwitchBotTokenService;
 use He4rt\IntegrationTwitch\OAuth\TwitchScopes;
 use He4rt\IntegrationTwitch\OAuth\TwitchStreamerFeature;
+use He4rt\IntegrationTwitch\OAuth\TwitchUserAuthorization;
 use He4rt\PanelApp\Clusters\Streaming\StreamingCluster;
+use He4rt\PanelApp\Clusters\Streaming\StreamingHealthBadge;
 use He4rt\Streaming\Enums\ChatReader;
 use He4rt\Streaming\Enums\StreamEventType;
+use He4rt\Streaming\Health\Checks\CheckOverlayConnections;
+use He4rt\Streaming\Health\HealthCheck;
 use He4rt\Streaming\Streamer\Actions\EnsureStreamer;
 use He4rt\Streaming\Streamer\Actions\UpdateStreamerSource;
 use He4rt\Streaming\Streamer\Models\Streamer;
@@ -43,6 +50,7 @@ use Livewire\Attributes\Computed;
  * @property-read StreamerSource|null $twitchSource
  * @property-read Collection<int, StreamerSource> $sources
  * @property-read array<int, string> $missingTwitchScopes
+ * @property-read array<int, HealthCheck> $healthChecks
  */
 class StreamDashboardPage extends Page
 {
@@ -51,6 +59,8 @@ class StreamDashboardPage extends Page
     private const int RECENT_ACTIVITY_LIMIT = 10;
 
     private const string WITHOUT_CHAT = 'none';
+
+    public bool $healthRequested = false;
 
     protected static ?string $cluster = StreamingCluster::class;
 
@@ -71,9 +81,29 @@ class StreamDashboardPage extends Page
         return auth()->user()?->can('use-streamer-tools') ?? false;
     }
 
+    public static function getNavigationBadge(): ?string
+    {
+        return StreamingHealthBadge::label();
+    }
+
+    public static function getNavigationBadgeColor(): string
+    {
+        return 'danger';
+    }
+
+    public static function getNavigationBadgeTooltip(): string
+    {
+        return StreamingHealthBadge::TOOLTIP;
+    }
+
     public function mount(EnsureStreamer $ensureStreamer): void
     {
         $ensureStreamer->handle($this->currentUser());
+    }
+
+    public function loadHealth(): void
+    {
+        $this->healthRequested = true;
     }
 
     #[Computed]
@@ -122,6 +152,24 @@ class StreamDashboardPage extends Page
         return $this->twitchConnection?->missingScopes($this->requiredTwitchScopes($this->twitchSource?->chat_reader)) ?? [];
     }
 
+    /**
+     * @return array<int, HealthCheck>
+     */
+    #[Computed]
+    public function healthChecks(): array
+    {
+        $source = $this->twitchSource;
+
+        if (!$this->healthRequested || !$source instanceof StreamerSource) {
+            return [];
+        }
+
+        return [
+            ...resolve(TwitchHealthReport::class)->for($source),
+            resolve(CheckOverlayConnections::class)->handle($this->currentStreamer()),
+        ];
+    }
+
     public function connectTwitchAction(): Action
     {
         return Action::make('connectTwitch')
@@ -166,6 +214,69 @@ class StreamDashboardPage extends Page
             ->visible(fn (): bool => $this->missingTwitchScopes !== []);
     }
 
+    public function reconnectTwitchAction(): Action
+    {
+        return Action::make('reconnectTwitch')
+            ->label('Reconectar Twitch')
+            ->icon(Heroicon::OutlinedArrowPath)
+            ->color('danger')
+            ->size('sm')
+            ->url(fn (): string => $this->twitchAuthorizationUrl($this->twitchSource?->chat_reader));
+    }
+
+    public function repairSubscriptionsAction(): Action
+    {
+        return Action::make('repairSubscriptions')
+            ->label('Reparar inscrições')
+            ->icon(Heroicon::OutlinedWrenchScrewdriver)
+            ->color('warning')
+            ->size('sm')
+            ->action(function (RepairStreamerTwitchSubscriptions $repairSubscriptions): void {
+                $source = $this->twitchSource;
+
+                if (!$source instanceof StreamerSource) {
+                    return;
+                }
+
+                try {
+                    $repairSubscriptions->handle($source);
+                } catch (TwitchUnreachable) {
+                    Notification::make()
+                        ->title('A Twitch não respondeu')
+                        ->body('Nada mudou. Tente de novo em instantes.')
+                        ->danger()
+                        ->send();
+
+                    return;
+                }
+
+                unset($this->healthChecks);
+
+                Notification::make()
+                    ->title('Inscrições reparadas')
+                    ->body('A Twitch confirma as novas em alguns segundos.')
+                    ->success()
+                    ->send();
+            });
+    }
+
+    public function recheckHealthAction(): Action
+    {
+        return Action::make('recheckHealth')
+            ->label('Verificar de novo')
+            ->icon(Heroicon::OutlinedArrowPath)
+            ->link()
+            ->color('gray')
+            ->size('sm')
+            ->action(function (TwitchUserAuthorization $authorization): void {
+                if ($this->twitchConnection instanceof ExternalIdentity) {
+                    $authorization->forget($this->twitchConnection);
+                }
+
+                unset($this->healthChecks);
+            });
+    }
+
     public function disconnectTwitchAction(): Action
     {
         return Action::make('disconnectTwitch')
@@ -183,7 +294,7 @@ class StreamDashboardPage extends Page
                     $disconnectIdentity->handle($this->twitchConnection);
                 }
 
-                unset($this->twitchConnection, $this->twitchSource, $this->sources, $this->missingTwitchScopes);
+                unset($this->twitchConnection, $this->twitchSource, $this->sources, $this->missingTwitchScopes, $this->healthChecks);
 
                 Notification::make()
                     ->title('Twitch desconectada')
@@ -325,21 +436,11 @@ class StreamDashboardPage extends Page
     }
 
     /**
-     * @return array<int, TwitchStreamerFeature>
-     */
-    private function featuresFor(?ChatReader $chatReader): array
-    {
-        return $chatReader instanceof ChatReader
-            ? [TwitchStreamerFeature::Alerts, TwitchStreamerFeature::fromChatReader($chatReader)]
-            : [TwitchStreamerFeature::Alerts];
-    }
-
-    /**
      * @return array<int, string>
      */
     private function requiredTwitchScopes(?ChatReader $chatReader): array
     {
-        return TwitchScopes::requestedFor(FilamentPanel::App->value, $this->currentUser(), $this->featuresFor($chatReader));
+        return TwitchScopes::requestedFor(FilamentPanel::App->value, $this->currentUser(), TwitchStreamerFeature::neededFor($chatReader));
     }
 
     private function twitchAuthorizationUrl(?ChatReader $chatReader): string
@@ -347,7 +448,7 @@ class StreamDashboardPage extends Page
         return route('oauth.redirect', [
             'panel' => FilamentPanel::App->value,
             'provider' => IdentityProvider::Twitch->value,
-            'features' => array_map(fn (TwitchStreamerFeature $feature): string => $feature->value, $this->featuresFor($chatReader)),
+            'features' => array_map(fn (TwitchStreamerFeature $feature): string => $feature->value, TwitchStreamerFeature::neededFor($chatReader)),
         ]);
     }
 

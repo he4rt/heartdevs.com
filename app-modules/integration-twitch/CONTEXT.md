@@ -23,11 +23,14 @@ Transport and integration layer for the Twitch platform. Owns all HTTP communica
 src/
 ├── Console/
 │   ├── LinkTwitchChannelCommand.php       ← Links channel to tenant via ExternalIdentity
-│   └── SubscribeTwitchEventsCommand.php   ← Creates EventSub subscriptions via Helix API
+│   ├── SubscribeTwitchEventsCommand.php   ← Creates EventSub subscriptions via Helix API
+│   └── SyncStreamerSubscriptionsCommand.php ← twitch:sync-streamer-subscriptions
 ├── Actions/
 │   ├── RegisterTwitchSubscriptionsAction.php  ← Community subscriptions (twitch:subscribe)
 │   ├── SyncTwitchSubscriptionAction.php
-│   └── SyncStreamerTwitchSubscriptions.php    ← Desired vs. owned subscriptions of one streamer source
+│   ├── SyncStreamerTwitchSubscriptions.php    ← Desired vs. owned subscriptions of one streamer source
+│   ├── ReconcileStreamerTwitchSubscriptions.php ← Local statuses ← ListSubscriptions (Twitch is the truth)
+│   └── RepairStreamerTwitchSubscriptions.php  ← Reconcile, then sync ("Reparar inscrições")
 ├── Enums/
 │   ├── TwitchEventSubType.php             ← All EventSub subscription types with version/condition
 │   └── TwitchSubscriptionStatus.php
@@ -37,6 +40,11 @@ src/
 │       └── ProjectTwitchEventToStreaming.php ← Queued. TwitchEventReceived → streaming Actions
 ├── Events/
 │   └── TwitchEventReceived.php
+├── Exceptions/
+│   └── TwitchUnreachable.php              ← Twitch did not answer; nothing local changed
+├── Health/
+│   ├── TwitchHealthReport.php             ← Account, webhook address, subscriptions, last event
+│   └── Check*.php                         ← One check each, all return streaming's HealthCheck
 ├── Http/
 │   ├── Controllers/
 │   │   └── TwitchWebhookController.php    ← Receives EventSub webhooks, persists to TwitchEventLog
@@ -52,13 +60,15 @@ src/
 │   ├── TwitchOAuthClient.php              ← Implements OAuthClientContract (uses Transport)
 │   ├── TwitchAppTokenService.php          ← Client credentials flow, cached app token
 │   ├── TwitchBotTokenService.php          ← Bot account user token, refreshed and cached
+│   ├── TwitchUserAuthorization.php        ← Streamer token: /validate, refresh on 401, cached 10 min
 │   ├── TwitchScopes.php                   ← Scopes per panel and per streamer feature
 │   ├── TwitchStreamerFeature.php          ← Alerts · chat by own account · chat by bot
 │   └── DTO/
 │       ├── TwitchOAuthAccessDTO.php
 │       └── TwitchOAuthDTO.php
 ├── Support/
-│   └── EventSubWebhook.php                ← Callback URL and secret for EventSub
+│   ├── EventSubWebhook.php                ← Callback URL and secret for EventSub
+│   └── StreamerSubscriptionPlan.php       ← Which subscriptions one streamer source needs
 └── Transport/
     ├── TwitchHelixConnector.php           ← App token auth, base URL: api.twitch.tv/helix
     ├── TwitchOAuthConnector.php           ← No default auth, base URL: id.twitch.tv/oauth2

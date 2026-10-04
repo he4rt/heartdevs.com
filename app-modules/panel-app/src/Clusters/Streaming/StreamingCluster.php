@@ -22,4 +22,19 @@ class StreamingCluster extends Cluster
     protected static ?int $navigationSort = 4;
 
     protected static ?SubNavigationPosition $subNavigationPosition = SubNavigationPosition::Top;
+
+    public static function getNavigationBadge(): ?string
+    {
+        return StreamingHealthBadge::label();
+    }
+
+    public static function getNavigationBadgeColor(): string
+    {
+        return 'danger';
+    }
+
+    public static function getNavigationBadgeTooltip(): string
+    {
+        return StreamingHealthBadge::TOOLTIP;
+    }
 }

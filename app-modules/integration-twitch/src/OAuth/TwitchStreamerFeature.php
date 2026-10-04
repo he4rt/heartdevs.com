@@ -43,6 +43,14 @@ enum TwitchStreamerFeature: string implements HasColor, HasDescription, HasLabel
         };
     }
 
+    /**
+     * @return array<int, self>
+     */
+    public static function neededFor(?ChatReader $chatReader): array
+    {
+        return $chatReader instanceof ChatReader ? [self::Alerts, self::fromChatReader($chatReader)] : [self::Alerts];
+    }
+
     public static function fromChatReader(ChatReader $chatReader): self
     {
         return match ($chatReader) {

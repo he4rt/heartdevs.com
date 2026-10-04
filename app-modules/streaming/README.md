@@ -43,8 +43,27 @@ Pelo painel (Minha Live › Chat), o streamer também age só na overlay, sem me
 
 O chat recente da overlay ignora o que veio antes de `chat_cleared_at`, as mensagens ocultas e as
 dos chatters silenciados. A mensagem nova de um silenciado vai para a atividade, mas não para a
-overlay. Uma fonte criada antes de
-uma inscrição nova ganha essa inscrição com `php artisan twitch:sync-streamer-subscriptions`.
+overlay.
+
+Uma fonte criada antes de uma inscrição nova ganha essa inscrição com
+`php artisan twitch:sync-streamer-subscriptions` ou com **Reparar inscrições** no Painel.
+
+## Saúde da integração
+
+O Painel mostra uma verificação por item. Cada uma mora no módulo dono do dado e devolve o mesmo
+`HealthCheck` (`src/Health`):
+
+| Verificação         | Módulo               | Fonte do dado                                             |
+| ------------------- | -------------------- | --------------------------------------------------------- |
+| Conta da Twitch     | `integration-twitch` | `/validate`, com renovação do token no 401 (10 min)       |
+| Endereço do webhook | `integration-twitch` | `services.twitch.eventsub_callback`                       |
+| Inscrições          | `integration-twitch` | `twitch_subscriptions` (pendente vira problema em 10 min) |
+| Último evento       | `integration-twitch` | `twitch_event_logs` (alerta só ao vivo, após 15 min)      |
+| Overlays conectadas | `streaming`          | `subscription_count` do canal privado no Reverb           |
+
+A seção carrega depois da página (`wire:init`), porque a Twitch pode demorar. O selo vermelho no
+menu usa só as verificações que leem o banco (endereço e inscrições), para não chamar a Twitch a
+cada página. A revogação também aparece ali, porque a Twitch avisa pelo webhook.
 
 ## Rodar a overlay localmente
 
