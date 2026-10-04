@@ -3,7 +3,7 @@
     'user' => null,
     'character' => null,
     'initials' => '',
-    'avatarPreviewUrl' => null,
+    'avatarDisplayUrl' => null,
     'coverPreviewUrl' => null,
     'coverAspectRatio',
     'coverFocalY' => 50,
@@ -107,9 +107,9 @@
 
         {{-- Avatar --}}
         <div class="absolute -bottom-8 left-6">
-            @if ($avatarPreviewUrl)
+            @if ($avatarDisplayUrl)
                 <img
-                    src="{{ $avatarPreviewUrl }}"
+                    src="{{ $avatarDisplayUrl }}"
                     alt="{{ $name }}"
                     style="object-position: center {{ $avatarFocalY }}%"
                     class="h-16 w-16 rounded-full border-4 border-white object-cover shadow-md dark:border-gray-800"

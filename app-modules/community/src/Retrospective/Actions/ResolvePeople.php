@@ -11,6 +11,7 @@ use He4rt\Community\Retrospective\Contracts\PersonDirectory;
 use He4rt\Community\Retrospective\DTOs\PersonAccount;
 use He4rt\Community\Retrospective\DTOs\PersonIdentity;
 use He4rt\Identity\ExternalIdentity\Enums\IdentityProvider;
+use He4rt\Identity\User\Enums\ProfileImage;
 use He4rt\Identity\User\Models\User;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Relations\Relation;
@@ -91,7 +92,7 @@ final readonly class ResolvePeople implements PersonDirectory
                 identityId: $identity->id,
                 accountId: $identity->external_account_id,
                 username: $this->stringOrNull($metadata['username'] ?? null),
-                avatar: $this->stringOrNull($metadata['avatar'] ?? null),
+                avatar: $identity->avatarUrl(),
             );
         }
 
@@ -99,35 +100,17 @@ final readonly class ResolvePeople implements PersonDirectory
     }
 
     /**
-     * GitHub primeiro, Discord depois, o do sistema por último.
-     *
-     * A URL `github.com/{username}.png` usa o username da conta VINCULADA, então
-     * sempre resolve para a foto real — diferente do fallback final, que monta a
-     * mesma URL com o username do site e costuma devolver a imagem de erro.
+     * GitHub primeiro, Discord depois, o upload por último. Sem nenhum dos três,
+     * null: a view mostra as iniciais em vez de chutar `github.com/{username}.png`
+     * com o username do site, que costuma devolver a imagem de erro.
      *
      * @param  array<string, PersonAccount>  $accounts
      */
-    private function avatar(User $user, array $accounts): string
+    private function avatar(User $user, array $accounts): ?string
     {
-        $github = $accounts[IdentityProvider::GitHub->value] ?? null;
-
-        if ($github?->username !== null) {
-            return sprintf('https://github.com/%s.png', $github->username);
-        }
-
-        $discord = $accounts[IdentityProvider::Discord->value] ?? null;
-
-        if ($discord?->avatar !== null && $discord->avatar !== '') {
-            return $discord->avatar;
-        }
-
-        $uploaded = $user->getFirstMediaUrl('avatar');
-
-        if ($uploaded !== '') {
-            return $uploaded;
-        }
-
-        return sprintf('https://github.com/%s.png', $user->username);
+        return $accounts[IdentityProvider::GitHub->value]->avatar
+            ?? $accounts[IdentityProvider::Discord->value]->avatar
+            ?? $user->imageUrl(ProfileImage::Avatar);
     }
 
     /**

@@ -17,6 +17,7 @@ use He4rt\Identity\Database\Factories\UserFactory;
 use He4rt\Identity\ExternalIdentity\Enums\IdentityProvider;
 use He4rt\Identity\ExternalIdentity\Models\ExternalIdentity;
 use He4rt\Identity\User\Concerns\HasProfileImages;
+use He4rt\Identity\User\Enums\ProfileImage;
 use He4rt\Identity\User\Enums\UserSituation;
 use He4rt\Identity\User\Observers\UserObserver;
 use He4rt\Profile\Models\Profile;
@@ -134,7 +135,7 @@ final class User extends Authenticatable implements FilamentUser, HasAvatar, Has
      */
     public function getFilamentAvatarUrl(): ?string
     {
-        return $this->getFirstMediaUrl('avatar')
+        return $this->imageUrl(ProfileImage::Avatar)
             ?: $this->linkedIdentity(IdentityProvider::GitHub)?->avatarUrl()
             ?: $this->linkedIdentity(IdentityProvider::Discord)?->avatarUrl();
     }

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use He4rt\Identity\ExternalIdentity\Enums\IdentityProvider;
 use He4rt\Identity\ExternalIdentity\Models\ExternalIdentity;
+use He4rt\Identity\User\Enums\ProfileImage;
 use He4rt\Identity\User\Models\User;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
@@ -25,7 +26,7 @@ test('uploaded avatar wins over linked accounts', function (): void {
     $user->addMedia(UploadedFile::fake()->image('avatar.jpg', 500, 500))->toMediaCollection('avatar');
     linkAvatarIdentity($user, IdentityProvider::GitHub, ['metadata' => ['username' => 'octocat']]);
 
-    expect($user->fresh()->getFilamentAvatarUrl())->toBe($user->getFirstMediaUrl('avatar'));
+    expect($user->fresh()->getFilamentAvatarUrl())->toBe($user->imageUrl(ProfileImage::Avatar));
 });
 
 test('linked github account wins over discord', function (): void {
@@ -34,6 +35,16 @@ test('linked github account wins over discord', function (): void {
     linkAvatarIdentity($user, IdentityProvider::Discord, ['metadata' => ['avatar' => 'https://cdn.discordapp.com/avatars/1/a.png']]);
 
     expect($user->getFilamentAvatarUrl())->toBe('https://github.com/octocat.png');
+});
+
+test('github avatar stored by oauth wins over the username url', function (): void {
+    $user = User::factory()->create();
+    linkAvatarIdentity($user, IdentityProvider::GitHub, ['metadata' => [
+        'username' => 'octocat',
+        'avatar' => 'https://avatars.githubusercontent.com/u/583231?v=4',
+    ]]);
+
+    expect($user->getFilamentAvatarUrl())->toBe('https://avatars.githubusercontent.com/u/583231?v=4');
 });
 
 test('discord avatar url is used as stored', function (): void {

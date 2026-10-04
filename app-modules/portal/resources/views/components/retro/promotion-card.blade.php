@@ -9,14 +9,7 @@
 --}}
 <article class="promo-card">
     <div class="promo-head">
-        <img
-            class="promo-avatar"
-            src="{{ $card->avatar }}"
-            width="{{ $size }}"
-            height="{{ $size }}"
-            alt="{{ $card->name }}"
-            style="width: {{ $size }}px; height: {{ $size }}px"
-        />
+        <x-portal::retro.avatar class="promo-avatar" :src="$card->avatar" :name="$card->name" :size="$size" />
 
         <div style="flex: 1; min-width: 0">
             <div class="promo-name">{{ $card->name }}</div>
