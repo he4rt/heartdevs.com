@@ -16,7 +16,7 @@
             @foreach ($timeline->children->take(3) as $reply)
                 @continue (!$reply->postable || !$reply->user)
                 <div class="flex gap-3">
-                    @php($replyAvatarUrl = $reply->user->getFirstMediaUrl('avatar') ?: null)
+                    @php($replyAvatarUrl = $reply->user->getFilamentAvatarUrl())
                     @if ($replyAvatarUrl)
                         <img
                             src="{{ $replyAvatarUrl }}"

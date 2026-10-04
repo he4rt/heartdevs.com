@@ -1,4 +1,5 @@
 @props ([
+    'avatarDisplayUrl' => null,
     'avatarPreviewUrl' => null,
     'coverPreviewUrl' => null,
     'initials' => '',
@@ -77,9 +78,9 @@
             @mouseleave="hover = false"
         >
             <div class="relative h-24 w-24 sm:h-28 sm:w-28">
-                @if ($avatarPreviewUrl)
+                @if ($avatarDisplayUrl)
                     <img
-                        src="{{ $avatarPreviewUrl }}"
+                        src="{{ $avatarDisplayUrl }}"
                         alt="{{ $name }}"
                         class="h-full w-full rounded-full border-4 border-white object-cover shadow-lg dark:border-gray-800"
                         style="object-position: center {{ $avatarFocalY }}%"

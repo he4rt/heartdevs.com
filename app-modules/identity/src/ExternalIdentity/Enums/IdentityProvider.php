@@ -21,6 +21,7 @@ use He4rt\IntegrationDiscord\OAuth\DiscordOAuthClient;
 use He4rt\IntegrationGithub\OAuth\GitHubOAuthClient;
 use He4rt\IntegrationTwitch\OAuth\TwitchOAuthClient;
 use He4rt\IntegrationTwitch\OAuth\TwitchScopes;
+use Illuminate\Support\Str;
 
 enum IdentityProvider: string implements HasColor, HasDescription, HasIcon, HasLabel
 {
@@ -273,10 +274,56 @@ enum IdentityProvider: string implements HasColor, HasDescription, HasIcon, HasL
         };
     }
 
+    /**
+     * @param  array<string, mixed>  $metadata
+     */
+    public function getAvatarUrl(?string $accountId, array $metadata): ?string
+    {
+        return match ($this) {
+            self::GitHub => $this->githubAvatarUrl($metadata),
+            self::Discord => $this->discordAvatarUrl($accountId, $metadata),
+            default => null,
+        };
+    }
+
     public function getMessageAdapter(): ?MessageActivityAdapter
     {
         return match ($this) {
             self::Discord => resolve(DiscordMessageAdapter::class),
+            default => null,
+        };
+    }
+
+    /**
+     * GitHub OAuth stores the id-based avatar URL, which survives a username rename.
+     *
+     * @param  array<string, mixed>  $metadata
+     */
+    private function githubAvatarUrl(array $metadata): ?string
+    {
+        $avatar = data_get($metadata, 'avatar');
+        $username = data_get($metadata, 'username');
+
+        return match (true) {
+            filled($avatar) => $avatar,
+            filled($username) => sprintf('https://github.com/%s.png', $username),
+            default => null,
+        };
+    }
+
+    /**
+     * Discord OAuth stores the full CDN URL; the bot and the guild sync store only the avatar hash.
+     *
+     * @param  array<string, mixed>  $metadata
+     */
+    private function discordAvatarUrl(?string $accountId, array $metadata): ?string
+    {
+        $avatar = data_get($metadata, 'avatar');
+
+        return match (true) {
+            blank($avatar) => null,
+            Str::startsWith($avatar, 'https://') => $avatar,
+            filled($accountId) => sprintf('https://cdn.discordapp.com/avatars/%s/%s.png', $accountId, $avatar),
             default => null,
         };
     }

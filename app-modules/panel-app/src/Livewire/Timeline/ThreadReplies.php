@@ -43,7 +43,7 @@ final class ThreadReplies extends Component
     {
         $replies = Timeline::query()
             ->where('root_id', $this->timelineId)->whereNotNull('parent_id')
-            ->with(['user.media', 'postable'])
+            ->with(['user.media', 'user.providers', 'postable'])
             ->oldest()
             ->simplePaginate($this->perPage);
 

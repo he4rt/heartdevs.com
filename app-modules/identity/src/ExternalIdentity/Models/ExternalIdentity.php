@@ -105,6 +105,11 @@ final class ExternalIdentity extends Model
         return array_values(array_diff($requiredScopes, $grantedScopes));
     }
 
+    public function avatarUrl(): ?string
+    {
+        return $this->provider->getAvatarUrl($this->external_account_id, $this->metadata ?? []);
+    }
+
     protected static function newFactory(): ExternalIdentityFactory
     {
         return ExternalIdentityFactory::new();

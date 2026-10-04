@@ -8,7 +8,9 @@ use Carbon\CarbonInterface;
 use He4rt\Activity\Database\Factories\TimelineFactory;
 use He4rt\Activity\Reaction\Concerns\HasReactions;
 use He4rt\Identity\User\Models\User;
+use Illuminate\Database\Eloquent\Attributes\Scope;
 use Illuminate\Database\Eloquent\Attributes\Table;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -70,6 +72,16 @@ final class Timeline extends Model
     protected static function newFactory(): TimelineFactory
     {
         return TimelineFactory::new();
+    }
+
+    /** @param  Builder<self>  $query */
+    #[Scope]
+    protected function feed(Builder $query): void
+    {
+        $query->where('is_ignored', operator: false)
+            ->whereHas('user')
+            ->whereNull('parent_id')
+            ->latest();
     }
 
     /** @return array<string, mixed> */

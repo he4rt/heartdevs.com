@@ -23,7 +23,7 @@ final class Feed extends Component
     {
         $items = new TimelineFeed()
             ->builder()
-            ->with(['user', 'postable'])
+            ->with(['user.media', 'user.providers', 'postable'])
             ->withCount('children', 'reactions')
             ->simplePaginate($this->perPage);
 

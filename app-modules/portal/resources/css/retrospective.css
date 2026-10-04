@@ -415,7 +415,8 @@
     background: var(--surface);
     text-align: left;
 }
-.retro .cover-host img {
+.retro .cover-host img,
+.retro .cover-host .retro-initials {
     width: 52px;
     height: 52px;
     border-radius: 50%;
@@ -873,6 +874,9 @@
 }
 .retro .pgrid > div {
     display: flex;
+    /* sem isso, um login longo sem quebra (@ramonsoarezcavalcante) define a
+       largura mínima do item e empurra o card para fora da coluna */
+    min-width: 0;
 }
 .retro .pgrid .card {
     padding: 16px 17px 17px;
@@ -1212,6 +1216,7 @@
     line-height: 1.12;
     color: var(--text);
     text-decoration: none;
+    overflow-wrap: anywhere;
 }
 .retro .name:hover {
     color: var(--brand-soft);
@@ -2554,6 +2559,16 @@
     box-shadow:
         0 0 0 2px var(--surface),
         0 0 0 4px rgba(120, 43, 241, 0.45);
+}
+.retro .retro-initials {
+    display: inline-flex;
+    flex-shrink: 0;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: var(--brand);
+    color: #fff;
+    font-weight: 700;
 }
 .retro .promo-avatar.big {
     box-shadow:

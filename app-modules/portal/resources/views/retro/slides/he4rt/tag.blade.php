@@ -26,13 +26,7 @@
                     style="--shift: {{ $position - (count($cards) - 1) / 2 }}"
                 >
                     <span class="promo-avatar-ring">
-                        <img
-                            class="promo-avatar big"
-                            src="{{ $card->avatar }}"
-                            width="112"
-                            height="112"
-                            alt="{{ $card->name }}"
-                        />
+                        <x-portal::retro.avatar class="promo-avatar big" :src="$card->avatar" :name="$card->name" :size="112" />
                     </span>
 
                     <div class="promo-name big">{{ $card->name }}</div>

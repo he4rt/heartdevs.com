@@ -107,6 +107,32 @@ it('agrega contribuições por pessoa com contagem por tipo e total, ordenado de
         ->and($people[0]['avatar'])->toContain('42');
 });
 
+it('commit sem conta GitHub não ganha avatar nem link', function (): void {
+    ghContribution(['actor_login' => 'Paulo Gabriel', 'actor_id' => null, 'type' => ContributionType::Commit, 'external_ref' => 'commit:a1', 'occurred_at' => '2026-06-02', 'metadata' => ['author_linked' => false]]);
+
+    $person = ghPeople(($this->collect)())[0];
+
+    expect($person['avatar'])->toBeNull()
+        ->and($person['linked'])->toBeFalse()
+        ->and($person['url'])->toBeNull();
+});
+
+it('usa o login quando o commit tem conta sem actor_id (push do webhook)', function (): void {
+    ghContribution(['actor_login' => 'maria', 'actor_id' => null, 'type' => ContributionType::Commit, 'external_ref' => 'commit:b1', 'occurred_at' => '2026-06-02', 'metadata' => ['author_linked' => true]]);
+
+    $person = ghPeople(($this->collect)())[0];
+
+    expect($person['avatar'])->toBe('https://github.com/maria.png')
+        ->and($person['url'])->toBe('https://github.com/maria');
+});
+
+it('pega o actor_id de qualquer contribuição da pessoa, não só da primeira', function (): void {
+    ghContribution(['actor_login' => 'maria', 'actor_id' => null, 'type' => ContributionType::Commit, 'external_ref' => 'commit:c1', 'occurred_at' => '2026-06-02', 'metadata' => ['author_linked' => true]]);
+    ghContribution(['actor_login' => 'maria', 'actor_id' => 42, 'type' => ContributionType::Issue, 'external_ref' => 'issue:1', 'occurred_at' => '2026-06-03']);
+
+    expect(ghPeople(($this->collect)())[0]['avatar'])->toBe('https://avatars.githubusercontent.com/u/42?v=4');
+});
+
 it('exclui bots do ranking', function (): void {
     ghContribution(['actor_login' => 'dependabot[bot]', 'type' => ContributionType::Pr, 'external_ref' => 'pr:9', 'occurred_at' => '2026-06-02', 'metadata' => ['is_bot' => true, 'state' => 'open', 'merged' => false]]);
     ghContribution(['actor_login' => 'maria', 'type' => ContributionType::Pr, 'external_ref' => 'pr:1', 'occurred_at' => '2026-06-02', 'metadata' => ['state' => 'open', 'merged' => false]]);
