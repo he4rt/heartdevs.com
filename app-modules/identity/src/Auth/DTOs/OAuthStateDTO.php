@@ -17,6 +17,7 @@ final readonly class OAuthStateDTO implements JsonSerializable, Stringable
         public IdentityProvider $provider,
         public string $panel,
         public ?string $returnUrl = null,
+        public ?string $nonce = null,
     ) {}
 
     public function __toString(): string
@@ -33,6 +34,7 @@ final readonly class OAuthStateDTO implements JsonSerializable, Stringable
             provider: IdentityProvider::from($data['provider']),
             panel: $data['panel'],
             returnUrl: $data['return_url'] ?? null,
+            nonce: $data['nonce'] ?? null,
         );
     }
 
@@ -46,6 +48,7 @@ final readonly class OAuthStateDTO implements JsonSerializable, Stringable
             'provider' => $this->provider->value,
             'panel' => $this->panel,
             'return_url' => $this->returnUrl,
+            'nonce' => $this->nonce,
         ];
     }
 }
