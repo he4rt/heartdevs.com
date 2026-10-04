@@ -11,7 +11,6 @@ use He4rt\Activity\Timeline\Actions\DeleteReply;
 use He4rt\Activity\Timeline\DTOs\CreatePostDTO;
 use He4rt\Activity\Timeline\DTOs\CreateReplyDTO;
 use He4rt\Activity\Timeline\Http\Resources\TimelinePostResource;
-use He4rt\Activity\Timeline\Queries\TimelineFeed;
 use He4rt\Activity\Timeline\Timeline;
 use He4rt\Identity\User\Models\User;
 use Illuminate\Auth\Access\AuthorizationException;
@@ -31,7 +30,8 @@ final class MobileTimelineController extends Controller
      */
     public function index(): AnonymousResourceCollection
     {
-        $posts = (new TimelineFeed)->builder()
+        $posts = Timeline::query()
+            ->feed()
             ->with(['user', 'postable.media'])
             ->withCount(['children', 'reactions'])
             ->simplePaginate(20);
