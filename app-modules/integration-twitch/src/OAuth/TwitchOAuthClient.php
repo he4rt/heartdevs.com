@@ -14,6 +14,7 @@ use He4rt\IntegrationTwitch\Transport\Requests\OAuth\ExchangeCodeForToken;
 use He4rt\IntegrationTwitch\Transport\Requests\Users\GetCurrentUser;
 use He4rt\IntegrationTwitch\Transport\TwitchHelixConnector;
 use He4rt\IntegrationTwitch\Transport\TwitchOAuthConnector;
+use Illuminate\Support\Facades\Auth;
 
 final readonly class TwitchOAuthClient implements OAuthClientContract
 {
@@ -24,8 +25,7 @@ final readonly class TwitchOAuthClient implements OAuthClientContract
 
     public function redirectUrl(?OAuthStateDTO $state = null): string
     {
-        $panel = $state->panel ?? 'app';
-        $scopes = config('services.twitch.scopes.'.$panel, config('services.twitch.scopes.app'));
+        $scopes = TwitchScopes::requestedFor($state->panel ?? 'app', Auth::user());
 
         $callbackUrl = $this->callbackUrl();
 
@@ -33,7 +33,7 @@ final readonly class TwitchOAuthClient implements OAuthClientContract
             'client_id' => $this->oauthConnector->clientId,
             'redirect_uri' => $callbackUrl,
             'response_type' => 'code',
-            'scope' => $scopes,
+            'scope' => implode(' ', $scopes),
             'state' => (string) $state,
         ]);
     }

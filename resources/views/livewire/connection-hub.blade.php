@@ -36,7 +36,7 @@
                         default => '#6b7280',
                     };
 
-                    $scopes = $provider->getScopes($panel);
+                    $scopes = $provider->getScopes($panel, auth()->user());
                 @endphp
                 <div
                     wire:key="provider-{{ $provider->value }}"

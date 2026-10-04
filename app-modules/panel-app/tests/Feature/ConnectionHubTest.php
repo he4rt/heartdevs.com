@@ -360,3 +360,22 @@ test('the connection hub groups providers by authentication method', function ()
         ->assertSee(CredentialsType::ApiKey->getLabel())
         ->assertSee(IdentityProvider::DevTo->getLabel());
 });
+
+test('o card da Twitch lista os escopos de broadcaster só para streamer', function (string $factoryState, bool $seesBroadcasterScopes): void {
+    config()->set('services.twitch.scopes.streamer', 'user:read:email moderator:read:followers channel:read:subscriptions bits:read');
+
+    $user = $factoryState === 'streamer'
+        ? User::factory()->streamer()->create()
+        : User::factory()->create();
+
+    $this->actingAs($user);
+
+    $component = livewire(ConnectionHub::class)->assertSee('user:read:email');
+
+    $seesBroadcasterScopes
+        ? $component->assertSee('moderator:read:followers')
+        : $component->assertDontSee('moderator:read:followers');
+})->with([
+    'streamer' => ['streamer', true],
+    'membro' => ['membro', false],
+]);

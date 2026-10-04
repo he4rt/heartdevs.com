@@ -13,12 +13,14 @@ use Filament\Support\Contracts\HasDescription;
 use Filament\Support\Contracts\HasIcon;
 use Filament\Support\Contracts\HasLabel;
 use He4rt\Activity\Message\Contracts\MessageActivityAdapter;
+use He4rt\Identity\User\Models\User;
 use He4rt\IntegrationDevTo\ApiKey\DevToApiKeyClient;
 use He4rt\IntegrationDevTo\OAuth\DevToOAuthClient;
 use He4rt\IntegrationDiscord\ETL\Adapters\DiscordMessageAdapter;
 use He4rt\IntegrationDiscord\OAuth\DiscordOAuthClient;
 use He4rt\IntegrationGithub\OAuth\GitHubOAuthClient;
 use He4rt\IntegrationTwitch\OAuth\TwitchOAuthClient;
+use He4rt\IntegrationTwitch\OAuth\TwitchScopes;
 
 enum IdentityProvider: string implements HasColor, HasDescription, HasIcon, HasLabel
 {
@@ -224,11 +226,14 @@ enum IdentityProvider: string implements HasColor, HasDescription, HasIcon, HasL
     /**
      * @return array<int, string>
      */
-    public function getScopes(?string $panel = null): array
+    public function getScopes(?string $panel = null, ?User $user = null): array
     {
+        if ($this === self::Twitch) {
+            return TwitchScopes::requestedFor($panel ?? 'app', $user);
+        }
+
         $scopes = match ($this) {
             self::Discord => config('services.discord.scopes'),
-            self::Twitch => config('services.twitch.scopes.'.($panel ?? 'app'), config('services.twitch.scopes.app')),
             default => '',
         };
 
