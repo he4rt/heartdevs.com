@@ -98,6 +98,8 @@ Sem gap de domínio — é serialização pura em cima do que já existe. O corp
 
 **Fora do v1, decisão explícita**: reações (`withCount('reactions')` aparece no `Feed.php`) — o PRD não menciona reagir como escopo v1 do app; incluir a contagem na resposta é grátis, mas o endpoint de reagir fica pra depois se a issue não abrir esse escopo.
 
+**Status: implementado** (`He4rt\Activity\Timeline\Http\Controllers\Mobile\MobileTimelineController` + `Http\Resources\TimelinePostResource`). Upload de imagens aceito via multipart (`images[]`), armazenado no mesmo diretório `timeline-uploads` que o Composer do painel usa. Rotas em `app-modules/activity/routes/api-mobile-routes.php`.
+
 ---
 
 ## Feature 2 — Eventos
