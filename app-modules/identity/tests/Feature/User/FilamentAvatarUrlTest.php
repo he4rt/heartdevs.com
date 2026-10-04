@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use He4rt\Identity\ExternalIdentity\Enums\IdentityProvider;
 use He4rt\Identity\ExternalIdentity\Models\ExternalIdentity;
+use He4rt\Identity\User\Enums\ProfileImage;
 use He4rt\Identity\User\Models\User;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
@@ -25,7 +26,7 @@ test('uploaded avatar wins over linked accounts', function (): void {
     $user->addMedia(UploadedFile::fake()->image('avatar.jpg', 500, 500))->toMediaCollection('avatar');
     linkAvatarIdentity($user, IdentityProvider::GitHub, ['metadata' => ['username' => 'octocat']]);
 
-    expect($user->fresh()->getFilamentAvatarUrl())->toBe($user->getFirstMediaUrl('avatar'));
+    expect($user->fresh()->getFilamentAvatarUrl())->toBe($user->imageUrl(ProfileImage::Avatar));
 });
 
 test('linked github account wins over discord', function (): void {
