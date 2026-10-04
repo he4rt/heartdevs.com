@@ -19,6 +19,8 @@ use He4rt\PanelApp\Clusters\Streaming\StreamingCluster;
 use He4rt\PanelApp\Clusters\Streaming\StreamingPreviewData;
 use He4rt\Streaming\Enums\StreamEventType;
 use He4rt\Streaming\Streamer\Actions\EnsureStreamer;
+use He4rt\Streaming\Streamer\Models\Streamer;
+use He4rt\Streaming\StreamEvent\Actions\TriggerTestAlert;
 use Livewire\Attributes\Computed;
 
 /**
@@ -48,13 +50,13 @@ class StreamDashboardPage extends Page
 
     public function mount(EnsureStreamer $ensureStreamer): void
     {
-        $ensureStreamer->handle($this->streamer());
+        $ensureStreamer->handle($this->currentUser());
     }
 
     #[Computed]
     public function twitchConnection(): ?ExternalIdentity
     {
-        return $this->streamer()
+        return $this->currentUser()
             ->providers()
             ->where('provider', IdentityProvider::Twitch)
             ->activelyConnected()
@@ -68,7 +70,7 @@ class StreamDashboardPage extends Page
     #[Computed]
     public function missingTwitchScopes(): array
     {
-        return $this->twitchConnection?->missingScopes(TwitchScopes::requestedFor(FilamentPanel::App->value, $this->streamer())) ?? [];
+        return $this->twitchConnection?->missingScopes(TwitchScopes::requestedFor(FilamentPanel::App->value, $this->currentUser())) ?? [];
     }
 
     public function connectTwitchAction(): Action
@@ -117,7 +119,7 @@ class StreamDashboardPage extends Page
             });
     }
 
-    public function sendTestAlert(string $type): void
+    public function sendTestAlert(TriggerTestAlert $triggerTestAlert, string $type): void
     {
         $alertType = StreamEventType::tryFrom($type);
 
@@ -125,9 +127,11 @@ class StreamDashboardPage extends Page
             return;
         }
 
+        $triggerTestAlert->handle($this->currentStreamer(), $alertType);
+
         Notification::make()
             ->title(sprintf('Alerta de %s enviado', $alertType->getLabel()))
-            ->body('Na versão final ele aparece na sua overlay.')
+            ->body('Confira na sua overlay.')
             ->success()
             ->send();
     }
@@ -152,12 +156,17 @@ class StreamDashboardPage extends Page
         ]);
     }
 
-    private function streamer(): User
+    private function currentUser(): User
     {
         $user = auth()->user();
 
         abort_unless($user instanceof User, 403);
 
         return $user;
+    }
+
+    private function currentStreamer(): Streamer
+    {
+        return Streamer::query()->whereBelongsTo($this->currentUser())->sole();
     }
 }

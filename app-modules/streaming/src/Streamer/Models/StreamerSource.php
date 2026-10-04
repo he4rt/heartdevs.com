@@ -8,6 +8,7 @@ use Carbon\CarbonInterface;
 use He4rt\Identity\ExternalIdentity\Models\ExternalIdentity;
 use He4rt\Streaming\Database\Factories\StreamerSourceFactory;
 use He4rt\Streaming\Enums\ChatReader;
+use He4rt\Streaming\Session\Models\StreamSession;
 use Illuminate\Database\Eloquent\Attributes\Table;
 use Illuminate\Database\Eloquent\Attributes\UseFactory;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
@@ -52,6 +53,14 @@ final class StreamerSource extends Model
     public function identity(): BelongsTo
     {
         return $this->belongsTo(ExternalIdentity::class, 'external_identity_id');
+    }
+
+    public function openSession(): ?StreamSession
+    {
+        return StreamSession::query()
+            ->open()
+            ->where('external_identity_id', $this->external_identity_id)
+            ->first();
     }
 
     public function showsChat(): bool

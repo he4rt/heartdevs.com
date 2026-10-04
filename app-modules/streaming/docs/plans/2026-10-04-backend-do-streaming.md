@@ -1062,9 +1062,9 @@ Feature: Fontes do streamer
 
 ## Fase 2 — Sessões e eventos
 
-- [ ] 2.1 Tabelas `stream_sessions` e `stream_events`, e os VOs de `details`
-- [ ] 2.2 Abrir, atualizar e fechar sessões
-- [ ] 2.3 `RecordStreamEvent` e o alerta de teste
+- [x] 2.1 Tabelas `stream_sessions` e `stream_events`, e os VOs de `details`
+- [x] 2.2 Abrir, atualizar e fechar sessões
+- [x] 2.3 `RecordStreamEvent` e o alerta de teste
 
 ### 2.1 Tabelas `stream_sessions` e `stream_events`, e os VOs de `details`
 
@@ -1221,6 +1221,11 @@ Regras do `StartStreamSession`:
 - **Ao abrir:** emite `StreamSessionStarted`.
 
 O `EndStreamSession` fecha a sessão aberta, se houver uma, e emite `StreamSessionEnded`.
+
+`StreamSessionStarted` e `StreamSessionEnded` recebem a fonte junto com a sessão. O
+`broadcastWhen()` lê o toggle da fonte, porque uma fonte desligada só some da overlay (ADR, seção
+3). A busca da sessão aberta fica em `StreamerSource::openSession()`, usada pelas Actions de sessão
+e pela `RecordStreamEvent`.
 
 **Comportamento esperado.**
 

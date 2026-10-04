@@ -11,8 +11,10 @@ use He4rt\PanelApp\Clusters\Streaming\Pages\StreamDashboardPage;
 use He4rt\PanelApp\Clusters\Streaming\Pages\StreamOverlaysPage;
 use He4rt\PanelApp\Clusters\Streaming\StreamingCluster;
 use He4rt\PanelApp\Clusters\Streaming\StreamingPreviewData;
+use He4rt\Streaming\Broadcasting\AlertTriggered;
 use He4rt\Streaming\Enums\OverlayScene;
 use He4rt\Streaming\Enums\StreamerStatus;
+use He4rt\Streaming\Enums\StreamEventType;
 use He4rt\Streaming\Streamer\Models\Streamer;
 use Illuminate\Support\Facades\Event;
 use Livewire\Features\SupportLockedProperties\CannotUpdateLockedPropertyException;
@@ -149,12 +151,18 @@ test('o painel ignora a conexão da Twitch de outro usuário', function (): void
     livewire(StreamDashboardPage::class)->assertSee('Conecte sua Twitch');
 });
 
-test('testar um alerta avisa que ele foi enviado', function (): void {
-    $this->actingAs(User::factory()->streamer()->create());
+test('testar um alerta manda o alerta de teste para a overlay', function (): void {
+    Event::fake([AlertTriggered::class]);
+    $user = User::factory()->streamer()->create();
+    $this->actingAs($user);
 
     livewire(StreamDashboardPage::class)
         ->call('sendTestAlert', 'cheer')
         ->assertNotified('Alerta de Bits enviado');
+
+    Event::assertDispatched(fn (AlertTriggered $alert): bool => $alert->isTest
+        && $alert->type === StreamEventType::Cheer
+        && $alert->streamer->user_id === $user->getKey());
 });
 
 test('o alerta de gift sub usa o valor do domínio', function (): void {
