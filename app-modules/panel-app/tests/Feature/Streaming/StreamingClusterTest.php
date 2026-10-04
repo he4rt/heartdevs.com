@@ -154,7 +154,7 @@ test('testar um alerta manda o alerta de teste para a overlay', function (): voi
     $this->actingAs($user);
 
     livewire(StreamDashboardPage::class)
-        ->call('sendTestAlert', 'cheer')
+        ->callAction('testAlert', arguments: ['type' => 'cheer'])
         ->assertNotified('Alerta de Bits enviado');
 
     Event::assertDispatched(fn (AlertTriggered $alert): bool => $alert->isTest
@@ -166,7 +166,7 @@ test('o alerta de gift sub usa o valor do domínio', function (): void {
     $this->actingAs(User::factory()->streamer()->create());
 
     livewire(StreamDashboardPage::class)
-        ->call('sendTestAlert', 'gift_sub')
+        ->callAction('testAlert', arguments: ['type' => 'gift_sub'])
         ->assertNotified('Alerta de Gift sub enviado');
 });
 
@@ -174,7 +174,7 @@ test('um tipo de alerta desconhecido não dispara nada', function (string $type)
     $this->actingAs(User::factory()->streamer()->create());
 
     livewire(StreamDashboardPage::class)
-        ->call('sendTestAlert', $type)
+        ->callAction('testAlert', arguments: ['type' => $type])
         ->assertNotNotified();
 })->with([
     'tipo que não existe' => ['donation'],

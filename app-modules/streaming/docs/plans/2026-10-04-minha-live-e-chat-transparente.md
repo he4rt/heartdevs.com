@@ -1136,9 +1136,24 @@ Feature: Overlays conectadas
 
 ## Fase 6 — Lives
 
-- [ ] 6.1 Ao vivo agora
-- [ ] 6.2 Histórico de lives
-- [ ] 6.3 Detalhe da live
+- [x] 6.1 Ao vivo agora
+- [x] 6.2 Histórico de lives
+- [x] 6.3 Detalhe da live
+
+> **Nota de implementação.**
+>
+> - As somas de cada sessão saem de subselects (`StreamSessionTotals`), lidos de volta por
+>   `SessionTotals::of()`. Os eventos usam o `stream_session_id`, que ganhou um índice. As mensagens
+>   usam o canal da sessão e a janela `started_at` → `ended_at` (ou agora, se a live está aberta).
+> - A tabela de Lives ordena só por `started_at`. O painel pagina por cursor, e ordenar por uma soma
+>   quebra a página 2.
+> - Uma sessão sem evento e sem mensagem mostra "—", não zero. O mais provável é a Twitch não ter
+>   entregado os eventos.
+> - O detalhe compara com a última live **com dados**, não com a imediatamente anterior. Uma live que
+>   caiu não infla as setas. O texto abaixo dos números diz a data usada. O ‹ › continua indo para a
+>   live vizinha.
+> - O alerta de teste virou uma action com argumento `type` e confirmação só durante a live. "Repetir
+>   alerta" manda o `AlertTriggered` do evento gravado de novo, sem gravar outro evento.
 
 ### 6.1 Ao vivo agora
 

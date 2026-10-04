@@ -16,6 +16,8 @@ use Filament\Support\Colors\Color;
 use He4rt\PanelApp\Clusters\Streaming\Pages\StreamChatPage;
 use He4rt\PanelApp\Clusters\Streaming\Pages\StreamDashboardPage;
 use He4rt\PanelApp\Clusters\Streaming\Pages\StreamOverlaysPage;
+use He4rt\PanelApp\Clusters\Streaming\Pages\StreamSessionPage;
+use He4rt\PanelApp\Clusters\Streaming\Pages\StreamSessionsPage;
 use He4rt\PanelApp\Clusters\Streaming\StreamingCluster;
 use He4rt\PanelApp\Pages\EventPage;
 use He4rt\PanelApp\Pages\EventsPage;
@@ -62,6 +64,8 @@ class AppPanelProvider extends PanelProvider
                 StreamDashboardPage::class,
                 StreamOverlaysPage::class,
                 StreamChatPage::class,
+                StreamSessionsPage::class,
+                StreamSessionPage::class,
             ])
             ->middleware([
                 EncryptCookies::class,

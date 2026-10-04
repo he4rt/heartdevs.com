@@ -143,6 +143,20 @@ TWITCH_BOT_REFRESH_TOKEN=
 
 A conta bot precisa autorizar o app uma vez com `user:read:chat user:bot`.
 
+## Lives
+
+Cada sessão de live (`stream_sessions`) junta as somas de follows, subs (com os presenteados),
+bits, raids, mensagens e chatters. As somas saem de subselects em `StreamSessionTotals`:
+
+| Número               | Fonte                                                                   |
+| -------------------- | ----------------------------------------------------------------------- |
+| Follows, subs, bits… | `stream_events` com o `stream_session_id` da sessão                     |
+| Mensagens, chatters  | `activity.messages` do canal da sessão, entre `started_at` e `ended_at` |
+
+O Painel mostra o card "Ao vivo" quando há uma sessão aberta. Em "Minha Live › Lives" fica o
+histórico, e cada linha abre o detalhe com a linha do tempo, quem mais falou e a comparação com a
+última live com dados.
+
 ## Limites conhecidos
 
 - O painel do usuário vive em `/app`, o mesmo prefixo do WebSocket do Reverb (`/app/{key}`). Se o
@@ -150,6 +164,8 @@ A conta bot precisa autorizar o app uma vez com `user:read:chat user:bot`.
   Reverb. A outra saída é servir o Reverb num host próprio.
 - A sincronização das inscrições EventSub precisa de um callback HTTPS público. Localmente, use o
   twitch-cli.
+- A comparação de uma live aberta usa a live anterior inteira. No meio da live, as setas tendem a
+  apontar para baixo.
 - XP da live, doações, "tocando agora" e sala de voz ficam fora deste módulo por enquanto. Essas
   partes da overlay ficam no estado vazio. Para ver a cena completa com dados de exemplo, abra a
   URL com `?demo`.

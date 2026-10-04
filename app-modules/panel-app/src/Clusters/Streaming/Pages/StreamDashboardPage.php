@@ -24,22 +24,25 @@ use He4rt\IntegrationTwitch\OAuth\TwitchBotTokenService;
 use He4rt\IntegrationTwitch\OAuth\TwitchScopes;
 use He4rt\IntegrationTwitch\OAuth\TwitchStreamerFeature;
 use He4rt\IntegrationTwitch\OAuth\TwitchUserAuthorization;
+use He4rt\PanelApp\Clusters\Streaming\StreamDuration;
+use He4rt\PanelApp\Clusters\Streaming\StreamEventSummary;
 use He4rt\PanelApp\Clusters\Streaming\StreamingCluster;
 use He4rt\PanelApp\Clusters\Streaming\StreamingHealthBadge;
 use He4rt\Streaming\Enums\ChatReader;
 use He4rt\Streaming\Enums\StreamEventType;
 use He4rt\Streaming\Health\Checks\CheckOverlayConnections;
+use He4rt\Streaming\Health\Contracts\OverlayConnections;
 use He4rt\Streaming\Health\HealthCheck;
+use He4rt\Streaming\Session\Data\SessionTotals;
+use He4rt\Streaming\Session\Models\StreamSession;
+use He4rt\Streaming\Session\Queries\StreamSessionChat;
+use He4rt\Streaming\Session\Queries\StreamSessionTotals;
 use He4rt\Streaming\Streamer\Actions\EnsureStreamer;
 use He4rt\Streaming\Streamer\Actions\UpdateStreamerSource;
 use He4rt\Streaming\Streamer\Models\Streamer;
 use He4rt\Streaming\Streamer\Models\StreamerSource;
+use He4rt\Streaming\StreamEvent\Actions\ReplayStreamEventAlert;
 use He4rt\Streaming\StreamEvent\Actions\TriggerTestAlert;
-use He4rt\Streaming\StreamEvent\Data\CheerDetails;
-use He4rt\Streaming\StreamEvent\Data\GiftSubDetails;
-use He4rt\Streaming\StreamEvent\Data\RaidDetails;
-use He4rt\Streaming\StreamEvent\Data\SubDetails;
-use He4rt\Streaming\StreamEvent\Models\StreamEvent;
 use He4rt\Streaming\StreamEvent\Queries\StreamerStats;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
@@ -51,6 +54,7 @@ use Livewire\Attributes\Computed;
  * @property-read Collection<int, StreamerSource> $sources
  * @property-read array<int, string> $missingTwitchScopes
  * @property-read array<int, HealthCheck> $healthChecks
+ * @property-read StreamSession|null $liveSession
  */
 class StreamDashboardPage extends Page
 {
@@ -59,6 +63,8 @@ class StreamDashboardPage extends Page
     private const int RECENT_ACTIVITY_LIMIT = 10;
 
     private const string WITHOUT_CHAT = 'none';
+
+    private const int CHAT_PACE_MINUTES = 5;
 
     public bool $healthRequested = false;
 
@@ -150,6 +156,14 @@ class StreamDashboardPage extends Page
     public function missingTwitchScopes(): array
     {
         return $this->twitchConnection?->missingScopes($this->requiredTwitchScopes($this->twitchSource?->chat_reader)) ?? [];
+    }
+
+    #[Computed]
+    public function liveSession(): ?StreamSession
+    {
+        $openSessions = StreamSession::query()->open()->whereBelongsTo($this->currentStreamer())->with('identity');
+
+        return resolve(StreamSessionTotals::class)->apply($openSessions)->latest('started_at')->first();
     }
 
     /**
@@ -375,21 +389,62 @@ class StreamDashboardPage extends Page
             });
     }
 
-    public function sendTestAlert(TriggerTestAlert $triggerTestAlert, string $type): void
+    public function testAlertAction(): Action
     {
-        $alertType = StreamEventType::tryFrom($type);
+        return Action::make('testAlert')
+            ->label(function (array $arguments): string {
+                $alertType = $this->alertTypeOf($arguments);
 
-        if ($alertType === null) {
-            return;
-        }
+                return $alertType instanceof StreamEventType ? sprintf('%s %s', $alertType->getEmoji(), $alertType->getLabel()) : '';
+            })
+            ->color('gray')
+            ->extraAttributes(['class' => 'w-full'])
+            ->requiresConfirmation(fn (): bool => $this->liveSession instanceof StreamSession)
+            ->modalIcon(Heroicon::OutlinedSignal)
+            ->modalHeading('Você está ao vivo')
+            ->modalDescription('O alerta de teste vai aparecer na live para quem está assistindo.')
+            ->modalSubmitActionLabel('Mandar mesmo assim')
+            ->action(function (array $arguments, TriggerTestAlert $triggerTestAlert): void {
+                $alertType = $this->alertTypeOf($arguments);
 
-        $triggerTestAlert->handle($this->currentStreamer(), $alertType);
+                if (!$alertType instanceof StreamEventType) {
+                    return;
+                }
 
-        Notification::make()
-            ->title(sprintf('Alerta de %s enviado', $alertType->getLabel()))
-            ->body('Confira na sua overlay.')
-            ->success()
-            ->send();
+                $triggerTestAlert->handle($this->currentStreamer(), $alertType);
+
+                Notification::make()
+                    ->title(sprintf('Alerta de %s enviado', $alertType->getLabel()))
+                    ->body('Confira na sua overlay.')
+                    ->success()
+                    ->send();
+            });
+    }
+
+    public function replayAlertAction(): Action
+    {
+        return Action::make('replayAlert')
+            ->label('Repetir alerta')
+            ->tooltip('Repetir o alerta na overlay')
+            ->icon(Heroicon::OutlinedArrowPathRoundedSquare)
+            ->iconButton()
+            ->color('gray')
+            ->size('sm')
+            ->action(function (array $arguments, ReplayStreamEventAlert $replayAlert): void {
+                $eventId = $arguments['event'] ?? null;
+
+                if (!is_string($eventId)) {
+                    return;
+                }
+
+                $event = $replayAlert->handle($this->currentStreamer(), $eventId);
+
+                Notification::make()
+                    ->title(sprintf('Alerta de %s repetido', $event->type->getLabel()))
+                    ->body('Confira na sua overlay.')
+                    ->success()
+                    ->send();
+            });
     }
 
     /**
@@ -402,6 +457,7 @@ class StreamDashboardPage extends Page
         $statTypes = [StreamEventType::Follow, StreamEventType::Sub, StreamEventType::Cheer, StreamEventType::Raid];
 
         return [
+            'live' => $this->liveSummary($streamer),
             'alertTypes' => StreamEventType::cases(),
             'stats' => array_map(fn (StreamEventType $type): array => [
                 'type' => $type,
@@ -411,28 +467,48 @@ class StreamDashboardPage extends Page
                 ->latest('occurred_at')
                 ->limit(self::RECENT_ACTIVITY_LIMIT)
                 ->get()
-                ->map(fn (StreamEvent $event): array => [
-                    'id' => $event->id,
-                    'type' => $event->type,
-                    'username' => $event->actor()?->displayName,
-                    'detail' => $this->activityDetail($event),
-                    'at' => $event->occurred_at,
-                ])
+                ->map(StreamEventSummary::of(...))
                 ->all(),
         ];
     }
 
-    private function activityDetail(StreamEvent $event): string
+    /**
+     * @return array<string, mixed>|null
+     */
+    private function liveSummary(Streamer $streamer): ?array
     {
-        $details = $event->details;
+        $session = $this->liveSession;
 
-        return match (true) {
-            $details instanceof SubDetails => sprintf('%s · %d %s', $details->tier->getLabel(), $details->months, $details->months === 1 ? 'mês' : 'meses'),
-            $details instanceof GiftSubDetails => sprintf('%d %s', $details->total, $details->total === 1 ? 'sub' : 'subs'),
-            $details instanceof CheerDetails => sprintf('%s bits', number_format($details->bits, thousands_separator: '.')),
-            $details instanceof RaidDetails => sprintf('+%d viewers', $details->viewers),
-            default => '',
-        };
+        if (!$session instanceof StreamSession) {
+            return null;
+        }
+
+        $totals = SessionTotals::of($session);
+
+        return [
+            'session' => $session,
+            'duration' => StreamDuration::between($session->started_at, now()),
+            'totals' => [
+                ['emoji' => StreamEventType::Follow->getEmoji(), 'label' => 'Follows', 'value' => $totals->follows],
+                ['emoji' => StreamEventType::Sub->getEmoji(), 'label' => 'Subs', 'value' => $totals->subs],
+                ['emoji' => StreamEventType::Cheer->getEmoji(), 'label' => 'Bits', 'value' => $totals->bits],
+                ['emoji' => StreamEventType::Raid->getEmoji(), 'label' => 'Raids', 'value' => $totals->raids],
+                ['emoji' => '💬', 'label' => 'Mensagens', 'value' => $totals->messages],
+            ],
+            'messagesPerMinute' => resolve(StreamSessionChat::class)->messagesPerMinute($session, self::CHAT_PACE_MINUTES),
+            'chatters' => $totals->chatters,
+            'openOverlays' => resolve(OverlayConnections::class)->count($streamer),
+        ];
+    }
+
+    /**
+     * @param  array<array-key, mixed>  $arguments
+     */
+    private function alertTypeOf(array $arguments): ?StreamEventType
+    {
+        $type = $arguments['type'] ?? null;
+
+        return is_string($type) ? StreamEventType::tryFrom($type) : null;
     }
 
     /**

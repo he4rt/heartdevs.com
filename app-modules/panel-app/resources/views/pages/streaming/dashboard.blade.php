@@ -4,6 +4,47 @@
         $missingScopes = $this->missingTwitchScopes;
     @endphp
 
+    @if ($live)
+        <x-filament::section class="ring-2 ring-danger-500/40">
+            <div class="flex flex-wrap items-center gap-x-3 gap-y-2">
+                <x-filament::badge color="danger" icon="heroicon-m-signal">Ao vivo</x-filament::badge>
+                <span class="text-sm text-gray-500 dark:text-gray-400">há {{ $live['duration'] }}</span>
+                <p class="min-w-0 flex-1 truncate text-end text-sm text-gray-700 dark:text-gray-200">
+                    <span class="font-medium">{{ $live['session']->title ?? 'Sem título' }}</span>
+                    @if (filled($live['session']->category))
+                        <span class="text-gray-500 dark:text-gray-400">· {{ $live['session']->category }}</span>
+                    @endif
+                </p>
+            </div>
+
+            <dl class="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-5">
+                @foreach ($live['totals'] as $total)
+                    <div class="rounded-lg bg-gray-50 px-3 py-2 dark:bg-white/5">
+                        <dt class="text-xs text-gray-500 dark:text-gray-400">
+                            <span aria-hidden="true">{{ $total['emoji'] }}</span>
+                            {{ $total['label'] }}
+                        </dt>
+                        <dd class="text-xl font-semibold text-gray-950 tabular-nums dark:text-white">
+                            {{ number_format($total['value'], thousands_separator: '.') }}
+                        </dd>
+                    </div>
+                @endforeach
+            </dl>
+
+            <p class="mt-3 text-xs text-gray-500 dark:text-gray-400">
+                {{ str_replace('.', ',', (string) $live['messagesPerMinute']) }} msgs/min nos últimos 5 min ·
+                {{ $live['chatters'] }} {{ $live['chatters'] === 1 ? 'chatter' : 'chatters' }} ·
+                @if ($live['openOverlays'] === null)
+                    tempo real fora do ar
+                @elseif ($live['openOverlays'] === 0)
+                    nenhuma overlay aberta
+                @else
+                    {{ $live['openOverlays'] === 1 ? '1 overlay aberta' : $live['openOverlays'] . ' overlays abertas' }}
+                @endif
+            </p>
+        </x-filament::section>
+    @endif
+
     <x-filament::section>
         @if ($connection)
             <div class="flex flex-wrap items-center gap-4">
@@ -173,14 +214,9 @@
         >
             <div class="grid grid-cols-2 gap-2">
                 @foreach ($alertTypes as $alertType)
-                    <x-filament::button
-                        wire:key="test-alert-{{ $alertType->value }}"
-                        wire:click="sendTestAlert('{{ $alertType->value }}')"
-                        color="gray"
-                    >
-                        <span aria-hidden="true">{{ $alertType->getEmoji() }}</span>
-                        {{ $alertType->getLabel() }}
-                    </x-filament::button>
+                    <div wire:key="test-alert-{{ $alertType->value }}">
+                        {{ ($this->testAlertAction)(['type' => $alertType->value]) }}
+                    </div>
                 @endforeach
             </div>
         </x-filament::section>
@@ -217,6 +253,7 @@
                             >
                                 {{ $event['at']->diffForHumans() }}
                             </time>
+                            {{ ($this->replayAlertAction)(['event' => $event['id']]) }}
                         </li>
                     @endforeach
                 </ul>
