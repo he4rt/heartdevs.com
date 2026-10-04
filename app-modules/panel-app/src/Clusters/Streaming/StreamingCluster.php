@@ -21,5 +21,5 @@ class StreamingCluster extends Cluster
 
     protected static ?int $navigationSort = 4;
 
-    protected static ?SubNavigationPosition $subNavigationPosition = SubNavigationPosition::Start;
+    protected static ?SubNavigationPosition $subNavigationPosition = SubNavigationPosition::Top;
 }
