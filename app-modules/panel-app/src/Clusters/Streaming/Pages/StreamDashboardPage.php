@@ -10,6 +10,7 @@ use Filament\Actions\Action;
 use Filament\Notifications\Notification;
 use Filament\Pages\Page;
 use Filament\Support\Icons\Heroicon;
+use He4rt\Identity\ExternalIdentity\Actions\DisconnectExternalIdentity;
 use He4rt\Identity\ExternalIdentity\Enums\IdentityProvider;
 use He4rt\Identity\ExternalIdentity\Models\ExternalIdentity;
 use He4rt\Identity\User\Models\User;
@@ -96,8 +97,10 @@ class StreamDashboardPage extends Page
             ->modalDescription('Os alertas e as overlays param de receber eventos do seu canal até você conectar de novo.')
             ->modalSubmitActionLabel('Desconectar')
             ->visible(fn (): bool => $this->twitchConnection instanceof ExternalIdentity)
-            ->action(function (): void {
-                $this->twitchConnection?->update(['disconnected_at' => now()]);
+            ->action(function (DisconnectExternalIdentity $disconnectIdentity): void {
+                if ($this->twitchConnection instanceof ExternalIdentity) {
+                    $disconnectIdentity->handle($this->twitchConnection);
+                }
 
                 unset($this->twitchConnection, $this->missingTwitchScopes);
 

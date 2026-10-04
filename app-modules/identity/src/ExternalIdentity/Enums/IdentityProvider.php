@@ -65,6 +65,14 @@ enum IdentityProvider: string implements HasColor, HasDescription, HasIcon, HasL
         ];
     }
 
+    /** @return array<int, self> */
+    public static function streamingPlatforms(): array
+    {
+        return [
+            self::Twitch,
+        ];
+    }
+
     /**
      * Providers suportados agrupados pelo método de autenticação, na ordem de
      * CredentialsType::cases(). Grupos sem nenhum provider são omitidos.
@@ -87,6 +95,11 @@ enum IdentityProvider: string implements HasColor, HasDescription, HasIcon, HasL
         }
 
         return $grouped;
+    }
+
+    public function isStreamingPlatform(): bool
+    {
+        return in_array($this, self::streamingPlatforms(), strict: true);
     }
 
     /**

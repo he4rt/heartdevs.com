@@ -14,6 +14,8 @@ final class ListSubscriptions extends Request
     public function __construct(
         private readonly ?string $status = null,
         private readonly ?string $type = null,
+        private readonly ?string $userId = null,
+        private readonly ?string $after = null,
     ) {}
 
     public function resolveEndpoint(): string
@@ -34,6 +36,14 @@ final class ListSubscriptions extends Request
 
         if ($this->type !== null) {
             $query['type'] = $this->type;
+        }
+
+        if ($this->userId !== null) {
+            $query['user_id'] = $this->userId;
+        }
+
+        if ($this->after !== null) {
+            $query['after'] = $this->after;
         }
 
         return $query;

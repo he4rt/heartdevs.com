@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use Filament\Facades\Filament;
 use He4rt\Identity\ExternalIdentity\Enums\IdentityProvider;
+use He4rt\Identity\ExternalIdentity\Events\ExternalIdentityDisconnected;
 use He4rt\Identity\ExternalIdentity\Models\ExternalIdentity;
 use He4rt\Identity\User\Models\User;
 use He4rt\PanelApp\Clusters\Streaming\Enums\OverlayScene;
@@ -11,6 +12,7 @@ use He4rt\PanelApp\Clusters\Streaming\Pages\StreamDashboardPage;
 use He4rt\PanelApp\Clusters\Streaming\Pages\StreamOverlaysPage;
 use He4rt\PanelApp\Clusters\Streaming\StreamingCluster;
 use He4rt\PanelApp\Clusters\Streaming\StreamingPreviewData;
+use Illuminate\Support\Facades\Event;
 use Livewire\Features\SupportLockedProperties\CannotUpdateLockedPropertyException;
 
 use function Pest\Livewire\livewire;
@@ -111,6 +113,8 @@ test('desconectar a Twitch pelo painel encerra a conexão do streamer', function
 
     $this->actingAs($streamer);
 
+    Event::fake([ExternalIdentityDisconnected::class]);
+
     livewire(StreamDashboardPage::class)
         ->callAction('disconnectTwitch')
         ->assertNotified('Twitch desconectada')
@@ -118,6 +122,8 @@ test('desconectar a Twitch pelo painel encerra a conexão do streamer', function
         ->assertActionVisible('connectTwitch');
 
     expect($connection->fresh()?->disconnected_at)->not->toBeNull();
+
+    Event::assertDispatched(fn (ExternalIdentityDisconnected $event): bool => $event->identity->is($connection));
 });
 
 test('desconectar sem conexão própria não mexe na conexão de outro usuário', function (): void {

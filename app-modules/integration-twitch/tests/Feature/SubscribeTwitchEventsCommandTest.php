@@ -174,3 +174,38 @@ test('enum getCondition returns correct structure', function (): void {
         'moderator_user_id' => '67890',
     ]);
 });
+
+test('lê todas as páginas de inscrições do broadcaster antes de limpar', function (): void {
+    $subscription = fn (string $id): array => [
+        'id' => $id,
+        'type' => 'stream.online',
+        'condition' => ['broadcaster_user_id' => '12345'],
+    ];
+
+    $mock = new MockClient([
+        MockResponse::make(['data' => [$subscription('sub-1')], 'pagination' => ['cursor' => 'page-2']]),
+        MockResponse::make(['data' => [$subscription('sub-2')], 'pagination' => []]),
+        MockResponse::make([], 204),
+        MockResponse::make([], 204),
+    ]);
+
+    Cache::put('twitch_app_access_token', 'fake-token', 3_600);
+
+    app()->instance(TwitchHelixConnector::class, new TwitchHelixConnector(
+        tokenService: new TwitchAppTokenService(new TwitchOAuthConnector(clientId: 'fake-client-id', clientSecret: 'fake-secret')),
+        clientId: 'fake-client-id',
+    )->withMockClient($mock));
+
+    $this->artisan('twitch:subscribe', [
+        'broadcaster_user_id' => '12345',
+        '--clear-all' => true,
+    ])->assertSuccessful();
+
+    $mock->assertSentCount(4);
+    $mock->assertSent(fn ($request): bool => $request instanceof ListSubscriptions
+        && $request->query()->get('user_id') === '12345'
+        && $request->query()->get('after') === null);
+    $mock->assertSent(fn ($request): bool => $request instanceof ListSubscriptions
+        && $request->query()->get('after') === 'page-2');
+    $mock->assertSent(fn ($request): bool => $request instanceof DeleteSubscription);
+});

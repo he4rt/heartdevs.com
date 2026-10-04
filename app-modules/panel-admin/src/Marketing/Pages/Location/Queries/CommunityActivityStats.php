@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace He4rt\PanelAdmin\Marketing\Pages\Location\Queries;
 
 use Carbon\CarbonInterface;
+use He4rt\Identity\ExternalIdentity\Enums\IdentityProvider;
 use He4rt\PanelAdmin\Marketing\Pages\Location\Data\CommunityActivitySnapshot;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\DB;
@@ -66,6 +67,7 @@ final readonly class CommunityActivityStats
     private function distinctMessageIdentities(CarbonInterface $start, CarbonInterface $end): int
     {
         return (int) DB::table('messages')
+            ->where('platform', IdentityProvider::Discord->value)
             ->whereNotNull('sent_at')
             ->whereBetween('sent_at', [$start, $end])
             ->distinct()

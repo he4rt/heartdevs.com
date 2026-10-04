@@ -2,7 +2,7 @@
 type: plan
 title: 'Backend do streaming: do webhook da Twitch à overlay no OBS'
 module: streaming
-status: proposed
+status: in_progress
 date: 2026-10-04
 author: danielhe4rt
 related:
@@ -84,11 +84,11 @@ próprios testes.
 
 ## Fase 0 — Pré-requisitos fora do módulo
 
-- [ ] 0.1 `IdentityProvider::streamingPlatforms()`
-- [ ] 0.2 `DisconnectExternalIdentity` e `ExternalIdentityDisconnected`
-- [ ] 0.3 Adoção de identidade solta e índice parcial único
-- [ ] 0.4 Coluna `messages.platform` e filtro nos 8 leitores
-- [ ] 0.5 Paginação da listagem de inscrições EventSub
+- [x] 0.1 `IdentityProvider::streamingPlatforms()`
+- [x] 0.2 `DisconnectExternalIdentity` e `ExternalIdentityDisconnected`
+- [x] 0.3 Adoção de identidade solta e índice parcial único
+- [x] 0.4 Coluna `messages.platform` e filtro nos 8 leitores
+- [x] 0.5 Paginação da listagem de inscrições EventSub
 
 ### 0.1 `IdentityProvider::streamingPlatforms()`
 

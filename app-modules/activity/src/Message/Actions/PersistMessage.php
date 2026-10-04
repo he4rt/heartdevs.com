@@ -15,6 +15,7 @@ class PersistMessage
         string $providerEntity
     ): Message {
         return Message::query()->create([
+            'platform' => $messageDTO->provider,
             'external_identity_id' => $providerEntity,
             'provider_message_id' => $messageDTO->providerMessageId,
             'channel_id' => $messageDTO->channelId,

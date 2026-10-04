@@ -13,6 +13,7 @@ use He4rt\Community\Retrospective\DTOs\Period;
 use He4rt\Community\Retrospective\DTOs\SourceFilters;
 use He4rt\Community\Retrospective\DTOs\SourceResult;
 use He4rt\Community\Retrospective\Enums\ExclusionKind;
+use He4rt\Identity\ExternalIdentity\Enums\IdentityProvider;
 use He4rt\Identity\ExternalIdentity\Models\ExternalIdentity;
 
 beforeEach(function (): void {
@@ -92,6 +93,23 @@ it('conta mensagens do recorte, escondendo bots e mantendo linhas sem source_kin
     expect($messages['total'])->toBe(3)
         ->and($messages['chatters'][0])->toMatchArray(['name' => 'Alice', 'messages' => 2])
         ->and($messages['chatters'][1])->toMatchArray(['name' => 'Bob', 'messages' => 1]);
+});
+
+it('ignora o chat das lives da Twitch', function (): void {
+    $alice = dcIdentity('Alice');
+    $viewer = dcIdentity('espectador');
+
+    Message::factory()->create(['external_identity_id' => $alice->id, 'sent_at' => '2026-06-02']);
+    Message::factory()->count(5)->create([
+        'external_identity_id' => $viewer->id,
+        'sent_at' => '2026-06-02',
+        'platform' => IdentityProvider::Twitch,
+    ]);
+
+    $messages = dcSlide(($this->collect)(), 'discord.messages');
+
+    expect($messages['total'])->toBe(1)
+        ->and($messages['chatters'])->toHaveCount(1);
 });
 
 it('mantém bots quando hideBots é falso', function (): void {

@@ -8,6 +8,7 @@ use Filament\Notifications\Notification;
 use He4rt\Identity\Auth\Actions\ConfirmOAuthMerge;
 use He4rt\Identity\Auth\DTOs\PendingOAuthMergeDTO;
 use He4rt\Identity\ExternalIdentity\Actions\ConnectApiKeyIdentity;
+use He4rt\Identity\ExternalIdentity\Actions\DisconnectExternalIdentity;
 use He4rt\Identity\ExternalIdentity\Enums\CredentialsType;
 use He4rt\Identity\ExternalIdentity\Enums\IdentityProvider;
 use He4rt\Identity\ExternalIdentity\Exceptions\InvalidApiKeyException;
@@ -179,7 +180,7 @@ class ConnectionHub extends Component
             return;
         }
 
-        $identity->update(['disconnected_at' => now()]);
+        resolve(DisconnectExternalIdentity::class)->handle($identity);
 
         Notification::make()
             ->title($provider->getLabel().' disconnected successfully')
@@ -207,7 +208,7 @@ class ConnectionHub extends Component
             return;
         }
 
-        $identity->update(['disconnected_at' => now()]);
+        resolve(DisconnectExternalIdentity::class)->handle($identity);
 
         Notification::make()
             ->title($identity->provider->getLabel().' disconnected successfully')

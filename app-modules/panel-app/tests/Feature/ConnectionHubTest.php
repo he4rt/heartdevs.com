@@ -12,6 +12,7 @@ use He4rt\Identity\ExternalIdentity\Data\ClientAccessManager;
 use He4rt\Identity\ExternalIdentity\Enums\CredentialsType;
 use He4rt\Identity\ExternalIdentity\Enums\IdentityProvider;
 use He4rt\Identity\ExternalIdentity\Events\ExternalIdentityConnected;
+use He4rt\Identity\ExternalIdentity\Events\ExternalIdentityDisconnected;
 use He4rt\Identity\ExternalIdentity\Models\ExternalIdentity;
 use He4rt\Identity\User\Models\User;
 use He4rt\IntegrationDiscord\OAuth\DiscordOAuthAccessDTO;
@@ -428,11 +429,15 @@ test('disconnectById não desconecta a conta de outra pessoa', function (string 
 
     $this->actingAs($caller);
 
+    Event::fake([ExternalIdentityDisconnected::class]);
+
     $component = livewire(ConnectionHub::class)->call('disconnectById', $identity->getKey());
 
     expect($identity->refresh()->disconnected_at)->toBeNull();
 
     $component->assertNotified('Connection not found');
+
+    Event::assertNotDispatched(ExternalIdentityDisconnected::class);
 })->with([
     'membro' => ['membro'],
     'super admin' => ['super admin'],
@@ -450,11 +455,38 @@ test('o dono desconecta a própria conta pelo id', function (): void {
 
     $this->actingAs($owner);
 
+    Event::fake([ExternalIdentityDisconnected::class]);
+
     livewire(ConnectionHub::class)
         ->call('disconnectById', $identity->getKey())
         ->assertNotified(IdentityProvider::GitHub->getLabel().' disconnected successfully');
 
     expect($identity->refresh()->disconnected_at)->not->toBeNull();
+
+    Event::assertDispatched(fn (ExternalIdentityDisconnected $event): bool => $event->identity->is($identity));
+});
+
+test('desconectar pelo provider anuncia a desconexão', function (): void {
+    $owner = User::factory()->create();
+
+    $identity = ExternalIdentity::factory()->create([
+        'model_id' => $owner->getKey(),
+        'provider' => IdentityProvider::Twitch,
+        'connected_at' => now(),
+        'disconnected_at' => null,
+    ]);
+
+    $this->actingAs($owner);
+
+    Event::fake([ExternalIdentityDisconnected::class]);
+
+    livewire(ConnectionHub::class)
+        ->call('disconnect', IdentityProvider::Twitch)
+        ->assertNotified(IdentityProvider::Twitch->getLabel().' disconnected successfully');
+
+    expect($identity->refresh()->disconnected_at)->not->toBeNull();
+
+    Event::assertDispatched(fn (ExternalIdentityDisconnected $event): bool => $event->identity->is($identity));
 });
 
 test('o super admin desconecta uma conexão de tenant pelo painel admin', function (): void {
