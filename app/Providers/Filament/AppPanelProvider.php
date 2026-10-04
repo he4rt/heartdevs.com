@@ -13,6 +13,9 @@ use Filament\Http\Middleware\DispatchServingFilamentEvent;
 use Filament\Panel;
 use Filament\PanelProvider;
 use Filament\Support\Colors\Color;
+use He4rt\PanelApp\Clusters\Streaming\Pages\StreamDashboardPage;
+use He4rt\PanelApp\Clusters\Streaming\Pages\StreamOverlaysPage;
+use He4rt\PanelApp\Clusters\Streaming\StreamingCluster;
 use He4rt\PanelApp\Pages\EventPage;
 use He4rt\PanelApp\Pages\EventsPage;
 use He4rt\PanelApp\Pages\LoginPage;
@@ -54,6 +57,9 @@ class AppPanelProvider extends PanelProvider
                 EventPage::class,
                 ThreadPage::class,
                 ProfilePage::class,
+                StreamingCluster::class,
+                StreamDashboardPage::class,
+                StreamOverlaysPage::class,
             ])
             ->middleware([
                 EncryptCookies::class,
