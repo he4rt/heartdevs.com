@@ -61,8 +61,16 @@ class UserForm
                             ->relationship('roles', 'name')
                             ->getOptionLabelFromRecordUsing(fn (Role $record): string => UserRole::from($record->name)->getLabel())
                             ->descriptions(self::roleDescriptions(...))
-                            ->disabled(self::isEditingSelf(...))
-                            ->helperText(fn (?User $record): ?string => self::isEditingSelf($record) ? 'Você não pode alterar os próprios papéis.' : null),
+                            ->disableOptionWhen(self::isOwnSuperAdminOption(...))
+                            ->in(fn (CheckboxList $component): array => array_keys($component->getOptions()))
+                            ->saveRelationshipsUsing(function (CheckboxList $component, ?User $record): void {
+                                if ($record instanceof User && self::isEditingSelf($record)) {
+                                    $component->state(self::keepOwnSuperAdmin($component->getState(), $record));
+                                }
+
+                                $component->saveStateToRelationship();
+                            })
+                            ->helperText(fn (?User $record): ?string => self::isEditingSelf($record) ? 'Você não pode alterar o próprio super admin.' : null),
                     ]),
             ]);
     }
@@ -70,6 +78,43 @@ class UserForm
     private static function isEditingSelf(?User $record): bool
     {
         return $record?->is(auth()->user()) ?? false;
+    }
+
+    private static function isOwnSuperAdminOption(int|string $value, ?User $record): bool
+    {
+        return self::isEditingSelf($record) && (string) $value === self::superAdminRoleKey();
+    }
+
+    /**
+     * @return array<int, string>
+     */
+    private static function keepOwnSuperAdmin(mixed $state, User $record): array
+    {
+        $superAdminKey = self::superAdminRoleKey();
+
+        /** @var array<int, int|string> $submittedKeys */
+        $submittedKeys = is_array($state) ? $state : [];
+
+        $otherRoleKeys = array_values(array_filter(
+            array_map(strval(...), $submittedKeys),
+            fn (string $key): bool => $key !== $superAdminKey,
+        ));
+
+        if ($superAdminKey === null || !$record->isSuperAdmin()) {
+            return $otherRoleKeys;
+        }
+
+        return [...$otherRoleKeys, $superAdminKey];
+    }
+
+    private static function superAdminRoleKey(): ?string
+    {
+        $key = Role::query()
+            ->where('name', UserRole::SuperAdmin->value)
+            ->where('guard_name', UserRole::GUARD)
+            ->value('id');
+
+        return $key === null ? null : (string) $key;
     }
 
     /**

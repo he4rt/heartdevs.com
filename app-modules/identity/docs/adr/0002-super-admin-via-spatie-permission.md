@@ -22,8 +22,8 @@ invisível para quem opera o painel.
   permission granular nesta fase: o painel inteiro é super admin ou nada.
 - `Gate::before` em `IdentityServiceProvider` libera qualquer ability para quem tem a role e
   devolve `null` para os demais, então policies futuras continuam funcionando.
-- O papel é atribuído pelo próprio `UserResource` do painel admin. Um admin não altera os
-  próprios papéis, para não se trancar fora.
+- O papel é atribuído pelo próprio `UserResource` do painel admin. Um admin pode se dar papéis
+  comuns, como `streamer`, mas não altera o próprio super admin, para não se trancar fora.
 - O bootstrap em produção e a recuperação de lockout ficam no comando
   `identity:grant-super-admin {username}`.
 - Fora de produção o painel continua aberto a qualquer usuário autenticado, como antes.

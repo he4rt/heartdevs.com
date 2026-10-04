@@ -180,14 +180,51 @@ test('salvar o form sem papéis revoga super admin de outro usuário', function 
     expect($other->fresh()?->hasRole(UserRole::SuperAdmin))->toBeFalse();
 });
 
-test('o admin não altera os próprios papéis', function (): void {
+test('o admin concede a si mesmo a role streamer sem perder o super admin', function (): void {
+    $superAdmin = Role::findByName(UserRole::SuperAdmin->value, UserRole::GUARD);
+    $streamer = Role::findByName(UserRole::Streamer->value, UserRole::GUARD);
+
     livewire(EditUser::class, ['record' => $this->admin->getKey()])
-        ->assertSchemaComponentExists('roles', checkComponentUsing: fn (CheckboxList $field): bool => $field->isDisabled())
+        ->fillForm(['roles' => [$superAdmin->getKey(), $streamer->getKey()]])
+        ->call('save')
+        ->assertHasNoFormErrors();
+
+    expect($this->admin->fresh())
+        ->hasRole(UserRole::SuperAdmin)->toBeTrue()
+        ->hasRole(UserRole::Streamer)->toBeTrue();
+});
+
+test('o admin não remove o próprio super admin', function (): void {
+    $superAdmin = Role::findByName(UserRole::SuperAdmin->value, UserRole::GUARD);
+
+    livewire(EditUser::class, ['record' => $this->admin->getKey()])
+        ->assertSchemaComponentExists('roles', checkComponentUsing: fn (CheckboxList $field): bool => $field->isOptionDisabled((string) $superAdmin->getKey(), $superAdmin->name))
         ->fillForm(['roles' => []])
         ->call('save')
         ->assertHasNoFormErrors();
 
     expect($this->admin->fresh()?->hasRole(UserRole::SuperAdmin))->toBeTrue();
+});
+
+test('quem não é super admin não se promove pelo próprio form', function (): void {
+    $member = User::factory()->create();
+    $superAdmin = Role::findByName(UserRole::SuperAdmin->value, UserRole::GUARD);
+
+    $this->actingAs($member);
+
+    livewire(EditUser::class, ['record' => $member->getKey()])
+        ->fillForm(['roles' => [$superAdmin->getKey()]])
+        ->call('save');
+
+    expect($member->fresh()?->hasRole(UserRole::SuperAdmin))->toBeFalse();
+});
+
+test('a opção de super admin fica livre ao editar outro usuário', function (): void {
+    $other = User::factory()->create();
+    $superAdmin = Role::findByName(UserRole::SuperAdmin->value, UserRole::GUARD);
+
+    livewire(EditUser::class, ['record' => $other->getKey()])
+        ->assertSchemaComponentExists('roles', checkComponentUsing: fn (CheckboxList $field): bool => !$field->isOptionDisabled((string) $superAdmin->getKey(), $superAdmin->name));
 });
 
 test('a coluna de papéis existe na tabela', function (): void {
