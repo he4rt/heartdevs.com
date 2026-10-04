@@ -145,6 +145,30 @@ test('salvar o form concede super admin a outro usuário', function (): void {
     expect($other->fresh()?->hasRole(UserRole::SuperAdmin))->toBeTrue();
 });
 
+test('salvar o form concede a role streamer a outro usuário', function (): void {
+    $other = User::factory()->create();
+    $role = Role::findByName(UserRole::Streamer->value, UserRole::GUARD);
+
+    livewire(EditUser::class, ['record' => $other->getKey()])
+        ->fillForm(['roles' => [$role->getKey()]])
+        ->call('save')
+        ->assertHasNoFormErrors();
+
+    expect($other->fresh()?->hasRole(UserRole::Streamer))->toBeTrue();
+});
+
+test('a listagem e o form de edição renderizam a role streamer', function (): void {
+    $streamer = User::factory()->streamer()->create();
+
+    livewire(ListUsers::class)
+        ->loadTable()
+        ->assertCanSeeTableRecords([$streamer])
+        ->assertSee(UserRole::Streamer->getLabel());
+
+    livewire(EditUser::class, ['record' => $streamer->getKey()])
+        ->assertSee(UserRole::Streamer->getDescription());
+});
+
 test('salvar o form sem papéis revoga super admin de outro usuário', function (): void {
     $other = User::factory()->superAdmin()->create();
 

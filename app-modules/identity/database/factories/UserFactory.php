@@ -37,4 +37,13 @@ final class UserFactory extends Factory
             $user->assignRole(UserRole::SuperAdmin);
         });
     }
+
+    public function streamer(): static
+    {
+        return $this->afterCreating(function (User $user): void {
+            Role::findOrCreate(UserRole::Streamer->value, UserRole::GUARD);
+
+            $user->assignRole(UserRole::Streamer);
+        });
+    }
 }
