@@ -77,8 +77,8 @@ próprios testes.
 - **Models:** `final`, `HasUuids`, casts em `casts()`, PHPDoc `@property` sincronizado
   (`.ai/04-model-phpdoc-sync`). Datas em `timestampTz`.
 - **jsonb:** um value object + cast por coluna, sem cast `array` (`.ai/06-typed-json-casts`).
-- **Broadcast:** todo evento de broadcast implementa `ShouldBroadcast` e
-  `ShouldDispatchAfterCommit`. Uma falha de broadcast nunca desfaz a gravação.
+- **Broadcast:** todo evento de broadcast implementa `ShouldBroadcastNow`,
+  `ShouldDispatchAfterCommit` e `ShouldRescue`. Uma falha de broadcast nunca desfaz a gravação.
 
 ---
 

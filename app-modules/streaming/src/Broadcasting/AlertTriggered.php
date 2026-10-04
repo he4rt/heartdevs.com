@@ -11,12 +11,13 @@ use He4rt\Streaming\StreamEvent\Data\StreamEventDetails;
 use He4rt\Streaming\StreamEvent\Models\StreamEvent;
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Broadcasting\PrivateChannel;
-use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
+use Illuminate\Contracts\Broadcasting\ShouldBroadcastNow;
+use Illuminate\Contracts\Broadcasting\ShouldRescue;
 use Illuminate\Contracts\Events\ShouldDispatchAfterCommit;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 
-final class AlertTriggered implements ShouldBroadcast, ShouldDispatchAfterCommit
+final class AlertTriggered implements ShouldBroadcastNow, ShouldDispatchAfterCommit, ShouldRescue
 {
     use Dispatchable;
     use InteractsWithSockets;

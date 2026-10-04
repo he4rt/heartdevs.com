@@ -68,7 +68,7 @@ O que já existe e foi verificado no código:
                                        │  TwitchEventReceived           │
                                        │  ETL: payload → DTO streaming  │
                                        └───────────────┬────────────────┘
-                                                       │ Actions (fila)
+                                                       │ Actions (no request)
                                        ┌───────────────▼────────────────┐
            ┌─────────────────────────► │ streaming                      │
            │ ExternalIdentityConnected │  streamers · streamer_sources  │
@@ -325,7 +325,7 @@ Na hora de conectar, o streamer escolhe o que quer, e só os escopos necessário
 ```text
  [webhook]         [lake]               [ETL — integration-twitch]        [streaming]
      │                │                          │                             │
- POST assinado ──► twitch_event_logs ──► TwitchEventReceived (fila) ──► resolve fonte
+ POST assinado ──► twitch_event_logs ──► TwitchEventReceived (sync) ──► resolve fonte
  ✓ HMAC            único por             ✓ tipo conhecido                → streamer active?
  ✓ dedupe          twitch_message_id     ✓ payload → DTO                   ✗ → só lake
                                          IncomingStreamEvent ─────────► RecordStreamEvent
@@ -335,9 +335,13 @@ Na hora de conectar, o streamer escolhe o que quer, e só os escopos necessário
                                                      persiste ──► após o commit ──► broadcast
 ```
 
-- **Fila:** o listener do ETL roda na fila. Toda Action de ingestão é idempotente.
-- **Broadcast depois do commit:** usa `ShouldDispatchAfterCommit`, e uma falha de broadcast nunca
-  desfaz a gravação.
+- **Sem fila:** o ETL e o broadcast rodam dentro do request do webhook. Os eventos de uma live são
+  poucos, e cada salto de fila somava até 3 segundos entre a Twitch e a overlay. Uma falha no ETL é
+  reportada e a Twitch recebe 204 mesmo assim, porque o evento já está no lake: um 500 faria a
+  Twitch reenviar (o reenvio é descartado pelo dedupe) e, com falhas seguidas, revogar a inscrição.
+  Toda Action de ingestão é idempotente.
+- **Broadcast depois do commit:** usa `ShouldBroadcastNow`, `ShouldDispatchAfterCommit` e
+  `ShouldRescue`. Uma falha de broadcast nunca desfaz a gravação nem quebra quem disparou.
 - **Lake intacto:** `twitch_event_logs` continua sendo o lake bruto, sem mudança de esquema.
 
 ### 12. Tempo real: Reverb, canal privado autenticado pelo token, um evento Laravel por tipo

@@ -8,12 +8,13 @@ use He4rt\Streaming\Session\Models\StreamSession;
 use He4rt\Streaming\Streamer\Models\StreamerSource;
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Broadcasting\PrivateChannel;
-use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
+use Illuminate\Contracts\Broadcasting\ShouldBroadcastNow;
+use Illuminate\Contracts\Broadcasting\ShouldRescue;
 use Illuminate\Contracts\Events\ShouldDispatchAfterCommit;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 
-final class StreamSessionStarted implements ShouldBroadcast, ShouldDispatchAfterCommit
+final class StreamSessionStarted implements ShouldBroadcastNow, ShouldDispatchAfterCommit, ShouldRescue
 {
     use Dispatchable;
     use InteractsWithSockets;

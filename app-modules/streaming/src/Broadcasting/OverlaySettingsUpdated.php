@@ -8,12 +8,13 @@ use He4rt\Streaming\Enums\OverlayScene;
 use He4rt\Streaming\Streamer\Models\Streamer;
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Broadcasting\PrivateChannel;
-use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
+use Illuminate\Contracts\Broadcasting\ShouldBroadcastNow;
+use Illuminate\Contracts\Broadcasting\ShouldRescue;
 use Illuminate\Contracts\Events\ShouldDispatchAfterCommit;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 
-final class OverlaySettingsUpdated implements ShouldBroadcast, ShouldDispatchAfterCommit
+final class OverlaySettingsUpdated implements ShouldBroadcastNow, ShouldDispatchAfterCommit, ShouldRescue
 {
     use Dispatchable;
     use InteractsWithSockets;

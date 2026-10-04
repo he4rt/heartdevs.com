@@ -23,11 +23,10 @@ use He4rt\Streaming\Session\Actions\UpdateStreamSession;
 use He4rt\Streaming\Streamer\Actions\ResolveActiveSource;
 use He4rt\Streaming\Streamer\Models\StreamerSource;
 use He4rt\Streaming\StreamEvent\Actions\RecordStreamEvent;
-use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Support\Facades\Log;
 use Saloon\Exceptions\SaloonException;
 
-final readonly class ProjectTwitchEventToStreaming implements ShouldQueue
+final readonly class ProjectTwitchEventToStreaming
 {
     public function __construct(
         private TwitchStreamingPayloadMapper $mapper,

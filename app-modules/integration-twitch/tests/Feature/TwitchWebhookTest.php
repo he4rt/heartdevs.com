@@ -6,7 +6,13 @@ use He4rt\IntegrationTwitch\Enums\TwitchSubscriptionStatus;
 use He4rt\IntegrationTwitch\Events\TwitchEventReceived;
 use He4rt\IntegrationTwitch\Models\TwitchEventLog;
 use He4rt\IntegrationTwitch\Models\TwitchSubscription;
+use He4rt\Streaming\Broadcasting\AlertTriggered;
+use He4rt\Streaming\Enums\StreamEventType;
+use He4rt\Streaming\Streamer\Models\StreamerSource;
+use He4rt\Streaming\StreamEvent\Models\StreamEvent;
 use Illuminate\Support\Facades\Event;
+use Illuminate\Support\Facades\Exceptions;
+use Illuminate\Support\Facades\Queue;
 use Illuminate\Support\Str;
 use Illuminate\Testing\TestResponse;
 
@@ -192,6 +198,34 @@ test('dispatches TwitchEventReceived for notifications', function (): void {
     postTwitchWebhook(twitchWebhookPayload('channel.follow'))->assertNoContent();
 
     Event::assertDispatched(fn (TwitchEventReceived $event): bool => $event->eventLog->event_type === 'channel.follow');
+});
+
+test('a follow becomes an overlay alert inside the webhook request, without the queue', function (): void {
+    $broadcasterId = StreamerSource::factory()->create()->identity->external_account_id;
+    $alerts = 0;
+    Event::listen(AlertTriggered::class, function () use (&$alerts): void {
+        $alerts++;
+    });
+    Queue::fake();
+
+    postTwitchWebhook(array_replace_recursive(twitchWebhookPayload('channel.follow'), [
+        'subscription' => ['condition' => ['broadcaster_user_id' => $broadcasterId]],
+        'event' => ['broadcaster_user_id' => $broadcasterId, 'user_login' => 'mariacoda', 'user_name' => 'MariaCoda'],
+    ]))->assertNoContent();
+
+    expect(StreamEvent::query()->sole()->type)->toBe(StreamEventType::Follow)
+        ->and($alerts)->toBe(1);
+    Queue::assertNothingPushed();
+});
+
+test('a failing ETL is reported and Twitch still gets 204, with the event kept in the lake', function (): void {
+    Exceptions::fake();
+    Event::listen(TwitchEventReceived::class, fn (): never => throw new RuntimeException('ETL failed'));
+
+    postTwitchWebhook(twitchWebhookPayload('channel.follow'))->assertNoContent();
+
+    expect(TwitchEventLog::query()->count())->toBe(1);
+    Exceptions::assertReported(fn (RuntimeException $exception): bool => $exception->getMessage() === 'ETL failed');
 });
 
 test('revocation updates the local subscription status instead of logging an event', function (): void {

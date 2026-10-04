@@ -65,7 +65,7 @@ final class TwitchWebhookController
                 ->first();
 
             if ($eventLog) {
-                event(new TwitchEventReceived($eventLog));
+                rescue(fn (): ?array => event(new TwitchEventReceived($eventLog)));
             }
         }
 

@@ -83,8 +83,9 @@ twitch event trigger channel.follow \
 | `channel.cheer`                | grava os bits                                    |
 | `channel.raid`                 | grava o raid com o número de viewers             |
 
-O ETL roda na fila. Com `QUEUE_CONNECTION=sync`, ele roda na hora. Com outra conexão, o worker de
-fila precisa estar ligado.
+O ETL e o broadcast rodam dentro do request do webhook, sem fila: o alerta chega na overlay assim
+que a Twitch entrega o evento. Uma falha no ETL vai para o log de erros, e a Twitch recebe 204
+mesmo assim. A sincronização das inscrições continua na fila.
 
 O twitch-cli não manda `channel.chat.message`. Para testar o chat, escolha um leitor na lista de
 fontes e escreva no chat de um canal real conectado.
