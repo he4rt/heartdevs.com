@@ -80,7 +80,7 @@ final readonly class BackfillRepository
                         'additions' => $this->intFrom($prSize, 'additions') ?? 0,
                         'deletions' => $this->intFrom($prSize, 'deletions') ?? 0,
                         'changed_files' => $this->intFrom($prSize, 'changed_files') ?? 0,
-                        'is_bot' => $this->isBot($login),
+                        'is_bot' => $this->isBot($login, $this->stringFrom($pr, 'user.type')),
                     ],
                 ), $onProgress);
 
@@ -127,7 +127,7 @@ final readonly class BackfillRepository
                     targetRef: ContributionType::Pr->ref($number),
                     metadata: [
                         'state' => data_get($review, 'state'),
-                        'is_bot' => $this->isBot($login),
+                        'is_bot' => $this->isBot($login, $this->stringFrom($review, 'user.type')),
                     ],
                 ), $onProgress);
             },
@@ -160,7 +160,7 @@ final readonly class BackfillRepository
                         'title' => data_get($issue, 'title'),
                         'state' => data_get($issue, 'state'),
                         'url' => data_get($issue, 'html_url'),
-                        'is_bot' => $this->isBot($login),
+                        'is_bot' => $this->isBot($login, $this->stringFrom($issue, 'user.type')),
                     ],
                 ), $onProgress);
             },
@@ -196,7 +196,7 @@ final readonly class BackfillRepository
                     metadata: [
                         'url' => $htmlUrl,
                         'kind' => $isPr ? 'pr' : 'issue',
-                        'is_bot' => $this->isBot($login),
+                        'is_bot' => $this->isBot($login, $this->stringFrom($comment, 'user.type')),
                     ],
                 ), $onProgress);
             },
@@ -224,7 +224,7 @@ final readonly class BackfillRepository
                     metadata: [
                         'url' => data_get($comment, 'html_url'),
                         'kind' => 'pr',
-                        'is_bot' => $this->isBot($login),
+                        'is_bot' => $this->isBot($login, $this->stringFrom($comment, 'user.type')),
                     ],
                 ), $onProgress);
             },
@@ -252,7 +252,7 @@ final readonly class BackfillRepository
                     targetRef: null,
                     metadata: [
                         'url' => data_get($commit, 'html_url'),
-                        'is_bot' => $this->isBot($login),
+                        'is_bot' => $this->isBot($login, $this->stringFrom($commit, 'author.type')),
                     ],
                 ), $onProgress);
             },
@@ -347,8 +347,12 @@ final readonly class BackfillRepository
         return $number === '' ? null : $kind->ref($number);
     }
 
-    private function isBot(string $login): bool
+    /**
+     * Some GitHub Apps act under a plain login (`Copilot` on review comments), so the
+     * `[bot]` suffix alone misses them; the account type is the reliable signal.
+     */
+    private function isBot(string $login, string $accountType = ''): bool
     {
-        return Str::endsWith($login, '[bot]');
+        return $accountType === 'Bot' || Str::endsWith($login, '[bot]');
     }
 }
