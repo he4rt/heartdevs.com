@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 
 it('rejects unauthenticated requests', function (): void {
-    $this->getJson('/api/mobile/timeline')
+    $this->getJson(route('mobile.timeline.index'))
         ->assertUnauthorized();
 });
 
@@ -21,7 +21,7 @@ it('lists root posts, newest first, with counts', function (): void {
     $newer = Timeline::factory()->for($user)->create(['created_at' => now()]);
     Timeline::factory()->for($user)->create(['parent_id' => $newer->id, 'root_id' => $newer->id]);
 
-    $response = $this->getJson('/api/mobile/timeline', ['Authorization' => "Bearer {$token}"])
+    $response = $this->getJson(route('mobile.timeline.index'), ['Authorization' => "Bearer {$token}"])
         ->assertOk();
 
     $response->assertJsonPath('data.0.id', $newer->id)
@@ -33,7 +33,7 @@ it('creates a post', function (): void {
     $user = User::factory()->create();
     $token = Auth::guard('api')->login($user);
 
-    $this->postJson('/api/mobile/timeline', ['content' => 'Olá, comunidade He4rt!'], ['Authorization' => "Bearer {$token}"])
+    $this->postJson(route('mobile.timeline.store'), ['content' => 'Olá, comunidade He4rt!'], ['Authorization' => "Bearer {$token}"])
         ->assertCreated()
         ->assertJsonPath('data.content', 'Olá, comunidade He4rt!')
         ->assertJsonPath('data.author.id', $user->id)
@@ -49,7 +49,7 @@ it('creates a post with images', function (): void {
     $user = User::factory()->create();
     $token = Auth::guard('api')->login($user);
 
-    $response = $this->postJson('/api/mobile/timeline', [
+    $response = $this->postJson(route('mobile.timeline.store'), [
         'content' => 'Com imagem',
         'images' => [UploadedFile::fake()->image('photo.jpg')],
     ], ['Authorization' => "Bearer {$token}"])
@@ -62,7 +62,7 @@ it('rejects an empty post', function (): void {
     $user = User::factory()->create();
     $token = Auth::guard('api')->login($user);
 
-    $this->postJson('/api/mobile/timeline', ['content' => ''], ['Authorization' => "Bearer {$token}"])
+    $this->postJson(route('mobile.timeline.store'), ['content' => ''], ['Authorization' => "Bearer {$token}"])
         ->assertUnprocessable();
 });
 
@@ -71,7 +71,7 @@ it('creates a reply pinned to the root post', function (): void {
     $token = Auth::guard('api')->login($user);
     $post = Timeline::factory()->create();
 
-    $this->postJson("/api/mobile/timeline/{$post->id}/replies", ['content' => 'Concordo!'], ['Authorization' => "Bearer {$token}"])
+    $this->postJson(route('mobile.timeline.replies.store', ['post' => $post->getKey()]), ['content' => 'Concordo!'], ['Authorization' => "Bearer {$token}"])
         ->assertCreated()
         ->assertJsonPath('data.content', 'Concordo!')
         ->assertJsonPath('data.root_id', $post->id)
@@ -84,7 +84,7 @@ it('deletes own reply', function (): void {
     $post = Timeline::factory()->create();
     $reply = Timeline::factory()->for($user)->create(['parent_id' => $post->id, 'root_id' => $post->id]);
 
-    $this->deleteJson("/api/mobile/timeline/replies/{$reply->id}", [], ['Authorization' => "Bearer {$token}"])
+    $this->deleteJson(route('mobile.timeline.replies.destroy', ['reply' => $reply->getKey()]), [], ['Authorization' => "Bearer {$token}"])
         ->assertNoContent();
 
     $this->assertDatabaseMissing('activity_timeline', ['id' => $reply->id]);
@@ -97,7 +97,7 @@ it('rejects deleting a reply from another user', function (): void {
     $post = Timeline::factory()->create();
     $reply = Timeline::factory()->for($owner)->create(['parent_id' => $post->id, 'root_id' => $post->id]);
 
-    $this->deleteJson("/api/mobile/timeline/replies/{$reply->id}", [], ['Authorization' => "Bearer {$token}"])
+    $this->deleteJson(route('mobile.timeline.replies.destroy', ['reply' => $reply->getKey()]), [], ['Authorization' => "Bearer {$token}"])
         ->assertForbidden();
 });
 
@@ -106,6 +106,6 @@ it('rejects deleting a root post as if it were a reply', function (): void {
     $token = Auth::guard('api')->login($user);
     $post = Timeline::factory()->for($user)->create();
 
-    $this->deleteJson("/api/mobile/timeline/replies/{$post->id}", [], ['Authorization' => "Bearer {$token}"])
+    $this->deleteJson(route('mobile.timeline.replies.destroy', ['reply' => $post->getKey()]), [], ['Authorization' => "Bearer {$token}"])
         ->assertForbidden();
 });
