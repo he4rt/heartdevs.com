@@ -7,6 +7,8 @@ use He4rt\Streaming\Chat\Data\ChatMessageMetadata;
 use He4rt\Streaming\Enums\OverlayScene;
 use He4rt\Streaming\Enums\StreamerStatus;
 use He4rt\Streaming\Session\Models\StreamSession;
+use He4rt\Streaming\Streamer\Data\MutedChatter;
+use He4rt\Streaming\Streamer\Data\MutedChatters;
 use He4rt\Streaming\Streamer\Models\Streamer;
 use He4rt\Streaming\Streamer\Models\StreamerSource;
 use He4rt\Streaming\StreamEvent\Models\StreamEvent;
@@ -113,6 +115,23 @@ test('depois de limpar o chat, a overlay só traz as mensagens novas', function 
             ->has('recentChat', 1)
             ->where('recentChat.0.msgId', $after->provider_message_id)
             ->where('recentChat.0.chatterId', $after->provider->external_account_id));
+});
+
+test('mensagens ocultas e de chatters silenciados não voltam ao recarregar', function (): void {
+    $source = StreamerSource::factory()->for($this->streamer)->readingChat()->create();
+    $hidden = overlayChatMessage($source, minutesAgo: 3);
+    $hidden->update(['metadata' => ChatMessageMetadata::fromArray($hidden->metadata ?? [])->withHiddenAt(now()->toImmutable())->toArray()]);
+
+    $muted = overlayChatMessage($source, minutesAgo: 2);
+    $shown = overlayChatMessage($source, minutesAgo: 1);
+    $this->streamer->update(['settings' => $this->streamer->settings->withMutedChatters(new MutedChatters()->with(
+        new MutedChatter($muted->provider->provider, $muted->provider->external_account_id ?? '', 'Spammer', now()->toImmutable()),
+    ))]);
+
+    $this->get('/overlay/'.OVERLAY_TOKEN.'/chat')
+        ->assertInertia(fn (AssertableInertia $page): AssertableInertia => $page
+            ->has('recentChat', 1)
+            ->where('recentChat.0.msgId', $shown->provider_message_id));
 });
 
 test('alertas antigos não voltam ao recarregar a overlay', function (): void {

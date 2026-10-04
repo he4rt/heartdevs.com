@@ -18,6 +18,7 @@ final readonly class ChatMessageMetadata
         public array $badges = [],
         public array $fragments = [],
         public ?CarbonImmutable $deletedAt = null,
+        public ?CarbonImmutable $hiddenAt = null,
     ) {}
 
     /**
@@ -28,6 +29,7 @@ final readonly class ChatMessageMetadata
         $badges = is_array($payload['badges'] ?? null) ? $payload['badges'] : [];
         $fragments = is_array($payload['fragments'] ?? null) ? $payload['fragments'] : [];
         $deletedAt = is_string($payload['deleted_at'] ?? null) ? CarbonImmutable::parse($payload['deleted_at']) : null;
+        $hiddenAt = is_string($payload['hidden_at'] ?? null) ? CarbonImmutable::parse($payload['hidden_at']) : null;
 
         return new self(
             displayName: is_string($payload['display_name'] ?? null) ? $payload['display_name'] : '',
@@ -35,12 +37,18 @@ final readonly class ChatMessageMetadata
             badges: self::listOf($badges, ChatBadge::fromArray(...)),
             fragments: self::listOf($fragments, ChatFragment::fromArray(...)),
             deletedAt: $deletedAt,
+            hiddenAt: $hiddenAt,
         );
     }
 
     public function withDeletedAt(CarbonImmutable $deletedAt): self
     {
-        return new self($this->displayName, $this->color, $this->badges, $this->fragments, $deletedAt);
+        return new self($this->displayName, $this->color, $this->badges, $this->fragments, $deletedAt, $this->hiddenAt);
+    }
+
+    public function withHiddenAt(CarbonImmutable $hiddenAt): self
+    {
+        return new self($this->displayName, $this->color, $this->badges, $this->fragments, $this->deletedAt, $hiddenAt);
     }
 
     public function isDeleted(): bool
@@ -48,8 +56,13 @@ final readonly class ChatMessageMetadata
         return $this->deletedAt instanceof CarbonImmutable;
     }
 
+    public function isHiddenOnOverlay(): bool
+    {
+        return $this->hiddenAt instanceof CarbonImmutable;
+    }
+
     /**
-     * @return array{display_name: string, color: string|null, badges: list<array<string, string|null>>, fragments: list<array<string, string|null>>, deleted_at: string|null}
+     * @return array{display_name: string, color: string|null, badges: list<array<string, string|null>>, fragments: list<array<string, string|null>>, deleted_at: string|null, hidden_at: string|null}
      */
     public function toArray(): array
     {
@@ -59,6 +72,7 @@ final readonly class ChatMessageMetadata
             'badges' => array_map(fn (ChatBadge $badge): array => $badge->toArray(), $this->badges),
             'fragments' => array_map(fn (ChatFragment $fragment): array => $fragment->toArray(), $this->fragments),
             'deleted_at' => $this->deletedAt?->toIso8601String(),
+            'hidden_at' => $this->hiddenAt?->toIso8601String(),
         ];
     }
 

@@ -14,6 +14,7 @@ final readonly class StreamerSettings
         public VoiceSettings $voice = new VoiceSettings,
         public ChatSettings $chat = new ChatSettings,
         public AlertSettings $alerts = new AlertSettings,
+        public MutedChatters $mutedChatters = new MutedChatters,
     ) {}
 
     /**
@@ -23,6 +24,7 @@ final readonly class StreamerSettings
     {
         $scenes = is_array($payload['scenes'] ?? null) ? $payload['scenes'] : [];
         $alerts = is_array($payload['alerts'] ?? null) ? $payload['alerts'] : [];
+        $mutedChatters = is_array($payload['muted_chatters'] ?? null) ? $payload['muted_chatters'] : [];
 
         return new self(
             coworking: CoworkingSettings::fromArray(self::scenePayload($scenes, OverlayScene::Coworking)),
@@ -30,6 +32,7 @@ final readonly class StreamerSettings
             voice: VoiceSettings::fromArray(self::scenePayload($scenes, OverlayScene::Voice)),
             chat: ChatSettings::fromArray(self::scenePayload($scenes, OverlayScene::Chat)),
             alerts: AlertSettings::fromArray($alerts),
+            mutedChatters: MutedChatters::fromArray($mutedChatters),
         );
     }
 
@@ -51,16 +54,22 @@ final readonly class StreamerSettings
             voice: $settings instanceof VoiceSettings ? $settings : $this->voice,
             chat: $settings instanceof ChatSettings ? $settings : $this->chat,
             alerts: $this->alerts,
+            mutedChatters: $this->mutedChatters,
         );
     }
 
     public function withAlerts(AlertSettings $alerts): self
     {
-        return new self($this->coworking, $this->startingSoon, $this->voice, $this->chat, $alerts);
+        return new self($this->coworking, $this->startingSoon, $this->voice, $this->chat, $alerts, $this->mutedChatters);
+    }
+
+    public function withMutedChatters(MutedChatters $mutedChatters): self
+    {
+        return new self($this->coworking, $this->startingSoon, $this->voice, $this->chat, $this->alerts, $mutedChatters);
     }
 
     /**
-     * @return array{scenes: array<string, array<string, string|int|null>>, alerts: array<string, bool>}
+     * @return array{scenes: array<string, array<string, string|int|null>>, alerts: array<string, bool>, muted_chatters: list<array{platform: string, chatter_id: string, display_name: string, muted_at: string}>}
      */
     public function toArray(): array
     {
@@ -73,6 +82,7 @@ final readonly class StreamerSettings
         return [
             'scenes' => $scenes,
             'alerts' => $this->alerts->toArray(),
+            'muted_chatters' => $this->mutedChatters->toArray(),
         ];
     }
 

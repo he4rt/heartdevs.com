@@ -4,41 +4,26 @@ declare(strict_types=1);
 
 namespace He4rt\Streaming\Overlay;
 
-use Carbon\CarbonInterface;
 use He4rt\Activity\Message\Models\Message;
 use He4rt\Streaming\Broadcasting\ChatMessageReceived;
 use He4rt\Streaming\Broadcasting\StreamSessionStarted;
+use He4rt\Streaming\Chat\Queries\StreamerChatMessages;
 use He4rt\Streaming\Session\Models\StreamSession;
 use He4rt\Streaming\Streamer\Models\Streamer;
 use He4rt\Streaming\Streamer\Models\StreamerSource;
-use Illuminate\Database\Eloquent\Builder;
 
 final readonly class OverlayInitialState
 {
+    public function __construct(
+        private StreamerChatMessages $chatMessages,
+    ) {}
+
     /**
      * @return list<array{msgId: string, chatterId: string, username: string, color: string|null, badges: list<array<string, string|null>>, fragments: list<array<string, string|null>>}>
      */
     public function recentChat(Streamer $streamer, int $limit = 30): array
     {
-        $chatSources = $streamer->sources()
-            ->with('identity')
-            ->get()
-            ->filter(fn (StreamerSource $source): bool => $source->showsChat());
-
-        if ($chatSources->isEmpty()) {
-            return [];
-        }
-
-        $latestMessages = Message::query()
-            ->where(function (Builder $query) use ($chatSources): void {
-                foreach ($chatSources as $source) {
-                    $query->orWhere(fn (Builder $channel): Builder => $channel
-                        ->where('platform', $source->identity->provider)
-                        ->where('channel_id', $source->identity->external_account_id));
-                }
-            })
-            ->whereNull('metadata->deleted_at')
-            ->when($streamer->chat_cleared_at instanceof CarbonInterface, fn (Builder $query): Builder => $query->where('sent_at', '>', $streamer->chat_cleared_at))
+        $latestMessages = $this->chatMessages->onOverlay($streamer)
             ->with('provider')
             ->latest('sent_at')
             ->limit($limit)

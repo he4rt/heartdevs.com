@@ -614,10 +614,20 @@ Feature: Ajustar o chat pelo painel
 
 ## Fase 3 — Controle do chat na overlay
 
-- [ ] 3.1 Ocultar uma mensagem só na overlay
-- [ ] 3.2 Silenciar um chatter só na overlay
-- [ ] 3.3 Limpar o chat da overlay
-- [ ] 3.4 Página **Chat** no painel
+- [x] 3.1 Ocultar uma mensagem só na overlay
+- [x] 3.2 Silenciar um chatter só na overlay
+- [x] 3.3 Limpar o chat da overlay
+- [x] 3.4 Página **Chat** no painel
+
+> **Nota de implementação.**
+>
+> - O `StreamerChatMessages` (`streaming/src/Chat/Queries`) é a consulta única de "chat do
+>   streamer". A página Chat e o `recentChat` da overlay usam essa consulta, e as Actions de
+>   ocultar e silenciar buscam a mensagem por ela. Uma mensagem de outro canal responde 404.
+> - A lista do painel usa `flex-col-reverse`: a mensagem mais nova fica embaixo, e a rolagem fica
+>   presa no fim sem JavaScript.
+> - A lista para de atualizar com o mouse em cima. O Alpine chama `$wire.$refresh()` a cada 3 s, e
+>   não o `wire:poll`, que não pausa.
 
 As três ações mexem só na overlay. Na Twitch nada muda, e cada botão diz isso. É o mesmo cuidado do
 Restream: "esses filtros valem para a overlay, não para o chat do canal".

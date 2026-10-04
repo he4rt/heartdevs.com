@@ -33,7 +33,17 @@ Mensagem apagada, ban, timeout e `/clear` na Twitch também tiram o chat da over
 | `channel.chat.clear_user_messages` | `ClearChatterMessages` marca as mensagens do chatter (24 h) | `chat.chatter-cleared` `{chatterId}` |
 | `channel.chat.clear`               | `ClearChat` grava `streamers.chat_cleared_at`               | `chat.cleared`                       |
 
-O chat recente da overlay ignora o que veio antes de `chat_cleared_at`. Uma fonte criada antes de
+Pelo painel (Minha Live › Chat), o streamer também age só na overlay, sem mexer na Twitch:
+
+| No painel              | Ação no `streaming`                                         | Broadcast              |
+| ---------------------- | ----------------------------------------------------------- | ---------------------- |
+| Ocultar na overlay     | `HideChatMessageFromOverlay` marca `hidden_at` na mensagem  | `chat.message-deleted` |
+| Silenciar na overlay   | `MuteChatterOnOverlay` guarda o chatter em `muted_chatters` | `chat.chatter-cleared` |
+| Limpar chat da overlay | `ClearChat`, o mesmo do `/clear`                            | `chat.cleared`         |
+
+O chat recente da overlay ignora o que veio antes de `chat_cleared_at`, as mensagens ocultas e as
+dos chatters silenciados. A mensagem nova de um silenciado vai para a atividade, mas não para a
+overlay. Uma fonte criada antes de
 uma inscrição nova ganha essa inscrição com `php artisan twitch:sync-streamer-subscriptions`.
 
 ## Rodar a overlay localmente

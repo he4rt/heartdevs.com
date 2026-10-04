@@ -286,6 +286,10 @@ ChatMessageReceived → overlay
   A janela cobre o chat recente da overlay e evita um update sem limite. `channel.chat.clear` chama
   `ClearChat`, que grava `streamers.chat_cleared_at` e manda `chat.cleared`. O chat recente ignora as
   mensagens anteriores a essa hora, então o chat limpo não volta ao recarregar a overlay.
+- **Ocultar e silenciar só na overlay.** Ocultar grava `metadata.hidden_at`, separado do
+  `deleted_at` da moderação, para o painel mostrar a diferença. Os chatters silenciados ficam em
+  `streamers.settings.muted_chatters`, porque a lista é curta e é configuração da overlay. Nenhuma
+  das duas coisas chega à Twitch.
 - **Corrida na criação.** Dois chats do mesmo espectador processados em paralelo poderiam criar
   duas identidades soltas. Um índice parcial único `(provider, external_account_id) WHERE model_id
 IS NULL AND deleted_at IS NULL` impede isso, e a criação usa `createOrFirst`.

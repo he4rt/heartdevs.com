@@ -45,7 +45,9 @@ final readonly class RecordChatMessage
             metadata: $incoming->metadata->toArray(),
         );
 
-        if ($message->wasRecentlyCreated && $source->showsChat()) {
+        $isMutedOnOverlay = $source->streamer->settings->mutedChatters->contains($incoming->platform, $incoming->chatterId);
+
+        if ($message->wasRecentlyCreated && $source->showsChat() && !$isMutedOnOverlay) {
             event(ChatMessageReceived::fromMessage($source->streamer, $message));
         }
 
