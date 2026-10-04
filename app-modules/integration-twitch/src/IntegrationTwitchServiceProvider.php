@@ -11,21 +11,22 @@ use He4rt\IntegrationTwitch\OAuth\TwitchOAuthClient;
 use He4rt\IntegrationTwitch\Transport\TwitchHelixConnector;
 use He4rt\IntegrationTwitch\Transport\TwitchOAuthConnector;
 use Illuminate\Support\ServiceProvider;
+use RuntimeException;
 
 class IntegrationTwitchServiceProvider extends ServiceProvider
 {
     public function register(): void
     {
         $this->app->singleton(TwitchOAuthConnector::class, fn (): TwitchOAuthConnector => new TwitchOAuthConnector(
-            clientId: config()->string('services.twitch.client_id'),
-            clientSecret: config()->string('services.twitch.client_secret')
+            clientId: $this->twitchCredential('client_id'),
+            clientSecret: $this->twitchCredential('client_secret'),
         ));
 
         $this->app->singleton(TwitchAppTokenService::class);
 
         $this->app->singleton(TwitchHelixConnector::class, fn (): TwitchHelixConnector => new TwitchHelixConnector(
             tokenService: $this->app->make(TwitchAppTokenService::class),
-            clientId: config()->string('services.twitch.client_id'),
+            clientId: $this->twitchCredential('client_id'),
         ));
 
         $this->app->singleton(TwitchOAuthClient::class);
@@ -39,5 +40,18 @@ class IntegrationTwitchServiceProvider extends ServiceProvider
                 SubscribeTwitchEventsCommand::class,
             ]);
         }
+    }
+
+    private function twitchCredential(string $key): string
+    {
+        $value = config('services.twitch.'.$key);
+
+        throw_unless(
+            is_string($value) && $value !== '',
+            RuntimeException::class,
+            'Twitch OAuth credentials are not configured (services.twitch.client_id / client_secret).',
+        );
+
+        return $value;
     }
 }
