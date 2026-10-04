@@ -14,6 +14,7 @@ use He4rt\Identity\ExternalIdentity\Exceptions\InvalidApiKeyException;
 use He4rt\Identity\ExternalIdentity\Models\ExternalIdentity;
 use He4rt\Identity\User\Models\User;
 use Illuminate\Contracts\View\View;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\Auth;
 use Livewire\Attributes\Locked;
@@ -22,6 +23,8 @@ use Livewire\Component;
 
 class ConnectionHub extends Component
 {
+    private const string TENANT_MODEL_TYPE = 'tenant';
+
     public string $panel = 'app';
 
     public bool $showMergeModal = false;
@@ -186,8 +189,11 @@ class ConnectionHub extends Component
 
     public function disconnectById(string $identityId): void
     {
-        $identity = ExternalIdentity::query()
-            ->where('id', $identityId)
+        /** @var User $user */
+        $user = auth()->user();
+
+        $identity = $this->identitiesManageableBy($user)
+            ->whereKey($identityId)
             ->whereNotNull('connected_at')
             ->whereNull('disconnected_at')
             ->first();
@@ -266,11 +272,25 @@ class ConnectionHub extends Component
         return auth()->user()->providers()->get();
     }
 
+    /** @return Builder<ExternalIdentity> */
+    private function identitiesManageableBy(User $user): Builder
+    {
+        $canManageTenantConnections = $user->isSuperAdmin();
+
+        return ExternalIdentity::query()->where(function (Builder $query) use ($user, $canManageTenantConnections): void {
+            $query->whereMorphedTo('model', $user);
+
+            if ($canManageTenantConnections) {
+                $query->orWhere('model_type', self::TENANT_MODEL_TYPE);
+            }
+        });
+    }
+
     /** @return Collection<int, ExternalIdentity> */
     private function getTenantProviders(): Collection
     {
         return ExternalIdentity::query()
-            ->where('model_type', 'tenant')
+            ->where('model_type', self::TENANT_MODEL_TYPE)
             ->whereNotNull('connected_at')
             ->whereNull('disconnected_at')
             ->with('connectedByUser')

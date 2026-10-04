@@ -412,3 +412,87 @@ test('o botão de reautorizar aparece só quando faltam escopos para quem conect
     'streamer que já concedeu tudo' => ['streamer', ['user:read:email', 'moderator:read:followers', 'channel:read:subscriptions', 'bits:read'], false],
     'membro com conexão antiga' => ['membro', null, false],
 ]);
+
+test('disconnectById não desconecta a conta de outra pessoa', function (string $callerRole): void {
+    $owner = User::factory()->create();
+    $caller = $callerRole === 'super admin'
+        ? User::factory()->superAdmin()->create()
+        : User::factory()->create();
+
+    $identity = ExternalIdentity::factory()->create([
+        'model_id' => $owner->getKey(),
+        'provider' => IdentityProvider::Discord,
+        'connected_at' => now(),
+        'disconnected_at' => null,
+    ]);
+
+    $this->actingAs($caller);
+
+    $component = livewire(ConnectionHub::class)->call('disconnectById', $identity->getKey());
+
+    expect($identity->refresh()->disconnected_at)->toBeNull();
+
+    $component->assertNotified('Connection not found');
+})->with([
+    'membro' => ['membro'],
+    'super admin' => ['super admin'],
+]);
+
+test('o dono desconecta a própria conta pelo id', function (): void {
+    $owner = User::factory()->create();
+
+    $identity = ExternalIdentity::factory()->create([
+        'model_id' => $owner->getKey(),
+        'provider' => IdentityProvider::GitHub,
+        'connected_at' => now(),
+        'disconnected_at' => null,
+    ]);
+
+    $this->actingAs($owner);
+
+    livewire(ConnectionHub::class)
+        ->call('disconnectById', $identity->getKey())
+        ->assertNotified(IdentityProvider::GitHub->getLabel().' disconnected successfully');
+
+    expect($identity->refresh()->disconnected_at)->not->toBeNull();
+});
+
+test('o super admin desconecta uma conexão de tenant pelo painel admin', function (): void {
+    $tenantIdentity = ExternalIdentity::factory()->create([
+        'model_type' => 'tenant',
+        'model_id' => fake()->uuid(),
+        'provider' => IdentityProvider::Twitch,
+        'connected_at' => now(),
+        'disconnected_at' => null,
+        'metadata' => ['username' => 'tenant-twitch'],
+    ]);
+
+    $this->actingAs(User::factory()->superAdmin()->create());
+    Filament::setCurrentPanel(Filament::getPanel('admin'));
+
+    livewire(ConnectionHub::class)
+        ->assertSee('tenant-twitch')
+        ->call('disconnectById', $tenantIdentity->getKey())
+        ->assertNotified(IdentityProvider::Twitch->getLabel().' disconnected successfully');
+
+    expect($tenantIdentity->refresh()->disconnected_at)->not->toBeNull();
+});
+
+test('quem não é super admin não desconecta conexão de tenant, nem pelo painel admin', function (): void {
+    $tenantIdentity = ExternalIdentity::factory()->create([
+        'model_type' => 'tenant',
+        'model_id' => fake()->uuid(),
+        'provider' => IdentityProvider::Twitch,
+        'connected_at' => now(),
+        'disconnected_at' => null,
+    ]);
+
+    $this->actingAs(User::factory()->create());
+    Filament::setCurrentPanel(Filament::getPanel('admin'));
+
+    $component = livewire(ConnectionHub::class)->call('disconnectById', $tenantIdentity->getKey());
+
+    expect($tenantIdentity->refresh()->disconnected_at)->toBeNull();
+
+    $component->assertNotified('Connection not found');
+});
