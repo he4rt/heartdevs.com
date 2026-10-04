@@ -8,6 +8,7 @@
         <div class="space-y-6 xl:col-span-2">
             @include ('panel-app::components.profile-media-header',
                 [
+                    'avatarDisplayUrl' => $this->avatarDisplayUrl,
                     'avatarPreviewUrl' => $this->avatarPreviewUrl,
                     'coverPreviewUrl' => $this->coverPreviewUrl,
                     'coverAspectRatio' => $this->coverAspectRatio,
@@ -29,7 +30,7 @@
                     'user' => auth()->user(),
                     'character' => $this->character,
                     'initials' => $this->initials,
-                    'avatarPreviewUrl' => $this->avatarPreviewUrl,
+                    'avatarDisplayUrl' => $this->avatarDisplayUrl,
                     'coverPreviewUrl' => $this->coverPreviewUrl,
                     'coverAspectRatio' => $this->coverAspectRatio,
                     'coverFocalY' => $this->coverFocalY,

@@ -52,6 +52,7 @@ use Livewire\WithFileUploads;
 /**
  * @property-read Schema $form
  * @property-read Schema $birthdateForm
+ * @property-read string|null $avatarDisplayUrl
  * @property-read string|null $avatarPreviewUrl
  * @property-read string|null $coverPreviewUrl
  * @property-read int $avatarFocalY
@@ -559,6 +560,15 @@ class ProfilePage extends Page
     }
 
     #[Computed]
+    public function avatarDisplayUrl(): ?string
+    {
+        /** @var User $user */
+        $user = auth()->user()->fresh();
+
+        return $user->getFilamentAvatarUrl();
+    }
+
+    #[Computed]
     public function avatarPreviewUrl(): ?string
     {
         /** @var User $user */
@@ -803,6 +813,7 @@ class ProfilePage extends Page
     private function refreshImageComputeds(): void
     {
         unset(
+            $this->avatarDisplayUrl,
             $this->avatarPreviewUrl,
             $this->coverPreviewUrl,
             $this->avatarFocalY,

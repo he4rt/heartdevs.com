@@ -3,6 +3,8 @@
 declare(strict_types=1);
 
 use Filament\Facades\Filament;
+use He4rt\Identity\ExternalIdentity\Enums\IdentityProvider;
+use He4rt\Identity\ExternalIdentity\Models\ExternalIdentity;
 use He4rt\Identity\User\Enums\ProfileImage;
 use He4rt\Identity\User\Models\User;
 use He4rt\PanelApp\Pages\ProfilePage;
@@ -242,4 +244,19 @@ test('imageUrl falls back to the original while the conversion does not exist', 
     expect($this->user->refresh()->imageUrl($cover))
         ->toBe($media->refresh()->getUrl())
         ->not->toContain('-'.$cover->value.'.webp');
+});
+
+test('without an upload, the profile shows the linked github avatar but no remove button', function (): void {
+    ExternalIdentity::factory()->create([
+        'model_type' => $this->user->getMorphClass(),
+        'model_id' => $this->user->id,
+        'provider' => IdentityProvider::GitHub,
+        'metadata' => ['username' => 'octocat', 'avatar' => 'https://avatars.githubusercontent.com/u/583231?v=4'],
+    ]);
+
+    livewire(ProfilePage::class)
+        ->assertSet('avatarDisplayUrl', 'https://avatars.githubusercontent.com/u/583231?v=4')
+        ->assertSet('avatarPreviewUrl', value: null)
+        ->assertSee('https://avatars.githubusercontent.com/u/583231?v=4', escape: false)
+        ->assertDontSeeHtml('wire:click="removeAvatar"');
 });
