@@ -32,7 +32,7 @@ final class MobileTimelineController extends Controller
     {
         $posts = Timeline::query()
             ->feed()
-            ->with(['user', 'postable.media'])
+            ->with(['user.media', 'user.providers', 'postable.media'])
             ->withCount(['children', 'reactions'])
             ->simplePaginate(20);
 
@@ -127,7 +127,7 @@ final class MobileTimelineController extends Controller
     private function postResponse(Timeline $post, int $status): JsonResponse
     {
         // create() não preenche defaults de banco (pinned, is_ignored, views) no model em memória.
-        $post->refresh()->load(['user', 'postable.media'])->loadCount(['children', 'reactions']);
+        $post->refresh()->load(['user.media', 'user.providers', 'postable.media'])->loadCount(['children', 'reactions']);
 
         return new TimelinePostResource($post)
             ->response()
