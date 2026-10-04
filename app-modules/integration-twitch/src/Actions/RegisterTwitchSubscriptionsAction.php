@@ -6,6 +6,7 @@ namespace He4rt\IntegrationTwitch\Actions;
 
 use He4rt\IntegrationTwitch\Enums\TwitchEventSubType;
 use He4rt\IntegrationTwitch\Models\TwitchSubscription;
+use He4rt\IntegrationTwitch\Support\EventSubWebhook;
 use He4rt\IntegrationTwitch\Transport\Requests\EventSub\CreateSubscription;
 use He4rt\IntegrationTwitch\Transport\TwitchHelixConnector;
 use Saloon\Exceptions\Request\RequestException;
@@ -26,9 +27,9 @@ final readonly class RegisterTwitchSubscriptionsAction
             $types = TwitchEventSubType::cases();
         }
 
-        $callbackUrl = $this->resolveCallbackUrl();
+        $callbackUrl = EventSubWebhook::callbackUrl();
 
-        $secret = config()->string('services.twitch.eventsub_secret');
+        $secret = EventSubWebhook::secret();
 
         $existingTypes = TwitchSubscription::query()
             ->where('broadcaster_user_id', $broadcasterId)
@@ -93,16 +94,5 @@ final readonly class RegisterTwitchSubscriptionsAction
         }
 
         return ['created' => $created, 'skipped' => $skipped, 'failed' => $failed, 'errors' => $errors];
-    }
-
-    private function resolveCallbackUrl(): string
-    {
-        $configured = config()->string('services.twitch.eventsub_callback', '');
-
-        if ($configured !== '') {
-            return $configured;
-        }
-
-        return mb_rtrim(config()->string('app.url'), '/').'/api/webhooks/twitch/eventsub';
     }
 }

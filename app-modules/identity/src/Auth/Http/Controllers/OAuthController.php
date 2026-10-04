@@ -47,6 +47,7 @@ final class OAuthController extends Controller
             panel: $panel,
             returnUrl: Auth::check() ? url()->previous() : null,
             nonce: $nonce,
+            features: OAuthStateDTO::featuresFrom(request()->input('features', [])),
         );
 
         return redirect()->to($client->redirectUrl($state));

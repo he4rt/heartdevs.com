@@ -47,12 +47,15 @@ return [
         'scopes' => [
             'admin' => env('TWITCH_OAUTH_SCOPES_ADMIN', 'user:read:email moderator:read:followers channel:read:subscriptions bits:read moderation:read channel:read:redemptions channel:read:polls channel:read:predictions channel:read:hype_train channel:read:goals channel:read:ads channel:bot'),
             'app' => env('TWITCH_OAUTH_SCOPES_APP', 'user:read:email'),
-            'streamer' => env('TWITCH_OAUTH_SCOPES_STREAMER', 'user:read:email moderator:read:followers channel:read:subscriptions bits:read'),
         ],
         'enabled' => env('TWITCH_OAUTH_ENABLED', default: true),
         'eventsub_secret' => env('TWITCH_EVENTSUB_SECRET'),
         'eventsub_callback' => env('TWITCH_EVENTSUB_CALLBACK', ''),
         'broadcaster_login' => env('TWITCH_BROADCASTER_LOGIN', ''),
+        'bot' => [
+            'user_id' => env('TWITCH_BOT_USER_ID'),
+            'refresh_token' => env('TWITCH_BOT_REFRESH_TOKEN'),
+        ],
     ],
 
     'devto' => [

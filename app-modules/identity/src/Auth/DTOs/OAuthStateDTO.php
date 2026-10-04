@@ -12,12 +12,16 @@ use Stringable;
 
 final readonly class OAuthStateDTO implements JsonSerializable, Stringable
 {
+    /**
+     * @param  array<int, string>  $features
+     */
     public function __construct(
         public OAuthIntent $intent,
         public IdentityProvider $provider,
         public string $panel,
         public ?string $returnUrl = null,
         public ?string $nonce = null,
+        public array $features = [],
     ) {}
 
     public function __toString(): string
@@ -35,7 +39,16 @@ final readonly class OAuthStateDTO implements JsonSerializable, Stringable
             panel: $data['panel'],
             returnUrl: $data['return_url'] ?? null,
             nonce: $data['nonce'] ?? null,
+            features: self::featuresFrom($data['features'] ?? []),
         );
+    }
+
+    /**
+     * @return array<int, string>
+     */
+    public static function featuresFrom(mixed $features): array
+    {
+        return is_array($features) ? array_values(array_filter($features, is_string(...))) : [];
     }
 
     /**
@@ -49,6 +62,7 @@ final readonly class OAuthStateDTO implements JsonSerializable, Stringable
             'panel' => $this->panel,
             'return_url' => $this->returnUrl,
             'nonce' => $this->nonce,
+            'features' => $this->features,
         ];
     }
 }

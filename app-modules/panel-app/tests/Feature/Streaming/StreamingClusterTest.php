@@ -23,8 +23,6 @@ use function Pest\Livewire\livewire;
 
 beforeEach(function (): void {
     Filament::setCurrentPanel(Filament::getPanel('app'));
-
-    config()->set('services.twitch.scopes.streamer', 'user:read:email moderator:read:followers channel:read:subscriptions bits:read');
 });
 
 function connectTwitch(User $user, ?array $grantedScopes): ExternalIdentity

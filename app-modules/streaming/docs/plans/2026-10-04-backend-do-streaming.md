@@ -1568,10 +1568,10 @@ Feature: Mensagem apagada pela moderação
 
 ## Fase 4 — Ingestão da Twitch
 
-- [ ] 4.1 ETL: `TwitchEventReceived` → Actions do streaming
-- [ ] 4.2 Inscrições EventSub por streamer
-- [ ] 4.3 Conta bot `he4rtdevs`
-- [ ] 4.4 Escopos conforme a escolha do streamer
+- [x] 4.1 ETL: `TwitchEventReceived` → Actions do streaming
+- [x] 4.2 Inscrições EventSub por streamer
+- [x] 4.3 Conta bot `he4rtdevs`
+- [x] 4.4 Escopos conforme a escolha do streamer
 
 ### 4.1 ETL: `TwitchEventReceived` → Actions do streaming
 
@@ -1662,6 +1662,11 @@ O `TwitchStreamingPayloadMapper` lê `payload.event`:
 
 Os testes usam payloads no formato do `twitch-cli`.
 
+O listener só consulta a Helix no `stream.online` quando o canal tem fonte ativa. Assim uma live
+da comunidade não gera chamada à Twitch. Se a Helix falhar, a sessão abre sem título e o erro vai
+para o log. O connector da Helix é resolvido na hora do uso, porque os testes não têm credenciais
+da Twitch.
+
 **Comportamento esperado.**
 
 ```gherkin
@@ -1734,11 +1739,18 @@ A solução é marcar quem é dono de cada inscrição. `twitch_subscriptions` g
 O conjunto desejado fica vazio quando o streamer está desativado ou a identidade está desconectada.
 
 ```php
-// integration-twitch/database/migrations/2026_10_04_000200_add_streamer_source_to_twitch_subscriptions.php
+// integration-twitch/database/migrations/2026_10_04_100400_add_streamer_source_to_twitch_subscriptions_table.php
+// a data vem depois de streamer_sources, porque as migrations de todos os módulos rodam numa fila só
 Schema::table('twitch_subscriptions', function (Blueprint $table): void {
     $table->foreignUuid('streamer_source_id')->nullable()->constrained('streamer_sources')->nullOnDelete();
 });
 ```
+
+O listener `SyncStreamerSubscriptionsOnChange` não faz nada sem `services.twitch.eventsub_secret`,
+que já é obrigatório para criar inscrição. A URL de callback e o segredo saíram do
+`RegisterTwitchSubscriptionsAction` para `Support/EventSubWebhook`, usado pelas duas Actions. A
+comparação entre inscrições ignora a ordem das chaves e os campos vazios da condição, porque o
+jsonb reordena as chaves e a Twitch devolve campos sem uso como string vazia.
 
 **Comportamento esperado.**
 
@@ -1916,6 +1928,10 @@ public ?string $nonce = null,
 /** @var array<int, string> */
 public array $features = [],
 ```
+
+O conjunto `services.twitch.scopes.streamer` sai da config. O streamer recebe os escopos do painel
+`app` mais os das features escolhidas, e sem escolha recebe os de alerta, que é o mesmo conjunto
+que a config tinha.
 
 **Comportamento esperado.**
 

@@ -363,8 +363,6 @@ test('the connection hub groups providers by authentication method', function ()
 });
 
 test('o card da Twitch lista os escopos de broadcaster só para streamer', function (string $factoryState, bool $seesBroadcasterScopes): void {
-    config()->set('services.twitch.scopes.streamer', 'user:read:email moderator:read:followers channel:read:subscriptions bits:read');
-
     $user = $factoryState === 'streamer'
         ? User::factory()->streamer()->create()
         : User::factory()->create();
@@ -383,7 +381,6 @@ test('o card da Twitch lista os escopos de broadcaster só para streamer', funct
 
 test('o botão de reautorizar aparece só quando faltam escopos para quem conectou', function (string $factoryState, ?array $grantedScopes, bool $seesReauthorize): void {
     config()->set('services.twitch.scopes.app', 'user:read:email');
-    config()->set('services.twitch.scopes.streamer', 'user:read:email moderator:read:followers channel:read:subscriptions bits:read');
 
     $user = $factoryState === 'streamer'
         ? User::factory()->streamer()->create()

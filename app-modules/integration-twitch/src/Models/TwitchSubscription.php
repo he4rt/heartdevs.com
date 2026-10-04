@@ -19,6 +19,7 @@ use Illuminate\Database\Eloquent\Model;
  * @property string|null $callback_url
  * @property int $cost
  * @property string $version
+ * @property string|null $streamer_source_id
  * @property CarbonInterface|null $created_at
  * @property CarbonInterface|null $updated_at
  */
@@ -34,6 +35,7 @@ final class TwitchSubscription extends Model
         'callback_url',
         'cost',
         'version',
+        'streamer_source_id',
     ];
 
     /**

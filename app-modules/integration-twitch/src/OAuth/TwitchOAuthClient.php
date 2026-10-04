@@ -25,7 +25,11 @@ final readonly class TwitchOAuthClient implements OAuthClientContract
 
     public function redirectUrl(?OAuthStateDTO $state = null): string
     {
-        $scopes = TwitchScopes::requestedFor($state->panel ?? 'app', Auth::user());
+        $scopes = TwitchScopes::requestedFor(
+            $state->panel ?? 'app',
+            Auth::user(),
+            TwitchStreamerFeature::fromValues($state->features ?? []),
+        );
 
         $callbackUrl = $this->callbackUrl();
 
