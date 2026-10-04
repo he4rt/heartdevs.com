@@ -22,6 +22,7 @@ use He4rt\Streaming\Enums\ChatStyle;
 use He4rt\Streaming\Enums\OverlayScene;
 use He4rt\Streaming\Enums\StreamEventType;
 use He4rt\Streaming\Enums\VoiceLayout;
+use He4rt\Streaming\Health\Contracts\OverlayConnections;
 use He4rt\Streaming\Streamer\Actions\EnsureStreamer;
 use He4rt\Streaming\Streamer\Actions\RegenerateOverlayToken;
 use He4rt\Streaming\Streamer\Actions\UpdateStreamerSettings;
@@ -31,9 +32,14 @@ use He4rt\Streaming\Streamer\Data\StartingSoonSettings;
 use He4rt\Streaming\Streamer\Data\VoiceSettings;
 use He4rt\Streaming\Streamer\Models\Streamer;
 use Livewire\Attributes\Locked;
+use Livewire\Attributes\Renderless;
 
 class StreamOverlaysPage extends Page
 {
+    private const int SCENE_WIDTH = 1_920;
+
+    private const int CHAT_PREVIEW_WIDTH = 960;
+
     private const string WALL_CLOCK_PATTERN = '/^([01]\d|2[0-3]):[0-5]\d$/';
 
     #[Locked]
@@ -204,6 +210,12 @@ class StreamOverlaysPage extends Page
             });
     }
 
+    #[Renderless]
+    public function countOpenOverlays(OverlayConnections $connections): ?int
+    {
+        return $connections->count($this->currentStreamer());
+    }
+
     /**
      * @return Action[]
      */
@@ -256,10 +268,15 @@ class StreamOverlaysPage extends Page
      */
     protected function getViewData(): array
     {
+        $streamer = $this->currentStreamer();
+        $settingsVersion = mb_substr(md5(json_encode($streamer->settings->toArray(), JSON_THROW_ON_ERROR)), 0, 8);
+
         return [
+            'openOverlays' => resolve(OverlayConnections::class)->count($streamer),
             'scenes' => array_map(fn (OverlayScene $scene): array => [
                 'scene' => $scene,
                 'url' => $this->sceneUrl($scene, $this->overlayToken),
+                'previewUrl' => $this->sceneUrl($scene, $this->overlayToken).'?'.http_build_query(['demo' => 1, 'v' => $settingsVersion]),
                 'maskedUrl' => $this->sceneUrl($scene, str_repeat('•', 12)),
                 'settingsAction' => match ($scene) {
                     OverlayScene::StartingSoon => 'startingSoonSettingsAction',
@@ -268,6 +285,8 @@ class StreamOverlaysPage extends Page
                     OverlayScene::Coworking => null,
                 },
                 'size' => $scene === OverlayScene::Chat ? 'qualquer tamanho' : '1920 × 1080',
+                'hasTransparentBackground' => $scene->hasTransparentBackground(),
+                'previewWidth' => $scene === OverlayScene::Chat ? self::CHAT_PREVIEW_WIDTH : self::SCENE_WIDTH,
             ], OverlayScene::cases()),
         ];
     }

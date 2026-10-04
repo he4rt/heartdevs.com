@@ -1039,8 +1039,18 @@ Feature: Saúde no Painel
 
 ## Fase 5 — Overlays: prévia e conexões
 
-- [ ] 5.1 Prévia em escala com dados de exemplo
-- [ ] 5.2 Overlays conectadas agora
+- [x] 5.1 Prévia em escala com dados de exemplo
+- [x] 5.2 Overlays conectadas agora
+
+> **Nota de implementação.**
+>
+> - A prévia recarrega pela própria URL: `?demo=1&v=<8 caracteres do hash das configurações>`. Salvar
+>   qualquer configuração muda o `v`, o Livewire troca o `src` e o `iframe` carrega de novo. Não
+>   precisa de `wire:key`.
+> - O Chat renderiza a prévia em 960 × 540, não em 1920 × 1080. Na escala do card, a coluna de 480 px
+>   ficava ilegível no canto.
+> - A contagem do topo atualiza a cada 5 s por um método `#[Renderless]`, sem renderizar a página de
+>   novo. As prévias não entram na conta, porque o `?demo` não assina o canal.
 
 ### 5.1 Prévia em escala com dados de exemplo
 

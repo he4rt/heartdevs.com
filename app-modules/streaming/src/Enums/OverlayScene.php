@@ -35,6 +35,11 @@ enum OverlayScene: string implements HasColor, HasDescription, HasLabel
         };
     }
 
+    public function hasTransparentBackground(): bool
+    {
+        return $this === self::Voice || $this === self::Chat;
+    }
+
     public function getColor(): string
     {
         return match ($this) {

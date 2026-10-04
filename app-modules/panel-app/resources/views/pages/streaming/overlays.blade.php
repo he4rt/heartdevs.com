@@ -1,4 +1,42 @@
 <x-filament-panels::page>
+    <div
+        x-data="{
+            count: @js($openOverlays),
+            timer: null,
+            init() {
+                this.timer = setInterval(async () => (this.count = await this.$wire.countOpenOverlays()), 5000)
+            },
+            destroy() {
+                clearInterval(this.timer)
+            },
+            get label() {
+                if (this.count === null) return 'Tempo real fora do ar'
+                if (this.count === 0) return 'Nenhuma overlay aberta'
+                return this.count === 1 ? '1 overlay aberta agora' : `${this.count} overlays abertas agora`
+            },
+        }"
+        class="-mt-2 flex items-center justify-end gap-2 text-sm text-gray-600 dark:text-gray-300"
+    >
+        <span
+            x-bind:class="count === null ? 'bg-danger-500' : count > 0 ? 'bg-success-500' : 'bg-gray-400'"
+            @class([
+                'size-2 rounded-full',
+                'bg-danger-500' => $openOverlays === null,
+                'bg-success-500' => $openOverlays > 0,
+                'bg-gray-400' => $openOverlays === 0,
+            ])
+        ></span>
+        <span x-text="label">
+            @if ($openOverlays === null)
+                Tempo real fora do ar
+            @elseif ($openOverlays === 0)
+                Nenhuma overlay aberta
+            @else
+                {{ $openOverlays === 1 ? '1 overlay aberta agora' : $openOverlays . ' overlays abertas agora' }}
+            @endif
+        </span>
+    </div>
+
     <x-filament::section heading="Como usar no OBS" icon="heroicon-o-information-circle" collapsible>
         <ol class="list-decimal space-y-1 ps-5 text-sm text-gray-600 dark:text-gray-300">
             <li>No OBS, adicione uma fonte do tipo <strong>Navegador</strong>.</li>
@@ -14,11 +52,52 @@
                 class="overflow-hidden rounded-xl bg-white shadow-sm ring-1 ring-gray-950/5 dark:bg-gray-900 dark:ring-white/10"
             >
                 <div
-                    class="relative flex aspect-video items-center justify-center bg-linear-to-br from-[#1a0b2e] via-[#241036] to-zinc-950"
+                    x-data="{
+                        scale: 0,
+                        background: 'dark',
+                        init() {
+                            const fit = () => (this.scale = this.$el.clientWidth / @js($item['previewWidth']))
+                            fit()
+                            new ResizeObserver(fit).observe(this.$el)
+                        },
+                    }"
+                    x-bind:class="{
+                        'bg-linear-to-br from-[#1a0b2e] via-[#241036] to-zinc-950': background === 'dark',
+                        'bg-linear-to-br from-sky-100 via-white to-amber-50': background === 'light',
+                        'bg-[image:repeating-conic-gradient(#d4d4d8_0_25%,#fafafa_0_50%)] bg-size-[24px_24px]': background === 'checker',
+                    }"
+                    class="relative aspect-video overflow-hidden bg-zinc-950"
                 >
-                    <span class="text-xs font-semibold tracking-[0.2em] text-purple-200/70 uppercase">
-                        {{ $item['scene']->getLabel() }}
-                    </span>
+                    <iframe
+                        src="{{ $item['previewUrl'] }}"
+                        title="Prévia: {{ $item['scene']->getLabel() }}"
+                        loading="lazy"
+                        tabindex="-1"
+                        aria-hidden="true"
+                        class="pointer-events-none absolute top-0 left-0 origin-top-left border-0"
+                        x-bind:style="{ transform: `scale(${scale})` }"
+                        style="width: {{ $item['previewWidth'] }}px; height: {{ $item['previewWidth'] * 9 / 16 }}px; transform: scale(0)"
+                    ></iframe>
+
+                    @if ($item['hasTransparentBackground'])
+                        <div
+                            class="absolute top-2 left-2 flex gap-0.5 rounded-md bg-black/50 p-0.5 text-[11px] font-medium text-white/80"
+                            role="group"
+                            aria-label="Fundo da prévia"
+                        >
+                            @foreach (['dark' => 'Escuro', 'light' => 'Claro', 'checker' => 'Xadrez'] as $background => $label)
+                                <button
+                                    type="button"
+                                    x-on:click="background = @js($background)"
+                                    x-bind:class="background === @js($background) ? 'bg-white/25 text-white' : 'hover:bg-white/10'"
+                                    class="rounded px-1.5 py-0.5"
+                                >
+                                    {{ $label }}
+                                </button>
+                            @endforeach
+                        </div>
+                    @endif
+
                     <span
                         class="absolute right-3 bottom-3 rounded bg-black/40 px-1.5 py-0.5 font-mono text-[10px] text-white/70"
                     >
