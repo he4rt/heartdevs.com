@@ -1399,8 +1399,8 @@ Feature: Gravar eventos de stream
 
 ## Fase 3 — Chat
 
-- [ ] 3.1 `RecordChatMessage`
-- [ ] 3.2 `DeleteChatMessage`
+- [x] 3.1 `RecordChatMessage`
+- [x] 3.2 `DeleteChatMessage`
 
 ### 3.1 `RecordChatMessage`
 
@@ -1511,10 +1511,17 @@ Feature: Chat da live na atividade da comunidade
         Then existe uma identidade solta só para 9911
 ```
 
+O `ChatMessageMetadata` guarda `display_name`, `color`, `badges` (`ChatBadge`), `fragments`
+(`ChatFragment`, texto ou emote) e `deleted_at`. O emote já chega com a URL, porque montar a URL é
+coisa da plataforma e fica no ETL (4.1). O campo `reply` da ADR fica para quando a overlay mostrar
+respostas. O broadcast sai quando `StreamerSource::showsChat()` é verdadeiro: a fonte está ligada
+e tem leitor de chat.
+
 ### 3.2 `DeleteChatMessage`
 
 **Contexto.** Um moderador pode apagar uma mensagem na Twitch. A linha fica no banco, marcada, e
-some da overlay (ADR, seção 9).
+some da overlay (ADR, seção 9). A busca filtra também pelo `channel_id` do broadcaster, para um
+canal não marcar mensagem de outro.
 
 ```php
 // streaming/src/Chat/Actions/DeleteChatMessage.php
