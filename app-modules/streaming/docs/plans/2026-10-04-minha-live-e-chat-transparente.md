@@ -297,10 +297,21 @@ Feature: Overlay reage à limpeza do chat
 
 ## Fase 2 — Chat transparente
 
-- [ ] 2.1 Cena `chat` e `ChatSettings`
-- [ ] 2.2 Página `Overlays/Chat` e os seis estilos
-- [ ] 2.3 Comportamentos fixos
-- [ ] 2.4 Configuração no painel
+- [x] 2.1 Cena `chat` e `ChatSettings`
+- [x] 2.2 Página `Overlays/Chat` e os seis estilos
+- [x] 2.3 Comportamentos fixos
+- [x] 2.4 Configuração no painel
+
+> **Nota de implementação.**
+>
+> - O **Vidro** não desfoca a cena. A fonte de navegador do OBS é desenhada à parte, então o
+>   `backdrop-filter` não vê o que está atrás dela. O estilo virou uma faixa clara translúcida com
+>   sombra forte no texto.
+> - Quando uma linha some pelo tempo, as mais antigas saem junto. Uma linha escondida pelo corte
+>   por altura não roda a animação, e voltaria à tela depois que as mais novas sumissem.
+> - Os números chegam do `settings.updated` como texto, porque o `OverlayConfigDto` guarda
+>   `string`. O `toOverlayConfig` agora mantém o `0` ("nunca some").
+> - O card do Chat no painel mostra "qualquer tamanho" no lugar de 1920 × 1080.
 
 ### Os seis estilos
 
@@ -321,7 +332,7 @@ produtos pesquisados, e o **Terminal** combina com live de código.
  sobre jogo ou tela                      gameplay agitada, vertical             just chatting, coluna fixa
 
  DESTAQUE                                TERMINAL                               VIDRO
- fonte grande, nome na própria linha     monoespaçada, prompt de shell          linhas com fundo desfocado
+ fonte grande, nome na própria linha     monoespaçada, prompt de shell          faixa clara translúcida
 ┌───────────────────────────────┐       ┌───────────────────────────────┐      ┌───────────────────────────────┐
 │ usb777_ 🗡💜                   │       │ usb777_@he4rt:~$ tem emote?   │      │ ▒ usb777_  tem emote?        ▒ │
 │ TEM EMOTE?                    │       │ popokitas@he4rt:~$ boa noite  │      │ ▒ popokitas  boa noite       ▒ │
@@ -564,7 +575,7 @@ chat ganha a `chatSettingsAction`. Os ajustes salvam pelo `UpdateStreamerSetting
 │ ( ) Painel     Uma caixa atrás de tudo. Coluna lateral.      │
 │ ( ) Destaque   Fonte grande, nome em cima. Vertical.         │
 │ ( ) Terminal   Prompt de shell. Live de código.              │
-│ ( ) Vidro      Fundo desfocado. Câmera e conversa.           │
+│ ( ) Vidro      Faixa clara. Câmera e conversa.               │
 │                                                              │
 │ Sumir após [ 0 ] s  (0 = nunca)   Fonte [ 24 ] px            │
 │ Largura    [ 480 ] px                                        │

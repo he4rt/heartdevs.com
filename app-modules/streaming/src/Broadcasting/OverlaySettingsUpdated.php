@@ -21,7 +21,7 @@ final class OverlaySettingsUpdated implements ShouldBroadcastNow, ShouldDispatch
     use SerializesModels;
 
     /**
-     * @param  array<string, string|null>  $settings
+     * @param  array<string, string|int|null>  $settings
      */
     public function __construct(
         public Streamer $streamer,
@@ -40,7 +40,7 @@ final class OverlaySettingsUpdated implements ShouldBroadcastNow, ShouldDispatch
         return 'settings.updated';
     }
 
-    /** @return array{scene: string, settings: array<string, string|null>} */
+    /** @return array{scene: string, settings: array<string, string|int|null>} */
     public function broadcastWith(): array
     {
         return [

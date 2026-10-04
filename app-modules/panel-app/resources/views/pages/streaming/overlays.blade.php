@@ -2,7 +2,7 @@
     <x-filament::section heading="Como usar no OBS" icon="heroicon-o-information-circle" collapsible>
         <ol class="list-decimal space-y-1 ps-5 text-sm text-gray-600 dark:text-gray-300">
             <li>No OBS, adicione uma fonte do tipo <strong>Navegador</strong>.</li>
-            <li>Cole o link da cena e defina largura 1920 e altura 1080.</li>
+            <li>Cole o link da cena. As cenas usam 1920 × 1080; o Chat aceita qualquer tamanho.</li>
             <li>Não compartilhe os links: quem tiver um deles vê a sua overlay.</li>
         </ol>
     </x-filament::section>
@@ -22,7 +22,7 @@
                     <span
                         class="absolute right-3 bottom-3 rounded bg-black/40 px-1.5 py-0.5 font-mono text-[10px] text-white/70"
                     >
-                        1920 × 1080
+                        {{ $item['size'] }}
                     </span>
                 </div>
 

@@ -1,6 +1,6 @@
 import type { FragmentDto } from './feed';
 
-export type OverlayScene = 'coworking' | 'starting' | 'voice';
+export type OverlayScene = 'coworking' | 'starting' | 'voice' | 'chat';
 
 export type StartingSoonSettings = {
     title: string | null;
@@ -11,7 +11,16 @@ export type VoiceSettings = {
     layout: 'col' | 'row';
 };
 
-export type SceneSettings = Record<string, string | null>;
+export type ChatSettings = {
+    style: string;
+    fade_after_seconds: number;
+    font_size: number;
+    width: number;
+    direction: string;
+    alignment: string;
+};
+
+export type SceneSettings = Record<string, string | number | null>;
 
 export interface ChatBadgePayload {
     setId: string;

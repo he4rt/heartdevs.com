@@ -89,7 +89,9 @@ export function toOverlayConfig(scene: string, settings: SceneSettings, since: n
     const values: Record<string, string> = {};
 
     for (const [key, value] of Object.entries(settings)) {
-        if (value) values[VALUE_KEYS[key] ?? key] = value;
+        const isFilled = value !== null && value !== '';
+
+        if (isFilled) values[VALUE_KEYS[key] ?? key] = String(value);
     }
 
     return { kind: 'overlayConfig', overlays: { [scene]: { values, since } } };

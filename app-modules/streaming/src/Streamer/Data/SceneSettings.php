@@ -7,7 +7,7 @@ namespace He4rt\Streaming\Streamer\Data;
 interface SceneSettings
 {
     /**
-     * @return array<string, string|null>
+     * @return array<string, string|int|null>
      */
     public function toArray(): array;
 }

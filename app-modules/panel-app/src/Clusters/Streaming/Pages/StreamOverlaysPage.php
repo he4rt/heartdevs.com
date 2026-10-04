@@ -9,11 +9,16 @@ use Filament\Actions\Action;
 use Filament\Forms\Components\Radio;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
+use Filament\Forms\Components\ToggleButtons;
 use Filament\Notifications\Notification;
 use Filament\Pages\Page;
+use Filament\Schemas\Components\Grid;
 use Filament\Support\Icons\Heroicon;
 use He4rt\Identity\User\Models\User;
 use He4rt\PanelApp\Clusters\Streaming\StreamingCluster;
+use He4rt\Streaming\Enums\ChatAlignment;
+use He4rt\Streaming\Enums\ChatDirection;
+use He4rt\Streaming\Enums\ChatStyle;
 use He4rt\Streaming\Enums\OverlayScene;
 use He4rt\Streaming\Enums\StreamEventType;
 use He4rt\Streaming\Enums\VoiceLayout;
@@ -21,6 +26,7 @@ use He4rt\Streaming\Streamer\Actions\EnsureStreamer;
 use He4rt\Streaming\Streamer\Actions\RegenerateOverlayToken;
 use He4rt\Streaming\Streamer\Actions\UpdateStreamerSettings;
 use He4rt\Streaming\Streamer\Data\AlertSettings;
+use He4rt\Streaming\Streamer\Data\ChatSettings;
 use He4rt\Streaming\Streamer\Data\StartingSoonSettings;
 use He4rt\Streaming\Streamer\Data\VoiceSettings;
 use He4rt\Streaming\Streamer\Models\Streamer;
@@ -127,6 +133,77 @@ class StreamOverlaysPage extends Page
             });
     }
 
+    public function chatSettingsAction(): Action
+    {
+        $styleDescriptions = [];
+
+        foreach (ChatStyle::cases() as $style) {
+            $styleDescriptions[$style->value] = $style->getDescription();
+        }
+
+        return Action::make('chatSettings')
+            ->label('Configurar')
+            ->icon(Heroicon::OutlinedAdjustmentsHorizontal)
+            ->color('gray')
+            ->size('sm')
+            ->modalHeading(OverlayScene::Chat->getLabel())
+            ->modalDescription('A overlay aberta no OBS muda na hora.')
+            ->modalSubmitActionLabel('Salvar')
+            ->fillForm(fn (): array => $this->currentStreamer()->settings->chat->toArray())
+            ->schema([
+                Radio::make('style')
+                    ->label('Estilo')
+                    ->options($this->labelsOf(ChatStyle::cases()))
+                    ->descriptions($styleDescriptions)
+                    ->columns(2)
+                    ->required(),
+                Grid::make(3)->schema([
+                    TextInput::make('fade_after_seconds')
+                        ->label('Sumir após')
+                        ->helperText('0 = nunca some')
+                        ->integer()
+                        ->minValue(ChatSettings::NEVER_FADE)
+                        ->maxValue(ChatSettings::MAX_FADE_SECONDS)
+                        ->suffix('s')
+                        ->required(),
+                    TextInput::make('font_size')
+                        ->label('Fonte')
+                        ->integer()
+                        ->minValue(ChatSettings::MIN_FONT_SIZE)
+                        ->maxValue(ChatSettings::MAX_FONT_SIZE)
+                        ->suffix('px')
+                        ->required(),
+                    TextInput::make('width')
+                        ->label('Largura')
+                        ->integer()
+                        ->minValue(ChatSettings::MIN_WIDTH)
+                        ->maxValue(ChatSettings::MAX_WIDTH)
+                        ->suffix('px')
+                        ->required(),
+                ]),
+                ToggleButtons::make('direction')
+                    ->label('Direção')
+                    ->options($this->labelsOf(ChatDirection::cases()))
+                    ->inline()
+                    ->required(),
+                ToggleButtons::make('alignment')
+                    ->label('Alinhamento')
+                    ->options($this->labelsOf(ChatAlignment::cases()))
+                    ->inline()
+                    ->required(),
+            ])
+            ->action(function (array $data, UpdateStreamerSettings $updateSettings): void {
+                $streamer = $this->currentStreamer();
+
+                $updateSettings->handle($streamer, $streamer->settings->withScene(ChatSettings::fromArray($data)));
+
+                Notification::make()
+                    ->title('Chat atualizado')
+                    ->success()
+                    ->send();
+            });
+    }
+
     /**
      * @return Action[]
      */
@@ -187,10 +264,27 @@ class StreamOverlaysPage extends Page
                 'settingsAction' => match ($scene) {
                     OverlayScene::StartingSoon => 'startingSoonSettingsAction',
                     OverlayScene::Voice => 'voiceSettingsAction',
+                    OverlayScene::Chat => 'chatSettingsAction',
                     OverlayScene::Coworking => null,
                 },
+                'size' => $scene === OverlayScene::Chat ? 'qualquer tamanho' : '1920 × 1080',
             ], OverlayScene::cases()),
         ];
+    }
+
+    /**
+     * @param  list<ChatStyle|ChatDirection|ChatAlignment>  $cases
+     * @return array<string, string>
+     */
+    private function labelsOf(array $cases): array
+    {
+        $labels = [];
+
+        foreach ($cases as $case) {
+            $labels[$case->value] = $case->getLabel();
+        }
+
+        return $labels;
     }
 
     private function sceneUrl(OverlayScene $scene, string $token): string

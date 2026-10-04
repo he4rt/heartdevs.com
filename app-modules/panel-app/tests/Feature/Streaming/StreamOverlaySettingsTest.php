@@ -9,6 +9,7 @@ use He4rt\PanelApp\Clusters\Streaming\Pages\StreamOverlaysPage;
 use He4rt\Streaming\Broadcasting\AlertTriggered;
 use He4rt\Streaming\Broadcasting\OverlaySettingsUpdated;
 use He4rt\Streaming\DTOs\IncomingStreamEvent;
+use He4rt\Streaming\Enums\ChatStyle;
 use He4rt\Streaming\Enums\OverlayScene;
 use He4rt\Streaming\Enums\StreamEventType;
 use He4rt\Streaming\Enums\VoiceLayout;
@@ -63,6 +64,50 @@ test('a sala de voz troca de disposição', function (): void {
     Event::assertDispatched(fn (OverlaySettingsUpdated $broadcast): bool => $broadcast->scene === OverlayScene::Voice);
 });
 
+test('o chat salva estilo, tempo, tamanho, largura, direção e alinhamento e muda a overlay aberta', function (): void {
+    $chat = [
+        'style' => ChatStyle::Terminal->value,
+        'fade_after_seconds' => '15',
+        'font_size' => '28',
+        'width' => '560',
+        'direction' => 'newest_top',
+        'alignment' => 'right',
+    ];
+
+    livewire(StreamOverlaysPage::class)
+        ->callAction('chatSettings', data: $chat)
+        ->assertHasNoActionErrors()
+        ->assertNotified('Chat atualizado');
+
+    expect(Streamer::query()->whereKey($this->streamer->id)->sole()->settings->chat->style)->toBe(ChatStyle::Terminal);
+    Event::assertDispatched(fn (OverlaySettingsUpdated $broadcast): bool => $broadcast->broadcastWith() === [
+        'scene' => 'chat',
+        'settings' => ['style' => 'terminal', 'fade_after_seconds' => 15, 'font_size' => 28, 'width' => 560, 'direction' => 'newest_top', 'alignment' => 'right'],
+    ]);
+});
+
+test('o formulário do chat abre com o que está salvo', function (): void {
+    livewire(StreamOverlaysPage::class)
+        ->mountAction('chatSettings')
+        ->assertSchemaStateSet(['style' => 'lines', 'fade_after_seconds' => 0, 'font_size' => 24, 'width' => 480, 'direction' => 'newest_bottom', 'alignment' => 'left']);
+});
+
+test('uma fonte fora do limite não é salva', function (): void {
+    livewire(StreamOverlaysPage::class)
+        ->callAction('chatSettings', data: ['style' => 'lines', 'fade_after_seconds' => '0', 'font_size' => '200', 'width' => '480', 'direction' => 'newest_bottom', 'alignment' => 'left'])
+        ->assertHasActionErrors(['font_size']);
+
+    Event::assertNotDispatched(OverlaySettingsUpdated::class);
+});
+
+test('salvar o chat não muda a cena de abertura', function (): void {
+    livewire(StreamOverlaysPage::class)
+        ->callAction('startingSoonSettings', data: ['title' => 'Live de PHP', 'starts_at' => '19:05'])
+        ->callAction('chatSettings', data: ['style' => 'bubbles', 'fade_after_seconds' => '30', 'font_size' => '24', 'width' => '480', 'direction' => 'newest_bottom', 'alignment' => 'left']);
+
+    expect(Streamer::query()->whereKey($this->streamer->id)->sole()->settings->startingSoon->title)->toBe('Live de PHP');
+});
+
 test('com o alerta de follow desligado, o follow é gravado sem alerta', function (): void {
     $source = StreamerSource::factory()->create(['streamer_id' => $this->streamer->id]);
     $alerts = array_fill_keys(array_map(fn (StreamEventType $type): string => $type->value, StreamEventType::cases()), value: true);
@@ -89,5 +134,6 @@ test('cada cena com configuração tem o seu botão', function (): void {
     livewire(StreamOverlaysPage::class)
         ->assertActionVisible('startingSoonSettings')
         ->assertActionVisible('voiceSettings')
+        ->assertActionVisible('chatSettings')
         ->assertActionVisible('alertSettings');
 });

@@ -12,6 +12,7 @@ final readonly class StreamerSettings
         public CoworkingSettings $coworking = new CoworkingSettings,
         public StartingSoonSettings $startingSoon = new StartingSoonSettings,
         public VoiceSettings $voice = new VoiceSettings,
+        public ChatSettings $chat = new ChatSettings,
         public AlertSettings $alerts = new AlertSettings,
     ) {}
 
@@ -27,6 +28,7 @@ final readonly class StreamerSettings
             coworking: CoworkingSettings::fromArray(self::scenePayload($scenes, OverlayScene::Coworking)),
             startingSoon: StartingSoonSettings::fromArray(self::scenePayload($scenes, OverlayScene::StartingSoon)),
             voice: VoiceSettings::fromArray(self::scenePayload($scenes, OverlayScene::Voice)),
+            chat: ChatSettings::fromArray(self::scenePayload($scenes, OverlayScene::Chat)),
             alerts: AlertSettings::fromArray($alerts),
         );
     }
@@ -37,6 +39,7 @@ final readonly class StreamerSettings
             OverlayScene::Coworking => $this->coworking,
             OverlayScene::StartingSoon => $this->startingSoon,
             OverlayScene::Voice => $this->voice,
+            OverlayScene::Chat => $this->chat,
         };
     }
 
@@ -46,17 +49,18 @@ final readonly class StreamerSettings
             coworking: $settings instanceof CoworkingSettings ? $settings : $this->coworking,
             startingSoon: $settings instanceof StartingSoonSettings ? $settings : $this->startingSoon,
             voice: $settings instanceof VoiceSettings ? $settings : $this->voice,
+            chat: $settings instanceof ChatSettings ? $settings : $this->chat,
             alerts: $this->alerts,
         );
     }
 
     public function withAlerts(AlertSettings $alerts): self
     {
-        return new self($this->coworking, $this->startingSoon, $this->voice, $alerts);
+        return new self($this->coworking, $this->startingSoon, $this->voice, $this->chat, $alerts);
     }
 
     /**
-     * @return array{scenes: array<string, array<string, string|null>>, alerts: array<string, bool>}
+     * @return array{scenes: array<string, array<string, string|int|null>>, alerts: array<string, bool>}
      */
     public function toArray(): array
     {

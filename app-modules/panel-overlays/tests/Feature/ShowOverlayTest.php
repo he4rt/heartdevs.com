@@ -47,6 +47,7 @@ test('cada cena abre com o canal privado e as configurações do streamer', func
     'coworking' => [OverlayScene::Coworking, 'Overlays/Coworking'],
     'a live vai começar' => [OverlayScene::StartingSoon, 'Overlays/StartingSoon'],
     'sala de voz' => [OverlayScene::Voice, 'Overlays/Voice'],
+    'chat' => [OverlayScene::Chat, 'Overlays/Chat'],
 ]);
 
 test('a barra da overlay mostra o usuário do streamer, não o canal privado', function (): void {

@@ -43,6 +43,7 @@ class ShowOverlayController
             OverlayScene::Coworking => 'Overlays/Coworking',
             OverlayScene::StartingSoon => 'Overlays/StartingSoon',
             OverlayScene::Voice => 'Overlays/Voice',
+            OverlayScene::Chat => 'Overlays/Chat',
         };
     }
 }
