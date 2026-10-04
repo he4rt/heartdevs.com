@@ -874,6 +874,9 @@
 }
 .retro .pgrid > div {
     display: flex;
+    /* sem isso, um login longo sem quebra (@ramonsoarezcavalcante) define a
+       largura mínima do item e empurra o card para fora da coluna */
+    min-width: 0;
 }
 .retro .pgrid .card {
     padding: 16px 17px 17px;
@@ -1213,6 +1216,7 @@
     line-height: 1.12;
     color: var(--text);
     text-decoration: none;
+    overflow-wrap: anywhere;
 }
 .retro .name:hover {
     color: var(--brand-soft);
