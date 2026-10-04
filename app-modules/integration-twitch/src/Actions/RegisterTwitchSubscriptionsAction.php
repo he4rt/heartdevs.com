@@ -66,7 +66,7 @@ final readonly class RegisterTwitchSubscriptionsAction
                     continue;
                 }
 
-                TwitchSubscription::query()->updateOrCreate(
+                TwitchSubscription::query()->firstOrCreate(
                     ['subscription_id' => $data['id']],
                     [
                         'type' => $data['type'] ?? $type->value,

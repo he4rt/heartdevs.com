@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace He4rt\IntegrationTwitch\Actions;
 
+use He4rt\IntegrationTwitch\Enums\TwitchSubscriptionStatus;
 use He4rt\IntegrationTwitch\Models\TwitchSubscription;
 
 final readonly class SyncTwitchSubscriptionAction
@@ -11,7 +12,7 @@ final readonly class SyncTwitchSubscriptionAction
     /**
      * @param  array<string, mixed>  $subscription
      */
-    public function __invoke(array $subscription): TwitchSubscription
+    public function __invoke(array $subscription, ?TwitchSubscriptionStatus $status = null): TwitchSubscription
     {
         /** @var array<string, string> $condition */
         $condition = is_array($subscription['condition'] ?? null) ? $subscription['condition'] : [];
@@ -23,7 +24,7 @@ final readonly class SyncTwitchSubscriptionAction
             ['subscription_id' => $subscription['id']],
             [
                 'type' => $subscription['type'],
-                'status' => $subscription['status'],
+                'status' => $status ?? $subscription['status'],
                 'broadcaster_user_id' => $condition['broadcaster_user_id']
                     ?? $condition['to_broadcaster_user_id']
                     ?? '',

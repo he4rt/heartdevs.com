@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use He4rt\IntegrationTwitch\Actions\RegisterTwitchSubscriptionsAction;
 use He4rt\IntegrationTwitch\Enums\TwitchEventSubType;
+use He4rt\IntegrationTwitch\Enums\TwitchSubscriptionStatus;
 use He4rt\IntegrationTwitch\Models\TwitchSubscription;
 use He4rt\IntegrationTwitch\OAuth\TwitchAppTokenService;
 use He4rt\IntegrationTwitch\Transport\Requests\EventSub\CreateSubscription;
@@ -62,6 +63,38 @@ test('registra a subscription usando o broadcaster id informado, sem tocar em co
         'broadcaster_user_id' => '999888',
         'type' => 'stream.online',
     ]);
+});
+
+test('não rebaixa para pending uma subscription que a verificação já habilitou', function (): void {
+    TwitchSubscription::query()->create([
+        'subscription_id' => 'sub-abc',
+        'type' => 'stream.online',
+        'status' => TwitchSubscriptionStatus::Enabled,
+        'broadcaster_user_id' => '999888',
+        'condition' => ['broadcaster_user_id' => '999888'],
+        'transport' => 'webhook',
+        'callback_url' => 'https://example.com/api/webhooks/twitch/eventsub',
+        'cost' => 0,
+        'version' => '1',
+    ]);
+
+    bindMockedHelix(new MockClient([
+        CreateSubscription::class => MockResponse::make([
+            'data' => [[
+                'id' => 'sub-abc',
+                'type' => 'stream.online',
+                'status' => 'webhook_callback_verification_pending',
+                'condition' => ['broadcaster_user_id' => '999888'],
+                'transport' => ['method' => 'webhook', 'callback' => 'https://example.com/api/webhooks/twitch/eventsub'],
+                'cost' => 0,
+                'version' => '1',
+            ]],
+        ], 202),
+    ]));
+
+    resolve(RegisterTwitchSubscriptionsAction::class)('999888', [TwitchEventSubType::StreamOnline]);
+
+    expect(TwitchSubscription::query()->sole()->status)->toBe(TwitchSubscriptionStatus::Enabled);
 });
 
 test('classifica a recusa da Twitch como falha, sem gravar a subscription', function (int $status, string $reason): void {

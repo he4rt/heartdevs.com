@@ -39,6 +39,25 @@ function twitchWebhookPayload(string $eventType = 'stream.online', string $messa
 }
 
 /**
+ * @return array<string, mixed>
+ */
+function twitchVerificationPayload(): array
+{
+    return [
+        'challenge' => 'test-challenge-string',
+        'subscription' => [
+            'id' => 'sub-pending',
+            'type' => 'stream.online',
+            'version' => '1',
+            'status' => 'webhook_callback_verification_pending',
+            'cost' => 0,
+            'condition' => ['broadcaster_user_id' => '12345'],
+            'transport' => ['method' => 'webhook', 'callback' => 'https://example.com/api/webhooks/twitch/eventsub'],
+        ],
+    ];
+}
+
+/**
  * @return array<string, array<string, mixed>>
  */
 function twitchRevocationPayload(string $status = 'authorization_revoked'): array
@@ -120,10 +139,36 @@ test('rejects request with expired timestamp', function (): void {
 });
 
 test('returns challenge for webhook verification', function (): void {
-    $payload = ['challenge' => 'test-challenge-string', 'subscription' => ['type' => 'stream.online']];
-
-    postTwitchWebhook($payload, 'webhook_callback_verification')->assertOk()
+    postTwitchWebhook(twitchVerificationPayload(), 'webhook_callback_verification')->assertOk()
         ->assertSee('test-challenge-string');
+});
+
+test('verification enables the pending local subscription', function (): void {
+    TwitchSubscription::query()->create([
+        'subscription_id' => 'sub-pending',
+        'type' => 'stream.online',
+        'status' => TwitchSubscriptionStatus::VerificationPending,
+        'broadcaster_user_id' => '12345',
+        'condition' => ['broadcaster_user_id' => '12345'],
+        'transport' => 'webhook',
+        'callback_url' => 'https://example.com/api/webhooks/twitch/eventsub',
+        'cost' => 0,
+        'version' => '1',
+    ]);
+
+    postTwitchWebhook(twitchVerificationPayload(), 'webhook_callback_verification')->assertOk();
+
+    expect(TwitchSubscription::query()->sole()->status)->toBe(TwitchSubscriptionStatus::Enabled);
+});
+
+test('verification mirrors a subscription created outside the panel', function (): void {
+    postTwitchWebhook(twitchVerificationPayload(), 'webhook_callback_verification')->assertOk();
+
+    $subscription = TwitchSubscription::query()->sole();
+
+    expect($subscription->subscription_id)->toBe('sub-pending')
+        ->and($subscription->status)->toBe(TwitchSubscriptionStatus::Enabled)
+        ->and($subscription->broadcaster_user_id)->toBe('12345');
 });
 
 test('stores notification event in twitch_event_logs', function (): void {
