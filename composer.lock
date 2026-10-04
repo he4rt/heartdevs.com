@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "9e41cc016c6e4dc692738cab1a0badf5",
+    "content-hash": "85fa3f08e7b6b719d40f6466ff4e631e",
     "packages": [
         {
             "name": "anourvalar/eloquent-serialize",
@@ -3992,6 +3992,47 @@
             }
         },
         {
+            "name": "he4rt/panel-overlays",
+            "version": "1.0.0",
+            "dist": {
+                "type": "path",
+                "url": "app-modules/panel-overlays",
+                "reference": "43e166db164e970d94f6963fd0fa778028478a34"
+            },
+            "require": {
+                "illuminate/support": "^13.0",
+                "inertiajs/inertia-laravel": "^3.5",
+                "php": "^8.4"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "He4rt\\PanelOverlays\\PanelOverlaysServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "He4rt\\PanelOverlays\\": "src/",
+                    "He4rt\\PanelOverlays\\Database\\Factories\\": "database/factories/",
+                    "He4rt\\PanelOverlays\\Database\\Seeders\\": "database/seeders/"
+                }
+            },
+            "autoload-dev": {
+                "psr-4": {
+                    "He4rt\\PanelOverlays\\Tests\\": "tests/"
+                }
+            },
+            "license": [
+                "proprietary"
+            ],
+            "transport-options": {
+                "symlink": true,
+                "relative": true
+            }
+        },
+        {
             "name": "he4rt/portal",
             "version": "1.0",
             "dist": {
@@ -4103,6 +4144,78 @@
                 "symlink": true,
                 "relative": true
             }
+        },
+        {
+            "name": "inertiajs/inertia-laravel",
+            "version": "v3.5.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/inertiajs/inertia-laravel.git",
+                "reference": "35a27ea62b8a53ec40269c4c675db5d9d0e02426"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/inertiajs/inertia-laravel/zipball/35a27ea62b8a53ec40269c4c675db5d9d0e02426",
+                "reference": "35a27ea62b8a53ec40269c4c675db5d9d0e02426",
+                "shasum": ""
+            },
+            "require": {
+                "ext-json": "*",
+                "laravel/framework": "^11.35|^12.0|^13.0",
+                "php": "^8.2.0",
+                "symfony/console": "^7.0|^8.0"
+            },
+            "conflict": {
+                "laravel/boost": "<2.5.0"
+            },
+            "require-dev": {
+                "guzzlehttp/guzzle": "^7.15.2|^8.0",
+                "larastan/larastan": "^3.0",
+                "laravel/pint": "^1.16",
+                "mockery/mockery": "^1.3.3",
+                "orchestra/testbench": "^9.2|^10.0|^11.0",
+                "phpunit/phpunit": "^11.5|^12.0"
+            },
+            "suggest": {
+                "ext-pcntl": "Recommended when running the Inertia SSR server via the `inertia:start-ssr` artisan command."
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "Inertia\\ServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "files": [
+                    "./helpers.php"
+                ],
+                "psr-4": {
+                    "Inertia\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Jonathan Reinink",
+                    "email": "jonathan@reinink.ca",
+                    "homepage": "https://reinink.ca"
+                }
+            ],
+            "description": "The Laravel adapter for Inertia.js.",
+            "keywords": [
+                "inertia",
+                "laravel"
+            ],
+            "support": {
+                "issues": "https://github.com/inertiajs/inertia-laravel/issues",
+                "source": "https://github.com/inertiajs/inertia-laravel/tree/v3.5.1"
+            },
+            "time": "2026-10-01T10:38:10+00:00"
         },
         {
             "name": "internachi/modular",

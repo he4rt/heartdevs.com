@@ -55,6 +55,7 @@ Every issue must be tagged with the module(s) it affects. Labels follow the patt
 | `mod:moderation`         | `moderation`             | Moderation pipeline      |
 | `mod:panel-admin`        | `panel-admin`            | Admin Filament panel     |
 | `mod:panel-app`          | `panel-app`              | User Filament panel      |
+| `mod:panel-overlays`     | `panel-overlays`         | OBS overlays (Inertia)   |
 | `mod:portal`             | `portal`                 | Public portal / homepage |
 | `mod:profile`            | `profile`                | User profiles            |
 | `mod:docs`               | `docs`                   | Knowledge base docs      |
