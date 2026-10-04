@@ -25,7 +25,7 @@ final readonly class TwitchBotTokenService
         return self::configured('user_id');
     }
 
-    public function isConfigured(): bool
+    public static function isConfigured(): bool
     {
         return self::userId() !== null && self::configured('refresh_token') !== null;
     }

@@ -2259,9 +2259,9 @@ Feature: Overlay em tempo real
 
 ## Fase 6 — Minha Live com dados reais
 
-- [ ] 6.1 Painel com números e atividade reais
-- [ ] 6.2 Overlays: token real e configurações das cenas
-- [ ] 6.3 Modal de conexão e fontes
+- [x] 6.1 Painel com números e atividade reais
+- [x] 6.2 Overlays: token real e configurações das cenas
+- [x] 6.3 Modal de conexão e fontes
 
 ### 6.1 Painel com números e atividade reais
 
@@ -2301,6 +2301,11 @@ lê `StreamingPreviewData::stats()` e `recentActivity()` e mostra o aviso de pr�
 - **Subs:** contagem de `sub` mais a soma de `gift_sub.total`.
 - **Bits:** soma de `cheer.bits`, com `SUM((details->>'bits')::int)`.
 - **Raids:** contagem de `raid`.
+
+Na implementação, `StreamerStats` fica em `StreamEvent/Queries/` e faz uma consulta só, com
+`FILTER` do Postgres. Ele devolve os totais por tipo (`follow`, `sub`, `cheer`, `raid`), e a página
+formata os números com ponto de milhar. O resumo de cada evento (meses do sub, total do gift, bits
+e viewers) é montado na página, porque é texto de tela.
 
 **Comportamento esperado.**
 
@@ -2356,6 +2361,11 @@ $this->overlayToken = Str::lower(Str::random(32));
 // Depois
 $this->overlayToken = $this->regenerateOverlayToken->handle($this->streamer);
 ```
+
+Na implementação, o `UpdateStreamerSettings` emite o `OverlaySettingsUpdated` só para as cenas
+que mudaram. Os toggles de alerta não emitem nada, porque o backend já filtra o alerta antes do
+broadcast. A cena de coworking não tem configuração, então só "A live vai começar" e "Sala de voz"
+ganham o botão "Configurar". Os toggles de alerta ficam numa action "Alertas" no cabeçalho.
 
 **Comportamento esperado.**
 
@@ -2440,6 +2450,14 @@ return Action::make('connectTwitch')
     ])
     ->action(fn (array $data) => $this->redirect($this->twitchAuthorizationUrl($this->featuresFrom($data))))
 ```
+
+Na implementação, só o "Conectar Twitch" abre o modal. O "Reautorizar" continua um link direto,
+com as features do leitor que a fonte já tem, porque a escolha do leitor fica na lista de fontes.
+Trocar o leitor grava a escolha antes de ir para a Twitch. Assim, na volta, o
+`ExternalIdentityConnected` dispara a sincronização e as inscrições de chat são criadas. O aviso
+"Faltam permissões" compara os escopos concedidos com os do leitor escolhido.
+`TwitchBotTokenService::isConfigured()` passou a ser estático, para a página não resolver o
+connector da Twitch só para montar as opções.
 
 **Comportamento esperado.**
 

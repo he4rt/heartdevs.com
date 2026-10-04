@@ -1,6 +1,4 @@
 <x-filament-panels::page>
-    @include('panel-app::pages.streaming.partials.preview-notice')
-
     @php
         $connection = $this->twitchConnection;
         $missingScopes = $this->missingTwitchScopes;
@@ -65,6 +63,34 @@
         @endif
     </x-filament::section>
 
+    @if ($this->sources->isNotEmpty())
+        <x-filament::section heading="Fontes" description="Canais que mandam alertas e chat para as suas overlays.">
+            <ul class="divide-y divide-gray-950/5 dark:divide-white/10">
+                @foreach ($this->sources as $source)
+                    <li wire:key="source-{{ $source->id }}" class="flex flex-wrap items-center gap-3 py-3">
+                        <x-filament::icon :icon="$source->identity->provider->getIcon()" class="size-5 shrink-0 text-gray-400" />
+                        <div class="min-w-0 flex-1">
+                            <p class="truncate text-sm font-medium text-gray-950 dark:text-white">
+                                {{ '@' . ($source->identity->metadata['username'] ?? $source->identity->external_account_id) }}
+                            </p>
+                            <p class="text-xs text-gray-500 dark:text-gray-400">
+                                {{ $source->chat_reader?->getLabel() ?? 'Sem chat na overlay' }}
+                            </p>
+                        </div>
+                        <x-filament::badge :color="$source->enabled ? 'success' : 'gray'">
+                            {{ $source->enabled ? 'Ligada' : 'Desligada' }}
+                        </x-filament::badge>
+                        @if ($source->identity->provider === \He4rt\Identity\ExternalIdentity\Enums\IdentityProvider::Twitch)
+                            {{ ($this->chatReaderAction)(['source' => $source->id]) }}
+                        @endif
+
+                        {{ ($this->toggleSourceAction)(['source' => $source->id]) }}
+                    </li>
+                @endforeach
+            </ul>
+        </x-filament::section>
+    @endif
+
     <div class="grid grid-cols-2 gap-4 lg:grid-cols-4">
         @foreach ($stats as $stat)
             <div
@@ -104,9 +130,15 @@
 
         <div class="lg:col-span-2">
             <x-filament::section heading="Atividade recente">
+                @if ($recentActivity === [])
+                    <p class="py-6 text-center text-sm text-gray-500 dark:text-gray-400">
+                        Nenhum evento ainda. Follows, subs, bits e raids do seu canal aparecem aqui.
+                    </p>
+                @endif
+
                 <ul class="divide-y divide-gray-950/5 dark:divide-white/10">
                     @foreach ($recentActivity as $event)
-                        <li wire:key="activity-{{ $loop->index }}" class="flex items-center gap-3 py-3">
+                        <li wire:key="activity-{{ $event['id'] }}" class="flex items-center gap-3 py-3">
                             <span
                                 class="flex size-9 shrink-0 items-center justify-center rounded-lg text-lg"
                                 style="box-shadow: inset 0 0 0 2px {{ $event['type']->getAccent() }}"
@@ -116,7 +148,7 @@
                             </span>
                             <div class="min-w-0 flex-1">
                                 <p class="truncate text-sm font-medium text-gray-950 dark:text-white">
-                                    {{ '@' . $event['username'] }}
+                                    {{ filled($event['username']) ? '@' . $event['username'] : 'Anônimo' }}
                                 </p>
                                 <p class="text-xs text-gray-500 dark:text-gray-400">
                                     {{ $event['type']->getLabel() }}@if (filled($event['detail'])) · {{ $event['detail'] }}@endif

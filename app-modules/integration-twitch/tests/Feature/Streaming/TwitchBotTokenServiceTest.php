@@ -52,7 +52,7 @@ test('o refresh token novo da Twitch vale para o próximo refresh', function ():
 test('a conta bot sem configuração avisa que não está pronta', function (): void {
     config()->set('services.twitch.bot.user_id');
 
-    expect(botTokenService(new MockClient)->isConfigured())->toBeFalse()
+    expect(TwitchBotTokenService::isConfigured())->toBeFalse()
         ->and(TwitchBotTokenService::userId())->toBeNull();
 });
 

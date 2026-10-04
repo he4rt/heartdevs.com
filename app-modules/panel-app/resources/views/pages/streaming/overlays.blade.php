@@ -1,6 +1,4 @@
 <x-filament-panels::page>
-    @include('panel-app::pages.streaming.partials.preview-notice')
-
     <x-filament::section heading="Como usar no OBS" icon="heroicon-o-information-circle" collapsible>
         <ol class="list-decimal space-y-1 ps-5 text-sm text-gray-600 dark:text-gray-300">
             <li>No OBS, adicione uma fonte do tipo <strong>Navegador</strong>.</li>
@@ -29,13 +27,19 @@
                 </div>
 
                 <div class="space-y-3 p-4">
-                    <div>
-                        <h3 class="text-sm font-semibold text-gray-950 dark:text-white">
-                            {{ $item['scene']->getLabel() }}
-                        </h3>
-                        <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
-                            {{ $item['scene']->getDescription() }}
-                        </p>
+                    <div class="flex items-start gap-3">
+                        <div class="min-w-0 flex-1">
+                            <h3 class="text-sm font-semibold text-gray-950 dark:text-white">
+                                {{ $item['scene']->getLabel() }}
+                            </h3>
+                            <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
+                                {{ $item['scene']->getDescription() }}
+                            </p>
+                        </div>
+
+                        @if ($item['settingsAction'])
+                            {{ $this->{$item['settingsAction']} }}
+                        @endif
                     </div>
 
                     <div

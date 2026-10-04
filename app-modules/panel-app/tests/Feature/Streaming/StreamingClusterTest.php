@@ -10,11 +10,11 @@ use He4rt\Identity\User\Models\User;
 use He4rt\PanelApp\Clusters\Streaming\Pages\StreamDashboardPage;
 use He4rt\PanelApp\Clusters\Streaming\Pages\StreamOverlaysPage;
 use He4rt\PanelApp\Clusters\Streaming\StreamingCluster;
-use He4rt\PanelApp\Clusters\Streaming\StreamingPreviewData;
 use He4rt\Streaming\Broadcasting\AlertTriggered;
 use He4rt\Streaming\Enums\OverlayScene;
 use He4rt\Streaming\Enums\StreamerStatus;
 use He4rt\Streaming\Enums\StreamEventType;
+use He4rt\Streaming\Streamer\Actions\EnsureStreamer;
 use He4rt\Streaming\Streamer\Models\Streamer;
 use Illuminate\Support\Facades\Event;
 use Livewire\Features\SupportLockedProperties\CannotUpdateLockedPropertyException;
@@ -94,7 +94,7 @@ test('o painel pede reautorização quando faltam escopos', function (): void {
     livewire(StreamDashboardPage::class)
         ->assertSee('Faltam permissões')
         ->assertActionVisible('reauthorizeTwitch')
-        ->assertActionHasUrl('reauthorizeTwitch', route('oauth.redirect', ['panel' => 'app', 'provider' => 'twitch']))
+        ->assertActionHasUrl('reauthorizeTwitch', route('oauth.redirect', ['panel' => 'app', 'provider' => 'twitch', 'features' => ['alerts']]))
         ->assertActionVisible('disconnectTwitch');
 });
 
@@ -105,7 +105,6 @@ test('o painel convida a conectar a Twitch quando não há conexão', function (
         ->assertSee('Conecte sua Twitch')
         ->assertDontSee('Pronto para alertas')
         ->assertActionVisible('connectTwitch')
-        ->assertActionHasUrl('connectTwitch', route('oauth.redirect', ['panel' => 'app', 'provider' => 'twitch']))
         ->assertActionHidden('disconnectTwitch');
 });
 
@@ -206,7 +205,7 @@ test('o super-admin sem a role de streamer também ganha um streamer', function 
 
 test('as overlays mostram um link por cena com o token do streamer', function (): void {
     $streamer = User::factory()->streamer()->create();
-    $token = StreamingPreviewData::overlayToken($streamer);
+    $token = resolve(EnsureStreamer::class)->handle($streamer)->overlay_token;
 
     $this->actingAs($streamer);
 
@@ -221,7 +220,7 @@ test('as overlays mostram um link por cena com o token do streamer', function ()
 
 test('gerar novos links troca o token das overlays', function (): void {
     $streamer = User::factory()->streamer()->create();
-    $oldToken = StreamingPreviewData::overlayToken($streamer);
+    $oldToken = resolve(EnsureStreamer::class)->handle($streamer)->overlay_token;
 
     $this->actingAs($streamer);
 
@@ -231,7 +230,18 @@ test('gerar novos links troca o token das overlays', function (): void {
 
     expect($component->get('overlayToken'))
         ->not->toBe($oldToken)
-        ->toHaveLength(32);
+        ->toHaveLength(32)
+        ->toBe(Streamer::query()->whereBelongsTo($streamer)->sole()->overlay_token);
+
+    $this->get(sprintf('/overlay/%s/coworking', $oldToken))->assertNotFound();
+});
+
+test('abrir as overlays duas vezes mantém os mesmos links', function (): void {
+    $this->actingAs(User::factory()->streamer()->create());
+
+    $firstToken = livewire(StreamOverlaysPage::class)->get('overlayToken');
+
+    expect(livewire(StreamOverlaysPage::class)->get('overlayToken'))->toBe($firstToken);
 });
 
 test('o token das overlays não pode ser trocado pelo navegador', function (): void {

@@ -10,6 +10,7 @@ use He4rt\Streaming\Database\Factories\StreamerFactory;
 use He4rt\Streaming\Enums\StreamerStatus;
 use He4rt\Streaming\Streamer\Casts\AsStreamerSettings;
 use He4rt\Streaming\Streamer\Data\StreamerSettings;
+use He4rt\Streaming\StreamEvent\Models\StreamEvent;
 use Illuminate\Database\Eloquent\Attributes\Table;
 use Illuminate\Database\Eloquent\Attributes\UseFactory;
 use Illuminate\Database\Eloquent\Collection;
@@ -32,6 +33,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property CarbonInterface|null $deleted_at
  * @property-read User $user
  * @property-read Collection<int, StreamerSource> $sources
+ * @property-read Collection<int, StreamEvent> $events
  */
 #[Table(name: 'streamers')]
 #[UseFactory(factoryClass: StreamerFactory::class)]
@@ -57,6 +59,12 @@ final class Streamer extends Model
     public function sources(): HasMany
     {
         return $this->hasMany(StreamerSource::class);
+    }
+
+    /** @return HasMany<StreamEvent, $this> */
+    public function events(): HasMany
+    {
+        return $this->hasMany(StreamEvent::class);
     }
 
     public function isActive(): bool
