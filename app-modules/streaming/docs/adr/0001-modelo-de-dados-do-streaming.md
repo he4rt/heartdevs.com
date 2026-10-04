@@ -47,6 +47,12 @@ O que já existe e foi verificado no código:
 | O Reverb não está instalado (`BROADCAST_CONNECTION=null`, sem `config/reverb.php`, sem Echo)                                                                | `composer.json`, `package.json`                                       |
 | A sincronização de inscrições EventSub não pagina                                                                                                           | `integration-twitch`                                                  |
 
+> **Depois da implementação.** A tabela acima descreve o código no dia da decisão. Desde então: o
+> `TwitchEventSubType` ganhou `channel.chat.message_delete`, o login OAuth adota a identidade solta
+> e há índice único parcial em `(provider, external_account_id)`, `messages` ganhou a coluna
+> `platform`, o `events_enabled` do spatie está `true`, o Reverb está instalado e a sincronização
+> de inscrições pagina. O [plano](../plans/2026-10-04-backend-do-streaming.md) registra cada passo.
+
 ## Decisão
 
 ### Visão geral

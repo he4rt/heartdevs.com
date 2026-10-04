@@ -14,8 +14,9 @@ no futuro, YouTube ao mesmo tempo, como o StreamElements.
 
 Esses três dependem deste módulo, e este módulo não depende de nenhum deles.
 
-> **Status:** design aceito, implementação pendente. Veja
-> [ADR-0001](docs/adr/0001-modelo-de-dados-do-streaming.md).
+> **Status:** implementado. O [README](README.md) mostra como rodar a overlay localmente. As
+> decisões estão na [ADR-0001](docs/adr/0001-modelo-de-dados-do-streaming.md), e a ordem da
+> implementação no [plano](docs/plans/2026-10-04-backend-do-streaming.md).
 
 ```text
  ┌──────────────────────┐  DTOs normalizados   ┌────────────────────────────┐
@@ -92,35 +93,43 @@ As alternativas descartadas estão na ADR-0001.
   identidade solta e XP 0.
 - **Teste não suja dado.** O alerta de teste só existe no broadcast.
 
-## Estrutura prevista
+## Estrutura
 
 ```text
 src/
 ├── StreamingServiceProvider.php
-├── Enums/               ← StreamerStatus · StreamEventType · OverlayScene · ChatReader · SubTier
+├── Enums/               ← StreamerStatus · StreamEventType · OverlayScene · ChatReader · SubTier ·
+│                          VoiceLayout · ChatFragmentKind
 ├── Streamer/
 │   ├── Models/          ← Streamer · StreamerSource
 │   ├── Data/ · Casts/   ← StreamerSettings (+ um VO por cena, AlertSettings) · AsStreamerSettings
+│   ├── Support/         ← OverlayToken (gera e faz o hash do token)
 │   ├── Actions/         ← EnsureStreamer · ActivateStreamer · DisableStreamer ·
-│   │                      RegenerateOverlayToken · ResolveOverlayToken ·
-│   │                      UpdateStreamerSettings · UpdateStreamerSource
-│   ├── Events/          ← StreamerActivated · StreamerDisabled · StreamerSourceUpdated
-│   └── Listeners/       ← SyncStreamerWithRole · RegisterStreamerSource
+│   │                      RegenerateOverlayToken · ResolveOverlayToken · ResolveActiveSource ·
+│   │                      RegisterStreamerSource · UpdateStreamerSource · UpdateStreamerSettings
+│   ├── Events/          ← StreamerActivated · StreamerDisabled · StreamerSourceRegistered ·
+│   │                      StreamerSourceUpdated
+│   └── Listeners/       ← SyncStreamerWithRole · RegisterSourceOnIdentityConnected
 ├── Session/
 │   ├── Models/          ← StreamSession
-│   └── Actions/         ← StartStreamSession · EndStreamSession · UpdateStreamSession
+│   └── Actions/         ← StartStreamSession · UpdateStreamSession · EndStreamSession
 ├── StreamEvent/
 │   ├── Models/          ← StreamEvent
-│   ├── Data/ · Casts/   ← SubDetails · GiftSubDetails · CheerDetails · RaidDetails · AsStreamEventDetails
-│   └── Actions/         ← RecordStreamEvent
+│   ├── Data/ · Casts/   ← SubDetails · GiftSubDetails · CheerDetails · RaidDetails · StreamActor ·
+│   │                      AsStreamEventDetails
+│   ├── Actions/         ← RecordStreamEvent · TriggerTestAlert
+│   └── Queries/         ← StreamerStats (números do Painel)
 ├── Chat/
-│   ├── Data/            ← ChatMessageMetadata
+│   ├── Data/            ← ChatMessageMetadata · ChatBadge · ChatFragment
 │   └── Actions/         ← RecordChatMessage · DeleteChatMessage
+├── Overlay/             ← OverlayInitialState (chat recente e live aberta para as props)
 ├── DTOs/                ← IncomingStreamEvent · IncomingChatMessage · IncomingSessionChange
-└── Broadcasting/        ← OverlayChannel · AlertTriggered · ChatMessageReceived ·
-                           ChatMessageDeleted · OverlaySettingsUpdated ·
-                           StreamSessionStarted · StreamSessionEnded
+└── Broadcasting/        ← AlertTriggered · ChatMessageReceived · ChatMessageDeleted ·
+                           OverlaySettingsUpdated · StreamSessionStarted · StreamSessionEnded
 ```
+
+O nome do canal privado sai de `Streamer::overlayChannel()`:
+`overlay.{streamer_id}.{12 primeiros caracteres do hash do token}`.
 
 ## Adicionar uma plataforma
 
@@ -142,8 +151,8 @@ só, o DTO está errado. Corrija o DTO.
   fontes e os eventos de role do spatie para ativar e desativar o streamer. Nunca o contrário.
 - **Activity**: grava as mensagens de chat em `messages`. O `activity` não importa o `streaming`.
 - **`integration-*`**: dependem deste módulo. Chamam as Actions de ingestão e ouvem
-  `StreamerActivated`, `StreamerDisabled` e `StreamerSourceUpdated` para criar e remover
-  inscrições. O `streaming` nunca importa um `integration-*`.
+  `StreamerActivated`, `StreamerDisabled`, `StreamerSourceRegistered` e `StreamerSourceUpdated`
+  para criar e remover inscrições. O `streaming` nunca importa um `integration-*`.
 - **Apresentação** (`panel-app`, `panel-overlays`): leem deste módulo, nunca o contrário.
 - **`live`** (`feature/live-mvp`): é outro domínio, o da transmissão hospedada pela He4rt. Os
   dois não compartilham tabela nem vocabulário.

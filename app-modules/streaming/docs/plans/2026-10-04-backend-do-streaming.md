@@ -2495,7 +2495,7 @@ Feature: Conectar a Twitch com escolha
 
 ## Fase 7 — Documentação
 
-- [ ] 7.1 Atualizar os documentos dos módulos tocados
+- [x] 7.1 Atualizar os documentos dos módulos tocados
 
 ### 7.1 Atualizar os documentos dos módulos tocados
 
