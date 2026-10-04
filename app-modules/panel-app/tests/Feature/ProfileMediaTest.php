@@ -260,3 +260,14 @@ test('without an upload, the profile shows the linked github avatar but no remov
         ->assertSee('https://avatars.githubusercontent.com/u/583231?v=4', escape: false)
         ->assertDontSeeHtml('wire:click="removeAvatar"');
 });
+
+test('changing the avatar refreshes the user menu avatar', function (): void {
+    $avatar = ProfileImage::Avatar;
+
+    livewire(ProfilePage::class)
+        ->callAction('editAvatar', [
+            $avatar->value => UploadedFile::fake()->image('avatar.jpg', $avatar->width(), $avatar->height()),
+        ])
+        ->assertDispatched('refresh-sidebar')
+        ->assertDispatched('refresh-topbar');
+});

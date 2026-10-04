@@ -819,6 +819,9 @@ class ProfilePage extends Page
             $this->avatarFocalY,
             $this->coverFocalY,
         );
+
+        $this->dispatch('refresh-sidebar');
+        $this->dispatch('refresh-topbar');
     }
 
     /**
