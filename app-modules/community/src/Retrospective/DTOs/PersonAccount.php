@@ -12,6 +12,8 @@ namespace He4rt\Community\Retrospective\DTOs;
  * `accountId` (o mesmo número que `github_contributions.actor_id`), e `username`
  * é o que se mostra a um humano. Nenhuma fonte precisa saber por qual chave a
  * irmã casa.
+ *
+ * `avatar` já é a URL pronta da plataforma, resolvida pelo `IdentityProvider`.
  */
 final readonly class PersonAccount
 {

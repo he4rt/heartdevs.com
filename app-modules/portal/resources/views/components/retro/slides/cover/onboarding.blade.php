@@ -38,14 +38,7 @@
                 <div class="cover-host-list">
                     @foreach ($hosts as $host)
                         <div class="cover-host">
-                            <img
-                                class="mini"
-                                src="{{ $host->avatar }}"
-                                onerror="this.onerror=null;this.src='https://github.com/{{ $host->username }}.png'"
-                                width="52"
-                                height="52"
-                                alt="{{ $host->username }}"
-                            />
+                            <x-portal::retro.avatar class="mini" :src="$host->avatar" :name="$host->name" :size="52" />
                             <div class="cover-host-text">
                                 <span class="cover-host-name">{{ $host->name }}</span>
                                 <span class="cover-host-handle">{{ '@' . $host->username }}</span>
