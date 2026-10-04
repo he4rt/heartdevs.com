@@ -277,13 +277,20 @@ enum IdentityProvider: string implements HasColor, HasDescription, HasIcon, HasL
     }
 
     /**
+     * GitHub OAuth stores the id-based avatar URL, which survives a username rename.
+     *
      * @param  array<string, mixed>  $metadata
      */
     private function githubAvatarUrl(array $metadata): ?string
     {
+        $avatar = data_get($metadata, 'avatar');
         $username = data_get($metadata, 'username');
 
-        return filled($username) ? sprintf('https://github.com/%s.png', $username) : null;
+        return match (true) {
+            filled($avatar) => $avatar,
+            filled($username) => sprintf('https://github.com/%s.png', $username),
+            default => null,
+        };
     }
 
     /**

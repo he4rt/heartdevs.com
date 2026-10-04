@@ -37,6 +37,16 @@ test('linked github account wins over discord', function (): void {
     expect($user->getFilamentAvatarUrl())->toBe('https://github.com/octocat.png');
 });
 
+test('github avatar stored by oauth wins over the username url', function (): void {
+    $user = User::factory()->create();
+    linkAvatarIdentity($user, IdentityProvider::GitHub, ['metadata' => [
+        'username' => 'octocat',
+        'avatar' => 'https://avatars.githubusercontent.com/u/583231?v=4',
+    ]]);
+
+    expect($user->getFilamentAvatarUrl())->toBe('https://avatars.githubusercontent.com/u/583231?v=4');
+});
+
 test('discord avatar url is used as stored', function (): void {
     $user = User::factory()->create();
     linkAvatarIdentity($user, IdentityProvider::Discord, ['metadata' => ['avatar' => 'https://cdn.discordapp.com/avatars/1/a.png']]);
