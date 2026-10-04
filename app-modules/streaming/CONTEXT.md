@@ -112,13 +112,15 @@ src/
 │   └── Listeners/       ← SyncStreamerWithRole · RegisterSourceOnIdentityConnected
 ├── Session/
 │   ├── Models/          ← StreamSession
-│   └── Actions/         ← StartStreamSession · UpdateStreamSession · EndStreamSession
+│   ├── Actions/         ← StartStreamSession · UpdateStreamSession · EndStreamSession
+│   ├── Data/            ← SessionTotals
+│   └── Queries/         ← StreamSessionTotals · StreamSessionHistory · StreamSessionChat
+│                          (números das lives no Painel)
 ├── StreamEvent/
 │   ├── Models/          ← StreamEvent
 │   ├── Data/ · Casts/   ← SubDetails · GiftSubDetails · CheerDetails · RaidDetails · StreamActor ·
 │   │                      AsStreamEventDetails
-│   ├── Actions/         ← RecordStreamEvent · TriggerTestAlert
-│   └── Queries/         ← StreamerStats (números do Painel)
+│   └── Actions/         ← RecordStreamEvent · TriggerTestAlert · ReplayStreamEventAlert
 ├── Chat/
 │   ├── Data/            ← ChatMessageMetadata · ChatBadge · ChatFragment
 │   └── Actions/         ← RecordChatMessage · DeleteChatMessage

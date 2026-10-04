@@ -48,39 +48,7 @@
                 entregado os eventos. Confira a saúde da integração no Painel.
             </p>
         @else
-            <dl class="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-5">
-                @foreach ($comparison as $item)
-                    <div class="rounded-lg bg-gray-50 px-3 py-2 dark:bg-white/5">
-                        <dt class="text-xs text-gray-500 dark:text-gray-400">
-                            <span aria-hidden="true">{{ $item['emoji'] }}</span>
-                            {{ $item['label'] }}
-                        </dt>
-                        <dd class="flex items-baseline gap-2">
-                            <span class="text-xl font-semibold text-gray-950 tabular-nums dark:text-white">
-                                {{ number_format($item['value'], thousands_separator: '.') }}
-                            </span>
-                            @if ($item['delta'] !== null)
-                                <span
-                                    @class([
-                                        'text-xs font-medium tabular-nums',
-                                        'text-success-600 dark:text-success-400' => $item['delta'] > 0,
-                                        'text-danger-600 dark:text-danger-400' => $item['delta'] < 0,
-                                        'text-gray-400' => $item['delta'] === 0,
-                                    ])
-                                >
-                                    @if ($item['delta'] > 0)
-                                        ▲{{ number_format($item['delta'], thousands_separator: '.') }}
-                                    @elseif ($item['delta'] < 0)
-                                        ▼{{ number_format(abs($item['delta']), thousands_separator: '.') }}
-                                    @else
-                                        =
-                                    @endif
-                                </span>
-                            @endif
-                        </dd>
-                    </div>
-                @endforeach
-            </dl>
+            <x-panel-app::streaming.session-totals :rows="$comparison" class="mt-4" />
 
             @if ($baseline)
                 <p class="mt-3 text-xs text-gray-500 dark:text-gray-400">

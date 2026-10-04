@@ -10,6 +10,7 @@ use He4rt\Identity\ExternalIdentity\Enums\IdentityProvider;
 use He4rt\Identity\ExternalIdentity\Models\ExternalIdentity;
 use He4rt\Identity\User\Models\User;
 use He4rt\PanelApp\Clusters\Streaming\Pages\StreamDashboardPage;
+use He4rt\PanelApp\Clusters\Streaming\Pages\StreamOverlaysPage;
 use He4rt\PanelApp\Clusters\Streaming\Pages\StreamSessionPage;
 use He4rt\PanelApp\Clusters\Streaming\Pages\StreamSessionsPage;
 use He4rt\Streaming\Broadcasting\AlertTriggered;
@@ -31,7 +32,16 @@ beforeEach(function (): void {
     $this->user = User::factory()->streamer()->create();
     $this->actingAs($this->user);
 
-    $this->source = StreamerSource::factory()->create(['streamer_id' => resolve(EnsureStreamer::class)->handle($this->user)->id]);
+    $identity = ExternalIdentity::factory()->create([
+        'model_id' => $this->user->getKey(),
+        'provider' => IdentityProvider::Twitch,
+        'connected_at' => now(),
+        'disconnected_at' => null,
+        'metadata' => ['username' => 'canal_do_streamer'],
+    ]);
+    $streamer = resolve(EnsureStreamer::class)->handle($this->user);
+
+    $this->source = StreamerSource::query()->whereBelongsTo($streamer)->where('external_identity_id', $identity->getKey())->sole();
 });
 
 function liveOf(StreamerSource $source, string $title, DateTimeInterface $startedAt, ?DateTimeInterface $endedAt = null): StreamSession
@@ -71,7 +81,7 @@ function chatterSays(StreamerSource $source, ExternalIdentity $chatter, DateTime
     ]);
 }
 
-describe('Painel ao vivo', function (): void {
+describe('Painel', function (): void {
     test('mostra o card ao vivo com as somas da sessão aberta', function (): void {
         $live = liveOf($this->source, 'Refatorando o módulo de lives', now()->subMinutes(95));
         eventsIn($live, $this->source, [StreamEventType::Follow, StreamEventType::Follow, StreamEventType::Raid]);
@@ -88,10 +98,49 @@ describe('Painel ao vivo', function (): void {
             ->toContain('2 chatters');
     });
 
-    test('sem live aberta, o card ao vivo não aparece', function (): void {
-        liveOf($this->source, 'Live de ontem', now()->subDay(), now()->subDay()->addHours(2));
+    test('offline, mostra a última live comparada com a anterior com dados', function (): void {
+        $older = liveOf($this->source, 'Live antiga', now()->subDays(4), now()->subDays(4)->addHours(2));
+        liveOf($this->source, 'Live que caiu', now()->subDays(3), now()->subDays(3)->addMinutes(20));
+        $last = liveOf($this->source, 'Live de ontem', now()->subDays(2)->subHours(2), now()->subDays(2));
+        eventsIn($older, $this->source, [StreamEventType::Follow]);
+        eventsIn($last, $this->source, [StreamEventType::Follow, StreamEventType::Follow, StreamEventType::Follow]);
 
-        livewire(StreamDashboardPage::class)->assertViewHas('live');
+        $page = livewire(StreamDashboardPage::class)
+            ->assertViewHas('live', fn (?array $live): bool => $live === null)
+            ->assertViewHas('lastLive', fn (?array $lastLive): bool => $lastLive !== null
+                && $lastLive['session']->is($last)
+                && $lastLive['baseline']->is($older)
+                && $lastLive['rows'][0]['value'] === 3
+                && $lastLive['rows'][0]['delta'] === 2);
+
+        expect($page->html())
+            ->toContain('Offline')
+            ->toContain('última live há 2 dias')
+            ->toContain('Live de ontem')
+            ->toContain('▲2')
+            ->toContain(StreamSessionPage::getUrl(['session' => $last->id]));
+    });
+
+    test('ao vivo, o card da live aberta substitui a última live', function (): void {
+        liveOf($this->source, 'Live de ontem', now()->subDay(), now()->subDay()->addHours(2));
+        $live = liveOf($this->source, 'Ao vivo agora', now()->subMinutes(10));
+
+        livewire(StreamDashboardPage::class)
+            ->assertViewHas('live', fn (?array $summary): bool => $summary !== null && $summary['session']->is($live))
+            ->assertViewHas('lastLive', fn (?array $lastLive): bool => $lastLive === null);
+    });
+
+    test('a última live sem dados avisa para conferir a integração', function (): void {
+        liveOf($this->source, 'Live que caiu', now()->subDay(), now()->subDay()->addMinutes(20));
+
+        expect(livewire(StreamDashboardPage::class)->html())
+            ->toContain('Nenhum evento e nenhuma mensagem chegaram nessa live');
+    });
+
+    test('sem nenhuma live, diz que os números aparecem na primeira', function (): void {
+        $page = livewire(StreamDashboardPage::class)->assertViewHas('lastLive', fn (?array $lastLive): bool => $lastLive === null);
+
+        expect($page->html())->toContain('Nenhuma live ainda');
     });
 
     test('o alerta de teste pede confirmação só durante a live', function (bool $isLive): void {
@@ -99,7 +148,7 @@ describe('Painel ao vivo', function (): void {
             liveOf($this->source, 'Ao vivo agora', now()->subMinutes(10));
         }
 
-        livewire(StreamDashboardPage::class)->assertActionExists(
+        livewire(StreamOverlaysPage::class)->assertActionExists(
             TestAction::make('testAlert')->arguments(['type' => 'follow']),
             fn (Action $action): bool => $action->isConfirmationRequired() === $isLive,
         );
@@ -209,7 +258,7 @@ describe('Detalhe da live', function (): void {
         eventsIn($first, $this->source, [StreamEventType::Follow]);
 
         $page = livewire(StreamSessionPage::class, ['session' => $first->id])
-            ->assertViewHas('previous')
+            ->assertViewHas('previous', fn (?StreamSession $session): bool => !$session instanceof StreamSession)
             ->assertViewHas('comparison', fn (array $comparison): bool => $comparison[0]['delta'] === null);
 
         expect($page->html())->not->toContain('▲')->not->toContain('▼');

@@ -12,7 +12,7 @@ use Illuminate\Database\Eloquent\Builder;
 
 /**
  * Adds the totals of each session as subselects, read back with SessionTotals::of().
- * The sub total includes gifted subs, like StreamerStats.
+ * The sub total includes the gifted subs.
  */
 final class StreamSessionTotals
 {

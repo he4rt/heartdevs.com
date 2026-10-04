@@ -7,14 +7,14 @@ namespace He4rt\PanelApp\Clusters\Streaming\Pages;
 use Filament\Pages\Page;
 use Filament\Panel;
 use He4rt\Identity\User\Models\User;
+use He4rt\PanelApp\Clusters\Streaming\SessionComparison;
 use He4rt\PanelApp\Clusters\Streaming\StreamDuration;
 use He4rt\PanelApp\Clusters\Streaming\StreamEventSummary;
 use He4rt\PanelApp\Clusters\Streaming\StreamingCluster;
-use He4rt\Streaming\Enums\StreamEventType;
 use He4rt\Streaming\Session\Data\SessionTotals;
 use He4rt\Streaming\Session\Models\StreamSession;
 use He4rt\Streaming\Session\Queries\StreamSessionChat;
-use He4rt\Streaming\Session\Queries\StreamSessionTotals;
+use He4rt\Streaming\Session\Queries\StreamSessionHistory;
 use He4rt\Streaming\Streamer\Actions\EnsureStreamer;
 use He4rt\Streaming\Streamer\Models\Streamer;
 use Illuminate\Database\Eloquent\Builder;
@@ -77,45 +77,21 @@ class StreamSessionPage extends Page
     protected function getViewData(): array
     {
         $session = $this->session();
-        $earlierSessions = $this->sessions()->where('started_at', '<', $session->started_at)->latest('started_at');
-        $previous = (clone $earlierSessions)->first();
-        $next = $this->sessions()->where('started_at', '>', $session->started_at)->oldest('started_at')->first();
-        $baseline = $earlierSessions->cursor()->first(fn (StreamSession $earlier): bool => !SessionTotals::of($earlier)->hasNoData());
+        $history = resolve(StreamSessionHistory::class);
+        $baseline = $history->baselineFor($session);
         $totals = SessionTotals::of($session);
-        $previousTotals = $baseline instanceof StreamSession ? SessionTotals::of($baseline) : null;
 
         return [
             'session' => $session,
             'duration' => StreamDuration::between($session->started_at, $session->ended_at ?? now()),
             'hasNoData' => $totals->hasNoData(),
-            'comparison' => [
-                $this->compare(StreamEventType::Follow->getEmoji(), 'Follows', $totals->follows, $previousTotals?->follows),
-                $this->compare(StreamEventType::Sub->getEmoji(), 'Subs', $totals->subs, $previousTotals?->subs),
-                $this->compare(StreamEventType::Cheer->getEmoji(), 'Bits', $totals->bits, $previousTotals?->bits),
-                $this->compare(StreamEventType::Raid->getEmoji(), 'Raids', $totals->raids, $previousTotals?->raids),
-                $this->compare('💬', 'Mensagens', $totals->messages, $previousTotals?->messages),
-            ],
+            'comparison' => SessionComparison::rows($totals, $baseline instanceof StreamSession ? SessionTotals::of($baseline) : null),
             'baseline' => $baseline,
-            'previous' => $previous,
-            'next' => $next,
+            'previous' => $history->previous($session),
+            'next' => $history->next($session),
             'timeline' => $session->events()->oldest('occurred_at')->get()->map(StreamEventSummary::of(...))->all(),
             'topChatters' => resolve(StreamSessionChat::class)->topChatters($session, self::TOP_CHATTERS),
             'chatters' => $totals->chatters,
-        ];
-    }
-
-    /**
-     * The baseline skips sessions without data, so a live that lost its events does not inflate the deltas.
-     *
-     * @return array{emoji: string, label: string, value: int, delta: int|null}
-     */
-    private function compare(string $emoji, string $label, int $value, ?int $previousValue): array
-    {
-        return [
-            'emoji' => $emoji,
-            'label' => $label,
-            'value' => $value,
-            'delta' => $previousValue === null ? null : $value - $previousValue,
         ];
     }
 
@@ -129,7 +105,7 @@ class StreamSessionPage extends Page
      */
     private function sessions(): Builder
     {
-        return resolve(StreamSessionTotals::class)->apply(StreamSession::query()->whereBelongsTo($this->currentStreamer()));
+        return resolve(StreamSessionHistory::class)->of($this->currentStreamer());
     }
 
     private function currentUser(): User

@@ -94,12 +94,13 @@ payload.
 
 1. Dê a role `streamer` ao seu usuário pelo painel admin.
 2. Abra **Minha Live › Painel**. O primeiro acesso cria o streamer.
-3. Conecte a Twitch pelo botão **Conectar Twitch**. A conexão vira uma fonte na lista de fontes.
+3. Conecte a Twitch pelo botão **Conectar Twitch**. A conexão vira a fonte principal, no card da
+   conta à direita do Painel.
 4. Em **Minha Live › Overlays**, copie o link de uma cena e abra no navegador ou no OBS
    (fonte do tipo Navegador, 1920 × 1080).
 
-O botão de cada tipo em **Testar alertas** manda um alerta de exemplo para a overlay, sem passar
-pela Twitch e sem gravar nada.
+O menu **Testar alerta**, no topo de **Minha Live › Overlays**, manda um alerta de exemplo para a
+overlay, sem passar pela Twitch e sem gravar nada. Durante a live, ele pede confirmação.
 
 ### 3. Eventos com o twitch-cli
 
@@ -153,9 +154,10 @@ bits, raids, mensagens e chatters. As somas saem de subselects em `StreamSession
 | Follows, subs, bits… | `stream_events` com o `stream_session_id` da sessão                     |
 | Mensagens, chatters  | `activity.messages` do canal da sessão, entre `started_at` e `ended_at` |
 
-O Painel mostra o card "Ao vivo" quando há uma sessão aberta. Em "Minha Live › Lives" fica o
-histórico, e cada linha abre o detalhe com a linha do tempo, quem mais falou e a comparação com a
-última live com dados.
+O Painel mostra o card "Ao vivo" quando há uma sessão aberta. Fora da live, o mesmo lugar mostra a
+última live encerrada, com a comparação. Em "Minha Live › Lives" fica o histórico, e cada linha abre
+o detalhe com a linha do tempo, quem mais falou e a comparação com a última live com dados.
+`StreamSessionHistory` acha a live aberta, a última encerrada, as vizinhas e a base da comparação.
 
 ## Limites conhecidos
 

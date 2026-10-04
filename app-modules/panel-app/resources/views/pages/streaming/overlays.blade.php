@@ -15,7 +15,7 @@
                 return this.count === 1 ? '1 overlay aberta agora' : `${this.count} overlays abertas agora`
             },
         }"
-        class="-mt-2 flex items-center justify-end gap-2 text-sm text-gray-600 dark:text-gray-300"
+        class="-mt-2 flex flex-wrap items-center justify-end gap-x-2 gap-y-3 text-sm text-gray-600 dark:text-gray-300"
     >
         <span
             x-bind:class="count === null ? 'bg-danger-500' : count > 0 ? 'bg-success-500' : 'bg-gray-400'"
@@ -35,6 +35,17 @@
                 {{ $openOverlays === 1 ? '1 overlay aberta agora' : $openOverlays . ' overlays abertas agora' }}
             @endif
         </span>
+
+        <x-filament-actions::group
+            :actions="array_map(fn ($alertType) => ($this->testAlertAction)(['type' => $alertType->value]), $alertTypes)"
+            :button="true"
+            label="Testar alerta"
+            icon="heroicon-m-bolt"
+            color="gray"
+            size="sm"
+            dropdown-placement="bottom-end"
+            class="ms-2"
+        />
     </div>
 
     <x-filament::section heading="Como usar no OBS" icon="heroicon-o-information-circle" collapsible>

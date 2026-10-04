@@ -24,26 +24,24 @@ use He4rt\IntegrationTwitch\OAuth\TwitchBotTokenService;
 use He4rt\IntegrationTwitch\OAuth\TwitchScopes;
 use He4rt\IntegrationTwitch\OAuth\TwitchStreamerFeature;
 use He4rt\IntegrationTwitch\OAuth\TwitchUserAuthorization;
+use He4rt\PanelApp\Clusters\Streaming\SessionComparison;
 use He4rt\PanelApp\Clusters\Streaming\StreamDuration;
 use He4rt\PanelApp\Clusters\Streaming\StreamEventSummary;
 use He4rt\PanelApp\Clusters\Streaming\StreamingCluster;
 use He4rt\PanelApp\Clusters\Streaming\StreamingHealthBadge;
 use He4rt\Streaming\Enums\ChatReader;
-use He4rt\Streaming\Enums\StreamEventType;
 use He4rt\Streaming\Health\Checks\CheckOverlayConnections;
 use He4rt\Streaming\Health\Contracts\OverlayConnections;
 use He4rt\Streaming\Health\HealthCheck;
 use He4rt\Streaming\Session\Data\SessionTotals;
 use He4rt\Streaming\Session\Models\StreamSession;
 use He4rt\Streaming\Session\Queries\StreamSessionChat;
-use He4rt\Streaming\Session\Queries\StreamSessionTotals;
+use He4rt\Streaming\Session\Queries\StreamSessionHistory;
 use He4rt\Streaming\Streamer\Actions\EnsureStreamer;
 use He4rt\Streaming\Streamer\Actions\UpdateStreamerSource;
 use He4rt\Streaming\Streamer\Models\Streamer;
 use He4rt\Streaming\Streamer\Models\StreamerSource;
 use He4rt\Streaming\StreamEvent\Actions\ReplayStreamEventAlert;
-use He4rt\Streaming\StreamEvent\Actions\TriggerTestAlert;
-use He4rt\Streaming\StreamEvent\Queries\StreamerStats;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Livewire\Attributes\Computed;
@@ -58,8 +56,6 @@ use Livewire\Attributes\Computed;
  */
 class StreamDashboardPage extends Page
 {
-    private const int STATS_WINDOW_DAYS = 30;
-
     private const int RECENT_ACTIVITY_LIMIT = 10;
 
     private const string WITHOUT_CHAT = 'none';
@@ -161,9 +157,7 @@ class StreamDashboardPage extends Page
     #[Computed]
     public function liveSession(): ?StreamSession
     {
-        $openSessions = StreamSession::query()->open()->whereBelongsTo($this->currentStreamer())->with('identity');
-
-        return resolve(StreamSessionTotals::class)->apply($openSessions)->latest('started_at')->first();
+        return resolve(StreamSessionHistory::class)->live($this->currentStreamer());
     }
 
     /**
@@ -294,8 +288,9 @@ class StreamDashboardPage extends Page
     public function disconnectTwitchAction(): Action
     {
         return Action::make('disconnectTwitch')
-            ->label('Desconectar')
-            ->color('gray')
+            ->label('Desconectar a Twitch')
+            ->icon(Heroicon::OutlinedLinkSlash)
+            ->color('danger')
             ->size('sm')
             ->requiresConfirmation()
             ->modalIcon(Heroicon::OutlinedLinkSlash)
@@ -320,7 +315,8 @@ class StreamDashboardPage extends Page
     public function toggleSourceAction(): Action
     {
         return Action::make('toggleSource')
-            ->label(fn (array $arguments): string => $this->ownedSource($arguments)?->enabled === true ? 'Desligar' : 'Ligar')
+            ->label(fn (array $arguments): string => $this->ownedSource($arguments)?->enabled === true ? 'Desligar fonte' : 'Ligar fonte')
+            ->icon(fn (array $arguments): Heroicon => $this->ownedSource($arguments)?->enabled === true ? Heroicon::OutlinedPauseCircle : Heroicon::OutlinedPlayCircle)
             ->color('gray')
             ->size('sm')
             ->action(function (array $arguments, UpdateStreamerSource $updateSource): void {
@@ -389,38 +385,6 @@ class StreamDashboardPage extends Page
             });
     }
 
-    public function testAlertAction(): Action
-    {
-        return Action::make('testAlert')
-            ->label(function (array $arguments): string {
-                $alertType = $this->alertTypeOf($arguments);
-
-                return $alertType instanceof StreamEventType ? sprintf('%s %s', $alertType->getEmoji(), $alertType->getLabel()) : '';
-            })
-            ->color('gray')
-            ->extraAttributes(['class' => 'w-full'])
-            ->requiresConfirmation(fn (): bool => $this->liveSession instanceof StreamSession)
-            ->modalIcon(Heroicon::OutlinedSignal)
-            ->modalHeading('Você está ao vivo')
-            ->modalDescription('O alerta de teste vai aparecer na live para quem está assistindo.')
-            ->modalSubmitActionLabel('Mandar mesmo assim')
-            ->action(function (array $arguments, TriggerTestAlert $triggerTestAlert): void {
-                $alertType = $this->alertTypeOf($arguments);
-
-                if (!$alertType instanceof StreamEventType) {
-                    return;
-                }
-
-                $triggerTestAlert->handle($this->currentStreamer(), $alertType);
-
-                Notification::make()
-                    ->title(sprintf('Alerta de %s enviado', $alertType->getLabel()))
-                    ->body('Confira na sua overlay.')
-                    ->success()
-                    ->send();
-            });
-    }
-
     public function replayAlertAction(): Action
     {
         return Action::make('replayAlert')
@@ -453,16 +417,13 @@ class StreamDashboardPage extends Page
     protected function getViewData(): array
     {
         $streamer = $this->currentStreamer();
-        $totals = resolve(StreamerStats::class)->lastDays($streamer, self::STATS_WINDOW_DAYS);
-        $statTypes = [StreamEventType::Follow, StreamEventType::Sub, StreamEventType::Cheer, StreamEventType::Raid];
+        $live = $this->liveSummary($streamer);
+        $mainSource = $this->twitchSource;
 
         return [
-            'live' => $this->liveSummary($streamer),
-            'alertTypes' => StreamEventType::cases(),
-            'stats' => array_map(fn (StreamEventType $type): array => [
-                'type' => $type,
-                'value' => number_format($totals[$type->value], thousands_separator: '.'),
-            ], $statTypes),
+            'live' => $live,
+            'lastLive' => $live === null ? $this->lastLiveSummary($streamer) : null,
+            'otherSources' => $this->sources->reject(fn (StreamerSource $source): bool => $source->is($mainSource)),
             'recentActivity' => $streamer->events()
                 ->latest('occurred_at')
                 ->limit(self::RECENT_ACTIVITY_LIMIT)
@@ -488,13 +449,7 @@ class StreamDashboardPage extends Page
         return [
             'session' => $session,
             'duration' => StreamDuration::between($session->started_at, now()),
-            'totals' => [
-                ['emoji' => StreamEventType::Follow->getEmoji(), 'label' => 'Follows', 'value' => $totals->follows],
-                ['emoji' => StreamEventType::Sub->getEmoji(), 'label' => 'Subs', 'value' => $totals->subs],
-                ['emoji' => StreamEventType::Cheer->getEmoji(), 'label' => 'Bits', 'value' => $totals->bits],
-                ['emoji' => StreamEventType::Raid->getEmoji(), 'label' => 'Raids', 'value' => $totals->raids],
-                ['emoji' => '💬', 'label' => 'Mensagens', 'value' => $totals->messages],
-            ],
+            'rows' => SessionComparison::rows($totals),
             'messagesPerMinute' => resolve(StreamSessionChat::class)->messagesPerMinute($session, self::CHAT_PACE_MINUTES),
             'chatters' => $totals->chatters,
             'openOverlays' => resolve(OverlayConnections::class)->count($streamer),
@@ -502,13 +457,27 @@ class StreamDashboardPage extends Page
     }
 
     /**
-     * @param  array<array-key, mixed>  $arguments
+     * @return array<string, mixed>|null
      */
-    private function alertTypeOf(array $arguments): ?StreamEventType
+    private function lastLiveSummary(Streamer $streamer): ?array
     {
-        $type = $arguments['type'] ?? null;
+        $history = resolve(StreamSessionHistory::class);
+        $session = $history->lastEnded($streamer);
 
-        return is_string($type) ? StreamEventType::tryFrom($type) : null;
+        if (!$session instanceof StreamSession) {
+            return null;
+        }
+
+        $baseline = $history->baselineFor($session);
+        $totals = SessionTotals::of($session);
+
+        return [
+            'session' => $session,
+            'duration' => StreamDuration::between($session->started_at, $session->ended_at ?? now()),
+            'hasNoData' => $totals->hasNoData(),
+            'rows' => SessionComparison::rows($totals, $baseline instanceof StreamSession ? SessionTotals::of($baseline) : null),
+            'baseline' => $baseline,
+        ];
     }
 
     /**

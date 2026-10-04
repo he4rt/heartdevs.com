@@ -244,7 +244,7 @@ describe('Último evento', function (): void {
         $check = resolve(CheckLastTwitchEvent::class)->handle($this->source);
 
         expect($check->status)->toBe(HealthStatus::Warning)
-            ->and($check->detail)->toContain('mensagem do chat');
+            ->and($check->detail)->toStartWith('há 20 minutos · mensagem do chat');
     });
 
     test('ao vivo com evento recente está ok e diz o que chegou', function (): void {

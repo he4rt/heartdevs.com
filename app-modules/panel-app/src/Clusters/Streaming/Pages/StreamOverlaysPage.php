@@ -31,6 +31,7 @@ use He4rt\Streaming\Streamer\Data\ChatSettings;
 use He4rt\Streaming\Streamer\Data\StartingSoonSettings;
 use He4rt\Streaming\Streamer\Data\VoiceSettings;
 use He4rt\Streaming\Streamer\Models\Streamer;
+use He4rt\Streaming\StreamEvent\Actions\TriggerTestAlert;
 use Livewire\Attributes\Locked;
 use Livewire\Attributes\Renderless;
 
@@ -210,6 +211,36 @@ class StreamOverlaysPage extends Page
             });
     }
 
+    public function testAlertAction(): Action
+    {
+        return Action::make('testAlert')
+            ->label(function (array $arguments): string {
+                $alertType = $this->alertTypeOf($arguments);
+
+                return $alertType instanceof StreamEventType ? sprintf('%s %s', $alertType->getEmoji(), $alertType->getLabel()) : '';
+            })
+            ->requiresConfirmation(fn (): bool => $this->currentStreamer()->isLive())
+            ->modalIcon(Heroicon::OutlinedSignal)
+            ->modalHeading('Você está ao vivo')
+            ->modalDescription('O alerta de teste vai aparecer na live para quem está assistindo.')
+            ->modalSubmitActionLabel('Mandar mesmo assim')
+            ->action(function (array $arguments, TriggerTestAlert $triggerTestAlert): void {
+                $alertType = $this->alertTypeOf($arguments);
+
+                if (!$alertType instanceof StreamEventType) {
+                    return;
+                }
+
+                $triggerTestAlert->handle($this->currentStreamer(), $alertType);
+
+                Notification::make()
+                    ->title(sprintf('Alerta de %s enviado', $alertType->getLabel()))
+                    ->body('Confira na sua overlay.')
+                    ->success()
+                    ->send();
+            });
+    }
+
     #[Renderless]
     public function countOpenOverlays(OverlayConnections $connections): ?int
     {
@@ -273,6 +304,7 @@ class StreamOverlaysPage extends Page
 
         return [
             'openOverlays' => resolve(OverlayConnections::class)->count($streamer),
+            'alertTypes' => StreamEventType::cases(),
             'scenes' => array_map(fn (OverlayScene $scene): array => [
                 'scene' => $scene,
                 'url' => $this->sceneUrl($scene, $this->overlayToken),
@@ -304,6 +336,16 @@ class StreamOverlaysPage extends Page
         }
 
         return $labels;
+    }
+
+    /**
+     * @param  array<array-key, mixed>  $arguments
+     */
+    private function alertTypeOf(array $arguments): ?StreamEventType
+    {
+        $type = $arguments['type'] ?? null;
+
+        return is_string($type) ? StreamEventType::tryFrom($type) : null;
     }
 
     private function sceneUrl(OverlayScene $scene, string $token): string

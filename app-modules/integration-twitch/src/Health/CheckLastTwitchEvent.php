@@ -32,7 +32,7 @@ final class CheckLastTwitchEvent
                 : new HealthCheck(self::KEY, HealthStatus::Ok, self::TITLE, 'Nenhum evento recebido ainda.');
         }
 
-        $detail = sprintf('%s · %s', $receivedAt->created_at->diffForHumans(), $this->describe($receivedAt->event_type));
+        $detail = sprintf('%s · %s', $receivedAt->created_at->locale('pt_BR')->diffForHumans(), $this->describe($receivedAt->event_type));
         $isSilentDuringLive = $isLive && $receivedAt->created_at->lt(now()->subMinutes(self::SILENCE_MINUTES));
 
         return $isSilentDuringLive

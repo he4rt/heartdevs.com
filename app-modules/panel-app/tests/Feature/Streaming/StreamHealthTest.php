@@ -174,6 +174,6 @@ test('sem Twitch conectada a seção de saúde não aparece', function (): void 
     $this->source->identity->update(['disconnected_at' => now()]);
 
     livewire(StreamDashboardPage::class)
-        ->assertDontSee('Saúde da integração')
+        ->assertDontSee('Verificando a integração')
         ->assertSee('Conecte sua Twitch');
 });

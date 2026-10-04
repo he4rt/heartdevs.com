@@ -10,12 +10,9 @@ use He4rt\Identity\User\Models\User;
 use He4rt\PanelApp\Clusters\Streaming\Pages\StreamDashboardPage;
 use He4rt\Streaming\Enums\ChatReader;
 use He4rt\Streaming\Enums\StreamEventType;
-use He4rt\Streaming\Enums\SubTier;
 use He4rt\Streaming\Streamer\Actions\EnsureStreamer;
 use He4rt\Streaming\Streamer\Models\StreamerSource;
 use He4rt\Streaming\StreamEvent\Data\CheerDetails;
-use He4rt\Streaming\StreamEvent\Data\GiftSubDetails;
-use He4rt\Streaming\StreamEvent\Data\SubDetails;
 use He4rt\Streaming\StreamEvent\Models\StreamEvent;
 
 use function Pest\Livewire\livewire;
@@ -57,27 +54,6 @@ function enableBotAccount(): void
     config()->set('services.twitch.bot.refresh_token', 'refresh-token');
 }
 
-/**
- * @param  array<int, array{type: StreamEventType, value: string}>  $stats
- * @return array<string, string>
- */
-function statValues(array $stats): array
-{
-    return array_column(array_map(fn (array $stat): array => ['type' => $stat['type']->value, 'value' => $stat['value']], $stats), 'value', 'type');
-}
-
-test('o painel mostra os números dos últimos 30 dias', function (): void {
-    $source = dashboardTwitchSource($this->user);
-    StreamEvent::factory()->forSource($source)->count(3)->create(['occurred_at' => now()->subDays(2)]);
-    StreamEvent::factory()->forSource($source)->ofType(StreamEventType::Sub, new SubDetails(SubTier::Tier1))->count(2)->create();
-    StreamEvent::factory()->forSource($source)->ofType(StreamEventType::GiftSub, new GiftSubDetails(SubTier::Tier1, total: 5))->create();
-    StreamEvent::factory()->forSource($source)->ofType(StreamEventType::Cheer, new CheerDetails(bits: 250))->count(2)->create();
-    StreamEvent::factory()->forSource($source)->count(10)->create(['occurred_at' => now()->subDays(40)]);
-
-    livewire(StreamDashboardPage::class)
-        ->assertViewHas('stats', fn (array $stats): bool => statValues($stats) === ['follow' => '3', 'sub' => '7', 'cheer' => '500', 'raid' => '0']);
-});
-
 test('a atividade recente mostra os 10 eventos mais novos com o resumo', function (): void {
     $source = dashboardTwitchSource($this->user);
     StreamEvent::factory()->forSource($source)->count(11)->sequence(fn ($sequence): array => ['occurred_at' => now()->subHours($sequence->index + 2)])->create();
@@ -89,19 +65,17 @@ test('a atividade recente mostra os 10 eventos mais novos com o resumo', functio
         ->assertSee('1.500 bits');
 });
 
-test('o canal sem eventos mostra zeros e a atividade vazia', function (): void {
-    livewire(StreamDashboardPage::class)
-        ->assertViewHas('stats', fn (array $stats): bool => statValues($stats) === ['follow' => '0', 'sub' => '0', 'cheer' => '0', 'raid' => '0'])
-        ->assertSee('Nenhum evento ainda');
+test('o canal sem eventos mostra a atividade vazia', function (): void {
+    dashboardTwitchSource($this->user);
+
+    livewire(StreamDashboardPage::class)->assertSee('Nenhum evento ainda');
 });
 
 test('o painel não mostra os eventos de outro streamer', function (): void {
     $otherSource = dashboardTwitchSource(User::factory()->streamer()->create());
     StreamEvent::factory()->forSource($otherSource)->count(4)->create();
 
-    livewire(StreamDashboardPage::class)
-        ->assertViewHas('stats', fn (array $stats): bool => statValues($stats)['follow'] === '0')
-        ->assertViewHas('recentActivity', []);
+    livewire(StreamDashboardPage::class)->assertViewHas('recentActivity', []);
 });
 
 test('conectar a Twitch leva as features escolhidas', function (array $data, array $features): void {
@@ -192,4 +166,13 @@ test('faltam permissões quando o leitor escolhido não tem os escopos', functio
     livewire(StreamDashboardPage::class)
         ->assertSee('Faltam permissões')
         ->assertActionHasUrl('reauthorizeTwitch', route('oauth.redirect', ['panel' => 'app', 'provider' => 'twitch', 'features' => ['alerts', 'chat_own_account']]));
+});
+
+test('as outras fontes aparecem separadas da conta da Twitch', function (): void {
+    $mainSource = dashboardTwitchSource($this->user);
+    $otherSource = StreamerSource::factory()->create(['streamer_id' => $mainSource->streamer_id]);
+    $otherSource->identity->update(['connected_at' => now(), 'disconnected_at' => null]);
+
+    livewire(StreamDashboardPage::class)
+        ->assertViewHas('otherSources', fn ($sources): bool => $sources->count() === 1 && $sources->first()->is($otherSource));
 });

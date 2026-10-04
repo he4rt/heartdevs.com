@@ -74,6 +74,9 @@ Fase 5 ─ Overlays: prévia e conexões
        │
 Fase 6 ─ Lives
   6.1 ao vivo agora ─► 6.2 histórico ─► 6.3 detalhe da live
+       │
+Fase 7 ─ Painel reorganizado
+  7.1 live × configuração ─► 7.2 alerta de teste em Overlays
 ```
 
 ## Convenções de todos os passos
@@ -1301,6 +1304,91 @@ Feature: Detalhe da live
     Scenario: Live de outro streamer
         When o streamer abre o detalhe de uma sessão de outro streamer
         Then a resposta é 404
+```
+
+---
+
+## Fase 7 — Painel reorganizado
+
+- [x] 7.1 Live × configuração
+- [x] 7.2 Alerta de teste em Overlays
+
+Pedido depois da Fase 6, ao ver o Painel em uso real.
+
+### 7.1 Live × configuração
+
+**Contexto.** O Painel empilhava seis blocos de largura total, e todos tinham o mesmo peso: conta,
+saúde (cinco linhas verdes quando está tudo certo), fontes (a mesma conta de novo), quatro números
+de 30 dias (zerados fora da live), alertas de teste e atividade. Fora da live, nada dizia como foi a
+última. A tela nova separa o que acontece na live (coluna larga) da configuração (coluna estreita).
+
+```text
+  ┌─ Ao vivo / Última live ────────────────────────┐ ┌─ Conta ──────────────────┐
+  │ (•) Offline · última live há 2 dias  Detalhe → │ │ (foto) @danielhe4rt    ⋮ │
+  │ Laravel 13 na prática                          │ │ Twitch · chat lido…      │
+  │ ⭐ 5 ▲2  💜 6 ▲5  💎 500 ▲500  ⚡ 1 =  💬 120   │ │ ✓ Pronto para alertas    │
+  │ Setas em relação à live de 28/09.              │ ├─ Integração ─ Tudo certo ┤
+  └────────────────────────────────────────────────┘ │ ✓ Conta da Twitch        │
+  ┌─ Atividade recente ────────────────────────────┐ │ ✓ Endereço do webhook    │
+  │ ⭐ @Bia             Follow        há 3 dias  ↻ │ │ ⚠ Inscrições             │
+  │ 💜 @ana             Sub · Tier 1  há 3 dias  ↻ │ │   0 de 9 · [Reparar]     │
+  │ …                                              │ ├─ Outras fontes ──────────┤
+  └────────────────────────────────────────────────┘ │ (só fontes além da conta)│
+                                                     └──────────────────────────┘
+  Celular: live → conta e integração → atividade
+```
+
+- Item da integração ok: só o título, com o detalhe no tooltip. Item com problema: o detalhe e o
+  botão de reparo aparecem embaixo.
+- Ações da fonte principal (alterar chat, desligar, desconectar) ficam no menu ⋮ da conta.
+- Os números de 30 dias saem. O `StreamerStats` saiu junto, porque só o Painel o usava.
+- O tempo relativo sai em pt-BR (`há 3 dias`), como o resto da página.
+
+**Comportamento esperado.**
+
+```gherkin
+Feature: Painel da Minha Live
+    Para saber como está a live e se a integração funciona
+    Como streamer
+    Eu quero ver primeiro a live e só os problemas da configuração
+
+    Scenario: Offline com live anterior
+        Given a última live encerrada teve 3 follows
+        And a live anterior com dados teve 1 follow
+        When o streamer abre o Painel
+        Then o card mostra "Offline · última live há 2 dias"
+        And mostra 3 follows com "▲2"
+
+    Scenario: Última live sem dados
+        Given a última live encerrada não recebeu evento nem mensagem
+        Then o card avisa para conferir a integração ao lado
+
+    Scenario: Ao vivo
+        Given uma sessão aberta
+        Then o card "Ao vivo" substitui o da última live
+
+    Scenario: Integração com problema
+        Given as inscrições estão faltando
+        Then o item "Inscrições" mostra o detalhe e o botão "Reparar inscrições"
+        And os itens ok mostram só o título
+```
+
+### 7.2 Alerta de teste em Overlays
+
+**Contexto.** O teste confere a overlay, então ele fica na página das overlays: um menu "Testar
+alerta ▾" no topo, ao lado do contador de overlays abertas. A action continua uma só, com o
+argumento `type`, e pede confirmação só durante a live.
+
+```gherkin
+Feature: Testar alerta
+    Scenario: Fora da live
+        When o streamer escolhe "💎 Bits" no menu "Testar alerta"
+        Then o alerta de teste vai para a overlay sem confirmação
+
+    Scenario: Durante a live
+        Given uma sessão aberta
+        When o streamer escolhe um tipo no menu
+        Then o painel pede confirmação antes de mandar
 ```
 
 ---

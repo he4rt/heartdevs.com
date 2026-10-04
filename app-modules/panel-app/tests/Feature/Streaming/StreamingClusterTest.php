@@ -153,7 +153,7 @@ test('testar um alerta manda o alerta de teste para a overlay', function (): voi
     $user = User::factory()->streamer()->create();
     $this->actingAs($user);
 
-    livewire(StreamDashboardPage::class)
+    livewire(StreamOverlaysPage::class)
         ->callAction('testAlert', arguments: ['type' => 'cheer'])
         ->assertNotified('Alerta de Bits enviado');
 
@@ -165,7 +165,7 @@ test('testar um alerta manda o alerta de teste para a overlay', function (): voi
 test('o alerta de gift sub usa o valor do domínio', function (): void {
     $this->actingAs(User::factory()->streamer()->create());
 
-    livewire(StreamDashboardPage::class)
+    livewire(StreamOverlaysPage::class)
         ->callAction('testAlert', arguments: ['type' => 'gift_sub'])
         ->assertNotified('Alerta de Gift sub enviado');
 });
@@ -173,7 +173,7 @@ test('o alerta de gift sub usa o valor do domínio', function (): void {
 test('um tipo de alerta desconhecido não dispara nada', function (string $type): void {
     $this->actingAs(User::factory()->streamer()->create());
 
-    livewire(StreamDashboardPage::class)
+    livewire(StreamOverlaysPage::class)
         ->callAction('testAlert', arguments: ['type' => $type])
         ->assertNotNotified();
 })->with([
