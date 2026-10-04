@@ -7,6 +7,8 @@ use He4rt\IntegrationTwitch\Enums\TwitchEventSubType;
 use He4rt\IntegrationTwitch\Events\TwitchEventReceived;
 use He4rt\IntegrationTwitch\Models\TwitchEventLog;
 use He4rt\IntegrationTwitch\OAuth\TwitchAppTokenService;
+use He4rt\IntegrationTwitch\Transport\Requests\Chat\GetChannelChatBadges;
+use He4rt\IntegrationTwitch\Transport\Requests\Chat\GetGlobalChatBadges;
 use He4rt\IntegrationTwitch\Transport\Requests\Streams\GetStreams;
 use He4rt\IntegrationTwitch\Transport\TwitchHelixConnector;
 use He4rt\IntegrationTwitch\Transport\TwitchOAuthConnector;
@@ -56,6 +58,54 @@ function twitchCliLog(TwitchEventSubType $type, array $event, ?string $messageId
             'subscription' => ['type' => $type->value, 'version' => $type->getVersion()],
             'event' => $event,
         ],
+    ]);
+}
+
+const SUBSCRIBER_BADGE_URL = 'https://static-cdn.jtvnw.net/badges/v1/canal-subscriber-12/2';
+
+/**
+ * @param  list<array{string, string}>  $versions  pairs of version id and image URL
+ * @return array{data: list<array<string, mixed>>}
+ */
+function helixBadgeSet(string $setId, array $versions): array
+{
+    return ['data' => [[
+        'set_id' => $setId,
+        'versions' => array_map(fn (array $version): array => [
+            'id' => $version[0],
+            'image_url_1x' => $version[1].'-1x',
+            'image_url_2x' => $version[1],
+            'image_url_4x' => $version[1].'-4x',
+        ], $versions),
+    ]]];
+}
+
+function bindBadgesHelix(): MockClient
+{
+    $mock = new MockClient([
+        GetGlobalChatBadges::class => MockResponse::make(helixBadgeSet('subscriber', [['12', 'https://static-cdn.jtvnw.net/badges/v1/global-subscriber/2']])),
+        GetChannelChatBadges::class => MockResponse::make(helixBadgeSet('subscriber', [['12', SUBSCRIBER_BADGE_URL]])),
+    ]);
+
+    bindStreamsHelix($mock);
+
+    return $mock;
+}
+
+/**
+ * @param  list<array<string, string>>  $badges
+ */
+function twitchChatLog(string $broadcasterId, string $messageId, array $badges): TwitchEventLog
+{
+    return twitchCliLog(TwitchEventSubType::ChannelChatMessage, [
+        'broadcaster_user_id' => $broadcasterId,
+        'chatter_user_id' => '9911',
+        'chatter_user_login' => 'mariacoda',
+        'chatter_user_name' => 'MariaCoda',
+        'message_id' => $messageId,
+        'message' => ['text' => 'oi', 'fragments' => [['type' => 'text', 'text' => 'oi']]],
+        'badges' => $badges,
+        'message_type' => 'text',
     ]);
 }
 
@@ -211,6 +261,8 @@ test('o channel.update e o stream.offline mexem na sessão aberta', function ():
 });
 
 test('a mensagem do chat vai para a atividade com badges e emotes', function (): void {
+    bindBadgesHelix();
+
     event(new TwitchEventReceived(twitchCliLog(TwitchEventSubType::ChannelChatMessage, [
         'broadcaster_user_id' => $this->broadcasterId,
         'chatter_user_id' => '9911',
@@ -236,12 +288,46 @@ test('a mensagem do chat vai para a atividade com badges e emotes', function ():
         ->and(ChatMessageMetadata::fromArray($message->metadata ?? []))->toEqual(new ChatMessageMetadata(
             displayName: 'MariaCoda',
             color: '#00FF7F',
-            badges: [new ChatBadge('subscriber', '12')],
+            badges: [new ChatBadge('subscriber', '12', SUBSCRIBER_BADGE_URL)],
             fragments: [
                 ChatFragment::text('boa noite '),
                 ChatFragment::emote('Kappa', '25', 'https://static-cdn.jtvnw.net/emoticons/v2/25/default/dark/1.0'),
             ],
         ));
+});
+
+test('a imagem do badge sai do catálogo da Helix, que fica em cache', function (): void {
+    $mock = bindBadgesHelix();
+
+    event(new TwitchEventReceived(twitchChatLog($this->broadcasterId, 'msg-1', [['set_id' => 'subscriber', 'id' => '12', 'info' => '16']])));
+    event(new TwitchEventReceived(twitchChatLog($this->broadcasterId, 'msg-2', [['set_id' => 'subscriber', 'id' => '12', 'info' => '16']])));
+
+    $badgeUrls = Message::query()->get()->map(fn (Message $message): ?string => ChatMessageMetadata::fromArray($message->metadata ?? [])->badges[0]->url);
+
+    expect($badgeUrls->all())->toBe([SUBSCRIBER_BADGE_URL, SUBSCRIBER_BADGE_URL]);
+    $mock->assertSentCount(1, GetGlobalChatBadges::class);
+    $mock->assertSentCount(1, GetChannelChatBadges::class);
+});
+
+test('a mensagem sem badge não consulta a Helix', function (): void {
+    $mock = bindBadgesHelix();
+
+    event(new TwitchEventReceived(twitchChatLog($this->broadcasterId, 'msg-1', [])));
+
+    expect(Message::query()->count())->toBe(1);
+    $mock->assertNothingSent();
+});
+
+test('a mensagem entra com o badge sem imagem quando a Helix falha', function (): void {
+    bindStreamsHelix(new MockClient([
+        GetGlobalChatBadges::class => MockResponse::make(['message' => 'Service Unavailable'], 503),
+        GetChannelChatBadges::class => MockResponse::make(['message' => 'Service Unavailable'], 503),
+    ]));
+
+    event(new TwitchEventReceived(twitchChatLog($this->broadcasterId, 'msg-1', [['set_id' => 'vip', 'id' => '1', 'info' => '']])));
+
+    expect(ChatMessageMetadata::fromArray(Message::query()->sole()->metadata ?? [])->badges)
+        ->toEqual([new ChatBadge('vip', '1')]);
 });
 
 test('a mensagem apagada pela moderação é marcada', function (): void {

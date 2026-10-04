@@ -1,5 +1,5 @@
-import type { ChatMessageDto, OverlayConfigDto, StreamEventDto, SubTierDto } from '../feed';
-import type { ChatMessagePayload, SceneSettings } from '../types';
+import type { ChatBadgeDto, ChatMessageDto, OverlayConfigDto, StreamEventDto, SubTierDto } from '../feed';
+import type { ChatBadgePayload, ChatMessagePayload, SceneSettings } from '../types';
 
 type TwitchTier = '1000' | '2000' | '3000';
 
@@ -68,6 +68,10 @@ export function toStreamEvent(alert: AlertPayload): StreamEventDto {
     }
 }
 
+function hasImage(badge: ChatBadgePayload): badge is ChatBadgeDto {
+    return badge.url !== null;
+}
+
 export function toChatMessage(payload: ChatMessagePayload): ChatMessageDto {
     return {
         kind: 'chatMessage',
@@ -75,7 +79,7 @@ export function toChatMessage(payload: ChatMessagePayload): ChatMessageDto {
         username: payload.username,
         color: payload.color ?? '',
         channel: '',
-        badges: payload.badges,
+        badges: payload.badges.filter(hasImage),
         fragments: payload.fragments,
     };
 }

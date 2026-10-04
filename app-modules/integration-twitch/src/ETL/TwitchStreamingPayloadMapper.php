@@ -89,7 +89,10 @@ final readonly class TwitchStreamingPayloadMapper
         };
     }
 
-    public function chatMessage(TwitchEventLog $log): ?IncomingChatMessage
+    /**
+     * @param  array<string, string>  $badgeUrls  image URL keyed by "set_id/version", from TwitchChatBadgeCatalog
+     */
+    public function chatMessage(TwitchEventLog $log, array $badgeUrls = []): ?IncomingChatMessage
     {
         $event = $this->event($log);
         $messageId = $this->stringOf($event, 'message_id');
@@ -112,10 +115,15 @@ final readonly class TwitchStreamingPayloadMapper
             metadata: new ChatMessageMetadata(
                 displayName: $this->stringOf($event, 'chatter_user_name') ?? $chatterLogin,
                 color: $this->stringOf($event, 'color'),
-                badges: $this->badgesOf($event),
+                badges: $this->badgesOf($event, $badgeUrls),
                 fragments: $this->fragmentsOf($event),
             ),
         );
+    }
+
+    public function hasChatBadges(TwitchEventLog $log): bool
+    {
+        return $this->listOf($this->event($log), 'badges') !== [];
     }
 
     public function deletedMessageId(TwitchEventLog $log): ?string
@@ -194,9 +202,10 @@ final readonly class TwitchStreamingPayloadMapper
 
     /**
      * @param  array<array-key, mixed>  $event
+     * @param  array<string, string>  $badgeUrls
      * @return list<ChatBadge>
      */
-    private function badgesOf(array $event): array
+    private function badgesOf(array $event, array $badgeUrls): array
     {
         $badges = [];
 
@@ -205,7 +214,7 @@ final readonly class TwitchStreamingPayloadMapper
             $version = $this->stringOf($badge, 'id');
 
             if ($setId !== null && $version !== null) {
-                $badges[] = new ChatBadge($setId, $version);
+                $badges[] = new ChatBadge($setId, $version, $badgeUrls[$setId.'/'.$version] ?? null);
             }
         }
 

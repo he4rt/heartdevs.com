@@ -1,4 +1,4 @@
-import type { ChatBadgeDto, FragmentDto } from './feed';
+import type { FragmentDto } from './feed';
 
 export type OverlayScene = 'coworking' | 'starting' | 'voice';
 
@@ -13,11 +13,17 @@ export type VoiceSettings = {
 
 export type SceneSettings = Record<string, string | null>;
 
+export interface ChatBadgePayload {
+    setId: string;
+    version: string;
+    url: string | null;
+}
+
 export interface ChatMessagePayload {
     msgId: string;
     username: string;
     color: string | null;
-    badges: ChatBadgeDto[];
+    badges: ChatBadgePayload[];
     fragments: FragmentDto[];
 }
 

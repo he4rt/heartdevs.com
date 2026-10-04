@@ -6,6 +6,7 @@ namespace He4rt\IntegrationTwitch\ETL\Listeners;
 
 use He4rt\Identity\ExternalIdentity\Enums\IdentityProvider;
 use He4rt\IntegrationTwitch\Enums\TwitchEventSubType;
+use He4rt\IntegrationTwitch\ETL\TwitchChatBadgeCatalog;
 use He4rt\IntegrationTwitch\ETL\TwitchStreamingPayloadMapper;
 use He4rt\IntegrationTwitch\Events\TwitchEventReceived;
 use He4rt\IntegrationTwitch\Models\TwitchEventLog;
@@ -37,6 +38,7 @@ final readonly class ProjectTwitchEventToStreaming implements ShouldQueue
         private RecordStreamEvent $recordStreamEvent,
         private RecordChatMessage $recordChatMessage,
         private DeleteChatMessage $deleteChatMessage,
+        private TwitchChatBadgeCatalog $badgeCatalog,
     ) {}
 
     public function handle(TwitchEventReceived $received): void
@@ -101,11 +103,27 @@ final readonly class ProjectTwitchEventToStreaming implements ShouldQueue
 
     private function recordChatMessage(TwitchEventLog $log): void
     {
-        $incoming = $this->mapper->chatMessage($log);
+        $incoming = $this->mapper->chatMessage($log, $this->badgeUrlsFor($log));
 
         if ($incoming instanceof IncomingChatMessage) {
             $this->recordChatMessage->handle($incoming);
         }
+    }
+
+    /**
+     * @return array<string, string>
+     */
+    private function badgeUrlsFor(TwitchEventLog $log): array
+    {
+        $broadcasterId = $log->broadcaster_user_id;
+
+        if ($broadcasterId === null || !$this->mapper->hasChatBadges($log)) {
+            return [];
+        }
+
+        $hasActiveSource = $this->resolveActiveSource->handle(IdentityProvider::Twitch, $broadcasterId) instanceof StreamerSource;
+
+        return $hasActiveSource ? $this->badgeCatalog->forChannel($broadcasterId) : [];
     }
 
     private function deleteChatMessage(TwitchEventLog $log): void
