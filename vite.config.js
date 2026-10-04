@@ -1,4 +1,5 @@
 import tailwindcss from '@tailwindcss/vite';
+import react from '@vitejs/plugin-react';
 import laravel from 'laravel-vite-plugin';
 import { bunny, google, local } from 'laravel-vite-plugin/fonts';
 import { defineConfig } from 'vite';
@@ -14,6 +15,7 @@ export default defineConfig({
                 'app-modules/he4rt/resources/css/theme.css',
                 'app-modules/docs/resources/css/theme.css',
                 'app-modules/portal/resources/css/retrospective.css',
+                'app-modules/panel-overlays/resources/js/app.tsx',
             ],
             refresh: true,
             fonts: [
@@ -46,6 +48,7 @@ export default defineConfig({
                 }),
             ],
         }),
+        react(),
         tailwindcss(),
     ],
     server: {
