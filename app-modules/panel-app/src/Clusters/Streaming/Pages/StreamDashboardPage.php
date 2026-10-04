@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace He4rt\PanelApp\Clusters\Streaming\Pages;
 
+use App\Enums\FilamentPanel;
 use BackedEnum;
+use Filament\Actions\Action;
 use Filament\Notifications\Notification;
 use Filament\Pages\Page;
 use Filament\Support\Icons\Heroicon;
@@ -15,7 +17,6 @@ use He4rt\IntegrationTwitch\OAuth\TwitchScopes;
 use He4rt\PanelApp\Clusters\Streaming\Enums\StreamAlertType;
 use He4rt\PanelApp\Clusters\Streaming\StreamingCluster;
 use He4rt\PanelApp\Clusters\Streaming\StreamingPreviewData;
-use He4rt\PanelApp\Pages\ProfilePage;
 use Livewire\Attributes\Computed;
 
 /**
@@ -60,7 +61,51 @@ class StreamDashboardPage extends Page
     #[Computed]
     public function missingTwitchScopes(): array
     {
-        return $this->twitchConnection?->missingScopes(TwitchScopes::requestedFor('app', $this->streamer())) ?? [];
+        return $this->twitchConnection?->missingScopes(TwitchScopes::requestedFor(FilamentPanel::App->value, $this->streamer())) ?? [];
+    }
+
+    public function connectTwitchAction(): Action
+    {
+        return Action::make('connectTwitch')
+            ->label('Conectar Twitch')
+            ->icon(IdentityProvider::Twitch->getIcon())
+            ->url($this->twitchAuthorizationUrl())
+            ->visible(fn (): bool => !$this->twitchConnection instanceof ExternalIdentity);
+    }
+
+    public function reauthorizeTwitchAction(): Action
+    {
+        return Action::make('reauthorizeTwitch')
+            ->label('Reautorizar')
+            ->icon(Heroicon::OutlinedArrowPath)
+            ->color('warning')
+            ->size('sm')
+            ->url($this->twitchAuthorizationUrl())
+            ->visible(fn (): bool => $this->missingTwitchScopes !== []);
+    }
+
+    public function disconnectTwitchAction(): Action
+    {
+        return Action::make('disconnectTwitch')
+            ->label('Desconectar')
+            ->color('gray')
+            ->size('sm')
+            ->requiresConfirmation()
+            ->modalIcon(Heroicon::OutlinedLinkSlash)
+            ->modalHeading('Desconectar a Twitch?')
+            ->modalDescription('Os alertas e as overlays param de receber eventos do seu canal até você conectar de novo.')
+            ->modalSubmitActionLabel('Desconectar')
+            ->visible(fn (): bool => $this->twitchConnection instanceof ExternalIdentity)
+            ->action(function (): void {
+                $this->twitchConnection?->update(['disconnected_at' => now()]);
+
+                unset($this->twitchConnection, $this->missingTwitchScopes);
+
+                Notification::make()
+                    ->title('Twitch desconectada')
+                    ->success()
+                    ->send();
+            });
     }
 
     public function sendTestAlert(string $type): void
@@ -87,8 +132,15 @@ class StreamDashboardPage extends Page
             'alertTypes' => StreamAlertType::cases(),
             'stats' => StreamingPreviewData::stats(),
             'recentActivity' => StreamingPreviewData::recentActivity(),
-            'profileUrl' => ProfilePage::getUrl(),
         ];
+    }
+
+    private function twitchAuthorizationUrl(): string
+    {
+        return route('oauth.redirect', [
+            'panel' => FilamentPanel::App->value,
+            'provider' => IdentityProvider::Twitch->value,
+        ]);
     }
 
     private function streamer(): User

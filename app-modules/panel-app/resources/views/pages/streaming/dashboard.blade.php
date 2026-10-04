@@ -31,16 +31,20 @@
                     <p class="text-sm text-gray-500 dark:text-gray-400">Canal da Twitch conectado à He4rt</p>
                 </div>
 
-                @if ($missingScopes === [])
-                    <x-filament::badge color="success" icon="heroicon-m-check-circle">Pronto para alertas</x-filament::badge>
-                @else
-                    <x-filament::badge color="warning" icon="heroicon-m-exclamation-triangle">
-                        Faltam permissões
-                    </x-filament::badge>
-                    <x-filament::button tag="a" :href="$profileUrl" size="sm" color="warning">
-                        Reautorizar no perfil
-                    </x-filament::button>
-                @endif
+                <div class="flex flex-wrap items-center gap-2">
+                    @if ($missingScopes === [])
+                        <x-filament::badge color="success" icon="heroicon-m-check-circle">
+                            Pronto para alertas
+                        </x-filament::badge>
+                    @else
+                        <x-filament::badge color="warning" icon="heroicon-m-exclamation-triangle">
+                            Faltam permissões
+                        </x-filament::badge>
+                        {{ $this->reauthorizeTwitchAction }}
+                    @endif
+
+                    {{ $this->disconnectTwitchAction }}
+                </div>
             </div>
         @else
             <div class="flex flex-col items-center gap-3 py-6 text-center">
@@ -53,10 +57,10 @@
                 <div>
                     <p class="text-base font-semibold text-gray-950 dark:text-white">Conecte sua Twitch</p>
                     <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
-                        Os alertas e as overlays usam o seu canal. Conecte a Twitch na área de conexões do perfil.
+                        Os alertas e as overlays usam o seu canal. Conecte a Twitch para começar.
                     </p>
                 </div>
-                <x-filament::button tag="a" :href="$profileUrl" size="sm">Conectar no perfil</x-filament::button>
+                {{ $this->connectTwitchAction }}
             </div>
         @endif
     </x-filament::section>

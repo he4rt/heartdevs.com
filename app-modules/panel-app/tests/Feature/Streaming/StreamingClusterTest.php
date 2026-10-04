@@ -75,7 +75,10 @@ test('o painel mostra o canal conectado e pronto para alertas', function (): voi
     livewire(StreamDashboardPage::class)
         ->assertSee('@canal_do_streamer')
         ->assertSee('Pronto para alertas')
-        ->assertDontSee('Conecte sua Twitch');
+        ->assertDontSee('Conecte sua Twitch')
+        ->assertActionVisible('disconnectTwitch')
+        ->assertActionHidden('reauthorizeTwitch')
+        ->assertActionHidden('connectTwitch');
 });
 
 test('o painel pede reautorização quando faltam escopos', function (): void {
@@ -86,7 +89,9 @@ test('o painel pede reautorização quando faltam escopos', function (): void {
 
     livewire(StreamDashboardPage::class)
         ->assertSee('Faltam permissões')
-        ->assertSee('Reautorizar no perfil');
+        ->assertActionVisible('reauthorizeTwitch')
+        ->assertActionHasUrl('reauthorizeTwitch', route('oauth.redirect', ['panel' => 'app', 'provider' => 'twitch']))
+        ->assertActionVisible('disconnectTwitch');
 });
 
 test('o painel convida a conectar a Twitch quando não há conexão', function (): void {
@@ -94,7 +99,38 @@ test('o painel convida a conectar a Twitch quando não há conexão', function (
 
     livewire(StreamDashboardPage::class)
         ->assertSee('Conecte sua Twitch')
-        ->assertDontSee('Pronto para alertas');
+        ->assertDontSee('Pronto para alertas')
+        ->assertActionVisible('connectTwitch')
+        ->assertActionHasUrl('connectTwitch', route('oauth.redirect', ['panel' => 'app', 'provider' => 'twitch']))
+        ->assertActionHidden('disconnectTwitch');
+});
+
+test('desconectar a Twitch pelo painel encerra a conexão do streamer', function (): void {
+    $streamer = User::factory()->streamer()->create();
+    $connection = connectTwitch($streamer, grantedScopes: null);
+
+    $this->actingAs($streamer);
+
+    livewire(StreamDashboardPage::class)
+        ->callAction('disconnectTwitch')
+        ->assertNotified('Twitch desconectada')
+        ->assertSee('Conecte sua Twitch')
+        ->assertActionVisible('connectTwitch');
+
+    expect($connection->fresh()?->disconnected_at)->not->toBeNull();
+});
+
+test('desconectar sem conexão própria não mexe na conexão de outro usuário', function (): void {
+    $otherConnection = connectTwitch(User::factory()->streamer()->create(), grantedScopes: null);
+
+    $this->actingAs(User::factory()->streamer()->create());
+
+    livewire(StreamDashboardPage::class)
+        ->assertActionHidden('disconnectTwitch')
+        ->call('mountAction', 'disconnectTwitch')
+        ->call('callMountedAction');
+
+    expect($otherConnection->fresh()?->disconnected_at)->toBeNull();
 });
 
 test('o painel ignora a conexão da Twitch de outro usuário', function (): void {
