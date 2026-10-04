@@ -26,6 +26,7 @@ final class ChatMessageReceived implements ShouldBroadcastNow, ShouldDispatchAft
     public function __construct(
         public Streamer $streamer,
         public string $msgId,
+        public string $chatterId,
         public ChatMessageMetadata $metadata,
     ) {}
 
@@ -34,6 +35,7 @@ final class ChatMessageReceived implements ShouldBroadcastNow, ShouldDispatchAft
         return new self(
             streamer: $streamer,
             msgId: $message->provider_message_id ?? '',
+            chatterId: $message->provider->external_account_id ?? '',
             metadata: ChatMessageMetadata::fromArray($message->metadata ?? []),
         );
     }
@@ -50,12 +52,13 @@ final class ChatMessageReceived implements ShouldBroadcastNow, ShouldDispatchAft
     }
 
     /**
-     * @return array{msgId: string, username: string, color: string|null, badges: list<array<string, string|null>>, fragments: list<array<string, string|null>>}
+     * @return array{msgId: string, chatterId: string, username: string, color: string|null, badges: list<array<string, string|null>>, fragments: list<array<string, string|null>>}
      */
     public function broadcastWith(): array
     {
         return [
             'msgId' => $this->msgId,
+            'chatterId' => $this->chatterId,
             'username' => $this->metadata->displayName,
             'color' => $this->metadata->color,
             'badges' => array_map(fn (ChatBadge $badge): array => $badge->toBroadcast(), $this->metadata->badges),

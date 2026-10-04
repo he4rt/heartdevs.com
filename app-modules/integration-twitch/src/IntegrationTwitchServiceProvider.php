@@ -8,6 +8,7 @@ use He4rt\Identity\ExternalIdentity\Events\ExternalIdentityConnected;
 use He4rt\Identity\ExternalIdentity\Events\ExternalIdentityDisconnected;
 use He4rt\IntegrationTwitch\Console\LinkTwitchChannelCommand;
 use He4rt\IntegrationTwitch\Console\SubscribeTwitchEventsCommand;
+use He4rt\IntegrationTwitch\Console\SyncStreamerSubscriptionsCommand;
 use He4rt\IntegrationTwitch\ETL\Listeners\ProjectTwitchEventToStreaming;
 use He4rt\IntegrationTwitch\Events\TwitchEventReceived;
 use He4rt\IntegrationTwitch\Listeners\InferChatReaderFromGrantedScopes;
@@ -60,6 +61,7 @@ class IntegrationTwitchServiceProvider extends ServiceProvider
             $this->commands([
                 LinkTwitchChannelCommand::class,
                 SubscribeTwitchEventsCommand::class,
+                SyncStreamerSubscriptionsCommand::class,
             ]);
         }
     }

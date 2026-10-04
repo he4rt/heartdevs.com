@@ -12,6 +12,8 @@ use He4rt\IntegrationTwitch\Events\TwitchEventReceived;
 use He4rt\IntegrationTwitch\Models\TwitchEventLog;
 use He4rt\IntegrationTwitch\Transport\Requests\Streams\GetStreams;
 use He4rt\IntegrationTwitch\Transport\TwitchHelixConnector;
+use He4rt\Streaming\Chat\Actions\ClearChat;
+use He4rt\Streaming\Chat\Actions\ClearChatterMessages;
 use He4rt\Streaming\Chat\Actions\DeleteChatMessage;
 use He4rt\Streaming\Chat\Actions\RecordChatMessage;
 use He4rt\Streaming\DTOs\IncomingChatMessage;
@@ -37,6 +39,8 @@ final readonly class ProjectTwitchEventToStreaming
         private RecordStreamEvent $recordStreamEvent,
         private RecordChatMessage $recordChatMessage,
         private DeleteChatMessage $deleteChatMessage,
+        private ClearChatterMessages $clearChatterMessages,
+        private ClearChat $clearChat,
         private TwitchChatBadgeCatalog $badgeCatalog,
     ) {}
 
@@ -56,6 +60,8 @@ final readonly class ProjectTwitchEventToStreaming
             TwitchEventSubType::ChannelRaid => $this->recordStreamEvent($log),
             TwitchEventSubType::ChannelChatMessage => $this->recordChatMessage($log),
             TwitchEventSubType::ChannelChatMessageDelete => $this->deleteChatMessage($log),
+            TwitchEventSubType::ChannelChatClearUserMessages => $this->clearChatterMessages($log),
+            TwitchEventSubType::ChannelChatClear => $this->clearChat($log),
             default => null,
         };
     }
@@ -135,6 +141,28 @@ final readonly class ProjectTwitchEventToStreaming
         }
 
         $this->deleteChatMessage->handle(IdentityProvider::Twitch, $broadcasterId, $messageId, $this->mapper->receivedAt($log));
+    }
+
+    private function clearChatterMessages(TwitchEventLog $log): void
+    {
+        $chatterId = $this->mapper->clearedChatterId($log);
+        $broadcasterId = $log->broadcaster_user_id;
+
+        if ($chatterId === null || $broadcasterId === null) {
+            return;
+        }
+
+        $this->clearChatterMessages->handle(IdentityProvider::Twitch, $broadcasterId, $chatterId, $this->mapper->receivedAt($log));
+    }
+
+    private function clearChat(TwitchEventLog $log): void
+    {
+        $broadcasterId = $log->broadcaster_user_id;
+        $source = $broadcasterId === null ? null : $this->resolveActiveSource->handle(IdentityProvider::Twitch, $broadcasterId);
+
+        if ($source?->showsChat() === true) {
+            $this->clearChat->handle($source->streamer, $this->mapper->receivedAt($log));
+        }
     }
 
     /**

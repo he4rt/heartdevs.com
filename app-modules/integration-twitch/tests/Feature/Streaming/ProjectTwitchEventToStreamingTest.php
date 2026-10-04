@@ -3,6 +3,8 @@
 declare(strict_types=1);
 
 use He4rt\Activity\Message\Models\Message;
+use He4rt\Identity\ExternalIdentity\Enums\IdentityProvider;
+use He4rt\Identity\ExternalIdentity\Models\ExternalIdentity;
 use He4rt\IntegrationTwitch\Enums\TwitchEventSubType;
 use He4rt\IntegrationTwitch\Events\TwitchEventReceived;
 use He4rt\IntegrationTwitch\Models\TwitchEventLog;
@@ -347,6 +349,53 @@ test('a mensagem apagada pela moderação é marcada', function (): void {
     ])));
 
     expect(ChatMessageMetadata::fromArray($message->refresh()->metadata ?? [])->isDeleted())->toBeTrue();
+});
+
+test('o ban de um chatter marca só as mensagens dele no canal', function (): void {
+    $spammer = ExternalIdentity::factory()->create(['provider' => IdentityProvider::Twitch, 'external_account_id' => '9911']);
+    $spam = Message::factory()->count(2)->create([
+        'platform' => 'twitch',
+        'channel_id' => $this->broadcasterId,
+        'external_identity_id' => $spammer->getKey(),
+        'metadata' => new ChatMessageMetadata('Spammer')->toArray(),
+    ]);
+    $greeting = Message::factory()->create([
+        'platform' => 'twitch',
+        'channel_id' => $this->broadcasterId,
+        'metadata' => new ChatMessageMetadata('MariaCoda')->toArray(),
+    ]);
+
+    event(new TwitchEventReceived(twitchCliLog(TwitchEventSubType::ChannelChatClearUserMessages, [
+        'broadcaster_user_id' => $this->broadcasterId,
+        'target_user_id' => '9911',
+        'target_user_login' => 'spammer',
+        'target_user_name' => 'Spammer',
+    ])));
+
+    $isDeleted = fn (Message $message): bool => ChatMessageMetadata::fromArray($message->refresh()->metadata ?? [])->isDeleted();
+
+    expect($spam->every($isDeleted))->toBeTrue()
+        ->and($isDeleted($greeting))->toBeFalse();
+});
+
+test('o /clear da Twitch limpa o chat da overlay', function (): void {
+    event(new TwitchEventReceived(twitchCliLog(TwitchEventSubType::ChannelChatClear, [
+        'broadcaster_user_id' => $this->broadcasterId,
+        'broadcaster_user_login' => 'danielhe4rt',
+        'broadcaster_user_name' => 'danielhe4rt',
+    ])));
+
+    expect($this->source->streamer->refresh()->chat_cleared_at)->not->toBeNull();
+});
+
+test('o /clear num canal sem chat na overlay não muda nada', function (): void {
+    $this->source->update(['chat_reader' => null]);
+
+    event(new TwitchEventReceived(twitchCliLog(TwitchEventSubType::ChannelChatClear, [
+        'broadcaster_user_id' => $this->broadcasterId,
+    ])));
+
+    expect($this->source->streamer->refresh()->chat_cleared_at)->toBeNull();
 });
 
 test('um tipo fora do escopo fica só no lake', function (): void {

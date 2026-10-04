@@ -36,6 +36,10 @@ export function subscribeOverlayChannel(
         .listen('.chat.message-deleted', ({ msgId }: { msgId: string }) =>
             listener({ kind: 'chatMessageDeleted', msgId }),
         )
+        .listen('.chat.chatter-cleared', ({ chatterId }: { chatterId: string }) =>
+            listener({ kind: 'chatterCleared', chatterId }),
+        )
+        .listen('.chat.cleared', () => listener({ kind: 'chatCleared' }))
         .listen('.settings.updated', ({ scene, settings }: SettingsPayload) =>
             listener(toOverlayConfig(scene, settings, Date.now())),
         );

@@ -98,8 +98,23 @@ test('o chat lido pela própria conta usa o broadcaster como leitor', function (
 
     $chat = TwitchSubscription::query()->where('type', TwitchEventSubType::ChannelChatMessage->value)->sole();
 
-    expect(ownedSubscriptionTypes($source))->toHaveCount(11)
+    expect(ownedSubscriptionTypes($source))->toHaveCount(13)
         ->and($chat->condition)->toEqual(['broadcaster_user_id' => $broadcasterId, 'user_id' => $broadcasterId]);
+});
+
+test('a fonte com leitor de chat assina a limpeza do chat com a mesma condição', function (): void {
+    $source = StreamerSource::factory()->readingChat(ChatReader::OwnAccount)->create();
+    $broadcasterId = $source->identity->external_account_id;
+
+    resolve(SyncStreamerTwitchSubscriptions::class)->handle($source);
+
+    $clearConditions = TwitchSubscription::query()
+        ->whereIn('type', [TwitchEventSubType::ChannelChatClear->value, TwitchEventSubType::ChannelChatClearUserMessages->value])
+        ->pluck('condition')
+        ->all();
+
+    expect($clearConditions)->toHaveCount(2)
+        ->each->toEqual(['broadcaster_user_id' => $broadcasterId, 'user_id' => $broadcasterId]);
 });
 
 test('trocar o leitor para a conta bot refaz as inscrições de chat', function (): void {
@@ -114,7 +129,7 @@ test('trocar o leitor para a conta bot refaz as inscrições de chat', function 
 
     expect($chat->condition['user_id'])->toBe('555000')
         ->and(TwitchSubscription::query()->whereIn('subscription_id', $ownChatIds)->exists())->toBeFalse();
-    $this->helix->assertSentCount(2, DeleteSubscription::class);
+    $this->helix->assertSentCount(4, DeleteSubscription::class);
 });
 
 test('desativar o streamer remove as inscrições dele na Twitch e no banco', function (): void {
@@ -159,7 +174,7 @@ test('sem escopo de chat, os alertas são criados e o erro vai para o log', func
     resolve(SyncStreamerTwitchSubscriptions::class)->handle($source);
 
     expect(ownedSubscriptionTypes($source))->toHaveCount(9);
-    Log::shouldHaveReceived('warning')->with('Twitch EventSub subscription failed', Mockery::on(fn (array $context): bool => $context['status'] === 403))->twice();
+    Log::shouldHaveReceived('warning')->with('Twitch EventSub subscription failed', Mockery::on(fn (array $context): bool => $context['status'] === 403))->times(4);
 });
 
 test('a mudança na fonte dispara a sincronização', function (): void {
@@ -177,4 +192,45 @@ test('sem o segredo do EventSub a sincronização não roda', function (): void 
     event(new StreamerSourceUpdated($source));
 
     $this->helix->assertNothingSent();
+});
+
+test('o comando cria só as inscrições que faltam numa fonte antiga', function (): void {
+    $source = StreamerSource::factory()->readingChat(ChatReader::OwnAccount)->create();
+    resolve(SyncStreamerTwitchSubscriptions::class)->handle($source);
+    TwitchSubscription::query()->where('type', 'like', 'channel.chat.clear%')->delete();
+    $oldIds = TwitchSubscription::query()->pluck('subscription_id')->all();
+
+    $this->artisan('twitch:sync-streamer-subscriptions', ['source' => $source->getKey()])
+        ->expectsOutputToContain('13 subscriptions')
+        ->assertSuccessful();
+
+    $firstSyncCreates = 13;
+    $missingClearTypes = 2;
+
+    expect(ownedSubscriptionTypes($source))->toHaveCount(13)
+        ->and(TwitchSubscription::query()->whereIn('subscription_id', $oldIds)->count())->toBe(11);
+    $this->helix->assertSentCount($firstSyncCreates + $missingClearTypes, CreateSubscription::class);
+});
+
+test('o comando sem argumento sincroniza todas as fontes da Twitch', function (): void {
+    $sources = StreamerSource::factory()->count(2)->create();
+
+    $this->artisan('twitch:sync-streamer-subscriptions')->assertSuccessful();
+
+    expect($sources->map(fn (StreamerSource $source): int => count(ownedSubscriptionTypes($source)))->all())->toBe([9, 9]);
+});
+
+test('o comando sem o segredo do EventSub não sincroniza', function (): void {
+    config()->set('services.twitch.eventsub_secret');
+    StreamerSource::factory()->create();
+
+    $this->artisan('twitch:sync-streamer-subscriptions')->assertFailed();
+
+    $this->helix->assertNothingSent();
+});
+
+test('o comando com uma fonte que não existe falha', function (): void {
+    $this->artisan('twitch:sync-streamer-subscriptions', ['source' => (string) Str::uuid()])
+        ->expectsOutputToContain('No Twitch streamer source found.')
+        ->assertFailed();
 });

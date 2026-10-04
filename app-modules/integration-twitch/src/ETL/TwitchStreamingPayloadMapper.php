@@ -131,6 +131,11 @@ final readonly class TwitchStreamingPayloadMapper
         return $this->stringOf($this->event($log), 'message_id');
     }
 
+    public function clearedChatterId(TwitchEventLog $log): ?string
+    {
+        return $this->stringOf($this->event($log), 'target_user_id');
+    }
+
     public function receivedAt(TwitchEventLog $log): CarbonImmutable
     {
         return $log->created_at instanceof CarbonInterface

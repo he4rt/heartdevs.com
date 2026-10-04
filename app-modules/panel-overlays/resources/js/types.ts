@@ -21,6 +21,7 @@ export interface ChatBadgePayload {
 
 export interface ChatMessagePayload {
     msgId: string;
+    chatterId: string;
     username: string;
     color: string | null;
     badges: ChatBadgePayload[];

@@ -15,6 +15,8 @@ import type { OverlayChannelSource } from '../types';
 export interface OverlayFeedHandlers {
     onChatMessage?(dto: ChatMessageDto): void;
     onChatDeleted?(msgId: string): void;
+    onChatterCleared?(chatterId: string): void;
+    onChatCleared?(): void;
     onStreamEvent?(dto: StreamEventDto): void;
     onNowPlaying?(dto: NowPlayingDto): void;
     onVoiceRoster?(dto: VoiceRosterDto): void;
@@ -41,6 +43,12 @@ function dispatch(dto: FeedEventDto, handlers: OverlayFeedHandlers): void {
             break;
         case 'chatMessageDeleted':
             handlers.onChatDeleted?.(dto.msgId);
+            break;
+        case 'chatterCleared':
+            handlers.onChatterCleared?.(dto.chatterId);
+            break;
+        case 'chatCleared':
+            handlers.onChatCleared?.();
             break;
         case 'streamEvent':
             handlers.onStreamEvent?.(dto);

@@ -28,6 +28,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property string $overlay_token
  * @property string $overlay_token_hash
  * @property StreamerSettings $settings
+ * @property CarbonInterface|null $chat_cleared_at
  * @property CarbonInterface|null $created_at
  * @property CarbonInterface|null $updated_at
  * @property CarbonInterface|null $deleted_at
@@ -88,6 +89,7 @@ final class Streamer extends Model
             'status' => StreamerStatus::class,
             'overlay_token' => 'encrypted',
             'settings' => AsStreamerSettings::class,
+            'chat_cleared_at' => 'datetime',
         ];
     }
 }

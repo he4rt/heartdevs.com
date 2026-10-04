@@ -106,6 +106,7 @@ export function subscribeDemoFeed(listener: Listener): () => void {
         return {
             kind: 'chatMessage',
             msgId: `demo-${messageCount}`,
+            chatterId: chatter.username,
             username: chatter.username,
             color: chatter.color,
             channel: 'demo',

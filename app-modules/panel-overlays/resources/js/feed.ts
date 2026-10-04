@@ -20,6 +20,7 @@ export interface ChatBadgeDto {
 export interface ChatMessageDto {
     kind: 'chatMessage';
     msgId: string;
+    chatterId: string;
     username: string;
     color: string;
     channel: string;
@@ -30,6 +31,15 @@ export interface ChatMessageDto {
 export interface ChatMessageDeletedDto {
     kind: 'chatMessageDeleted';
     msgId: string;
+}
+
+export interface ChatterClearedDto {
+    kind: 'chatterCleared';
+    chatterId: string;
+}
+
+export interface ChatClearedDto {
+    kind: 'chatCleared';
 }
 
 export type SubTierDto = 'tier1' | 'tier2' | 'tier3' | 'prime';
@@ -141,6 +151,8 @@ export interface LevelProgressDto {
 export type FeedEventDto =
     | ChatMessageDto
     | ChatMessageDeletedDto
+    | ChatterClearedDto
+    | ChatClearedDto
     | StreamEventDto
     | NowPlayingDto
     | VoiceRosterDto

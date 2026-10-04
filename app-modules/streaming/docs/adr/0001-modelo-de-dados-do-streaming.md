@@ -281,6 +281,11 @@ ChatMessageReceived → overlay
   compartilhada com o Discord. O `streaming` lê e grava essa coluna só pelo `ChatMessageMetadata`.
 - **Mensagem apagada.** `channel.chat.message_delete` chama `DeleteChatMessage`. A linha fica no
   banco com `metadata.deleted_at` preenchido, e a overlay recebe `ChatMessageDeleted`.
+- **Ban, timeout e `/clear`.** `channel.chat.clear_user_messages` chama `ClearChatterMessages`, que
+  marca `deleted_at` nas mensagens do chatter nas últimas 24 horas e manda `chat.chatter-cleared`.
+  A janela cobre o chat recente da overlay e evita um update sem limite. `channel.chat.clear` chama
+  `ClearChat`, que grava `streamers.chat_cleared_at` e manda `chat.cleared`. O chat recente ignora as
+  mensagens anteriores a essa hora, então o chat limpo não volta ao recarregar a overlay.
 - **Corrida na criação.** Dois chats do mesmo espectador processados em paralelo poderiam criar
   duas identidades soltas. Um índice parcial único `(provider, external_account_id) WHERE model_id
 IS NULL AND deleted_at IS NULL` impede isso, e a criação usa `createOrFirst`.

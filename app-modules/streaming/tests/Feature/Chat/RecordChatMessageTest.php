@@ -60,6 +60,7 @@ test('o espectador novo vira identidade solta e a mensagem vai para a atividade 
     Event::assertDispatched(fn (ChatMessageReceived $broadcast): bool => $broadcast->broadcastAs() === 'chat.message'
         && $broadcast->broadcastWith() === [
             'msgId' => 'msg-1',
+            'chatterId' => '9911',
             'username' => 'MariaCoda',
             'color' => '#8b2fe8',
             'badges' => [],

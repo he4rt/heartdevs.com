@@ -37,6 +37,8 @@ export default function StartingSoonOverlay({
         {
             onChatMessage: chat.push,
             onChatDeleted: chat.remove,
+            onChatterCleared: chat.removeChatter,
+            onChatCleared: chat.clear,
             onNowPlaying: np.onDto,
             onOverlayConfig,
             onLevelProgress: leveling.onDto,

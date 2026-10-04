@@ -36,6 +36,8 @@ final readonly class SyncStreamerTwitchSubscriptions
     private const array CHAT_TYPES = [
         TwitchEventSubType::ChannelChatMessage,
         TwitchEventSubType::ChannelChatMessageDelete,
+        TwitchEventSubType::ChannelChatClear,
+        TwitchEventSubType::ChannelChatClearUserMessages,
     ];
 
     public function __construct(

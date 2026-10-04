@@ -101,6 +101,19 @@ test('ao recarregar, a overlay traz as 30 últimas mensagens em ordem cronológi
             ->where('recentChat', fn (Collection $chat): bool => $chat->doesntContain('msgId', $deleted->provider_message_id)));
 });
 
+test('depois de limpar o chat, a overlay só traz as mensagens novas', function (): void {
+    $source = StreamerSource::factory()->for($this->streamer)->readingChat()->create();
+    overlayChatMessage($source, minutesAgo: 10);
+    $this->streamer->update(['chat_cleared_at' => now()->subMinutes(5)]);
+    $after = overlayChatMessage($source, minutesAgo: 1);
+
+    $this->get('/overlay/'.OVERLAY_TOKEN.'/coworking')
+        ->assertInertia(fn (AssertableInertia $page): AssertableInertia => $page
+            ->has('recentChat', 1)
+            ->where('recentChat.0.msgId', $after->provider_message_id)
+            ->where('recentChat.0.chatterId', $after->provider->external_account_id));
+});
+
 test('alertas antigos não voltam ao recarregar a overlay', function (): void {
     $source = StreamerSource::factory()->for($this->streamer)->create();
     StreamEvent::factory()->forSource($source)->count(5)->create();

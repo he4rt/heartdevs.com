@@ -76,6 +76,7 @@ export function toChatMessage(payload: ChatMessagePayload): ChatMessageDto {
     return {
         kind: 'chatMessage',
         msgId: payload.msgId,
+        chatterId: payload.chatterId,
         username: payload.username,
         color: payload.color ?? '',
         channel: '',

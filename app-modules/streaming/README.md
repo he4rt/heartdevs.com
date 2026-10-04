@@ -23,6 +23,19 @@ configurações das cenas do OBS. O chat da live vai para `activity.messages`.
                                                                  canal privado ───► Echo
 ```
 
+### Moderação do chat
+
+Mensagem apagada, ban, timeout e `/clear` na Twitch também tiram o chat da overlay:
+
+| Evento da Twitch                   | Ação no `streaming`                                         | Broadcast                            |
+| ---------------------------------- | ----------------------------------------------------------- | ------------------------------------ |
+| `channel.chat.message_delete`      | `DeleteChatMessage` marca `deleted_at` na mensagem          | `chat.message-deleted` `{msgId}`     |
+| `channel.chat.clear_user_messages` | `ClearChatterMessages` marca as mensagens do chatter (24 h) | `chat.chatter-cleared` `{chatterId}` |
+| `channel.chat.clear`               | `ClearChat` grava `streamers.chat_cleared_at`               | `chat.cleared`                       |
+
+O chat recente da overlay ignora o que veio antes de `chat_cleared_at`. Uma fonte criada antes de
+uma inscrição nova ganha essa inscrição com `php artisan twitch:sync-streamer-subscriptions`.
+
 ## Rodar a overlay localmente
 
 ### 1. Reverb

@@ -35,6 +35,8 @@ export default function CoworkingOverlay({ handle, channel, authEndpoint, recent
         {
             onChatMessage: chat.push,
             onChatDeleted: chat.remove,
+            onChatterCleared: chat.removeChatter,
+            onChatCleared: chat.clear,
             onStreamEvent: footer.pushEvent,
             onNowPlaying: np.onDto,
             onVoiceRoster: voice.onDto,

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace He4rt\Streaming\Overlay;
 
+use Carbon\CarbonInterface;
 use He4rt\Activity\Message\Models\Message;
 use He4rt\Streaming\Broadcasting\ChatMessageReceived;
 use He4rt\Streaming\Broadcasting\StreamSessionStarted;
@@ -15,7 +16,7 @@ use Illuminate\Database\Eloquent\Builder;
 final readonly class OverlayInitialState
 {
     /**
-     * @return list<array{msgId: string, username: string, color: string|null, badges: list<array<string, string|null>>, fragments: list<array<string, string|null>>}>
+     * @return list<array{msgId: string, chatterId: string, username: string, color: string|null, badges: list<array<string, string|null>>, fragments: list<array<string, string|null>>}>
      */
     public function recentChat(Streamer $streamer, int $limit = 30): array
     {
@@ -37,6 +38,8 @@ final readonly class OverlayInitialState
                 }
             })
             ->whereNull('metadata->deleted_at')
+            ->when($streamer->chat_cleared_at instanceof CarbonInterface, fn (Builder $query): Builder => $query->where('sent_at', '>', $streamer->chat_cleared_at))
+            ->with('provider')
             ->latest('sent_at')
             ->limit($limit)
             ->get()
