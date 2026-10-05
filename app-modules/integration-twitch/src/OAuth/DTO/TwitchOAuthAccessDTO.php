@@ -13,10 +13,14 @@ class TwitchOAuthAccessDTO extends OAuthAccessDTO
      */
     public static function make(array $payload): self
     {
+        /** @var array<int, string> $grantedScopes */
+        $grantedScopes = is_array($payload['scope'] ?? null) ? $payload['scope'] : [];
+
         return new self(
             accessToken: $payload['access_token'],
             refreshToken: $payload['refresh_token'],
-            expiresIn: $payload['expires_in']
+            expiresIn: $payload['expires_in'],
+            grantedScopes: $grantedScopes,
         );
     }
 }

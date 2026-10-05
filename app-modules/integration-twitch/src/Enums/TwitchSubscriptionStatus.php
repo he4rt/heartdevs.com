@@ -35,6 +35,11 @@ enum TwitchSubscriptionStatus: string implements HasColor, HasLabel
         };
     }
 
+    public function needsReconnect(): bool
+    {
+        return $this === self::AuthorizationRevoked || $this === self::UserRemoved;
+    }
+
     public function getColor(): string
     {
         return match ($this) {

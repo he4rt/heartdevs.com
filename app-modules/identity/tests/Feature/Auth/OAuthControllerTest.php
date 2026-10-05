@@ -11,6 +11,7 @@ use He4rt\Identity\Auth\DTOs\OAuthUserDTO;
 use He4rt\Identity\Auth\Enums\OAuthIntent;
 use He4rt\Identity\Auth\Http\Controllers\OAuthController;
 use He4rt\Identity\ExternalIdentity\Enums\IdentityProvider;
+use He4rt\Identity\User\Models\User;
 use He4rt\IntegrationGithub\OAuth\GitHubOAuthClient;
 use Illuminate\Support\Facades\Auth;
 
@@ -54,7 +55,7 @@ function bindControllerGithubClient(): void
 
         public function redirectUrl(?OAuthStateDTO $state = null): string
         {
-            return 'https://github.test/oauth';
+            return 'https://github.test/oauth?state='.urlencode((string) $state);
         }
 
         public function auth(string $code): OAuthAccessDTO
@@ -67,6 +68,19 @@ function bindControllerGithubClient(): void
             return $this->user;
         }
     });
+}
+
+function githubStateIssuedToSession(OAuthIntent $intent, ?string $returnUrl = null): OAuthStateDTO
+{
+    session()->put('oauth_state_nonce.github', 'session-nonce');
+
+    return new OAuthStateDTO(
+        intent: $intent,
+        provider: IdentityProvider::GitHub,
+        panel: 'app',
+        returnUrl: $returnUrl,
+        nonce: 'session-nonce',
+    );
 }
 
 function callGithubCallback(OAuthStateDTO $state): string
@@ -85,12 +99,7 @@ test('successful app oauth login marks the provider in the redirect URL', functi
     Filament::setCurrentPanel(Filament::getPanel('app'));
     bindControllerGithubClient();
 
-    $targetUrl = callGithubCallback(new OAuthStateDTO(
-        intent: OAuthIntent::Login,
-        provider: IdentityProvider::GitHub,
-        panel: 'app',
-        returnUrl: '/app?source=oauth',
-    ));
+    $targetUrl = callGithubCallback(githubStateIssuedToSession(OAuthIntent::Login, '/app?source=oauth'));
 
     expect($targetUrl)
         ->toContain('source=oauth')
@@ -99,12 +108,7 @@ test('successful app oauth login marks the provider in the redirect URL', functi
 });
 
 test('denied app oauth login does not mark a provider in the redirect URL', function (): void {
-    $state = new OAuthStateDTO(
-        intent: OAuthIntent::Login,
-        provider: IdentityProvider::GitHub,
-        panel: 'app',
-        returnUrl: '/app/login',
-    );
+    $state = githubStateIssuedToSession(OAuthIntent::Login, '/app/login');
 
     request()->merge([
         'state' => (string) $state,
@@ -118,4 +122,64 @@ test('denied app oauth login does not mark a provider in the redirect URL', func
     expect($targetUrl)
         ->toContain('/app/login')
         ->not->toContain('oauth_provider=');
+});
+
+test('redirect binds the state nonce to the session and the callback accepts it', function (): void {
+    Filament::setCurrentPanel(Filament::getPanel('app'));
+    bindControllerGithubClient();
+
+    $providerUrl = resolve(OAuthController::class)->getRedirect('app', 'github')->getTargetUrl();
+    parse_str((string) parse_url($providerUrl, PHP_URL_QUERY), $query);
+    $state = OAuthStateDTO::fromEncryptedString($query['state']);
+
+    expect($state->nonce)->toBeString()->toBe(session('oauth_state_nonce.github'));
+
+    callGithubCallback($state);
+
+    expect(Auth::check())->toBeTrue();
+});
+
+test('callback with a state issued to another session is rejected', function (): void {
+    bindControllerGithubClient();
+
+    $targetUrl = callGithubCallback(new OAuthStateDTO(
+        intent: OAuthIntent::Login,
+        provider: IdentityProvider::GitHub,
+        panel: 'app',
+        returnUrl: 'https://attacker.test',
+        nonce: 'attacker-nonce',
+    ));
+
+    expect($targetUrl)->toBe(url('/'))
+        ->and(Auth::check())->toBeFalse();
+});
+
+test('forged link callback does not attach the attacker account to the logged-in user', function (): void {
+    bindControllerGithubClient();
+    $victim = User::factory()->create();
+    $this->actingAs($victim);
+    session()->put('oauth_state_nonce.github', 'victim-nonce');
+
+    callGithubCallback(new OAuthStateDTO(
+        intent: OAuthIntent::Link,
+        provider: IdentityProvider::GitHub,
+        panel: 'app',
+        nonce: 'attacker-nonce',
+    ));
+
+    expect($victim->providers()->count())->toBe(0);
+});
+
+test('state nonce is single use', function (): void {
+    Filament::setCurrentPanel(Filament::getPanel('app'));
+    bindControllerGithubClient();
+    $state = githubStateIssuedToSession(OAuthIntent::Login);
+
+    callGithubCallback($state);
+    Auth::logout();
+
+    $replayTargetUrl = callGithubCallback($state);
+
+    expect($replayTargetUrl)->toBe(url('/'))
+        ->and(Auth::check())->toBeFalse();
 });

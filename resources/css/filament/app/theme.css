@@ -4,7 +4,7 @@
 @source '../../../../app/Filament/**/*';
 @source '../../../../app/Filament/**/*';
 @source '../../../../resources/views/**/*';
-@source '../../../../app-modules/**/src/Filament/**/*';
+@source '../../../../app-modules/**/panel-app/**/*';
 @source '../../../../app-modules/**/resources/views/**/*';
 
 /* Login split layout — strip Filament's card wrapper */

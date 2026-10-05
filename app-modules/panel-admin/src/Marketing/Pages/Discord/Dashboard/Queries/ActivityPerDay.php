@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace He4rt\PanelAdmin\Marketing\Pages\Discord\Dashboard\Queries;
 
+use He4rt\Identity\ExternalIdentity\Enums\IdentityProvider;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\DB;
@@ -25,6 +26,7 @@ final readonly class ActivityPerDay
             ->selectRaw('(sent_at AT TIME ZONE ?)::date AS day', [$tz])
             ->selectRaw('COUNT(*) AS total_messages')
             ->selectRaw('COUNT(DISTINCT external_identity_id) AS unique_users')
+            ->where('platform', IdentityProvider::Discord->value)
             ->where('sent_at', '>=', $start)
             ->whereNotNull('sent_at')
             ->groupBy('day')
