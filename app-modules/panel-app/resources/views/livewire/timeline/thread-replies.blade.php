@@ -78,6 +78,16 @@
                                         @endforeach
                                     </div>
                                 @endif
+
+                                @php($replySummary = $reactionSummaries->get($reply->id))
+                                <div class="mt-2">
+                                    <livewire:timeline-reactions
+                                        :timeline-id="$reply->id"
+                                        :counts="$replySummary?->counts ?? []"
+                                        :mine="$replySummary?->mine?->value"
+                                        :key="'rx-'.$reply->id"
+                                    />
+                                </div>
                             </div>
                         </div>
                     </div>
