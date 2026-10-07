@@ -46,4 +46,22 @@ final class UserFactory extends Factory
             $user->assignRole(UserRole::Streamer);
         });
     }
+
+    public function delasModerator(): static
+    {
+        return $this->afterCreating(function (User $user): void {
+            Role::findOrCreate(UserRole::DelasModerator->value, UserRole::GUARD);
+
+            $user->assignRole(UserRole::DelasModerator);
+        });
+    }
+
+    public function delasLead(): static
+    {
+        return $this->afterCreating(function (User $user): void {
+            Role::findOrCreate(UserRole::DelasLead->value, UserRole::GUARD);
+
+            $user->assignRole(UserRole::DelasLead);
+        });
+    }
 }

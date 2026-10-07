@@ -294,3 +294,38 @@ test('o filtro de papel separa super admin de usuário comum', function (): void
         ->assertCanSeeTableRecords([$this->admin])
         ->assertCanNotSeeTableRecords([$regular]);
 });
+
+test('quem não é super admin não vê os papéis no form', function (): void {
+    $this->actingAs(User::factory()->delasLead()->create());
+    $other = User::factory()->create();
+
+    livewire(EditUser::class, ['record' => $other->getKey()])
+        ->assertFormFieldHidden('roles');
+});
+
+test('quem não é super admin não concede papéis nem forçando o estado do form', function (): void {
+    $this->actingAs(User::factory()->delasLead()->create());
+    $other = User::factory()->create();
+    $role = Role::findByName(UserRole::DelasModerator->value, UserRole::GUARD);
+
+    livewire(EditUser::class, ['record' => $other->getKey()])
+        ->set('data.roles', [$role->getKey()])
+        ->call('save');
+
+    expect($other->fresh()->hasRole(UserRole::DelasModerator))->toBeFalse();
+});
+
+test('salvar o form concede os papéis da He4rt Delas a outro usuário', function (): void {
+    $other = User::factory()->create();
+    $roleIds = Role::query()
+        ->whereIn('name', [UserRole::DelasModerator->value, UserRole::DelasLead->value])
+        ->pluck('id')
+        ->all();
+
+    livewire(EditUser::class, ['record' => $other->getKey()])
+        ->fillForm(['roles' => $roleIds])
+        ->call('save')
+        ->assertHasNoFormErrors();
+
+    expect($other->fresh()->hasAllRoles([UserRole::DelasModerator, UserRole::DelasLead]))->toBeTrue();
+});

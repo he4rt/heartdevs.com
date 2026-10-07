@@ -55,6 +55,7 @@ class UserForm
                 Section::make('Papéis')
                     ->columnSpanFull()
                     ->columns(1)
+                    ->visible(fn (): bool => auth()->user()?->isSuperAdmin() ?? false)
                     ->description('Quem tem super admin passa por cima de qualquer verificação de permissão.')
                     ->schema([
                         CheckboxList::make('roles')
