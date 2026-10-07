@@ -48,8 +48,8 @@ enum UserRole: string implements HasColor, HasDescription, HasIcon, HasLabel
         return match ($this) {
             self::SuperAdmin => Color::Red,
             self::Streamer => Color::Purple,
-            self::DelasModerator => Color::Pink,
-            self::DelasLead => Color::Rose,
+            self::DelasModerator => Color::hex('#F485A2'),
+            self::DelasLead => Color::hex('#CF6481'),
         };
     }
 

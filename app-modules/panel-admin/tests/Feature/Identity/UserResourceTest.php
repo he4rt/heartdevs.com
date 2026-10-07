@@ -315,7 +315,40 @@ test('quem não é super admin não concede papéis nem forçando o estado do fo
     expect($other->fresh()->hasRole(UserRole::DelasModerator))->toBeFalse();
 });
 
-test('salvar o form concede os papéis da He4rt Delas a outro usuário', function (): void {
+test('salvar o form concede um papel da He4rt Delas a outro usuário', function (UserRole $role): void {
+    $other = User::factory()->create();
+
+    livewire(EditUser::class, ['record' => $other->getKey()])
+        ->fillForm(['roles' => [Role::findByName($role->value, UserRole::GUARD)->getKey()]])
+        ->call('save')
+        ->assertHasNoFormErrors();
+
+    expect($other->fresh()->hasRole($role))->toBeTrue();
+})->with([UserRole::DelasModerator, UserRole::DelasLead]);
+
+test('marcar moderadora desmarca líder da He4rt Delas', function (): void {
+    $other = User::factory()->create();
+    $lead = (string) Role::findByName(UserRole::DelasLead->value, UserRole::GUARD)->getKey();
+    $moderator = (string) Role::findByName(UserRole::DelasModerator->value, UserRole::GUARD)->getKey();
+
+    livewire(EditUser::class, ['record' => $other->getKey()])
+        ->fillForm(['roles' => [$lead]])
+        ->fillForm(['roles' => [$lead, $moderator]])
+        ->assertSchemaStateSet(['roles' => [$moderator]]);
+});
+
+test('marcar líder desmarca moderadora da He4rt Delas', function (): void {
+    $other = User::factory()->create();
+    $lead = (string) Role::findByName(UserRole::DelasLead->value, UserRole::GUARD)->getKey();
+    $moderator = (string) Role::findByName(UserRole::DelasModerator->value, UserRole::GUARD)->getKey();
+
+    livewire(EditUser::class, ['record' => $other->getKey()])
+        ->fillForm(['roles' => [$moderator]])
+        ->fillForm(['roles' => [$moderator, $lead]])
+        ->assertSchemaStateSet(['roles' => [$lead]]);
+});
+
+test('salvar com líder e moderadora mantém só a líder', function (): void {
     $other = User::factory()->create();
     $roleIds = Role::query()
         ->whereIn('name', [UserRole::DelasModerator->value, UserRole::DelasLead->value])
@@ -323,9 +356,10 @@ test('salvar o form concede os papéis da He4rt Delas a outro usuário', functio
         ->all();
 
     livewire(EditUser::class, ['record' => $other->getKey()])
-        ->fillForm(['roles' => $roleIds])
+        ->set('data.roles', $roleIds)
         ->call('save')
         ->assertHasNoFormErrors();
 
-    expect($other->fresh()->hasAllRoles([UserRole::DelasModerator, UserRole::DelasLead]))->toBeTrue();
+    expect($other->fresh()->hasRole(UserRole::DelasLead))->toBeTrue()
+        ->and($other->fresh()->hasRole(UserRole::DelasModerator))->toBeFalse();
 });

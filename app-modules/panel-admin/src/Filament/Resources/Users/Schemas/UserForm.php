@@ -8,6 +8,7 @@ use Filament\Forms\Components\CheckboxList;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Schemas\Components\Section;
+use Filament\Schemas\Components\Utilities\Set;
 use Filament\Schemas\Schema;
 use He4rt\Identity\Authorization\Enums\UserRole;
 use He4rt\Identity\User\Models\User;
@@ -65,12 +66,14 @@ class UserForm
                             ->descriptions(self::roleDescriptions(...))
                             ->disableOptionWhen(self::isOwnSuperAdminOption(...))
                             ->in(fn (CheckboxList $component): array => array_keys($component->getOptions()))
+                            ->live()
+                            ->afterStateUpdated(fn (mixed $state, mixed $old, Set $set) => $set('roles', self::keepOneDelasRole($state, $old)))
                             ->saveRelationshipsUsing(function (CheckboxList $component, ?User $record): void {
                                 if ($record instanceof User && self::isEditingSelf($record)) {
                                     $component->state(self::keepOwnSuperAdmin($component->getState(), $record));
                                 }
 
-                                $roleIds = array_map(intval(...), $component->getState() ?? []);
+                                $roleIds = array_map(intval(...), self::keepOneDelasRole($component->getState(), old: null));
 
                                 DB::transaction(fn (): ?User => $record?->syncRoles($roleIds));
                             })
@@ -131,5 +134,45 @@ class UserForm
             ->get()
             ->mapWithKeys(fn (Role $role): array => [(int) $role->getKey() => UserRole::from($role->name)->getDescription()])
             ->all();
+    }
+
+    /**
+     * Líder e moderadora da He4rt Delas são exclusivas: a líder já faz tudo o
+     * que a moderadora faz. Fica o papel marcado por último; sem essa
+     * informação, fica a líder.
+     *
+     * @return array<int, string>
+     */
+    private static function keepOneDelasRole(mixed $state, mixed $old): array
+    {
+        /** @var array<int, int|string> $submittedKeys */
+        $submittedKeys = is_array($state) ? $state : [];
+        $keys = array_values(array_unique(array_map(strval(...), $submittedKeys)));
+
+        $leadKey = self::roleKey(UserRole::DelasLead);
+        $moderatorKey = self::roleKey(UserRole::DelasModerator);
+
+        if (!in_array($leadKey, $keys, strict: true) || !in_array($moderatorKey, $keys, strict: true)) {
+            return $keys;
+        }
+
+        /** @var array<int, int|string> $previousKeys */
+        $previousKeys = is_array($old) ? $old : [];
+        $previous = array_map(strval(...), $previousKeys);
+        $moderatorJustChecked = in_array($leadKey, $previous, strict: true) && !in_array($moderatorKey, $previous, strict: true);
+
+        $discarded = $moderatorJustChecked ? $leadKey : $moderatorKey;
+
+        return array_values(array_filter($keys, fn (string $key): bool => $key !== $discarded));
+    }
+
+    private static function roleKey(UserRole $role): ?string
+    {
+        $key = Role::query()
+            ->where('name', $role->value)
+            ->where('guard_name', UserRole::GUARD)
+            ->value('id');
+
+        return $key === null ? null : (string) $key;
     }
 }
