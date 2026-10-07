@@ -30,7 +30,7 @@ return [
         'blocked' => ['label' => 'Blocked', 'description' => 'The person was prevented from requesting the tag.'],
         'unblocked' => ['label' => 'Unblocked', 'description' => 'The person can request the tag again.'],
         'moderator_added' => ['label' => 'Moderator added', 'description' => 'A lead gave the He4rt Delas moderator role.'],
-        'reason_corrected' => ['label' => 'Reason corrected', 'description' => 'The reason of a decision was corrected; the original stays in the history.'],
+        'reason_corrected' => ['label' => 'Reason edited', 'description' => 'The reason of a decision was edited; the original stays in the history.'],
         'moderator_removed' => ['label' => 'Moderator removed', 'description' => 'A lead removed the He4rt Delas moderator role.'],
     ],
     'triggered_by' => [

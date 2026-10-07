@@ -18,7 +18,7 @@ return [
     'cannot_manage_role' => 'Leads and super admins are managed in /admin.',
     'already_moderator' => 'This person is already a He4rt Delas moderator.',
     'not_moderator' => 'This person is not a He4rt Delas moderator.',
-    'reason_not_correctable' => 'This history entry has no reason that can be corrected.',
-    'cannot_correct_reason' => 'Only whoever wrote the reason can correct it, up to :hours hours later. After that, ask a lead.',
-    'reason_unchanged' => 'The corrected reason is the same as the current one.',
+    'reason_not_correctable' => 'This history entry has no reason that can be edited.',
+    'cannot_correct_reason' => 'Only whoever wrote the reason can edit it, up to :hours hours later. After that, ask a lead.',
+    'reason_unchanged' => 'The edited reason is the same as the current one.',
 ];

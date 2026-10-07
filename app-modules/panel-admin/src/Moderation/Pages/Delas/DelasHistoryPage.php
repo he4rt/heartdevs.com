@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace He4rt\PanelAdmin\Moderation\Pages\Delas;
 
 use BackedEnum;
+use Carbon\CarbonInterface;
 use Filament\Actions\Action;
 use Filament\Pages\Page;
 use Filament\Support\Icons\Heroicon;
@@ -18,6 +19,7 @@ use He4rt\Delas\History\Enums\DelasAction;
 use He4rt\Delas\History\Models\DelasTransition;
 use He4rt\PanelAdmin\Moderation\ModerationCluster;
 use He4rt\PanelAdmin\Moderation\Pages\Delas\Concerns\InteractsWithDelasModeration;
+use Illuminate\Support\HtmlString;
 
 /**
  * Histórico das decisões sobre a tag He4rt Delas. A moderadora vê as decisões;
@@ -60,7 +62,7 @@ class DelasHistoryPage extends Page implements HasTable
 
     public function table(Table $table): Table
     {
-        $query = DelasTransition::query()->with(['user', 'actor', 'corrected', 'latestCorrection.actor']);
+        $query = DelasTransition::query()->with(['user', 'actor', 'corrected.actor', 'latestCorrection.actor']);
 
         // A moderadora vê as decisões; a líder vê também os pedidos e cada correção de motivo.
         if (!$this->isLead()) {
@@ -86,7 +88,8 @@ class DelasHistoryPage extends Page implements HasTable
                 TextColumn::make('reason')
                     ->label(__('panel-admin::delas.columns.reason'))
                     ->state(fn (DelasTransition $record): ?string => $record->currentReason())
-                    ->description(fn (DelasTransition $record): ?string => $this->reasonNote($record))
+                    ->description(fn (DelasTransition $record): ?HtmlString => $this->reasonNote($record))
+                    ->action($this->viewOriginalAction())
                     ->wrap()
                     ->lineClamp(2)
                     ->placeholder('—'),
@@ -100,7 +103,8 @@ class DelasHistoryPage extends Page implements HasTable
                     ->size('sm')
                     ->visible(fn (DelasTransition $record): bool => $this->canCorrect($record))
                     ->modalHeading(__('panel-admin::delas.actions.correct_reason_heading'))
-                    ->modalDescription(__('panel-admin::delas.actions.correct_reason_body'))
+                    ->tooltip(fn (DelasTransition $record): string => $this->correctionWindowNote($record))
+                    ->modalDescription(fn (DelasTransition $record): string => $this->text('panel-admin::delas.actions.correct_reason_body').' '.$this->correctionWindowNote($record))
                     ->fillForm(fn (DelasTransition $record): array => ['reason' => $record->currentReason()])
                     ->schema([$this->reasonField(__('panel-admin::delas.actions.correct_reason_field'))])
                     ->action(fn (DelasTransition $record, array $data): bool => $this->attempt(
@@ -134,24 +138,80 @@ class DelasHistoryPage extends Page implements HasTable
     }
 
     /**
-     * Corrigir nunca esconde o que foi escrito: a linha corrigida mostra quando,
-     * quem corrigiu e o texto original; a linha da correção mostra o que ela corrigiu.
+     * Clicar no motivo corrigido abre o texto original, com quem escreveu e quando.
      */
-    private function reasonNote(DelasTransition $record): ?string
+    private function viewOriginalAction(): Action
+    {
+        return Action::make('viewOriginal')
+            ->disabled(fn (DelasTransition $record): bool => !$this->originalOf($record) instanceof DelasTransition)
+            ->modalHeading(__('panel-admin::delas.actions.original_heading'))
+            ->modalDescription(function (DelasTransition $record): ?string {
+                $original = $this->originalOf($record);
+
+                return $original instanceof DelasTransition ? $this->text('panel-admin::delas.actions.original_written', [
+                    'name' => $original->actor->name ?? '—',
+                    'date' => $this->displayDate($original->created_at),
+                ]) : null;
+            })
+            ->modalContent(fn (DelasTransition $record): HtmlString => new HtmlString(
+                '<p style="white-space: pre-line"><span style="opacity: .7">'.e($this->text('panel-admin::delas.actions.message_label')).'</span> '.e($this->originalOf($record)?->reason).'</p>',
+            ))
+            ->modalSubmitAction(action: false)
+            ->modalCancelActionLabel(__('panel-admin::delas.actions.close'));
+    }
+
+    /**
+     * A decisão cujo motivo foi corrigido: a própria linha, se já tem correção,
+     * ou a linha que a correção aponta.
+     */
+    private function originalOf(DelasTransition $record): ?DelasTransition
     {
         if ($record->corrected instanceof DelasTransition) {
-            return $this->text('panel-admin::delas.actions.original_reason', ['reason' => $record->corrected->reason]);
+            return $record->corrected;
         }
 
-        $correction = $record->latestCorrection;
+        return $record->latestCorrection instanceof DelasTransition ? $record : null;
+    }
 
-        if (!$correction instanceof DelasTransition) {
+    /**
+     * "Corrigido em DD/MM/AA por X · ver original" na linha corrigida; só
+     * "ver original" na linha da correção.
+     */
+    private function reasonNote(DelasTransition $record): ?HtmlString
+    {
+        if (!$this->originalOf($record) instanceof DelasTransition) {
             return null;
         }
 
-        return $this->text('panel-admin::delas.actions.corrected_note', [
+        $link = '<span style="text-decoration: underline; cursor: pointer">'.e($this->text('panel-admin::delas.actions.view_original')).'</span>';
+        $correction = $record->latestCorrection;
+
+        if (!$correction instanceof DelasTransition) {
+            return new HtmlString($link);
+        }
+
+        return new HtmlString(e($this->text('panel-admin::delas.actions.corrected_note', [
             'date' => $correction->created_at?->timezone(config('app.display_timezone'))->format('d/m/y'),
             'name' => $correction->actor->name ?? '—',
-        ]).' · '.$this->text('panel-admin::delas.actions.original_reason', ['reason' => $record->reason]);
+        ])).' · '.$link);
+    }
+
+    /**
+     * Até quando quem escreveu pode corrigir; a líder corrige sempre.
+     */
+    private function correctionWindowNote(DelasTransition $record): string
+    {
+        if ($this->isLead()) {
+            return $this->text('panel-admin::delas.actions.correct_anytime');
+        }
+
+        return $this->text('panel-admin::delas.actions.correct_until', [
+            'date' => $this->displayDate($record->created_at?->copy()->addHours(config()->integer('delas.reason_correction_hours'))),
+        ]);
+    }
+
+    private function displayDate(?CarbonInterface $date): string
+    {
+        return $date?->timezone(config('app.display_timezone'))->format('d/m/Y H:i') ?? '—';
     }
 }

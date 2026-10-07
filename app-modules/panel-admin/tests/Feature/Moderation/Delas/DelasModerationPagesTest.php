@@ -369,7 +369,10 @@ test('a moderadora corrige o próprio motivo pelo histórico, e a original conti
         ->callAction(TestAction::make('correctReason')->table($own), data: ['reason' => 'Perfil incompleto.'])
         ->assertNotified(__('panel-admin::delas.actions.reason_corrected'))
         ->assertSee('Perfil incompleto.')
-        ->assertSee(__('panel-admin::delas.actions.original_reason', ['reason' => 'Perfil incompleo.']));
+        ->assertSee(__('panel-admin::delas.actions.view_original'))
+        ->mountAction(TestAction::make('viewOriginal')->table($own))
+        ->assertActionMounted(TestAction::make('viewOriginal')->table($own))
+        ->assertMountedActionModalSee('Perfil incompleo.');
 
     expect($own->fresh()->reason)->toBe('Perfil incompleo.')
         ->and($own->fresh()->currentReason())->toBe('Perfil incompleto.');
@@ -421,4 +424,19 @@ test('a líder remove a tag pela Membras e bloqueia novos pedidos junto', functi
         ->and($block->user_id)->toBe($member->user_id)
         ->and($block->reason)->toBe('Perfil falso.')
         ->and($other->fresh()->status)->toBe(DelasRequestStatus::Revoked);
+});
+
+test('o botão de corrigir avisa até quando a moderadora pode corrigir', function (): void {
+    $this->freezeTime();
+    $moderator = User::factory()->delasModerator()->create();
+    $this->actingAs($moderator);
+    $own = DelasTransition::factory()->create(['action' => DelasAction::Rejected, 'actor_id' => $moderator->getKey(), 'reason' => 'Motivo.']);
+    DelasTransition::factory()->create(['action' => DelasAction::Rejected, 'reason' => 'Outro.']);
+
+    $deadline = now()->addHours(config()->integer('delas.reason_correction_hours'))->timezone(config('app.display_timezone'))->format('d/m/Y H:i');
+
+    livewire(DelasHistoryPage::class)
+        ->loadTable()
+        ->mountAction(TestAction::make('correctReason')->table($own))
+        ->assertMountedActionModalSee(__('panel-admin::delas.actions.correct_until', ['date' => $deadline]));
 });

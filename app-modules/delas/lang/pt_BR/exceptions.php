@@ -18,7 +18,7 @@ return [
     'cannot_manage_role' => 'Líderes e super admins são gerenciados no /admin.',
     'already_moderator' => 'Esta pessoa já é moderadora He4rt Delas.',
     'not_moderator' => 'Esta pessoa não é moderadora He4rt Delas.',
-    'reason_not_correctable' => 'Esta linha do histórico não tem um motivo que possa ser corrigido.',
-    'cannot_correct_reason' => 'Só quem escreveu o motivo pode corrigi-lo, e até :hours horas depois. Depois disso, peça a uma líder.',
-    'reason_unchanged' => 'O motivo corrigido é igual ao atual.',
+    'reason_not_correctable' => 'Esta linha do histórico não tem um motivo que possa ser editado.',
+    'cannot_correct_reason' => 'Só quem escreveu o motivo pode editá-lo, e até :hours horas depois. Depois disso, peça a uma líder.',
+    'reason_unchanged' => 'O motivo editado é igual ao atual.',
 ];
