@@ -148,7 +148,7 @@
                 </p>
             @endif
             @if ($hasDelasTag)
-                <div class="mt-3"><x-panel-app::delas.tag /></div>
+                <div class="mt-3"><x-he4rt::delas.tag /></div>
             @endif
         </div>
 

@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace He4rt\PanelApp;
 
-use BladeUI\Icons\Factory as IconFactory;
 use Filament\Support\Assets\Js;
 use Filament\Support\Facades\FilamentAsset;
 use He4rt\PanelApp\Livewire\Delas\DelasProfileSection;
@@ -22,14 +21,6 @@ use Livewire\Livewire;
 
 class PanelAppServiceProvider extends ServiceProvider
 {
-    public function register(): void
-    {
-        // Ícone oficial da He4rt Delas como `he4rt-delas` (cor da marca no próprio SVG).
-        $this->callAfterResolving(IconFactory::class, function (IconFactory $factory): void {
-            $factory->add('he4rt', ['path' => __DIR__.'/../resources/svg', 'prefix' => 'he4rt']);
-        });
-    }
-
     public function boot(): void
     {
         $this->loadViewsFrom(__DIR__.'/../resources/views', 'panel-app');

@@ -11,7 +11,7 @@
     <x-filament::section>
         <x-slot name="heading">
             <span class="inline-flex items-center gap-2">
-                <x-panel-app::delas.logo class="text-delas-500 h-4 w-auto" />
+                <x-he4rt::delas.logo class="text-delas-500 h-4 w-auto" />
                 {{ __('panel-app::delas.name') }}
             </span>
         </x-slot>
@@ -76,7 +76,7 @@
                     <x-panel-app::delas.callout tone="success" icon="heroicon-o-check-circle" role="status">
                         <x-slot name="title">{{ __('panel-app::delas.profile.member_title') }}</x-slot>
                         {{ __('panel-app::delas.profile.member_body') }}
-                        <div class="mt-3"><x-panel-app::delas.tag /></div>
+                        <div class="mt-3"><x-he4rt::delas.tag /></div>
                     </x-panel-app::delas.callout>
 
                     @break

@@ -10,6 +10,6 @@
         ])
     }}
 >
-    <x-panel-app::delas.logo @class(['w-auto', 'h-3.5' => $size === 'lg', 'h-3' => $size !== 'lg']) />
+    <x-he4rt::delas.logo @class(['w-auto', 'h-3.5' => $size === 'lg', 'h-3' => $size !== 'lg']) />
     He4rt Delas
 </span>
