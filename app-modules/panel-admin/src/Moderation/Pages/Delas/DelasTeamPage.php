@@ -91,7 +91,8 @@ class DelasTeamPage extends Page implements HasTable
                     ->modalHeading(__('panel-admin::delas.actions.add_moderator_heading'))
                     ->modalDescription(__('panel-admin::delas.actions.add_moderator_body'))
                     ->schema([
-                        $this->searchablePersonSelect(fn (): Builder => $this->candidates()->forModerator($this->actor())),
+                        $this->searchablePersonSelect(fn (): Builder => $this->candidates()->forModerator($this->actor()))
+                            ->helperText(__('panel-admin::delas.actions.moderator_hint')),
                     ])
                     ->action(fn (array $data): bool => $this->attempt(
                         fn () => resolve(AddDelasModerator::class)->handle($this->findUser($data['user_id']), $this->actor()),

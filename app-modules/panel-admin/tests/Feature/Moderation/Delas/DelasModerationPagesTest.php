@@ -285,7 +285,7 @@ test('líder remove a tag com motivo', function (): void {
 test('líder adiciona e revoga moderadora pela Equipe', function (): void {
     $this->actingAs(User::factory()->delasLead()->create());
     User::factory()->delasModerator()->create();
-    $target = User::factory()->create();
+    $target = DelasTagRequest::factory()->approved()->create()->user;
 
     livewire(DelasTeamPage::class)
         ->callAction(TestAction::make('addModerator')->table(), data: ['user_id' => $target->getKey()])
@@ -345,12 +345,20 @@ test('o seletor de remover lista só quem tem a tag, já carregado', function ()
         ->and(array_keys($select->getOptions()))->toEqualCanonicalizing($members->map->getKey()->all());
 });
 
-test('a busca de adicionar moderadora não acha super admin nem a equipe', function (): void {
-    $this->actingAs(User::factory()->delasLead()->create());
+test('a busca de adicionar moderadora só acha membras com a tag, fora super admin e a equipe', function (): void {
+    $lead = User::factory()->delasLead()->create();
+    $this->actingAs($lead);
     $carla = User::factory()->create(['name' => 'Carla Comum', 'username' => 'carlacomum']);
-    User::factory()->superAdmin()->create(['name' => 'Carla Admin', 'username' => 'carlaadmin']);
-    User::factory()->delasModerator()->create(['name' => 'Carla Moderadora', 'username' => 'carlamod']);
-    User::factory()->delasLead()->create(['name' => 'Carla Líder', 'username' => 'carlalider']);
+    User::factory()->create(['name' => 'Carla Sem Tag', 'username' => 'carlasemtag']);
+    $others = [
+        User::factory()->superAdmin()->create(['name' => 'Carla Admin', 'username' => 'carlaadmin']),
+        User::factory()->delasModerator()->create(['name' => 'Carla Moderadora', 'username' => 'carlamod']),
+        User::factory()->delasLead()->create(['name' => 'Carla Líder', 'username' => 'carlalider']),
+    ];
+
+    foreach ([$carla, ...$others] as $user) {
+        DelasTagRequest::factory()->for($user)->approved()->create(['decided_by' => $lead->getKey()]);
+    }
 
     $select = mountedPersonSelect(livewire(DelasTeamPage::class)->mountAction(TestAction::make('addModerator')->table()));
 

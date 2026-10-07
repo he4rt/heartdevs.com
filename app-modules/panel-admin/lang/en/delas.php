@@ -123,6 +123,7 @@ return [
         'add_moderator' => 'Add moderator',
         'add_moderator_heading' => 'Add a He4rt Delas moderator',
         'add_moderator_body' => 'The person will see the He4rt Delas queue, blocks and history and decide requests. Leads are assigned by super admins in the user form.',
+        'moderator_hint' => 'Only members with the tag show up. To add someone without the tag, use “Grant tag” first.',
         'moderator_added' => 'Moderator added',
         'remove_moderator' => 'Revoke moderator',
         'remove_moderator_heading' => "Revoke :name's role?",

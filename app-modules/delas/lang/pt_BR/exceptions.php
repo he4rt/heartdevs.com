@@ -16,6 +16,7 @@ return [
     'already_has_tag' => 'Esta pessoa já tem a tag He4rt Delas.',
     'has_no_tag' => 'Esta pessoa não tem a tag He4rt Delas.',
     'cannot_manage_role' => 'Líderes e super admins são gerenciados no /admin.',
+    'moderator_needs_tag' => 'Só quem tem a tag He4rt Delas pode ser moderadora. Conceda a tag antes.',
     'already_moderator' => 'Esta pessoa já é moderadora He4rt Delas.',
     'not_moderator' => 'Esta pessoa não é moderadora He4rt Delas.',
     'reason_not_correctable' => 'Esta linha do histórico não tem um motivo que possa ser editado.',

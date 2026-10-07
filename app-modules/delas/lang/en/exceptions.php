@@ -16,6 +16,7 @@ return [
     'already_has_tag' => 'This person already has the He4rt Delas tag.',
     'has_no_tag' => 'This person does not have the He4rt Delas tag.',
     'cannot_manage_role' => 'Leads and super admins are managed in /admin.',
+    'moderator_needs_tag' => 'Only people with the He4rt Delas tag can be moderators. Grant the tag first.',
     'already_moderator' => 'This person is already a He4rt Delas moderator.',
     'not_moderator' => 'This person is not a He4rt Delas moderator.',
     'reason_not_correctable' => 'This history entry has no reason that can be edited.',

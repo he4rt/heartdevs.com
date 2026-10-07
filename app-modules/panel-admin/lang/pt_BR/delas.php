@@ -123,6 +123,7 @@ return [
         'add_moderator' => 'Adicionar moderadora',
         'add_moderator_heading' => 'Adicionar moderadora He4rt Delas',
         'add_moderator_body' => 'A pessoa passa a ver a fila, os bloqueios e o histórico da He4rt Delas e a decidir pedidos. Líderes são atribuídas por super admins, no cadastro de usuários.',
+        'moderator_hint' => 'Só aparecem membras com a tag. Para adicionar alguém sem a tag, use “Conceder tag” antes.',
         'moderator_added' => 'Moderadora adicionada',
         'remove_moderator' => 'Revogar moderadora',
         'remove_moderator_heading' => 'Revogar o papel de :name?',

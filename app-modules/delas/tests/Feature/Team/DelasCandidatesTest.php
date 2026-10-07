@@ -32,17 +32,22 @@ test('remover: só aparece quem tem a tag', function (): void {
     expect($this->candidates->forRevoke($this->lead)->pluck('id')->all())->toBe([$member->id]);
 });
 
-test('adicionar moderadora: fora quem é super admin, moderadora ou líder', function (): void {
+test('adicionar moderadora: só quem tem a tag, fora super admin, moderadora ou líder', function (): void {
     $member = User::factory()->create();
     $streamer = User::factory()->streamer()->create();
+    $withoutTag = User::factory()->create();
     $superAdmin = User::factory()->superAdmin()->create();
     $moderator = User::factory()->delasModerator()->create();
     $otherLead = User::factory()->delasLead()->create();
 
+    foreach ([$member, $streamer, $superAdmin, $moderator, $otherLead] as $user) {
+        DelasTagRequest::factory()->for($user)->approved()->create(['decided_by' => $this->lead->getKey()]);
+    }
+
     $ids = $this->candidates->forModerator($this->lead)->pluck('id')->all();
 
     expect($ids)->toContain($member->id, $streamer->id)
-        ->not->toContain($superAdmin->id, $moderator->id, $otherLead->id);
+        ->not->toContain($withoutTag->id, $superAdmin->id, $moderator->id, $otherLead->id);
 });
 
 test('a própria pessoa que age nunca aparece', function (): void {

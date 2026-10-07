@@ -5,6 +5,7 @@ declare(strict_types=1);
 use He4rt\Delas\Exceptions\DelasException;
 use He4rt\Delas\History\Enums\DelasAction;
 use He4rt\Delas\History\Models\DelasTransition;
+use He4rt\Delas\TagRequest\Models\DelasTagRequest;
 use He4rt\Delas\Team\Actions\AddDelasModerator;
 use He4rt\Delas\Team\Actions\RemoveDelasModerator;
 use He4rt\Identity\Authorization\Enums\UserRole;
@@ -13,7 +14,7 @@ use Illuminate\Auth\Access\AuthorizationException;
 
 test('líder adiciona e remove moderadora, e as duas ações vão para o histórico', function (): void {
     $lead = User::factory()->delasLead()->create();
-    $target = User::factory()->create();
+    $target = DelasTagRequest::factory()->approved()->create(['decided_by' => $lead->getKey()])->user;
 
     resolve(AddDelasModerator::class)->handle($target, $lead);
     expect($target->fresh()->can('moderate-delas'))->toBeTrue();
@@ -22,6 +23,15 @@ test('líder adiciona e remove moderadora, e as duas ações vão para o histór
     expect($target->fresh()->can('moderate-delas'))->toBeFalse()
         ->and(DelasTransition::query()->pluck('action')->all())
         ->toEqualCanonicalizing([DelasAction::ModeratorAdded, DelasAction::ModeratorRemoved]);
+});
+
+test('só quem tem a tag vira moderadora', function (): void {
+    $lead = User::factory()->delasLead()->create();
+    $withoutTag = User::factory()->create();
+
+    expect(fn () => resolve(AddDelasModerator::class)->handle($withoutTag, $lead))
+        ->toThrow(DelasException::class, __('delas::exceptions.moderator_needs_tag'))
+        ->and($withoutTag->fresh()->hasRole(UserRole::DelasModerator))->toBeFalse();
 });
 
 test('moderadora não gerencia a equipe', function (): void {
