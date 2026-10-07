@@ -20,7 +20,6 @@ use He4rt\PanelApp\Clusters\Streaming\Pages\StreamOverlaysPage;
 use He4rt\PanelApp\Clusters\Streaming\Pages\StreamSessionPage;
 use He4rt\PanelApp\Clusters\Streaming\Pages\StreamSessionsPage;
 use He4rt\PanelApp\Clusters\Streaming\StreamingCluster;
-use He4rt\PanelApp\Pages\Delas\DelasModerationPage;
 use He4rt\PanelApp\Pages\EventPage;
 use He4rt\PanelApp\Pages\EventsPage;
 use He4rt\PanelApp\Pages\LoginPage;
@@ -63,7 +62,6 @@ class AppPanelProvider extends PanelProvider
                 EventPage::class,
                 ThreadPage::class,
                 ProfilePage::class,
-                DelasModerationPage::class,
                 StreamingCluster::class,
                 StreamDashboardPage::class,
                 StreamOverlaysPage::class,
