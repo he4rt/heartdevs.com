@@ -352,3 +352,35 @@ test('a busca de adicionar moderadora não acha super admin nem a equipe', funct
 
     expect($select->getSearchResults('carla'))->toBe([$carla->getKey() => 'Carla Comum (@carlacomum)']);
 });
+
+test('a moderadora corrige o próprio motivo pelo histórico, e a original continua lá', function (): void {
+    $moderator = User::factory()->delasModerator()->create();
+    $this->actingAs($moderator);
+    $own = DelasTransition::factory()->create(['action' => DelasAction::Rejected, 'actor_id' => $moderator->getKey(), 'reason' => 'Perfil incompleo.']);
+    $others = DelasTransition::factory()->create(['action' => DelasAction::Rejected, 'actor_id' => User::factory()->delasModerator()->create()->getKey(), 'reason' => 'Outro motivo.']);
+
+    livewire(DelasHistoryPage::class)
+        ->loadTable()
+        ->assertActionVisible(TestAction::make('correctReason')->table($own))
+        ->assertActionHidden(TestAction::make('correctReason')->table($others))
+        ->callAction(TestAction::make('correctReason')->table($own), data: ['reason' => 'Perfil incompleto.'])
+        ->assertNotified(__('panel-admin::delas.actions.reason_corrected'))
+        ->assertSee('Perfil incompleto.');
+
+    expect($own->fresh()->reason)->toBe('Perfil incompleo.')
+        ->and($own->fresh()->currentReason())->toBe('Perfil incompleto.');
+});
+
+test('a líder vê a correção como linha própria no histórico; a moderadora, não', function (): void {
+    $original = DelasTransition::factory()->create(['action' => DelasAction::Blocked, 'reason' => 'Motivo.']);
+    $correction = DelasTransition::factory()->create(['action' => DelasAction::ReasonCorrected, 'corrects_id' => $original->getKey(), 'reason' => 'Motivo corrigido.']);
+
+    $this->actingAs(User::factory()->delasModerator()->create());
+    livewire(DelasHistoryPage::class)->loadTable()
+        ->assertCanSeeTableRecords([$original])
+        ->assertCanNotSeeTableRecords([$correction]);
+
+    $this->actingAs(User::factory()->delasLead()->create());
+    livewire(DelasHistoryPage::class)->loadTable()
+        ->assertCanSeeTableRecords([$original, $correction]);
+});
