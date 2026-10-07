@@ -30,6 +30,29 @@ enum UserRole: string implements HasColor, HasDescription, HasIcon, HasLabel
 
     public const string GUARD = 'web';
 
+    /**
+     * @return list<self>
+     */
+    public static function withAdminAccess(): array
+    {
+        return array_values(array_filter(self::cases(), fn (self $role): bool => $role->grantsAdminAccess()));
+    }
+
+    /**
+     * Papéis que entram no `/admin` (ADR-0003). Entrar não libera nada por si só:
+     * cada Resource, Page e Cluster decide no próprio `canAccess()`.
+     *
+     * O `match` não tem `default` de propósito: papel novo sem essa decisão
+     * quebra no PHPStan antes de quebrar em produção.
+     */
+    public function grantsAdminAccess(): bool
+    {
+        return match ($this) {
+            self::SuperAdmin, self::DelasModerator, self::DelasLead => true,
+            self::Streamer => false,
+        };
+    }
+
     public function getLabel(): string
     {
         return match ($this) {
@@ -58,7 +81,7 @@ enum UserRole: string implements HasColor, HasDescription, HasIcon, HasLabel
         return match ($this) {
             self::SuperAdmin => 'Acesso total ao painel admin. Passa por cima de qualquer verificação de permissão.',
             self::Streamer => 'Conecta a Twitch com permissões de broadcaster para usar as ferramentas de live.',
-            self::DelasModerator => 'Aprova, rejeita e bloqueia solicitações da tag He4rt Delas no Hub.',
+            self::DelasModerator => 'Aprova, rejeita e bloqueia solicitações da tag He4rt Delas na moderação do /admin.',
             self::DelasLead => 'Tudo da moderadora, mais gerenciar moderadoras e conceder ou remover a tag He4rt Delas.',
         };
     }

@@ -36,6 +36,22 @@ test('super admin can access panel via canAccessPanel in production', function (
     expect($user->canAccessPanel($panel))->toBeTrue();
 });
 
+test('roles that moderate something can access the admin panel in production', function (string $state): void {
+    $user = User::factory()->{$state}()->create();
+
+    app()->detectEnvironment(fn () => 'production');
+
+    expect($user->canAccessPanel(Filament::getPanel('admin')))->toBeTrue();
+})->with(['delasModerator', 'delasLead']);
+
+test('streamer cannot access admin panel in production', function (): void {
+    $user = User::factory()->streamer()->create();
+
+    app()->detectEnvironment(fn () => 'production');
+
+    expect($user->canAccessPanel(Filament::getPanel('admin')))->toBeFalse();
+});
+
 test('user without role cannot access admin panel in production', function (): void {
     $user = User::factory()->create();
 
