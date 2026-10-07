@@ -7,6 +7,7 @@ use Filament\Facades\Filament;
 use Filament\Forms\Components\Select;
 use Filament\Navigation\NavigationItem;
 use He4rt\Delas\Block\Models\DelasRequesterBlock;
+use He4rt\Delas\History\Actions\CorrectDelasReason;
 use He4rt\Delas\History\Enums\DelasAction;
 use He4rt\Delas\History\Models\DelasTransition;
 use He4rt\Delas\TagRequest\Enums\DelasRequestStatus;
@@ -369,27 +370,37 @@ test('a moderadora corrige o próprio motivo pelo histórico, e a original conti
         ->callAction(TestAction::make('correctReason')->table($own), data: ['reason' => 'Perfil incompleto.'])
         ->assertNotified(__('panel-admin::delas.actions.reason_corrected'))
         ->assertSee('Perfil incompleto.')
-        ->assertSee(__('panel-admin::delas.actions.view_original'))
-        ->mountAction(TestAction::make('viewOriginal')->table($own))
-        ->assertActionMounted(TestAction::make('viewOriginal')->table($own))
-        ->assertMountedActionModalSee('Perfil incompleo.');
+        ->assertDontSee(__('panel-admin::delas.actions.view_versions'))
+        ->assertDontSee('Perfil incompleo.');
 
     expect($own->fresh()->reason)->toBe('Perfil incompleo.')
         ->and($own->fresh()->currentReason())->toBe('Perfil incompleto.');
 });
 
-test('a líder vê a correção como linha própria no histórico; a moderadora, não', function (): void {
-    $original = DelasTransition::factory()->create(['action' => DelasAction::Blocked, 'reason' => 'Motivo.']);
-    $correction = DelasTransition::factory()->create(['action' => DelasAction::ReasonCorrected, 'corrects_id' => $original->getKey(), 'reason' => 'Motivo corrigido.']);
+test('cada edição fica guardada, sem linha a mais, e só a líder abre as versões', function (): void {
+    $lead = User::factory()->delasLead()->create();
+    $original = DelasTransition::factory()->create(['action' => DelasAction::Blocked, 'actor_id' => $lead->getKey(), 'reason' => 'Primeiro texto.']);
+    resolve(CorrectDelasReason::class)->handle($original, $lead, 'Segundo texto.');
+    $this->travel(1)->minutes();
+    resolve(CorrectDelasReason::class)->handle($original->fresh(), $lead, 'Terceiro texto.');
+    DelasTransition::factory()->create(['action' => DelasAction::Approved]);
+
+    $this->actingAs($lead);
+    livewire(DelasHistoryPage::class)
+        ->loadTable()
+        ->assertCountTableRecords(2)
+        ->assertSee('Terceiro texto.')
+        ->mountAction(TestAction::make('viewVersions')->table($original))
+        ->assertMountedActionModalSee(['Primeiro texto.', 'Segundo texto.', 'Terceiro texto.']);
 
     $this->actingAs(User::factory()->delasModerator()->create());
-    livewire(DelasHistoryPage::class)->loadTable()
-        ->assertCanSeeTableRecords([$original])
-        ->assertCanNotSeeTableRecords([$correction]);
+    livewire(DelasHistoryPage::class)
+        ->loadTable()
+        ->assertSee('Terceiro texto.')
+        ->assertDontSee(['Primeiro texto.', 'Segundo texto.'])
+        ->assertActionDisabled(TestAction::make('viewVersions')->table($original));
 
-    $this->actingAs(User::factory()->delasLead()->create());
-    livewire(DelasHistoryPage::class)->loadTable()
-        ->assertCanSeeTableRecords([$original, $correction]);
+    expect(DelasTransition::query()->where('corrects_id', $original->getKey())->count())->toBe(2);
 });
 
 test('a moderadora vê quem tem a tag, mas só a líder remove', function (): void {

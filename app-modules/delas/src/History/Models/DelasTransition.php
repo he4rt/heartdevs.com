@@ -14,10 +14,12 @@ use He4rt\Delas\TagRequest\Models\DelasTagRequest;
 use He4rt\Identity\User\Models\User;
 use Illuminate\Database\Eloquent\Attributes\Table;
 use Illuminate\Database\Eloquent\Attributes\UseFactory;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 
 /**
@@ -37,6 +39,7 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
  * @property string|null $reason
  * @property CarbonInterface|null $created_at
  * @property-read DelasTransition|null $latestCorrection
+ * @property-read Collection<int, DelasTransition> $corrections
  */
 #[Table(name: 'delas_transitions')]
 #[UseFactory(factoryClass: DelasTransitionFactory::class)]
@@ -96,6 +99,16 @@ final class DelasTransition extends Model
     }
 
     /**
+     * Todas as edições do motivo desta linha, da mais antiga para a mais recente.
+     *
+     * @return HasMany<self, $this>
+     */
+    public function corrections(): HasMany
+    {
+        return $this->hasMany(self::class, 'corrects_id')->oldest('created_at');
+    }
+
+    /**
      * A correção mais recente do motivo desta linha, se houver.
      *
      * @return HasOne<self, $this>
@@ -111,7 +124,7 @@ final class DelasTransition extends Model
      */
     public function currentReason(): ?string
     {
-        $correction = $this->latestCorrection;
+        $correction = $this->relationLoaded('corrections') ? $this->corrections->last() : $this->latestCorrection;
 
         return $correction instanceof self ? $correction->reason : $this->reason;
     }
