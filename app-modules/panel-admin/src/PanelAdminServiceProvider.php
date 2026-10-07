@@ -4,10 +4,13 @@ declare(strict_types=1);
 
 namespace He4rt\PanelAdmin;
 
+use Filament\Clusters\Cluster;
 use Filament\Navigation\NavigationBuilder;
 use Filament\Navigation\NavigationGroup;
 use Filament\Navigation\NavigationItem;
+use Filament\Pages\Page;
 use Filament\Panel;
+use Filament\Resources\Resource as FilamentResource;
 use Filament\Support\Assets\AlpineComponent;
 use Filament\Support\Facades\FilamentAsset;
 use He4rt\PanelAdmin\Contributions\Widgets\ActivityTimelineWidget;
@@ -155,32 +158,50 @@ class PanelAdminServiceProvider extends ServiceProvider
     {
         return $builder
             ->items([
-                ...Dashboard::getNavigationItems(),
-                ...ModerationCluster::getNavigationItems(),
-                ...MarketingCluster::getNavigationItems(),
-                ...TwitchCluster::getNavigationItems(),
-                ...GithubCluster::getNavigationItems(),
-                ...DiscordCluster::getNavigationItems(),
-                ...EventResource::getNavigationItems(),
+                ...$this->itemsFor(Dashboard::class),
+                ...$this->itemsFor(ModerationCluster::class),
+                ...$this->itemsFor(MarketingCluster::class),
+                ...$this->itemsFor(TwitchCluster::class),
+                ...$this->itemsFor(GithubCluster::class),
+                ...$this->itemsFor(DiscordCluster::class),
+                ...$this->itemsFor(EventResource::class),
             ])
             ->groups([
                 NavigationGroup::make(NavGroup::People->getLabel())
                     ->icon(NavGroup::People->getIcon())
                     ->items([
-                        ...UserResource::getNavigationItems(),
-                        ...ExternalIdentityResource::getNavigationItems(),
-                        ...ProfileResource::getNavigationItems(),
-                        ...SkillResource::getNavigationItems(),
+                        ...$this->itemsFor(UserResource::class),
+                        ...$this->itemsFor(ExternalIdentityResource::class),
+                        ...$this->itemsFor(ProfileResource::class),
+                        ...$this->itemsFor(SkillResource::class),
                     ]),
                 NavigationGroup::make(NavGroup::Content->getLabel())
                     ->icon(NavGroup::Content->getIcon())
                     ->items([
-                        ...ContentEntryResource::getNavigationItems(),
-                        ...InteractionResource::getNavigationItems(),
-                        ...RetrospectiveResource::getNavigationItems(),
-                        ...AlbumResource::getNavigationItems(),
+                        ...$this->itemsFor(ContentEntryResource::class),
+                        ...$this->itemsFor(InteractionResource::class),
+                        ...$this->itemsFor(RetrospectiveResource::class),
+                        ...$this->itemsFor(AlbumResource::class),
                     ]),
             ]);
+    }
+
+    /**
+     * Itens de navegação de um Resource, Page ou Cluster, só se a pessoa pode
+     * acessá-lo. O `getNavigationItems()` não checa o `canAccess()` (quem checa é
+     * o `registerNavigationItems()`, que a navegação montada na mão não usa), e
+     * sem isso o item aparece na sidebar e dá 403 no clique (ADR-0003 do identity).
+     *
+     * @param  class-string<FilamentResource>|class-string<Page>  $component
+     * @return array<NavigationItem>
+     */
+    private function itemsFor(string $component): array
+    {
+        $isAccessible = is_subclass_of($component, Cluster::class)
+            ? $component::canAccessClusteredComponents()
+            : $component::canAccess();
+
+        return $isAccessible ? $component::getNavigationItems() : [];
     }
 
     private function moderationNavigation(NavigationBuilder $builder): NavigationBuilder

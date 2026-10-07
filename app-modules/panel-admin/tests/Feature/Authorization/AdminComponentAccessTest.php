@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 use Filament\Clusters\Cluster;
 use Filament\Facades\Filament;
+use Filament\Navigation\NavigationGroup;
+use Filament\Navigation\NavigationItem;
 use He4rt\Identity\User\Models\User;
 use He4rt\PanelAdmin\Contributions\Widgets\ActivityTimelineWidget;
 use He4rt\PanelAdmin\Pages\Dashboard;
@@ -69,4 +71,15 @@ test('quem não é super admin recebe 403 ao abrir uma tela restrita', function 
 
     $this->get(Dashboard::getUrl())->assertOk();
     $this->get('/admin/users')->assertForbidden();
+});
+
+test('a sidebar só mostra o que a pessoa pode acessar', function (): void {
+    actingAs(User::factory()->create());
+
+    $labels = collect(Filament::getPanel('admin')->getNavigation())
+        ->flatMap(fn (NavigationGroup $group): array => $group->getItems())
+        ->map(fn (NavigationItem $item): string => $item->getLabel())
+        ->all();
+
+    expect($labels)->toBe(['Dashboard']);
 });
