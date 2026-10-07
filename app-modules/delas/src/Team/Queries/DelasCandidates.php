@@ -46,17 +46,18 @@ final readonly class DelasCandidates
 
     /**
      * Quem pode virar moderadora: fora da equipe (moderadoras e líderes) e sem
-     * super admin.
+     * super admin. Filtra pelo nome da role direto, sem o `withoutRole()` do
+     * Spatie, que quebra quando uma das roles ainda não existe no banco.
      *
      * @return Builder<User>
      */
     public function forModerator(User $actor): Builder
     {
-        return $this->others($actor)->withoutRole([
+        return $this->others($actor)->whereDoesntHave('roles', fn (Builder $roles): Builder => $roles->whereIn('name', [
             UserRole::SuperAdmin->value,
             UserRole::DelasModerator->value,
             UserRole::DelasLead->value,
-        ]);
+        ]));
     }
 
     /**
