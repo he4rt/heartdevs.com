@@ -259,7 +259,7 @@ Sem coluna `metadata`: nenhum fluxo a preenche, e um jsonb sem forma quebraria o
 
 ### Actions de domínio
 
-`final readonly`, `handle(DTO)`, sem sufixo `Action` (padrão de `CreateShortLink`,
+`final readonly`, `handle()` com parâmetros tipados (ator sempre explícito), sem sufixo `Action` (padrão de `CreateShortLink`,
 `ReviewAppeal`). As que mudam estado rodam em `DB::transaction` com `lockForUpdate()` e gravam
 a linha de histórico.
 

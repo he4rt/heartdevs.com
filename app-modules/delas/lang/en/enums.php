@@ -39,4 +39,11 @@ return [
         'admin' => ['label' => 'Admin', 'description' => 'Done by a super admin.'],
         'system' => ['label' => 'System', 'description' => 'Done automatically by the platform.'],
     ],
+    'eligibility' => [
+        'can_request' => ['label' => 'Can request', 'description' => 'The person can request the He4rt Delas tag.'],
+        'pending' => ['label' => 'Awaiting approval', 'description' => 'There is a pending request.'],
+        'member' => ['label' => 'Member', 'description' => 'The person has the He4rt Delas tag.'],
+        'cooldown' => ['label' => 'Cooldown', 'description' => 'A recent rejection or removal prevents a new request for now.'],
+        'blocked' => ['label' => 'Unavailable', 'description' => 'The person is blocked from requesting the tag.'],
+    ],
 ];

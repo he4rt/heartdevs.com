@@ -39,4 +39,11 @@ return [
         'admin' => ['label' => 'Admin', 'description' => 'Ação feita por um super admin.'],
         'system' => ['label' => 'Sistema', 'description' => 'Ação automática da plataforma.'],
     ],
+    'eligibility' => [
+        'can_request' => ['label' => 'Pode solicitar', 'description' => 'A pessoa pode pedir a tag He4rt Delas.'],
+        'pending' => ['label' => 'Aguardando aprovação', 'description' => 'Há uma solicitação pendente.'],
+        'member' => ['label' => 'Faz parte', 'description' => 'A pessoa tem a tag He4rt Delas.'],
+        'cooldown' => ['label' => 'Em espera', 'description' => 'Uma rejeição ou remoção recente impede um novo pedido por enquanto.'],
+        'blocked' => ['label' => 'Indisponível', 'description' => 'A pessoa está bloqueada de solicitar a tag.'],
+    ],
 ];

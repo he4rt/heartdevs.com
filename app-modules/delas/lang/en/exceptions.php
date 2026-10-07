@@ -1,0 +1,21 @@
+<?php
+
+declare(strict_types=1);
+
+return [
+    'already_has_active_request' => 'This person already has a pending or approved request.',
+    'in_cooldown' => 'You cannot request yet. Try again from :date.',
+    'blocked' => 'It is not possible to request the He4rt Delas tag right now.',
+    'invalid_transition' => 'A :from request cannot become :to.',
+    'cannot_decide_own' => 'You cannot decide on your own tag. Someone else on the team has to.',
+    'reason_required' => 'Provide a reason to continue.',
+    'cannot_block_team' => 'Moderators, leads, admins and yourself cannot be blocked.',
+    'already_blocked' => 'This person is already blocked.',
+    'block_already_lifted' => 'This block has already been lifted.',
+    'cannot_unblock_others' => 'Only whoever created the block or a lead can lift it.',
+    'already_has_tag' => 'This person already has the He4rt Delas tag.',
+    'has_no_tag' => 'This person does not have the He4rt Delas tag.',
+    'cannot_manage_role' => 'Leads and super admins are managed in /admin.',
+    'already_moderator' => 'This person is already a He4rt Delas moderator.',
+    'not_moderator' => 'This person is not a He4rt Delas moderator.',
+];
