@@ -23,7 +23,7 @@ The admin panel (`/admin`) is the operational hub for the He4rt Developers commu
 
 Panel Admin is a **view layer** module. It:
 
-- **Reads from** `activity` (messages, voice), `identity` (external identities), `moderation` (cases, appeals, actions), `community` (retrospectives)
+- **Reads from** `activity` (messages, voice), `identity` (external identities), `moderation` (cases, appeals, actions), `community` (retrospectives), `delas` (tag requests, blocks, history)
 - **Writes only editorial state** it is the operator UI for: the retrospective's texts, period and
   `deck_config` curation. Everything that computes or freezes data goes through a domain Action
   (`PublishRetrospective`), never through the panel
@@ -42,9 +42,12 @@ panel-admin/
 │   │   │   └── MeetingShowcasePage.php
 │   │   └── Widgets/
 │   │       └── DiscordStatsWidget.php
+│   ├── Concerns/
+│   │   └── SuperAdminOnly.php
 │   ├── Moderation/
 │   │   ├── ModerationCluster.php
 │   │   ├── Pages/
+│   │   │   └── Delas/           (He4rt Delas: queue, blocks, history, team)
 │   │   ├── Resources/
 │   │   ├── Widgets/
 │   │   └── Livewire/
@@ -59,6 +62,21 @@ panel-admin/
 ├── config/panel-admin.php
 └── docs/adr/
 ```
+
+## Access
+
+Entering `/admin` does not unlock anything by itself
+([identity ADR-0003](../identity/docs/adr/0003-acesso-ao-admin-por-papel-de-moderacao.md)):
+
+- In production, `User::canAccessPanel('admin')` admits super admins and every role whose
+  `UserRole::grantsAdminAccess()` is true (today, the He4rt Delas moderator and lead).
+- Every Resource, Page and Cluster uses the `He4rt\PanelAdmin\Concerns\SuperAdminOnly` trait,
+  except the He4rt Delas pages (gated by `moderate-delas` / `lead-delas`), the shared
+  `ModerationCluster` and the `Dashboard` entry page (whose widgets are super-admin only).
+- `buildNavigation()` adds items through `itemsFor()`, which drops anything the user cannot
+  access (clusters via `canAccessClusteredComponents()`).
+- `tests/Feature/Authorization/AdminComponentAccessTest.php` sweeps every component: a new
+  Resource or Page without the trait breaks it.
 
 ## Navigation pattern
 

@@ -8,6 +8,7 @@ deciders:
     - damacosta
 related:
     spec: 2026-10-06-he4rt-delas-tag-e-moderacao
+    adr: identity/0003-acesso-ao-admin-por-papel-de-moderacao
 ---
 
 # ADR-0001: Módulo próprio, papel do Spatie e histórico de decisões
@@ -36,8 +37,8 @@ precisa morar em algum lugar e ter uma forma de autorizar quem decide.
 - **Módulo de domínio `delas`**, dependente só do `identity`. Os painéis dependem dele.
 - **Papéis `delas-moderator` e `delas-lead`** como cases de `UserRole` no `identity`, criados por
   migration, como a role `streamer`. A líder gerencia moderadoras, concede e remove a tag e vê o
-  histórico completo, tudo no Hub. _Vai além da #570_ ("atribuível apenas por admins do Hub"):
-  dá autonomia à He4rt Delas sem abrir o `/admin`.
+  histórico completo. _Vai além da #570_ ("atribuível apenas por admins do Hub"): dá autonomia à
+  He4rt Delas sem depender de super admin no dia a dia.
 - **Gates nomeados no `DelasServiceProvider`**: `moderate-delas` (moderadora ou líder) e
   `lead-delas` (líder). Super admins passam nos dois pelo `Gate::before` do identity.
   O código checa o gate, nunca o nome da role.
@@ -50,18 +51,41 @@ precisa morar em algum lugar e ter uma forma de autorizar quem decide.
   quem bloqueou ou por super admin.
 - **Histórico append-only** em `delas_transitions`, gravado pelas actions, sem trigger (ADR-0003
   do `events`).
-- **Tudo no Hub.** Moderadoras, líderes e super admins usam a mesma página He4rt Delas no `/app`,
-  que mostra mais partes conforme o papel. No `/admin` fica só a atribuição dos papéis, pela
-  seção Papéis do formulário de usuário que já existe.
-    - _Alternativas descartadas:_ um cluster He4rt Delas no `/admin` (dois lugares para manter, e
-      líderes não entram no `/admin`) e abrir o `/admin` para moderadoras (contradiz a ADR-0002
-      do `identity`: "o painel inteiro é super admin ou nada").
+- **Moderação no `/admin`, pedido e tag no `/app`.** Moderação na He4rt mora no `/admin`, no
+  cluster de Moderação (`/admin/mod`). A He4rt Delas entra nele como o grupo "He4rt Delas" da
+  subnavegação, com uma página por parte, cada uma com o próprio gate:
+    - Fila (`moderate-delas`, badge de pendentes): aprovar, rejeitar e bloquear;
+    - Bloqueios (`moderate-delas`, badge de bloqueios ativos): desbloquear;
+    - Histórico (`moderate-delas`): só decisões para a moderadora, completo e com filtro para a
+      líder;
+    - Equipe (`lead-delas`): números, conceder e remover a tag, adicionar e revogar moderadora.
+
+    No `/app` ficam só o pedido no perfil (`DelasProfileSection`) e a tag no card do perfil. A
+    atribuição de `delas-lead` continua pela seção Papéis do `UserForm`, só para super admin.
+    - _Antes:_ tudo ficava numa página He4rt Delas no `/app`, porque a ADR-0002 do `identity`
+      dizia que o `/admin` era "super admin ou nada". A
+      [ADR-0003 do `identity`](../../../identity/docs/adr/0003-acesso-ao-admin-por-papel-de-moderacao.md)
+      substitui essa regra: papéis de moderação entram no `/admin` e cada Resource, Page e Cluster
+      decide no `canAccess()`. Assim, a alternativa "abrir o `/admin` para moderadoras" deixa de
+      ser descartada e vira a decisão.
+    - _Alternativa descartada:_ manter a moderação no `/app`. Criaria um segundo lugar de
+      moderação, fora do cluster que já existe.
+
+- **Seletores de pessoa como consulta de domínio** (`DelasCandidates`): conceder lista quem não tem
+  a tag, remover lista só quem tem, adicionar moderadora exclui super admins, moderadoras e
+  líderes, e a própria pessoa que age nunca aparece. As telas só chamam a consulta.
+- **Marca no design system.** A logo, a tag e o ícone `he4rt-delas` moram no módulo `he4rt`
+  (`x-he4rt::delas.logo`, `x-he4rt::delas.tag`), porque os dois painéis usam. A paleta
+  `--color-delas-*` está no tema dos dois painéis.
 
 ## Consequências
 
 - O `identity` ganha um case em `UserRole`, uma migration de role e um state de factory.
 - O campo de roles do `UserForm` passa a ser visível só para super admin. Fora de produção o
   `/admin` é aberto, e sem isso qualquer pessoa autenticada se daria `delas-moderator`.
+- `delas-moderator` e `delas-lead` entram no `/admin` (`UserRole::grantsAdminAccess()`), mas só
+  acessam o Dashboard (sem widgets) e as páginas da He4rt Delas. Todo o resto do admin tem o
+  trait `SuperAdminOnly`, e um teste de varredura cobra isso.
 - Papéis alterados pelas actions do delas entram no histórico. Os alterados direto no `UserForm`
   não: essa auditoria é concern do `identity` e vale para todas as roles.
 - Sincronizar a tag com o cargo `he4rt_delas` do Discord fica para depois. Os eventos de domínio

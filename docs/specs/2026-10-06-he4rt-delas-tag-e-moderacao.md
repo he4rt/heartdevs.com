@@ -6,13 +6,14 @@ date: 2026-10-06
 author: damacosta
 related:
     issues: [570, 571]
-    modules: [delas, identity, panel-app, panel-admin]
+    modules: [delas, identity, panel-app, panel-admin, he4rt]
+    adr: identity/0003-acesso-ao-admin-por-papel-de-moderacao
 ---
 
 # He4rt Delas: solicitação da tag e painel de moderação
 
-Spec cross-module: cria o módulo `delas` e altera `identity`, `panel-app` e `panel-admin`. Por
-isso fica em `docs/specs/` e não dentro de um módulo.
+Spec cross-module: cria o módulo `delas` e altera `identity`, `panel-app`, `panel-admin` e o
+design system (`he4rt`). Por isso fica em `docs/specs/` e não dentro de um módulo.
 
 ## Contexto
 
@@ -35,7 +36,11 @@ Fatos do código atual que moldam o desenho:
   `IdentityServiceProvider` libera tudo para `super-admin`. O precedente de papel comum é
   `streamer`, verificado por `Gate::define('use-streamer-tools')`.
 - **Fora de produção, o `/admin` é aberto a qualquer usuário autenticado**
-  (`User::canAccessPanel`).
+  (`User::canAccessPanel`). Em produção, entram super admins e os papéis de moderação
+  ([ADR-0003 do identity](../../app-modules/identity/docs/adr/0003-acesso-ao-admin-por-papel-de-moderacao.md),
+  que substitui o "super admin ou nada" da ADR-0002). Em qualquer ambiente, cada Resource, Page e
+  Cluster do admin decide no `canAccess()`.
+- **Moderação mora no `/admin`**, no cluster de Moderação (`/admin/mod`).
 - **Não há perfil público.** "Exibir no perfil" significa a página de perfil do `/app`
   (`panel-app/src/Pages/ProfilePage.php`) e o card de preview
   (`components/profile-preview-card.blade.php`), visíveis só para a própria pessoa.
@@ -43,7 +48,8 @@ Fatos do código atual que moldam o desenho:
 ## Objetivos
 
 1. Uma membra solicita a tag He4rt Delas no próprio perfil e acompanha o status.
-2. Moderadoras da He4rt Delas veem a fila de pendentes no Hub e aprovam, rejeitam ou bloqueiam.
+2. Moderadoras da He4rt Delas veem a fila de pendentes no `/admin`, no cluster de Moderação, e
+   aprovam, rejeitam ou bloqueiam.
 3. Super admins atribuem o papel de moderadora e podem conceder ou remover a tag diretamente.
 4. Toda decisão sobre a tag fica registrada com quem fez, quando e o motivo.
 5. Toda regra de acesso é aplicada no domínio, não só ocultando a interface.
@@ -88,12 +94,13 @@ Fatos do código atual que moldam o desenho:
 ### Liderança (líderes da He4rt Delas)
 
 Papel `delas-lead`, atribuído só por super admins, no `/admin`. A líder trabalha **na mesma
-página do Hub**, sem acesso ao `/admin`, e tem tudo o que a moderadora tem, mais:
+área do `/admin` que as moderadoras** (o grupo He4rt Delas do cluster de Moderação) e tem tudo o
+que a moderadora tem, mais:
 
-- números da He4rt Delas no topo da página;
-- histórico completo;
-- aba Moderadoras: adiciona e revoga `delas-moderator`. Não cria nem revoga líderes, e não age
-  sobre super admins;
+- página Equipe, com os números da He4rt Delas no topo;
+- histórico completo, com filtro por ação;
+- na Equipe, adiciona e revoga `delas-moderator`. Não cria nem revoga líderes, e não age sobre
+  super admins;
 - desbloqueia qualquer bloqueio;
 - concede e remove a tag direto:
     - se houver solicitação `pending`, ela é aprovada (`pending → approved`);
@@ -109,10 +116,10 @@ página do Hub**, sem acesso ao `/admin`, e tem tudo o que a moderadora tem, mai
 
 ### Administração (super admins)
 
-- No `/admin`, a única coisa da He4rt Delas é atribuir e retirar `delas-lead` e `delas-moderator`,
-  pela seção Papéis do formulário de usuário (`UserForm`), que já existe. O acesso some na
-  próxima requisição, porque `hasRole` lê `model_has_roles` a cada request.
-- No Hub, passam em todos os gates (via `Gate::before`) e veem a página He4rt Delas como uma
+- Atribuem e retiram `delas-lead` e `delas-moderator` pela seção Papéis do formulário de usuário
+  (`UserForm`), que já existe. O acesso some na próxima requisição, porque `hasRole` lê
+  `model_has_roles` a cada request.
+- Passam em todos os gates (via `Gate::before`) e veem as páginas da He4rt Delas como uma
   líder.
 
 ### Espera de 15 dias
@@ -177,6 +184,12 @@ O case precisa morar em `UserRole` porque enums não são extensíveis por outro
 - "Não bloquear moderadora ou admin" é `Gate::forUser($target)->allows('moderate-delas')`.
 - O `CheckboxList` de roles do `UserForm` passa a ser visível só para `isSuperAdmin()`. Sem
   isso, fora de produção qualquer pessoa autenticada atribuiria `delas-moderator`.
+- Acesso ao `/admin` (ADR-0003 do identity): `UserRole::grantsAdminAccess()` diz se o papel entra
+  (`match` sem `default`), e `User::canAccessPanel('admin')` em produção usa
+  `hasAnyRole(UserRole::withAdminAccess())`. Dentro do painel, todo Resource, Page e Cluster que
+  não é da He4rt Delas tem o trait `SuperAdminOnly`; o Dashboard é a página de entrada, com os
+  widgets só para super admin. A sidebar (`PanelAdminServiceProvider::buildNavigation()`) só
+  mostra o que passa no `canAccess()`.
 
 ### Modelo de dados
 
@@ -289,32 +302,31 @@ dispara também `DelasRequesterUnblocked`. Nenhum listener nesta entrega.
 
 **Hub (`/app`, `panel-app`)**
 
-- Perfil (`ProfilePage`): seção He4rt Delas com toggle e pop-up de confirmação, estado pendente,
-  data da próxima tentativa ou aviso de bloqueio. Tag no card de preview, separada dos badges.
-  Textos em `panel-app/lang/{en,pt_BR}/profile.php`.
-- Página He4rt Delas (nova), registrada em `AppPanelProvider->pages([...])`, com
-  `canAccess(): auth()->user()?->can('moderate-delas') ?? false`, como as páginas de streaming.
-  O conteúdo depende do papel:
-
-    | Parte da página                                                                                                            | Moderadora  | Líder e super admin  |
-    | -------------------------------------------------------------------------------------------------------------------------- | :---------: | :------------------: |
-    | Pendentes: aprovar, rejeitar, bloquear                                                                                     |      ✓      |          ✓           |
-    | Bloqueios: desbloquear                                                                                                     | os próprios |        todos         |
-    | Histórico                                                                                                                  |  decisões   | completo, com filtro |
-    | Números no topo (pendentes, membras com a tag, tempo médio até a decisão, aprovadas e rejeitadas no mês, bloqueios ativos) |             |          ✓           |
-    | Moderadoras: adicionar e revogar `delas-moderator`                                                                         |             |          ✓           |
-    | Conceder e remover a tag direto                                                                                            |             |          ✓           |
-
-    Base visual: `panel-admin/src/Moderation/Livewire/AppealQueue.php`.
+- Perfil (`ProfilePage`): seção He4rt Delas (`DelasProfileSection`) com toggle e pop-up de
+  confirmação, estado pendente, data da próxima tentativa ou aviso de bloqueio. Tag no card de
+  preview, separada dos badges. Textos em `panel-app/lang/{en,pt_BR}/delas.php`.
+- Nada de moderação no `/app`.
 
 **Admin (`/admin`, `panel-admin`)**
 
-Sem cluster nem página da He4rt Delas. Só:
+- Moderação no `ModerationCluster` (`/admin/mod`), no grupo "He4rt Delas" da subnavegação, com
+  uma página por parte. A subnavegação do cluster já filtra por `canAccess()`, então cada pessoa
+  só vê as páginas do próprio papel. Textos em `panel-admin/lang/{en,pt_BR}/delas.php`.
 
-- a seção Papéis do `UserForm`, onde super admins atribuem `delas-lead` e `delas-moderator`,
-  visível só para super admins (fora de produção o `/admin` é aberto a qualquer pessoa
-  autenticada);
-- a tabela de Usuários, que só **mostra** as roles (badges), sem coluna da tag nem ações.
+    | Página    | `canAccess()`    | Badge            | Conteúdo                                                                                                                                                                     |
+    | --------- | ---------------- | ---------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+    | Fila      | `moderate-delas` | pendentes        | aprovar, rejeitar, bloquear                                                                                                                                                  |
+    | Bloqueios | `moderate-delas` | bloqueios ativos | desbloquear (moderadora: os próprios; líder: todos)                                                                                                                          |
+    | Histórico | `moderate-delas` |                  | moderadora: decisões; líder: completo, com filtro por ação                                                                                                                   |
+    | Equipe    | `lead-delas`     |                  | números (pendentes, membras com a tag, tempo médio até a decisão, aprovadas e rejeitadas no mês, bloqueios ativos), conceder e remover a tag, adicionar e revogar moderadora |
+
+- Os seletores de pessoa da Equipe usam a consulta de domínio `DelasCandidates`: conceder e
+  adicionar moderadora buscam por nome ou `@username` (a lista é a comunidade inteira); remover
+  já vem carregado só com quem tem a tag. Quem age nunca aparece.
+- Cada tabela declara o eager load (`user.roles` na fila, `user` e `blocker` nos bloqueios,
+  `user` e `actor` no histórico, `roles` na equipe).
+- A seção Papéis do `UserForm`, onde super admins atribuem `delas-lead` e `delas-moderator`,
+  visível só para super admins; a tabela de Usuários só **mostra** as roles (badges).
 
 ### Identidade visual
 
@@ -325,13 +337,13 @@ Sem cluster nem página da He4rt Delas. Só:
   menu e o botão principal do pedido ("Enviar solicitação" e o toggle do perfil). Sem degradês e
   sem fundos rosados.
 - Paleta He4rt Delas (primária `#F485A2`; 50 `#FFD1EE` → 900 `#730835`) como cores `delas-*` no
-  `@theme` do tema do Hub (`resources/css/filament/app/theme.css`), que é o CSS que o `/app`
-  carrega; o design system de `app-modules/he4rt` não é importado pelo painel.
+  `@theme` dos temas dos dois painéis (`resources/css/filament/{app,admin}/theme.css`).
 - A tag usa o rosa claro com texto e ícone no tom 900. Texto branco só do tom 600 para cima
   (WCAG AA).
-- Logos oficiais (ícone, vertical e horizontal) no componente `x-panel-app::delas.logo`
-  (`currentColor`); o ícone do menu é o set de ícones `he4rt` (`he4rt-delas`), com a cor da
-  marca no próprio SVG.
+- Logos oficiais (ícone, vertical e horizontal) no componente `x-he4rt::delas.logo`
+  (`currentColor`) e a tag em `x-he4rt::delas.tag`, no design system (módulo `he4rt`), porque
+  os dois painéis usam. O ícone `he4rt-delas` é registrado pelo `He4rtServiceProvider` como set
+  de ícones `he4rt`, com a cor da marca no próprio SVG.
 - Protótipo de referência validado com a Danielle; tokens e assets a confirmar com a Sther.
 
 ## Trade-offs e alternativas consideradas
@@ -343,6 +355,7 @@ Sem cluster nem página da He4rt Delas. Só:
 | Tipo dentro de `onboarding`                                | Onboarding é a camada de entrada obrigatória; a tag é opcional e pode vir a qualquer momento     |
 | Subdomínio em `profile`                                    | Acoplaria o perfil a moderação e papéis; um módulo próprio isola a feature e as regras           |
 | Permissions granulares (`delas.solicitacoes.decidir` etc.) | A ADR-0002 adota só roles nesta fase; gates nomeados permitem migrar depois sem mudar chamadas   |
+| Moderação numa página única no `/app`                      | Era a primeira versão. Criaria um segundo lugar de moderação, fora do cluster que já existe      |
 
 ## Testes
 
@@ -361,8 +374,14 @@ unitários em `delas/tests/Unit`.
 - Admin: concede com pendente aberta (aprova), sem solicitação (cria), já aprovada (recusa) e
   bloqueada (encerra o bloqueio); remove a tag.
 - Papel: perde acesso ao retirar `delas-moderator`; o campo de roles não aparece para quem não é
-  super admin.
-- Páginas: seção He4rt Delas do Hub invisível e inacessível sem `moderate-delas`.
+  super admin; papéis de moderação entram no `/admin` em produção, `streamer` não.
+- Candidatas (`DelasCandidates`): um teste por escopo (conceder, remover, adicionar moderadora,
+  quem age nunca aparece) e a busca.
+- Páginas do admin (`panel-admin/tests/Feature/Moderation/Delas`): gate de cada página, badges,
+  ações, busca e rótulo dos seletores, com eager load automático desligado e lazy loading
+  proibido, e pelo menos dois registros por tabela.
+- Varredura: no `/admin`, a moderadora só acessa o Dashboard e as páginas da He4rt Delas; quem
+  não tem papel, só o Dashboard.
 - Arch (opcional): `He4rt\Delas` não importa `He4rt\Panel*`.
 
 Validação: `make check`, `make test` e `make test-shards`.
