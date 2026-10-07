@@ -80,8 +80,8 @@ precisa morar em algum lugar e ter uma forma de autorizar quem decide.
       moderação, fora do cluster que já existe.
 
 - **Seletores de pessoa como consulta de domínio** (`DelasCandidates`): conceder lista quem não tem
-  a tag, remover lista só quem tem, adicionar moderadora exclui super admins, moderadoras e
-  líderes, e a própria pessoa que age nunca aparece. As telas só chamam a consulta.
+  a tag, remover lista só quem tem, adicionar moderadora lista só quem tem a tag, sem super
+  admins, moderadoras e líderes, e a própria pessoa que age nunca aparece. As telas só chamam a consulta.
 - **Marca no design system.** A logo, a tag e o ícone `he4rt-delas` moram no módulo `he4rt`
   (`x-he4rt::delas.logo`, `x-he4rt::delas.tag`), porque os dois painéis usam. A paleta
   `--color-delas-*` está no tema dos dois painéis.

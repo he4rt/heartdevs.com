@@ -107,8 +107,9 @@ que a moderadora tem, mais:
 
 - página Equipe, com os números da He4rt Delas no topo;
 - histórico completo, com filtro por ação;
-- na Equipe, adiciona e revoga `delas-moderator`. Não cria nem revoga líderes, e não age sobre
-  super admins;
+- na Equipe, adiciona e revoga `delas-moderator`. Só quem tem a tag vira moderadora: para
+  promover alguém de fora, a líder concede a tag antes. Não cria nem revoga líderes, e não age
+  sobre super admins;
 - desbloqueia qualquer bloqueio;
 - edita qualquer motivo, a qualquer momento, e abre "ver versões": a original e cada edição,
   com quem escreveu e quando;
@@ -289,17 +290,17 @@ Sem coluna `metadata`: nenhum fluxo a preenche, e um jsonb sem forma quebraria o
 `ReviewAppeal`). As que mudam estado rodam em `DB::transaction` com `lockForUpdate()` e gravam
 a linha de histórico.
 
-| Action                                       | Gate do ator                                       | Faz                                                                          |
-| -------------------------------------------- | -------------------------------------------------- | ---------------------------------------------------------------------------- |
-| `RequestDelasTag`                            | (própria pessoa)                                   | valida ativa, espera e bloqueio; cria `pending`                              |
-| `ApproveDelasRequest`                        | `moderate-delas`                                   | `pending → approved`                                                         |
-| `RejectDelasRequest`                         | `moderate-delas`                                   | `pending → rejected`, com motivo                                             |
-| `BlockDelasRequester`                        | `moderate-delas`                                   | cria bloqueio e rejeita a pendente                                           |
-| `UnblockDelasRequester`                      | `moderate-delas` (próprios) / `lead-delas` (todos) | encerra bloqueio                                                             |
-| `GrantDelasTag`                              | `lead-delas`                                       | aprova a pendente ou cria `approved`; encerra bloqueio                       |
-| `RevokeDelasTag`                             | `lead-delas`                                       | `approved → revoked`, com motivo; opcionalmente bloqueia junto               |
-| `CorrectDelasReason`                         | `moderate-delas` (próprio, 24h) / `lead-delas`     | grava `reason_corrected` e atualiza o motivo vigente                         |
-| `AddDelasModerator` / `RemoveDelasModerator` | `lead-delas`                                       | atribui ou retira `delas-moderator`; recusa líderes e super admins como alvo |
+| Action                                       | Gate do ator                                       | Faz                                                                                    |
+| -------------------------------------------- | -------------------------------------------------- | -------------------------------------------------------------------------------------- |
+| `RequestDelasTag`                            | (própria pessoa)                                   | valida ativa, espera e bloqueio; cria `pending`                                        |
+| `ApproveDelasRequest`                        | `moderate-delas`                                   | `pending → approved`                                                                   |
+| `RejectDelasRequest`                         | `moderate-delas`                                   | `pending → rejected`, com motivo                                                       |
+| `BlockDelasRequester`                        | `moderate-delas`                                   | cria bloqueio e rejeita a pendente                                                     |
+| `UnblockDelasRequester`                      | `moderate-delas` (próprios) / `lead-delas` (todos) | encerra bloqueio                                                                       |
+| `GrantDelasTag`                              | `lead-delas`                                       | aprova a pendente ou cria `approved`; encerra bloqueio                                 |
+| `RevokeDelasTag`                             | `lead-delas`                                       | `approved → revoked`, com motivo; opcionalmente bloqueia junto                         |
+| `CorrectDelasReason`                         | `moderate-delas` (próprio, 24h) / `lead-delas`     | grava `reason_corrected` e atualiza o motivo vigente                                   |
+| `AddDelasModerator` / `RemoveDelasModerator` | `lead-delas`                                       | atribui ou retira `delas-moderator`; recusa líderes, super admins e quem não tem a tag |
 
 A consulta `DelasEligibility` responde para o perfil: pode solicitar, por que não, e
 `next_allowed_at`.
@@ -335,9 +336,9 @@ dispara também `DelasRequesterUnblocked`. Nenhum listener nesta entrega.
     | Histórico | `moderate-delas` |                   | moderadora: decisões; líder: completo, com filtro por ação e versões do motivo; editar motivo                                                                                |
     | Equipe    | `lead-delas`     |                   | números (pendentes, membras com a tag, tempo médio até a decisão, aprovadas e rejeitadas no mês, bloqueios ativos), conceder e remover a tag, adicionar e revogar moderadora |
 
-- Os seletores de pessoa da Equipe usam a consulta de domínio `DelasCandidates`: conceder e
-  adicionar moderadora buscam por nome ou `@username` (a lista é a comunidade inteira); remover
-  já vem carregado só com quem tem a tag. Quem age nunca aparece.
+- Os seletores de pessoa da Equipe usam a consulta de domínio `DelasCandidates`: conceder
+  busca por nome ou `@username` (a lista é a comunidade inteira); remover e adicionar moderadora
+  já vêm carregados só com quem tem a tag. Quem age nunca aparece.
 - Cada tabela declara o eager load (`user.roles` na fila, `user` e `blocker` nos bloqueios,
   `user`, `actor` e `latestCorrection.actor` no histórico, `user` e `decider` na Membras, `roles`
   na equipe).
