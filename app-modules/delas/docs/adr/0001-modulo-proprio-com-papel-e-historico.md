@@ -51,10 +51,18 @@ precisa morar em algum lugar e ter uma forma de autorizar quem decide.
   quem bloqueou ou por super admin.
 - **Histórico append-only** em `delas_transitions`, gravado pelas actions, sem trigger (ADR-0003
   do `events`).
+- **Corrigir motivo sem apagar.** Um motivo errado se corrige com uma linha nova
+  (`reason_corrected`, `corrects_id` apontando para a original), nunca editando a original. O
+  motivo vigente na solicitação ou no bloqueio passa a ser o corrigido. Quem escreveu corrige até
+  24 horas depois; a líder, sempre.
+    - _Alternativa descartada:_ editar o campo `reason` direto. Mais simples, mas apagaria o que
+      foi escrito e quebraria o append-only.
 - **Moderação no `/admin`, pedido e tag no `/app`.** Moderação na He4rt mora no `/admin`, no
   cluster de Moderação (`/admin/mod`). A He4rt Delas entra nele como o grupo "He4rt Delas" da
   subnavegação, com uma página por parte, cada uma com o próprio gate:
     - Fila (`moderate-delas`, badge de pendentes): aprovar, rejeitar e bloquear;
+    - Membras (`moderate-delas`, badge de quem tem a tag): consulta; a líder remove a tag e pode
+      bloquear novos pedidos no mesmo passo;
     - Bloqueios (`moderate-delas`, badge de bloqueios ativos): desbloquear;
     - Histórico (`moderate-delas`): só decisões para a moderadora, completo e com filtro para a
       líder;

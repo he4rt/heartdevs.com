@@ -90,6 +90,11 @@ Fatos do código atual que moldam o desenho:
 - Não decidem a própria solicitação: ela fica para outra moderadora, uma líder ou um super admin.
 - O bloqueio vale **só** para solicitar a tag. Não é ban nem suspensão (`UserSituation`) e não
   afeta a conta.
+- Veem a lista de quem tem a tag (página Membras), só para consulta.
+- Corrigem o motivo que escreveram até 24 horas depois (`delas.reason_correction_hours`). A
+  correção é uma linha nova no histórico (`reason_corrected`, com `corrects_id` apontando para a
+  original); a original nunca muda. A tela mostra o motivo corrigido, "corrigido em DD/MM/AA por
+  X" e, ao passar o mouse, o texto original.
 
 ### Liderança (líderes da He4rt Delas)
 
@@ -102,6 +107,7 @@ que a moderadora tem, mais:
 - na Equipe, adiciona e revoga `delas-moderator`. Não cria nem revoga líderes, e não age sobre
   super admins;
 - desbloqueia qualquer bloqueio;
+- corrige qualquer motivo, a qualquer momento;
 - concede e remove a tag direto:
     - se houver solicitação `pending`, ela é aprovada (`pending → approved`);
     - se não houver, é criada uma solicitação já `approved`;
@@ -109,7 +115,9 @@ que a moderadora tem, mais:
     - se a pessoa estiver bloqueada, a interface mostra quem bloqueou, quando e o motivo, e exige
       um motivo. O bloqueio é encerrado na mesma transação;
     - remover (`approved → revoked`) exige motivo. O registro não é apagado, e a pessoa pode
-      solicitar de novo após a espera, salvo se também for bloqueada.
+      solicitar de novo após a espera, salvo se também for bloqueada. Pela Membras (ou pela
+      Equipe), a líder pode marcar "Também bloquear novos pedidos": o bloqueio usa o mesmo motivo
+      e entra na mesma transação. Se a pessoa já estiver bloqueada, só perde a tag.
 
 > _Vai além da #570_, que diz que a permissão é "atribuível apenas por admins do Hub". Precisa do
 > ok da Sther e de um comentário na issue.
@@ -244,18 +252,19 @@ approved → revoked
 Histórico append-only, gravado pelas actions, sem trigger (ADR-0003 do events). Formato mais
 próximo de `squad_membership_events` (ação + trilha) do que de `events_enrollment_transitions`.
 
-| coluna                      | tipo             | nota                                                                                                                                     |
-| --------------------------- | ---------------- | ---------------------------------------------------------------------------------------------------------------------------------------- |
-| `id`                        | uuid             | PK                                                                                                                                       |
-| `user_id`                   | uuid             | FK `users`, cascade on delete; a pessoa afetada                                                                                          |
-| `request_id`                | uuid null        | FK `delas_tag_requests`, cascade on delete                                                                                               |
-| `block_id`                  | uuid null        | FK `delas_requester_blocks`, cascade on delete                                                                                           |
-| `action`                    | string(20)       | `DelasAction`: `requested`, `approved`, `rejected`, `granted`, `revoked`, `blocked`, `unblocked`, `moderator_added`, `moderator_removed` |
-| `from_status` / `to_status` | string(20) null  | `DelasRequestStatus`, quando há mudança de status                                                                                        |
-| `actor_id`                  | uuid null        | FK `users`, null on delete                                                                                                               |
-| `triggered_by`              | string(20)       | `DelasTriggeredBy`: `user`, `moderator`, `lead`, `admin`, `system`                                                                       |
-| `reason`                    | string(500) null |                                                                                                                                          |
-| `created_at`                | timestampTz      | `useCurrent()`                                                                                                                           |
+| coluna                      | tipo             | nota                                                                                                                                                         |
+| --------------------------- | ---------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `id`                        | uuid             | PK                                                                                                                                                           |
+| `user_id`                   | uuid             | FK `users`, cascade on delete; a pessoa afetada                                                                                                              |
+| `request_id`                | uuid null        | FK `delas_tag_requests`, cascade on delete                                                                                                                   |
+| `block_id`                  | uuid null        | FK `delas_requester_blocks`, cascade on delete                                                                                                               |
+| `corrects_id`               | uuid null        | FK `delas_transitions`, cascade on delete; a linha cujo motivo esta corrige                                                                                  |
+| `action`                    | string(20)       | `DelasAction`: `requested`, `approved`, `rejected`, `granted`, `revoked`, `blocked`, `unblocked`, `moderator_added`, `moderator_removed`, `reason_corrected` |
+| `from_status` / `to_status` | string(20) null  | `DelasRequestStatus`, quando há mudança de status                                                                                                            |
+| `actor_id`                  | uuid null        | FK `users`, null on delete                                                                                                                                   |
+| `triggered_by`              | string(20)       | `DelasTriggeredBy`: `user`, `moderator`, `lead`, `admin`, `system`                                                                                           |
+| `reason`                    | string(500) null |                                                                                                                                                              |
+| `created_at`                | timestampTz      | `useCurrent()`                                                                                                                                               |
 
 Sem coluna `metadata`: nenhum fluxo a preenche, e um jsonb sem forma quebraria o
 `tests/Arch/NoLooseArrayCastsTest.php` (guideline `domain/06`).
@@ -284,7 +293,8 @@ a linha de histórico.
 | `BlockDelasRequester`                        | `moderate-delas`                                   | cria bloqueio e rejeita a pendente                                           |
 | `UnblockDelasRequester`                      | `moderate-delas` (próprios) / `lead-delas` (todos) | encerra bloqueio                                                             |
 | `GrantDelasTag`                              | `lead-delas`                                       | aprova a pendente ou cria `approved`; encerra bloqueio                       |
-| `RevokeDelasTag`                             | `lead-delas`                                       | `approved → revoked`, com motivo                                             |
+| `RevokeDelasTag`                             | `lead-delas`                                       | `approved → revoked`, com motivo; opcionalmente bloqueia junto               |
+| `CorrectDelasReason`                         | `moderate-delas` (próprio, 24h) / `lead-delas`     | grava `reason_corrected` e atualiza o motivo vigente                         |
 | `AddDelasModerator` / `RemoveDelasModerator` | `lead-delas`                                       | atribui ou retira `delas-moderator`; recusa líderes e super admins como alvo |
 
 A consulta `DelasEligibility` responde para o perfil: pode solicitar, por que não, e
@@ -313,18 +323,20 @@ dispara também `DelasRequesterUnblocked`. Nenhum listener nesta entrega.
   uma página por parte. A subnavegação do cluster já filtra por `canAccess()`, então cada pessoa
   só vê as páginas do próprio papel. Textos em `panel-admin/lang/{en,pt_BR}/delas.php`.
 
-    | Página    | `canAccess()`    | Badge            | Conteúdo                                                                                                                                                                     |
-    | --------- | ---------------- | ---------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-    | Fila      | `moderate-delas` | pendentes        | aprovar, rejeitar, bloquear                                                                                                                                                  |
-    | Bloqueios | `moderate-delas` | bloqueios ativos | desbloquear (moderadora: os próprios; líder: todos)                                                                                                                          |
-    | Histórico | `moderate-delas` |                  | moderadora: decisões; líder: completo, com filtro por ação                                                                                                                   |
-    | Equipe    | `lead-delas`     |                  | números (pendentes, membras com a tag, tempo médio até a decisão, aprovadas e rejeitadas no mês, bloqueios ativos), conceder e remover a tag, adicionar e revogar moderadora |
+    | Página    | `canAccess()`    | Badge             | Conteúdo                                                                                                                                                                     |
+    | --------- | ---------------- | ----------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+    | Fila      | `moderate-delas` | pendentes         | aprovar, rejeitar, bloquear                                                                                                                                                  |
+    | Membras   | `moderate-delas` | membras com a tag | quem tem a tag, desde quando e quem decidiu; líder: remover a tag, com a opção de bloquear novos pedidos                                                                     |
+    | Bloqueios | `moderate-delas` | bloqueios ativos  | desbloquear (moderadora: os próprios; líder: todos)                                                                                                                          |
+    | Histórico | `moderate-delas` |                   | moderadora: decisões; líder: completo, com filtro por ação; corrigir motivo                                                                                                  |
+    | Equipe    | `lead-delas`     |                   | números (pendentes, membras com a tag, tempo médio até a decisão, aprovadas e rejeitadas no mês, bloqueios ativos), conceder e remover a tag, adicionar e revogar moderadora |
 
 - Os seletores de pessoa da Equipe usam a consulta de domínio `DelasCandidates`: conceder e
   adicionar moderadora buscam por nome ou `@username` (a lista é a comunidade inteira); remover
   já vem carregado só com quem tem a tag. Quem age nunca aparece.
 - Cada tabela declara o eager load (`user.roles` na fila, `user` e `blocker` nos bloqueios,
-  `user` e `actor` no histórico, `roles` na equipe).
+  `user`, `actor` e `latestCorrection.actor` no histórico, `user` e `decider` na Membras, `roles`
+  na equipe).
 - A seção Papéis do `UserForm`, onde super admins atribuem `delas-lead` e `delas-moderator`,
   visível só para super admins; a tabela de Usuários só **mostra** as roles (badges).
 
@@ -372,7 +384,11 @@ unitários em `delas/tests/Unit`.
 - Bloqueio: motivo obrigatório; recusa bloquear moderadora, super admin ou a si mesma; moderadora
   não desbloqueia bloqueio de outra.
 - Admin: concede com pendente aberta (aprova), sem solicitação (cria), já aprovada (recusa) e
-  bloqueada (encerra o bloqueio); remove a tag.
+  bloqueada (encerra o bloqueio); remove a tag, sozinha ou bloqueando junto (desfaz tudo se o
+  bloqueio for recusado).
+- Correção de motivo: linha nova sem mudar a original, vale a mais recente, atualiza o motivo da
+  solicitação ou do bloqueio, prazo de quem escreveu, líder a qualquer momento, recusa motivo
+  vazio, igual ou de ação sem motivo.
 - Papel: perde acesso ao retirar `delas-moderator`; o campo de roles não aparece para quem não é
   super admin; papéis de moderação entram no `/admin` em produção, `streamer` não.
 - Candidatas (`DelasCandidates`): um teste por escopo (conceder, remover, adicionar moderadora,
