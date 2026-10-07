@@ -115,3 +115,41 @@ test('não remove de quem não tem a tag', function (): void {
     expect(fn () => resolve(RevokeDelasTag::class)->handle(User::factory()->create(), $lead, 'motivo'))
         ->toThrow(DelasException::class, __('delas::exceptions.has_no_tag'));
 });
+
+test('remover a tag e bloquear acontecem juntos, com o mesmo motivo', function (): void {
+    $lead = User::factory()->delasLead()->create();
+    $approved = DelasTagRequest::factory()->approved()->create();
+
+    resolve(RevokeDelasTag::class)->handle($approved->user, $lead, 'Conta criada só para conseguir a tag.', alsoBlock: true);
+
+    $block = DelasRequesterBlock::query()->active()->where('user_id', $approved->user_id)->sole();
+
+    expect($approved->fresh()->status)->toBe(DelasRequestStatus::Revoked)
+        ->and($block->reason)->toBe('Conta criada só para conseguir a tag.')
+        ->and($block->blocked_by)->toBe($lead->getKey())
+        ->and(resolve(DelasEligibility::class)->for($approved->user)->state)->toBe(DelasEligibilityState::Blocked)
+        ->and(DelasTransition::query()->pluck('action')->all())
+        ->toEqualCanonicalizing([DelasAction::Revoked, DelasAction::Blocked]);
+});
+
+test('se não der para bloquear, a tag também não é removida', function (): void {
+    $lead = User::factory()->delasLead()->create();
+    $moderatorWithTag = User::factory()->delasModerator()->create();
+    $approved = DelasTagRequest::factory()->for($moderatorWithTag)->approved()->create();
+
+    expect(fn () => resolve(RevokeDelasTag::class)->handle($moderatorWithTag, $lead, 'Motivo.', alsoBlock: true))
+        ->toThrow(DelasException::class, __('delas::exceptions.cannot_block_team'))
+        ->and($approved->fresh()->status)->toBe(DelasRequestStatus::Approved)
+        ->and(DelasTransition::query()->count())->toBe(0);
+});
+
+test('quem já está bloqueada só perde a tag, sem segundo bloqueio', function (): void {
+    $lead = User::factory()->delasLead()->create();
+    $approved = DelasTagRequest::factory()->approved()->create();
+    DelasRequesterBlock::factory()->for($approved->user)->create();
+
+    resolve(RevokeDelasTag::class)->handle($approved->user, $lead, 'Motivo.', alsoBlock: true);
+
+    expect(DelasRequesterBlock::query()->where('user_id', $approved->user_id)->count())->toBe(1)
+        ->and($approved->fresh()->status)->toBe(DelasRequestStatus::Revoked);
+});
