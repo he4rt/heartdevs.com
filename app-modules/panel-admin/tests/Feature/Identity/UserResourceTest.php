@@ -265,11 +265,12 @@ test('quem não é super admin não se promove pelo próprio form', function ():
 
     $this->actingAs($member);
 
+    // Desde a ADR-0003 do identity, o UserResource é só de super admin: o form nem abre.
     livewire(EditUser::class, ['record' => $member->getKey()])
-        ->fillForm(['roles' => [$superAdmin->getKey()]])
-        ->call('save');
+        ->assertForbidden();
 
-    expect($member->fresh()?->hasRole(UserRole::SuperAdmin))->toBeFalse();
+    expect($member->fresh()?->hasRole(UserRole::SuperAdmin))->toBeFalse()
+        ->and($superAdmin->exists)->toBeTrue();
 });
 
 test('a opção de super admin fica livre ao editar outro usuário', function (): void {
@@ -295,12 +296,12 @@ test('o filtro de papel separa super admin de usuário comum', function (): void
         ->assertCanNotSeeTableRecords([$regular]);
 });
 
-test('quem não é super admin não vê os papéis no form', function (): void {
+test('quem não é super admin não abre o form de usuário, mesmo com papel que entra no admin', function (): void {
     $this->actingAs(User::factory()->delasLead()->create());
     $other = User::factory()->create();
 
     livewire(EditUser::class, ['record' => $other->getKey()])
-        ->assertFormFieldHidden('roles');
+        ->assertForbidden();
 });
 
 test('quem não é super admin não concede papéis nem forçando o estado do form', function (): void {
@@ -309,10 +310,10 @@ test('quem não é super admin não concede papéis nem forçando o estado do fo
     $role = Role::findByName(UserRole::DelasModerator->value, UserRole::GUARD);
 
     livewire(EditUser::class, ['record' => $other->getKey()])
-        ->set('data.roles', [$role->getKey()])
-        ->call('save');
+        ->assertForbidden();
 
-    expect($other->fresh()->hasRole(UserRole::DelasModerator))->toBeFalse();
+    expect($other->fresh()->hasRole(UserRole::DelasModerator))->toBeFalse()
+        ->and($role->exists)->toBeTrue();
 });
 
 test('salvar o form concede um papel da He4rt Delas a outro usuário', function (UserRole $role): void {
