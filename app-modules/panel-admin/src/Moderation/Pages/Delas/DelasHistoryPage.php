@@ -60,7 +60,7 @@ class DelasHistoryPage extends Page implements HasTable
 
     public function table(Table $table): Table
     {
-        $query = DelasTransition::query()->with(['user', 'actor', 'latestCorrection.actor']);
+        $query = DelasTransition::query()->with(['user', 'actor', 'corrected', 'latestCorrection.actor']);
 
         // A moderadora vê as decisões; a líder vê também os pedidos e cada correção de motivo.
         if (!$this->isLead()) {
@@ -86,8 +86,7 @@ class DelasHistoryPage extends Page implements HasTable
                 TextColumn::make('reason')
                     ->label(__('panel-admin::delas.columns.reason'))
                     ->state(fn (DelasTransition $record): ?string => $record->currentReason())
-                    ->description(fn (DelasTransition $record): ?string => $this->correctedNote($record))
-                    ->tooltip(fn (DelasTransition $record): ?string => $this->originalNote($record))
+                    ->description(fn (DelasTransition $record): ?string => $this->reasonNote($record))
                     ->wrap()
                     ->lineClamp(2)
                     ->placeholder('—'),
@@ -134,33 +133,25 @@ class DelasHistoryPage extends Page implements HasTable
             && ($record->created_at?->greaterThanOrEqualTo(now()->subHours(config()->integer('delas.reason_correction_hours'))) ?? false);
     }
 
-    private function correctedNote(DelasTransition $record): ?string
+    /**
+     * Corrigir nunca esconde o que foi escrito: a linha corrigida mostra quando,
+     * quem corrigiu e o texto original; a linha da correção mostra o que ela corrigiu.
+     */
+    private function reasonNote(DelasTransition $record): ?string
     {
+        if ($record->corrected instanceof DelasTransition) {
+            return $this->text('panel-admin::delas.actions.original_reason', ['reason' => $record->corrected->reason]);
+        }
+
         $correction = $record->latestCorrection;
 
         if (!$correction instanceof DelasTransition) {
             return null;
         }
 
-        $note = __('panel-admin::delas.actions.corrected_note', [
+        return $this->text('panel-admin::delas.actions.corrected_note', [
             'date' => $correction->created_at?->timezone(config('app.display_timezone'))->format('d/m/y'),
             'name' => $correction->actor->name ?? '—',
-        ]);
-
-        return is_string($note) ? $note : null;
-    }
-
-    /**
-     * O texto original fica a um passe de mouse: corrigir nunca esconde o que foi escrito.
-     */
-    private function originalNote(DelasTransition $record): ?string
-    {
-        if (!$record->latestCorrection instanceof DelasTransition) {
-            return null;
-        }
-
-        $note = __('panel-admin::delas.actions.original_reason', ['reason' => $record->reason]);
-
-        return is_string($note) ? $note : null;
+        ]).' · '.$this->text('panel-admin::delas.actions.original_reason', ['reason' => $record->reason]);
     }
 }

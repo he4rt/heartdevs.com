@@ -368,7 +368,8 @@ test('a moderadora corrige o próprio motivo pelo histórico, e a original conti
         ->assertActionHidden(TestAction::make('correctReason')->table($others))
         ->callAction(TestAction::make('correctReason')->table($own), data: ['reason' => 'Perfil incompleto.'])
         ->assertNotified(__('panel-admin::delas.actions.reason_corrected'))
-        ->assertSee('Perfil incompleto.');
+        ->assertSee('Perfil incompleto.')
+        ->assertSee(__('panel-admin::delas.actions.original_reason', ['reason' => 'Perfil incompleo.']));
 
     expect($own->fresh()->reason)->toBe('Perfil incompleo.')
         ->and($own->fresh()->currentReason())->toBe('Perfil incompleto.');

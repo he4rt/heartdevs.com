@@ -133,9 +133,12 @@ trait InteractsWithDelasModeration
         return is_string($reason) ? $reason : null;
     }
 
-    protected function text(string $key): string
+    /**
+     * @param  array<string, mixed>  $replace
+     */
+    protected function text(string $key, array $replace = []): string
     {
-        $text = __($key);
+        $text = __($key, $replace);
 
         return is_string($text) ? $text : $key;
     }
