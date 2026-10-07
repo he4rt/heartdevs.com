@@ -59,7 +59,8 @@ test('a busca acha por nome ou @username, dentro do escopo', function (): void {
     $ana = User::factory()->create(['name' => 'Ana Souza', 'username' => 'anasouza']);
     $bia = User::factory()->create(['name' => 'Beatriz Lima', 'username' => 'bialima']);
     $member = User::factory()->create(['name' => 'Ana Membra', 'username' => 'anamembra']);
-    DelasTagRequest::factory()->for($member)->approved()->create();
+    // Decisora fixa: um nome aleatório da factory (ex.: "Mariana") também casaria com "ana".
+    DelasTagRequest::factory()->for($member)->approved()->create(['decided_by' => $this->lead->getKey()]);
 
     $byName = $this->candidates->search($this->candidates->forGrant($this->lead), 'ana')->pluck('id')->all();
     $byUsername = $this->candidates->search($this->candidates->forGrant($this->lead), '@bialima')->pluck('id')->all();
