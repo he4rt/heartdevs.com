@@ -324,12 +324,14 @@ Sem cluster nem página da He4rt Delas. Só:
 - O rosa da He4rt Delas aparece **só nos pontos de marca**: a tag, a logo, o ícone do item no
   menu e o botão principal do pedido ("Enviar solicitação" e o toggle do perfil). Sem degradês e
   sem fundos rosados.
-- Paleta He4rt Delas (primária `#F485A2`; 50 `#FFD1EE` → 900 `#730835`) como tokens do design
-  system em `app-modules/he4rt/resources/css/support/themes.css` e `index.css`.
+- Paleta He4rt Delas (primária `#F485A2`; 50 `#FFD1EE` → 900 `#730835`) como cores `delas-*` no
+  `@theme` do tema do Hub (`resources/css/filament/app/theme.css`), que é o CSS que o `/app`
+  carrega; o design system de `app-modules/he4rt` não é importado pelo painel.
 - A tag usa o rosa claro com texto e ícone no tom 900. Texto branco só do tom 600 para cima
   (WCAG AA).
-- Logos oficiais (ícone, vertical e horizontal) como SVG `currentColor` nos assets do design
-  system.
+- Logos oficiais (ícone, vertical e horizontal) no componente `x-panel-app::delas.logo`
+  (`currentColor`); o ícone do menu é o set de ícones `he4rt` (`he4rt-delas`), com a cor da
+  marca no próprio SVG.
 - Protótipo de referência validado com a Danielle; tokens e assets a confirmar com a Sther.
 
 ## Trade-offs e alternativas consideradas

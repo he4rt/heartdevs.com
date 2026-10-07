@@ -11,7 +11,7 @@ histórico de cada uma dessas decisões.
 
 Os dois painéis dependem deste módulo, e este módulo só depende do `identity`.
 
-> **Status:** em implementação. O design está na
+> **Status:** implementado (aguardando PR). O design está na
 > [spec](../../docs/specs/2026-10-06-he4rt-delas-tag-e-moderacao.md) e as decisões na
 > [ADR-0001](docs/adr/0001-modulo-proprio-com-papel-e-historico.md).
 
