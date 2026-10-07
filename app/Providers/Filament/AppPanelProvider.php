@@ -20,6 +20,7 @@ use He4rt\PanelApp\Clusters\Streaming\Pages\StreamOverlaysPage;
 use He4rt\PanelApp\Clusters\Streaming\Pages\StreamSessionPage;
 use He4rt\PanelApp\Clusters\Streaming\Pages\StreamSessionsPage;
 use He4rt\PanelApp\Clusters\Streaming\StreamingCluster;
+use He4rt\PanelApp\Pages\Delas\DelasModerationPage;
 use He4rt\PanelApp\Pages\EventPage;
 use He4rt\PanelApp\Pages\EventsPage;
 use He4rt\PanelApp\Pages\LoginPage;
@@ -48,6 +49,7 @@ class AppPanelProvider extends PanelProvider
             ->colors([
                 'primary' => Color::Purple,
                 'gray' => Color::Zinc,
+                'delas' => Color::hex('#F485A2'),
             ])
             ->viteTheme('resources/css/filament/app/theme.css')
             ->sidebarCollapsibleOnDesktop()
@@ -61,6 +63,7 @@ class AppPanelProvider extends PanelProvider
                 EventPage::class,
                 ThreadPage::class,
                 ProfilePage::class,
+                DelasModerationPage::class,
                 StreamingCluster::class,
                 StreamDashboardPage::class,
                 StreamOverlaysPage::class,

@@ -7,7 +7,8 @@
     'coverPreviewUrl' => null,
     'coverAspectRatio',
     'coverFocalY' => 50,
-    'avatarFocalY' => 50
+    'avatarFocalY' => 50,
+    'hasDelasTag' => false
 ])
 
 @php
@@ -145,6 +146,9 @@
                     <x-heroicon-m-map-pin class="h-3 w-3" />
                     {{ $location }}
                 </p>
+            @endif
+            @if ($hasDelasTag)
+                <div class="mt-3"><x-panel-app::delas.tag /></div>
             @endif
         </div>
 

@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace He4rt\PanelApp;
 
+use BladeUI\Icons\Factory as IconFactory;
 use Filament\Support\Assets\Js;
 use Filament\Support\Facades\FilamentAsset;
+use He4rt\PanelApp\Livewire\Delas\DelasProfileSection;
 use He4rt\PanelApp\Livewire\Events\EventDetail;
 use He4rt\PanelApp\Livewire\Events\EventsList;
 use He4rt\PanelApp\Livewire\Events\MyEventsList;
@@ -20,7 +22,13 @@ use Livewire\Livewire;
 
 class PanelAppServiceProvider extends ServiceProvider
 {
-    public function register(): void {}
+    public function register(): void
+    {
+        // Ícone oficial da He4rt Delas como `he4rt-delas` (cor da marca no próprio SVG).
+        $this->callAfterResolving(IconFactory::class, function (IconFactory $factory): void {
+            $factory->add('he4rt', ['path' => __DIR__.'/../resources/svg', 'prefix' => 'he4rt']);
+        });
+    }
 
     public function boot(): void
     {
@@ -41,5 +49,7 @@ class PanelAppServiceProvider extends ServiceProvider
         Livewire::component('timeline-post-show', PostShow::class);
         Livewire::component('timeline-reply-composer', ReplyComposer::class);
         Livewire::component('timeline-thread-replies', ThreadReplies::class);
+
+        Livewire::component('delas-profile-section', DelasProfileSection::class);
     }
 }
