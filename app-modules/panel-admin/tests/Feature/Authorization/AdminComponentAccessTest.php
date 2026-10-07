@@ -8,6 +8,7 @@ use Filament\Navigation\NavigationGroup;
 use Filament\Navigation\NavigationItem;
 use He4rt\Identity\User\Models\User;
 use He4rt\PanelAdmin\Contributions\Widgets\ActivityTimelineWidget;
+use He4rt\PanelAdmin\Moderation\Pages\Delas\DelasTeamPage;
 use He4rt\PanelAdmin\Pages\Dashboard;
 
 use function Pest\Laravel\actingAs;
@@ -82,4 +83,41 @@ test('a sidebar só mostra o que a pessoa pode acessar', function (): void {
         ->all();
 
     expect($labels)->toBe(['Dashboard']);
+});
+
+test('no admin, a moderadora da He4rt Delas só acessa o Dashboard e a área da He4rt Delas', function (): void {
+    actingAs(User::factory()->delasModerator()->create());
+
+    $panel = Filament::getPanel('admin');
+
+    collect([...$panel->getResources(), ...$panel->getPages()])
+        ->reject(fn (string $component): bool => is_subclass_of($component, Cluster::class))
+        ->each(function (string $component): void {
+            $isAllowed = $component === Dashboard::class
+                || (str_starts_with($component, 'He4rt\\PanelAdmin\\Moderation\\Pages\\Delas\\') && $component !== DelasTeamPage::class);
+
+            expect($component::canAccess())->toBe($isAllowed, $component);
+        });
+});
+
+test('a líder da He4rt Delas acessa também a Equipe, e nada além da área dela', function (): void {
+    actingAs(User::factory()->delasLead()->create());
+
+    foreach (adminComponents() as $component) {
+        $isAllowed = $component === Dashboard::class
+            || str_starts_with($component, 'He4rt\\PanelAdmin\\Moderation\\Pages\\Delas\\');
+
+        expect($component::canAccess())->toBe($isAllowed, $component);
+    }
+});
+
+test('a sidebar da moderadora mostra só o Dashboard e a Moderação', function (): void {
+    actingAs(User::factory()->delasModerator()->create());
+
+    $labels = collect(Filament::getPanel('admin')->getNavigation())
+        ->flatMap(fn (NavigationGroup $group): array => $group->getItems())
+        ->map(fn (NavigationItem $item): string => $item->getLabel())
+        ->all();
+
+    expect($labels)->toBe(['Dashboard', __('panel-admin::moderation.navigation.cluster')]);
 });
