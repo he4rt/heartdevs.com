@@ -195,7 +195,7 @@ Datas em `timestampTz`.
 | `requested_at`              | timestampTz      |                               |
 | `decided_by`                | uuid null        | FK `users`, null on delete    |
 | `decided_at`                | timestampTz null |                               |
-| `decision_reason`           | text null        | interno                       |
+| `decision_reason`           | string(500) null | interno                       |
 | `created_at` / `updated_at` | timestampTz      |                               |
 
 Índice único parcial em `user_id` onde `status in ('pending', 'approved')`, via `DB::statement`
@@ -217,11 +217,11 @@ approved → revoked
 | `id`                        | uuid             | PK                                              |
 | `user_id`                   | uuid             | FK `users`, cascade on delete                   |
 | `blocked_by`                | uuid null        | FK `users`, null on delete                      |
-| `reason`                    | text             | obrigatório                                     |
+| `reason`                    | string(500)      | obrigatório                                     |
 | `blocked_at`                | timestampTz      |                                                 |
 | `lifted_by`                 | uuid null        | FK `users`, null on delete                      |
 | `lifted_at`                 | timestampTz null |                                                 |
-| `lift_reason`               | text null        | obrigatório ao desbloquear; nulo enquanto ativo |
+| `lift_reason`               | string(500) null | obrigatório ao desbloquear; nulo enquanto ativo |
 | `created_at` / `updated_at` | timestampTz      |                                                 |
 
 Índice único parcial em `user_id` onde `lifted_at is null`.
@@ -231,18 +231,18 @@ approved → revoked
 Histórico append-only, gravado pelas actions, sem trigger (ADR-0003 do events). Formato mais
 próximo de `squad_membership_events` (ação + trilha) do que de `events_enrollment_transitions`.
 
-| coluna                      | tipo            | nota                                                                                                                                     |
-| --------------------------- | --------------- | ---------------------------------------------------------------------------------------------------------------------------------------- |
-| `id`                        | uuid            | PK                                                                                                                                       |
-| `user_id`                   | uuid            | FK `users`, cascade on delete; a pessoa afetada                                                                                          |
-| `request_id`                | uuid null       | FK `delas_tag_requests`, cascade on delete                                                                                               |
-| `block_id`                  | uuid null       | FK `delas_requester_blocks`, cascade on delete                                                                                           |
-| `action`                    | string(20)      | `DelasAction`: `requested`, `approved`, `rejected`, `granted`, `revoked`, `blocked`, `unblocked`, `moderator_added`, `moderator_removed` |
-| `from_status` / `to_status` | string(20) null | `DelasRequestStatus`, quando há mudança de status                                                                                        |
-| `actor_id`                  | uuid null       | FK `users`, null on delete                                                                                                               |
-| `triggered_by`              | string(20)      | `DelasTriggeredBy`: `user`, `moderator`, `lead`, `admin`, `system`                                                                       |
-| `reason`                    | text null       |                                                                                                                                          |
-| `created_at`                | timestampTz     | `useCurrent()`                                                                                                                           |
+| coluna                      | tipo             | nota                                                                                                                                     |
+| --------------------------- | ---------------- | ---------------------------------------------------------------------------------------------------------------------------------------- |
+| `id`                        | uuid             | PK                                                                                                                                       |
+| `user_id`                   | uuid             | FK `users`, cascade on delete; a pessoa afetada                                                                                          |
+| `request_id`                | uuid null        | FK `delas_tag_requests`, cascade on delete                                                                                               |
+| `block_id`                  | uuid null        | FK `delas_requester_blocks`, cascade on delete                                                                                           |
+| `action`                    | string(20)       | `DelasAction`: `requested`, `approved`, `rejected`, `granted`, `revoked`, `blocked`, `unblocked`, `moderator_added`, `moderator_removed` |
+| `from_status` / `to_status` | string(20) null  | `DelasRequestStatus`, quando há mudança de status                                                                                        |
+| `actor_id`                  | uuid null        | FK `users`, null on delete                                                                                                               |
+| `triggered_by`              | string(20)       | `DelasTriggeredBy`: `user`, `moderator`, `lead`, `admin`, `system`                                                                       |
+| `reason`                    | string(500) null |                                                                                                                                          |
+| `created_at`                | timestampTz      | `useCurrent()`                                                                                                                           |
 
 Sem coluna `metadata`: nenhum fluxo a preenche, e um jsonb sem forma quebraria o
 `tests/Arch/NoLooseArrayCastsTest.php` (guideline `domain/06`).
