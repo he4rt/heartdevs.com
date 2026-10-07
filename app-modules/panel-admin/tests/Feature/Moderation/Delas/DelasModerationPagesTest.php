@@ -12,6 +12,7 @@ use He4rt\Delas\History\Enums\DelasAction;
 use He4rt\Delas\History\Models\DelasTransition;
 use He4rt\Delas\TagRequest\Enums\DelasRequestStatus;
 use He4rt\Delas\TagRequest\Models\DelasTagRequest;
+use He4rt\Delas\Team\Queries\DelasCandidates;
 use He4rt\Identity\Authorization\Enums\UserRole;
 use He4rt\Identity\User\Models\User;
 use He4rt\PanelAdmin\Moderation\ModerationCluster;
@@ -333,16 +334,27 @@ test('a busca de conceder acha quem não tem a tag e rotula a escolhida', functi
     expect(mountedPersonSelect($page)->getOptionLabel(withDefault: false))->toBeNull();
 });
 
-test('o seletor de remover lista só quem tem a tag, já carregado', function (): void {
+test('o seletor de remover abre com quem tem a tag, até o limite, e busca o resto', function (): void {
     $this->actingAs(User::factory()->delasLead()->create());
     $members = DelasTagRequest::factory()->approved()->count(2)->create()->map->user;
     DelasTagRequest::factory()->pending()->create();
-    User::factory()->create();
+    User::factory()->create(['name' => 'Zuleica Sem Tag']);
 
     $select = mountedPersonSelect(livewire(DelasTeamPage::class)->mountAction('revoke'));
 
     expect($select->isPreloaded())->toBeTrue()
-        ->and(array_keys($select->getOptions()))->toEqualCanonicalizing($members->map->getKey()->all());
+        ->and(array_keys($select->getOptions()))->toEqualCanonicalizing($members->map->getKey()->all())
+        ->and(array_keys($select->getSearchResults($members->first()->name)))->toContain($members->first()->getKey())
+        ->and($select->getSearchResults('Zuleica'))->toBeEmpty();
+});
+
+test('o seletor de remover não carrega mais do que o limite', function (): void {
+    $this->actingAs(User::factory()->delasLead()->create());
+    DelasTagRequest::factory()->approved()->count(DelasCandidates::SEARCH_LIMIT + 3)->create();
+
+    $select = mountedPersonSelect(livewire(DelasTeamPage::class)->mountAction('revoke'));
+
+    expect($select->getOptions())->toHaveCount(DelasCandidates::SEARCH_LIMIT);
 });
 
 test('a busca de adicionar moderadora só acha membras com a tag, fora super admin e a equipe', function (): void {

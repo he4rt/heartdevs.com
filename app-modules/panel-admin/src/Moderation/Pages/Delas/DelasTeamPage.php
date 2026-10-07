@@ -165,16 +165,9 @@ class DelasTeamPage extends Page implements HasTable
                 ->modalHeading(__('panel-admin::delas.actions.revoke_heading'))
                 ->modalDescription(__('panel-admin::delas.actions.revoke_body'))
                 ->schema([
-                    // Quem tem a tag é uma lista pequena: carrega tudo e a pessoa só escolhe.
-                    Select::make('user_id')
-                        ->label(__('panel-admin::delas.actions.person'))
-                        ->helperText(__('panel-admin::delas.actions.member_hint'))
-                        ->required()
-                        ->options(fn (): array => $this->optionsFor(
-                            $this->candidates()->forRevoke($this->actor())->orderBy('name')->get(),
-                        ))
-                        ->searchable()
-                        ->preload(),
+                    // Abre com as primeiras membras; digitar busca entre todas, sem carregar a lista inteira.
+                    $this->searchablePersonSelect(fn (): Builder => $this->candidates()->forRevoke($this->actor()))
+                        ->helperText(__('panel-admin::delas.actions.member_hint')),
                     $this->reasonField(__('panel-admin::delas.actions.revoke_reason')),
                     $this->alsoBlockToggle(),
                 ])
