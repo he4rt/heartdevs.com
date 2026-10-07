@@ -34,8 +34,5 @@ class DelasServiceProvider extends ServiceProvider
         ]));
 
         Gate::define('lead-delas', fn (User $user): bool => $user->hasRole(UserRole::DelasLead));
-
-        // Ninguém além do super admin, que passa pelo Gate::before.
-        Gate::define('administer-delas', fn (User $user): bool => false);
     }
 }

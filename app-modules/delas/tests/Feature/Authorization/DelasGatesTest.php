@@ -10,18 +10,17 @@ test('os papéis da He4rt Delas existem depois das migrations, sem seed', functi
     expect(Role::findByName($role->value, UserRole::GUARD))->toBeInstanceOf(Role::class);
 })->with([UserRole::DelasModerator, UserRole::DelasLead]);
 
-test('cada papel passa só nos gates do seu nível', function (?string $state, bool $moderate, bool $lead, bool $administer): void {
+test('cada papel passa só nos gates do seu nível', function (?string $state, bool $moderate, bool $lead): void {
     $factory = User::factory();
     $user = ($state === null ? $factory : $factory->{$state}())->create();
 
     expect($user->can('moderate-delas'))->toBe($moderate)
-        ->and($user->can('lead-delas'))->toBe($lead)
-        ->and($user->can('administer-delas'))->toBe($administer);
+        ->and($user->can('lead-delas'))->toBe($lead);
 })->with([
-    'membra comum' => [null, false, false, false],
-    'moderadora' => ['delasModerator', true, false, false],
-    'líder' => ['delasLead', true, true, false],
-    'super admin' => ['superAdmin', true, true, true],
+    'membra comum' => [null, false, false],
+    'moderadora' => ['delasModerator', true, false],
+    'líder' => ['delasLead', true, true],
+    'super admin' => ['superAdmin', true, true],
 ]);
 
 test('ao perder o papel, a moderadora perde o gate na próxima leitura', function (): void {

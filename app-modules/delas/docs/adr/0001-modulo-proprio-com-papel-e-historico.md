@@ -38,9 +38,8 @@ precisa morar em algum lugar e ter uma forma de autorizar quem decide.
   migration, como a role `streamer`. A líder gerencia moderadoras, concede e remove a tag e vê o
   histórico completo, tudo no Hub. _Vai além da #570_ ("atribuível apenas por admins do Hub"):
   dá autonomia à He4rt Delas sem abrir o `/admin`.
-- **Gates nomeados no `DelasServiceProvider`**: `moderate-delas` (moderadora ou líder),
-  `lead-delas` (líder) e `administer-delas` (sempre `false`; só `super-admin` passa, pelo
-  `Gate::before` do identity).
+- **Gates nomeados no `DelasServiceProvider`**: `moderate-delas` (moderadora ou líder) e
+  `lead-delas` (líder). Super admins passam nos dois pelo `Gate::before` do identity.
   O código checa o gate, nunca o nome da role.
     - _Diverge do `use-streamer-tools`, que fica no `IdentityServiceProvider`._ Aqui o gate é
       vocabulário do delas, e o identity não deve conhecer regras de outro módulo.
@@ -51,12 +50,12 @@ precisa morar em algum lugar e ter uma forma de autorizar quem decide.
   quem bloqueou ou por super admin.
 - **Histórico append-only** em `delas_transitions`, gravado pelas actions, sem trigger (ADR-0003
   do `events`).
-- **Dois espaços de interface.** Moderadoras decidem numa página do Hub (`/app`), como a #570
-  pede, porque não têm acesso ao `/admin`. Super admins têm um **cluster He4rt Delas** no
-  `/admin` (dashboard, solicitações, bloqueios, histórico e moderadoras), no formato do cluster de
-  Moderação. A tabela de Usuários só exibe as roles.
-    - _Alternativa descartada:_ abrir o `/admin` para moderadoras, limitado ao cluster. Contradiz a
-      ADR-0002 do `identity` ("o painel inteiro é super admin ou nada").
+- **Tudo no Hub.** Moderadoras, líderes e super admins usam a mesma página He4rt Delas no `/app`,
+  que mostra mais partes conforme o papel. No `/admin` fica só a atribuição dos papéis, pela
+  seção Papéis do formulário de usuário que já existe.
+    - _Alternativas descartadas:_ um cluster He4rt Delas no `/admin` (dois lugares para manter, e
+      líderes não entram no `/admin`) e abrir o `/admin` para moderadoras (contradiz a ADR-0002
+      do `identity`: "o painel inteiro é super admin ou nada").
 
 ## Consequências
 
