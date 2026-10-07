@@ -6,6 +6,7 @@ namespace He4rt\PanelAdmin\Moderation\Pages\Delas\Concerns;
 
 use Closure;
 use Filament\Forms\Components\Textarea;
+use Filament\Forms\Components\Toggle;
 use Filament\Notifications\Notification;
 use Filament\Schemas\Components\EmbeddedTable;
 use Filament\Schemas\Schema;
@@ -72,6 +73,35 @@ trait InteractsWithDelasModeration
             ->maxLength(Reason::MAX_LENGTH)
             ->rows(3)
             ->helperText($hint ?? __('panel-admin::delas.reason_hint'));
+    }
+
+    /**
+     * Ao remover a tag, a líder pode impedir novos pedidos com o mesmo motivo.
+     */
+    protected function alsoBlockToggle(): Toggle
+    {
+        return Toggle::make('also_block')
+            ->label(__('panel-admin::delas.actions.also_block'))
+            ->helperText(__('panel-admin::delas.actions.also_block_hint'))
+            ->default(state: false);
+    }
+
+    /**
+     * @param  array<array-key, mixed>  $data
+     */
+    protected function alsoBlockFrom(array $data): bool
+    {
+        return ($data['also_block'] ?? false) === true;
+    }
+
+    /**
+     * @param  array<array-key, mixed>  $data
+     */
+    protected function revokedTitle(array $data): string
+    {
+        return $this->text($this->alsoBlockFrom($data)
+            ? 'panel-admin::delas.actions.revoked_and_blocked'
+            : 'panel-admin::delas.actions.revoked');
     }
 
     /**

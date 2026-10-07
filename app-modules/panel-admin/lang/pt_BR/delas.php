@@ -7,6 +7,7 @@ return [
     'navigation' => [
         'group' => 'He4rt Delas',
         'queue' => 'Fila',
+        'members' => 'Membras',
         'blocks' => 'Bloqueios',
         'history' => 'Histórico',
         'history_full' => 'Histórico completo',
@@ -16,6 +17,10 @@ return [
         'queue' => [
             'title' => 'Fila da He4rt Delas',
             'subtitle' => 'Analise os pedidos da tag He4rt Delas. Toda decisão fica registrada com quem decidiu, quando e o motivo.',
+        ],
+        'members' => [
+            'title' => 'Membras da He4rt Delas',
+            'subtitle' => 'Quem tem a tag He4rt Delas hoje.',
         ],
         'blocks' => [
             'title' => 'Bloqueios da He4rt Delas',
@@ -42,10 +47,14 @@ return [
         'actor' => 'Quem fez',
         'role' => 'Papel',
         'decisions' => 'Decisões',
+        'member_since' => 'Membra desde',
+        'decided_by' => 'Decidido por',
     ],
     'empty' => [
         'pending' => 'Nenhuma solicitação pendente',
         'pending_body' => 'Quando alguém pedir a tag He4rt Delas, o pedido aparece aqui.',
+        'members' => 'Ninguém com a tag ainda',
+        'members_body' => 'Quem tiver o pedido aprovado ou receber a tag direto aparece aqui.',
         'blocks' => 'Nenhum bloqueio ativo',
         'blocks_body' => 'Pessoas bloqueadas de solicitar a tag aparecem aqui.',
         'history' => 'Nada no histórico',
@@ -96,6 +105,10 @@ return [
         'revoke_body' => 'O registro não é apagado. A pessoa poderá solicitar de novo depois da espera.',
         'revoke_reason' => 'Motivo da remoção',
         'revoked' => 'Tag removida',
+        'revoke_member_heading' => 'Remover a tag de :name?',
+        'also_block' => 'Também bloquear novos pedidos',
+        'also_block_hint' => 'Usa o mesmo motivo. Só impede novos pedidos da tag: não é banimento e não afeta a conta.',
+        'revoked_and_blocked' => 'Tag removida e novos pedidos bloqueados',
         'person' => 'Pessoa',
         'person_hint' => 'Busque por nome ou @username.',
         'member_hint' => 'Só aparece quem tem a tag hoje.',

@@ -32,7 +32,7 @@ class DelasHistoryPage extends Page implements HasTable
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedClock;
 
-    protected static ?int $navigationSort = 22;
+    protected static ?int $navigationSort = 23;
 
     protected static ?string $slug = 'delas/history';
 

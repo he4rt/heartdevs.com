@@ -30,7 +30,7 @@ class DelasBlocksPage extends Page implements HasTable
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedLockClosed;
 
-    protected static ?int $navigationSort = 21;
+    protected static ?int $navigationSort = 22;
 
     protected static ?string $slug = 'delas/blocks';
 

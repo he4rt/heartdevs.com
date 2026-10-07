@@ -42,7 +42,7 @@ class DelasTeamPage extends Page implements HasTable
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedUsers;
 
-    protected static ?int $navigationSort = 23;
+    protected static ?int $navigationSort = 24;
 
     protected static ?string $slug = 'delas/team';
 
@@ -175,10 +175,11 @@ class DelasTeamPage extends Page implements HasTable
                         ->searchable()
                         ->preload(),
                     $this->reasonField(__('panel-admin::delas.actions.revoke_reason')),
+                    $this->alsoBlockToggle(),
                 ])
                 ->action(fn (array $data): bool => $this->attempt(
-                    fn () => resolve(RevokeDelasTag::class)->handle($this->findUser($data['user_id']), $this->actor(), $this->reasonFrom($data)),
-                    __('panel-admin::delas.actions.revoked'),
+                    fn () => resolve(RevokeDelasTag::class)->handle($this->findUser($data['user_id']), $this->actor(), $this->reasonFrom($data), $this->alsoBlockFrom($data)),
+                    $this->revokedTitle($data),
                 )),
         ];
     }

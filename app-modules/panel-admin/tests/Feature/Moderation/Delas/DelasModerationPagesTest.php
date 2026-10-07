@@ -16,6 +16,7 @@ use He4rt\Identity\User\Models\User;
 use He4rt\PanelAdmin\Moderation\ModerationCluster;
 use He4rt\PanelAdmin\Moderation\Pages\Delas\DelasBlocksPage;
 use He4rt\PanelAdmin\Moderation\Pages\Delas\DelasHistoryPage;
+use He4rt\PanelAdmin\Moderation\Pages\Delas\DelasMembersPage;
 use He4rt\PanelAdmin\Moderation\Pages\Delas\DelasQueuePage;
 use He4rt\PanelAdmin\Moderation\Pages\Delas\DelasTeamPage;
 use He4rt\PanelAdmin\Moderation\Widgets\Delas\DelasStatsOverview;
@@ -62,7 +63,7 @@ test('membra comum não acessa nenhuma página da He4rt Delas', function (string
     expect($page::canAccess())->toBeFalse();
 
     $this->get($page::getUrl())->assertForbidden();
-})->with([DelasQueuePage::class, DelasBlocksPage::class, DelasHistoryPage::class, DelasTeamPage::class]);
+})->with([DelasQueuePage::class, DelasMembersPage::class, DelasBlocksPage::class, DelasHistoryPage::class, DelasTeamPage::class]);
 
 test('moderadora vê a fila de pendentes, mas não a Equipe', function (): void {
     $this->actingAs(User::factory()->delasModerator()->create());
@@ -83,10 +84,11 @@ test('a moderadora abre a página pelo navegador, com o lazy loading vigiado', f
     $this->actingAs(User::factory()->delasModerator()->create());
     DelasTagRequest::factory()->pending()->count(2)->create();
     DelasRequesterBlock::factory()->count(2)->create();
+    DelasTagRequest::factory()->approved()->count(2)->create();
     DelasTransition::factory()->count(2)->create(['action' => DelasAction::Approved]);
 
     $this->get($page::getUrl())->assertOk();
-})->with([DelasQueuePage::class, DelasBlocksPage::class, DelasHistoryPage::class]);
+})->with([DelasQueuePage::class, DelasMembersPage::class, DelasBlocksPage::class, DelasHistoryPage::class]);
 
 test('ao revogar o papel, a moderadora perde o acesso na hora', function (): void {
     $moderator = User::factory()->delasModerator()->create();
@@ -110,6 +112,7 @@ test('a moderadora entra no cluster de Moderação e só vê as páginas dela', 
         ->toBe([__('panel-admin::delas.navigation.group')])
         ->and($items->map(fn (NavigationItem $item): string => $item->getLabel())->all())->toBe([
             __('panel-admin::delas.navigation.queue'),
+            __('panel-admin::delas.navigation.members'),
             __('panel-admin::delas.navigation.blocks'),
             __('panel-admin::delas.navigation.history'),
         ]);
@@ -383,4 +386,38 @@ test('a líder vê a correção como linha própria no histórico; a moderadora,
     $this->actingAs(User::factory()->delasLead()->create());
     livewire(DelasHistoryPage::class)->loadTable()
         ->assertCanSeeTableRecords([$original, $correction]);
+});
+
+test('a moderadora vê quem tem a tag, mas só a líder remove', function (): void {
+    [$member] = DelasTagRequest::factory()->approved()->count(2)->create();
+    $pending = DelasTagRequest::factory()->pending()->create();
+
+    $this->actingAs(User::factory()->delasModerator()->create());
+    livewire(DelasMembersPage::class)
+        ->loadTable()
+        ->assertCanSeeTableRecords([$member])
+        ->assertCanNotSeeTableRecords([$pending])
+        ->assertActionHidden(TestAction::make('revoke')->table($member));
+
+    expect(DelasMembersPage::getNavigationBadge())->toBe('2');
+});
+
+test('a líder remove a tag pela Membras e bloqueia novos pedidos junto', function (): void {
+    $this->actingAs(User::factory()->delasLead()->create());
+    [$member, $other] = DelasTagRequest::factory()->approved()->count(2)->create();
+
+    livewire(DelasMembersPage::class)
+        ->loadTable()
+        ->callAction(TestAction::make('revoke')->table($member), data: ['reason' => 'Perfil falso.', 'also_block' => true])
+        ->assertNotified(__('panel-admin::delas.actions.revoked_and_blocked'))
+        ->assertCanNotSeeTableRecords([$member])
+        ->callAction(TestAction::make('revoke')->table($other), data: ['reason' => 'Pedido da pessoa.'])
+        ->assertNotified(__('panel-admin::delas.actions.revoked'));
+
+    $block = DelasRequesterBlock::query()->active()->sole();
+
+    expect($member->fresh()->status)->toBe(DelasRequestStatus::Revoked)
+        ->and($block->user_id)->toBe($member->user_id)
+        ->and($block->reason)->toBe('Perfil falso.')
+        ->and($other->fresh()->status)->toBe(DelasRequestStatus::Revoked);
 });

@@ -7,6 +7,7 @@ return [
     'navigation' => [
         'group' => 'He4rt Delas',
         'queue' => 'Queue',
+        'members' => 'Members',
         'blocks' => 'Blocks',
         'history' => 'History',
         'history_full' => 'Full history',
@@ -16,6 +17,10 @@ return [
         'queue' => [
             'title' => 'He4rt Delas queue',
             'subtitle' => 'Review He4rt Delas tag requests. Every decision records who decided, when and why.',
+        ],
+        'members' => [
+            'title' => 'He4rt Delas members',
+            'subtitle' => 'Who has the He4rt Delas tag today.',
         ],
         'blocks' => [
             'title' => 'He4rt Delas blocks',
@@ -42,10 +47,14 @@ return [
         'actor' => 'Done by',
         'role' => 'Role',
         'decisions' => 'Decisions',
+        'member_since' => 'Member since',
+        'decided_by' => 'Decided by',
     ],
     'empty' => [
         'pending' => 'No pending requests',
         'pending_body' => 'When someone requests the He4rt Delas tag, it shows up here.',
+        'members' => 'Nobody has the tag yet',
+        'members_body' => 'People whose request is approved or who get the tag directly show up here.',
         'blocks' => 'No active blocks',
         'blocks_body' => 'People blocked from requesting the tag show up here.',
         'history' => 'Nothing in the history',
@@ -96,6 +105,10 @@ return [
         'revoke_body' => 'The record is kept. The person can request again after the cooldown.',
         'revoke_reason' => 'Removal reason',
         'revoked' => 'Tag removed',
+        'revoke_member_heading' => 'Remove the tag from :name?',
+        'also_block' => 'Also block new requests',
+        'also_block_hint' => 'Uses the same reason. Only prevents new tag requests: it is not a ban and does not affect the account.',
+        'revoked_and_blocked' => 'Tag removed and new requests blocked',
         'person' => 'Person',
         'person_hint' => 'Search by name or @username.',
         'member_hint' => 'Only people who have the tag today.',
