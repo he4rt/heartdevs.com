@@ -196,6 +196,9 @@ class DelasTeamPage extends Page implements HasTable
             ->helperText(__('panel-admin::delas.actions.person_hint'))
             ->required()
             ->searchable()
+            // Abre já com as primeiras pessoas do escopo; digitar filtra pela comunidade inteira.
+            ->options(fn (): array => $this->optionsFor($this->candidates()->search($candidates(), '')))
+            ->preload()
             ->getSearchResultsUsing(fn (string $search): array => $this->optionsFor(
                 $this->candidates()->search($candidates(), $search),
             ))

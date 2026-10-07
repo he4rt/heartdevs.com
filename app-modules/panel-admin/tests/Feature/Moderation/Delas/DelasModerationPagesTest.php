@@ -315,7 +315,12 @@ test('a busca de conceder acha quem não tem a tag e rotula a escolhida', functi
     $page = livewire(DelasTeamPage::class)->mountAction('grant');
     $select = mountedPersonSelect($page);
 
-    expect($select->getSearchResults('ana'))->toBe([$ana->getKey() => 'Ana Souza (@anasouza)']);
+    expect($select->getSearchResults('ana'))->toBe([$ana->getKey() => 'Ana Souza (@anasouza)'])
+        // Abre já com a lista, sem precisar digitar: quem tem a tag e a própria líder não aparecem.
+        ->and($select->isPreloaded())->toBeTrue()
+        ->and($select->getOptions())->toHaveKey($ana->getKey())
+        ->and($select->getOptions())->not->toHaveKey($member->getKey())
+        ->and($select->getOptions())->not->toHaveKey($lead->getKey());
 
     $page->fillForm(['user_id' => $ana->getKey()]);
     expect(mountedPersonSelect($page)->getOptionLabel())->toBe('Ana Souza (@anasouza)');
