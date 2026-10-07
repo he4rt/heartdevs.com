@@ -48,6 +48,12 @@ precisa morar em algum lugar e ter uma forma de autorizar quem decide.
   quem bloqueou ou por super admin.
 - **Histórico append-only** em `delas_transitions`, gravado pelas actions, sem trigger (ADR-0003
   do `events`).
+- **Dois espaços de interface.** Moderadoras decidem numa página do Hub (`/app`), como a #570
+  pede, porque não têm acesso ao `/admin`. Super admins têm um **cluster He4rt Delas** no
+  `/admin` (dashboard, solicitações, bloqueios, histórico e moderadoras), no formato do cluster de
+  Moderação. A tabela de Usuários só exibe as roles.
+    - _Alternativa descartada:_ abrir o `/admin` para moderadoras, limitado ao cluster. Contradiz a
+      ADR-0002 do `identity` ("o painel inteiro é super admin ou nada").
 
 ## Consequências
 

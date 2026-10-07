@@ -85,8 +85,12 @@ Fatos do código atual que moldam o desenho:
 
 ### Administração (super admins)
 
-- Atribuem e retiram o papel `delas-moderator` pelo `UserForm` existente. O acesso some na
-  próxima requisição, porque `hasRole` lê `model_has_roles` a cada request.
+Tudo acontece no cluster He4rt Delas do `/admin` (ver [Interface](#interface)). Super admins
+também passam no gate `moderate-delas` e podem decidir solicitações por lá.
+
+- Atribuem e retiram o papel `delas-moderator` na página Moderadoras do cluster. O `UserForm`
+  continua listando a role, como faz com todas. O acesso some na próxima requisição, porque
+  `hasRole` lê `model_has_roles` a cada request.
 - Concedem a tag diretamente:
     - se houver solicitação `pending`, ela é aprovada (`pending → approved`, `triggered_by=admin`);
     - se não houver, é criada uma solicitação já `approved`;
@@ -279,10 +283,35 @@ dispara também `DelasRequesterUnblocked`. Nenhum listener nesta entrega.
 
 **Admin (`/admin`, `panel-admin`)**
 
-- Actions Filament `GrantDelasTagAction` e `RevokeDelasTagAction` em
-  `panel-admin/src/Filament/Resources/Users/Tables/UsersTable.php`, chamando as actions de
-  domínio.
+Cluster **He4rt Delas** em `panel-admin/src/Delas/`, no mesmo formato do cluster de Moderação
+(`ModerationDashboard`, fila, appeals, `AuditLogPage`): slug `delas`, sidebar própria em
+`PanelAdminServiceProvider::buildNavigation` (match em `delas/`, com link de volta ao admin) e
+entrada na navegação padrão.
+
+| Página       | Conteúdo                                                                                                                                                                        |
+| ------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Dashboard    | Cartões: pendentes agora, membras com a tag, tempo médio até a decisão, aprovadas e rejeitadas no mês, bloqueios ativos. Lista das últimas decisões. Gráficos ficam para depois |
+| Solicitações | Todas, com filtro por status. Aprovar e rejeitar as pendentes, conceder e remover a tag (`GrantDelasTagAction`, `RevokeDelasTagAction`)                                         |
+| Bloqueios    | Todos (ativos e encerrados), com desbloqueio                                                                                                                                    |
+| Histórico    | `delas_transitions`: data, ação, pessoa afetada, quem fez e motivo                                                                                                              |
+| Moderadoras  | Quem tem `delas-moderator`, com adicionar e revogar                                                                                                                             |
+
+- Todas as páginas do cluster exigem `manage-delas-tag` no `canAccess()`. Fora de produção o
+  `/admin` é aberto a qualquer pessoa autenticada, então o painel sozinho não protege.
+- A tabela de Usuários só **mostra** as roles (badges "Super admin", "Moderadora He4rt Delas"),
+  sem ações da He4rt Delas.
 - Visibilidade do `CheckboxList` de roles no `UserForm` restrita a super admins.
+
+### Identidade visual
+
+- Paleta He4rt Delas (primária `#F485A2`; 50 `#FFD1EE` → 900 `#730835`) como tokens do design
+  system em `app-modules/he4rt/resources/css/support/themes.css` e `index.css`, usada só nos
+  elementos da He4rt Delas. O resto do Hub mantém os tokens da He4rt.
+- A tag usa o rosa claro com texto e ícone no tom 900. Texto branco só do tom 600 para cima
+  (WCAG AA).
+- Logos oficiais (ícone, vertical e horizontal) como SVG `currentColor` nos assets do design
+  system.
+- Protótipo de referência validado com a Danielle; tokens e assets a confirmar com a Sther.
 
 ## Trade-offs e alternativas consideradas
 
@@ -311,7 +340,8 @@ unitários em `delas/tests/Unit`.
   bloqueada (encerra o bloqueio); remove a tag.
 - Papel: perde acesso ao retirar `delas-moderator`; o campo de roles não aparece para quem não é
   super admin.
-- Páginas: seção He4rt Delas invisível e inacessível sem `moderate-delas`.
+- Páginas: seção He4rt Delas do Hub invisível e inacessível sem `moderate-delas`; páginas do
+  cluster do `/admin` inacessíveis sem `manage-delas-tag`, inclusive para moderadoras.
 - Arch (opcional): `He4rt\Delas` não importa `He4rt\Panel*`.
 
 Validação: `make check`, `make test` e `make test-shards`.
