@@ -31,7 +31,6 @@ use He4rt\PanelAdmin\Moderation\Livewire\AppealQueue;
 use He4rt\PanelAdmin\Moderation\Livewire\ModerationDashboardLivewire;
 use He4rt\PanelAdmin\Moderation\Livewire\ModerationQueue;
 use He4rt\PanelAdmin\Moderation\ModerationCluster;
-use He4rt\PanelAdmin\Moderation\Pages\Delas\DelasQueuePage;
 use He4rt\PanelAdmin\Pages\Dashboard;
 use He4rt\PanelAdmin\Twitch\TwitchCluster;
 use Illuminate\Contracts\Support\Arrayable;
@@ -162,7 +161,6 @@ class PanelAdminServiceProvider extends ServiceProvider
             ->items([
                 ...$this->itemsFor(Dashboard::class),
                 ...$this->itemsFor(ModerationCluster::class),
-                ...$this->delasShortcut(),
                 ...$this->itemsFor(MarketingCluster::class),
                 ...$this->itemsFor(TwitchCluster::class),
                 ...$this->itemsFor(GithubCluster::class),
@@ -219,27 +217,6 @@ class PanelAdminServiceProvider extends ServiceProvider
             $this->brandDelasGroup(...),
             resolve(ModerationCluster::class)->getCachedSubNavigation(),
         ));
-    }
-
-    /**
-     * Atalho para a fila da He4rt Delas no menu principal, com a marca, para quem
-     * modera. A moderação mora no cluster de Moderação; o atalho só encurta o caminho.
-     *
-     * @return array<int, NavigationItem>
-     */
-    private function delasShortcut(): array
-    {
-        if (!DelasQueuePage::canAccess()) {
-            return [];
-        }
-
-        return [
-            NavigationItem::make(__('panel-admin::delas.navigation.group'))
-                ->icon('he4rt-delas')
-                ->sort(11)
-                ->badge(DelasQueuePage::getNavigationBadge())
-                ->url(DelasQueuePage::getUrl()),
-        ];
     }
 
     /**
