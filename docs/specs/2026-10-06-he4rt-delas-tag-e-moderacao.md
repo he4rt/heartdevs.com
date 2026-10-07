@@ -328,9 +328,14 @@ entrada na navegação padrão.
 
 ### Identidade visual
 
+- As telas da He4rt Delas usam o visual normal do Hub e do Filament: superfícies neutras, tokens
+  da He4rt e as cores semânticas padrão (aprovar e aprovada em verde, rejeitar, remover e bloquear
+  em vermelho, pendente em âmbar, encerrado em cinza).
+- O rosa da He4rt Delas aparece **só nos pontos de marca**: a tag, a logo, o ícone do item no
+  menu e o botão principal do pedido ("Enviar solicitação" e o toggle do perfil). Sem degradês e
+  sem fundos rosados.
 - Paleta He4rt Delas (primária `#F485A2`; 50 `#FFD1EE` → 900 `#730835`) como tokens do design
-  system em `app-modules/he4rt/resources/css/support/themes.css` e `index.css`, usada só nos
-  elementos da He4rt Delas. O resto do Hub mantém os tokens da He4rt.
+  system em `app-modules/he4rt/resources/css/support/themes.css` e `index.css`.
 - A tag usa o rosa claro com texto e ícone no tom 900. Texto branco só do tom 600 para cima
   (WCAG AA).
 - Logos oficiais (ícone, vertical e horizontal) como SVG `currentColor` nos assets do design
