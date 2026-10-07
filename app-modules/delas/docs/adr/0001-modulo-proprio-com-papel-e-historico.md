@@ -34,10 +34,13 @@ precisa morar em algum lugar e ter uma forma de autorizar quem decide.
 ## Decisão
 
 - **Módulo de domínio `delas`**, dependente só do `identity`. Os painéis dependem dele.
-- **Papel `delas-moderator`** como case de `UserRole` no `identity`, criado por migration, como a
-  role `streamer`. Líder e moderadora são o mesmo papel, como na issue.
-- **Gates nomeados no `DelasServiceProvider`**: `moderate-delas` (checa a role) e
-  `manage-delas-tag` (sempre `false`; só `super-admin` passa, pelo `Gate::before` do identity).
+- **Papéis `delas-moderator` e `delas-lead`** como cases de `UserRole` no `identity`, criados por
+  migration, como a role `streamer`. A líder gerencia moderadoras, concede e remove a tag e vê o
+  histórico completo, tudo no Hub. _Vai além da #570_ ("atribuível apenas por admins do Hub"):
+  dá autonomia à He4rt Delas sem abrir o `/admin`.
+- **Gates nomeados no `DelasServiceProvider`**: `moderate-delas` (moderadora ou líder),
+  `lead-delas` (líder) e `administer-delas` (sempre `false`; só `super-admin` passa, pelo
+  `Gate::before` do identity).
   O código checa o gate, nunca o nome da role.
     - _Diverge do `use-streamer-tools`, que fica no `IdentityServiceProvider`._ Aqui o gate é
       vocabulário do delas, e o identity não deve conhecer regras de outro módulo.
@@ -60,8 +63,8 @@ precisa morar em algum lugar e ter uma forma de autorizar quem decide.
 - O `identity` ganha um case em `UserRole`, uma migration de role e um state de factory.
 - O campo de roles do `UserForm` passa a ser visível só para super admin. Fora de produção o
   `/admin` é aberto, e sem isso qualquer pessoa autenticada se daria `delas-moderator`.
-- A auditoria de quem atribuiu ou retirou `delas-moderator` não fica neste módulo: é concern do
-  `identity` e vale para todas as roles.
+- Papéis alterados pelas actions do delas entram no histórico. Os alterados direto no `UserForm`
+  não: essa auditoria é concern do `identity` e vale para todas as roles.
 - Sincronizar a tag com o cargo `he4rt_delas` do Discord fica para depois. Os eventos de domínio
   deixam o gancho pronto.
 - A tag revela identidade de gênero, dado sensível pela LGPD. Hoje só a própria pessoa e quem
