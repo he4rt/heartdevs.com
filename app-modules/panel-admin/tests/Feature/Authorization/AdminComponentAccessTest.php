@@ -111,7 +111,7 @@ test('a líder da He4rt Delas acessa também a Equipe, e nada além da área del
     }
 });
 
-test('a sidebar da moderadora mostra só o Dashboard e a Moderação', function (): void {
+test('a sidebar da moderadora mostra só o Dashboard, a Moderação e o atalho da He4rt Delas', function (): void {
     actingAs(User::factory()->delasModerator()->create());
 
     $labels = collect(Filament::getPanel('admin')->getNavigation())
@@ -119,5 +119,18 @@ test('a sidebar da moderadora mostra só o Dashboard e a Moderação', function 
         ->map(fn (NavigationItem $item): string => $item->getLabel())
         ->all();
 
-    expect($labels)->toBe(['Dashboard', __('panel-admin::moderation.navigation.cluster')]);
+    expect($labels)->toBe([
+        'Dashboard',
+        __('panel-admin::moderation.navigation.cluster'),
+        __('panel-admin::delas.navigation.group'),
+    ]);
+});
+
+test('super admin também vê o atalho da He4rt Delas', function (): void {
+    actingAs(User::factory()->superAdmin()->create());
+    $superAdminLabels = collect(Filament::getPanel('admin')->getNavigation())
+        ->flatMap(fn (NavigationGroup $group): array => $group->getItems())
+        ->map(fn (NavigationItem $item): string => $item->getLabel());
+
+    expect($superAdminLabels)->toContain(__('panel-admin::delas.navigation.group'));
 });
