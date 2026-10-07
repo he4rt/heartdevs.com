@@ -11,6 +11,7 @@ use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
 use He4rt\Identity\User\Models\User;
+use He4rt\PanelAdmin\Concerns\SuperAdminOnly;
 use He4rt\PanelAdmin\Filament\Resources\Users\Pages\EditUser;
 use He4rt\PanelAdmin\Filament\Resources\Users\Pages\ListUsers;
 use He4rt\PanelAdmin\Filament\Resources\Users\Pages\ViewUser;
@@ -23,6 +24,8 @@ use Illuminate\Database\Eloquent\Model;
 
 class UserResource extends Resource
 {
+    use SuperAdminOnly;
+
     protected static ?string $model = User::class;
 
     protected static ?string $slug = 'users';

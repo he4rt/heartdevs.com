@@ -16,12 +16,15 @@ use He4rt\Moderation\Enums\CaseStatus;
 use He4rt\Moderation\Enums\Platform;
 use He4rt\Moderation\Enums\Severity;
 use He4rt\Moderation\Enums\ViolationType;
+use He4rt\PanelAdmin\Concerns\SuperAdminOnly;
 use He4rt\PanelAdmin\Moderation\ModerationCluster;
 use He4rt\PanelAdmin\Moderation\Resources\ModerationCaseResource\Pages\ListModerationCases;
 use He4rt\PanelAdmin\Moderation\Resources\ModerationCaseResource\Pages\ViewModerationCase;
 
 class ModerationCaseResource extends Resource
 {
+    use SuperAdminOnly;
+
     protected static ?string $cluster = ModerationCluster::class;
 
     protected static ?string $model = ModerationCase::class;

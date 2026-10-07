@@ -11,6 +11,7 @@ use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
 use He4rt\IntegrationDiscord\Models\DiscordGuild;
+use He4rt\PanelAdmin\Concerns\SuperAdminOnly;
 use He4rt\PanelAdmin\Discord\DiscordCluster;
 use He4rt\PanelAdmin\Discord\Resources\DiscordGuilds\Pages\ListDiscordGuilds;
 use He4rt\PanelAdmin\Discord\Resources\DiscordGuilds\Pages\ViewDiscordGuild;
@@ -22,6 +23,8 @@ use He4rt\PanelAdmin\Discord\Resources\DiscordGuilds\Tables\DiscordGuildsTable;
 
 class DiscordGuildResource extends Resource
 {
+    use SuperAdminOnly;
+
     protected static ?string $cluster = DiscordCluster::class;
 
     protected static ?string $model = DiscordGuild::class;

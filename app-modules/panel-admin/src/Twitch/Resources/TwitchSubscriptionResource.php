@@ -17,12 +17,15 @@ use He4rt\IntegrationTwitch\Enums\TwitchSubscriptionStatus;
 use He4rt\IntegrationTwitch\Models\TwitchSubscription;
 use He4rt\IntegrationTwitch\Transport\Requests\EventSub\DeleteSubscription;
 use He4rt\IntegrationTwitch\Transport\TwitchHelixConnector;
+use He4rt\PanelAdmin\Concerns\SuperAdminOnly;
 use He4rt\PanelAdmin\Twitch\Resources\TwitchSubscriptionResource\Pages\ListTwitchSubscriptions;
 use He4rt\PanelAdmin\Twitch\TwitchCluster;
 use Saloon\Exceptions\Request\RequestException;
 
 class TwitchSubscriptionResource extends Resource
 {
+    use SuperAdminOnly;
+
     protected static ?string $cluster = TwitchCluster::class;
 
     protected static ?string $model = TwitchSubscription::class;

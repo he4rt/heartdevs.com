@@ -8,6 +8,7 @@ use BackedEnum;
 use Filament\Pages\Page;
 use Filament\Support\Enums\Width;
 use Filament\Support\Icons\Heroicon;
+use He4rt\PanelAdmin\Concerns\SuperAdminOnly;
 use He4rt\PanelAdmin\Marketing\MarketingCluster;
 use He4rt\PanelAdmin\Marketing\Pages\Discord\Dashboard\Queries\ActivityPerDay;
 use He4rt\PanelAdmin\Marketing\Pages\Discord\Dashboard\Queries\MessageHeatmap;
@@ -20,6 +21,8 @@ use Illuminate\Support\Facades\Date;
 
 class DiscordDashboard extends Page
 {
+    use SuperAdminOnly;
+
     public int $rangeDays = 14;
 
     /** @var array<int, array{day: string, msgs: int, users: int, voiceHours: float}> */

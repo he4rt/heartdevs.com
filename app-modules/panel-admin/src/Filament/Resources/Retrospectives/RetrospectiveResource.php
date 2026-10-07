@@ -11,6 +11,7 @@ use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
 use He4rt\Community\Retrospective\Models\Retrospective;
+use He4rt\PanelAdmin\Concerns\SuperAdminOnly;
 use He4rt\PanelAdmin\Filament\Resources\Retrospectives\Pages\BuildDeck;
 use He4rt\PanelAdmin\Filament\Resources\Retrospectives\Pages\CreateRetrospective;
 use He4rt\PanelAdmin\Filament\Resources\Retrospectives\Pages\ListRetrospectives;
@@ -19,6 +20,8 @@ use He4rt\PanelAdmin\Filament\Resources\Retrospectives\Tables\RetrospectivesTabl
 
 class RetrospectiveResource extends Resource
 {
+    use SuperAdminOnly;
+
     protected static ?string $model = Retrospective::class;
 
     protected static ?string $slug = 'retrospectives';

@@ -11,6 +11,7 @@ use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
 use He4rt\IntegrationDiscord\Models\DiscordMember;
+use He4rt\PanelAdmin\Concerns\SuperAdminOnly;
 use He4rt\PanelAdmin\Discord\DiscordCluster;
 use He4rt\PanelAdmin\Discord\Resources\DiscordMembers\Pages\ListDiscordMembers;
 use He4rt\PanelAdmin\Discord\Resources\DiscordMembers\Pages\ViewDiscordMember;
@@ -20,6 +21,8 @@ use Illuminate\Database\Eloquent\Model;
 
 class DiscordMemberResource extends Resource
 {
+    use SuperAdminOnly;
+
     protected static ?string $cluster = DiscordCluster::class;
 
     protected static ?string $model = DiscordMember::class;

@@ -22,7 +22,7 @@ beforeEach(function (): void {
         ]),
     ]);
 
-    $admin = User::factory()->create();
+    $admin = User::factory()->superAdmin()->create();
 
     $this->actingAs($admin);
     Filament::setCurrentPanel(Filament::getPanel('admin'));

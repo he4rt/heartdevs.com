@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace He4rt\PanelAdmin\Contributions\Widgets;
 
 use Filament\Widgets\Widget;
+use He4rt\Identity\User\Models\User;
 use He4rt\PanelAdmin\Contributions\Timeline\DailyActivitySeries;
 
 /**
@@ -24,6 +25,17 @@ class ActivityTimelineWidget extends Widget
     protected int|string|array $columnSpan = 'full';
 
     protected DailyActivitySeries $series;
+
+    /**
+     * O Dashboard é a página de entrada de todo papel que entra no `/admin`
+     * (ADR-0003 do identity), mas os números da comunidade são só de super admin.
+     */
+    public static function canView(): bool
+    {
+        $user = auth()->user();
+
+        return $user instanceof User && $user->isSuperAdmin();
+    }
 
     /**
      * Livewire resolve o boot a cada request, então a dependência entra por injeção

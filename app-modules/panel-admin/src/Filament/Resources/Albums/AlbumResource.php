@@ -11,6 +11,7 @@ use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
 use He4rt\Events\Gallery\Models\Album;
+use He4rt\PanelAdmin\Concerns\SuperAdminOnly;
 use He4rt\PanelAdmin\Filament\Resources\Albums\Pages\CreateAlbum;
 use He4rt\PanelAdmin\Filament\Resources\Albums\Pages\EditAlbum;
 use He4rt\PanelAdmin\Filament\Resources\Albums\Pages\ListAlbums;
@@ -20,6 +21,8 @@ use He4rt\PanelAdmin\Filament\Resources\Albums\Tables\AlbumsTable;
 
 final class AlbumResource extends Resource
 {
+    use SuperAdminOnly;
+
     protected static ?string $model = Album::class;
 
     protected static ?string $slug = 'albums';

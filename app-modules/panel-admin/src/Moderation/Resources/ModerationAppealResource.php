@@ -14,12 +14,15 @@ use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use He4rt\Moderation\Appeals\ModerationAppeal;
 use He4rt\Moderation\Enums\AppealStatus;
+use He4rt\PanelAdmin\Concerns\SuperAdminOnly;
 use He4rt\PanelAdmin\Moderation\ModerationCluster;
 use He4rt\PanelAdmin\Moderation\Resources\ModerationAppealResource\Pages\ListModerationAppeals;
 use He4rt\PanelAdmin\Moderation\Resources\ModerationAppealResource\Pages\ViewModerationAppeal;
 
 class ModerationAppealResource extends Resource
 {
+    use SuperAdminOnly;
+
     protected static ?string $cluster = ModerationCluster::class;
 
     protected static ?string $model = ModerationAppeal::class;
