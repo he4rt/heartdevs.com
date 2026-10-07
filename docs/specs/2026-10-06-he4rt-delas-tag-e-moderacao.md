@@ -91,10 +91,13 @@ Fatos do código atual que moldam o desenho:
 - O bloqueio vale **só** para solicitar a tag. Não é ban nem suspensão (`UserSituation`) e não
   afeta a conta.
 - Veem a lista de quem tem a tag (página Membras), só para consulta.
-- Corrigem o motivo que escreveram até 24 horas depois (`delas.reason_correction_hours`). A
-  correção é uma linha nova no histórico (`reason_corrected`, com `corrects_id` apontando para a
-  original); a original nunca muda. A tela mostra o motivo corrigido, "corrigido em DD/MM/AA por
-  X" e, ao passar o mouse, o texto original.
+- Editam o motivo que escreveram até 24 horas depois (`delas.reason_correction_hours`); o botão
+  "Editar motivo" mostra até quando. Cada edição é uma linha nova no histórico
+  (`reason_corrected`, com `corrects_id` apontando para a original), e a original nunca muda. Na
+  tabela, a edição não vira uma linha a mais: a linha editada mostra o texto que vale hoje e
+  "Editado em DD/MM/AA por X".
+- Não veem as versões anteriores do motivo. Quem edita pode ter tirado algo sensível, e isso não
+  volta para a tela de toda a equipe.
 
 ### Liderança (líderes da He4rt Delas)
 
@@ -107,7 +110,8 @@ que a moderadora tem, mais:
 - na Equipe, adiciona e revoga `delas-moderator`. Não cria nem revoga líderes, e não age sobre
   super admins;
 - desbloqueia qualquer bloqueio;
-- corrige qualquer motivo, a qualquer momento;
+- edita qualquer motivo, a qualquer momento, e abre "ver versões": a original e cada edição,
+  com quem escreveu e quando;
 - concede e remove a tag direto:
     - se houver solicitação `pending`, ela é aprovada (`pending → approved`);
     - se não houver, é criada uma solicitação já `approved`;
@@ -328,7 +332,7 @@ dispara também `DelasRequesterUnblocked`. Nenhum listener nesta entrega.
     | Fila      | `moderate-delas` | pendentes         | aprovar, rejeitar, bloquear                                                                                                                                                  |
     | Membras   | `moderate-delas` | membras com a tag | quem tem a tag, desde quando e quem decidiu; líder: remover a tag, com a opção de bloquear novos pedidos                                                                     |
     | Bloqueios | `moderate-delas` | bloqueios ativos  | desbloquear (moderadora: os próprios; líder: todos)                                                                                                                          |
-    | Histórico | `moderate-delas` |                   | moderadora: decisões; líder: completo, com filtro por ação; corrigir motivo                                                                                                  |
+    | Histórico | `moderate-delas` |                   | moderadora: decisões; líder: completo, com filtro por ação e versões do motivo; editar motivo                                                                                |
     | Equipe    | `lead-delas`     |                   | números (pendentes, membras com a tag, tempo médio até a decisão, aprovadas e rejeitadas no mês, bloqueios ativos), conceder e remover a tag, adicionar e revogar moderadora |
 
 - Os seletores de pessoa da Equipe usam a consulta de domínio `DelasCandidates`: conceder e

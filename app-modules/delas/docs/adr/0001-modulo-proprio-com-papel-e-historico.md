@@ -51,10 +51,10 @@ precisa morar em algum lugar e ter uma forma de autorizar quem decide.
   quem bloqueou ou por super admin.
 - **Histórico append-only** em `delas_transitions`, gravado pelas actions, sem trigger (ADR-0003
   do `events`).
-- **Corrigir motivo sem apagar.** Um motivo errado se corrige com uma linha nova
-  (`reason_corrected`, `corrects_id` apontando para a original), nunca editando a original. O
-  motivo vigente na solicitação ou no bloqueio passa a ser o corrigido. Quem escreveu corrige até
-  24 horas depois; a líder, sempre.
+- **Editar motivo sem apagar.** Cada edição é uma linha nova (`reason_corrected`, `corrects_id`
+  apontando para a original), nunca uma alteração da original. O motivo vigente na solicitação ou
+  no bloqueio passa a ser o editado. Quem escreveu edita até 24 horas depois; a líder, sempre. Só
+  a liderança vê as versões anteriores na tela: quem edita pode ter tirado algo sensível.
     - _Alternativa descartada:_ editar o campo `reason` direto. Mais simples, mas apagaria o que
       foi escrito e quebraria o append-only.
 - **Moderação no `/admin`, pedido e tag no `/app`.** Moderação na He4rt mora no `/admin`, no
