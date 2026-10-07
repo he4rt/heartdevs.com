@@ -28,6 +28,7 @@ enum DelasAction: string implements HasColor, HasDescription, HasIcon, HasLabel
     case Unblocked = 'unblocked';
     case ModeratorAdded = 'moderator_added';
     case ModeratorRemoved = 'moderator_removed';
+    case ReasonCorrected = 'reason_corrected';
 
     public function getLabel(): string
     {
@@ -52,6 +53,7 @@ enum DelasAction: string implements HasColor, HasDescription, HasIcon, HasLabel
             self::Unblocked => Color::Sky,
             self::ModeratorAdded => Color::Indigo,
             self::ModeratorRemoved => Color::Slate,
+            self::ReasonCorrected => Color::Yellow,
         };
     }
 
@@ -72,6 +74,19 @@ enum DelasAction: string implements HasColor, HasDescription, HasIcon, HasLabel
             self::Unblocked => Heroicon::OutlinedLockOpen,
             self::ModeratorAdded => Heroicon::OutlinedUserPlus,
             self::ModeratorRemoved => Heroicon::OutlinedUserMinus,
+            self::ReasonCorrected => Heroicon::OutlinedPencilSquare,
+        };
+    }
+
+    /**
+     * Ações cujo motivo pode ser corrigido depois. A correção é uma linha nova
+     * no histórico; a original nunca muda.
+     */
+    public function hasCorrectableReason(): bool
+    {
+        return match ($this) {
+            self::Rejected, self::Revoked, self::Granted, self::Blocked, self::Unblocked => true,
+            self::Requested, self::Approved, self::ModeratorAdded, self::ModeratorRemoved, self::ReasonCorrected => false,
         };
     }
 

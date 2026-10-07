@@ -27,11 +27,13 @@ final readonly class RecordDelasTransition
         ?DelasRequestStatus $from = null,
         ?DelasRequestStatus $to = null,
         ?string $reason = null,
+        ?DelasTransition $corrects = null,
     ): DelasTransition {
         return DelasTransition::query()->create([
             'user_id' => $subject->getKey(),
             'request_id' => $request?->getKey(),
             'block_id' => $block?->getKey(),
+            'corrects_id' => $corrects?->getKey(),
             'action' => $action,
             'from_status' => $from,
             'to_status' => $to,

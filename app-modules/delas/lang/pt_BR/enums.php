@@ -30,6 +30,7 @@ return [
         'blocked' => ['label' => 'Bloqueou', 'description' => 'A pessoa foi impedida de solicitar a tag.'],
         'unblocked' => ['label' => 'Desbloqueou', 'description' => 'A pessoa voltou a poder solicitar a tag.'],
         'moderator_added' => ['label' => 'Moderadora adicionada', 'description' => 'Uma líder deu o papel de moderadora He4rt Delas.'],
+        'reason_corrected' => ['label' => 'Motivo corrigido', 'description' => 'O motivo de uma decisão foi corrigido; a versão original continua no histórico.'],
         'moderator_removed' => ['label' => 'Moderadora removida', 'description' => 'Uma líder retirou o papel de moderadora He4rt Delas.'],
     ],
     'triggered_by' => [

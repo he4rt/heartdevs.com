@@ -93,6 +93,21 @@ final class DelasException extends Exception
         return new self(__('delas::exceptions.already_moderator'), Response::HTTP_CONFLICT);
     }
 
+    public static function reasonNotCorrectable(): self
+    {
+        return new self(__('delas::exceptions.reason_not_correctable'), Response::HTTP_UNPROCESSABLE_ENTITY);
+    }
+
+    public static function cannotCorrectReason(int $hours): self
+    {
+        return new self(__('delas::exceptions.cannot_correct_reason', ['hours' => $hours]), Response::HTTP_FORBIDDEN);
+    }
+
+    public static function reasonUnchanged(): self
+    {
+        return new self(__('delas::exceptions.reason_unchanged'), Response::HTTP_UNPROCESSABLE_ENTITY);
+    }
+
     public static function notModerator(): self
     {
         return new self(__('delas::exceptions.not_moderator'), Response::HTTP_UNPROCESSABLE_ENTITY);

@@ -18,6 +18,7 @@ use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 /**
  * Uma linha do histórico da He4rt Delas. Append-only: a aplicação nunca edita
@@ -27,6 +28,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property string $user_id
  * @property string|null $request_id
  * @property string|null $block_id
+ * @property string|null $corrects_id
  * @property DelasAction $action
  * @property DelasRequestStatus|null $from_status
  * @property DelasRequestStatus|null $to_status
@@ -34,6 +36,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property DelasTriggeredBy $triggered_by
  * @property string|null $reason
  * @property CarbonInterface|null $created_at
+ * @property-read DelasTransition|null $latestCorrection
  */
 #[Table(name: 'delas_transitions')]
 #[UseFactory(factoryClass: DelasTransitionFactory::class)]
@@ -49,6 +52,7 @@ final class DelasTransition extends Model
         'user_id',
         'request_id',
         'block_id',
+        'corrects_id',
         'action',
         'from_status',
         'to_status',
@@ -79,6 +83,42 @@ final class DelasTransition extends Model
     public function block(): BelongsTo
     {
         return $this->belongsTo(DelasRequesterBlock::class, 'block_id');
+    }
+
+    /**
+     * A linha cujo motivo esta corrige (só em linhas `reason_corrected`).
+     *
+     * @return BelongsTo<self, $this>
+     */
+    public function corrected(): BelongsTo
+    {
+        return $this->belongsTo(self::class, 'corrects_id');
+    }
+
+    /**
+     * A correção mais recente do motivo desta linha, se houver.
+     *
+     * @return HasOne<self, $this>
+     */
+    public function latestCorrection(): HasOne
+    {
+        // Sem latestOfMany(): ele desempata por MAX(id), e o Postgres não calcula MAX de UUID.
+        return $this->hasOne(self::class, 'corrects_id')->latest('created_at');
+    }
+
+    /**
+     * O motivo que vale hoje: o da correção mais recente ou o original.
+     */
+    public function currentReason(): ?string
+    {
+        $correction = $this->latestCorrection;
+
+        return $correction instanceof self ? $correction->reason : $this->reason;
+    }
+
+    public function hasCorrectableReason(): bool
+    {
+        return $this->reason !== null && $this->action->hasCorrectableReason();
     }
 
     /** @return array<string, mixed> */
