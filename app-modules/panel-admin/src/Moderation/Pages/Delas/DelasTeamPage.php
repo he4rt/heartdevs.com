@@ -261,7 +261,7 @@ class DelasTeamPage extends Page implements HasTable
         return $this->text('panel-admin::delas.actions.grant_blocked_body', [
             'name' => $block->blocker->name ?? '—',
             'date' => $block->blocked_at->timezone(config('app.display_timezone'))->format('d/m/Y H:i'),
-            'reason' => $block->reason,
+            'reason' => mb_rtrim($block->reason, '. '),
         ]);
     }
 
