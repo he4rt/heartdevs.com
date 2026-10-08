@@ -168,3 +168,52 @@ test('the form step alone does not make the user APTO', function (): void {
         ->and(resolve(OnboardingCompletionGate::class)->isCompleted($user, OnboardingType::Squads))
         ->toBeFalse();
 });
+
+test('starting Squads again after linking github unblocks the git_challenge step', function (): void {
+    $user = User::factory()->create();
+    Onboarding::factory()->for($user)->completed()->create();
+
+    $onboarding = resolve(StartOnboarding::class)->handle($user, OnboardingType::Squads);
+
+    expect(fn () => resolve(AdvanceStep::class)->handle($onboarding, ['data' => ['terms' => true]]))
+        ->toThrow(GateBlockedException::class);
+
+    ExternalIdentity::factory()->create([
+        'model_type' => $user->getMorphClass(),
+        'model_id' => $user->id,
+        'provider' => IdentityProvider::GitHub,
+        'connected_at' => now(),
+        'disconnected_at' => null,
+    ]);
+
+    $onboarding = resolve(StartOnboarding::class)->handle($user, OnboardingType::Squads);
+
+    expect($onboarding->steps()->where('step_key', 'git_challenge')->sole()->status)
+        ->toBe(OnboardingStepStatus::Pending);
+
+    resolve(AdvanceStep::class)->handle($onboarding, [
+        'repo' => 'he4rt/git-challenge',
+        'pr_number' => 42,
+        'approved_at' => now()->toIso8601String(),
+    ]);
+
+    expect($onboarding->refresh()->status)->toBe(OnboardingStatus::Completed)
+        ->and(resolve(OnboardingCompletionGate::class)->isCompleted($user, OnboardingType::Squads))
+        ->toBeTrue();
+});
+
+test('starting Squads again without linking github keeps the gate closed', function (): void {
+    $user = User::factory()->create();
+    Onboarding::factory()->for($user)->completed()->create();
+
+    $onboarding = resolve(StartOnboarding::class)->handle($user, OnboardingType::Squads);
+
+    expect(fn () => resolve(AdvanceStep::class)->handle($onboarding, ['data' => ['terms' => true]]))
+        ->toThrow(GateBlockedException::class);
+
+    expect(fn () => resolve(StartOnboarding::class)->handle($user, OnboardingType::Squads))
+        ->toThrow(GateBlockedException::class);
+
+    expect($onboarding->steps()->where('step_key', 'git_challenge')->exists())->toBeFalse()
+        ->and($onboarding->refresh()->status)->toBe(OnboardingStatus::InProgress);
+});

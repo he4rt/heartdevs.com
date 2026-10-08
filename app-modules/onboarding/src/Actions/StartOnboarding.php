@@ -50,6 +50,16 @@ final readonly class StartOnboarding
                 ['status' => OnboardingStepStatus::Pending],
             );
 
+            // Reentrada: se um gate barrou a criação do próximo step (ex.: GitHub
+            // não vinculado antes do git_challenge), iniciar de novo tenta criá-lo.
+            $hasPendingStep = $onboarding->steps()
+                ->where('status', OnboardingStepStatus::Pending)
+                ->exists();
+
+            if ($onboarding->status === OnboardingStatus::InProgress && !$hasPendingStep) {
+                $flow->createNextStep($onboarding);
+            }
+
             return $onboarding;
         });
     }
