@@ -76,7 +76,14 @@ Fatos do código atual que moldam o desenho:
     - já existe uma solicitação `pending` ou `approved`;
     - a última solicitação foi `rejected` ou `revoked` e ainda não passou a espera
       (ver [Espera](#espera-de-15-dias));
-    - existe um bloqueio ativo. O perfil informa apenas que não é possível solicitar, sem motivo.
+    - existe um bloqueio ativo. O perfil informa apenas que não é possível solicitar, sem motivo;
+    - a pessoa não tem o Discord conectado (`delas.require_discord`, ligado por padrão). O perfil
+      pede para conectar, com o botão que já existe nas Conexões. A He4rt Delas acontece no
+      Discord, a moderação conhece a pessoa por lá, e a conta conectada é o que vai ligar a tag ao
+      cargo `he4rt_delas` numa próxima issue. Espera e bloqueio aparecem antes de faltar o Discord.
+- O pop-up de confirmação lembra que perfis com foto e informações básicas são analisados mais
+  rápido. É só um lembrete: o perfil completo não é exigido, para não pedir dados pessoais a mais
+  (minimização da LGPD) nem afastar quem está começando.
 
 ### Moderação (moderadoras da He4rt Delas)
 
