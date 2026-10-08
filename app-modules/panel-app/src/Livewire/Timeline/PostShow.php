@@ -96,8 +96,8 @@ final class PostShow extends Component
             $rootReactionMine = $this->reactionMine;
         } else {
             $rootSummary = $reactionSummaries->get($this->timelineId);
-            $rootReactionCounts = $rootSummary?->counts ?? [];
-            $rootReactionMine = $rootSummary?->mine?->value;
+            $rootReactionCounts = $rootSummary->counts;
+            $rootReactionMine = $rootSummary->mine?->value;
         }
 
         return view('panel-app::livewire.timeline.post-show', [
