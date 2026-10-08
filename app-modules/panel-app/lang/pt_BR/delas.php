@@ -8,7 +8,7 @@ return [
         'intro' => 'A He4rt Delas é a iniciativa da comunidade para mulheres e pessoas que se identificam como mulheres.',
         'toggle' => 'Quero fazer parte da He4rt Delas',
         'toggle_hint' => 'Ao ativar, explicamos como funciona antes de enviar o pedido. Nada é enviado sem a sua confirmação.',
-        'pending_title' => 'Inclusão no He4rt Delas aguardando aprovação',
+        'pending_title' => 'Inclusão na He4rt Delas aguardando aprovação',
         'pending_body' => 'Pedido enviado em :date. Uma moderadora da He4rt Delas vai analisar. Acompanhe o status por aqui.',
         'member_title' => 'Você faz parte da He4rt Delas',
         'member_body' => 'A tag já aparece no seu cartão de perfil. Por enquanto, só você e a moderação conseguem vê-la.',
