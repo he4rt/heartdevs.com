@@ -178,20 +178,23 @@ concessão direta ignora a espera e encerra o bloqueio.
 
 ### Ordem das verificações
 
-`DelasEligibility` decide a situação da pessoa nesta ordem, e a primeira que vale é a que o
-perfil mostra:
+Uma pessoa pode estar em mais de uma situação ao mesmo tempo (por exemplo, em espera **e**
+bloqueada), mas o perfil mostra um aviso só. `DelasEligibility` resolve isso como uma fila de
+perguntas: pergunta uma de cada vez e para na primeira resposta "sim".
 
-1. **Pedido aberto** (`pending` ou `approved`): aguardando aprovação ou membra.
-2. **Bloqueio ativo:** "não é possível solicitar", sem motivo e sem data.
-3. **Espera:** a data a partir da qual pode pedir de novo.
-4. **Sem Discord conectado:** pede para conectar.
-5. **Pode pedir.**
+1. Já tem um pedido aberto ou a tag? → "aguardando aprovação" ou "você faz parte".
+2. Está bloqueada? → "não é possível solicitar", sem motivo e sem data.
+3. Está em espera? → "você poderá pedir a partir de DD/MM".
+4. Falta conectar o Discord? → "conecte seu Discord".
+5. Nada disso → pode pedir.
 
-- _Por quê o bloqueio vem antes da espera:_ quem está bloqueada não deve ver uma data, que daria a
-  entender que vai poder pedir sozinha quando ela chegar. O bloqueio só acaba quando alguém
-  desbloqueia.
-- _Por quê o Discord vem por último:_ não adianta pedir para conectar o Discord a quem não poderia
-  pedir de qualquer jeito.
+Exemplo: a Bia foi rejeitada (está em espera) e também foi bloqueada. A pergunta 2 já responde
+"sim", então ela vê "não é possível solicitar" e nunca chega na pergunta 3.
+
+- _Por quê o bloqueio vem antes da espera:_ se a Bia visse "você poderá pedir a partir do dia
+  18", acharia que no dia 18 está liberada. Mas o bloqueio só acaba quando alguém desbloqueia.
+- _Por quê o Discord vem por último:_ sem isso, a Bia seria mandada conectar o Discord para só
+  então descobrir que não pode pedir.
 
 ## Arquitetura
 
@@ -470,13 +473,30 @@ Validação: `make check`, `make test` e `make test-shards`.
 
 ## Pontos em aberto
 
-1. **Papel `delas-lead`**: líder atribuindo `delas-moderator` vai além da #570. Precisa do ok da
-   Sther e de comentário na issue.
+Dependem de outras pessoas e ficam fora deste PR.
 
-2. **Regras além das issues** (espera de 15 dias, bloqueio, concessão e remoção direta): alinhar
-   com a Alícia e a Sther nas issues.
-3. **Nome do papel**: `delas-moderator` cobre líder e moderadora, como na issue. Confirmar com a
-   Sther.
-4. **LGPD**: a tag revela identidade de gênero, dado sensível. Hoje só a própria pessoa e quem
-   modera a veem. Qualquer exibição pública futura precisa de decisão própria.
-5. **Rejeição**: a solicitante deve ver o motivo? Hoje, não.
+**Alinhar com a Alícia e a Sther** (vão além do texto das issues):
+
+1. **Regras além das issues**: espera de 15 dias, bloqueio, concessão e remoção direta, edição
+   de motivo, moderadora precisa ter a tag e Discord obrigatório para pedir. As que forem
+   recusadas saem do PR; a espera e o Discord são configuráveis
+   (`delas.request_cooldown_days`, `delas.require_discord`).
+2. **Papel `delas-lead`**: a líder gerencia moderadoras. A #570 diz que a permissão é
+   "atribuível apenas por admins do Hub".
+3. **Rejeição**: a solicitante deve ver o motivo? Hoje, não: o motivo é interno.
+
+**Próximas issues** (rascunhos locais, abrir depois do ok):
+
+4. **Tag pública por escolha da pessoa**: a tag revela identidade de gênero, dado sensível pela
+   LGPD. Hoje só a própria pessoa e quem modera a veem. A proposta é um interruptor "Mostrar a
+   tag no meu perfil público", desligado por padrão.
+5. **Integração com o `/cargo-delas` do Discord**: dar e tirar o cargo `he4rt_delas` quando a tag
+   é concedida ou removida. Os eventos de domínio e a conta do Discord conectada (agora
+   obrigatória para pedir) já deixam o gancho pronto.
+
+**Padrões do projeto** (mudar é decisão do time, não deste PR):
+
+6. **Seletores de pessoa**: o projeto pré-carrega todo Select
+   (`FilamentServiceProvider::configureSelect()`). Na revisão, o Daniel sugeriu "Conceder tag" só
+   por busca, porque a lista é a comunidade inteira. Seguimos o padrão do projeto; se fizer
+   sentido mudar, é uma conversa com o time.
