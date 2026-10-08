@@ -5,18 +5,23 @@ declare(strict_types=1);
 namespace He4rt\PanelAdmin\Moderation\Pages\Delas\Concerns;
 
 use Closure;
+use Filament\Actions\Action;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\Toggle;
 use Filament\Notifications\Notification;
 use Filament\Schemas\Components\EmbeddedTable;
 use Filament\Schemas\Schema;
+use Filament\Support\Enums\Width;
 use Filament\Tables\Columns\TextColumn;
 use He4rt\Delas\Exceptions\DelasException;
 use He4rt\Delas\Support\Reason;
 use He4rt\Identity\User\Models\User;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Contracts\Support\Htmlable;
+use Illuminate\Contracts\View\View;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\HtmlString;
+use Illuminate\Support\Str;
 
 /**
  * O que as páginas da He4rt Delas no cluster de Moderação têm em comum: o grupo
@@ -47,13 +52,42 @@ trait InteractsWithDelasModeration
         return $this->actor()->can('lead-delas');
     }
 
+    /**
+     * Nome, @username e "Ver perfil": clicar abre um resumo só leitura do perfil,
+     * sem sair da página.
+     */
     protected function personColumn(string $name, string $username, string $label): TextColumn
     {
+        $relation = str_contains($name, '.') ? Str::before($name, '.') : null;
+
         return TextColumn::make($name)
             ->label($label)
             ->weight('medium')
-            ->description(fn (mixed $record): string => '@'.data_get($record, $username))
-            ->searchable([str_contains($name, '.') ? 'name' : $name]);
+            ->description(fn (mixed $record): HtmlString => new HtmlString(
+                e('@'.data_get($record, $username)).' · <span style="text-decoration: underline; cursor: pointer">'.e($this->text('panel-admin::delas.actions.view_profile')).'</span>',
+            ))
+            ->action($this->viewProfileAction($relation))
+            ->searchable([$relation === null ? $name : 'name']);
+    }
+
+    /**
+     * O que a moderação precisa para decidir, e nada além: sem e-mail, data de
+     * nascimento nem localização. A pessoa é carregada sozinha, com o perfil e
+     * as conexões, só quando o resumo abre.
+     */
+    protected function viewProfileAction(?string $relation): Action
+    {
+        return Action::make('viewProfile')
+            ->modalHeading(__('panel-admin::delas.profile.heading'))
+            ->slideOver()
+            ->modalWidth(Width::Medium)
+            ->modalContent(fn (Model $record): View => view('panel-admin::moderation.delas.person-profile', [
+                'person' => User::query()
+                    ->with(['profile', 'providers'])
+                    ->findOrFail($relation === null ? $record->getKey() : $record->getAttribute($relation.'_id')),
+            ]))
+            ->modalSubmitAction(action: false)
+            ->modalCancelActionLabel(__('panel-admin::delas.actions.close'));
     }
 
     protected function dateColumn(string $name, string $label): TextColumn

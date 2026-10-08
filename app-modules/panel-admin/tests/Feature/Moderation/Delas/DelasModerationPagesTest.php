@@ -485,3 +485,28 @@ test('conceder a quem está bloqueada mostra o bloqueio e exige o motivo no form
 
     expect($block->fresh()->isActive())->toBeTrue();
 });
+
+test('"Ver perfil" abre um resumo só leitura, sem dados pessoais', function (): void {
+    $this->actingAs(User::factory()->delasModerator()->create());
+    $person = User::factory()->withDiscord()->create(['email' => 'pessoa@exemplo.test']);
+    $person->profile->update(['headline' => 'Dev Back-end', 'about' => 'Gosto de PHP.', 'birthdate' => '1990-05-20']);
+    [$request] = [DelasTagRequest::factory()->for($person)->pending()->create(), DelasTagRequest::factory()->pending()->create()];
+
+    livewire(DelasQueuePage::class)
+        ->loadTable()
+        ->assertSee(__('panel-admin::delas.actions.view_profile'))
+        ->mountAction(TestAction::make('viewProfile')->table($request))
+        ->assertMountedActionModalSee(['Dev Back-end', 'Gosto de PHP.', __('panel-admin::delas.profile.discord')])
+        ->assertMountedActionModalDontSee(['pessoa@exemplo.test', '20/05/1990']);
+});
+
+test('"Ver perfil" funciona também na Equipe, onde a linha já é a pessoa', function (): void {
+    $this->actingAs(User::factory()->delasLead()->create());
+    $moderator = User::factory()->delasModerator()->create();
+    User::factory()->delasModerator()->create();
+
+    livewire(DelasTeamPage::class)
+        ->loadTable()
+        ->mountAction(TestAction::make('viewProfile')->table($moderator))
+        ->assertMountedActionModalSee([$moderator->name, __('panel-admin::delas.profile.empty')]);
+});
