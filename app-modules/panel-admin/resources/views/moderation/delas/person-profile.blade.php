@@ -1,34 +1,32 @@
-@php
-    use He4rt\Identity\ExternalIdentity\Enums\IdentityProvider;
+{{--
+    "Ver perfil": resumo só leitura para a moderação decidir. Fica de fora o que
+    não ajuda a decidir: e-mail, data de nascimento e localização.
 
-    /**
-     * @var \He4rt\Identity\User\Models\User $person
-     * @var \He4rt\Delas\TagRequest\ValueObjects\DelasEligibilityResult $eligibility
-     */
+    @var \He4rt\Identity\User\Models\User $person
+    @var \He4rt\Delas\TagRequest\ValueObjects\DelasEligibilityResult $eligibility
+    @var \He4rt\Identity\ExternalIdentity\Models\ExternalIdentity|null $discord
+--}}
+@php
+    use He4rt\Delas\TagRequest\Enums\DelasEligibilityState;
+
     $profile = $person->profile;
-    $discord = $person->providers
-        ->where('provider', IdentityProvider::Discord)
-        ->filter->isConnected()
-        ->sortByDesc('connected_at')
-        ->first();
-    $discordName = $discord?->metadata['username'] ?? $discord?->external_account_id;
+    $state = $eligibility->state;
+    $avatarUrl = $person->getFilamentAvatarUrl();
+
     $initials = collect(explode(' ', $person->name))
         ->filter()
         ->take(2)
         ->map(fn (string $part): string => mb_strtoupper(mb_substr($part, 0, 1)))
         ->implode('');
-    $avatarUrl = $person->getFilamentAvatarUrl();
-    $seniority = collect([
-        $profile?->seniority_level?->getLabel(),
-        $profile?->years_experience !== null
-            ? trans_choice('panel-admin::delas.profile.years', $profile->years_experience, ['years' => $profile->years_experience])
-            : null,
-    ])->filter()->implode(' · ');
-    $hasProfile = $profile?->headline || $seniority !== '' || $profile?->about;
-    $state = $eligibility->state;
+
+    $experience = $profile?->years_experience !== null
+        ? trans_choice('panel-admin::delas.profile.years', $profile->years_experience, ['years' => $profile->years_experience])
+        : null;
+    $seniority = collect([$profile?->seniority_level?->getLabel(), $experience])->filter()->implode(' · ');
+
+    $hasProfessionalInfo = $profile?->headline || $seniority !== '' || $profile?->about;
 @endphp
 
-{{-- Resumo só leitura para a moderação decidir: sem e-mail, data de nascimento nem localização. --}}
 <div class="flex flex-col gap-6 text-sm">
     {{-- Cartão: faixa do Hub, foto (ou iniciais), nome e a situação na He4rt Delas. --}}
     <div class="overflow-hidden rounded-xl border border-gray-200 dark:border-white/10">
@@ -39,6 +37,8 @@
                 class="relative -mt-8 flex size-16 items-center justify-center overflow-hidden rounded-full bg-purple-100 text-lg font-semibold text-purple-700 ring-4 ring-white dark:bg-purple-500/20 dark:text-purple-200 dark:ring-gray-900"
             >
                 <span>{{ $initials }}</span>
+
+                {{-- Se a foto não carregar (link antigo do Discord, por exemplo), ficam as iniciais. --}}
                 @if ($avatarUrl)
                     <img src="{{ $avatarUrl }}" alt="" class="absolute inset-0 size-full object-cover" onerror="this.remove()" />
                 @endif
@@ -54,7 +54,7 @@
                     {{ $state->getLabel() }}
                 </x-filament::badge>
 
-                @if ($state === \He4rt\Delas\TagRequest\Enums\DelasEligibilityState::Member)
+                @if ($state === DelasEligibilityState::Member)
                     <x-he4rt::delas.tag />
                 @endif
             </div>
@@ -62,26 +62,18 @@
     </div>
 
     {{-- Perfil profissional --}}
-    @if ($hasProfile)
+    @if ($hasProfessionalInfo)
         <dl class="flex flex-col gap-4">
             @if ($profile?->headline)
-                <div class="flex gap-3">
-                    <x-filament::icon icon="heroicon-o-briefcase" class="mt-0.5 size-5 shrink-0 text-gray-400" />
-                    <div>
-                        <dt class="text-xs text-gray-500 dark:text-gray-400">{{ __('panel-admin::delas.profile.headline') }}</dt>
-                        <dd class="font-medium text-gray-950 dark:text-white">{{ $profile->headline }}</dd>
-                    </div>
-                </div>
+                <x-panel-admin::delas.profile-row icon="heroicon-o-briefcase" :label="__('panel-admin::delas.profile.headline')">
+                    {{ $profile->headline }}
+                </x-panel-admin::delas.profile-row>
             @endif
 
             @if ($seniority !== '')
-                <div class="flex gap-3">
-                    <x-filament::icon icon="heroicon-o-chart-bar" class="mt-0.5 size-5 shrink-0 text-gray-400" />
-                    <div>
-                        <dt class="text-xs text-gray-500 dark:text-gray-400">{{ __('panel-admin::delas.profile.seniority') }}</dt>
-                        <dd class="font-medium text-gray-950 dark:text-white">{{ $seniority }}</dd>
-                    </div>
-                </div>
+                <x-panel-admin::delas.profile-row icon="heroicon-o-chart-bar" :label="__('panel-admin::delas.profile.seniority')">
+                    {{ $seniority }}
+                </x-panel-admin::delas.profile-row>
             @endif
 
             @if ($profile?->about)
@@ -100,37 +92,25 @@
 
     {{-- Comunidade --}}
     <dl class="flex flex-col gap-4 border-t border-gray-200 pt-5 dark:border-white/10">
-        <div class="flex gap-3">
-            <x-filament::icon icon="fab-discord" class="mt-0.5 size-5 shrink-0 text-[#5865F2]" />
-            <div>
-                <dt class="text-xs text-gray-500 dark:text-gray-400">{{ __('panel-admin::delas.profile.discord') }}</dt>
-                <dd class="font-medium text-gray-950 dark:text-white">
-                    @if ($discord && $discord->external_account_id)
-                        <a
-                            href="https://discord.com/users/{{ $discord->external_account_id }}"
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            class="inline-flex items-center gap-1 text-primary-600 hover:underline dark:text-primary-400"
-                        >
-                            {{ $discordName }}
-                            <x-filament::icon icon="heroicon-m-arrow-top-right-on-square" class="size-4" />
-                        </a>
-                    @else
-                        <span class="text-gray-500 dark:text-gray-400">{{ __('panel-admin::delas.profile.discord_none') }}</span>
-                    @endif
-                </dd>
-            </div>
-        </div>
+        <x-panel-admin::delas.profile-row icon="fab-discord" icon-class="text-[#5865F2]" :label="__('panel-admin::delas.profile.discord')">
+            @if ($discord?->external_account_id)
+                <a
+                    href="https://discord.com/users/{{ $discord->external_account_id }}"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    class="inline-flex items-center gap-1 text-primary-600 hover:underline dark:text-primary-400"
+                >
+                    {{ $discord->metadata['username'] ?? $discord->external_account_id }}
+                    <x-filament::icon icon="heroicon-m-arrow-top-right-on-square" class="size-4" />
+                </a>
+            @else
+                <span class="font-normal text-gray-500 dark:text-gray-400">{{ __('panel-admin::delas.profile.discord_none') }}</span>
+            @endif
+        </x-panel-admin::delas.profile-row>
 
-        <div class="flex gap-3">
-            <x-filament::icon icon="heroicon-o-calendar" class="mt-0.5 size-5 shrink-0 text-gray-400" />
-            <div>
-                <dt class="text-xs text-gray-500 dark:text-gray-400">{{ __('panel-admin::delas.profile.since') }}</dt>
-                <dd class="font-medium text-gray-950 dark:text-white">
-                    {{ $person->created_at?->timezone(config('app.display_timezone'))->format('d/m/Y') }}
-                </dd>
-            </div>
-        </div>
+        <x-panel-admin::delas.profile-row icon="heroicon-o-calendar" :label="__('panel-admin::delas.profile.since')">
+            {{ $person->created_at?->timezone(config('app.display_timezone'))->format('d/m/Y') }}
+        </x-panel-admin::delas.profile-row>
     </dl>
 
     <p class="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
