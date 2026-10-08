@@ -6,12 +6,14 @@ use He4rt\Identity\ExternalIdentity\Enums\IdentityProvider;
 use He4rt\Identity\ExternalIdentity\Models\ExternalIdentity;
 use He4rt\Identity\User\Models\User;
 use He4rt\Onboarding\Actions\AdvanceStep;
+use He4rt\Onboarding\Actions\PauseOnboarding;
 use He4rt\Onboarding\Actions\StartOnboarding;
 use He4rt\Onboarding\Contracts\OnboardingCompletionGate;
 use He4rt\Onboarding\Enums\OnboardingStatus;
 use He4rt\Onboarding\Enums\OnboardingStepStatus;
 use He4rt\Onboarding\Enums\OnboardingType;
 use He4rt\Onboarding\Exceptions\GateBlockedException;
+use He4rt\Onboarding\Exceptions\OnboardingPausedException;
 use He4rt\Onboarding\Flows\SquadsOnboardingFlow;
 use He4rt\Onboarding\Models\Onboarding;
 
@@ -165,6 +167,39 @@ test('the form step alone does not make the user APTO', function (): void {
 
     expect($onboarding->status)->toBe(OnboardingStatus::InProgress)
         ->and($onboarding->completed_at)->toBeNull()
+        ->and(resolve(OnboardingCompletionGate::class)->isCompleted($user, OnboardingType::Squads))
+        ->toBeFalse();
+});
+
+test('a paused Squads onboarding cannot advance and does not become APTO', function (): void {
+    $user = User::factory()->create();
+    Onboarding::factory()->for($user)->completed()->create();
+
+    ExternalIdentity::factory()->create([
+        'model_type' => $user->getMorphClass(),
+        'model_id' => $user->id,
+        'provider' => IdentityProvider::GitHub,
+        'connected_at' => now(),
+        'disconnected_at' => null,
+    ]);
+
+    $onboarding = resolve(StartOnboarding::class)->handle($user, OnboardingType::Squads);
+
+    resolve(AdvanceStep::class)->handle($onboarding, ['data' => ['terms' => true]]);
+
+    resolve(PauseOnboarding::class)->handle($onboarding);
+
+    expect(fn () => resolve(AdvanceStep::class)->handle($onboarding->refresh(), [
+        'repo' => 'he4rt/git-challenge',
+        'pr_number' => 42,
+        'approved_at' => now()->toIso8601String(),
+    ]))->toThrow(OnboardingPausedException::class);
+
+    $onboarding->refresh();
+    $step = $onboarding->steps()->where('step_key', 'git_challenge')->sole();
+
+    expect($step->status)->toBe(OnboardingStepStatus::Pending)
+        ->and($onboarding->status)->toBe(OnboardingStatus::Paused)
         ->and(resolve(OnboardingCompletionGate::class)->isCompleted($user, OnboardingType::Squads))
         ->toBeFalse();
 });

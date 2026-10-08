@@ -13,6 +13,7 @@ use He4rt\Onboarding\Enums\OnboardingStatus;
 use He4rt\Onboarding\Enums\OnboardingStepStatus;
 use He4rt\Onboarding\Enums\OnboardingType;
 use He4rt\Onboarding\Exceptions\GateBlockedException;
+use He4rt\Onboarding\Exceptions\OnboardingPausedException;
 use He4rt\Onboarding\Models\Onboarding;
 use InvalidArgumentException;
 
@@ -42,6 +43,10 @@ final class SquadsOnboardingFlow implements OnboardingFlow
 
     public function advance(Onboarding $onboarding): void
     {
+        if ($onboarding->status === OnboardingStatus::Paused) {
+            throw OnboardingPausedException::cannotAdvance($onboarding);
+        }
+
         $nextStep = $onboarding->steps()
             ->where('status', OnboardingStepStatus::Pending)
             ->oldest()
