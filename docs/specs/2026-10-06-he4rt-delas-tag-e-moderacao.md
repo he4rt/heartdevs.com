@@ -97,6 +97,14 @@ Fatos do código atual que moldam o desenho:
 - Não decidem a própria solicitação: ela fica para outra moderadora, uma líder ou um super admin.
 - O bloqueio vale **só** para solicitar a tag. Não é ban nem suspensão (`UserSituation`) e não
   afeta a conta.
+- **Bloquear não tira a tag.** Quem já tem a tag continua com ela mesmo bloqueada; o bloqueio só
+  passaria a valer se ela perdesse a tag e tentasse pedir de novo. Por isso o cadeado de bloquear
+  aparece só na Fila, para quem está pedindo.
+    - _Por quê:_ bloquear é da moderadora e serve para pedidos insistentes ou falsos. Tirar a tag
+      de quem já faz parte é mais sério e fica só com a líder, com motivo próprio. Se o bloqueio
+      tirasse a tag, a moderadora teria um caminho indireto para remover membras.
+    - Para tirar a tag **e** impedir novos pedidos, a líder usa "Remover tag" com "Também bloquear
+      novos pedidos" (Membras ou Equipe): as duas coisas na mesma transação, ou nenhuma.
 - Veem a lista de quem tem a tag (página Membras), só para consulta.
 - Editam o motivo que escreveram até 24 horas depois (`delas.reason_correction_hours`); o botão
   "Editar motivo" mostra até quando. Cada edição é uma linha nova no histórico
