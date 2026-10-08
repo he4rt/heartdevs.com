@@ -25,14 +25,16 @@ test('a opção de solicitar aparece para quem pode pedir', function (): void {
         ->assertActionVisible('request');
 });
 
-test('a solicitação só é registrada depois da confirmação no pop-up', function (): void {
+test('abrir o pop-up de solicitar ainda não registra nada', function (): void {
     livewire(DelasProfileSection::class)
         ->mountAction('request')
         ->assertActionMounted('request')
         ->assertMountedActionModalSee(__('panel-app::delas.profile.modal.tip'));
 
     expect(DelasTagRequest::query()->exists())->toBeFalse();
+});
 
+test('confirmar no pop-up registra a solicitação como pendente', function (): void {
     livewire(DelasProfileSection::class)
         ->callAction('request')
         ->assertNotified(__('panel-app::delas.profile.sent'))

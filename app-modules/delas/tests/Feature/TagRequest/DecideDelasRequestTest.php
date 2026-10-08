@@ -17,92 +17,141 @@ use He4rt\Identity\User\Models\User;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Support\Facades\Event;
 
-test('moderadora aprova: a tag aparece e o histórico guarda quem e quando', function (): void {
+beforeEach(function (): void {
+    $this->approve = resolve(ApproveDelasRequest::class);
+    $this->reject = resolve(RejectDelasRequest::class);
+    $this->eligibility = resolve(DelasEligibility::class);
+});
+
+// Aprovar
+
+test('moderadora aprova: a solicitação guarda quem decidiu e quando', function (): void {
     Event::fake([DelasTagApproved::class]);
     $moderator = User::factory()->delasModerator()->create();
     $request = DelasTagRequest::factory()->pending()->create();
-
     $this->freezeSecond();
-    resolve(ApproveDelasRequest::class)->handle($request, $moderator);
+
+    $this->approve->handle($request, $moderator);
 
     $request->refresh();
-    $transition = DelasTransition::query()->sole();
-
-    expect($request->status)->toBe(DelasRequestStatus::Approved)
-        ->and($request->decided_by)->toBe($moderator->getKey())
-        ->and($request->decided_at->toDateTimeString())->toBe(now()->toDateTimeString())
-        ->and(resolve(DelasEligibility::class)->hasTag($request->user))->toBeTrue()
-        ->and($transition->action)->toBe(DelasAction::Approved)
-        ->and($transition->triggered_by)->toBe(DelasTriggeredBy::Moderator)
-        ->and($transition->from_status)->toBe(DelasRequestStatus::Pending)
-        ->and($transition->to_status)->toBe(DelasRequestStatus::Approved);
-
+    expect($request->status)->toBe(DelasRequestStatus::Approved);
+    expect($request->decided_by)->toBe($moderator->getKey());
+    expect($request->decided_at->toDateTimeString())->toBe(now()->toDateTimeString());
     Event::assertDispatched(DelasTagApproved::class);
 });
 
-test('moderadora rejeita com motivo: a tag não aparece e a solicitação sai das pendentes', function (): void {
-    Event::fake([DelasTagRejected::class]);
+test('aprovada, a pessoa passa a ter a tag', function (): void {
     $moderator = User::factory()->delasModerator()->create();
     $request = DelasTagRequest::factory()->pending()->create();
 
-    resolve(RejectDelasRequest::class)->handle($request, $moderator, '  Perfil sem informações.  ');
+    $this->approve->handle($request, $moderator);
 
-    $request->refresh();
-
-    expect($request->status)->toBe(DelasRequestStatus::Rejected)
-        ->and($request->decision_reason)->toBe('Perfil sem informações.')
-        ->and(DelasTagRequest::query()->pending()->exists())->toBeFalse()
-        ->and(resolve(DelasEligibility::class)->hasTag($request->user))->toBeFalse()
-        ->and(DelasTransition::query()->sole()->reason)->toBe('Perfil sem informações.');
-
-    Event::assertDispatched(DelasTagRejected::class);
+    expect($this->eligibility->hasTag($request->user))->toBeTrue();
 });
 
-test('rejeitar sem motivo é recusado', function (?string $reason): void {
+test('aprovar registra no histórico a moderadora e a mudança de situação', function (): void {
     $moderator = User::factory()->delasModerator()->create();
     $request = DelasTagRequest::factory()->pending()->create();
 
-    expect(fn () => resolve(RejectDelasRequest::class)->handle($request, $moderator, $reason))
-        ->toThrow(DelasException::class, __('delas::exceptions.reason_required'));
-})->with([null, '', '   ']);
+    $this->approve->handle($request, $moderator);
 
-test('quem não é da equipe não aprova nem rejeita', function (): void {
-    $member = User::factory()->create();
-    $request = DelasTagRequest::factory()->pending()->create();
-
-    expect(fn () => resolve(ApproveDelasRequest::class)->handle($request, $member))->toThrow(AuthorizationException::class)
-        ->and(fn () => resolve(RejectDelasRequest::class)->handle($request, $member, 'motivo'))->toThrow(AuthorizationException::class)
-        ->and($request->fresh()->status)->toBe(DelasRequestStatus::Pending);
-});
-
-test('moderadora não decide a própria solicitação', function (): void {
-    $moderator = User::factory()->delasModerator()->create();
-    $request = DelasTagRequest::factory()->for($moderator)->pending()->create();
-
-    expect(fn () => resolve(ApproveDelasRequest::class)->handle($request, $moderator))
-        ->toThrow(DelasException::class, __('delas::exceptions.cannot_decide_own'))
-        ->and(fn () => resolve(RejectDelasRequest::class)->handle($request, $moderator, 'motivo'))
-        ->toThrow(DelasException::class, __('delas::exceptions.cannot_decide_own'));
-});
-
-test('uma solicitação já decidida não é decidida de novo', function (): void {
-    $moderator = User::factory()->delasModerator()->create();
-    $other = User::factory()->delasModerator()->create();
-    $request = DelasTagRequest::factory()->pending()->create();
-
-    resolve(ApproveDelasRequest::class)->handle($request, $moderator);
-
-    expect(fn () => resolve(RejectDelasRequest::class)->handle($request, $other, 'atrasada'))
-        ->toThrow(DelasException::class)
-        ->and($request->fresh()->status)->toBe(DelasRequestStatus::Approved)
-        ->and(DelasTransition::query()->count())->toBe(1);
+    $transition = DelasTransition::query()->sole();
+    expect($transition->action)->toBe(DelasAction::Approved);
+    expect($transition->triggered_by)->toBe(DelasTriggeredBy::Moderator);
+    expect($transition->from_status)->toBe(DelasRequestStatus::Pending);
+    expect($transition->to_status)->toBe(DelasRequestStatus::Approved);
 });
 
 test('super admin decide sem papel da He4rt Delas e fica registrado como admin', function (): void {
     $admin = User::factory()->superAdmin()->create();
     $request = DelasTagRequest::factory()->pending()->create();
 
-    resolve(ApproveDelasRequest::class)->handle($request, $admin);
+    $this->approve->handle($request, $admin);
 
     expect(DelasTransition::query()->sole()->triggered_by)->toBe(DelasTriggeredBy::Admin);
+});
+
+// Rejeitar
+
+test('moderadora rejeita com motivo: a solicitação sai das pendentes e guarda o motivo limpo', function (): void {
+    Event::fake([DelasTagRejected::class]);
+    $moderator = User::factory()->delasModerator()->create();
+    $request = DelasTagRequest::factory()->pending()->create();
+
+    $this->reject->handle($request, $moderator, '  Perfil sem informações.  ');
+
+    $request->refresh();
+    expect($request->status)->toBe(DelasRequestStatus::Rejected);
+    expect($request->decision_reason)->toBe('Perfil sem informações.');
+    expect(DelasTagRequest::query()->pending()->exists())->toBeFalse();
+    expect(DelasTransition::query()->sole()->reason)->toBe('Perfil sem informações.');
+    Event::assertDispatched(DelasTagRejected::class);
+});
+
+test('rejeitada, a pessoa não tem a tag', function (): void {
+    $moderator = User::factory()->delasModerator()->create();
+    $request = DelasTagRequest::factory()->pending()->create();
+
+    $this->reject->handle($request, $moderator, 'Perfil sem informações.');
+
+    expect($this->eligibility->hasTag($request->user))->toBeFalse();
+});
+
+test('rejeitar sem motivo é recusado', function (?string $reason): void {
+    $moderator = User::factory()->delasModerator()->create();
+    $request = DelasTagRequest::factory()->pending()->create();
+
+    expect(fn () => $this->reject->handle($request, $moderator, $reason))
+        ->toThrow(DelasException::class, __('delas::exceptions.reason_required'));
+})->with([null, '', '   ']);
+
+// Quem pode decidir
+
+test('quem não é da equipe não aprova', function (): void {
+    $member = User::factory()->create();
+    $request = DelasTagRequest::factory()->pending()->create();
+
+    expect(fn () => $this->approve->handle($request, $member))
+        ->toThrow(AuthorizationException::class);
+
+    expect($request->fresh()->status)->toBe(DelasRequestStatus::Pending);
+});
+
+test('quem não é da equipe não rejeita', function (): void {
+    $member = User::factory()->create();
+    $request = DelasTagRequest::factory()->pending()->create();
+
+    expect(fn () => $this->reject->handle($request, $member, 'motivo'))
+        ->toThrow(AuthorizationException::class);
+
+    expect($request->fresh()->status)->toBe(DelasRequestStatus::Pending);
+});
+
+test('moderadora não aprova a própria solicitação', function (): void {
+    $moderator = User::factory()->delasModerator()->create();
+    $ownRequest = DelasTagRequest::factory()->for($moderator)->pending()->create();
+
+    expect(fn () => $this->approve->handle($ownRequest, $moderator))
+        ->toThrow(DelasException::class, __('delas::exceptions.cannot_decide_own'));
+});
+
+test('moderadora não rejeita a própria solicitação', function (): void {
+    $moderator = User::factory()->delasModerator()->create();
+    $ownRequest = DelasTagRequest::factory()->for($moderator)->pending()->create();
+
+    expect(fn () => $this->reject->handle($ownRequest, $moderator, 'motivo'))
+        ->toThrow(DelasException::class, __('delas::exceptions.cannot_decide_own'));
+});
+
+test('uma solicitação já decidida não é decidida de novo', function (): void {
+    $moderator = User::factory()->delasModerator()->create();
+    $otherModerator = User::factory()->delasModerator()->create();
+    $request = DelasTagRequest::factory()->pending()->create();
+    $this->approve->handle($request, $moderator);
+
+    expect(fn () => $this->reject->handle($request, $otherModerator, 'atrasada'))
+        ->toThrow(DelasException::class);
+
+    expect($request->fresh()->status)->toBe(DelasRequestStatus::Approved);
+    expect(DelasTransition::query()->count())->toBe(1);
 });

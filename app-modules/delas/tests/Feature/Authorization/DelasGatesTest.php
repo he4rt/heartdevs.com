@@ -14,8 +14,8 @@ test('cada papel passa só nos gates do seu nível', function (?string $state, b
     $factory = User::factory();
     $user = ($state === null ? $factory : $factory->{$state}())->create();
 
-    expect($user->can('moderate-delas'))->toBe($moderate)
-        ->and($user->can('lead-delas'))->toBe($lead);
+    expect($user->can('moderate-delas'))->toBe($moderate);
+    expect($user->can('lead-delas'))->toBe($lead);
 })->with([
     'membra comum' => [null, false, false],
     'moderadora' => ['delasModerator', true, false],

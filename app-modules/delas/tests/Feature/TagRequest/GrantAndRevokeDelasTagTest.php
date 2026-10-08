@@ -20,18 +20,26 @@ use He4rt\Identity\User\Models\User;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Support\Facades\Event;
 
+beforeEach(function (): void {
+    $this->grant = resolve(GrantDelasTag::class);
+    $this->revoke = resolve(RevokeDelasTag::class);
+    $this->eligibility = resolve(DelasEligibility::class);
+});
+
+// Conceder
+
 test('líder concede a quem não tem solicitação: cria uma já aprovada', function (): void {
     Event::fake([DelasTagGranted::class]);
     $lead = User::factory()->delasLead()->create();
     $target = User::factory()->create();
 
-    $request = resolve(GrantDelasTag::class)->handle($target, $lead);
+    $request = $this->grant->handle($target, $lead);
 
-    expect($request->status)->toBe(DelasRequestStatus::Approved)
-        ->and(DelasTagRequest::query()->count())->toBe(1)
-        ->and(DelasTransition::query()->sole()->action)->toBe(DelasAction::Granted)
-        ->and(DelasTransition::query()->sole()->triggered_by)->toBe(DelasTriggeredBy::Lead);
-
+    $transition = DelasTransition::query()->sole();
+    expect($request->status)->toBe(DelasRequestStatus::Approved);
+    expect(DelasTagRequest::query()->count())->toBe(1);
+    expect($transition->action)->toBe(DelasAction::Granted);
+    expect($transition->triggered_by)->toBe(DelasTriggeredBy::Lead);
     Event::assertDispatched(DelasTagGranted::class);
 });
 
@@ -39,96 +47,122 @@ test('conceder com solicitação pendente aprova essa solicitação', function (
     $lead = User::factory()->delasLead()->create();
     $pending = DelasTagRequest::factory()->pending()->create();
 
-    $request = resolve(GrantDelasTag::class)->handle($pending->user, $lead);
+    $request = $this->grant->handle($pending->user, $lead);
 
-    expect($request->is($pending))->toBeTrue()
-        ->and($pending->fresh()->status)->toBe(DelasRequestStatus::Approved)
-        ->and(DelasTagRequest::query()->count())->toBe(1);
+    expect($request->is($pending))->toBeTrue();
+    expect($pending->fresh()->status)->toBe(DelasRequestStatus::Approved);
+    expect(DelasTagRequest::query()->count())->toBe(1);
 });
 
 test('conceder ignora a espera', function (): void {
     $lead = User::factory()->delasLead()->create();
     $rejected = DelasTagRequest::factory()->rejected()->create();
 
-    resolve(GrantDelasTag::class)->handle($rejected->user, $lead);
+    $this->grant->handle($rejected->user, $lead);
 
-    expect(resolve(DelasEligibility::class)->hasTag($rejected->user))->toBeTrue();
+    expect($this->eligibility->hasTag($rejected->user))->toBeTrue();
 });
 
-test('conceder a quem está bloqueada exige motivo e encerra o bloqueio', function (): void {
+test('conceder a quem está bloqueada exige motivo', function (): void {
+    $lead = User::factory()->delasLead()->create();
+    $block = DelasRequesterBlock::factory()->create();
+
+    expect(fn () => $this->grant->handle($block->user, $lead))
+        ->toThrow(DelasException::class, __('delas::exceptions.reason_required'));
+});
+
+test('conceder a quem está bloqueada, com motivo, encerra o bloqueio', function (): void {
     Event::fake([DelasTagGranted::class, DelasRequesterUnblocked::class]);
     $lead = User::factory()->delasLead()->create();
     $block = DelasRequesterBlock::factory()->create();
 
-    expect(fn () => resolve(GrantDelasTag::class)->handle($block->user, $lead))
-        ->toThrow(DelasException::class, __('delas::exceptions.reason_required'));
+    $this->grant->handle($block->user, $lead, 'Esclarecido com o comitê.');
 
-    resolve(GrantDelasTag::class)->handle($block->user, $lead, 'Esclarecido com o comitê.');
-
-    expect($block->fresh()->isActive())->toBeFalse()
-        ->and($block->fresh()->lift_reason)->toBe('Esclarecido com o comitê.')
-        ->and(DelasTransition::query()->pluck('action')->all())
+    $block->refresh();
+    expect($block->isActive())->toBeFalse();
+    expect($block->lift_reason)->toBe('Esclarecido com o comitê.');
+    expect(DelasTransition::query()->pluck('action')->all())
         ->toEqualCanonicalizing([DelasAction::Unblocked, DelasAction::Granted]);
-
     Event::assertDispatched(DelasRequesterUnblocked::class);
     Event::assertDispatched(DelasTagGranted::class);
 });
 
-test('não concede a quem já tem a tag nem a si mesma', function (): void {
+test('não concede a quem já tem a tag', function (): void {
     $lead = User::factory()->delasLead()->create();
     $approved = DelasTagRequest::factory()->approved()->create();
 
-    expect(fn () => resolve(GrantDelasTag::class)->handle($approved->user, $lead))
-        ->toThrow(DelasException::class, __('delas::exceptions.already_has_tag'))
-        ->and(fn () => resolve(GrantDelasTag::class)->handle($lead, $lead))
+    expect(fn () => $this->grant->handle($approved->user, $lead))
+        ->toThrow(DelasException::class, __('delas::exceptions.already_has_tag'));
+});
+
+test('líder não concede a tag a si mesma', function (): void {
+    $lead = User::factory()->delasLead()->create();
+
+    expect(fn () => $this->grant->handle($lead, $lead))
         ->toThrow(DelasException::class, __('delas::exceptions.cannot_decide_own'));
 });
 
-test('moderadora não concede nem remove a tag direto', function (): void {
+test('moderadora não concede a tag direto', function (): void {
+    $moderator = User::factory()->delasModerator()->create();
+    $target = User::factory()->create();
+
+    expect(fn () => $this->grant->handle($target, $moderator))
+        ->toThrow(AuthorizationException::class);
+});
+
+// Remover
+
+test('moderadora não remove a tag direto', function (): void {
     $moderator = User::factory()->delasModerator()->create();
     $approved = DelasTagRequest::factory()->approved()->create();
 
-    expect(fn () => resolve(GrantDelasTag::class)->handle(User::factory()->create(), $moderator))->toThrow(AuthorizationException::class)
-        ->and(fn () => resolve(RevokeDelasTag::class)->handle($approved->user, $moderator, 'motivo'))->toThrow(AuthorizationException::class);
+    expect(fn () => $this->revoke->handle($approved->user, $moderator, 'motivo'))
+        ->toThrow(AuthorizationException::class);
 });
 
-test('remover a tag exige motivo, não apaga o registro e abre a espera', function (): void {
+test('remover a tag exige motivo', function (): void {
+    $admin = User::factory()->superAdmin()->create();
+    $approved = DelasTagRequest::factory()->approved()->create();
+
+    expect(fn () => $this->revoke->handle($approved->user, $admin, reason: null))
+        ->toThrow(DelasException::class, __('delas::exceptions.reason_required'));
+});
+
+test('remover a tag não apaga o registro e abre a espera', function (): void {
     Event::fake([DelasTagRevoked::class]);
     $admin = User::factory()->superAdmin()->create();
     $approved = DelasTagRequest::factory()->approved()->create();
 
-    expect(fn () => resolve(RevokeDelasTag::class)->handle($approved->user, $admin, reason: null))
-        ->toThrow(DelasException::class, __('delas::exceptions.reason_required'));
+    $this->revoke->handle($approved->user, $admin, 'A pessoa pediu a remoção.');
 
-    resolve(RevokeDelasTag::class)->handle($approved->user, $admin, 'A pessoa pediu a remoção.');
-
-    expect($approved->fresh()->status)->toBe(DelasRequestStatus::Revoked)
-        ->and(resolve(DelasEligibility::class)->for($approved->user)->state)->toBe(DelasEligibilityState::Cooldown)
-        ->and(DelasTransition::query()->sole()->triggered_by)->toBe(DelasTriggeredBy::Admin);
-
+    expect($approved->fresh()->status)->toBe(DelasRequestStatus::Revoked);
+    expect($this->eligibility->for($approved->user)->state)->toBe(DelasEligibilityState::Cooldown);
+    expect(DelasTransition::query()->sole()->triggered_by)->toBe(DelasTriggeredBy::Admin);
     Event::assertDispatched(DelasTagRevoked::class);
 });
 
 test('não remove de quem não tem a tag', function (): void {
     $lead = User::factory()->delasLead()->create();
+    $withoutTag = User::factory()->create();
 
-    expect(fn () => resolve(RevokeDelasTag::class)->handle(User::factory()->create(), $lead, 'motivo'))
+    expect(fn () => $this->revoke->handle($withoutTag, $lead, 'motivo'))
         ->toThrow(DelasException::class, __('delas::exceptions.has_no_tag'));
 });
+
+// Remover e bloquear
 
 test('remover a tag e bloquear acontecem juntos, com o mesmo motivo', function (): void {
     $lead = User::factory()->delasLead()->create();
     $approved = DelasTagRequest::factory()->approved()->create();
 
-    resolve(RevokeDelasTag::class)->handle($approved->user, $lead, 'Conta criada só para conseguir a tag.', alsoBlock: true);
+    $this->revoke->handle($approved->user, $lead, 'Conta criada só para conseguir a tag.', alsoBlock: true);
 
     $block = DelasRequesterBlock::query()->active()->where('user_id', $approved->user_id)->sole();
-
-    expect($approved->fresh()->status)->toBe(DelasRequestStatus::Revoked)
-        ->and($block->reason)->toBe('Conta criada só para conseguir a tag.')
-        ->and($block->blocked_by)->toBe($lead->getKey())
-        ->and(resolve(DelasEligibility::class)->for($approved->user)->state)->toBe(DelasEligibilityState::Blocked)
-        ->and(DelasTransition::query()->pluck('action')->all())
+    expect($approved->fresh()->status)->toBe(DelasRequestStatus::Revoked);
+    expect($block->reason)->toBe('Conta criada só para conseguir a tag.');
+    expect($block->blocked_by)->toBe($lead->getKey());
+    expect($this->eligibility->for($approved->user)->state)->toBe(DelasEligibilityState::Blocked);
+    expect(DelasTransition::query()->pluck('action')->all())
         ->toEqualCanonicalizing([DelasAction::Revoked, DelasAction::Blocked]);
 });
 
@@ -137,10 +171,11 @@ test('se não der para bloquear, a tag também não é removida', function (): v
     $moderatorWithTag = User::factory()->delasModerator()->create();
     $approved = DelasTagRequest::factory()->for($moderatorWithTag)->approved()->create();
 
-    expect(fn () => resolve(RevokeDelasTag::class)->handle($moderatorWithTag, $lead, 'Motivo.', alsoBlock: true))
-        ->toThrow(DelasException::class, __('delas::exceptions.cannot_block_team'))
-        ->and($approved->fresh()->status)->toBe(DelasRequestStatus::Approved)
-        ->and(DelasTransition::query()->count())->toBe(0);
+    expect(fn () => $this->revoke->handle($moderatorWithTag, $lead, 'Motivo.', alsoBlock: true))
+        ->toThrow(DelasException::class, __('delas::exceptions.cannot_block_team'));
+
+    expect($approved->fresh()->status)->toBe(DelasRequestStatus::Approved);
+    expect(DelasTransition::query()->count())->toBe(0);
 });
 
 test('quem já está bloqueada só perde a tag, sem segundo bloqueio', function (): void {
@@ -148,8 +183,8 @@ test('quem já está bloqueada só perde a tag, sem segundo bloqueio', function 
     $approved = DelasTagRequest::factory()->approved()->create();
     DelasRequesterBlock::factory()->for($approved->user)->create();
 
-    resolve(RevokeDelasTag::class)->handle($approved->user, $lead, 'Motivo.', alsoBlock: true);
+    $this->revoke->handle($approved->user, $lead, 'Motivo.', alsoBlock: true);
 
-    expect(DelasRequesterBlock::query()->where('user_id', $approved->user_id)->count())->toBe(1)
-        ->and($approved->fresh()->status)->toBe(DelasRequestStatus::Revoked);
+    expect(DelasRequesterBlock::query()->where('user_id', $approved->user_id)->count())->toBe(1);
+    expect($approved->fresh()->status)->toBe(DelasRequestStatus::Revoked);
 });

@@ -15,74 +15,110 @@ use He4rt\Delas\TagRequest\Queries\DelasEligibility;
 use He4rt\Identity\User\Models\User;
 use Illuminate\Auth\Access\AuthorizationException;
 
+beforeEach(function (): void {
+    $this->block = resolve(BlockDelasRequester::class);
+    $this->unblock = resolve(UnblockDelasRequester::class);
+});
+
+// Bloquear
+
+test('bloquear deixa a pessoa bloqueada por quem bloqueou', function (): void {
+    $moderator = User::factory()->delasModerator()->create();
+    $target = User::factory()->create();
+
+    $block = $this->block->handle($target, $moderator, 'Pedidos repetidos.');
+
+    expect($block->isActive())->toBeTrue();
+    expect($block->blocked_by)->toBe($moderator->getKey());
+    expect(resolve(DelasEligibility::class)->for($target)->state)->toBe(DelasEligibilityState::Blocked);
+});
+
 test('bloquear rejeita a solicitação pendente e registra as duas ações', function (): void {
     $moderator = User::factory()->delasModerator()->create();
     $target = User::factory()->create();
     $request = DelasTagRequest::factory()->for($target)->pending()->create();
 
-    $block = resolve(BlockDelasRequester::class)->handle($target, $moderator, 'Pedidos repetidos.');
+    $this->block->handle($target, $moderator, 'Pedidos repetidos.');
 
-    expect($block->isActive())->toBeTrue()
-        ->and($block->blocked_by)->toBe($moderator->getKey())
-        ->and($request->fresh()->status)->toBe(DelasRequestStatus::Rejected)
-        ->and(resolve(DelasEligibility::class)->for($target)->state)->toBe(DelasEligibilityState::Blocked)
-        ->and(DelasTransition::query()->oldest()->pluck('action')->all())
+    expect($request->fresh()->status)->toBe(DelasRequestStatus::Rejected);
+    expect(DelasTransition::query()->oldest()->pluck('action')->all())
         ->toEqualCanonicalizing([DelasAction::Rejected, DelasAction::Blocked]);
 });
 
 test('bloquear exige motivo', function (): void {
     $moderator = User::factory()->delasModerator()->create();
+    $target = User::factory()->create();
 
-    expect(fn () => resolve(BlockDelasRequester::class)->handle(User::factory()->create(), $moderator, ' '))
+    expect(fn () => $this->block->handle($target, $moderator, ' '))
         ->toThrow(DelasException::class, __('delas::exceptions.reason_required'));
 });
 
-test('não bloqueia moderadora, líder, super admin nem a si mesma', function (string $state): void {
+test('não bloqueia quem é da equipe nem a si mesma', function (string $state): void {
     $moderator = User::factory()->delasModerator()->create();
     $target = $state === 'self' ? $moderator : User::factory()->{$state}()->create();
 
-    expect(fn () => resolve(BlockDelasRequester::class)->handle($target, $moderator, 'motivo'))
+    expect(fn () => $this->block->handle($target, $moderator, 'motivo'))
         ->toThrow(DelasException::class, __('delas::exceptions.cannot_block_team'));
-})->with(['delasModerator', 'delasLead', 'superAdmin', 'self']);
+})->with([
+    'moderadora' => 'delasModerator',
+    'líder' => 'delasLead',
+    'super admin' => 'superAdmin',
+    'a si mesma' => 'self',
+]);
 
 test('não bloqueia quem já está bloqueada', function (): void {
     $moderator = User::factory()->delasModerator()->create();
     $target = User::factory()->create();
-    resolve(BlockDelasRequester::class)->handle($target, $moderator, 'primeiro');
+    $this->block->handle($target, $moderator, 'primeiro');
 
-    expect(fn () => resolve(BlockDelasRequester::class)->handle($target, $moderator, 'segundo'))
+    expect(fn () => $this->block->handle($target, $moderator, 'segundo'))
         ->toThrow(DelasException::class, __('delas::exceptions.already_blocked'));
 });
 
 test('membra comum não bloqueia', function (): void {
-    expect(fn () => resolve(BlockDelasRequester::class)->handle(User::factory()->create(), User::factory()->create(), 'motivo'))
+    $member = User::factory()->create();
+    $target = User::factory()->create();
+
+    expect(fn () => $this->block->handle($target, $member, 'motivo'))
         ->toThrow(AuthorizationException::class);
 });
 
-test('moderadora desbloqueia o próprio bloqueio, com motivo obrigatório', function (): void {
+// Desbloquear
+
+test('desbloquear exige motivo', function (): void {
     $moderator = User::factory()->delasModerator()->create();
     $block = DelasRequesterBlock::factory()->create(['blocked_by' => $moderator->getKey()]);
 
-    expect(fn () => resolve(UnblockDelasRequester::class)->handle($block, $moderator, ''))
+    expect(fn () => $this->unblock->handle($block, $moderator, ''))
         ->toThrow(DelasException::class, __('delas::exceptions.reason_required'));
-
-    resolve(UnblockDelasRequester::class)->handle($block, $moderator, 'Situação esclarecida.');
-
-    $block->refresh();
-
-    expect($block->isActive())->toBeFalse()
-        ->and($block->lifted_by)->toBe($moderator->getKey())
-        ->and($block->lift_reason)->toBe('Situação esclarecida.')
-        ->and(DelasTransition::query()->sole()->action)->toBe(DelasAction::Unblocked);
 });
 
-test('moderadora não desbloqueia o bloqueio de outra; líder desbloqueia qualquer um', function (): void {
+test('moderadora desbloqueia o próprio bloqueio e o histórico registra', function (): void {
+    $moderator = User::factory()->delasModerator()->create();
+    $block = DelasRequesterBlock::factory()->create(['blocked_by' => $moderator->getKey()]);
+
+    $this->unblock->handle($block, $moderator, 'Situação esclarecida.');
+
+    $block->refresh();
+    expect($block->isActive())->toBeFalse();
+    expect($block->lifted_by)->toBe($moderator->getKey());
+    expect($block->lift_reason)->toBe('Situação esclarecida.');
+    expect(DelasTransition::query()->sole()->action)->toBe(DelasAction::Unblocked);
+});
+
+test('moderadora não desbloqueia o bloqueio de outra', function (): void {
     $block = DelasRequesterBlock::factory()->create();
+    $otherModerator = User::factory()->delasModerator()->create();
 
-    expect(fn () => resolve(UnblockDelasRequester::class)->handle($block, User::factory()->delasModerator()->create(), 'motivo'))
+    expect(fn () => $this->unblock->handle($block, $otherModerator, 'motivo'))
         ->toThrow(DelasException::class, __('delas::exceptions.cannot_unblock_others'));
+});
 
-    resolve(UnblockDelasRequester::class)->handle($block, User::factory()->delasLead()->create(), 'motivo');
+test('líder desbloqueia qualquer bloqueio', function (): void {
+    $block = DelasRequesterBlock::factory()->create();
+    $lead = User::factory()->delasLead()->create();
+
+    $this->unblock->handle($block, $lead, 'motivo');
 
     expect($block->fresh()->isActive())->toBeFalse();
 });
@@ -91,6 +127,6 @@ test('um bloqueio encerrado não é encerrado de novo', function (): void {
     $lead = User::factory()->delasLead()->create();
     $block = DelasRequesterBlock::factory()->lifted()->create();
 
-    expect(fn () => resolve(UnblockDelasRequester::class)->handle($block, $lead, 'de novo'))
+    expect(fn () => $this->unblock->handle($block, $lead, 'de novo'))
         ->toThrow(DelasException::class, __('delas::exceptions.block_already_lifted'));
 });

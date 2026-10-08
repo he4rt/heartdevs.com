@@ -12,7 +12,6 @@ use Illuminate\Database\UniqueConstraintViolationException;
 
 test('o banco recusa duas solicitações ativas da mesma pessoa', function (string $first, string $second): void {
     $user = User::factory()->create();
-
     DelasTagRequest::factory()->for($user)->{$first}()->create();
 
     expect(fn () => DelasTagRequest::factory()->for($user)->{$second}()->create())
@@ -24,22 +23,30 @@ test('o banco recusa duas solicitações ativas da mesma pessoa', function (stri
 
 test('solicitações encerradas não ocupam o lugar da pessoa', function (): void {
     $user = User::factory()->create();
-
     DelasTagRequest::factory()->for($user)->rejected()->create();
     DelasTagRequest::factory()->for($user)->revoked()->create();
+
     $pending = DelasTagRequest::factory()->for($user)->pending()->create();
 
-    expect(DelasTagRequest::query()->where('user_id', $user->getKey())->active()->sole()->is($pending))->toBeTrue();
+    $active = DelasTagRequest::query()->where('user_id', $user->getKey())->active()->sole();
+    expect($active->is($pending))->toBeTrue();
 });
 
-test('o banco recusa dois bloqueios ativos da mesma pessoa, mas guarda os encerrados', function (): void {
+test('o banco guarda bloqueios encerrados ao lado do ativo', function (): void {
     $user = User::factory()->create();
 
     DelasRequesterBlock::factory()->for($user)->lifted()->create();
     DelasRequesterBlock::factory()->for($user)->create();
 
-    expect(DelasRequesterBlock::query()->where('user_id', $user->getKey())->count())->toBe(2)
-        ->and(fn () => DelasRequesterBlock::factory()->for($user)->create())
+    expect(DelasRequesterBlock::query()->where('user_id', $user->getKey())->count())->toBe(2);
+});
+
+test('o banco recusa dois bloqueios ativos da mesma pessoa', function (): void {
+    $user = User::factory()->create();
+    DelasRequesterBlock::factory()->for($user)->lifted()->create();
+    DelasRequesterBlock::factory()->for($user)->create();
+
+    expect(fn () => DelasRequesterBlock::factory()->for($user)->create())
         ->toThrow(UniqueConstraintViolationException::class);
 });
 
@@ -48,11 +55,13 @@ test('o histórico guarda enums e só tem data de criação', function (): void 
         'action' => DelasAction::Approved,
         'from_status' => DelasRequestStatus::Pending,
         'to_status' => DelasRequestStatus::Approved,
-    ])->fresh();
+    ]);
 
-    expect($transition->action)->toBe(DelasAction::Approved)
-        ->and($transition->from_status)->toBe(DelasRequestStatus::Pending)
-        ->and($transition->to_status)->toBe(DelasRequestStatus::Approved)
-        ->and($transition->created_at)->not->toBeNull()
-        ->and($transition->getAttributes())->not->toHaveKey('updated_at');
+    $stored = $transition->fresh();
+
+    expect($stored->action)->toBe(DelasAction::Approved);
+    expect($stored->from_status)->toBe(DelasRequestStatus::Pending);
+    expect($stored->to_status)->toBe(DelasRequestStatus::Approved);
+    expect($stored->created_at)->not->toBeNull();
+    expect($stored->getAttributes())->not->toHaveKey('updated_at');
 });

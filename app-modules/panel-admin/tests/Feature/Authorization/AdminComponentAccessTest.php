@@ -86,27 +86,44 @@ test('a sidebar só mostra o que a pessoa pode acessar', function (): void {
     expect($labels)->toBe(['Dashboard']);
 });
 
+/**
+ * Uma das páginas da área da He4rt Delas dentro da Moderação.
+ */
+function isDelasAdminPage(string $component): bool
+{
+    return str_starts_with($component, 'He4rt\\PanelAdmin\\Moderation\\Pages\\Delas\\');
+}
+
+/**
+ * Os rótulos dos itens da sidebar do admin, para quem está logada.
+ *
+ * @return list<string>
+ */
+function adminSidebarLabels(): array
+{
+    return collect(Filament::getPanel('admin')->getNavigation())
+        ->flatMap(fn (NavigationGroup $group): array => $group->getItems())
+        ->map(fn (NavigationItem $item): string => $item->getLabel())
+        ->values()
+        ->all();
+}
+
 test('no admin, a moderadora da He4rt Delas só acessa o Dashboard e a área da He4rt Delas', function (): void {
     actingAs(User::factory()->delasModerator()->create());
 
-    $panel = Filament::getPanel('admin');
+    foreach (adminComponents() as $component) {
+        $isAllowed = $component === Dashboard::class
+            || (isDelasAdminPage($component) && $component !== DelasTeamPage::class);
 
-    collect([...$panel->getResources(), ...$panel->getPages()])
-        ->reject(fn (string $component): bool => is_subclass_of($component, Cluster::class))
-        ->each(function (string $component): void {
-            $isAllowed = $component === Dashboard::class
-                || (str_starts_with($component, 'He4rt\\PanelAdmin\\Moderation\\Pages\\Delas\\') && $component !== DelasTeamPage::class);
-
-            expect($component::canAccess())->toBe($isAllowed, $component);
-        });
+        expect($component::canAccess())->toBe($isAllowed, $component);
+    }
 });
 
 test('a líder da He4rt Delas acessa também a Equipe, e nada além da área dela', function (): void {
     actingAs(User::factory()->delasLead()->create());
 
     foreach (adminComponents() as $component) {
-        $isAllowed = $component === Dashboard::class
-            || str_starts_with($component, 'He4rt\\PanelAdmin\\Moderation\\Pages\\Delas\\');
+        $isAllowed = $component === Dashboard::class || isDelasAdminPage($component);
 
         expect($component::canAccess())->toBe($isAllowed, $component);
     }
@@ -115,33 +132,34 @@ test('a líder da He4rt Delas acessa também a Equipe, e nada além da área del
 test('a sidebar da moderadora mostra só a Moderação', function (): void {
     actingAs(User::factory()->delasModerator()->create());
 
-    $labels = collect(Filament::getPanel('admin')->getNavigation())
-        ->flatMap(fn (NavigationGroup $group): array => $group->getItems())
-        ->map(fn (NavigationItem $item): string => $item->getLabel())
-        ->all();
+    $labels = adminSidebarLabels();
 
     expect($labels)->toBe([__('panel-admin::moderation.navigation.cluster')]);
 });
 
-test('quem só modera entra no admin direto na Moderação; super admin fica no Dashboard', function (string $state, bool $goesToModeration): void {
+test('quem só modera entra no admin direto na Moderação', function (string $state): void {
     actingAs(User::factory()->{$state}()->create());
 
     $response = $this->get(Dashboard::getUrl());
 
-    $goesToModeration
-        ? $response->assertRedirect(ModerationCluster::getUrl())
-        : $response->assertOk();
+    $response->assertRedirect(ModerationCluster::getUrl());
 })->with([
-    'moderadora' => ['delasModerator', true],
-    'líder' => ['delasLead', true],
-    'super admin' => ['superAdmin', false],
+    'moderadora' => 'delasModerator',
+    'líder' => 'delasLead',
 ]);
+
+test('super admin entra no admin pelo Dashboard', function (): void {
+    actingAs(User::factory()->superAdmin()->create());
+
+    $response = $this->get(Dashboard::getUrl());
+
+    $response->assertOk();
+});
 
 test('a He4rt Delas fica só dentro da Moderação, sem item no menu principal', function (): void {
     actingAs(User::factory()->superAdmin()->create());
-    $superAdminLabels = collect(Filament::getPanel('admin')->getNavigation())
-        ->flatMap(fn (NavigationGroup $group): array => $group->getItems())
-        ->map(fn (NavigationItem $item): string => $item->getLabel());
+
+    $superAdminLabels = adminSidebarLabels();
 
     expect($superAdminLabels)->not->toContain(__('panel-admin::delas.navigation.group'));
 });

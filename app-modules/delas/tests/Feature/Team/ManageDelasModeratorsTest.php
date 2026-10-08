@@ -12,60 +12,92 @@ use He4rt\Identity\Authorization\Enums\UserRole;
 use He4rt\Identity\User\Models\User;
 use Illuminate\Auth\Access\AuthorizationException;
 
-test('líder adiciona e remove moderadora, e as duas ações vão para o histórico', function (): void {
+beforeEach(function (): void {
+    $this->addModerator = resolve(AddDelasModerator::class);
+    $this->removeModerator = resolve(RemoveDelasModerator::class);
+});
+
+// Adicionar
+
+test('líder adiciona moderadora e a ação vai para o histórico', function (): void {
     $lead = User::factory()->delasLead()->create();
     $target = DelasTagRequest::factory()->approved()->create(['decided_by' => $lead->getKey()])->user;
 
-    resolve(AddDelasModerator::class)->handle($target, $lead);
-    expect($target->fresh()->can('moderate-delas'))->toBeTrue();
+    $this->addModerator->handle($target, $lead);
 
-    resolve(RemoveDelasModerator::class)->handle($target->fresh(), $lead);
-    expect($target->fresh()->can('moderate-delas'))->toBeFalse()
-        ->and(DelasTransition::query()->pluck('action')->all())
-        ->toEqualCanonicalizing([DelasAction::ModeratorAdded, DelasAction::ModeratorRemoved]);
+    expect($target->fresh()->can('moderate-delas'))->toBeTrue();
+    expect(DelasTransition::query()->pluck('action')->all())->toBe([DelasAction::ModeratorAdded]);
 });
 
 test('só quem tem a tag vira moderadora', function (): void {
     $lead = User::factory()->delasLead()->create();
     $withoutTag = User::factory()->create();
 
-    expect(fn () => resolve(AddDelasModerator::class)->handle($withoutTag, $lead))
-        ->toThrow(DelasException::class, __('delas::exceptions.moderator_needs_tag'))
-        ->and($withoutTag->fresh()->hasRole(UserRole::DelasModerator))->toBeFalse();
+    expect(fn () => $this->addModerator->handle($withoutTag, $lead))
+        ->toThrow(DelasException::class, __('delas::exceptions.moderator_needs_tag'));
+
+    expect($withoutTag->fresh()->hasRole(UserRole::DelasModerator))->toBeFalse();
+});
+
+test('não adiciona quem já é moderadora', function (): void {
+    $lead = User::factory()->delasLead()->create();
+    $moderator = User::factory()->delasModerator()->create();
+
+    expect(fn () => $this->addModerator->handle($moderator, $lead))
+        ->toThrow(DelasException::class, __('delas::exceptions.already_moderator'));
 });
 
 test('moderadora não gerencia a equipe', function (): void {
     $moderator = User::factory()->delasModerator()->create();
+    $target = User::factory()->create();
 
-    expect(fn () => resolve(AddDelasModerator::class)->handle(User::factory()->create(), $moderator))
+    expect(fn () => $this->addModerator->handle($target, $moderator))
         ->toThrow(AuthorizationException::class);
 });
 
-test('líder não mexe em líderes nem em super admins', function (string $state): void {
+test('líder não transforma líder nem super admin em moderadora', function (string $state): void {
     $lead = User::factory()->delasLead()->create();
     $target = User::factory()->{$state}()->create();
 
-    expect(fn () => resolve(AddDelasModerator::class)->handle($target, $lead))
-        ->toThrow(DelasException::class, __('delas::exceptions.cannot_manage_role'))
-        ->and(fn () => resolve(RemoveDelasModerator::class)->handle($target, $lead))
+    expect(fn () => $this->addModerator->handle($target, $lead))
         ->toThrow(DelasException::class, __('delas::exceptions.cannot_manage_role'));
 })->with(['delasLead', 'superAdmin']);
 
-test('não adiciona quem já é moderadora nem remove quem não é', function (): void {
-    $lead = User::factory()->delasLead()->create();
+// Remover
 
-    expect(fn () => resolve(AddDelasModerator::class)->handle(User::factory()->delasModerator()->create(), $lead))
-        ->toThrow(DelasException::class, __('delas::exceptions.already_moderator'))
-        ->and(fn () => resolve(RemoveDelasModerator::class)->handle(User::factory()->create(), $lead))
+test('líder remove moderadora e a ação vai para o histórico', function (): void {
+    $lead = User::factory()->delasLead()->create();
+    $moderator = User::factory()->delasModerator()->create();
+    DelasTagRequest::factory()->for($moderator)->approved()->create(['decided_by' => $lead->getKey()]);
+
+    $this->removeModerator->handle($moderator, $lead);
+
+    expect($moderator->fresh()->can('moderate-delas'))->toBeFalse();
+    expect(DelasTransition::query()->pluck('action')->all())->toBe([DelasAction::ModeratorRemoved]);
+});
+
+test('não remove quem não é moderadora', function (): void {
+    $lead = User::factory()->delasLead()->create();
+    $member = User::factory()->create();
+
+    expect(fn () => $this->removeModerator->handle($member, $lead))
         ->toThrow(DelasException::class, __('delas::exceptions.not_moderator'));
 });
+
+test('líder não remove líder nem super admin', function (string $state): void {
+    $lead = User::factory()->delasLead()->create();
+    $target = User::factory()->{$state}()->create();
+
+    expect(fn () => $this->removeModerator->handle($target, $lead))
+        ->toThrow(DelasException::class, __('delas::exceptions.cannot_manage_role'));
+})->with(['delasLead', 'superAdmin']);
 
 test('a moderadora removida mantém as decisões no histórico', function (): void {
     $lead = User::factory()->delasLead()->create();
     $moderator = User::factory()->delasModerator()->create();
 
-    resolve(RemoveDelasModerator::class)->handle($moderator, $lead);
+    $this->removeModerator->handle($moderator, $lead);
 
-    expect($moderator->fresh()->hasRole(UserRole::DelasModerator))->toBeFalse()
-        ->and(DelasTransition::query()->where('user_id', $moderator->getKey())->exists())->toBeTrue();
+    expect($moderator->fresh()->hasRole(UserRole::DelasModerator))->toBeFalse();
+    expect(DelasTransition::query()->where('user_id', $moderator->getKey())->exists())->toBeTrue();
 });
