@@ -80,7 +80,7 @@ precisa morar em algum lugar e ter uma forma de autorizar quem decide.
       moderação, fora do cluster que já existe.
 
 - **Seletores de pessoa como consulta de domínio** (`DelasCandidates`): conceder lista quem não tem
-  a tag, remover lista só quem tem, adicionar moderadora lista só quem tem a tag, sem super
+  a tag, remover lista só quem tem e não é da equipe, adicionar moderadora lista só quem tem a tag, sem super
   admins, moderadoras e líderes, e a própria pessoa que age nunca aparece. As telas só chamam a consulta.
 - **Discord conectado para pedir a tag** (`delas.require_discord`, ligado por padrão). A He4rt
   Delas acontece no Discord: a moderação conhece a pessoa por lá, e a conta conectada é o que vai
@@ -89,8 +89,11 @@ precisa morar em algum lugar e ter uma forma de autorizar quem decide.
     - _Alternativa descartada:_ exigir o perfil completo. Não prova nada sobre a pessoa, pede
       dados pessoais a mais (minimização da LGPD) e afasta quem está começando. Ficou só um
       lembrete no pop-up.
-- **Moderadora precisa ter a tag.** Quem modera a He4rt Delas faz parte dela; para promover
-  alguém de fora, a líder concede a tag antes.
+- **Moderadora precisa ter a tag, e quem é da equipe não perde a tag.** Quem modera a He4rt
+  Delas faz parte dela: para promover alguém de fora, a líder concede a tag antes; para tirar a
+  tag de uma moderadora, revoga o papel antes. `RevokeDelasTag` recusa moderadoras e líderes.
+    - _Alternativa descartada:_ tirar da moderação junto ao remover a tag. Ficaria num passo só,
+      mas uma ação de tag passaria a mexer na equipe por um caminho indireto.
 - **Bloquear não tira a tag.** Tirar a tag é da líder, com motivo próprio ("Remover tag", com a
   opção de bloquear junto). Se o bloqueio tirasse a tag, a moderadora teria um caminho indireto
   para remover membras.
