@@ -38,14 +38,18 @@ final readonly class DelasCandidates
     }
 
     /**
-     * Só quem tem a tag hoje. A lista é pequena, então o seletor pode
-     * pré-carregar.
+     * Quem tem a tag hoje e não é da equipe: moderadoras e líderes saem da
+     * equipe antes de perder a tag (`RevokeDelasTag`).
      *
      * @return Builder<User>
      */
     public function forRevoke(User $actor): Builder
     {
-        return $this->others($actor)->whereIn('id', $this->members());
+        $team = [UserRole::DelasModerator->value, UserRole::DelasLead->value];
+
+        return $this->others($actor)
+            ->whereIn('id', $this->members())
+            ->whereDoesntHave('roles', fn (Builder $roles): Builder => $roles->whereIn('name', $team));
     }
 
     /**

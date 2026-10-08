@@ -93,6 +93,11 @@ final class DelasException extends Exception
         return new self(__('delas::exceptions.cannot_manage_role'), Response::HTTP_FORBIDDEN);
     }
 
+    public static function teamMemberKeepsTag(): self
+    {
+        return new self(__('delas::exceptions.team_member_keeps_tag'), Response::HTTP_UNPROCESSABLE_ENTITY);
+    }
+
     public static function moderatorNeedsTag(): self
     {
         return new self(__('delas::exceptions.moderator_needs_tag'), Response::HTTP_UNPROCESSABLE_ENTITY);

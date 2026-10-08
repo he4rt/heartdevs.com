@@ -17,6 +17,7 @@ return [
     'already_has_tag' => 'This person already has the He4rt Delas tag.',
     'has_no_tag' => 'This person does not have the He4rt Delas tag.',
     'cannot_manage_role' => 'Leads and super admins are managed in /admin.',
+    'team_member_keeps_tag' => 'He4rt Delas team members keep the tag. Remove the person from moderation before removing the tag.',
     'moderator_needs_tag' => 'Only people with the He4rt Delas tag can be moderators. Grant the tag first.',
     'already_moderator' => 'This person is already a He4rt Delas moderator.',
     'not_moderator' => 'This person is not a He4rt Delas moderator.',

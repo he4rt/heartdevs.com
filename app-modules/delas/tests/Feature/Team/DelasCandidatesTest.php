@@ -115,3 +115,16 @@ test('a busca ignora acento e maiúscula', function (string $term): void {
 
     expect($ids)->toContain($thais->id);
 })->with(['thais', 'THAÍS']);
+
+test('remover: quem é da equipe não aparece, mesmo com a tag', function (): void {
+    $member = DelasTagRequest::factory()->approved()->create(['decided_by' => $this->lead->getKey()])->user;
+    $moderator = User::factory()->delasModerator()->create();
+    $otherLead = User::factory()->delasLead()->create();
+    foreach ([$moderator, $otherLead] as $teamMember) {
+        DelasTagRequest::factory()->for($teamMember)->approved()->create(['decided_by' => $this->lead->getKey()]);
+    }
+
+    $ids = $this->candidates->forRevoke($this->lead)->pluck('id')->all();
+
+    expect($ids)->toContain($member->id)->not->toContain($moderator->id, $otherLead->id);
+});

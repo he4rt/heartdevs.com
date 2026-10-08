@@ -17,6 +17,7 @@ return [
     'already_has_tag' => 'Esta pessoa já tem a tag He4rt Delas.',
     'has_no_tag' => 'Esta pessoa não tem a tag He4rt Delas.',
     'cannot_manage_role' => 'Líderes e super admins são gerenciados no /admin.',
+    'team_member_keeps_tag' => 'Quem é da equipe da He4rt Delas não perde a tag. Tire a pessoa da moderação antes de remover a tag.',
     'moderator_needs_tag' => 'Só quem tem a tag He4rt Delas pode ser moderadora. Conceda a tag antes.',
     'already_moderator' => 'Esta pessoa já é moderadora He4rt Delas.',
     'not_moderator' => 'Esta pessoa não é moderadora He4rt Delas.',

@@ -16,6 +16,7 @@ use He4rt\Delas\TagRequest\Events\DelasTagGranted;
 use He4rt\Delas\TagRequest\Events\DelasTagRevoked;
 use He4rt\Delas\TagRequest\Models\DelasTagRequest;
 use He4rt\Delas\TagRequest\Queries\DelasEligibility;
+use He4rt\Delas\Team\Actions\RemoveDelasModerator;
 use He4rt\Identity\User\Models\User;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Support\Facades\Event;
@@ -168,10 +169,11 @@ test('remover a tag e bloquear acontecem juntos, com o mesmo motivo', function (
 
 test('se não der para bloquear, a tag também não é removida', function (): void {
     $lead = User::factory()->delasLead()->create();
-    $moderatorWithTag = User::factory()->delasModerator()->create();
-    $approved = DelasTagRequest::factory()->for($moderatorWithTag)->approved()->create();
+    // Super admin passa no `moderate-delas` pelo Gate::before, então nunca pode ser bloqueado.
+    $superAdminWithTag = User::factory()->superAdmin()->create();
+    $approved = DelasTagRequest::factory()->for($superAdminWithTag)->approved()->create();
 
-    expect(fn () => $this->revoke->handle($moderatorWithTag, $lead, 'Motivo.', alsoBlock: true))
+    expect(fn () => $this->revoke->handle($superAdminWithTag, $lead, 'Motivo.', alsoBlock: true))
         ->toThrow(DelasException::class, __('delas::exceptions.cannot_block_team'));
 
     expect($approved->fresh()->status)->toBe(DelasRequestStatus::Approved);
@@ -186,5 +188,29 @@ test('quem já está bloqueada só perde a tag, sem segundo bloqueio', function 
     $this->revoke->handle($approved->user, $lead, 'Motivo.', alsoBlock: true);
 
     expect(DelasRequesterBlock::query()->where('user_id', $approved->user_id)->count())->toBe(1);
+    expect($approved->fresh()->status)->toBe(DelasRequestStatus::Revoked);
+});
+
+// Quem é da equipe não perde a tag
+
+test('não remove a tag de quem é da equipe', function (string $role): void {
+    $lead = User::factory()->delasLead()->create();
+    $teamMember = User::factory()->{$role}()->create();
+    $approved = DelasTagRequest::factory()->for($teamMember)->approved()->create();
+
+    expect(fn () => $this->revoke->handle($teamMember, $lead, 'Motivo.'))
+        ->toThrow(DelasException::class, __('delas::exceptions.team_member_keeps_tag'));
+
+    expect($approved->fresh()->status)->toBe(DelasRequestStatus::Approved);
+})->with(['moderadora' => 'delasModerator', 'líder' => 'delasLead']);
+
+test('depois de sair da moderação, a pessoa pode perder a tag', function (): void {
+    $lead = User::factory()->delasLead()->create();
+    $moderator = User::factory()->delasModerator()->create();
+    $approved = DelasTagRequest::factory()->for($moderator)->approved()->create();
+
+    resolve(RemoveDelasModerator::class)->handle($moderator, $lead);
+    $this->revoke->handle($moderator->fresh(), $lead, 'Saiu da He4rt Delas.');
+
     expect($approved->fresh()->status)->toBe(DelasRequestStatus::Revoked);
 });
