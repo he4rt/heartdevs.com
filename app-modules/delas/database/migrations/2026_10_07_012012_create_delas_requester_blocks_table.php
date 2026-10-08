@@ -19,14 +19,20 @@ return new class extends Migration
             $table->timestampTz('blocked_at');
             $table->foreignUuid('lifted_by')->nullable()->constrained('users')->nullOnDelete();
             $table->timestampTz('lifted_at')->nullable();
-            $table->string('lift_reason', 500)->nullable()->comment('Obrigatório ao desbloquear; nulo enquanto o bloqueio está ativo.');
+            $table->string('lift_reason', 500)
+                ->nullable()
+                ->comment('Obrigatório ao desbloquear; nulo enquanto o bloqueio está ativo.');
             $table->timestampsTz();
 
             $table->index(['lifted_at', 'blocked_at'], 'idx_delas_requester_blocks_active');
         });
 
         // No máximo um bloqueio ativo por pessoa.
-        DB::statement('CREATE UNIQUE INDEX uq_delas_requester_blocks_active_user ON delas_requester_blocks (user_id) WHERE lifted_at IS NULL');
+        DB::statement(<<<'SQL'
+            CREATE UNIQUE INDEX uq_delas_requester_blocks_active_user
+                ON delas_requester_blocks (user_id)
+                WHERE lifted_at IS NULL
+            SQL);
     }
 
     public function down(): void

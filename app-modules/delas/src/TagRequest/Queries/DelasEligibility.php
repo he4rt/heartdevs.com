@@ -30,10 +30,11 @@ final readonly class DelasEligibility
             ->first();
 
         if ($active instanceof DelasTagRequest) {
-            return new DelasEligibilityResult(
-                state: $active->status === DelasRequestStatus::Approved ? DelasEligibilityState::Member : DelasEligibilityState::Pending,
-                request: $active,
-            );
+            $state = $active->status === DelasRequestStatus::Approved
+                ? DelasEligibilityState::Member
+                : DelasEligibilityState::Pending;
+
+            return new DelasEligibilityResult(state: $state, request: $active);
         }
 
         if ($this->isBlocked($user)) {

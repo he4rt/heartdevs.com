@@ -58,11 +58,15 @@ final readonly class DelasCandidates
      */
     public function forModerator(User $actor): Builder
     {
-        return $this->others($actor)->whereIn('id', $this->members())->whereDoesntHave('roles', fn (Builder $roles): Builder => $roles->whereIn('name', [
+        $teamAndAdmins = [
             UserRole::SuperAdmin->value,
             UserRole::DelasModerator->value,
             UserRole::DelasLead->value,
-        ]));
+        ];
+
+        return $this->others($actor)
+            ->whereIn('id', $this->members())
+            ->whereDoesntHave('roles', fn (Builder $roles): Builder => $roles->whereIn('name', $teamAndAdmins));
     }
 
     /**
