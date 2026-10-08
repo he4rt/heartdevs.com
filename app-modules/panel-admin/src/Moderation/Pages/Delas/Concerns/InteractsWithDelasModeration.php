@@ -65,7 +65,7 @@ trait InteractsWithDelasModeration
             ->label($label)
             ->weight('medium')
             ->description(fn (mixed $record): HtmlString => new HtmlString(
-                e('@'.data_get($record, $username)).' · <span style="text-decoration: underline; cursor: pointer">'.e($this->text('panel-admin::delas.actions.view_profile')).'</span>',
+                e('@'.data_get($record, $username)).' · '.$this->clickableHint('panel-admin::delas.actions.view_profile'),
             ))
             ->action($this->viewProfileAction($relation))
             ->searchable([$relation === null ? $name : 'name']);
@@ -95,6 +95,15 @@ trait InteractsWithDelasModeration
             })
             ->modalSubmitAction(action: false)
             ->modalCancelActionLabel(__('panel-admin::delas.actions.close'));
+    }
+
+    /**
+     * Texto sublinhado dentro da descrição de uma coluna, avisando que clicar na
+     * célula abre algo. O clique em si é a action da coluna.
+     */
+    protected function clickableHint(string $key): string
+    {
+        return '<span class="cursor-pointer underline">'.e($this->text($key)).'</span>';
     }
 
     protected function dateColumn(string $name, string $label): TextColumn

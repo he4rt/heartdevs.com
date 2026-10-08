@@ -30,6 +30,14 @@ enum DelasAction: string implements HasColor, HasDescription, HasIcon, HasLabel
     case ModeratorRemoved = 'moderator_removed';
     case ReasonCorrected = 'reason_corrected';
 
+    /**
+     * @return list<self>
+     */
+    public static function moderationDecisions(): array
+    {
+        return array_values(array_filter(self::cases(), fn (self $action): bool => $action->isModerationDecision()));
+    }
+
     public function getLabel(): string
     {
         return __('delas::enums.action.'.$this->value.'.label');
@@ -91,10 +99,14 @@ enum DelasAction: string implements HasColor, HasDescription, HasIcon, HasLabel
     }
 
     /**
-     * Ações que a moderação vê no histórico resumido (sem os pedidos em si).
+     * Decisão de moderação sobre uma pessoa: o que conta em "Decisões" na Equipe.
+     * Pedir a tag, mexer na equipe e editar um motivo não contam.
      */
-    public function isDecision(): bool
+    public function isModerationDecision(): bool
     {
-        return $this !== self::Requested;
+        return match ($this) {
+            self::Approved, self::Rejected, self::Granted, self::Revoked, self::Blocked, self::Unblocked => true,
+            self::Requested, self::ModeratorAdded, self::ModeratorRemoved, self::ReasonCorrected => false,
+        };
     }
 }

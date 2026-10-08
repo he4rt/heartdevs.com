@@ -109,7 +109,10 @@ class DelasHistoryPage extends Page implements HasTable
                     ->visible(fn (DelasTransition $record): bool => $this->canCorrect($record))
                     ->modalHeading(__('panel-admin::delas.actions.correct_reason_heading'))
                     ->tooltip(fn (DelasTransition $record): string => $this->correctionWindowNote($record))
-                    ->modalDescription(fn (DelasTransition $record): string => $this->text('panel-admin::delas.actions.correct_reason_body').' '.$this->correctionWindowNote($record))
+                    ->modalDescription(fn (DelasTransition $record): string => implode(' ', [
+                        $this->text('panel-admin::delas.actions.correct_reason_body'),
+                        $this->correctionWindowNote($record),
+                    ]))
                     ->fillForm(fn (DelasTransition $record): array => ['reason' => $record->currentReason()])
                     ->schema([$this->reasonField(__('panel-admin::delas.actions.correct_reason_field'))])
                     ->action(fn (DelasTransition $record, array $data): bool => $this->attempt(
@@ -141,8 +144,17 @@ class DelasHistoryPage extends Page implements HasTable
             return true;
         }
 
-        return $record->actor_id === $this->actor()->getKey()
-            && ($record->created_at?->greaterThanOrEqualTo(now()->subHours(config()->integer('delas.reason_correction_hours'))) ?? false);
+        $isAuthor = $record->actor_id === $this->actor()->getKey();
+
+        return $isAuthor && ($this->correctionDeadline($record)?->isFuture() ?? false);
+    }
+
+    /**
+     * Até quando quem escreveu o motivo pode editá-lo.
+     */
+    private function correctionDeadline(DelasTransition $record): ?CarbonInterface
+    {
+        return $record->created_at?->copy()->addHours(config()->integer('delas.reason_correction_hours'));
     }
 
     /**
@@ -179,7 +191,7 @@ class DelasHistoryPage extends Page implements HasTable
         ]));
 
         if ($this->isLead()) {
-            $note .= ' · <span style="text-decoration: underline; cursor: pointer">'.e($this->text('panel-admin::delas.actions.view_versions')).'</span>';
+            $note .= ' · '.$this->clickableHint('panel-admin::delas.actions.view_versions');
         }
 
         return new HtmlString($note);
@@ -195,7 +207,7 @@ class DelasHistoryPage extends Page implements HasTable
         }
 
         return $this->text('panel-admin::delas.actions.correct_until', [
-            'date' => $this->displayDate($record->created_at?->copy()->addHours(config()->integer('delas.reason_correction_hours'))),
+            'date' => $this->displayDate($this->correctionDeadline($record)),
         ]);
     }
 

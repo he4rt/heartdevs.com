@@ -78,7 +78,7 @@ class DelasTeamPage extends Page implements HasTable
                     ->addSelect(['decisions_count' => DelasTransition::query()
                         ->selectRaw('count(*)')
                         ->whereColumn('delas_transitions.actor_id', 'users.id')
-                        ->whereIn('action', [DelasAction::Approved, DelasAction::Rejected, DelasAction::Blocked, DelasAction::Unblocked, DelasAction::Granted, DelasAction::Revoked]),
+                        ->whereIn('action', DelasAction::moderationDecisions()),
                     ])
                     ->role([UserRole::DelasModerator->value, UserRole::DelasLead->value])
                     ->with('roles'),
@@ -183,7 +183,12 @@ class DelasTeamPage extends Page implements HasTable
                     $this->alsoBlockToggle(),
                 ])
                 ->action(fn (array $data): bool => $this->attempt(
-                    fn () => resolve(RevokeDelasTag::class)->handle($this->findUser($data['user_id']), $this->actor(), $this->reasonFrom($data), $this->alsoBlockFrom($data)),
+                    fn () => resolve(RevokeDelasTag::class)->handle(
+                        target: $this->findUser($data['user_id']),
+                        actor: $this->actor(),
+                        reason: $this->reasonFrom($data),
+                        alsoBlock: $this->alsoBlockFrom($data),
+                    ),
                     $this->revokedTitle($data),
                 )),
         ];

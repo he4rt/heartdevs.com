@@ -4,6 +4,7 @@
     $eligibility = $this->eligibility;
     $state = $eligibility->state;
     $displayTimezone = config('app.display_timezone');
+    $canRequest = $state === DelasEligibilityState::CanRequest;
     $switchOn = in_array($state, [DelasEligibilityState::Pending, DelasEligibilityState::Member], true);
 @endphp
 
@@ -25,8 +26,8 @@
                         role="switch"
                         id="delas-request-switch"
                         aria-checked="{{ $switchOn ? 'true' : 'false' }}"
-                        @if ($state === DelasEligibilityState::CanRequest) aria-describedby="delas-request-switch-hint" @endif
-                        @if ($state === DelasEligibilityState::CanRequest)
+                        @if ($canRequest) aria-describedby="delas-request-switch-hint" @endif
+                        @if ($canRequest)
                             wire:click="mountAction('request')"
                         @else
                             disabled
@@ -35,8 +36,8 @@
                             'relative mt-0.5 inline-flex h-6 w-11 shrink-0 rounded-full border-2 border-transparent transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-600',
                             'bg-delas-600' => $switchOn,
                             'bg-gray-200 dark:bg-gray-700' => !$switchOn,
-                            'cursor-pointer' => $state === DelasEligibilityState::CanRequest,
-                            'cursor-not-allowed opacity-60' => $state !== DelasEligibilityState::CanRequest,
+                            'cursor-pointer' => $canRequest,
+                            'cursor-not-allowed opacity-60' => !$canRequest,
                         ])
                     >
                         <span
@@ -51,7 +52,7 @@
                         <label for="delas-request-switch" class="text-sm font-medium text-gray-950 dark:text-white">
                             {{ __('panel-app::delas.profile.toggle') }}
                         </label>
-                        @if ($state === DelasEligibilityState::CanRequest)
+                        @if ($canRequest)
                             <p id="delas-request-switch-hint" class="text-sm text-gray-500 dark:text-gray-400">
                                 {{ __('panel-app::delas.profile.toggle_hint') }}
                             </p>
