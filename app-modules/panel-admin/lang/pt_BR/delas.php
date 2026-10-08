@@ -121,6 +121,7 @@ return [
         'also_block_hint' => 'Usa o mesmo motivo. Só impede novos pedidos da tag: não é banimento e não afeta a conta.',
         'revoked_and_blocked' => 'Tag removida e novos pedidos bloqueados',
         'person' => 'Pessoa',
+        'person_search_prompt' => 'Digite o nome ou @username',
         'person_hint' => 'Busque por nome ou @username.',
         'member_hint' => 'Só aparece quem tem a tag hoje.',
         'add_moderator' => 'Adicionar moderadora',

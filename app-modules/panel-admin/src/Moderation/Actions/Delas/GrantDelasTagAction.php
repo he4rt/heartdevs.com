@@ -33,18 +33,22 @@ final class GrantDelasTagAction extends Action
             ->modalHeading(__('panel-admin::delas.actions.grant_heading'))
             ->modalDescription(__('panel-admin::delas.actions.grant_body'))
             ->schema([
-                DelasPersonSelect::make(fn (DelasCandidates $candidates) => $candidates->forGrant($this->actor()))->live(),
+                // A comunidade inteira: só por busca, como nos outros seletores grandes do admin.
+                DelasPersonSelect::make(
+                    fn (DelasCandidates $candidates) => $candidates->forGrant($this->actor()),
+                    opensWithList: false,
+                )->live(),
                 Callout::make(__('panel-admin::delas.actions.grant_blocked_heading'))
-                    ->description(fn (Get $get): ?string => $this->blockSummary($this->activeBlockOf($get('user_id'))))
+                    ->description(fn (Get $get): ?string => $this->blockSummary($this->activeBlockOf($get->string('user_id', isNullable: true))))
                     ->warning()
-                    ->visible(fn (Get $get): bool => $this->activeBlockOf($get('user_id')) instanceof DelasRequesterBlock),
+                    ->visible(fn (Get $get): bool => $this->activeBlockOf($get->string('user_id', isNullable: true)) instanceof DelasRequesterBlock),
                 $this->reasonField(
                     __('panel-admin::delas.actions.grant_reason'),
-                    required: fn (Get $get): bool => $this->activeBlockOf($get('user_id')) instanceof DelasRequesterBlock,
+                    required: fn (Get $get): bool => $this->activeBlockOf($get->string('user_id', isNullable: true)) instanceof DelasRequesterBlock,
                 ),
             ])
             ->action(fn (array $data) => $this->runDomainAction(
-                fn () => resolve(GrantDelasTag::class)->handle(DelasPersonSelect::chosen($data['user_id']), $this->actor(), $this->reasonFrom($data)),
+                fn () => resolve(GrantDelasTag::class)->handle(DelasPersonSelect::chosen($data), $this->actor(), $this->reasonFrom($data)),
                 $this->text('panel-admin::delas.actions.granted'),
             ));
     }
@@ -54,9 +58,9 @@ final class GrantDelasTagAction extends Action
         return 'grant';
     }
 
-    private function activeBlockOf(mixed $userId): ?DelasRequesterBlock
+    private function activeBlockOf(?string $userId): ?DelasRequesterBlock
     {
-        if (!is_string($userId) || $userId === '') {
+        if ($userId === null || $userId === '') {
             return null;
         }
 

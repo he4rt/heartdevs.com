@@ -51,7 +51,7 @@ final class RevokeDelasTagAction extends Action
 
                 $this->runDomainAction(
                     fn () => resolve(RevokeDelasTag::class)->handle(
-                        target: $record instanceof DelasTagRequest ? $record->user : DelasPersonSelect::chosen($data['user_id'] ?? null),
+                        target: $record instanceof DelasTagRequest ? $record->user : DelasPersonSelect::chosen($data),
                         actor: $this->actor(),
                         reason: $this->reasonFrom($data),
                         alsoBlock: $alsoBlock,

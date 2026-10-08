@@ -32,7 +32,7 @@ final class AddDelasModeratorAction extends Action
                     ->helperText(__('panel-admin::delas.actions.moderator_hint')),
             ])
             ->action(fn (array $data) => $this->runDomainAction(
-                fn () => resolve(AddDelasModerator::class)->handle(DelasPersonSelect::chosen($data['user_id']), $this->actor()),
+                fn () => resolve(AddDelasModerator::class)->handle(DelasPersonSelect::chosen($data), $this->actor()),
                 $this->text('panel-admin::delas.actions.moderator_added'),
             ));
     }

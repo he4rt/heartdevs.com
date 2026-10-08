@@ -7,6 +7,8 @@ namespace He4rt\PanelAdmin\Moderation\Actions\Delas;
 use Filament\Actions\Action;
 use Filament\Support\Enums\Width;
 use He4rt\Delas\TagRequest\Queries\DelasEligibility;
+use He4rt\Identity\ExternalIdentity\Enums\IdentityProvider;
+use He4rt\Identity\ExternalIdentity\Models\ExternalIdentity;
 use He4rt\Identity\User\Models\User;
 use Illuminate\Contracts\View\View;
 use Illuminate\Database\Eloquent\Model;
@@ -36,6 +38,7 @@ final class ViewDelasProfileAction extends Action
                 return view('panel-admin::moderation.delas.person-profile', [
                     'person' => $person,
                     'eligibility' => resolve(DelasEligibility::class)->for($person),
+                    'discord' => $this->connectedDiscord($person),
                 ]);
             })
             ->modalSubmitAction(action: false)
@@ -52,6 +55,19 @@ final class ViewDelasProfileAction extends Action
         $this->personRelation = $relation;
 
         return $this;
+    }
+
+    /**
+     * O Discord que a pessoa conectou e ainda está conectado, o mais recente.
+     * As conexões já vêm carregadas com a pessoa.
+     */
+    private function connectedDiscord(User $person): ?ExternalIdentity
+    {
+        return $person->providers
+            ->where('provider', IdentityProvider::Discord)
+            ->filter(fn (ExternalIdentity $identity): bool => $identity->isConnected())
+            ->sortByDesc('connected_at')
+            ->first();
     }
 
     /**

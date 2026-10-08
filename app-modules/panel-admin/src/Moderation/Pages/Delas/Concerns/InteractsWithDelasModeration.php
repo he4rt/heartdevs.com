@@ -10,6 +10,7 @@ use Filament\Tables\Columns\TextColumn;
 use He4rt\Identity\User\Models\User;
 use He4rt\PanelAdmin\Moderation\Actions\Delas\ViewDelasProfileAction;
 use Illuminate\Contracts\Support\Htmlable;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\HtmlString;
 use Illuminate\Support\Str;
 
@@ -64,7 +65,7 @@ trait InteractsWithDelasModeration
         return TextColumn::make($name)
             ->label($label)
             ->weight('medium')
-            ->description(fn (mixed $record): HtmlString => new HtmlString(
+            ->description(fn (Model $record): HtmlString => new HtmlString(
                 e('@'.data_get($record, $username)).' · '.$this->clickableHint('panel-admin::delas.actions.view_profile'),
             ))
             ->action(ViewDelasProfileAction::make()->personRelation($relation))

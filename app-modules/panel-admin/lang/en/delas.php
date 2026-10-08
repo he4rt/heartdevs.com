@@ -121,6 +121,7 @@ return [
         'also_block_hint' => 'Uses the same reason. Only prevents new tag requests: it is not a ban and does not affect the account.',
         'revoked_and_blocked' => 'Tag removed and new requests blocked',
         'person' => 'Person',
+        'person_search_prompt' => 'Type a name or @username',
         'person_hint' => 'Search by name or @username.',
         'member_hint' => 'Only people who have the tag today.',
         'add_moderator' => 'Add moderator',
