@@ -134,6 +134,15 @@ final class DelasTransition extends Model
         return $this->reason !== null && $this->action->hasCorrectableReason();
     }
 
+    /**
+     * Até quando quem escreveu o motivo pode editá-lo (`delas.reason_correction_hours`).
+     * Líderes editam a qualquer momento.
+     */
+    public function reasonCorrectionDeadline(): ?CarbonInterface
+    {
+        return $this->created_at?->copy()->addHours(config()->integer('delas.reason_correction_hours'));
+    }
+
     /** @return array<string, mixed> */
     protected function casts(): array
     {

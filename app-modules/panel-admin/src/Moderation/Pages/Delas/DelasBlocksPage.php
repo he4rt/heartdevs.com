@@ -5,15 +5,14 @@ declare(strict_types=1);
 namespace He4rt\PanelAdmin\Moderation\Pages\Delas;
 
 use BackedEnum;
-use Filament\Actions\Action;
 use Filament\Pages\Page;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Concerns\InteractsWithTable;
 use Filament\Tables\Contracts\HasTable;
 use Filament\Tables\Table;
-use He4rt\Delas\Block\Actions\UnblockDelasRequester;
 use He4rt\Delas\Block\Models\DelasRequesterBlock;
+use He4rt\PanelAdmin\Moderation\Actions\Delas\UnblockDelasRequesterAction;
 use He4rt\PanelAdmin\Moderation\ModerationCluster;
 use He4rt\PanelAdmin\Moderation\Pages\Delas\Concerns\InteractsWithDelasModeration;
 
@@ -79,34 +78,16 @@ class DelasBlocksPage extends Page implements HasTable
                 $this->personColumn('user.name', 'user.username', __('panel-admin::delas.columns.person')),
                 TextColumn::make('blocker.name')
                     ->label(__('panel-admin::delas.columns.blocked_by'))
-                    ->description(fn (DelasRequesterBlock $record): string => $record->blocked_at->timezone(config('app.display_timezone'))->format('d/m/Y H:i')),
+                    ->description(fn (DelasRequesterBlock $record): string => $record->blocked_at
+                        ->timezone(config('app.display_timezone'))
+                        ->format('d/m/Y H:i')),
                 TextColumn::make('reason')
                     ->label(__('panel-admin::delas.columns.reason'))
                     ->wrap()
                     ->lineClamp(2),
             ])
             ->recordActions([
-                Action::make('unblock')
-                    ->label(__('panel-admin::delas.actions.unblock'))
-                    ->icon(Heroicon::OutlinedLockOpen)
-                    ->color('gray')
-                    ->button()
-                    ->size('sm')
-                    ->disabled(fn (DelasRequesterBlock $record): bool => !$this->canUnblock($record))
-                    ->tooltip(fn (DelasRequesterBlock $record): ?string => $this->canUnblock($record) ? null : $this->text('panel-admin::delas.actions.unblock_disabled'))
-                    ->modalHeading(fn (DelasRequesterBlock $record): string => __('panel-admin::delas.actions.unblock_heading', ['name' => $record->user->name]))
-                    ->modalDescription(__('panel-admin::delas.actions.unblock_body'))
-                    ->modalSubmitActionLabel(__('panel-admin::delas.actions.unblock'))
-                    ->schema([$this->reasonField(__('panel-admin::delas.actions.unblock_reason'), hint: __('panel-admin::delas.history_hint'))])
-                    ->action(fn (DelasRequesterBlock $record, array $data): bool => $this->attempt(
-                        fn () => resolve(UnblockDelasRequester::class)->handle($record, $this->actor(), $this->reasonFrom($data)),
-                        __('panel-admin::delas.actions.unblocked'),
-                    )),
+                UnblockDelasRequesterAction::make(),
             ]);
-    }
-
-    private function canUnblock(DelasRequesterBlock $block): bool
-    {
-        return $block->blocked_by === $this->actor()->getKey() || $this->isLead();
     }
 }

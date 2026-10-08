@@ -75,11 +75,10 @@ final readonly class CorrectDelasReason
             return;
         }
 
-        $hours = config()->integer('delas.reason_correction_hours');
         $isAuthor = $original->actor_id === $actor->getKey();
-        $isWithinWindow = $original->created_at?->greaterThanOrEqualTo(now()->subHours($hours)) ?? false;
+        $isWithinWindow = $original->reasonCorrectionDeadline()?->isFuture() ?? false;
 
-        throw_unless($isAuthor && $isWithinWindow, DelasException::cannotCorrectReason($hours));
+        throw_unless($isAuthor && $isWithinWindow, DelasException::cannotCorrectReason(config()->integer('delas.reason_correction_hours')));
     }
 
     /**

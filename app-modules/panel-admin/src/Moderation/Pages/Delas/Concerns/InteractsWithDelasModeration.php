@@ -4,30 +4,20 @@ declare(strict_types=1);
 
 namespace He4rt\PanelAdmin\Moderation\Pages\Delas\Concerns;
 
-use Closure;
-use Filament\Actions\Action;
-use Filament\Forms\Components\Textarea;
-use Filament\Forms\Components\Toggle;
-use Filament\Notifications\Notification;
 use Filament\Schemas\Components\EmbeddedTable;
 use Filament\Schemas\Schema;
-use Filament\Support\Enums\Width;
 use Filament\Tables\Columns\TextColumn;
-use He4rt\Delas\Exceptions\DelasException;
-use He4rt\Delas\Support\Reason;
-use He4rt\Delas\TagRequest\Queries\DelasEligibility;
 use He4rt\Identity\User\Models\User;
-use Illuminate\Auth\Access\AuthorizationException;
+use He4rt\PanelAdmin\Moderation\Actions\Delas\ViewDelasProfileAction;
 use Illuminate\Contracts\Support\Htmlable;
-use Illuminate\Contracts\View\View;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\HtmlString;
 use Illuminate\Support\Str;
 
 /**
  * O que as páginas da He4rt Delas no cluster de Moderação têm em comum: o grupo
- * na subnavegação, o cabeçalho com a logo, a tabela única e os campos e colunas
- * repetidos. Cada página decide o próprio acesso no `canAccess()`.
+ * na subnavegação, o cabeçalho com a logo, a tabela única e as colunas
+ * repetidas. Cada página decide o próprio acesso no `canAccess()`, e as ações
+ * moram em `Moderation\Actions\Delas`.
  */
 trait InteractsWithDelasModeration
 {
@@ -53,9 +43,19 @@ trait InteractsWithDelasModeration
         return $this->actor()->can('lead-delas');
     }
 
+    protected function actor(): User
+    {
+        $user = auth()->user();
+
+        abort_unless($user instanceof User, 403);
+
+        return $user;
+    }
+
     /**
-     * Nome, @username e "Ver perfil": clicar abre um resumo só leitura do perfil,
-     * sem sair da página.
+     * Nome, @username e "Ver perfil". Clicar na célula abre o resumo do perfil.
+     *
+     * @param  string  $name  `name` quando a linha é a pessoa; `user.name` quando ela vem pela relação `user`
      */
     protected function personColumn(string $name, string $username, string $label): TextColumn
     {
@@ -67,43 +67,8 @@ trait InteractsWithDelasModeration
             ->description(fn (mixed $record): HtmlString => new HtmlString(
                 e('@'.data_get($record, $username)).' · '.$this->clickableHint('panel-admin::delas.actions.view_profile'),
             ))
-            ->action($this->viewProfileAction($relation))
+            ->action(ViewDelasProfileAction::make()->personRelation($relation))
             ->searchable([$relation === null ? $name : 'name']);
-    }
-
-    /**
-     * O que a moderação precisa para decidir, e nada além: sem e-mail, data de
-     * nascimento nem localização. A pessoa é carregada sozinha, com o perfil e
-     * as conexões, só quando o resumo abre.
-     */
-    protected function viewProfileAction(?string $relation): Action
-    {
-        return Action::make('viewProfile')
-            ->modalHeading(__('panel-admin::delas.profile.heading'))
-            ->slideOver()
-            ->modalWidth(Width::Medium)
-            ->modalContent(function (Model $record) use ($relation): View {
-                $person = User::query()
-                    ->with(['profile', 'providers'])
-                    ->whereKey($relation === null ? $record->getKey() : $record->getAttribute($relation.'_id'))
-                    ->firstOrFail();
-
-                return view('panel-admin::moderation.delas.person-profile', [
-                    'person' => $person,
-                    'eligibility' => resolve(DelasEligibility::class)->for($person),
-                ]);
-            })
-            ->modalSubmitAction(action: false)
-            ->modalCancelActionLabel(__('panel-admin::delas.actions.close'));
-    }
-
-    /**
-     * Texto sublinhado dentro da descrição de uma coluna, avisando que clicar na
-     * célula abre algo. O clique em si é a action da coluna.
-     */
-    protected function clickableHint(string $key): string
-    {
-        return '<span class="cursor-pointer underline">'.e($this->text($key)).'</span>';
     }
 
     protected function dateColumn(string $name, string $label): TextColumn
@@ -115,72 +80,13 @@ trait InteractsWithDelasModeration
             ->sortable();
     }
 
-    protected function reasonField(string $label, bool|Closure $required = true, ?string $hint = null): Textarea
-    {
-        return Textarea::make('reason')
-            ->label($label)
-            ->required($required)
-            ->maxLength(Reason::MAX_LENGTH)
-            ->rows(3)
-            ->helperText($hint ?? __('panel-admin::delas.reason_hint'));
-    }
-
     /**
-     * Ao remover a tag, a líder pode impedir novos pedidos com o mesmo motivo.
+     * Texto sublinhado na descrição de uma coluna, avisando que clicar na célula
+     * abre algo. O clique em si é a action da coluna.
      */
-    protected function alsoBlockToggle(): Toggle
+    protected function clickableHint(string $key): string
     {
-        return Toggle::make('also_block')
-            ->label(__('panel-admin::delas.actions.also_block'))
-            ->helperText(__('panel-admin::delas.actions.also_block_hint'))
-            ->default(state: false);
-    }
-
-    /**
-     * @param  array<array-key, mixed>  $data
-     */
-    protected function alsoBlockFrom(array $data): bool
-    {
-        return ($data['also_block'] ?? false) === true;
-    }
-
-    /**
-     * @param  array<array-key, mixed>  $data
-     */
-    protected function revokedTitle(array $data): string
-    {
-        return $this->text($this->alsoBlockFrom($data)
-            ? 'panel-admin::delas.actions.revoked_and_blocked'
-            : 'panel-admin::delas.actions.revoked');
-    }
-
-    /**
-     * Roda uma action de domínio e transforma recusas em notificação, sem
-     * derrubar a página.
-     */
-    protected function attempt(Closure $operation, string $successTitle): bool
-    {
-        try {
-            $operation();
-        } catch (DelasException|AuthorizationException $exception) {
-            Notification::make()->danger()->title($exception->getMessage())->send();
-
-            return false;
-        }
-
-        Notification::make()->success()->title($successTitle)->send();
-
-        return true;
-    }
-
-    /**
-     * @param  array<array-key, mixed>  $data
-     */
-    protected function reasonFrom(array $data): ?string
-    {
-        $reason = $data['reason'] ?? null;
-
-        return is_string($reason) ? $reason : null;
+        return '<span class="cursor-pointer underline">'.e($this->text($key)).'</span>';
     }
 
     /**
@@ -191,14 +97,5 @@ trait InteractsWithDelasModeration
         $text = __($key, $replace);
 
         return is_string($text) ? $text : $key;
-    }
-
-    protected function actor(): User
-    {
-        $user = auth()->user();
-
-        abort_unless($user instanceof User, 403);
-
-        return $user;
     }
 }

@@ -5,16 +5,15 @@ declare(strict_types=1);
 namespace He4rt\PanelAdmin\Moderation\Pages\Delas;
 
 use BackedEnum;
-use Filament\Actions\Action;
 use Filament\Pages\Page;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Concerns\InteractsWithTable;
 use Filament\Tables\Contracts\HasTable;
 use Filament\Tables\Table;
-use He4rt\Delas\TagRequest\Actions\RevokeDelasTag;
 use He4rt\Delas\TagRequest\Enums\DelasRequestStatus;
 use He4rt\Delas\TagRequest\Models\DelasTagRequest;
+use He4rt\PanelAdmin\Moderation\Actions\Delas\RevokeDelasTagAction;
 use He4rt\PanelAdmin\Moderation\ModerationCluster;
 use He4rt\PanelAdmin\Moderation\Pages\Delas\Concerns\InteractsWithDelasModeration;
 
@@ -83,25 +82,7 @@ class DelasMembersPage extends Page implements HasTable
                     ->placeholder('—'),
             ])
             ->recordActions([
-                Action::make('revoke')
-                    ->label(__('panel-admin::delas.actions.revoke'))
-                    ->icon(Heroicon::OutlinedMinusCircle)
-                    ->color('danger')
-                    ->button()
-                    ->outlined()
-                    ->size('sm')
-                    ->visible(fn (): bool => $this->isLead())
-                    ->modalHeading(fn (DelasTagRequest $record): string => __('panel-admin::delas.actions.revoke_member_heading', ['name' => $record->user->name]))
-                    ->modalDescription(__('panel-admin::delas.actions.revoke_body'))
-                    ->modalSubmitActionLabel(__('panel-admin::delas.actions.revoke'))
-                    ->schema([
-                        $this->reasonField(__('panel-admin::delas.actions.revoke_reason')),
-                        $this->alsoBlockToggle(),
-                    ])
-                    ->action(fn (DelasTagRequest $record, array $data): bool => $this->attempt(
-                        fn () => resolve(RevokeDelasTag::class)->handle($record->user, $this->actor(), $this->reasonFrom($data), $this->alsoBlockFrom($data)),
-                        $this->revokedTitle($data),
-                    )),
+                RevokeDelasTagAction::make()->button()->size('sm'),
             ]);
     }
 }
