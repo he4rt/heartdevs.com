@@ -162,6 +162,37 @@ até a data original se ainda não acabou. Como bloquear rejeita o pedido penden
 bloqueada com pedido aberto ganha uma espera contada do dia do bloqueio. A concessão direta
 ignora a espera.
 
+- _Por quê:_ o bloqueio já teve motivo próprio. Reiniciar a espera ao desbloquear puniria a pessoa
+  duas vezes pelo mesmo episódio.
+
+Exemplo: pedido no dia 1, bloqueada no dia 3 (o pedido é rejeitado nesse dia, então a espera vai
+até o dia 18).
+
+| Desbloqueada no dia | Pode pedir                                   |
+| ------------------- | -------------------------------------------- |
+| 10                  | a partir do dia 18 (a espera ainda corre)    |
+| 20                  | na hora (a espera acabou durante o bloqueio) |
+
+Se, em vez de desbloquear, a líder conceder a tag no dia 10, a pessoa ganha a tag na hora: a
+concessão direta ignora a espera e encerra o bloqueio.
+
+### Ordem das verificações
+
+`DelasEligibility` decide a situação da pessoa nesta ordem, e a primeira que vale é a que o
+perfil mostra:
+
+1. **Pedido aberto** (`pending` ou `approved`): aguardando aprovação ou membra.
+2. **Bloqueio ativo:** "não é possível solicitar", sem motivo e sem data.
+3. **Espera:** a data a partir da qual pode pedir de novo.
+4. **Sem Discord conectado:** pede para conectar.
+5. **Pode pedir.**
+
+- _Por quê o bloqueio vem antes da espera:_ quem está bloqueada não deve ver uma data, que daria a
+  entender que vai poder pedir sozinha quando ela chegar. O bloqueio só acaba quando alguém
+  desbloqueia.
+- _Por quê o Discord vem por último:_ não adianta pedir para conectar o Discord a quem não poderia
+  pedir de qualquer jeito.
+
 ## Arquitetura
 
 ### Módulo `delas`
