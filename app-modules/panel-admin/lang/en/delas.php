@@ -107,6 +107,8 @@ return [
         'grant_heading' => 'Grant the He4rt Delas tag',
         'grant_body' => 'A pending request gets approved; without one, an approved request is created. The cooldown is ignored. If the person is blocked, the reason is required and the block is lifted.',
         'grant_reason' => 'Reason',
+        'grant_blocked_heading' => 'This person is blocked',
+        'grant_blocked_body' => 'Blocked by :name on :date. Reason: :reason. Granting the tag lifts the block, so a reason is required.',
         'granted' => 'Tag granted',
         'revoke' => 'Remove tag',
         'revoke_heading' => 'Remove the He4rt Delas tag',

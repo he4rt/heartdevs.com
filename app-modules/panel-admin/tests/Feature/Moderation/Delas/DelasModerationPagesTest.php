@@ -471,3 +471,17 @@ test('o botão de corrigir avisa até quando a moderadora pode corrigir', functi
         ->mountAction(TestAction::make('correctReason')->table($own))
         ->assertMountedActionModalSee(__('panel-admin::delas.actions.correct_until', ['date' => $deadline]));
 });
+
+test('conceder a quem está bloqueada mostra o bloqueio e exige o motivo no formulário', function (): void {
+    $this->actingAs(User::factory()->delasLead()->create());
+    $block = DelasRequesterBlock::factory()->create(['reason' => 'Pedidos repetidos.']);
+
+    livewire(DelasTeamPage::class)
+        ->mountAction('grant')
+        ->fillForm(['user_id' => $block->user_id])
+        ->assertMountedActionModalSee([__('panel-admin::delas.actions.grant_blocked_heading'), 'Pedidos repetidos.'])
+        ->callMountedAction()
+        ->assertHasFormErrors(['reason' => 'required']);
+
+    expect($block->fresh()->isActive())->toBeTrue();
+});

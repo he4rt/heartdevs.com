@@ -9,11 +9,14 @@ use Closure;
 use Filament\Actions\Action;
 use Filament\Forms\Components\Select;
 use Filament\Pages\Page;
+use Filament\Schemas\Components\Callout;
+use Filament\Schemas\Components\Utilities\Get;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Concerns\InteractsWithTable;
 use Filament\Tables\Contracts\HasTable;
 use Filament\Tables\Table;
+use He4rt\Delas\Block\Models\DelasRequesterBlock;
 use He4rt\Delas\History\Enums\DelasAction;
 use He4rt\Delas\History\Models\DelasTransition;
 use He4rt\Delas\TagRequest\Actions\GrantDelasTag;
@@ -150,8 +153,16 @@ class DelasTeamPage extends Page implements HasTable
                 ->modalHeading(__('panel-admin::delas.actions.grant_heading'))
                 ->modalDescription(__('panel-admin::delas.actions.grant_body'))
                 ->schema([
-                    $this->searchablePersonSelect(fn (): Builder => $this->candidates()->forGrant($this->actor())),
-                    $this->reasonField(__('panel-admin::delas.actions.grant_reason'), required: false),
+                    $this->searchablePersonSelect(fn (): Builder => $this->candidates()->forGrant($this->actor()))->live(),
+                    // Quem está bloqueada: a líder vê quem bloqueou, quando e por quê, e o motivo vira obrigatório.
+                    Callout::make(fn (Get $get): ?string => $this->blockedHeading($get('user_id')))
+                        ->description(fn (Get $get): ?string => $this->blockedDescription($get('user_id')))
+                        ->warning()
+                        ->visible(fn (Get $get): bool => $this->activeBlockOf($get('user_id')) instanceof DelasRequesterBlock),
+                    $this->reasonField(
+                        __('panel-admin::delas.actions.grant_reason'),
+                        required: fn (Get $get): bool => $this->activeBlockOf($get('user_id')) instanceof DelasRequesterBlock,
+                    ),
                 ])
                 ->action(fn (array $data): bool => $this->attempt(
                     fn () => resolve(GrantDelasTag::class)->handle($this->findUser($data['user_id']), $this->actor(), $this->reasonFrom($data)),
@@ -221,6 +232,37 @@ class DelasTeamPage extends Page implements HasTable
     private function candidates(): DelasCandidates
     {
         return resolve(DelasCandidates::class);
+    }
+
+    private function activeBlockOf(mixed $userId): ?DelasRequesterBlock
+    {
+        if (!is_string($userId) || $userId === '') {
+            return null;
+        }
+
+        return DelasRequesterBlock::query()->active()->with('blocker')->where('user_id', $userId)->first();
+    }
+
+    private function blockedHeading(mixed $userId): ?string
+    {
+        return $this->activeBlockOf($userId) instanceof DelasRequesterBlock
+            ? $this->text('panel-admin::delas.actions.grant_blocked_heading')
+            : null;
+    }
+
+    private function blockedDescription(mixed $userId): ?string
+    {
+        $block = $this->activeBlockOf($userId);
+
+        if (!$block instanceof DelasRequesterBlock) {
+            return null;
+        }
+
+        return $this->text('panel-admin::delas.actions.grant_blocked_body', [
+            'name' => $block->blocker->name ?? '—',
+            'date' => $block->blocked_at->timezone(config('app.display_timezone'))->format('d/m/Y H:i'),
+            'reason' => $block->reason,
+        ]);
     }
 
     private function findUser(mixed $id): User

@@ -107,6 +107,8 @@ return [
         'grant_heading' => 'Conceder a tag He4rt Delas',
         'grant_body' => 'Com solicitação pendente, ela é aprovada; sem solicitação, é criada uma já aprovada. A espera é ignorada. Se a pessoa estiver bloqueada, o motivo é obrigatório e o bloqueio é encerrado.',
         'grant_reason' => 'Motivo',
+        'grant_blocked_heading' => 'Esta pessoa está bloqueada',
+        'grant_blocked_body' => 'Bloqueada por :name em :date. Motivo: :reason. Conceder a tag encerra o bloqueio, por isso o motivo é obrigatório.',
         'granted' => 'Tag concedida',
         'revoke' => 'Remover tag',
         'revoke_heading' => 'Remover a tag He4rt Delas',

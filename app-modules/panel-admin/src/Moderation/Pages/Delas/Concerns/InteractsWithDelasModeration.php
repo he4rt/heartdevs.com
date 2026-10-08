@@ -65,7 +65,7 @@ trait InteractsWithDelasModeration
             ->sortable();
     }
 
-    protected function reasonField(string $label, bool $required = true, ?string $hint = null): Textarea
+    protected function reasonField(string $label, bool|Closure $required = true, ?string $hint = null): Textarea
     {
         return Textarea::make('reason')
             ->label($label)
