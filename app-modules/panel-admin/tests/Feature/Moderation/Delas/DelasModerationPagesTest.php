@@ -587,12 +587,13 @@ describe('seletor de conceder', function (): void {
         expect($results)->toBe([$this->ana->getKey() => 'Ana Souza (@anasouza)']);
     });
 
-    test('abre vazio e pede para digitar, porque a lista é a comunidade inteira', function (): void {
+    test('abre já com a lista, sem quem tem a tag nem a própria líder', function (): void {
         $select = mountedPersonSelect($this->page);
 
-        expect($select->isPreloaded())->toBeFalse();
-        expect($select->getOptions())->toBeEmpty();
-        expect($select->getSearchPrompt())->toBe(__('panel-admin::delas.actions.person_search_prompt'));
+        expect($select->isPreloaded())->toBeTrue();
+        expect($select->getOptions())->toHaveKey($this->ana->getKey());
+        expect($select->getOptions())->not->toHaveKey($this->member->getKey());
+        expect($select->getOptions())->not->toHaveKey($this->lead->getKey());
     });
 
     test('a busca não acha quem tem a tag nem a própria líder', function (): void {

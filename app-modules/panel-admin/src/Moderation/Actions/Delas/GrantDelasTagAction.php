@@ -33,11 +33,7 @@ final class GrantDelasTagAction extends Action
             ->modalHeading(__('panel-admin::delas.actions.grant_heading'))
             ->modalDescription(__('panel-admin::delas.actions.grant_body'))
             ->schema([
-                // A comunidade inteira: só por busca, como nos outros seletores grandes do admin.
-                DelasPersonSelect::make(
-                    fn (DelasCandidates $candidates) => $candidates->forGrant($this->actor()),
-                    opensWithList: false,
-                )->live(),
+                DelasPersonSelect::make(fn (DelasCandidates $candidates) => $candidates->forGrant($this->actor()))->live(),
                 Callout::make(__('panel-admin::delas.actions.grant_blocked_heading'))
                     ->description(fn (Get $get): ?string => $this->blockSummary($this->activeBlockOf($get->string('user_id', isNullable: true))))
                     ->warning()
