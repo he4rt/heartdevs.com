@@ -159,7 +159,7 @@ class PanelAdminServiceProvider extends ServiceProvider
     {
         return $builder
             ->items([
-                ...$this->itemsFor(Dashboard::class),
+                ...(Dashboard::isModerationHome() ? [] : $this->itemsFor(Dashboard::class)),
                 ...$this->itemsFor(ModerationCluster::class),
                 ...$this->itemsFor(MarketingCluster::class),
                 ...$this->itemsFor(TwitchCluster::class),
@@ -207,13 +207,15 @@ class PanelAdminServiceProvider extends ServiceProvider
 
     private function moderationNavigation(NavigationBuilder $builder): NavigationBuilder
     {
-        return $builder->items([
+        // Para quem a Moderação é a casa do admin, "voltar ao admin" voltaria para cá.
+        $backToAdmin = Dashboard::isModerationHome() ? [] : [
             NavigationItem::make(__('panel-admin::moderation.navigation.back_to_admin'))
                 ->sort(0)
                 ->icon('heroicon-o-arrow-left')
                 ->url(Dashboard::getUrl()),
+        ];
 
-        ])->groups(array_map(
+        return $builder->items($backToAdmin)->groups(array_map(
             $this->brandDelasGroup(...),
             resolve(ModerationCluster::class)->getCachedSubNavigation(),
         ));

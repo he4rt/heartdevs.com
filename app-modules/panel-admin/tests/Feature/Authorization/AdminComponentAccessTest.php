@@ -8,6 +8,7 @@ use Filament\Navigation\NavigationGroup;
 use Filament\Navigation\NavigationItem;
 use He4rt\Identity\User\Models\User;
 use He4rt\PanelAdmin\Contributions\Widgets\ActivityTimelineWidget;
+use He4rt\PanelAdmin\Moderation\ModerationCluster;
 use He4rt\PanelAdmin\Moderation\Pages\Delas\DelasTeamPage;
 use He4rt\PanelAdmin\Pages\Dashboard;
 
@@ -111,7 +112,7 @@ test('a líder da He4rt Delas acessa também a Equipe, e nada além da área del
     }
 });
 
-test('a sidebar da moderadora mostra só o Dashboard e a Moderação', function (): void {
+test('a sidebar da moderadora mostra só a Moderação', function (): void {
     actingAs(User::factory()->delasModerator()->create());
 
     $labels = collect(Filament::getPanel('admin')->getNavigation())
@@ -119,11 +120,22 @@ test('a sidebar da moderadora mostra só o Dashboard e a Moderação', function 
         ->map(fn (NavigationItem $item): string => $item->getLabel())
         ->all();
 
-    expect($labels)->toBe([
-        'Dashboard',
-        __('panel-admin::moderation.navigation.cluster'),
-    ]);
+    expect($labels)->toBe([__('panel-admin::moderation.navigation.cluster')]);
 });
+
+test('quem só modera entra no admin direto na Moderação; super admin fica no Dashboard', function (string $state, bool $goesToModeration): void {
+    actingAs(User::factory()->{$state}()->create());
+
+    $response = $this->get(Dashboard::getUrl());
+
+    $goesToModeration
+        ? $response->assertRedirect(ModerationCluster::getUrl())
+        : $response->assertOk();
+})->with([
+    'moderadora' => ['delasModerator', true],
+    'líder' => ['delasLead', true],
+    'super admin' => ['superAdmin', false],
+]);
 
 test('a He4rt Delas fica só dentro da Moderação, sem item no menu principal', function (): void {
     actingAs(User::factory()->superAdmin()->create());
