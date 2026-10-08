@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use Filament\Facades\Filament;
+use He4rt\Delas\Team\Actions\RemoveDelasModerator;
 use He4rt\Identity\User\Models\User;
 
 test('unauthenticated user is redirected to login', function (): void {
@@ -68,4 +69,15 @@ test('user without role can access admin panel outside production', function ():
     $panel = Filament::getPanel('admin');
 
     expect($user->canAccessPanel($panel))->toBeTrue();
+});
+
+test('moderadora revogada pela líder perde a entrada no admin em produção', function (): void {
+    $lead = User::factory()->delasLead()->create();
+    $moderator = User::factory()->delasModerator()->create();
+
+    resolve(RemoveDelasModerator::class)->handle($moderator, $lead);
+
+    app()->detectEnvironment(fn () => 'production');
+
+    expect($moderator->fresh()->canAccessPanel(Filament::getPanel('admin')))->toBeFalse();
 });

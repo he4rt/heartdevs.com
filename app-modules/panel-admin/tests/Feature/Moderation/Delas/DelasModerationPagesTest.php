@@ -12,6 +12,7 @@ use He4rt\Delas\History\Enums\DelasAction;
 use He4rt\Delas\History\Models\DelasTransition;
 use He4rt\Delas\TagRequest\Enums\DelasRequestStatus;
 use He4rt\Delas\TagRequest\Models\DelasTagRequest;
+use He4rt\Delas\Team\Actions\RemoveDelasModerator;
 use He4rt\Delas\Team\Queries\DelasCandidates;
 use He4rt\Identity\Authorization\Enums\UserRole;
 use He4rt\Identity\User\Models\User;
@@ -130,13 +131,15 @@ test('a moderadora abre a página pelo navegador, com o lazy loading vigiado', f
     $response->assertOk();
 })->with([DelasQueuePage::class, DelasMembersPage::class, DelasBlocksPage::class, DelasHistoryPage::class]);
 
-test('ao revogar o papel, a moderadora perde o acesso na hora', function (): void {
+test('ao ser revogada pela líder, a moderadora perde o acesso na hora', function (): void {
+    $lead = User::factory()->delasLead()->create();
     $moderator = User::factory()->delasModerator()->create();
+    $this->actingAs($moderator);
 
-    $moderator->removeRole(UserRole::DelasModerator);
-    $this->actingAs($moderator->fresh());
+    resolve(RemoveDelasModerator::class)->handle($moderator, $lead);
 
     expect(DelasQueuePage::canAccess())->toBeFalse();
+    $this->get(DelasQueuePage::getUrl())->assertForbidden();
 });
 
 test('o cluster de Moderação leva a moderadora direto para a fila', function (): void {
