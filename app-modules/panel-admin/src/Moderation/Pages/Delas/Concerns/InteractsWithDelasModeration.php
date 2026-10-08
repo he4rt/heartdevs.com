@@ -15,6 +15,7 @@ use Filament\Support\Enums\Width;
 use Filament\Tables\Columns\TextColumn;
 use He4rt\Delas\Exceptions\DelasException;
 use He4rt\Delas\Support\Reason;
+use He4rt\Delas\TagRequest\Queries\DelasEligibility;
 use He4rt\Identity\User\Models\User;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Contracts\Support\Htmlable;
@@ -81,11 +82,17 @@ trait InteractsWithDelasModeration
             ->modalHeading(__('panel-admin::delas.profile.heading'))
             ->slideOver()
             ->modalWidth(Width::Medium)
-            ->modalContent(fn (Model $record): View => view('panel-admin::moderation.delas.person-profile', [
-                'person' => User::query()
+            ->modalContent(function (Model $record) use ($relation): View {
+                $person = User::query()
                     ->with(['profile', 'providers'])
-                    ->findOrFail($relation === null ? $record->getKey() : $record->getAttribute($relation.'_id')),
-            ]))
+                    ->whereKey($relation === null ? $record->getKey() : $record->getAttribute($relation.'_id'))
+                    ->firstOrFail();
+
+                return view('panel-admin::moderation.delas.person-profile', [
+                    'person' => $person,
+                    'eligibility' => resolve(DelasEligibility::class)->for($person),
+                ]);
+            })
             ->modalSubmitAction(action: false)
             ->modalCancelActionLabel(__('panel-admin::delas.actions.close'));
     }
