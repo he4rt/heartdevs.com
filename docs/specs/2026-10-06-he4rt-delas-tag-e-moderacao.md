@@ -392,12 +392,18 @@ dispara também `DelasRequesterUnblocked`. Nenhum listener nesta entrega.
     | Histórico | `moderate-delas` |                   | moderadora: decisões (os pedidos ela já vê na Fila); líder: completo, com os pedidos, filtro por ação e versões do motivo; editar motivo                                     |
     | Equipe    | `lead-delas`     |                   | números (pendentes, membras com a tag, tempo médio até a decisão, aprovadas e rejeitadas no mês, bloqueios ativos), conceder e remover a tag, adicionar e revogar moderadora |
 
-- Os seletores de pessoa da Equipe usam a consulta de domínio `DelasCandidates`: conceder
-  busca por nome ou `@username` (a lista é a comunidade inteira); remover e adicionar moderadora
-  já vêm carregados só com quem tem a tag. Quem age nunca aparece.
+- Os seletores de pessoa da Equipe usam a consulta de domínio `DelasCandidates` e seguem o
+  padrão de Select do projeto: abrem com as primeiras pessoas do escopo e buscam o resto por nome
+  ou `@username`, sem diferenciar acento nem maiúscula. Quem age nunca aparece.
+- **"Ver perfil"**: em todas as páginas, embaixo do nome, abre na lateral um resumo só leitura
+  com foto, título, senioridade, "Sobre", Discord conectado, "Na He4rt desde" e a situação da
+  pessoa na He4rt Delas. Ficam de fora e-mail, data de nascimento e localização (minimização da
+  LGPD); a pessoa e as conexões só são carregadas quando o resumo abre.
+- Cada ação é uma classe em `panel-admin/src/Moderation/Actions/Delas` (padrão do admin, como
+  `HideInteractionAction`); as páginas só listam as ações e declaram a consulta e as colunas.
 - Cada tabela declara o eager load (`user.roles` na fila, `user` e `blocker` nos bloqueios,
-  `user`, `actor` e `latestCorrection.actor` no histórico, `user` e `decider` na Membras, `roles`
-  na equipe).
+  `user`, `actor` e `corrections.actor` no histórico, `user` e `decider` na Membras, `roles` na
+  equipe).
 - A seção Papéis do `UserForm`, onde super admins atribuem `delas-lead` e `delas-moderator`,
   visível só para super admins; a tabela de Usuários só **mostra** as roles (badges).
 
@@ -455,8 +461,16 @@ unitários em `delas/tests/Unit`.
 - Candidatas (`DelasCandidates`): um teste por escopo (conceder, remover, adicionar moderadora,
   quem age nunca aparece) e a busca.
 - Páginas do admin (`panel-admin/tests/Feature/Moderation/Delas`): gate de cada página, badges,
-  ações, busca e rótulo dos seletores, com eager load automático desligado e lazy loading
-  proibido, e pelo menos dois registros por tabela.
+  ações, busca e rótulo dos seletores, "Ver perfil" sem dados pessoais e versões do motivo só
+  para a liderança, com eager load automático desligado e lazy loading proibido, e pelo menos
+  dois registros por tabela.
+- Perfil (`panel-app/tests/Feature/Delas`): pop-up antes de registrar, estados pendente, membra,
+  espera, bloqueada (sem o motivo) e sem Discord.
+- Testes escritos para leitura: um comportamento por teste, arrumar / agir / conferir separados,
+  um `expect` por linha.
+- Testes manuais com as contas do `DelasDemoSeeder`
+  (`php artisan db:seed --class="He4rt\Delas\Database\Seeders\DelasDemoSeeder"`): uma conta por
+  papel e por situação.
 - Varredura: no `/admin`, a moderadora só acessa o Dashboard e as páginas da He4rt Delas; quem
   não tem papel, só o Dashboard. Quem só modera é levada do Dashboard para a Moderação.
 - Arch (opcional): `He4rt\Delas` não importa `He4rt\Panel*`.

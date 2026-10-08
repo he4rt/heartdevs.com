@@ -82,6 +82,21 @@ precisa morar em algum lugar e ter uma forma de autorizar quem decide.
 - **Seletores de pessoa como consulta de domínio** (`DelasCandidates`): conceder lista quem não tem
   a tag, remover lista só quem tem, adicionar moderadora lista só quem tem a tag, sem super
   admins, moderadoras e líderes, e a própria pessoa que age nunca aparece. As telas só chamam a consulta.
+- **Discord conectado para pedir a tag** (`delas.require_discord`, ligado por padrão). A He4rt
+  Delas acontece no Discord: a moderação conhece a pessoa por lá, e a conta conectada é o que vai
+  ligar a tag ao cargo `he4rt_delas`. Fica depois da espera e do bloqueio na ordem das
+  verificações, para ninguém ser mandada conectar o Discord sem poder pedir.
+    - _Alternativa descartada:_ exigir o perfil completo. Não prova nada sobre a pessoa, pede
+      dados pessoais a mais (minimização da LGPD) e afasta quem está começando. Ficou só um
+      lembrete no pop-up.
+- **Moderadora precisa ter a tag.** Quem modera a He4rt Delas faz parte dela; para promover
+  alguém de fora, a líder concede a tag antes.
+- **Bloquear não tira a tag.** Tirar a tag é da líder, com motivo próprio ("Remover tag", com a
+  opção de bloquear junto). Se o bloqueio tirasse a tag, a moderadora teria um caminho indireto
+  para remover membras.
+- **"Ver perfil" só leitura, com o mínimo.** A moderação vê o que ajuda a decidir (foto, título,
+  senioridade, "Sobre", Discord), nunca e-mail, data de nascimento ou localização. Não abre a área
+  de Perfis do admin para moderadoras: daria acesso ao perfil de todo mundo.
 - **Marca no design system.** A logo, a tag e o ícone `he4rt-delas` moram no módulo `he4rt`
   (`x-he4rt::delas.logo`, `x-he4rt::delas.tag`), porque os dois painéis usam. A paleta
   `--color-delas-*` está no tema dos dois painéis.
