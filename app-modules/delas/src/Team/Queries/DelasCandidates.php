@@ -22,6 +22,10 @@ final readonly class DelasCandidates
 {
     public const int SEARCH_LIMIT = 20;
 
+    private const string ACCENTED = 'ÁÀÂÃÄáàâãäÉÈÊËéèêëÍÌÎÏíìîïÓÒÔÕÖóòôõöÚÙÛÜúùûüÇçÑñ';
+
+    private const string PLAIN = 'AAAAAaaaaaEEEEeeeeIIIIiiiiOOOOOoooooUUUUuuuuCcNn';
+
     /**
      * Quem ainda não tem a tag. A lista é a comunidade inteira, então o seletor
      * busca em vez de pré-carregar.
@@ -73,11 +77,17 @@ final readonly class DelasCandidates
 
         return $candidates
             ->where(fn (Builder $query): Builder => $query
-                ->whereLike('name', '%'.mb_trim($search).'%')
+                // Sem acento dos dois lados: "thais" acha "Thaís".
+                ->whereRaw('lower(translate(name, ?, ?)) like ?', [self::ACCENTED, self::PLAIN, '%'.$this->plain($search).'%'])
                 ->orWhereLike('username', '%'.$username.'%'))
             ->orderBy('name')
             ->limit($limit)
             ->get();
+    }
+
+    private function plain(string $search): string
+    {
+        return mb_strtolower(strtr(mb_trim($search), array_combine(mb_str_split(self::ACCENTED), mb_str_split(self::PLAIN))));
     }
 
     /**

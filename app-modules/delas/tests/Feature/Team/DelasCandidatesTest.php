@@ -79,3 +79,10 @@ test('a busca respeita o limite', function (): void {
 
     expect($this->candidates->search($this->candidates->forGrant($this->lead), 'carla', limit: 2))->toHaveCount(2);
 });
+
+test('a busca ignora acento e maiúscula', function (): void {
+    $thais = User::factory()->create(['name' => 'Thaís Barbosa', 'username' => 'thaisb']);
+
+    expect($this->candidates->search($this->candidates->forGrant($this->lead), 'thais')->pluck('id')->all())->toContain($thais->id)
+        ->and($this->candidates->search($this->candidates->forGrant($this->lead), 'THAÍS')->pluck('id')->all())->toContain($thais->id);
+});
