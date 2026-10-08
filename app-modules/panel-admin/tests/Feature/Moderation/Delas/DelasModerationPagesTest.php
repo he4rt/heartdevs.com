@@ -705,3 +705,15 @@ test('"Ver perfil" funciona também na Equipe, onde a linha já é a pessoa', fu
         ->mountAction(TestAction::make('viewProfile')->table($moderator))
         ->assertMountedActionModalSee([$moderator->name, __('panel-admin::delas.profile.empty')]);
 });
+
+test('em Membras, a linha de quem é da equipe não tem "Remover tag"', function (): void {
+    $lead = actingAsDelasLead();
+    $moderator = User::factory()->delasModerator()->create();
+    $moderatorRequest = DelasTagRequest::factory()->for($moderator)->approved()->create(['decided_by' => $lead->getKey()]);
+    $memberRequest = DelasTagRequest::factory()->approved()->create(['decided_by' => $lead->getKey()]);
+
+    livewire(DelasMembersPage::class)
+        ->loadTable()
+        ->assertActionHidden(TestAction::make('revoke')->table($moderatorRequest))
+        ->assertActionVisible(TestAction::make('revoke')->table($memberRequest));
+});

@@ -69,7 +69,7 @@ class DelasMembersPage extends Page implements HasTable
     public function table(Table $table): Table
     {
         return $table
-            ->query(DelasTagRequest::query()->where('status', DelasRequestStatus::Approved)->with(['user', 'decider']))
+            ->query(DelasTagRequest::query()->where('status', DelasRequestStatus::Approved)->with(['user.roles', 'decider']))
             ->defaultSort('decided_at', 'desc')
             ->emptyStateHeading(__('panel-admin::delas.empty.members'))
             ->emptyStateDescription(__('panel-admin::delas.empty.members_body'))
