@@ -141,6 +141,12 @@ que a moderadora tem, mais:
 comparação é com `now()` em UTC. A data é exibida como DD/MM em
 `config('app.display_timezone')`.
 
+A espera conta sempre da última rejeição ou remoção, e o bloqueio não a pausa nem a reinicia.
+Ao desbloquear, a pessoa pode pedir na hora se a espera já acabou durante o bloqueio, ou espera
+até a data original se ainda não acabou. Como bloquear rejeita o pedido pendente, quem é
+bloqueada com pedido aberto ganha uma espera contada do dia do bloqueio. A concessão direta
+ignora a espera.
+
 ## Arquitetura
 
 ### Módulo `delas`
@@ -200,8 +206,9 @@ O case precisa morar em `UserRole` porque enums não são extensíveis por outro
 - Acesso ao `/admin` (ADR-0003 do identity): `UserRole::grantsAdminAccess()` diz se o papel entra
   (`match` sem `default`), e `User::canAccessPanel('admin')` em produção usa
   `hasAnyRole(UserRole::withAdminAccess())`. Dentro do painel, todo Resource, Page e Cluster que
-  não é da He4rt Delas tem o trait `SuperAdminOnly`; o Dashboard é a página de entrada, com os
-  widgets só para super admin. A sidebar (`PanelAdminServiceProvider::buildNavigation()`) só
+  não é da He4rt Delas tem o trait `SuperAdminOnly`; o Dashboard é a página de entrada do
+  super admin, com os widgets só para ele. Para quem só modera, o Dashboard some do menu e abrir
+  o `/admin` leva direto à Moderação (e dali à Fila da He4rt Delas). A sidebar (`PanelAdminServiceProvider::buildNavigation()`) só
   mostra o que passa no `canAccess()`.
 
 ### Modelo de dados
@@ -333,7 +340,7 @@ dispara também `DelasRequesterUnblocked`. Nenhum listener nesta entrega.
     | Fila      | `moderate-delas` | pendentes         | aprovar, rejeitar, bloquear                                                                                                                                                  |
     | Membras   | `moderate-delas` | membras com a tag | quem tem a tag, desde quando e quem decidiu; líder: remover a tag, com a opção de bloquear novos pedidos                                                                     |
     | Bloqueios | `moderate-delas` | bloqueios ativos  | desbloquear (moderadora: os próprios; líder: todos)                                                                                                                          |
-    | Histórico | `moderate-delas` |                   | moderadora: decisões; líder: completo, com filtro por ação e versões do motivo; editar motivo                                                                                |
+    | Histórico | `moderate-delas` |                   | moderadora: decisões (os pedidos ela já vê na Fila); líder: completo, com os pedidos, filtro por ação e versões do motivo; editar motivo                                     |
     | Equipe    | `lead-delas`     |                   | números (pendentes, membras com a tag, tempo médio até a decisão, aprovadas e rejeitadas no mês, bloqueios ativos), conceder e remover a tag, adicionar e revogar moderadora |
 
 - Os seletores de pessoa da Equipe usam a consulta de domínio `DelasCandidates`: conceder
@@ -402,7 +409,7 @@ unitários em `delas/tests/Unit`.
   ações, busca e rótulo dos seletores, com eager load automático desligado e lazy loading
   proibido, e pelo menos dois registros por tabela.
 - Varredura: no `/admin`, a moderadora só acessa o Dashboard e as páginas da He4rt Delas; quem
-  não tem papel, só o Dashboard.
+  não tem papel, só o Dashboard. Quem só modera é levada do Dashboard para a Moderação.
 - Arch (opcional): `He4rt\Delas` não importa `He4rt\Panel*`.
 
 Validação: `make check`, `make test` e `make test-shards`.
