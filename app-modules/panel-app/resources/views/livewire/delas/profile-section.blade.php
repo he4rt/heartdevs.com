@@ -105,7 +105,7 @@
                             <x-filament::button
                                 tag="a"
                                 size="sm"
-                                icon="heroicon-o-link"
+                                icon="fab-discord"
                                 :href="route('oauth.redirect', ['panel' => 'app', 'provider' => 'discord'])"
                             >
                                 {{ __('panel-app::delas.profile.discord_connect') }}
