@@ -89,7 +89,7 @@ final class PostShow extends Component
         /** @var Collection<string, TimelineReactionSummary> $reactionSummaries */
         $reactionSummaries = $idsToFetch === []
             ? Collection::make()
-            : resolve(ReactionSummary::class)->forTimelines($idsToFetch, auth()->id());
+            : resolve(ReactionSummary::class)->forTimelines($idsToFetch, auth()->user()?->id);
 
         if ($this->reactionsProvided) {
             $rootReactionCounts = $this->reactionCounts;

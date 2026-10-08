@@ -33,7 +33,7 @@ final class Feed extends Component
 
         /** @var Collection<string, TimelineReactionSummary> $reactionSummaries */
         $reactionSummaries = resolve(ReactionSummary::class)
-            ->forTimelines($items->getCollection()->pluck('id'), auth()->id());
+            ->forTimelines($items->getCollection()->pluck('id'), auth()->user()?->id);
 
         return view('panel-app::livewire.timeline.feed', [
             'items' => $items,

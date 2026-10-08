@@ -53,7 +53,7 @@ final class ThreadReplies extends Component
 
         /** @var Collection<string, TimelineReactionSummary> $reactionSummaries */
         $reactionSummaries = resolve(ReactionSummary::class)
-            ->forTimelines($replies->getCollection()->pluck('id'), auth()->id());
+            ->forTimelines($replies->getCollection()->pluck('id'), auth()->user()?->id);
 
         return view('panel-app::livewire.timeline.thread-replies', [
             'replies' => $replies,
