@@ -13,7 +13,13 @@
 {{-- Resumo só leitura para a moderação decidir: sem e-mail, data de nascimento nem localização. --}}
 <div class="flex flex-col gap-5 text-sm">
     <div class="flex items-center gap-3">
-        <x-filament::avatar :src="$person->getFilamentAvatarUrl()" :alt="$person->name" size="lg" />
+        {{-- Sem foto, ou com um link de foto que não carrega mais, ficam as iniciais. --}}
+        <div class="relative flex size-12 shrink-0 items-center justify-center overflow-hidden rounded-full bg-gray-100 font-semibold text-gray-700 dark:bg-white/10 dark:text-gray-200">
+            <span>{{ collect(explode(' ', $person->name))->filter()->take(2)->map(fn (string $part): string => mb_strtoupper(mb_substr($part, 0, 1)))->implode('') }}</span>
+            @if ($avatarUrl = $person->getFilamentAvatarUrl())
+                <img src="{{ $avatarUrl }}" alt="" class="absolute inset-0 size-full object-cover" onerror="this.remove()" />
+            @endif
+        </div>
         <div>
             <p class="font-semibold text-gray-950 dark:text-white">{{ $person->name }}</p>
             <p class="text-gray-500 dark:text-gray-400">{{ '@'.$person->username }}</p>
