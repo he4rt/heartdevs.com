@@ -6,6 +6,7 @@ return [
     'already_has_active_request' => 'Já existe uma solicitação pendente ou aprovada para esta pessoa.',
     'in_cooldown' => 'Ainda não é possível solicitar. Tente de novo a partir de :date.',
     'blocked' => 'No momento, não é possível solicitar a tag He4rt Delas.',
+    'discord_required' => 'Conecte sua conta do Discord para pedir a tag He4rt Delas.',
     'invalid_transition' => 'Uma solicitação :from não pode passar para :to.',
     'cannot_decide_own' => 'Você não pode decidir sobre a própria tag. Outra pessoa da equipe precisa fazer isso.',
     'reason_required' => 'Informe o motivo para continuar.',

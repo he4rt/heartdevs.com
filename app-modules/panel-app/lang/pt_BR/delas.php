@@ -15,6 +15,9 @@ return [
         'cooldown_title' => 'Ainda não é possível pedir de novo',
         'cooldown_body' => 'Você poderá solicitar novamente em :date.',
         'blocked_title' => 'No momento, não é possível solicitar a tag He4rt Delas.',
+        'discord_title' => 'Conecte seu Discord para pedir a tag',
+        'discord_body' => 'A He4rt Delas acontece no Discord, e é por lá que a moderação conhece você.',
+        'discord_connect' => 'Conectar Discord',
         'modal' => [
             'heading' => 'Solicitar a tag He4rt Delas',
             'what' => 'A He4rt Delas é a iniciativa da comunidade He4rt para mulheres e pessoas que se identificam como mulheres: um espaço de troca, apoio e visibilidade.',
@@ -23,6 +26,7 @@ return [
                 'Enquanto isso, seu perfil mostra o pedido como aguardando aprovação.',
                 'Quando aprovado, a tag aparece no seu cartão de perfil. Hoje, só você e a moderação conseguem vê-la.',
             ],
+            'tip' => 'Perfis com foto e informações básicas são analisados mais rápido.',
             'submit' => 'Enviar solicitação',
             'cancel' => 'Agora não',
         ],

@@ -35,6 +35,11 @@ final class DelasException extends Exception
         return new self(__('delas::exceptions.blocked'), Response::HTTP_FORBIDDEN);
     }
 
+    public static function discordRequired(): self
+    {
+        return new self(__('delas::exceptions.discord_required'), Response::HTTP_UNPROCESSABLE_ENTITY);
+    }
+
     public static function invalidTransition(DelasRequestStatus $from, DelasRequestStatus $to): self
     {
         return new self(

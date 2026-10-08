@@ -97,6 +97,23 @@
                     </x-panel-app::delas.callout>
 
                     @break
+                @case(DelasEligibilityState::DiscordRequired)
+                    <x-panel-app::delas.callout tone="gray" icon="heroicon-o-link">
+                        <x-slot name="title">{{ __('panel-app::delas.profile.discord_title') }}</x-slot>
+                        {{ __('panel-app::delas.profile.discord_body') }}
+                        <div class="mt-3">
+                            <x-filament::button
+                                tag="a"
+                                size="sm"
+                                icon="heroicon-o-link"
+                                :href="route('oauth.redirect', ['panel' => 'app', 'provider' => 'discord'])"
+                            >
+                                {{ __('panel-app::delas.profile.discord_connect') }}
+                            </x-filament::button>
+                        </div>
+                    </x-panel-app::delas.callout>
+
+                    @break
             @endswitch
         </div>
     </x-filament::section>

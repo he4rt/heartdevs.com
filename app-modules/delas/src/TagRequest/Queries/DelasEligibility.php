@@ -11,6 +11,7 @@ use He4rt\Delas\TagRequest\Enums\DelasEligibilityState;
 use He4rt\Delas\TagRequest\Enums\DelasRequestStatus;
 use He4rt\Delas\TagRequest\Models\DelasTagRequest;
 use He4rt\Delas\TagRequest\ValueObjects\DelasEligibilityResult;
+use He4rt\Identity\ExternalIdentity\Enums\IdentityProvider;
 use He4rt\Identity\User\Models\User;
 
 /**
@@ -45,6 +46,10 @@ final readonly class DelasEligibility
             return new DelasEligibilityResult(DelasEligibilityState::Cooldown, nextAllowedAt: $nextAllowedAt);
         }
 
+        if (config()->boolean('delas.require_discord') && !$this->hasDiscord($user)) {
+            return new DelasEligibilityResult(DelasEligibilityState::DiscordRequired);
+        }
+
         return new DelasEligibilityResult(DelasEligibilityState::CanRequest);
     }
 
@@ -53,6 +58,18 @@ final readonly class DelasEligibility
         return DelasTagRequest::query()
             ->where('user_id', $user->getKey())
             ->where('status', DelasRequestStatus::Approved)
+            ->exists();
+    }
+
+    /**
+     * Discord conectado de verdade pela pessoa, não um registro criado por
+     * ingestão (ver o escopo `activelyConnected` do identity).
+     */
+    public function hasDiscord(User $user): bool
+    {
+        return $user->providers()
+            ->where('provider', IdentityProvider::Discord)
+            ->activelyConnected()
             ->exists();
     }
 

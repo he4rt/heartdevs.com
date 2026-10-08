@@ -26,4 +26,16 @@ return [
     */
 
     'reason_correction_hours' => (int) env('DELAS_REASON_CORRECTION_HOURS', 24),
+
+    /*
+    |--------------------------------------------------------------------------
+    | Discord conectado para pedir a tag
+    |--------------------------------------------------------------------------
+    |
+    | A He4rt Delas acontece no Discord: a moderação conhece a pessoa por lá, e
+    | a conta conectada é o que vai ligar a tag ao cargo `he4rt_delas`.
+    |
+    */
+
+    'require_discord' => (bool) env('DELAS_REQUIRE_DISCORD', default: true),
 ];

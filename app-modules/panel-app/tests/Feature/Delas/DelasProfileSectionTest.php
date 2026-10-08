@@ -14,7 +14,7 @@ use function Pest\Livewire\livewire;
 beforeEach(function (): void {
     Filament::setCurrentPanel(Filament::getPanel('app'));
 
-    $this->user = User::factory()->create();
+    $this->user = User::factory()->withDiscord()->create();
     $this->actingAs($this->user);
 });
 
@@ -28,7 +28,8 @@ test('a opção de solicitar aparece para quem pode pedir', function (): void {
 test('a solicitação só é registrada depois da confirmação no pop-up', function (): void {
     livewire(DelasProfileSection::class)
         ->mountAction('request')
-        ->assertActionMounted('request');
+        ->assertActionMounted('request')
+        ->assertMountedActionModalSee(__('panel-app::delas.profile.modal.tip'));
 
     expect(DelasTagRequest::query()->exists())->toBeFalse();
 
@@ -65,5 +66,14 @@ test('bloqueada, mostra só que não é possível solicitar, sem o motivo', func
     livewire(DelasProfileSection::class)
         ->assertSee(__('panel-app::delas.profile.blocked_title'))
         ->assertDontSee('motivo interno sigiloso')
+        ->assertActionHidden('request');
+});
+
+test('sem o Discord, pede para conectar e não deixa solicitar', function (): void {
+    $this->actingAs(User::factory()->create());
+
+    livewire(DelasProfileSection::class)
+        ->assertSee(__('panel-app::delas.profile.discord_title'))
+        ->assertSee(route('oauth.redirect', ['panel' => 'app', 'provider' => 'discord']), escape: false)
         ->assertActionHidden('request');
 });

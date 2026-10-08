@@ -46,5 +46,6 @@ return [
         'member' => ['label' => 'Faz parte', 'description' => 'A pessoa tem a tag He4rt Delas.'],
         'cooldown' => ['label' => 'Em espera', 'description' => 'Uma rejeição ou remoção recente impede um novo pedido por enquanto.'],
         'blocked' => ['label' => 'Indisponível', 'description' => 'A pessoa está bloqueada de solicitar a tag.'],
+        'discord_required' => ['label' => 'Falta o Discord', 'description' => 'A pessoa precisa conectar o Discord para pedir a tag.'],
     ],
 ];

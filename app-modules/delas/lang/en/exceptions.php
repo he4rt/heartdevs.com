@@ -6,6 +6,7 @@ return [
     'already_has_active_request' => 'This person already has a pending or approved request.',
     'in_cooldown' => 'You cannot request yet. Try again from :date.',
     'blocked' => 'It is not possible to request the He4rt Delas tag right now.',
+    'discord_required' => 'Connect your Discord account to request the He4rt Delas tag.',
     'invalid_transition' => 'A :from request cannot become :to.',
     'cannot_decide_own' => 'You cannot decide on your own tag. Someone else on the team has to.',
     'reason_required' => 'Provide a reason to continue.',

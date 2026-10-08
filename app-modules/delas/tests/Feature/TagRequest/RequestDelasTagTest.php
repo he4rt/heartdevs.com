@@ -18,7 +18,7 @@ use Illuminate\Support\Facades\Event;
 
 test('registra a solicitação como pendente e grava o histórico', function (): void {
     Event::fake([DelasTagRequested::class]);
-    $user = User::factory()->create();
+    $user = User::factory()->withDiscord()->create();
 
     $request = resolve(RequestDelasTag::class)->handle($user);
 
@@ -51,7 +51,7 @@ test('recusa quem está bloqueada', function (): void {
 
 test('respeita a espera de 15 dias depois de uma rejeição ou remoção', function (string $state): void {
     $this->travelTo(today());
-    $user = User::factory()->create();
+    $user = User::factory()->withDiscord()->create();
     DelasTagRequest::factory()->for($user)->{$state}()->create(['decided_at' => now()]);
 
     $this->travelTo(now()->addDays(15)->subMinute());
@@ -63,7 +63,7 @@ test('respeita a espera de 15 dias depois de uma rejeição ou remoção', funct
 
 test('a espera vem da config', function (): void {
     config(['delas.request_cooldown_days' => 3]);
-    $user = User::factory()->create();
+    $user = User::factory()->withDiscord()->create();
     DelasTagRequest::factory()->for($user)->rejected()->create(['decided_at' => now()->subDays(4)]);
 
     expect(resolve(DelasEligibility::class)->for($user)->canRequest())->toBeTrue();
@@ -75,4 +75,35 @@ test('quem tem a tag continua com ela mesmo bloqueada', function (): void {
     DelasRequesterBlock::factory()->for($user)->create();
 
     expect(resolve(DelasEligibility::class)->for($user)->hasTag())->toBeTrue();
+});
+
+test('sem o Discord conectado, não dá para pedir', function (): void {
+    $user = User::factory()->create();
+
+    expect(resolve(DelasEligibility::class)->for($user)->state)->toBe(DelasEligibilityState::DiscordRequired)
+        ->and(fn () => resolve(RequestDelasTag::class)->handle($user))
+        ->toThrow(DelasException::class, __('delas::exceptions.discord_required'));
+});
+
+test('um Discord desconectado não conta', function (): void {
+    $user = User::factory()->withDiscord()->create();
+    $user->providers()->update(['disconnected_at' => now()]);
+
+    expect(resolve(DelasEligibility::class)->for($user)->state)->toBe(DelasEligibilityState::DiscordRequired);
+});
+
+test('a exigência do Discord vem da config', function (): void {
+    config(['delas.require_discord' => false]);
+
+    expect(resolve(DelasEligibility::class)->for(User::factory()->create())->canRequest())->toBeTrue();
+});
+
+test('espera e bloqueio aparecem antes de faltar o Discord', function (): void {
+    $blocked = User::factory()->create();
+    DelasRequesterBlock::factory()->for($blocked)->create();
+    $waiting = User::factory()->create();
+    DelasTagRequest::factory()->for($waiting)->rejected()->create(['decided_at' => now()]);
+
+    expect(resolve(DelasEligibility::class)->for($blocked)->state)->toBe(DelasEligibilityState::Blocked)
+        ->and(resolve(DelasEligibility::class)->for($waiting)->state)->toBe(DelasEligibilityState::Cooldown);
 });

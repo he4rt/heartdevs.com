@@ -21,6 +21,7 @@ enum DelasEligibilityState: string implements HasColor, HasDescription, HasIcon,
     case Member = 'member';
     case Cooldown = 'cooldown';
     case Blocked = 'blocked';
+    case DiscordRequired = 'discord_required';
 
     public function getLabel(): string
     {
@@ -33,7 +34,7 @@ enum DelasEligibilityState: string implements HasColor, HasDescription, HasIcon,
             self::CanRequest => 'primary',
             self::Pending => 'warning',
             self::Member => 'success',
-            self::Cooldown, self::Blocked => 'gray',
+            self::Cooldown, self::Blocked, self::DiscordRequired => 'gray',
         };
     }
 
@@ -50,6 +51,7 @@ enum DelasEligibilityState: string implements HasColor, HasDescription, HasIcon,
             self::Member => Heroicon::OutlinedCheckCircle,
             self::Cooldown => Heroicon::OutlinedClock,
             self::Blocked => Heroicon::OutlinedInformationCircle,
+            self::DiscordRequired => Heroicon::OutlinedLink,
         };
     }
 }

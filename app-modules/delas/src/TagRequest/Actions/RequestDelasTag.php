@@ -37,6 +37,7 @@ final readonly class RequestDelasTag
             DelasEligibilityState::Pending, DelasEligibilityState::Member => throw DelasException::alreadyHasActiveRequest(),
             DelasEligibilityState::Blocked => throw DelasException::blocked(),
             DelasEligibilityState::Cooldown => throw DelasException::inCooldown($eligibility->nextAllowedAt ?? now()),
+            DelasEligibilityState::DiscordRequired => throw DelasException::discordRequired(),
             DelasEligibilityState::CanRequest => null,
         };
 

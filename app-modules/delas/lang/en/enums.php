@@ -46,5 +46,6 @@ return [
         'member' => ['label' => 'Member', 'description' => 'The person has the He4rt Delas tag.'],
         'cooldown' => ['label' => 'Cooldown', 'description' => 'A recent rejection or removal prevents a new request for now.'],
         'blocked' => ['label' => 'Unavailable', 'description' => 'The person is blocked from requesting the tag.'],
+        'discord_required' => ['label' => 'Discord missing', 'description' => 'The person needs to connect Discord to request the tag.'],
     ],
 ];
