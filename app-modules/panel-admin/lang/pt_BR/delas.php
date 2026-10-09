@@ -116,6 +116,7 @@ return [
         'revoke_body' => 'O registro não é apagado. A pessoa poderá solicitar de novo depois da espera.',
         'revoke_reason' => 'Motivo da remoção',
         'revoked' => 'Tag removida',
+        'revoke_team_disabled' => 'Quem é da equipe não perde a tag. Tire da moderação antes (Equipe → Revogar moderadora).',
         'revoke_member_heading' => 'Remover a tag de :name?',
         'also_block' => 'Também bloquear novos pedidos',
         'also_block_hint' => 'Usa o mesmo motivo. Só impede novos pedidos da tag: não é banimento e não afeta a conta.',

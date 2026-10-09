@@ -11,7 +11,6 @@ use Filament\Support\Icons\Heroicon;
 use He4rt\Delas\TagRequest\Actions\RevokeDelasTag;
 use He4rt\Delas\TagRequest\Models\DelasTagRequest;
 use He4rt\Delas\Team\Queries\DelasCandidates;
-use He4rt\Identity\Authorization\Enums\UserRole;
 use He4rt\Identity\User\Models\User;
 use He4rt\PanelAdmin\Moderation\Actions\Delas\Concerns\InteractsWithDelasActions;
 use He4rt\PanelAdmin\Moderation\Actions\Delas\Fields\DelasPersonSelect;
@@ -34,8 +33,12 @@ final class RevokeDelasTagAction extends Action
             ->icon(Heroicon::OutlinedMinusCircle)
             ->color('danger')
             ->outlined()
-            // Na linha de Membras, quem é da equipe não tem o botão: sai da equipe antes.
-            ->visible(fn (?DelasTagRequest $record): bool => $this->isLead() && !$this->isTeamMember($record?->user))
+            ->visible(fn (): bool => $this->isLead())
+            // Na linha de Membras, quem é da equipe tem o botão desabilitado: sai da equipe antes.
+            ->disabled(fn (?DelasTagRequest $record): bool => $this->isTeamMember($record?->user))
+            ->tooltip(fn (?DelasTagRequest $record): ?string => $this->isTeamMember($record?->user)
+                ? $this->text('panel-admin::delas.actions.revoke_team_disabled')
+                : null)
             ->modalHeading(fn (?DelasTagRequest $record): string => $record instanceof DelasTagRequest
                 ? $this->text('panel-admin::delas.actions.revoke_member_heading', ['name' => $record->user->name])
                 : $this->text('panel-admin::delas.actions.revoke_heading'))
@@ -71,7 +74,8 @@ final class RevokeDelasTagAction extends Action
 
     private function isTeamMember(?User $person): bool
     {
-        return $person?->hasAnyRole([UserRole::DelasModerator, UserRole::DelasLead]) ?? false;
+        // Mesma definição da action de domínio: equipe é quem passa no `moderate-delas`.
+        return $person instanceof User && $person->can('moderate-delas');
     }
 
     private function memberSelect(): Select

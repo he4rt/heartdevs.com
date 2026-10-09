@@ -116,6 +116,7 @@ return [
         'revoke_body' => 'The record is kept. The person can request again after the cooldown.',
         'revoke_reason' => 'Removal reason',
         'revoked' => 'Tag removed',
+        'revoke_team_disabled' => 'Team members keep the tag. Remove them from moderation first (Team → Revoke moderator).',
         'revoke_member_heading' => 'Remove the tag from :name?',
         'also_block' => 'Also block new requests',
         'also_block_hint' => 'Uses the same reason. Only prevents new tag requests: it is not a ban and does not affect the account.',

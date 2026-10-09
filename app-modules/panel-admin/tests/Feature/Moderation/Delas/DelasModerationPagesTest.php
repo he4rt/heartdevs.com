@@ -709,7 +709,7 @@ test('"Ver perfil" funciona também na Equipe, onde a linha já é a pessoa', fu
         ->assertMountedActionModalSee([$moderator->name, __('panel-admin::delas.profile.empty')]);
 });
 
-test('em Membras, a linha de quem é da equipe não tem "Remover tag"', function (): void {
+test('em Membras, a linha de quem é da equipe tem "Remover tag" desabilitado, com a dica', function (): void {
     $lead = actingAsDelasLead();
     $moderator = User::factory()->delasModerator()->create();
     $moderatorRequest = DelasTagRequest::factory()->for($moderator)->approved()->create(['decided_by' => $lead->getKey()]);
@@ -717,6 +717,7 @@ test('em Membras, a linha de quem é da equipe não tem "Remover tag"', function
 
     livewire(DelasMembersPage::class)
         ->loadTable()
-        ->assertActionHidden(TestAction::make('revoke')->table($moderatorRequest))
-        ->assertActionVisible(TestAction::make('revoke')->table($memberRequest));
+        ->assertActionDisabled(TestAction::make('revoke')->table($moderatorRequest))
+        ->assertSee(__('panel-admin::delas.actions.revoke_team_disabled'))
+        ->assertActionEnabled(TestAction::make('revoke')->table($memberRequest));
 });
