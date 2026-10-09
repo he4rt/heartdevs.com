@@ -91,7 +91,8 @@ precisa morar em algum lugar e ter uma forma de autorizar quem decide.
       lembrete no pop-up.
 - **Moderadora precisa ter a tag, e quem é da equipe não perde a tag.** Quem modera a He4rt
   Delas faz parte dela: para promover alguém de fora, a líder concede a tag antes; para tirar a
-  tag de uma moderadora, revoga o papel antes. `RevokeDelasTag` recusa moderadoras e líderes.
+  tag de uma moderadora, revoga o papel antes. `RevokeDelasTag` recusa quem passa no
+  `moderate-delas`: moderadoras, líderes e super admins.
     - _Alternativa descartada:_ tirar da moderação junto ao remover a tag. Ficaria num passo só,
       mas uma ação de tag passaria a mexer na equipe por um caminho indireto.
 - **Bloquear não tira a tag.** Tirar a tag é da líder, com motivo próprio ("Remover tag", com a

@@ -125,11 +125,13 @@ que a moderadora tem, mais:
 - na Equipe, adiciona e revoga `delas-moderator`. Só quem tem a tag vira moderadora: para
   promover alguém de fora, a líder concede a tag antes. Não cria nem revoga líderes, e não age
   sobre super admins;
-- **quem é da equipe não perde a tag.** Para tirar a tag de uma moderadora, a líder primeiro
-  revoga o papel (Equipe → "Revogar moderadora") e só depois remove a tag. Líderes saem da
-  equipe pelo super admin, no cadastro de usuários. Por isso o "Remover tag" não aparece na
-  linha de quem é da equipe em Membras, e moderadoras e líderes não aparecem no seletor da
-  Equipe. A regra também vale no domínio (`RevokeDelasTag` recusa).
+- **quem é da equipe não perde a tag.** Equipe é quem passa no `moderate-delas`: moderadora,
+  líder ou super admin. Para tirar a tag de uma moderadora, a líder primeiro revoga o papel
+  (Equipe → "Revogar moderadora") e só depois remove a tag. Líderes e super admins saem da
+  equipe pelo super admin, no cadastro de usuários. Por isso, em Membras, o "Remover tag" fica
+  desabilitado na linha de quem é da equipe, com a dica de como tirar da equipe antes; e quem é
+  da equipe não aparece no seletor da Equipe. A regra também vale no domínio (`RevokeDelasTag`
+  recusa).
     - _Por quê:_ é o espelho de "moderadora precisa ter a tag". Sem isso, uma moderadora sem a tag
       continuaria moderando. E, como quem é da equipe nunca pode ser bloqueada, o "Também
       bloquear" nunca aparece para quem falharia;
