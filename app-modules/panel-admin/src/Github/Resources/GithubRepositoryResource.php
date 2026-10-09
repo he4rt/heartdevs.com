@@ -19,6 +19,7 @@ use Filament\Tables\Columns\ToggleColumn;
 use Filament\Tables\Table;
 use He4rt\IntegrationGithub\Backfill\Jobs\BackfillGithubRepository;
 use He4rt\IntegrationGithub\Models\GithubRepository;
+use He4rt\PanelAdmin\Concerns\SuperAdminOnly;
 use He4rt\PanelAdmin\Github\GithubCluster;
 use He4rt\PanelAdmin\Github\Resources\GithubRepositoryResource\Pages\CreateGithubRepository;
 use He4rt\PanelAdmin\Github\Resources\GithubRepositoryResource\Pages\EditGithubRepository;
@@ -26,6 +27,8 @@ use He4rt\PanelAdmin\Github\Resources\GithubRepositoryResource\Pages\ListGithubR
 
 class GithubRepositoryResource extends Resource
 {
+    use SuperAdminOnly;
+
     protected static ?string $cluster = GithubCluster::class;
 
     protected static ?string $model = GithubRepository::class;

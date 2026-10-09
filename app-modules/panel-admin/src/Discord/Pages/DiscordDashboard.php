@@ -8,6 +8,7 @@ use BackedEnum;
 use Filament\Pages\Page;
 use Filament\Support\Enums\Width;
 use Filament\Support\Icons\Heroicon;
+use He4rt\PanelAdmin\Concerns\SuperAdminOnly;
 use He4rt\PanelAdmin\Discord\DiscordCluster;
 use He4rt\PanelAdmin\Discord\Widgets\DiscordStatsWidget;
 use He4rt\PanelAdmin\Discord\Widgets\EventsPerDayChartWidget;
@@ -16,6 +17,8 @@ use Illuminate\Contracts\Support\Htmlable;
 
 class DiscordDashboard extends Page
 {
+    use SuperAdminOnly;
+
     protected static ?string $cluster = DiscordCluster::class;
 
     protected Width|string|null $maxContentWidth = Width::Full;

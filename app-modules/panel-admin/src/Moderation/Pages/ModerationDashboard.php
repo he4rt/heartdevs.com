@@ -8,10 +8,13 @@ use BackedEnum;
 use Filament\Pages\Page;
 use Filament\Support\Enums\Width;
 use Filament\Support\Icons\Heroicon;
+use He4rt\PanelAdmin\Concerns\SuperAdminOnly;
 use He4rt\PanelAdmin\Moderation\ModerationCluster;
 
 class ModerationDashboard extends Page
 {
+    use SuperAdminOnly;
+
     protected static ?string $cluster = ModerationCluster::class;
 
     protected Width|string|null $maxContentWidth = Width::Full;

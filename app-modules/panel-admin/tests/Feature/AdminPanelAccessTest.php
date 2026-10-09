@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use Filament\Facades\Filament;
+use He4rt\Delas\Team\Actions\RemoveDelasModerator;
 use He4rt\Identity\User\Models\User;
 
 test('unauthenticated user is redirected to login', function (): void {
@@ -36,6 +37,22 @@ test('super admin can access panel via canAccessPanel in production', function (
     expect($user->canAccessPanel($panel))->toBeTrue();
 });
 
+test('roles that moderate something can access the admin panel in production', function (string $state): void {
+    $user = User::factory()->{$state}()->create();
+
+    app()->detectEnvironment(fn () => 'production');
+
+    expect($user->canAccessPanel(Filament::getPanel('admin')))->toBeTrue();
+})->with(['delasModerator', 'delasLead']);
+
+test('streamer cannot access admin panel in production', function (): void {
+    $user = User::factory()->streamer()->create();
+
+    app()->detectEnvironment(fn () => 'production');
+
+    expect($user->canAccessPanel(Filament::getPanel('admin')))->toBeFalse();
+});
+
 test('user without role cannot access admin panel in production', function (): void {
     $user = User::factory()->create();
 
@@ -52,4 +69,15 @@ test('user without role can access admin panel outside production', function ():
     $panel = Filament::getPanel('admin');
 
     expect($user->canAccessPanel($panel))->toBeTrue();
+});
+
+test('moderadora revogada pela líder perde a entrada no admin em produção', function (): void {
+    $lead = User::factory()->delasLead()->create();
+    $moderator = User::factory()->delasModerator()->create();
+
+    resolve(RemoveDelasModerator::class)->handle($moderator, $lead);
+
+    app()->detectEnvironment(fn () => 'production');
+
+    expect($moderator->fresh()->canAccessPanel(Filament::getPanel('admin')))->toBeFalse();
 });

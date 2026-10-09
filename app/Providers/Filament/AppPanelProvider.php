@@ -48,6 +48,7 @@ class AppPanelProvider extends PanelProvider
             ->colors([
                 'primary' => Color::Purple,
                 'gray' => Color::Zinc,
+                'delas' => Color::hex('#F485A2'),
             ])
             ->viteTheme('resources/css/filament/app/theme.css')
             ->sidebarCollapsibleOnDesktop()

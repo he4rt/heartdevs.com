@@ -11,6 +11,7 @@ use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
 use He4rt\Events\Event\Models\Event;
+use He4rt\PanelAdmin\Concerns\SuperAdminOnly;
 use He4rt\PanelAdmin\Filament\Resources\Events\Pages\CreateEvent;
 use He4rt\PanelAdmin\Filament\Resources\Events\Pages\EditEvent;
 use He4rt\PanelAdmin\Filament\Resources\Events\Pages\ListEvents;
@@ -22,6 +23,8 @@ use He4rt\PanelAdmin\Filament\Resources\Events\Tables\EventsTable;
 
 final class EventResource extends Resource
 {
+    use SuperAdminOnly;
+
     protected static ?string $model = Event::class;
 
     protected static ?string $slug = 'events';

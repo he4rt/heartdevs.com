@@ -11,6 +11,7 @@ use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
 use He4rt\IntegrationDiscord\Models\DiscordChannel;
+use He4rt\PanelAdmin\Concerns\SuperAdminOnly;
 use He4rt\PanelAdmin\Discord\DiscordCluster;
 use He4rt\PanelAdmin\Discord\Resources\DiscordChannels\Pages\ListDiscordChannels;
 use He4rt\PanelAdmin\Discord\Resources\DiscordChannels\Pages\ViewDiscordChannel;
@@ -21,6 +22,8 @@ use Illuminate\Database\Eloquent\Model;
 
 class DiscordChannelResource extends Resource
 {
+    use SuperAdminOnly;
+
     protected static ?string $model = DiscordChannel::class;
 
     protected static ?string $cluster = DiscordCluster::class;

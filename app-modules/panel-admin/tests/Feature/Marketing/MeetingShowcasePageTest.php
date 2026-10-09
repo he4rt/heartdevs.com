@@ -15,7 +15,7 @@ use function Pest\Livewire\livewire;
 beforeEach(function (): void {
     config(['app.display_timezone' => 'America/Sao_Paulo']);
 
-    $admin = User::factory()->create();
+    $admin = User::factory()->superAdmin()->create();
 
     $this->actingAs($admin);
     Filament::setCurrentPanel(Filament::getPanel('admin'));

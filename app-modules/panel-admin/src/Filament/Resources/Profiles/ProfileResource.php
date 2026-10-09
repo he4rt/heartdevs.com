@@ -10,6 +10,7 @@ use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
+use He4rt\PanelAdmin\Concerns\SuperAdminOnly;
 use He4rt\PanelAdmin\Filament\Resources\Profiles\Pages\EditProfile;
 use He4rt\PanelAdmin\Filament\Resources\Profiles\Pages\ListProfiles;
 use He4rt\PanelAdmin\Filament\Resources\Profiles\Pages\ViewProfile;
@@ -24,6 +25,8 @@ use Illuminate\Database\Eloquent\Model;
 
 class ProfileResource extends Resource
 {
+    use SuperAdminOnly;
+
     protected static ?string $model = Profile::class;
 
     protected static ?string $slug = 'profiles';

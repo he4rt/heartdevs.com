@@ -10,6 +10,7 @@ use Filament\Resources\Resource;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
 use He4rt\Activity\Tracking\Models\Interaction;
+use He4rt\PanelAdmin\Concerns\SuperAdminOnly;
 use He4rt\PanelAdmin\Filament\Resources\Interactions\Pages\ListInteractions;
 use He4rt\PanelAdmin\Filament\Resources\Interactions\Tables\InteractionsTable;
 use Illuminate\Database\Eloquent\Builder;
@@ -17,6 +18,8 @@ use Illuminate\Database\Eloquent\Model;
 
 class InteractionResource extends Resource
 {
+    use SuperAdminOnly;
+
     protected static ?string $model = Interaction::class;
 
     protected static ?string $slug = 'contributions';

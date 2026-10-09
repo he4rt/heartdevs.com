@@ -17,12 +17,15 @@ use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use He4rt\IntegrationTwitch\Enums\TwitchEventSubType;
 use He4rt\IntegrationTwitch\Models\TwitchEventLog;
+use He4rt\PanelAdmin\Concerns\SuperAdminOnly;
 use He4rt\PanelAdmin\Twitch\Resources\TwitchEventLogResource\Pages\ListTwitchEventLogs;
 use He4rt\PanelAdmin\Twitch\Resources\TwitchEventLogResource\Pages\ViewTwitchEventLog;
 use He4rt\PanelAdmin\Twitch\TwitchCluster;
 
 class TwitchEventLogResource extends Resource
 {
+    use SuperAdminOnly;
+
     protected static ?string $cluster = TwitchCluster::class;
 
     protected static ?string $model = TwitchEventLog::class;

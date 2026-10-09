@@ -1,0 +1,112 @@
+<?php
+
+declare(strict_types=1);
+
+namespace He4rt\Delas\History\Enums;
+
+use App\Enums\Concerns\StringifyEnum;
+use Filament\Support\Colors\Color;
+use Filament\Support\Contracts\HasColor;
+use Filament\Support\Contracts\HasDescription;
+use Filament\Support\Contracts\HasIcon;
+use Filament\Support\Contracts\HasLabel;
+use Filament\Support\Icons\Heroicon;
+
+/**
+ * O que aconteceu numa linha do histórico da He4rt Delas.
+ */
+enum DelasAction: string implements HasColor, HasDescription, HasIcon, HasLabel
+{
+    use StringifyEnum;
+
+    case Requested = 'requested';
+    case Approved = 'approved';
+    case Rejected = 'rejected';
+    case Granted = 'granted';
+    case Revoked = 'revoked';
+    case Blocked = 'blocked';
+    case Unblocked = 'unblocked';
+    case ModeratorAdded = 'moderator_added';
+    case ModeratorRemoved = 'moderator_removed';
+    case ReasonCorrected = 'reason_corrected';
+
+    /**
+     * @return list<self>
+     */
+    public static function moderationDecisions(): array
+    {
+        return array_values(array_filter(self::cases(), fn (self $action): bool => $action->isModerationDecision()));
+    }
+
+    public function getLabel(): string
+    {
+        return __('delas::enums.action.'.$this->value.'.label');
+    }
+
+    /**
+     * Cada ação tem a sua cor para o histórico ser lido de relance. Não é uma
+     * escala, então a rampa do claro ao vermelho não se aplica.
+     *
+     * @return array<int|string, string>
+     */
+    public function getColor(): array
+    {
+        return match ($this) {
+            self::Requested => Color::Gray,
+            self::Approved => Color::Green,
+            self::Granted => Color::Emerald,
+            self::Rejected => Color::Red,
+            self::Revoked => Color::Orange,
+            self::Blocked => Color::Rose,
+            self::Unblocked => Color::Sky,
+            self::ModeratorAdded => Color::Indigo,
+            self::ModeratorRemoved => Color::Slate,
+            self::ReasonCorrected => Color::Yellow,
+        };
+    }
+
+    public function getDescription(): string
+    {
+        return __('delas::enums.action.'.$this->value.'.description');
+    }
+
+    public function getIcon(): Heroicon
+    {
+        return match ($this) {
+            self::Requested => Heroicon::OutlinedPaperAirplane,
+            self::Approved => Heroicon::OutlinedCheck,
+            self::Granted => Heroicon::OutlinedPlusCircle,
+            self::Rejected => Heroicon::OutlinedXMark,
+            self::Revoked => Heroicon::OutlinedMinusCircle,
+            self::Blocked => Heroicon::OutlinedNoSymbol,
+            self::Unblocked => Heroicon::OutlinedLockOpen,
+            self::ModeratorAdded => Heroicon::OutlinedUserPlus,
+            self::ModeratorRemoved => Heroicon::OutlinedUserMinus,
+            self::ReasonCorrected => Heroicon::OutlinedPencilSquare,
+        };
+    }
+
+    /**
+     * Ações cujo motivo pode ser corrigido depois. A correção é uma linha nova
+     * no histórico; a original nunca muda.
+     */
+    public function hasCorrectableReason(): bool
+    {
+        return match ($this) {
+            self::Rejected, self::Revoked, self::Granted, self::Blocked, self::Unblocked => true,
+            self::Requested, self::Approved, self::ModeratorAdded, self::ModeratorRemoved, self::ReasonCorrected => false,
+        };
+    }
+
+    /**
+     * Decisão de moderação sobre uma pessoa: o que conta em "Decisões" na Equipe.
+     * Pedir a tag, mexer na equipe e editar um motivo não contam.
+     */
+    public function isModerationDecision(): bool
+    {
+        return match ($this) {
+            self::Approved, self::Rejected, self::Granted, self::Revoked, self::Blocked, self::Unblocked => true,
+            self::Requested, self::ModeratorAdded, self::ModeratorRemoved, self::ReasonCorrected => false,
+        };
+    }
+}

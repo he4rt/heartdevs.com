@@ -9,21 +9,22 @@ This is a modular monorepo (`internachi/modular`). Each bounded context lives un
 
 ## Contexts
 
-| Context             | Path                               | Description                                                                                                                |
-| ------------------- | ---------------------------------- | -------------------------------------------------------------------------------------------------------------------------- |
-| Moderation          | `app-modules/moderation/`          | Content moderation pipeline — classification, routing, enforcement, appeals                                                |
-| Bot Discord         | `app-modules/bot-discord/`         | Discord bot runtime (Laracord websocket, slash commands, event handlers)                                                   |
-| Integration Discord | `app-modules/integration-discord/` | Discord platform transport (REST API via Saloon), OAuth, ETL                                                               |
-| Identity            | `app-modules/identity/`            | Users, tenants, external identities, authentication                                                                        |
-| Events              | `app-modules/events/`              | Event participation lifecycle — enrollment, check-in, attendance, XP dispatch; community photo gallery (albums)           |
-| Gamification        | `app-modules/gamification/`        | Character progression — XP, levels, badges, seasons, daily bonuses                                                         |
-| Panel Admin         | `app-modules/panel-admin/`         | Filament admin panel — dashboards, resources, moderation UI, marketing                                                     |
-| Integration Twitch  | `app-modules/integration-twitch/`  | Twitch platform transport (Helix API via Saloon), OAuth, EventSub webhooks                                                 |
-| Integration GitHub  | `app-modules/integration-github/`  | GitHub transport (REST via Saloon), OAuth, community contribution ingestion (backfill + webhooks) + event lake             |
-| Onboarding          | `app-modules/onboarding/`          | Universal, mandatory entry layer — polymorphic onboarding state machines by type; owns the per-type completion gate (APTO) |
-| Squads              | `app-modules/squads/`              | Squad lifecycle, membership and governance (captain/sub-captain, elections, removal, reallocation)                         |
-| Marketing           | `app-modules/marketing/`           | Divulgação e sua medição — links curtos (`/l/{slug}`), destino versionado, captura crua de cliques                         |
+| Context             | Path                               | Description                                                                                                                     |
+| ------------------- | ---------------------------------- | ------------------------------------------------------------------------------------------------------------------------------- |
+| Moderation          | `app-modules/moderation/`          | Content moderation pipeline — classification, routing, enforcement, appeals                                                     |
+| Bot Discord         | `app-modules/bot-discord/`         | Discord bot runtime (Laracord websocket, slash commands, event handlers)                                                        |
+| Integration Discord | `app-modules/integration-discord/` | Discord platform transport (REST API via Saloon), OAuth, ETL                                                                    |
+| Identity            | `app-modules/identity/`            | Users, tenants, external identities, authentication                                                                             |
+| Events              | `app-modules/events/`              | Event participation lifecycle — enrollment, check-in, attendance, XP dispatch; community photo gallery (albums)                 |
+| Gamification        | `app-modules/gamification/`        | Character progression — XP, levels, badges, seasons, daily bonuses                                                              |
+| Panel Admin         | `app-modules/panel-admin/`         | Filament admin panel — dashboards, resources, moderation UI, marketing                                                          |
+| Integration Twitch  | `app-modules/integration-twitch/`  | Twitch platform transport (Helix API via Saloon), OAuth, EventSub webhooks                                                      |
+| Integration GitHub  | `app-modules/integration-github/`  | GitHub transport (REST via Saloon), OAuth, community contribution ingestion (backfill + webhooks) + event lake                  |
+| Onboarding          | `app-modules/onboarding/`          | Universal, mandatory entry layer — polymorphic onboarding state machines by type; owns the per-type completion gate (APTO)      |
+| Squads              | `app-modules/squads/`              | Squad lifecycle, membership and governance (captain/sub-captain, elections, removal, reallocation)                              |
+| Marketing           | `app-modules/marketing/`           | Divulgação e sua medição — links curtos (`/l/{slug}`), destino versionado, captura crua de cliques                              |
 | Contents            | `app-modules/contents/`            | Canonical catalogue of content published on external platforms (articles now, video next) — delegated types + provider contract |
+| Delas               | `app-modules/delas/`               | He4rt Delas no Hub — solicitação da tag, decisão das moderadoras, bloqueios e histórico                                         |
 
 ## Relationships
 
@@ -76,3 +77,4 @@ This is a modular monorepo (`internachi/modular`). Each bounded context lives un
 - **Squads** depends on Onboarding (reads the `Squads`-completion gate, "APTO") and Identity (users/tenants). It never imports from presentation; the panels depend on it.
 - **Marketing** owns short links and their click record. It depends only on **Identity** (`created_by` / `user_id` on a click) and on no other context. It renders no UI and registers no route: `portal` owns the public `/l/{slug}` edge and the "link unavailable" page, and `panel-admin` owns the staff CRUD and dashboards — both depend on `marketing`, never the reverse.
 - **Contents** owns the canonical record of externally published content. It never talks HTTP (the `integration-*` modules implement its provider contract) and never awards anything — it emits `ArticlePublished` and `activity` decides. It depends on Identity (authorship resolution, `ExternalIdentityConnected`); `activity` and the panels depend on it, never the reverse.
+- **Delas** owns the He4rt Delas tag (request, decision, cooldown, blocks and their history). It depends only on **Identity** (`User`, the `delas-moderator` and `delas-lead` cases of `UserRole`). It renders no UI: `panel-app` (profile request and tag) and `panel-admin` (moderation in the Moderation cluster: queue, members, blocks, history, team) depend on it, never the reverse.

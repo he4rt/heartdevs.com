@@ -6,6 +6,7 @@ namespace He4rt\PanelApp;
 
 use Filament\Support\Assets\Js;
 use Filament\Support\Facades\FilamentAsset;
+use He4rt\PanelApp\Livewire\Delas\DelasProfileSection;
 use He4rt\PanelApp\Livewire\Events\EventDetail;
 use He4rt\PanelApp\Livewire\Events\EventsList;
 use He4rt\PanelApp\Livewire\Events\MyEventsList;
@@ -20,8 +21,6 @@ use Livewire\Livewire;
 
 class PanelAppServiceProvider extends ServiceProvider
 {
-    public function register(): void {}
-
     public function boot(): void
     {
         $this->loadViewsFrom(__DIR__.'/../resources/views', 'panel-app');
@@ -41,5 +40,7 @@ class PanelAppServiceProvider extends ServiceProvider
         Livewire::component('timeline-post-show', PostShow::class);
         Livewire::component('timeline-reply-composer', ReplyComposer::class);
         Livewire::component('timeline-thread-replies', ThreadReplies::class);
+
+        Livewire::component('delas-profile-section', DelasProfileSection::class);
     }
 }

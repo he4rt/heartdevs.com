@@ -265,11 +265,12 @@ test('quem não é super admin não se promove pelo próprio form', function ():
 
     $this->actingAs($member);
 
+    // Desde a ADR-0003 do identity, o UserResource é só de super admin: o form nem abre.
     livewire(EditUser::class, ['record' => $member->getKey()])
-        ->fillForm(['roles' => [$superAdmin->getKey()]])
-        ->call('save');
+        ->assertForbidden();
 
-    expect($member->fresh()?->hasRole(UserRole::SuperAdmin))->toBeFalse();
+    expect($member->fresh()?->hasRole(UserRole::SuperAdmin))->toBeFalse()
+        ->and($superAdmin->exists)->toBeTrue();
 });
 
 test('a opção de super admin fica livre ao editar outro usuário', function (): void {
@@ -293,4 +294,73 @@ test('o filtro de papel separa super admin de usuário comum', function (): void
         ->filterTable('roles', $role->getKey())
         ->assertCanSeeTableRecords([$this->admin])
         ->assertCanNotSeeTableRecords([$regular]);
+});
+
+test('quem não é super admin não abre o form de usuário, mesmo com papel que entra no admin', function (): void {
+    $this->actingAs(User::factory()->delasLead()->create());
+    $other = User::factory()->create();
+
+    livewire(EditUser::class, ['record' => $other->getKey()])
+        ->assertForbidden();
+});
+
+test('quem não é super admin não concede papéis nem forçando o estado do form', function (): void {
+    $this->actingAs(User::factory()->delasLead()->create());
+    $other = User::factory()->create();
+    $role = Role::findByName(UserRole::DelasModerator->value, UserRole::GUARD);
+
+    livewire(EditUser::class, ['record' => $other->getKey()])
+        ->assertForbidden();
+
+    expect($other->fresh()->hasRole(UserRole::DelasModerator))->toBeFalse()
+        ->and($role->exists)->toBeTrue();
+});
+
+test('salvar o form concede um papel da He4rt Delas a outro usuário', function (UserRole $role): void {
+    $other = User::factory()->create();
+
+    livewire(EditUser::class, ['record' => $other->getKey()])
+        ->fillForm(['roles' => [Role::findByName($role->value, UserRole::GUARD)->getKey()]])
+        ->call('save')
+        ->assertHasNoFormErrors();
+
+    expect($other->fresh()->hasRole($role))->toBeTrue();
+})->with([UserRole::DelasModerator, UserRole::DelasLead]);
+
+test('marcar moderadora desmarca líder da He4rt Delas', function (): void {
+    $other = User::factory()->create();
+    $lead = (string) Role::findByName(UserRole::DelasLead->value, UserRole::GUARD)->getKey();
+    $moderator = (string) Role::findByName(UserRole::DelasModerator->value, UserRole::GUARD)->getKey();
+
+    livewire(EditUser::class, ['record' => $other->getKey()])
+        ->fillForm(['roles' => [$lead]])
+        ->fillForm(['roles' => [$lead, $moderator]])
+        ->assertSchemaStateSet(['roles' => [$moderator]]);
+});
+
+test('marcar líder desmarca moderadora da He4rt Delas', function (): void {
+    $other = User::factory()->create();
+    $lead = (string) Role::findByName(UserRole::DelasLead->value, UserRole::GUARD)->getKey();
+    $moderator = (string) Role::findByName(UserRole::DelasModerator->value, UserRole::GUARD)->getKey();
+
+    livewire(EditUser::class, ['record' => $other->getKey()])
+        ->fillForm(['roles' => [$moderator]])
+        ->fillForm(['roles' => [$moderator, $lead]])
+        ->assertSchemaStateSet(['roles' => [$lead]]);
+});
+
+test('salvar com líder e moderadora mantém só a líder', function (): void {
+    $other = User::factory()->create();
+    $roleIds = Role::query()
+        ->whereIn('name', [UserRole::DelasModerator->value, UserRole::DelasLead->value])
+        ->pluck('id')
+        ->all();
+
+    livewire(EditUser::class, ['record' => $other->getKey()])
+        ->set('data.roles', $roleIds)
+        ->call('save')
+        ->assertHasNoFormErrors();
+
+    expect($other->fresh()->hasRole(UserRole::DelasLead))->toBeTrue()
+        ->and($other->fresh()->hasRole(UserRole::DelasModerator))->toBeFalse();
 });

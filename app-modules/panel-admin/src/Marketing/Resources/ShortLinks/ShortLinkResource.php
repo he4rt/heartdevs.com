@@ -11,6 +11,7 @@ use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
 use He4rt\Marketing\ShortLink\Models\ShortLink;
+use He4rt\PanelAdmin\Concerns\SuperAdminOnly;
 use He4rt\PanelAdmin\Marketing\MarketingCluster;
 use He4rt\PanelAdmin\Marketing\Resources\ShortLinks\Pages\CreateShortLink;
 use He4rt\PanelAdmin\Marketing\Resources\ShortLinks\Pages\EditShortLink;
@@ -24,6 +25,8 @@ use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 class ShortLinkResource extends Resource
 {
+    use SuperAdminOnly;
+
     protected static ?string $model = ShortLink::class;
 
     protected static ?string $cluster = MarketingCluster::class;

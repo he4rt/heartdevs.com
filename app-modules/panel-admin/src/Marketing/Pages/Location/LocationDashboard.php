@@ -8,6 +8,7 @@ use BackedEnum;
 use Filament\Pages\Page;
 use Filament\Support\Enums\Width;
 use Filament\Support\Icons\Heroicon;
+use He4rt\PanelAdmin\Concerns\SuperAdminOnly;
 use He4rt\PanelAdmin\Marketing\MarketingCluster;
 use He4rt\PanelAdmin\Marketing\Widgets\LocationMapWidget;
 use He4rt\PanelAdmin\Marketing\Widgets\LocationStatsWidget;
@@ -15,6 +16,8 @@ use He4rt\PanelAdmin\Marketing\Widgets\TopStatesWidget;
 
 class LocationDashboard extends Page
 {
+    use SuperAdminOnly;
+
     protected static ?string $cluster = MarketingCluster::class;
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedMapPin;
