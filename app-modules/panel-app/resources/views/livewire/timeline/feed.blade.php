@@ -7,7 +7,14 @@
                 @if ($item->postable_type === 'moderation_event')
                     <x-panel-app::timeline.moderation-event :timeline="$item" />
                 @else
-                    <livewire:timeline-post-show :timeline-id="$item->id" :key="'post-' . $item->id" />
+                    @php($summary = $reactionSummaries->get($item->id))
+                    <livewire:timeline-post-show
+                        :timeline-id="$item->id"
+                        :reaction-counts="$summary?->counts ?? []"
+                        :reaction-mine="$summary?->mine?->value"
+                        :reactions-provided="true"
+                        :key="'post-' . $item->id"
+                    />
                 @endif
             </div>
         @empty

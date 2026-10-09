@@ -9,12 +9,18 @@
         <x-panel-app::timeline.post-entry :content="$timeline->postable" />
     @endif
 
-    <x-panel-app::timeline.engagement :timeline="$timeline" :is-owner="auth()->id() === $timeline->user_id" />
+    <x-panel-app::timeline.engagement
+        :timeline="$timeline"
+        :is-owner="auth()->id() === $timeline->user_id"
+        :reaction-counts="$rootReactionCounts"
+        :reaction-mine="$rootReactionMine"
+    />
 
     @if ($showReplies && $timeline->children_count > 0)
         <div class="space-y-3 border-t border-gray-200 px-3 py-3 sm:px-4 dark:border-white/10">
             @foreach ($timeline->children->take(3) as $reply)
                 @continue (!$reply->postable || !$reply->user)
+                @php($replySummary = $reactionSummaries->get($reply->id))
                 <div class="flex gap-3">
                     @php($replyAvatarUrl = $reply->user->getFirstMediaUrl('avatar') ?: null)
                     @if ($replyAvatarUrl)
@@ -46,6 +52,14 @@
                                     ->markdown()
                                     ->sanitizeHtml()
                             !!}
+                        </div>
+                        <div class="mt-2">
+                            <livewire:timeline-reactions
+                                :timeline-id="$reply->id"
+                                :counts="$replySummary?->counts ?? []"
+                                :mine="$replySummary?->mine?->value"
+                                :key="'rx-'.$reply->id"
+                            />
                         </div>
                     </div>
                 </div>
