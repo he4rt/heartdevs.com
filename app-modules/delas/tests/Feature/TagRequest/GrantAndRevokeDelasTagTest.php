@@ -167,19 +167,6 @@ test('remover a tag e bloquear acontecem juntos, com o mesmo motivo', function (
         ->toEqualCanonicalizing([DelasAction::Revoked, DelasAction::Blocked]);
 });
 
-test('se não der para bloquear, a tag também não é removida', function (): void {
-    $lead = User::factory()->delasLead()->create();
-    // Super admin passa no `moderate-delas` pelo Gate::before, então nunca pode ser bloqueado.
-    $superAdminWithTag = User::factory()->superAdmin()->create();
-    $approved = DelasTagRequest::factory()->for($superAdminWithTag)->approved()->create();
-
-    expect(fn () => $this->revoke->handle($superAdminWithTag, $lead, 'Motivo.', alsoBlock: true))
-        ->toThrow(DelasException::class, __('delas::exceptions.cannot_block_team'));
-
-    expect($approved->fresh()->status)->toBe(DelasRequestStatus::Approved);
-    expect(DelasTransition::query()->count())->toBe(0);
-});
-
 test('quem já está bloqueada só perde a tag, sem segundo bloqueio', function (): void {
     $lead = User::factory()->delasLead()->create();
     $approved = DelasTagRequest::factory()->approved()->create();
@@ -202,7 +189,7 @@ test('não remove a tag de quem é da equipe', function (string $role): void {
         ->toThrow(DelasException::class, __('delas::exceptions.team_member_keeps_tag'));
 
     expect($approved->fresh()->status)->toBe(DelasRequestStatus::Approved);
-})->with(['moderadora' => 'delasModerator', 'líder' => 'delasLead']);
+})->with(['moderadora' => 'delasModerator', 'líder' => 'delasLead', 'super admin' => 'superAdmin']);
 
 test('depois de sair da moderação, a pessoa pode perder a tag', function (): void {
     $lead = User::factory()->delasLead()->create();

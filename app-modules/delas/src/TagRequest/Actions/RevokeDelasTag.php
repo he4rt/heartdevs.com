@@ -13,7 +13,6 @@ use He4rt\Delas\TagRequest\Enums\DelasRequestStatus;
 use He4rt\Delas\TagRequest\Events\DelasTagRevoked;
 use He4rt\Delas\TagRequest\Models\DelasTagRequest;
 use He4rt\Delas\TagRequest\Queries\DelasEligibility;
-use He4rt\Identity\Authorization\Enums\UserRole;
 use He4rt\Identity\User\Models\User;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Support\Facades\DB;
@@ -23,9 +22,10 @@ use Illuminate\Support\Facades\Gate;
  * Uma líder ou super admin remove a tag. O registro não é apagado: muda para
  * `revoked` e abre a espera para um novo pedido.
  *
- * Quem é da equipe (moderadora ou líder) não perde a tag por aqui: moderadora
- * precisa ter a tag (`AddDelasModerator`), então primeiro a pessoa sai da
- * equipe e só depois pode perder a tag. Assim ninguém modera sem ter a tag.
+ * Quem é da equipe (moderadora, líder ou super admin) não perde a tag por
+ * aqui: moderadora precisa ter a tag (`AddDelasModerator`), então primeiro a
+ * pessoa sai da equipe e só depois pode perder a tag. Assim ninguém modera sem
+ * ter a tag, e o "também bloquear" nunca tenta bloquear quem modera.
  *
  * Com `$alsoBlock`, a pessoa também é bloqueada de pedir de novo, com o mesmo
  * motivo e na mesma transação: ou as duas coisas acontecem, ou nenhuma.
@@ -46,10 +46,8 @@ final readonly class RevokeDelasTag
         Gate::forUser($actor)->authorize('lead-delas');
 
         throw_if($target->is($actor), DelasException::cannotDecideOwn());
-        throw_if(
-            $target->hasAnyRole([UserRole::DelasModerator, UserRole::DelasLead]),
-            DelasException::teamMemberKeepsTag(),
-        );
+        // Equipe é quem passa no `moderate-delas`: moderadora, líder ou super admin.
+        throw_if(Gate::forUser($target)->allows('moderate-delas'), DelasException::teamMemberKeepsTag());
 
         $reason = Reason::required($reason);
 

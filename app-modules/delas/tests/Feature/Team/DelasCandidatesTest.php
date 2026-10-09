@@ -120,11 +120,12 @@ test('remover: quem é da equipe não aparece, mesmo com a tag', function (): vo
     $member = DelasTagRequest::factory()->approved()->create(['decided_by' => $this->lead->getKey()])->user;
     $moderator = User::factory()->delasModerator()->create();
     $otherLead = User::factory()->delasLead()->create();
-    foreach ([$moderator, $otherLead] as $teamMember) {
+    $superAdmin = User::factory()->superAdmin()->create();
+    foreach ([$moderator, $otherLead, $superAdmin] as $teamMember) {
         DelasTagRequest::factory()->for($teamMember)->approved()->create(['decided_by' => $this->lead->getKey()]);
     }
 
     $ids = $this->candidates->forRevoke($this->lead)->pluck('id')->all();
 
-    expect($ids)->toContain($member->id)->not->toContain($moderator->id, $otherLead->id);
+    expect($ids)->toContain($member->id)->not->toContain($moderator->id, $otherLead->id, $superAdmin->id);
 });
