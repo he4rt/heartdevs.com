@@ -20,7 +20,13 @@ final class PersistOAuthConnection
             'external_account_id' => $connection->providerId,
         ]);
 
+        if (!$identity->exists) {
+            $identity = $this->unclaimedIdentity($connection) ?? $identity;
+        }
+
         $identity->forceFill([
+            'model_type' => $owner->getMorphClass(),
+            'model_id' => $owner->getKey(),
             'type' => $connection->provider->getType(),
             'credentials_type' => CredentialsType::OAuth2,
             'credentials' => $connection->credentials,
@@ -33,5 +39,14 @@ final class PersistOAuthConnection
         event(new ExternalIdentityConnected($identity));
 
         return $identity;
+    }
+
+    private function unclaimedIdentity(OAuthConnectionDTO $connection): ?ExternalIdentity
+    {
+        return ExternalIdentity::query()
+            ->whereNull('model_id')
+            ->where('provider', $connection->provider)
+            ->where('external_account_id', $connection->providerId)
+            ->first();
     }
 }

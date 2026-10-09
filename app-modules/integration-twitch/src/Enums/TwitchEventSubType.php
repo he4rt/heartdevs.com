@@ -41,6 +41,9 @@ enum TwitchEventSubType: string
     case ChannelShoutoutReceive = 'channel.shoutout.receive';
     case ChannelAdBreakBegin = 'channel.ad_break.begin';
     case ChannelChatMessage = 'channel.chat.message';
+    case ChannelChatMessageDelete = 'channel.chat.message_delete';
+    case ChannelChatClear = 'channel.chat.clear';
+    case ChannelChatClearUserMessages = 'channel.chat.clear_user_messages';
 
     public function getVersion(): string
     {
@@ -67,7 +70,10 @@ enum TwitchEventSubType: string
                 'broadcaster_user_id' => $broadcasterId,
                 'moderator_user_id' => $moderatorOrUserId ?? $broadcasterId,
             ],
-            self::ChannelChatMessage => [
+            self::ChannelChatMessage,
+            self::ChannelChatMessageDelete,
+            self::ChannelChatClear,
+            self::ChannelChatClearUserMessages => [
                 'broadcaster_user_id' => $broadcasterId,
                 'user_id' => $moderatorOrUserId ?? $broadcasterId,
             ],

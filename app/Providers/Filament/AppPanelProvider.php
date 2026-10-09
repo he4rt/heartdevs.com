@@ -6,6 +6,7 @@ namespace App\Providers\Filament;
 
 use App\Enums\FilamentPanel;
 use App\Http\Middleware\SetApplicationLocale;
+use Filament\Actions\Action;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
@@ -13,6 +14,12 @@ use Filament\Http\Middleware\DispatchServingFilamentEvent;
 use Filament\Panel;
 use Filament\PanelProvider;
 use Filament\Support\Colors\Color;
+use He4rt\PanelApp\Clusters\Streaming\Pages\StreamChatPage;
+use He4rt\PanelApp\Clusters\Streaming\Pages\StreamDashboardPage;
+use He4rt\PanelApp\Clusters\Streaming\Pages\StreamOverlaysPage;
+use He4rt\PanelApp\Clusters\Streaming\Pages\StreamSessionPage;
+use He4rt\PanelApp\Clusters\Streaming\Pages\StreamSessionsPage;
+use He4rt\PanelApp\Clusters\Streaming\StreamingCluster;
 use He4rt\PanelApp\Pages\EventPage;
 use He4rt\PanelApp\Pages\EventsPage;
 use He4rt\PanelApp\Pages\LoginPage;
@@ -54,6 +61,18 @@ class AppPanelProvider extends PanelProvider
                 EventPage::class,
                 ThreadPage::class,
                 ProfilePage::class,
+                StreamingCluster::class,
+                StreamDashboardPage::class,
+                StreamOverlaysPage::class,
+                StreamChatPage::class,
+                StreamSessionsPage::class,
+                StreamSessionPage::class,
+            ])
+            ->userMenuItems([
+                'profile' => fn (Action $action): Action => $action
+                    ->label(__('app.user_menu.my_profile'))
+                    ->url(ProfilePage::getUrl())
+                    ->icon(icon: null),
             ])
             ->middleware([
                 EncryptCookies::class,

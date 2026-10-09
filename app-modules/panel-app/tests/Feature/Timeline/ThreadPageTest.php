@@ -5,6 +5,9 @@ declare(strict_types=1);
 use Filament\Facades\Filament;
 use He4rt\Activity\Timeline\Delegated\PostEntry;
 use He4rt\Activity\Timeline\Timeline;
+use He4rt\Identity\ExternalIdentity\Enums\IdentityProvider;
+use He4rt\Identity\ExternalIdentity\Models\ExternalIdentity;
+use He4rt\Identity\User\Enums\ProfileImage;
 use He4rt\Identity\User\Models\User;
 use He4rt\PanelApp\Livewire\Timeline\PostShow;
 use He4rt\PanelApp\Livewire\Timeline\ReplyComposer;
@@ -94,7 +97,28 @@ test('thread replies shows the author avatar when one exists', function (): void
     ]);
 
     livewire(ThreadReplies::class, ['timelineId' => $this->rootPost->id])
-        ->assertSee($replier->getFirstMediaUrl('avatar'), escape: false);
+        ->assertSee($replier->imageUrl(ProfileImage::Avatar), escape: false);
+});
+
+test('thread replies shows the linked github avatar when no avatar was uploaded', function (): void {
+    $replier = User::factory()->create();
+    ExternalIdentity::factory()->create([
+        'model_type' => $replier->getMorphClass(),
+        'model_id' => $replier->id,
+        'provider' => IdentityProvider::GitHub,
+        'metadata' => ['username' => 'octocat'],
+    ]);
+
+    $entry = PostEntry::factory()->create(['content' => 'Reply with github avatar']);
+    Timeline::factory()->for($replier)->create([
+        'postable_type' => (new PostEntry)->getMorphClass(),
+        'postable_id' => $entry->id,
+        'root_id' => $this->rootPost->id,
+        'parent_id' => $this->rootPost->id,
+    ]);
+
+    livewire(ThreadReplies::class, ['timelineId' => $this->rootPost->id])
+        ->assertSee('https://github.com/octocat.png', escape: false);
 });
 
 test('post renders without crashing when its author was deleted', function (): void {

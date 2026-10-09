@@ -98,6 +98,8 @@ Sem gap de domínio — é serialização pura em cima do que já existe. O corp
 
 **Fora do v1, decisão explícita**: reações (`withCount('reactions')` aparece no `Feed.php`) — o PRD não menciona reagir como escopo v1 do app; incluir a contagem na resposta é grátis, mas o endpoint de reagir fica pra depois se a issue não abrir esse escopo.
 
+**Status: implementado** (`He4rt\Activity\Timeline\Http\Controllers\Mobile\MobileTimelineController` + `Http\Resources\TimelinePostResource`). Upload de imagens aceito via multipart (`images[]`), armazenado no mesmo diretório `timeline-uploads` que o Composer do painel usa. Rotas em `app-modules/activity/routes/api-mobile-routes.php`.
+
 ---
 
 ## Feature 2 — Eventos
@@ -137,6 +139,8 @@ Domínio: `He4rt\Profile\*`.
 | GET    | `/api/mobile/profile` | `Profile::ensureExists(auth()->id())` — mesmo padrão usado hoje |
 
 v1 é só leitura (o PRD explicitamente escopa "visualização do próprio perfil" — editar fica de fora). Um `ProfileResource` serializa os campos públicos do model (nickname, headline, seniority, social_links, etc.) — sem gap de domínio, `UpsertProfile`/`SyncProfileSkills` já existem se a edição entrar em escopo depois.
+
+**Status: implementado** (`He4rt\Profile\Http\Controllers\Mobile\MobileProfileController` + `Http\Resources\ProfileResource`, também inclui `profileSkills.skill` e `workExperiences`). Rota registrada em `app-modules/profile/routes/api-mobile-routes.php`.
 
 ---
 

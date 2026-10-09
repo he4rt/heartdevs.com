@@ -52,6 +52,10 @@ return [
         'eventsub_secret' => env('TWITCH_EVENTSUB_SECRET'),
         'eventsub_callback' => env('TWITCH_EVENTSUB_CALLBACK', ''),
         'broadcaster_login' => env('TWITCH_BROADCASTER_LOGIN', ''),
+        'bot' => [
+            'user_id' => env('TWITCH_BOT_USER_ID'),
+            'refresh_token' => env('TWITCH_BOT_REFRESH_TOKEN'),
+        ],
     ],
 
     'devto' => [

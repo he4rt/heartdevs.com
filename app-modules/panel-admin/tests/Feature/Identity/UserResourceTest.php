@@ -12,6 +12,11 @@ use He4rt\PanelAdmin\Filament\Resources\Users\Pages\EditUser;
 use He4rt\PanelAdmin\Filament\Resources\Users\Pages\ListUsers;
 use He4rt\PanelAdmin\Filament\Resources\Users\RelationManagers\ProvidersRelationManager;
 use He4rt\PanelAdmin\Filament\Resources\Users\UserResource;
+use He4rt\Streaming\Enums\StreamerStatus;
+use He4rt\Streaming\Streamer\Events\StreamerActivated;
+use He4rt\Streaming\Streamer\Events\StreamerDisabled;
+use He4rt\Streaming\Streamer\Models\Streamer;
+use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Str;
 use Spatie\Permission\Models\Role;
 
@@ -145,6 +150,78 @@ test('salvar o form concede super admin a outro usuário', function (): void {
     expect($other->fresh()?->hasRole(UserRole::SuperAdmin))->toBeTrue();
 });
 
+test('salvar o form concede a role streamer a outro usuário', function (): void {
+    $other = User::factory()->create();
+    $role = Role::findByName(UserRole::Streamer->value, UserRole::GUARD);
+
+    livewire(EditUser::class, ['record' => $other->getKey()])
+        ->fillForm(['roles' => [$role->getKey()]])
+        ->call('save')
+        ->assertHasNoFormErrors();
+
+    expect($other->fresh()?->hasRole(UserRole::Streamer))->toBeTrue();
+});
+
+test('tirar a role streamer pelo form desativa o streamer sem apagar nada', function (): void {
+    Event::fake([StreamerDisabled::class, StreamerActivated::class]);
+    $streamer = Streamer::factory()->create();
+
+    livewire(EditUser::class, ['record' => $streamer->user_id])
+        ->fillForm(['roles' => []])
+        ->call('save')
+        ->assertHasNoFormErrors();
+
+    expect($streamer->refresh()->status)->toBe(StreamerStatus::Disabled)
+        ->and($streamer->trashed())->toBeFalse();
+    Event::assertDispatchedTimes(StreamerDisabled::class, 1);
+    Event::assertNotDispatched(StreamerActivated::class);
+});
+
+test('devolver a role streamer pelo form reativa o streamer com o mesmo token', function (): void {
+    Event::fake([StreamerDisabled::class, StreamerActivated::class]);
+    $streamer = Streamer::factory()->disabled()->create();
+    $streamer->user->removeRole(UserRole::Streamer);
+
+    $token = $streamer->overlay_token;
+    $role = Role::findByName(UserRole::Streamer->value, UserRole::GUARD);
+
+    livewire(EditUser::class, ['record' => $streamer->user_id])
+        ->fillForm(['roles' => [$role->getKey()]])
+        ->call('save')
+        ->assertHasNoFormErrors();
+
+    expect($streamer->refresh()->status)->toBe(StreamerStatus::Active)
+        ->and($streamer->overlay_token)->toBe($token);
+    Event::assertDispatchedTimes(StreamerActivated::class, 1);
+});
+
+test('salvar o form com as mesmas roles não mexe no streamer', function (): void {
+    Event::fake([StreamerDisabled::class, StreamerActivated::class]);
+    $streamer = Streamer::factory()->create();
+    $role = Role::findByName(UserRole::Streamer->value, UserRole::GUARD);
+
+    livewire(EditUser::class, ['record' => $streamer->user_id])
+        ->fillForm(['roles' => [$role->getKey()]])
+        ->call('save')
+        ->assertHasNoFormErrors();
+
+    expect($streamer->refresh()->status)->toBe(StreamerStatus::Active);
+    Event::assertNotDispatched(StreamerDisabled::class);
+    Event::assertNotDispatched(StreamerActivated::class);
+});
+
+test('a listagem e o form de edição renderizam a role streamer', function (): void {
+    $streamer = User::factory()->streamer()->create();
+
+    livewire(ListUsers::class)
+        ->loadTable()
+        ->assertCanSeeTableRecords([$streamer])
+        ->assertSee(UserRole::Streamer->getLabel());
+
+    livewire(EditUser::class, ['record' => $streamer->getKey()])
+        ->assertSee(UserRole::Streamer->getDescription());
+});
+
 test('salvar o form sem papéis revoga super admin de outro usuário', function (): void {
     $other = User::factory()->superAdmin()->create();
 
@@ -156,14 +233,51 @@ test('salvar o form sem papéis revoga super admin de outro usuário', function 
     expect($other->fresh()?->hasRole(UserRole::SuperAdmin))->toBeFalse();
 });
 
-test('o admin não altera os próprios papéis', function (): void {
+test('o admin concede a si mesmo a role streamer sem perder o super admin', function (): void {
+    $superAdmin = Role::findByName(UserRole::SuperAdmin->value, UserRole::GUARD);
+    $streamer = Role::findByName(UserRole::Streamer->value, UserRole::GUARD);
+
     livewire(EditUser::class, ['record' => $this->admin->getKey()])
-        ->assertSchemaComponentExists('roles', checkComponentUsing: fn (CheckboxList $field): bool => $field->isDisabled())
+        ->fillForm(['roles' => [$superAdmin->getKey(), $streamer->getKey()]])
+        ->call('save')
+        ->assertHasNoFormErrors();
+
+    expect($this->admin->fresh())
+        ->hasRole(UserRole::SuperAdmin)->toBeTrue()
+        ->hasRole(UserRole::Streamer)->toBeTrue();
+});
+
+test('o admin não remove o próprio super admin', function (): void {
+    $superAdmin = Role::findByName(UserRole::SuperAdmin->value, UserRole::GUARD);
+
+    livewire(EditUser::class, ['record' => $this->admin->getKey()])
+        ->assertSchemaComponentExists('roles', checkComponentUsing: fn (CheckboxList $field): bool => $field->isOptionDisabled((string) $superAdmin->getKey(), $superAdmin->name))
         ->fillForm(['roles' => []])
         ->call('save')
         ->assertHasNoFormErrors();
 
     expect($this->admin->fresh()?->hasRole(UserRole::SuperAdmin))->toBeTrue();
+});
+
+test('quem não é super admin não se promove pelo próprio form', function (): void {
+    $member = User::factory()->create();
+    $superAdmin = Role::findByName(UserRole::SuperAdmin->value, UserRole::GUARD);
+
+    $this->actingAs($member);
+
+    livewire(EditUser::class, ['record' => $member->getKey()])
+        ->fillForm(['roles' => [$superAdmin->getKey()]])
+        ->call('save');
+
+    expect($member->fresh()?->hasRole(UserRole::SuperAdmin))->toBeFalse();
+});
+
+test('a opção de super admin fica livre ao editar outro usuário', function (): void {
+    $other = User::factory()->create();
+    $superAdmin = Role::findByName(UserRole::SuperAdmin->value, UserRole::GUARD);
+
+    livewire(EditUser::class, ['record' => $other->getKey()])
+        ->assertSchemaComponentExists('roles', checkComponentUsing: fn (CheckboxList $field): bool => !$field->isOptionDisabled((string) $superAdmin->getKey(), $superAdmin->name));
 });
 
 test('a coluna de papéis existe na tabela', function (): void {

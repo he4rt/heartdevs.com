@@ -1,0 +1,173 @@
+# Streaming
+
+Este módulo guarda o que acontece nas lives dos streamers da comunidade: o streamer, as fontes
+(as contas de plataforma ligadas à overlay), as sessões de live, os eventos de stream e as
+configurações das cenas do OBS. O chat da live vai para `activity.messages`.
+
+- O vocabulário e as fronteiras estão no [CONTEXT](CONTEXT.md).
+- As decisões e as alternativas descartadas estão na
+  [ADR-0001](docs/adr/0001-modelo-de-dados-do-streaming.md).
+- A ordem da implementação está no [plano](docs/plans/2026-10-04-backend-do-streaming.md).
+
+## Como um evento chega na overlay
+
+```text
+  [Twitch]            [integration-twitch]             [streaming]               [OBS]
+     │                        │                             │                       │
+  channel.follow ───► webhook assinado ─────► ProjectTwitchEventToStreaming ──►     │
+  {user_login}        twitch_event_logs        RecordStreamEvent                    │
+                      TwitchEventReceived      ✓ fonte ligada                       │
+                                               ✓ alerta ligado                      │
+                                               stream_events ── AlertTriggered ──► Reverb
+                                                                 (alert.triggered)  │
+                                                                 canal privado ───► Echo
+```
+
+### Moderação do chat
+
+Mensagem apagada, ban, timeout e `/clear` na Twitch também tiram o chat da overlay:
+
+| Evento da Twitch                   | Ação no `streaming`                                         | Broadcast                            |
+| ---------------------------------- | ----------------------------------------------------------- | ------------------------------------ |
+| `channel.chat.message_delete`      | `DeleteChatMessage` marca `deleted_at` na mensagem          | `chat.message-deleted` `{msgId}`     |
+| `channel.chat.clear_user_messages` | `ClearChatterMessages` marca as mensagens do chatter (24 h) | `chat.chatter-cleared` `{chatterId}` |
+| `channel.chat.clear`               | `ClearChat` grava `streamers.chat_cleared_at`               | `chat.cleared`                       |
+
+Pelo painel (Minha Live › Chat), o streamer também age só na overlay, sem mexer na Twitch:
+
+| No painel              | Ação no `streaming`                                         | Broadcast              |
+| ---------------------- | ----------------------------------------------------------- | ---------------------- |
+| Ocultar na overlay     | `HideChatMessageFromOverlay` marca `hidden_at` na mensagem  | `chat.message-deleted` |
+| Silenciar na overlay   | `MuteChatterOnOverlay` guarda o chatter em `muted_chatters` | `chat.chatter-cleared` |
+| Limpar chat da overlay | `ClearChat`, o mesmo do `/clear`                            | `chat.cleared`         |
+
+O chat recente da overlay ignora o que veio antes de `chat_cleared_at`, as mensagens ocultas e as
+dos chatters silenciados. A mensagem nova de um silenciado vai para a atividade, mas não para a
+overlay.
+
+Uma fonte criada antes de uma inscrição nova ganha essa inscrição com
+`php artisan twitch:sync-streamer-subscriptions` ou com **Reparar inscrições** no Painel.
+
+## Saúde da integração
+
+O Painel mostra uma verificação por item. Cada uma mora no módulo dono do dado e devolve o mesmo
+`HealthCheck` (`src/Health`):
+
+| Verificação         | Módulo               | Fonte do dado                                             |
+| ------------------- | -------------------- | --------------------------------------------------------- |
+| Conta da Twitch     | `integration-twitch` | `/validate`, com renovação do token no 401 (10 min)       |
+| Endereço do webhook | `integration-twitch` | `services.twitch.eventsub_callback`                       |
+| Inscrições          | `integration-twitch` | `twitch_subscriptions` (pendente vira problema em 10 min) |
+| Último evento       | `integration-twitch` | `twitch_event_logs` (alerta só ao vivo, após 15 min)      |
+| Overlays conectadas | `streaming`          | `subscription_count` do canal privado no Reverb           |
+
+A seção carrega depois da página (`wire:init`), porque a Twitch pode demorar. O selo vermelho no
+menu usa só as verificações que leem o banco (endereço e inscrições), para não chamar a Twitch a
+cada página. A revogação também aparece ali, porque a Twitch avisa pelo webhook.
+
+## Rodar a overlay localmente
+
+### 1. Reverb
+
+A overlay recebe alertas e chat pelo Reverb. No `.env`:
+
+```dotenv
+BROADCAST_CONNECTION=reverb
+REVERB_APP_ID=he4rt-local
+REVERB_APP_KEY=he4rt-local-key
+REVERB_APP_SECRET=he4rt-local-secret
+REVERB_HOST=localhost
+REVERB_PORT=8080
+REVERB_SCHEME=http
+```
+
+Depois, suba o servidor. Com o lerd, ligue o worker `reverb`. Sem o lerd:
+
+```bash
+php artisan reverb:start --debug
+```
+
+Com `--debug`, o terminal mostra cada broadcast, o que ajuda a conferir o nome do canal e o
+payload.
+
+### 2. Streamer e fonte
+
+1. Dê a role `streamer` ao seu usuário pelo painel admin.
+2. Abra **Minha Live › Painel**. O primeiro acesso cria o streamer.
+3. Conecte a Twitch pelo botão **Conectar Twitch**. A conexão vira a fonte principal, no card da
+   conta à direita do Painel.
+4. Em **Minha Live › Overlays**, copie o link de uma cena e abra no navegador ou no OBS
+   (fonte do tipo Navegador, 1920 × 1080).
+
+O menu **Testar alerta**, no topo de **Minha Live › Overlays**, manda um alerta de exemplo para a
+overlay, sem passar pela Twitch e sem gravar nada. Durante a live, ele pede confirmação.
+
+### 3. Eventos com o twitch-cli
+
+O [Twitch CLI](https://dev.twitch.tv/docs/cli/) manda webhooks assinados para a aplicação. Use o
+seu id da Twitch em `-t`, para o evento cair na sua fonte:
+
+```bash
+twitch event trigger channel.follow \
+  -F "$APP_URL/api/webhooks/twitch/eventsub" \
+  -s "$TWITCH_EVENTSUB_SECRET" \
+  -t <seu id da Twitch>
+```
+
+| Evento                         | O que acontece no streaming                      |
+| ------------------------------ | ------------------------------------------------ |
+| `stream.online`                | abre a sessão, com título e categoria da Helix   |
+| `channel.update`               | atualiza o título e a categoria da sessão aberta |
+| `stream.offline`               | fecha a sessão                                   |
+| `channel.follow`               | grava o evento e manda `alert.triggered`         |
+| `channel.subscribe`            | grava o sub; o sub de presente é descartado      |
+| `channel.subscription.message` | grava o sub com os meses e a mensagem            |
+| `channel.subscription.gift`    | grava um gift com o total de subs                |
+| `channel.cheer`                | grava os bits                                    |
+| `channel.raid`                 | grava o raid com o número de viewers             |
+
+O ETL e o broadcast rodam dentro do request do webhook, sem fila: o alerta chega na overlay assim
+que a Twitch entrega o evento. Uma falha no ETL vai para o log de erros, e a Twitch recebe 204
+mesmo assim. A sincronização das inscrições continua na fila.
+
+O twitch-cli não manda `channel.chat.message`. Para testar o chat, escolha um leitor na lista de
+fontes e escreva no chat de um canal real conectado.
+
+### 4. Conta bot
+
+O leitor "Lido pela he4rtdevs" só aparece com a conta bot configurada:
+
+```dotenv
+TWITCH_BOT_USER_ID=
+TWITCH_BOT_REFRESH_TOKEN=
+```
+
+A conta bot precisa autorizar o app uma vez com `user:read:chat user:bot`.
+
+## Lives
+
+Cada sessão de live (`stream_sessions`) junta as somas de follows, subs (com os presenteados),
+bits, raids, mensagens e chatters. As somas saem de subselects em `StreamSessionTotals`:
+
+| Número               | Fonte                                                                   |
+| -------------------- | ----------------------------------------------------------------------- |
+| Follows, subs, bits… | `stream_events` com o `stream_session_id` da sessão                     |
+| Mensagens, chatters  | `activity.messages` do canal da sessão, entre `started_at` e `ended_at` |
+
+O Painel mostra o card "Ao vivo" quando há uma sessão aberta. Fora da live, o mesmo lugar mostra a
+última live encerrada, com a comparação. Em "Minha Live › Lives" fica o histórico, e cada linha abre
+o detalhe com a linha do tempo, quem mais falou e a comparação com a última live com dados.
+`StreamSessionHistory` acha a live aberta, a última encerrada, as vizinhas e a base da comparação.
+
+## Limites conhecidos
+
+- O painel do usuário vive em `/app`, o mesmo prefixo do WebSocket do Reverb (`/app/{key}`). Se o
+  Reverb ficar no mesmo host do painel, o proxy precisa mandar só o upgrade de WebSocket para o
+  Reverb. A outra saída é servir o Reverb num host próprio.
+- A sincronização das inscrições EventSub precisa de um callback HTTPS público. Localmente, use o
+  twitch-cli.
+- A comparação de uma live aberta usa a live anterior inteira. No meio da live, as setas tendem a
+  apontar para baixo.
+- XP da live, doações, "tocando agora" e sala de voz ficam fora deste módulo por enquanto. Essas
+  partes da overlay ficam no estado vazio. Para ver a cena completa com dados de exemplo, abra a
+  URL com `?demo`.

@@ -83,7 +83,7 @@ final readonly class ProjectGithubEvent
                 'additions' => $this->intFrom($pr, 'additions') ?? 0,
                 'deletions' => $this->intFrom($pr, 'deletions') ?? 0,
                 'changed_files' => $this->intFrom($pr, 'changed_files') ?? 0,
-                'is_bot' => $this->isBot($login),
+                'is_bot' => $this->isBot($login, $this->stringFrom($pr, 'user.type')),
             ],
         ), emit: true);
     }
@@ -113,7 +113,7 @@ final readonly class ProjectGithubEvent
             targetRef: ContributionType::Pr->ref($this->stringFrom($payload, 'pull_request.number')),
             metadata: [
                 'state' => data_get($review, 'state'),
-                'is_bot' => $this->isBot($login),
+                'is_bot' => $this->isBot($login, $this->stringFrom($review, 'user.type')),
             ],
         ), emit: true);
     }
@@ -138,7 +138,7 @@ final readonly class ProjectGithubEvent
                 'title' => data_get($issue, 'title'),
                 'state' => data_get($issue, 'state'),
                 'url' => data_get($issue, 'html_url'),
-                'is_bot' => $this->isBot($login),
+                'is_bot' => $this->isBot($login, $this->stringFrom($issue, 'user.type')),
             ],
         ), emit: true);
     }
@@ -164,7 +164,7 @@ final readonly class ProjectGithubEvent
             metadata: [
                 'url' => data_get($comment, 'html_url'),
                 'kind' => $isPr ? 'pr' : 'issue',
-                'is_bot' => $this->isBot($login),
+                'is_bot' => $this->isBot($login, $this->stringFrom($comment, 'user.type')),
             ],
         ), emit: true);
     }
@@ -188,7 +188,7 @@ final readonly class ProjectGithubEvent
             metadata: [
                 'url' => data_get($comment, 'html_url'),
                 'kind' => 'pr',
-                'is_bot' => $this->isBot($login),
+                'is_bot' => $this->isBot($login, $this->stringFrom($comment, 'user.type')),
             ],
         ), emit: true);
     }
@@ -216,6 +216,7 @@ final readonly class ProjectGithubEvent
                 targetRef: null,
                 metadata: [
                     'url' => data_get($commit, 'url'),
+                    'author_linked' => $username !== '',
                     'is_bot' => $this->isBot($login),
                 ],
             ), emit: true);
@@ -258,8 +259,12 @@ final readonly class ProjectGithubEvent
         return $value;
     }
 
-    private function isBot(string $login): bool
+    /**
+     * Some GitHub Apps act under a plain login (`Copilot` on review comments), so the
+     * `[bot]` suffix alone misses them; the account type is the reliable signal.
+     */
+    private function isBot(string $login, string $accountType = ''): bool
     {
-        return Str::endsWith($login, '[bot]');
+        return $accountType === 'Bot' || Str::endsWith($login, '[bot]');
     }
 }

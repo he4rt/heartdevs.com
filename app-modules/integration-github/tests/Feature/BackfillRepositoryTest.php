@@ -243,6 +243,18 @@ it('marca is_bot para autores [bot]', function (): void {
     expect(GithubContribution::query()->where('external_ref', 'pr:7')->sole()->metadata['is_bot'])->toBeTrue();
 });
 
+it('marca is_bot para contas do tipo Bot sem o sufixo [bot]', function (): void {
+    mockGithub([
+        ListPullRequestReviewComments::class => MockResponse::make([
+            ['id' => 1_300, 'created_at' => '2026-06-03T11:00:00Z', 'html_url' => 'u', 'pull_request_url' => 'https://api.github.com/repos/he4rt/heartdevs.com/pulls/12', 'user' => ['login' => 'Copilot', 'id' => 175_728_472, 'type' => 'Bot']],
+        ]),
+    ]);
+
+    backfill($this->repo);
+
+    expect(GithubContribution::query()->where('external_ref', 'review_comment:1300')->sole()->metadata['is_bot'])->toBeTrue();
+});
+
 it('faz backfill das reviews de um PR com target_ref para o PR', function (): void {
     mockGithub([
         ListPullRequests::class => MockResponse::make([prPayload(1, 'maria', 42)]),
@@ -349,6 +361,8 @@ it('faz backfill de commits dedup por sha, com fallback de autor', function (): 
         ->and($linked->actor_login)->toBe('maria')
         ->and($linked->actor_id)->toBe(42)
         ->and($linked->occurred_at->toIso8601String())->toBe('2026-06-04T08:00:00+00:00')
+        ->and($linked->metadata['author_linked'])->toBeTrue()
         ->and($unlinked->actor_login)->toBe('Sem Conta')
-        ->and($unlinked->actor_id)->toBeNull();
+        ->and($unlinked->actor_id)->toBeNull()
+        ->and($unlinked->metadata['author_linked'])->toBeFalse();
 });

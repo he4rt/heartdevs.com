@@ -11,13 +11,13 @@ use He4rt\Community\Retrospective\Enums\PromotionStage;
 use He4rt\Portal\Retrospective\PromotionSection;
 use Illuminate\Support\Facades\Blade;
 
-function promoCard(string $id, PromotionStage $stage, ?string $reason = 'segurou o #ajuda'): PromotionCard
+function promoCard(string $id, PromotionStage $stage, ?string $reason = 'segurou o #ajuda', ?string $avatar = 'https://example.test/avatar.png'): PromotionCard
 {
     return new PromotionCard(
         userId: $id,
         name: 'Fulana '.$id,
         username: 'fulana'.$id,
-        avatar: 'https://example.test/'.$id.'.png',
+        avatar: $avatar,
         stage: $stage,
         reason: $reason,
         groups: [
@@ -106,4 +106,14 @@ it('o cartão separa as métricas por fonte e omite a frase quando não há moti
         ->and($comMotivo)->toContain('GitHub')
         ->and($comMotivo)->toContain('segurou o #ajuda')
         ->and($semMotivo)->not->toContain('promo-reason');
+});
+
+it('mostra as iniciais quando a pessoa não tem avatar', function (): void {
+    $card = promoCard('u1', PromotionStage::Spotlight, avatar: null);
+
+    $cardHtml = Blade::render('<x-portal::retro.promotion-card :card="$card" />', ['card' => $card]);
+    $tagHtml = Blade::render('@include("portal::retro.slides.he4rt.tag", ["cards" => $cards])', ['cards' => [$card]]);
+
+    expect($cardHtml)->toContain('retro-initials')->toContain('FU')->not->toContain('<img')
+        ->and($tagHtml)->toContain('retro-initials')->toContain('FU');
 });

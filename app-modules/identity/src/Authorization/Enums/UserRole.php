@@ -24,6 +24,7 @@ enum UserRole: string implements HasColor, HasDescription, HasIcon, HasLabel
     use StringifyEnum;
 
     case SuperAdmin = 'super-admin';
+    case Streamer = 'streamer';
 
     public const string GUARD = 'web';
 
@@ -31,6 +32,7 @@ enum UserRole: string implements HasColor, HasDescription, HasIcon, HasLabel
     {
         return match ($this) {
             self::SuperAdmin => 'Super admin',
+            self::Streamer => 'Streamer',
         };
     }
 
@@ -41,6 +43,7 @@ enum UserRole: string implements HasColor, HasDescription, HasIcon, HasLabel
     {
         return match ($this) {
             self::SuperAdmin => Color::Red,
+            self::Streamer => Color::Purple,
         };
     }
 
@@ -48,6 +51,7 @@ enum UserRole: string implements HasColor, HasDescription, HasIcon, HasLabel
     {
         return match ($this) {
             self::SuperAdmin => 'Acesso total ao painel admin. Passa por cima de qualquer verificação de permissão.',
+            self::Streamer => 'Conecta a Twitch com permissões de broadcaster para usar as ferramentas de live.',
         };
     }
 
@@ -55,6 +59,7 @@ enum UserRole: string implements HasColor, HasDescription, HasIcon, HasLabel
     {
         return match ($this) {
             self::SuperAdmin => Heroicon::OutlinedShieldCheck,
+            self::Streamer => Heroicon::OutlinedVideoCamera,
         };
     }
 }
