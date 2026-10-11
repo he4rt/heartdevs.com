@@ -828,13 +828,22 @@ final class DiscordSource implements CuratableSource, MeasuresPerson, Retrospect
         }
 
         return ExternalIdentity::query()
+            ->with('user')
             ->whereIn('id', array_unique($ids))
             ->get()
             ->mapWithKeys(function (ExternalIdentity $identity): array {
                 $metadata = $identity->metadata ?? [];
-                $username = is_string($metadata['username'] ?? null) ? $metadata['username'] : null;
+                $username = is_string($metadata['username'] ?? null)
+                    ? $metadata['username']
+                    : (is_string($metadata['user']['username'] ?? null) ? $metadata['user']['username'] : null);
 
-                return [$identity->id => $username ?? $identity->external_account_id ?? 'Anônimo'];
+                $fallback = $username
+                    ?? $identity->user?->username
+                    ?? $identity->user?->name
+                    ?? $identity->external_account_id
+                    ?? 'Anônimo';
+
+                return [$identity->id => $fallback];
             })
             ->all();
     }
