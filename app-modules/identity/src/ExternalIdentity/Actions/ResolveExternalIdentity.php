@@ -13,7 +13,7 @@ final class ResolveExternalIdentity
 {
     public function handle(ResolveUserProviderDTO $dto): ExternalIdentity
     {
-        return ExternalIdentity::query()->firstOrCreate(
+        $identity = ExternalIdentity::query()->firstOrCreate(
             [
                 'provider' => $dto->provider,
                 'external_account_id' => $dto->externalAccountId,
@@ -30,5 +30,13 @@ final class ResolveExternalIdentity
                 ]),
             ]
         );
+
+        if ($dto->username !== null && ($identity->metadata['username'] ?? null) !== $dto->username) {
+            $metadata = $identity->metadata ?? [];
+            $metadata['username'] = $dto->username;
+            $identity->update(['metadata' => $metadata]);
+        }
+
+        return $identity;
     }
 }
