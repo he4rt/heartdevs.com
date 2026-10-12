@@ -123,7 +123,7 @@ it('inclui dados estruturados JSON-LD na home quando existem eventos', function 
 
     get('/')
         ->assertOk()
-        ->assertSee('application/ld+json', escape: false)
+        ->assertSeeHtml('application/ld+json')
         ->assertSee('He4rt Meetup #42');
 });
 

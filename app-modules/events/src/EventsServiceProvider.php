@@ -9,8 +9,8 @@ use He4rt\Events\CheckIn\Listeners\GenerateQrTokenOnConfirmed;
 use He4rt\Events\CheckIn\Listeners\HandleBotCheckIn;
 use He4rt\Events\Console\Commands\ClosePendingEventsCommand;
 use He4rt\Events\Enrollment\Events\EnrollmentConfirmed;
-use He4rt\Events\Gallery\Models\Album;
 use He4rt\Events\Event\Models\Event;
+use He4rt\Events\Gallery\Models\Album;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Contracts\Container\BindingResolutionException;
 use Illuminate\Database\Eloquent\Relations\Relation;
@@ -31,7 +31,7 @@ class EventsServiceProvider extends ServiceProvider
             'events_album' => Album::class,
             'event' => Event::class,
         ]);
-        
+
         EventFacade::listen(EnrollmentConfirmed::class, GenerateQrTokenOnConfirmed::class);
         EventFacade::listen(CheckInRequested::class, HandleBotCheckIn::class);
 
