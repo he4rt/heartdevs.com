@@ -29,7 +29,16 @@ final readonly class WorldApiClient
     {
         return $this->get('/states', [
             'filters' => ['country_code' => $iso2],
-            'fields' => 'cities',
+        ]);
+    }
+
+    /**
+     * @return list<array<string, mixed>>
+     */
+    public function cities(int $stateId): array
+    {
+        return $this->get('/cities', [
+            'filters' => ['state_id' => $stateId],
         ]);
     }
 

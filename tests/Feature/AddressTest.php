@@ -9,8 +9,8 @@ it('user tem um endereço polimórfico', function (): void {
     $user = User::factory()->create();
 
     Address::factory()->forUser($user)->create([
-        'country' => 'BR',
-        'state' => 'SP',
+        'country' => 'BRA',
+        'state' => 'São Paulo',
         'city' => 'São Paulo',
     ]);
 
@@ -20,8 +20,8 @@ it('user tem um endereço polimórfico', function (): void {
         ->not->toBeNull()
         ->addressable_type->toBe('user')
         ->addressable_id->toBe($user->id)
-        ->country->toBe('BR')
-        ->state->toBe('SP');
+        ->country->toBe('BRA')
+        ->state->toBe('São Paulo');
 });
 
 it('user sem endereço retorna null', function (): void {
@@ -75,6 +75,6 @@ it('factory cria address válido para user', function (): void {
     expect($address)
         ->addressable_type->toBe('user')
         ->addressable_id->toBe($user->id)
-        ->country->toBe('BR')
-        ->state->toBe('SP');
+        ->country->toBe('BRA')
+        ->state->toBe('São Paulo');
 });

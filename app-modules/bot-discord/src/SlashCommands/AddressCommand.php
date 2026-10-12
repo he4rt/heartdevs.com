@@ -75,13 +75,13 @@ class AddressCommand extends AbstractSlashCommand
                 return;
             }
 
+            $stateName = self::STATES[$state];
+
             $this->memberProvider->user->address()->updateOrCreate([], [
                 'country' => 'BRA',
-                'state' => $state,
+                'state' => $stateName,
                 'city' => $city,
             ]);
-
-            $stateName = self::STATES[$state];
 
             $interaction->respondWithMessage(
                 sprintf('Localização atualizada para **%s, %s** 🇧🇷', $city, $stateName),

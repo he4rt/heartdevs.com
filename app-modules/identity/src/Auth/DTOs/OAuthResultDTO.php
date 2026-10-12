@@ -14,7 +14,7 @@ final readonly class OAuthResultDTO
         public User $user,
         public ?ExternalIdentity $identity,
         public OAuthIntent $intent,
-        public string $redirectUrl,
+        public ?string $redirectUrl,
         public ?MergeConflictDTO $mergeConflict = null,
     ) {}
 
