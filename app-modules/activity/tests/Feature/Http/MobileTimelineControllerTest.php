@@ -109,3 +109,66 @@ it('rejects deleting a root post as if it were a reply', function (): void {
     $this->deleteJson(route('mobile.timeline.replies.destroy', ['reply' => $post->getKey()]), [], ['Authorization' => "Bearer {$token}"])
         ->assertForbidden();
 });
+
+it('likes a post', function (): void {
+    $user = User::factory()->create();
+    $token = Auth::guard('api')->login($user);
+    $post = Timeline::factory()->create();
+
+    $this->postJson(route('mobile.timeline.like', ['post' => $post->getKey()]), [], ['Authorization' => "Bearer {$token}"])
+        ->assertOk()
+        ->assertJsonPath('likes_count', 1)
+        ->assertJsonPath('liked_by_me', true);
+
+    $this->assertDatabaseHas('activity_timeline_likes', ['timeline_id' => $post->id, 'user_id' => $user->id]);
+});
+
+it('liking a post twice is idempotent', function (): void {
+    $user = User::factory()->create();
+    $token = Auth::guard('api')->login($user);
+    $post = Timeline::factory()->create();
+
+    $this->postJson(route('mobile.timeline.like', ['post' => $post->getKey()]), [], ['Authorization' => "Bearer {$token}"]);
+    $this->postJson(route('mobile.timeline.like', ['post' => $post->getKey()]), [], ['Authorization' => "Bearer {$token}"])
+        ->assertOk()
+        ->assertJsonPath('likes_count', 1);
+
+    $this->assertDatabaseCount('activity_timeline_likes', 1);
+});
+
+it('unlikes a post', function (): void {
+    $user = User::factory()->create();
+    $token = Auth::guard('api')->login($user);
+    $post = Timeline::factory()->create();
+    $post->likes()->create(['user_id' => $user->id]);
+
+    $this->deleteJson(route('mobile.timeline.unlike', ['post' => $post->getKey()]), [], ['Authorization' => "Bearer {$token}"])
+        ->assertOk()
+        ->assertJsonPath('likes_count', 0)
+        ->assertJsonPath('liked_by_me', false);
+
+    $this->assertDatabaseMissing('activity_timeline_likes', ['timeline_id' => $post->id, 'user_id' => $user->id]);
+});
+
+it('unliking a post never liked is idempotent', function (): void {
+    $user = User::factory()->create();
+    $token = Auth::guard('api')->login($user);
+    $post = Timeline::factory()->create();
+
+    $this->deleteJson(route('mobile.timeline.unlike', ['post' => $post->getKey()]), [], ['Authorization' => "Bearer {$token}"])
+        ->assertOk()
+        ->assertJsonPath('likes_count', 0);
+});
+
+it("does not leak another user's like as liked_by_me", function (): void {
+    $owner = User::factory()->create();
+    $other = User::factory()->create();
+    $token = Auth::guard('api')->login($other);
+    $post = Timeline::factory()->create();
+    $post->likes()->create(['user_id' => $owner->id]);
+
+    $this->getJson(route('mobile.timeline.index'), ['Authorization' => "Bearer {$token}"])
+        ->assertOk()
+        ->assertJsonPath('data.0.likes_count', 1)
+        ->assertJsonPath('data.0.liked_by_me', false);
+});

@@ -100,6 +100,8 @@ Sem gap de domínio — é serialização pura em cima do que já existe. O corp
 
 **Status: implementado** (`He4rt\Activity\Timeline\Http\Controllers\Mobile\MobileTimelineController` + `Http\Resources\TimelinePostResource`). Upload de imagens aceito via multipart (`images[]`), armazenado no mesmo diretório `timeline-uploads` que o Composer do painel usa. Rotas em `app-modules/activity/routes/api-mobile-routes.php`.
 
+**PS — curtir, fora do original "fora do v1" acima**: o pedido veio do app mobile depois que o resto da Feature 1 já estava no ar. Investigando antes de implementar: `activity_reactions` (o que o `reactions_count` acima mede) é um espelho agregado por emoji sincronizado do Discord (`ImportDiscordReactionsAction`), sem `user_id` — não dá pra saber quem reagiu, e reaproveitar essa tabela pra curtida própria do app quebraria a unique constraint `(reactable_type, reactable_id, emoji_key)` assim que dois usuários curtissem o mesmo post. Implementado como sistema novo e independente: tabela `activity_timeline_likes` (`timeline_id` + `user_id`, unique por par), `LikePost`/`UnlikePost` Actions, `POST`/`DELETE /api/mobile/timeline/{post}/like` (ambos idempotentes), expostos no `TimelinePostResource` como `likes_count`/`liked_by_me` — campos distintos de `reactions_count`, que continua só espelhando o Discord.
+
 ---
 
 ## Feature 2 — Eventos

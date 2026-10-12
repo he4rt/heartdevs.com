@@ -19,4 +19,10 @@ Route::prefix('api/mobile')
 
         Route::delete('/timeline/replies/{reply}', [MobileTimelineController::class, 'destroyReply'])
             ->name('mobile.timeline.replies.destroy');
+
+        Route::post('/timeline/{post}/like', [MobileTimelineController::class, 'like'])
+            ->name('mobile.timeline.like');
+
+        Route::delete('/timeline/{post}/like', [MobileTimelineController::class, 'unlike'])
+            ->name('mobile.timeline.unlike');
     });

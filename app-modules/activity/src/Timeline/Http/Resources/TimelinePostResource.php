@@ -39,6 +39,8 @@ final class TimelinePostResource extends JsonResource
             'parent_id' => $this->parent_id,
             'replies_count' => $this->children_count ?? 0,
             'reactions_count' => $this->reactions_count ?? 0,
+            'likes_count' => $this->likes_count ?? 0,
+            'liked_by_me' => $this->relationLoaded('likes') ? $this->likes->isNotEmpty() : false,
             'created_at' => $this->created_at->toIso8601String(),
         ];
     }
