@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Database\Seeders;
 
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
+use He4rt\Activity\Database\Seeders\TimelineSeeder;
 use He4rt\Events\Database\Seeders\EventsSeeder;
 use Illuminate\Database\Seeder;
 
@@ -18,6 +19,7 @@ final class DatabaseSeeder extends Seeder
         $this->call([
             BaseSeeder::class,
             EventsSeeder::class,
+            TimelineSeeder::class,
             RetrospectiveDemoSeeder::class,
         ]);
     }
