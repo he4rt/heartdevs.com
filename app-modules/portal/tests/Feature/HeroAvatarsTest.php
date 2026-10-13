@@ -64,3 +64,28 @@ it('ignora identidades GitHub cujo external_account_id não é numérico', funct
 
     expect($avatars)->toBeEmpty();
 });
+
+it('não conta o chat das lives da Twitch como atividade no Discord', function (): void {
+    $user = User::factory()->create();
+
+    $twitchIdentity = ExternalIdentity::factory()->create([
+        'model_type' => $user->getMorphClass(),
+        'model_id' => $user->id,
+        'provider' => IdentityProvider::Twitch,
+    ]);
+
+    Message::factory()->count(25)->create([
+        'external_identity_id' => $twitchIdentity->id,
+        'sent_at' => now()->subDay(),
+        'platform' => IdentityProvider::Twitch,
+    ]);
+
+    ExternalIdentity::factory()->create([
+        'model_type' => $user->getMorphClass(),
+        'model_id' => $user->id,
+        'provider' => IdentityProvider::GitHub,
+        'external_account_id' => '583231',
+    ]);
+
+    expect(livewire(HeroSection::class)->instance()->avatars())->toBeEmpty();
+});

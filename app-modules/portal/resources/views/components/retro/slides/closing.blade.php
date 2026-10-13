@@ -21,15 +21,13 @@
         @if (count($people))
             <div class="closing-wall" data-anim>
                 @foreach ($people as $person)
-                    <img
+                    <x-portal::retro.avatar
                         class="mini"
-                        src="{{ $person['avatar'] }}"
-                        onerror="this.onerror=null;this.src='https://github.com/{{ $person['login'] }}.png'"
+                        :src="$person['avatar']"
+                        :name="$person['login']"
+                        :size="46"
                         loading="lazy"
-                        width="46"
-                        height="46"
-                        alt="{{ $person['login'] }}"
-                        title="{{ $person['login'] }}"
+                        :title="$person['login']"
                     />
                 @endforeach
             </div>

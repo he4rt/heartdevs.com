@@ -13,14 +13,14 @@ use Illuminate\Support\Facades\Cache;
 use Saloon\Http\Faking\MockClient;
 use Saloon\Http\Faking\MockResponse;
 
-function mockEventSubResponses(array $existingSubscriptions = []): MockClient
+function mockEventSubResponses(array $existingSubscriptions = [], ?MockResponse $createResponse = null): MockClient
 {
     $mock = new MockClient([
         ListSubscriptions::class => MockResponse::make([
             'data' => $existingSubscriptions,
             'total' => count($existingSubscriptions),
         ]),
-        CreateSubscription::class => MockResponse::make([
+        CreateSubscription::class => $createResponse ?? MockResponse::make([
             'data' => [['id' => 'sub-123', 'status' => 'webhook_callback_verification_pending']],
             'total' => 1,
         ], 202),
@@ -86,6 +86,17 @@ test('skips already existing subscriptions', function (): void {
         '--type' => 'stream.online',
     ])->assertSuccessful()
         ->expectsOutputToContain('already_exists');
+});
+
+test('reports a rejected creation instead of counting it as created', function (): void {
+    mockEventSubResponses(createResponse: MockResponse::make(['message' => 'missing scope'], 403));
+
+    $this->artisan('twitch:subscribe', [
+        'broadcaster_user_id' => '12345',
+        '--type' => 'channel.follow',
+    ])->assertSuccessful()
+        ->expectsOutputToContain('missing_scope')
+        ->expectsOutputToContain('0 subscription(s) created.');
 });
 
 test('fails without type, all, or clear-all flag', function (): void {
@@ -162,4 +173,39 @@ test('enum getCondition returns correct structure', function (): void {
         'broadcaster_user_id' => '12345',
         'moderator_user_id' => '67890',
     ]);
+});
+
+test('lê todas as páginas de inscrições do broadcaster antes de limpar', function (): void {
+    $subscription = fn (string $id): array => [
+        'id' => $id,
+        'type' => 'stream.online',
+        'condition' => ['broadcaster_user_id' => '12345'],
+    ];
+
+    $mock = new MockClient([
+        MockResponse::make(['data' => [$subscription('sub-1')], 'pagination' => ['cursor' => 'page-2']]),
+        MockResponse::make(['data' => [$subscription('sub-2')], 'pagination' => []]),
+        MockResponse::make([], 204),
+        MockResponse::make([], 204),
+    ]);
+
+    Cache::put('twitch_app_access_token', 'fake-token', 3_600);
+
+    app()->instance(TwitchHelixConnector::class, new TwitchHelixConnector(
+        tokenService: new TwitchAppTokenService(new TwitchOAuthConnector(clientId: 'fake-client-id', clientSecret: 'fake-secret')),
+        clientId: 'fake-client-id',
+    )->withMockClient($mock));
+
+    $this->artisan('twitch:subscribe', [
+        'broadcaster_user_id' => '12345',
+        '--clear-all' => true,
+    ])->assertSuccessful();
+
+    $mock->assertSentCount(4);
+    $mock->assertSent(fn ($request): bool => $request instanceof ListSubscriptions
+        && $request->query()->get('user_id') === '12345'
+        && $request->query()->get('after') === null);
+    $mock->assertSent(fn ($request): bool => $request instanceof ListSubscriptions
+        && $request->query()->get('after') === 'page-2');
+    $mock->assertSent(fn ($request): bool => $request instanceof DeleteSubscription);
 });

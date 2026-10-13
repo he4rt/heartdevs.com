@@ -59,6 +59,7 @@ final class HeroSection extends Component
     private function fetchAvatars(): array
     {
         $activeDiscordIdentityIds = Message::query()
+            ->onPlatform(IdentityProvider::Discord)
             ->where('sent_at', '>=', now()->subDays(30))
             ->select('external_identity_id')
             ->groupBy('external_identity_id')
@@ -96,7 +97,7 @@ final class HeroSection extends Component
      */
     private function fetchTerminalStats(): array
     {
-        $totalMessages = Message::query()->count();
+        $totalMessages = Message::query()->onPlatform(IdentityProvider::Discord)->count();
         $totalXp = Character::query()->sum('experience');
 
         return [

@@ -47,11 +47,10 @@ function admin(): User
 
 beforeEach(function (): void {
     config([
-        'he4rt.admins' => 'danielhe4rt',
         'app.display_timezone' => 'America/Sao_Paulo',
     ]);
 
-    $this->actingAs(User::factory()->create(['username' => 'danielhe4rt']));
+    $this->actingAs(User::factory()->superAdmin()->create(['username' => 'danielhe4rt']));
 
     Filament::setCurrentPanel(Filament::getPanel('admin'));
 });
@@ -224,7 +223,7 @@ test('the clicks tile counts humans only until the bots toggle is on', function 
 
     $page->assertSee($humans)->assertDontSee($everyone);
 
-    $page->set('filters.'.ViewShortLink::INCLUDE_BOTS, true)
+    $page->set('filters.'.ViewShortLink::INCLUDE_BOTS, value: true)
         ->assertSee($everyone)
         ->assertDontSee($humans);
 });
@@ -240,21 +239,21 @@ test('flipping the bots toggle changes the island keys, which is what remounts t
     $humansOnly = array_map($page->instance()->islandKey(...), $islands);
 
     foreach ($humansOnly as $key) {
-        $page->assertSee($key, escape: false);
+        $page->assertSeeHtml($key);
     }
 
-    $page->set('filters.'.ViewShortLink::INCLUDE_BOTS, true);
+    $page->set('filters.'.ViewShortLink::INCLUDE_BOTS, value: true);
 
     $withBots = array_map($page->instance()->islandKey(...), $islands);
 
     expect($withBots)->not->toBe($humansOnly);
 
     foreach ($withBots as $key) {
-        $page->assertSee($key, escape: false);
+        $page->assertSeeHtml($key);
     }
 
     foreach ($humansOnly as $key) {
-        $page->assertDontSee($key, escape: false);
+        $page->assertDontSeeHtml($key);
     }
 });
 

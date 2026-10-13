@@ -5,27 +5,33 @@ declare(strict_types=1);
 namespace App\Livewire;
 
 use Filament\Notifications\Notification;
-use He4rt\Identity\Auth\Actions\MergeAccountsAction;
+use He4rt\Identity\Auth\Actions\ConfirmOAuthMerge;
+use He4rt\Identity\Auth\DTOs\PendingOAuthMergeDTO;
 use He4rt\Identity\ExternalIdentity\Actions\ConnectApiKeyIdentity;
+use He4rt\Identity\ExternalIdentity\Actions\DisconnectExternalIdentity;
 use He4rt\Identity\ExternalIdentity\Enums\CredentialsType;
 use He4rt\Identity\ExternalIdentity\Enums\IdentityProvider;
 use He4rt\Identity\ExternalIdentity\Exceptions\InvalidApiKeyException;
 use He4rt\Identity\ExternalIdentity\Models\ExternalIdentity;
 use He4rt\Identity\User\Models\User;
 use Illuminate\Contracts\View\View;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\Auth;
+use Livewire\Attributes\Locked;
 use Livewire\Attributes\Validate;
 use Livewire\Component;
 
 class ConnectionHub extends Component
 {
+    private const string TENANT_MODEL_TYPE = 'tenant';
+
     public string $panel = 'app';
 
     public bool $showMergeModal = false;
 
-    /** @var array<string, mixed>|null */
-    public ?array $mergeData = null;
+    #[Locked]
+    public ?string $mergeTargetId = null;
 
     public bool $showApiKeyModal = false;
 
@@ -114,15 +120,11 @@ class ConnectionHub extends Component
         $this->resetValidation();
     }
 
-    public function confirmMerge(MergeAccountsAction $action): void
+    public function confirmMerge(ConfirmOAuthMerge $action): void
     {
-        if ($this->mergeData === null) {
-            return;
-        }
+        $pending = PendingOAuthMergeDTO::fromSession(session()->get('oauth_merge_pending'));
 
-        $oldUser = User::query()->find($this->mergeData['conflicting_user_id']);
-
-        if (!$oldUser instanceof User) {
+        if (!$pending instanceof PendingOAuthMergeDTO) {
             $this->cancelMerge();
 
             return;
@@ -131,11 +133,17 @@ class ConnectionHub extends Component
         /** @var User $currentUser */
         $currentUser = auth()->user();
 
-        $action->execute($currentUser, $oldUser);
+        $oldUser = $action->execute($currentUser, $pending);
+
+        if (!$oldUser instanceof User) {
+            $this->cancelMerge();
+
+            return;
+        }
 
         session()->forget('oauth_merge_pending');
         $this->showMergeModal = false;
-        $this->mergeData = null;
+        $this->mergeTargetId = null;
 
         Auth::login($oldUser);
 
@@ -151,7 +159,7 @@ class ConnectionHub extends Component
     {
         session()->forget('oauth_merge_pending');
         $this->showMergeModal = false;
-        $this->mergeData = null;
+        $this->mergeTargetId = null;
     }
 
     public function disconnect(IdentityProvider $provider): void
@@ -172,7 +180,7 @@ class ConnectionHub extends Component
             return;
         }
 
-        $identity->update(['disconnected_at' => now()]);
+        resolve(DisconnectExternalIdentity::class)->handle($identity);
 
         Notification::make()
             ->title($provider->getLabel().' disconnected successfully')
@@ -182,8 +190,11 @@ class ConnectionHub extends Component
 
     public function disconnectById(string $identityId): void
     {
-        $identity = ExternalIdentity::query()
-            ->where('id', $identityId)
+        /** @var User $user */
+        $user = auth()->user();
+
+        $identity = $this->identitiesManageableBy($user)
+            ->whereKey($identityId)
             ->whereNotNull('connected_at')
             ->whereNull('disconnected_at')
             ->first();
@@ -197,7 +208,7 @@ class ConnectionHub extends Component
             return;
         }
 
-        $identity->update(['disconnected_at' => now()]);
+        resolve(DisconnectExternalIdentity::class)->handle($identity);
 
         Notification::make()
             ->title($identity->provider->getLabel().' disconnected successfully')
@@ -209,11 +220,11 @@ class ConnectionHub extends Component
     {
         $pending = session()->get('oauth_merge_pending');
 
-        if ($pending === null) {
+        if (!is_array($pending) || !is_string($pending['conflicting_user_id'] ?? null)) {
             return;
         }
 
-        $this->mergeData = $pending;
+        $this->mergeTargetId = $pending['conflicting_user_id'];
         $this->showMergeModal = true;
     }
 
@@ -222,11 +233,11 @@ class ConnectionHub extends Component
      */
     private function getMergeTarget(): ?array
     {
-        if ($this->mergeData === null) {
+        if ($this->mergeTargetId === null) {
             return null;
         }
 
-        $user = User::query()->find($this->mergeData['conflicting_user_id']);
+        $user = User::query()->find($this->mergeTargetId);
 
         if (!$user instanceof User) {
             return null;
@@ -262,11 +273,25 @@ class ConnectionHub extends Component
         return auth()->user()->providers()->get();
     }
 
+    /** @return Builder<ExternalIdentity> */
+    private function identitiesManageableBy(User $user): Builder
+    {
+        $canManageTenantConnections = $user->isSuperAdmin();
+
+        return ExternalIdentity::query()->where(function (Builder $query) use ($user, $canManageTenantConnections): void {
+            $query->whereMorphedTo('model', $user);
+
+            if ($canManageTenantConnections) {
+                $query->orWhere('model_type', self::TENANT_MODEL_TYPE);
+            }
+        });
+    }
+
     /** @return Collection<int, ExternalIdentity> */
     private function getTenantProviders(): Collection
     {
         return ExternalIdentity::query()
-            ->where('model_type', 'tenant')
+            ->where('model_type', self::TENANT_MODEL_TYPE)
             ->whereNotNull('connected_at')
             ->whereNull('disconnected_at')
             ->with('connectedByUser')

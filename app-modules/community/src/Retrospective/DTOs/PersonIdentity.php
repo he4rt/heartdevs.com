@@ -26,7 +26,7 @@ final readonly class PersonIdentity
         public string $userId,
         public string $name,
         public string $username,
-        public string $avatar,
+        public ?string $avatar,
         public array $accounts = [],
         public ?CarbonImmutable $memberSince = null,
     ) {}

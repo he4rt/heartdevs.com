@@ -8,6 +8,7 @@ use Carbon\CarbonImmutable;
 use He4rt\Activity\Message\Enums\MessageSourceKind;
 use He4rt\Activity\Message\Models\Message;
 use He4rt\Activity\Voice\Models\Voice;
+use He4rt\Identity\ExternalIdentity\Enums\IdentityProvider;
 use He4rt\IntegrationGithub\Enums\ContributionType;
 use He4rt\IntegrationGithub\Models\GithubContribution;
 use He4rt\PanelAdmin\Contributions\Timeline\DTOs\GithubDay;
@@ -125,7 +126,7 @@ final readonly class DailyActivitySeries
      */
     private function messagesByDay(CarbonImmutable $since, CarbonImmutable $until, string $timezone): array
     {
-        $query = $this->daily(Message::query(), 'sent_at', $since, $until, $timezone)
+        $query = $this->daily(Message::query()->onPlatform(IdentityProvider::Discord), 'sent_at', $since, $until, $timezone)
             ->selectRaw('COUNT(*) AS messages')
             ->selectRaw('COUNT(DISTINCT external_identity_id) AS people')
             ->selectRaw('COALESCE(SUM(obtained_experience), 0) AS xp')

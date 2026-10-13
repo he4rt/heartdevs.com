@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace He4rt\PanelAdmin\Marketing\Pages\Discord\Dashboard\Queries;
 
+use He4rt\Identity\ExternalIdentity\Enums\IdentityProvider;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\DB;
@@ -25,6 +26,7 @@ final readonly class MessageHeatmap
             ->selectRaw('EXTRACT(DOW FROM sent_at AT TIME ZONE ?)::int AS dow', [$tz])
             ->selectRaw('EXTRACT(HOUR FROM sent_at AT TIME ZONE ?)::int AS hour', [$tz])
             ->selectRaw('COUNT(*) AS total')
+            ->where('platform', IdentityProvider::Discord->value)
             ->where('sent_at', '>=', $start)
             ->whereNotNull('sent_at')
             ->groupBy('dow', 'hour')

@@ -21,12 +21,12 @@ parameters:
             count: 1
             path: src/Tasks/VoiceExperienceTask.php
         -
-            message: '#^Parameter \#1 \$roles of method Discord\\Parts\\User\\Member::setRoles\(\) expects#'
+            message: '#^Parameter \#1 \$roles of method Discord\\Parts\\Guild\\Member\\Member::setRoles\(\) expects#'
             identifier: argument.type
             count: 1
             path: src/SlashCommands/CargoDelasCommand.php
         -
-            message: '#^Parameter \#1 \$roles of method Discord\\Parts\\User\\Member::setRoles\(\) expects#'
+            message: '#^Parameter \#1 \$roles of method Discord\\Parts\\Guild\\Member\\Member::setRoles\(\) expects#'
             identifier: argument.type
             count: 1
             path: src/SlashCommands/IntroductionCommand.php

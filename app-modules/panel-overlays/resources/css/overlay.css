@@ -1,0 +1,254 @@
+@import url('https://fonts.googleapis.com/css2?family=Saira:ital,wght@0,400;0,500;0,600;0,700;0,800;1,600;1,700;1,800&family=Saira+Condensed:wght@600;700;800&family=Saira+Semi+Condensed:ital,wght@0,700;0,800;1,700;1,800&family=JetBrains+Mono:wght@400;600;700&display=swap');
+@import 'tailwindcss' source('../');
+
+@theme {
+    --font-saira: 'Saira', sans-serif;
+    --font-saira-cond: 'Saira Condensed', sans-serif;
+    --font-saira-semi: 'Saira Semi Condensed', sans-serif;
+    --font-terminal: 'JetBrains Mono', ui-monospace, monospace;
+
+    --color-ink-950: #12081f;
+    --color-ink-900: #160b26;
+    --color-ink-850: #190d2c;
+    --color-ink-800: #1d0f31;
+    --color-panel: #241338;
+    --color-disc: #2a1840;
+
+    --color-brand: #8b2fe8;
+    --color-brand-bright: #9a3cff;
+    --color-brand-deep: #6d1fd0;
+    --color-brand-light: #c9a4ff;
+    --color-brand-pale: #e9ddff;
+    --color-brand-muted: #bcaad8;
+    --color-brand-faint: #9b86c0;
+    --color-brand-ticker: #cdbdee;
+
+    --color-yellow: #ffcb05;
+    --color-spotify: #1ed760;
+}
+
+html,
+body,
+#app {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    width: 100%;
+    background: transparent;
+    overflow: hidden;
+}
+
+@keyframes tickerScroll {
+    from {
+        transform: translateX(0);
+    }
+    to {
+        transform: translateX(-50%);
+    }
+}
+
+@keyframes heartLed {
+    to {
+        stroke-dashoffset: 0;
+    }
+}
+
+@keyframes logoPulse {
+    0%,
+    100% {
+        box-shadow:
+            0 0 0 0 rgba(139, 47, 232, 0.55),
+            0 8px 28px rgba(139, 47, 232, 0.35);
+    }
+    50% {
+        box-shadow:
+            0 0 0 8px rgba(139, 47, 232, 0),
+            0 8px 34px rgba(139, 47, 232, 0.6);
+    }
+}
+
+@keyframes evIn {
+    from {
+        transform: translateY(115%);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+@keyframes evIcon {
+    0% {
+        transform: scale(0.4) rotate(-12deg);
+        opacity: 0;
+    }
+    60% {
+        transform: scale(1.18) rotate(6deg);
+    }
+    100% {
+        transform: scale(1) rotate(0);
+        opacity: 1;
+    }
+}
+
+@keyframes evShine {
+    0% {
+        transform: translateX(-130%);
+    }
+    55%,
+    100% {
+        transform: translateX(330%);
+    }
+}
+
+@keyframes barEq {
+    0%,
+    100% {
+        height: 22%;
+    }
+    50% {
+        height: 92%;
+    }
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.chat-outline {
+    text-shadow:
+        1px 1px 0 rgba(0, 0, 0, 0.85),
+        -1px -1px 0 rgba(0, 0, 0, 0.85),
+        1px -1px 0 rgba(0, 0, 0, 0.85),
+        -1px 1px 0 rgba(0, 0, 0, 0.85),
+        0 2px 6px rgba(0, 0, 0, 0.6);
+}
+
+.chat-soft-shadow {
+    text-shadow:
+        0 1px 2px rgba(0, 0, 0, 0.9),
+        0 0 8px rgba(0, 0, 0, 0.5);
+}
+
+@keyframes chatLineIn {
+    from {
+        transform: translateY(0.6em);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+@keyframes chatLineOut {
+    to {
+        opacity: 0;
+        transform: translateY(-0.3em);
+    }
+}
+
+@keyframes cursorBlink {
+    50% {
+        opacity: 0;
+    }
+}
+
+@keyframes chatIn {
+    from {
+        transform: translateY(26px) scale(0.96);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0) scale(1);
+        opacity: 1;
+    }
+}
+
+@keyframes sbIn {
+    from {
+        transform: translateX(12px) scale(0.96);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0) scale(1);
+        opacity: 1;
+    }
+}
+
+@keyframes speakRing {
+    0%,
+    100% {
+        transform: scale(1);
+        opacity: 0.9;
+    }
+    50% {
+        transform: scale(1.08);
+        opacity: 0.35;
+    }
+}
+
+@keyframes ssTick {
+    from {
+        transform: translateY(-14px) scale(1.06);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0) scale(1);
+        opacity: 1;
+    }
+}
+
+@keyframes ssBlink {
+    0%,
+    100% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.25;
+    }
+}
+
+@keyframes ssFloat {
+    0%,
+    100% {
+        transform: translateY(0) rotate(-1.5deg);
+    }
+    50% {
+        transform: translateY(-18px) rotate(1.5deg);
+    }
+}
+
+@keyframes ssGlow {
+    0%,
+    100% {
+        transform: scale(1);
+        opacity: 0.85;
+    }
+    50% {
+        transform: scale(1.12);
+        opacity: 1;
+    }
+}
+
+@keyframes ssGridDrift {
+    from {
+        transform: translate(0, 0);
+    }
+    to {
+        transform: translate(96px, 96px);
+    }
+}
+
+@keyframes ssDonePulse {
+    0%,
+    100% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.03);
+    }
+}

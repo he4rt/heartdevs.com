@@ -46,7 +46,7 @@ it('redirects the docs index to the first document', function (): void {
 
 it('does not let the catch-all hijack the Scramble api route', function (): void {
     $route = resolve(Router::class)->getRoutes()->match(
-        Request::create('/docs/3.x/api', 'GET'),
+        Request::create('/docs/4.x/api', 'GET'),
     );
 
     expect($route->getActionName())->not->toContain(DocsController::class);

@@ -7,13 +7,17 @@ namespace He4rt\Identity\Auth\Http\Controllers;
 use App\Contracts\OAuthClientContract;
 use App\Http\Controllers\Controller;
 use He4rt\Identity\Auth\Actions\HandleOAuthCallbackAction;
+use He4rt\Identity\Auth\Actions\IssueMobileExchangeCodeAction;
 use He4rt\Identity\Auth\DTOs\OAuthStateDTO;
 use He4rt\Identity\Auth\Enums\OAuthIntent;
 use He4rt\Identity\Auth\Exceptions\OAuthFlowException;
+use He4rt\Identity\Auth\Support\MobileOAuthDeepLink;
 use He4rt\Identity\ExternalIdentity\Enums\IdentityProvider;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
+use LogicException;
 use RuntimeException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
@@ -35,11 +39,16 @@ final class OAuthController extends Controller
 
         throw_unless($client instanceof OAuthClientContract, NotFoundHttpException::class);
 
+        $nonce = Str::random(40);
+        session()->put($this->stateNonceSessionKey($identityProvider), $nonce);
+
         $state = new OAuthStateDTO(
             intent: Auth::check() ? OAuthIntent::Link : OAuthIntent::Login,
             provider: $identityProvider,
             panel: $panel,
             returnUrl: Auth::check() ? url()->previous() : null,
+            nonce: $nonce,
+            features: OAuthStateDTO::featuresFrom(request()->input('features', [])),
         );
 
         return redirect()->to($client->redirectUrl($state));
@@ -52,14 +61,23 @@ final class OAuthController extends Controller
         throw_if($identityProvider === null, NotFoundHttpException::class);
 
         $state = OAuthStateDTO::fromEncryptedString(request()->input('state'));
+        $isMobile = $state->intent === OAuthIntent::MobileLogin;
+
+        $stateIssuedToAnotherSession = !$isMobile && !$this->consumeStateNonce($state, $identityProvider);
+
+        if ($stateIssuedToAnotherSession) {
+            Log::warning('OAuth state does not belong to this session', ['provider' => $provider]);
+
+            return redirect()->to('/');
+        }
 
         $code = request()->input('code');
         $oauthDenied = $code === null || request()->has('error');
 
         if ($oauthDenied) {
-            $fallbackUrl = $state->returnUrl ?? '/';
-
-            return redirect()->to($fallbackUrl);
+            return $isMobile
+                ? redirect()->to(MobileOAuthDeepLink::build('error', 'access_denied'))
+                : redirect()->to($state->returnUrl ?? '/');
         }
 
         try {
@@ -67,16 +85,25 @@ final class OAuthController extends Controller
         } catch (OAuthFlowException $oAuthFlowException) {
             Log::warning('OAuth flow failed', ['provider' => $provider, 'error' => $oAuthFlowException->getMessage()]);
 
-            return redirect()->to($state->returnUrl ?? '/');
+            return $isMobile
+                ? redirect()->to(MobileOAuthDeepLink::build('error', 'oauth_flow_failed'))
+                : redirect()->to($state->returnUrl ?? '/');
         }
+
+        if ($isMobile) {
+            $exchangeCode = resolve(IssueMobileExchangeCodeAction::class)->execute($result->user);
+
+            return redirect()->to(MobileOAuthDeepLink::build('callback', code: $exchangeCode));
+        }
+
+        $redirectUrl = $result->redirectUrl;
+        throw_if($redirectUrl === null, LogicException::class, 'OAuthResultDTO::redirectUrl só é nulo no fluxo mobile, já tratado acima.');
 
         if ($result->hasMergeConflict()) {
             session()->put('oauth_merge_pending', $result->mergeConflict->toSession());
 
-            return redirect()->to($result->redirectUrl);
+            return redirect()->to($redirectUrl);
         }
-
-        $redirectUrl = $result->redirectUrl;
 
         if ($result->intent === OAuthIntent::Login) {
             Auth::login($result->user, remember: true);
@@ -90,5 +117,19 @@ final class OAuthController extends Controller
         }
 
         return redirect()->to($redirectUrl);
+    }
+
+    private function consumeStateNonce(OAuthStateDTO $state, IdentityProvider $provider): bool
+    {
+        $expectedNonce = session()->pull($this->stateNonceSessionKey($provider));
+
+        return is_string($expectedNonce)
+            && is_string($state->nonce)
+            && hash_equals($expectedNonce, $state->nonce);
+    }
+
+    private function stateNonceSessionKey(IdentityProvider $provider): string
+    {
+        return 'oauth_state_nonce.'.$provider->value;
     }
 }

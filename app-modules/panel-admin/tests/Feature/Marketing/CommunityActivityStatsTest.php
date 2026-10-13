@@ -5,6 +5,7 @@ declare(strict_types=1);
 use App\Models\Address;
 use He4rt\Activity\Message\Models\Message;
 use He4rt\Activity\Timeline\Timeline;
+use He4rt\Identity\ExternalIdentity\Enums\IdentityProvider;
 use He4rt\Identity\ExternalIdentity\Models\ExternalIdentity;
 use He4rt\Identity\User\Models\User;
 use He4rt\PanelAdmin\Marketing\Pages\Location\Queries\CommunityActivityStats;
@@ -59,4 +60,15 @@ test('it counts distinct web and discord actives within the current window', fun
         ->and($stats->locatedMembers)->toBe(1)
         ->and($stats->statesReached)->toBe(1)
         ->and($stats->statesTotal)->toBe(1);
+});
+
+test('o chat das lives da Twitch não conta como ativo no Discord', function (): void {
+    $viewer = ExternalIdentity::factory()->create();
+    Message::factory()->create([
+        'external_identity_id' => $viewer->id,
+        'sent_at' => Date::create(2_026, 6, 11, 12, 0, 0, $this->tz),
+        'platform' => IdentityProvider::Twitch,
+    ]);
+
+    expect(new CommunityActivityStats(30)->get()->discordActive)->toBe(0);
 });

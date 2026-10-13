@@ -145,10 +145,20 @@ final class SubscribeTwitchEventsCommand extends Command
      */
     private function getExistingSubscriptions(TwitchHelixConnector $helix, string $broadcasterId): array
     {
-        $response = $helix->send(new ListSubscriptions());
-
         /** @var array<int, array{id: string, type: string, condition: array<string, string>}> $subscriptions */
-        $subscriptions = $response->json('data', []);
+        $subscriptions = [];
+        $cursor = null;
+
+        do {
+            $response = $helix->send(new ListSubscriptions(userId: $broadcasterId, after: $cursor));
+
+            /** @var array<int, array{id: string, type: string, condition: array<string, string>}> $page */
+            $page = $response->json('data', []);
+            $subscriptions = [...$subscriptions, ...$page];
+
+            $nextCursor = $response->json('pagination.cursor');
+            $cursor = is_string($nextCursor) && $nextCursor !== '' ? $nextCursor : null;
+        } while ($cursor !== null);
 
         return collect($subscriptions)
             ->filter(fn (array $sub): bool => ($sub['condition']['broadcaster_user_id'] ?? null) === $broadcasterId

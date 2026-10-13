@@ -49,16 +49,8 @@
                             @endphp
                             <div class="rp-row">
                                 <div class="rp-id">
-                                    <img
-                                        class="mini"
-                                        src="{{ $p['avatar'] }}"
-                                        onerror="this.onerror=null;this.src='https://github.com/{{ $p['login'] }}.png'"
-                                        width="24"
-                                        height="24"
-                                        alt="{{ $p['login'] }}"
-                                        style="width: 24px; height: 24px"
-                                    />
-                                    <span class="rp-login">{{ '@' . $p['login'] }}</span>
+                                    <x-portal::retro.avatar class="mini" :src="$p['avatar']" :name="$p['login']" :size="24" />
+                                    <span class="rp-login">{{ ($p['linked'] ?? true) ? '@' . $p['login'] : $p['login'] }}</span>
                                     <span class="rp-prs">{{ $p['prs'] }} @choice('PR|PRs', $p['prs'])</span>
                                 </div>
                                 <div class="rp-meter">
@@ -80,15 +72,7 @@
                     <div class="rp-present">
                         <span class="avstack">
                             @foreach (array_slice($present, 0, 6) as $p)
-                                <img
-                                    class="mini"
-                                    src="{{ $p['avatar'] }}"
-                                    onerror="this.onerror=null;this.src='https://github.com/{{ $p['login'] }}.png'"
-                                    width="28"
-                                    height="28"
-                                    alt="{{ $p['login'] }}"
-                                    style="width: 28px; height: 28px"
-                                />
+                                <x-portal::retro.avatar class="mini" :src="$p['avatar']" :name="$p['login']" :size="28" />
                             @endforeach
                         </span>
                         @if ($authors !== [])

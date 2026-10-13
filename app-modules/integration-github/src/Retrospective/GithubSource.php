@@ -339,12 +339,13 @@ final class GithubSource implements CuratableSource, MeasuresPerson, Retrospecti
      */
     private function person(string $login, Collection $items): array
     {
-        $actorId = $items->first()?->actor_id;
+        $linked = $this->isLinked($items);
 
         return [
             'login' => $login,
-            'avatar' => $this->avatar($login, $actorId),
-            'url' => 'https://github.com/'.$login,
+            'avatar' => $this->avatar($login, $items),
+            'linked' => $linked,
+            'url' => $linked ? 'https://github.com/'.$login : null,
             'prs' => $this->countType($items, ContributionType::Pr),
             'prs_merged' => $this->countMergedPrs($items),
             'prs_unmerged' => $this->countUnmergedPrs($items),
@@ -449,11 +450,33 @@ final class GithubSource implements CuratableSource, MeasuresPerson, Retrospecti
         return is_string($state) ? $state : null;
     }
 
-    private function avatar(string $login, ?int $actorId): string
+    /**
+     * @param  Collection<int, GithubContribution>  $items
+     */
+    private function avatar(string $login, Collection $items): ?string
     {
-        return $actorId !== null
-            ? 'https://avatars.githubusercontent.com/u/'.$actorId.'?v=4'
-            : 'https://github.com/'.$login.'.png';
+        $actorId = $items->pluck('actor_id')->filter()->first();
+
+        return match (true) {
+            $actorId !== null => sprintf('https://avatars.githubusercontent.com/u/%s?v=4', $actorId),
+            $this->isLinked($items) => sprintf('https://github.com/%s.png', $login),
+            default => null,
+        };
+    }
+
+    /**
+     * Commit sem conta GitHub (e-mail não vinculado ou conta apagada) chega com o
+     * nome do git no lugar do login. Basta um item com conta para a pessoa existir;
+     * registros antigos sem `author_linked` contam como vinculados.
+     *
+     * @param  Collection<int, GithubContribution>  $items
+     */
+    private function isLinked(Collection $items): bool
+    {
+        return $items->contains(
+            fn (GithubContribution $contribution): bool => $contribution->type !== ContributionType::Commit
+                || ($contribution->metadata['author_linked'] ?? true) !== false,
+        );
     }
 
     /**
@@ -505,7 +528,8 @@ final class GithubSource implements CuratableSource, MeasuresPerson, Retrospecti
 
                             return [
                                 'login' => $login,
-                                'avatar' => $this->avatar($login, $group->first()?->actor_id),
+                                'avatar' => $this->avatar($login, $group),
+                                'linked' => $this->isLinked($group),
                                 'prs' => $authored->count(),
                                 'additions' => $this->sumMeta($authored, 'additions'),
                                 'deletions' => $this->sumMeta($authored, 'deletions'),

@@ -9,7 +9,9 @@ use He4rt\Activity\Database\Factories\TimelineFactory;
 use He4rt\Activity\Reaction\Concerns\HasReactions;
 use He4rt\Activity\Reaction\Models\UserReaction;
 use He4rt\Identity\User\Models\User;
+use Illuminate\Database\Eloquent\Attributes\Scope;
 use Illuminate\Database\Eloquent\Attributes\Table;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -68,6 +70,12 @@ final class Timeline extends Model
         return $this->hasMany(self::class, 'parent_id');
     }
 
+    /** @return HasMany<TimelineLike, $this> */
+    public function likes(): HasMany
+    {
+        return $this->hasMany(TimelineLike::class);
+    }
+
     /** @return HasMany<UserReaction, $this> */
     public function userReactions(): HasMany
     {
@@ -77,6 +85,16 @@ final class Timeline extends Model
     protected static function newFactory(): TimelineFactory
     {
         return TimelineFactory::new();
+    }
+
+    /** @param  Builder<self>  $query */
+    #[Scope]
+    protected function feed(Builder $query): void
+    {
+        $query->where('is_ignored', operator: false)
+            ->whereHas('user')
+            ->whereNull('parent_id')
+            ->latest();
     }
 
     /** @return array<string, mixed> */

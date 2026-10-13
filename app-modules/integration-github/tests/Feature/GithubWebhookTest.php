@@ -143,11 +143,13 @@ it('projeta issues e pushes (commits)', function (): void {
         'sender' => ['login' => 'maria', 'id' => 42],
         'commits' => [
             ['id' => 'sha1', 'url' => 'u', 'timestamp' => '2026-06-04T08:00:00Z', 'author' => ['username' => 'maria', 'name' => 'Maria']],
+            ['id' => 'sha2', 'url' => 'u', 'timestamp' => '2026-06-04T09:00:00Z', 'author' => ['name' => 'Sem Conta']],
         ],
     ])->assertSuccessful();
 
     expect(GithubContribution::query()->where('external_ref', 'issue:10')->exists())->toBeTrue()
-        ->and(GithubContribution::query()->where('external_ref', 'commit:sha1')->exists())->toBeTrue();
+        ->and(GithubContribution::query()->where('external_ref', 'commit:sha1')->sole()->metadata['author_linked'])->toBeTrue()
+        ->and(GithubContribution::query()->where('external_ref', 'commit:sha2')->sole()->metadata['author_linked'])->toBeFalse();
 });
 
 it('grava no lake mas NÃO projeta contribuição para repo de challenge', function (): void {
@@ -201,4 +203,18 @@ it('persiste merged_at do payload de PR mesclado', function (): void {
 
     expect($contribution->metadata['merged'])->toBeTrue()
         ->and($contribution->metadata['merged_at'])->toBe('2026-06-02T15:30:00Z');
+});
+
+it('marca is_bot para contas do tipo Bot sem o sufixo [bot]', function (): void {
+    GithubRepository::factory()->create([
+        'full_name' => 'he4rt/heartdevs.com',
+        'purpose' => PurposeType::Contributions,
+    ]);
+
+    $payload = prWebhookPayload(login: 'Copilot', id: 175_728_472);
+    $payload['pull_request']['user']['type'] = 'Bot';
+
+    postGithubWebhook('pull_request', $payload)->assertSuccessful();
+
+    expect(GithubContribution::query()->where('external_ref', 'pr:1')->sole()->metadata['is_bot'])->toBeTrue();
 });

@@ -301,3 +301,33 @@ it('o painel de conversas completo mostra totais, ritmo da semana, ranking e hor
         ->and(mb_substr_count($html, 'class="vb-bar"'))->toBe(23)
         ->and(mb_substr_count($html, 'vb-bar is-peak'))->toBe(1);
 });
+
+it('pessoa sem conta GitHub aparece com iniciais, sem @ e sem link', function (): void {
+    $person = [
+        'login' => 'Paulo Gabriel',
+        'avatar' => null,
+        'linked' => false,
+        'url' => null,
+        'total' => 1,
+        'prs' => 0,
+        'prs_merged' => 0,
+        'prs_unmerged' => 0,
+        'reviews' => 0,
+        'issues' => 0,
+        'comments' => 0,
+        'review_comments' => 0,
+        'commits' => 1,
+        'additions' => 0,
+        'deletions' => 0,
+        'pr_refs' => [],
+        'issue_refs' => [],
+    ];
+
+    $html = Blade::render('<x-portal::retro.person-card :person="$person" />', ['person' => $person]);
+
+    expect($html)->toContain('retro-initials')
+        ->toContain('>PG<')
+        ->not->toContain('<img')
+        ->not->toContain('@Paulo Gabriel')
+        ->not->toContain('github.com');
+});

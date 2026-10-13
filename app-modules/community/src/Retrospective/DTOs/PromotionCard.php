@@ -25,7 +25,7 @@ final readonly class PromotionCard
         public string $userId,
         public string $name,
         public string $username,
-        public string $avatar,
+        public ?string $avatar,
         public PromotionStage $stage,
         public ?string $reason = null,
         public array $groups = [],
@@ -45,13 +45,14 @@ final readonly class PromotionCard
         }
 
         $reason = $payload['reason'] ?? null;
+        $avatar = $payload['avatar'] ?? null;
         $memberSince = $payload['member_since'] ?? null;
 
         return new self(
             userId: $userId,
             name: (string) ($payload['name'] ?? ''),
             username: (string) ($payload['username'] ?? ''),
-            avatar: (string) ($payload['avatar'] ?? ''),
+            avatar: filled($avatar) ? $avatar : null,
             stage: $stage,
             reason: is_string($reason) && $reason !== '' ? $reason : null,
             groups: self::groups($payload['groups'] ?? []),

@@ -36,10 +36,14 @@ beforeEach(function (): void {
         'world.bmbc.cloud/api/states*' => Http::response([
             'success' => true,
             'data' => [
-                ['id' => 486, 'name' => 'São Paulo', 'cities' => [
-                    ['id' => 2, 'name' => 'São Paulo'],
-                    ['id' => 3, 'name' => 'Campinas'],
-                ]],
+                ['id' => 486, 'name' => 'São Paulo'],
+            ],
+        ]),
+        'world.bmbc.cloud/api/cities*' => Http::response([
+            'success' => true,
+            'data' => [
+                ['id' => 2, 'name' => 'São Paulo'],
+                ['id' => 3, 'name' => 'Campinas'],
             ],
         ]),
     ]);

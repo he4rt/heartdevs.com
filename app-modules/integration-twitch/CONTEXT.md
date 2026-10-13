@@ -4,15 +4,18 @@ Transport and integration layer for the Twitch platform. Owns all HTTP communica
 
 ## Glossary
 
-| Term                     | Definition                                                                                                                              | Not to be confused with                                         |
-| ------------------------ | --------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------- |
-| **Transport**            | The Saloon-based HTTP layer (`Transport/`) that sends requests to Twitch's Helix API and OAuth endpoints. All outbound HTTP goes here.  | Inbound webhooks (which are received in `Http/`)                |
-| **TwitchHelixConnector** | Saloon connector authenticated with App Access Token + Client-Id. Used for Helix API calls (EventSub, Users).                           | `TwitchOAuthConnector` (which handles token exchange, no auth)  |
-| **TwitchOAuthConnector** | Saloon connector for OAuth2 token exchange and app access token retrieval. Base URL: `id.twitch.tv/oauth2`.                             | —                                                               |
-| **App Access Token**     | Server-to-server token obtained via client_credentials grant. Cached. Used as default auth on `TwitchHelixConnector`.                   | User Access Token (obtained via authorization_code, per-user)   |
-| **EventSub**             | Twitch's unified event notification system. We receive events via webhook transport (HTTP POST to our endpoint).                        | PubSub (deprecated, shut down April 2025)                       |
-| **TwitchEventLog**       | Raw event record in `twitch_event_logs`. Stores the full EventSub payload as JSONB. Data lake — no processing on write.                 | Processed domain entities (future ETL output)                   |
-| **ETL**                  | Layer that transforms external data (raw payloads) into domain entities. Covers both historical imports and real-time event processing. | Transport (which is outbound HTTP) or Http (which is ingestion) |
+| Term                      | Definition                                                                                                                                                            | Not to be confused with                                             |
+| ------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------- |
+| **Transport**             | The Saloon-based HTTP layer (`Transport/`) that sends requests to Twitch's Helix API and OAuth endpoints. All outbound HTTP goes here.                                | Inbound webhooks (which are received in `Http/`)                    |
+| **TwitchHelixConnector**  | Saloon connector authenticated with App Access Token + Client-Id. Used for Helix API calls (EventSub, Users).                                                         | `TwitchOAuthConnector` (which handles token exchange, no auth)      |
+| **TwitchOAuthConnector**  | Saloon connector for OAuth2 token exchange and app access token retrieval. Base URL: `id.twitch.tv/oauth2`.                                                           | —                                                                   |
+| **App Access Token**      | Server-to-server token obtained via client_credentials grant. Cached. Used as default auth on `TwitchHelixConnector`.                                                 | User Access Token (obtained via authorization_code, per-user)       |
+| **EventSub**              | Twitch's unified event notification system. We receive events via webhook transport (HTTP POST to our endpoint).                                                      | PubSub (deprecated, shut down April 2025)                           |
+| **TwitchEventLog**        | Raw event record in `twitch_event_logs`. Stores the full EventSub payload as JSONB. Data lake — no processing on write.                                               | Processed domain entities (the ETL output in `streaming`)           |
+| **ETL**                   | Layer that transforms external data (raw payloads) into domain entities. Covers both historical imports and real-time event processing.                               | Transport (which is outbound HTTP) or Http (which is ingestion)     |
+| **Streamer subscription** | An EventSub subscription that a `streamer_sources` row owns (`twitch_subscriptions.streamer_source_id`). Created and removed by `SyncStreamerTwitchSubscriptions`.    | A community subscription (no source), created by `twitch:subscribe` |
+| **Bot account**           | The `he4rtdevs` Twitch account that reads chat for streamers who choose it. Configured by `TWITCH_BOT_USER_ID` and `TWITCH_BOT_REFRESH_TOKEN`.                        | The App Access Token (no user, no chat)                             |
+| **Streamer feature**      | What a streamer grants on connect: alerts, chat read by their own account, or chat read by the bot (`TwitchStreamerFeature`). Each feature maps to a fixed scope set. | A Twitch scope (one feature needs one or more scopes)               |
 
 ## Structure
 
@@ -20,32 +23,59 @@ Transport and integration layer for the Twitch platform. Owns all HTTP communica
 src/
 ├── Console/
 │   ├── LinkTwitchChannelCommand.php       ← Links channel to tenant via ExternalIdentity
-│   └── SubscribeTwitchEventsCommand.php   ← Creates EventSub subscriptions via Helix API
+│   ├── SubscribeTwitchEventsCommand.php   ← Creates EventSub subscriptions via Helix API
+│   └── SyncStreamerSubscriptionsCommand.php ← twitch:sync-streamer-subscriptions
+├── Actions/
+│   ├── RegisterTwitchSubscriptionsAction.php  ← Community subscriptions (twitch:subscribe)
+│   ├── SyncTwitchSubscriptionAction.php
+│   ├── SyncStreamerTwitchSubscriptions.php    ← Desired vs. owned subscriptions of one streamer source
+│   ├── ReconcileStreamerTwitchSubscriptions.php ← Local statuses ← ListSubscriptions (Twitch is the truth)
+│   └── RepairStreamerTwitchSubscriptions.php  ← Reconcile, then sync ("Reparar inscrições")
 ├── Enums/
-│   └── TwitchEventSubType.php             ← All EventSub subscription types with version/condition
-├── ETL/                                    ← Empty in MVP, ready for processing
-│   ├── Actions/
-│   ├── Console/
-│   └── DTOs/
+│   ├── TwitchEventSubType.php             ← All EventSub subscription types with version/condition
+│   └── TwitchSubscriptionStatus.php
+├── ETL/
+│   ├── TwitchStreamingPayloadMapper.php   ← Raw payload → streaming DTOs
+│   └── Listeners/
+│       └── ProjectTwitchEventToStreaming.php ← Queued. TwitchEventReceived → streaming Actions
+├── Events/
+│   └── TwitchEventReceived.php
+├── Exceptions/
+│   └── TwitchUnreachable.php              ← Twitch did not answer; nothing local changed
+├── Health/
+│   ├── TwitchHealthReport.php             ← Account, webhook address, subscriptions, last event
+│   └── Check*.php                         ← One check each, all return streaming's HealthCheck
 ├── Http/
 │   ├── Controllers/
 │   │   └── TwitchWebhookController.php    ← Receives EventSub webhooks, persists to TwitchEventLog
 │   └── Middleware/
 │       └── VerifyTwitchSignature.php      ← HMAC-SHA256 signature verification
+├── Listeners/
+│   ├── SyncStreamerSubscriptionsOnChange.php  ← Identity or streamer change → subscription sync
+│   └── InferChatReaderFromGrantedScopes.php   ← First connection → chat reader from granted scopes
 ├── Models/
-│   └── TwitchEventLog.php                 ← Raw event data lake
+│   ├── TwitchEventLog.php                 ← Raw event data lake
+│   └── TwitchSubscription.php             ← EventSub subscriptions, optionally owned by a streamer source
 ├── OAuth/
 │   ├── TwitchOAuthClient.php              ← Implements OAuthClientContract (uses Transport)
 │   ├── TwitchAppTokenService.php          ← Client credentials flow, cached app token
+│   ├── TwitchBotTokenService.php          ← Bot account user token, refreshed and cached
+│   ├── TwitchUserAuthorization.php        ← Streamer token: /validate, refresh on 401, cached 10 min
+│   ├── TwitchScopes.php                   ← Scopes per panel and per streamer feature
+│   ├── TwitchStreamerFeature.php          ← Alerts · chat by own account · chat by bot
 │   └── DTO/
 │       ├── TwitchOAuthAccessDTO.php
 │       └── TwitchOAuthDTO.php
+├── Support/
+│   ├── EventSubWebhook.php                ← Callback URL and secret for EventSub
+│   └── StreamerSubscriptionPlan.php       ← Which subscriptions one streamer source needs
 └── Transport/
     ├── TwitchHelixConnector.php           ← App token auth, base URL: api.twitch.tv/helix
     ├── TwitchOAuthConnector.php           ← No default auth, base URL: id.twitch.tv/oauth2
     └── Requests/
-        ├── OAuth/                          ← ExchangeCodeForToken, GetAppAccessToken
+        ├── OAuth/                          ← ExchangeCodeForToken, GetAppAccessToken, RefreshUserToken, ValidateToken
         ├── Users/                          ← GetCurrentUser, GetUsers
+        ├── Streams/                        ← GetStreams (title and category on stream.online)
         └── EventSub/                       ← CreateSubscription, ListSubscriptions, DeleteSubscription
 ```
 
@@ -57,8 +87,9 @@ src/
 - OAuth token exchange and user profile retrieval
 - App access token management (client credentials, cached)
 - EventSub webhook reception and raw payload storage
-- EventSub subscription lifecycle (create, list, delete)
-- ETL processing of Twitch events into domain entities (future)
+- EventSub subscription lifecycle (create, list, delete), for the community channel and for each streamer source
+- ETL processing of Twitch events into `streaming` Actions (sessions, stream events, chat)
+- The bot account token and the scope set of each streamer feature
 
 ### This module does NOT own:
 
@@ -121,10 +152,16 @@ php artisan tinker --execute 'dd(\He4rt\IntegrationTwitch\Models\TwitchEventLog:
 
 ### Known quirks
 
-- **`channel.raid`**: Uses `to_broadcaster_user_id` / `from_broadcaster_user_id` instead of `broadcaster_user_id` / `user_id`, so those columns are null in `twitch_event_logs`. Full data is preserved in the `payload` JSONB column.
+- **`channel.raid`**: Uses `to_broadcaster_user_id` / `from_broadcaster_user_id` instead of `broadcaster_user_id` / `user_id`. The webhook controller stores `to_broadcaster_user_id` in `broadcaster_user_id` and `from_broadcaster_user_id` in `user_id`, so a raid resolves the streamer source like any other event.
+- **Gift subs**: a gift of N subs sends one `channel.subscription.gift` and N `channel.subscribe` with `is_gift = true`. The ETL keeps the gift and drops the N gifted subs.
+
+### Streamer flow
+
+`ProjectTwitchEventToStreaming` turns each logged event into a `streaming` Action. Events of a channel without an active streamer source stay only in the lake. The full local flow, with Reverb and the overlay, is in the [streaming README](../streaming/README.md).
 
 ## Dependencies
 
 - **Identity** — OAuth user resolution (`OAuthClientContract`, `ExternalIdentity`)
+- **Streaming** — the ETL calls its Actions, and the subscription sync listens to its streamer and source events
 - **Saloon** — HTTP transport layer (`saloon/saloon ^4.0`)
 - **No dependency on** Moderation, Bot Discord, or Integration Discord

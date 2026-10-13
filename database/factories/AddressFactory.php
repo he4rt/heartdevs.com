@@ -20,8 +20,8 @@ final class AddressFactory extends Factory
     public function definition(): array
     {
         return [
-            'country' => 'BR',
-            'state' => 'SP',
+            'country' => 'BRA',
+            'state' => 'São Paulo',
             'city' => fake()->city(),
             'zip_code' => fake()->postcode(),
         ];

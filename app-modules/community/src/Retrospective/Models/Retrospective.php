@@ -12,7 +12,9 @@ use He4rt\Community\Retrospective\DTOs\DeckConfig;
 use He4rt\Community\Retrospective\DTOs\Period;
 use He4rt\Community\Retrospective\DTOs\RetrospectiveSnapshot;
 use He4rt\Community\Retrospective\DTOs\SourceFilters;
+use He4rt\Community\Retrospective\Enums\CoverKind;
 use He4rt\Community\Retrospective\Enums\RetrospectiveStatus;
+use Illuminate\Database\Eloquent\Attributes\Scope;
 use Illuminate\Database\Eloquent\Attributes\Table;
 use Illuminate\Database\Eloquent\Attributes\UseFactory;
 use Illuminate\Database\Eloquent\Builder;
@@ -26,6 +28,7 @@ use Illuminate\Database\Eloquent\Model;
  * @property CarbonInterface $since
  * @property CarbonInterface $until
  * @property RetrospectiveStatus $status
+ * @property CoverKind $cover_kind
  * @property string|null $cover_title
  * @property string|null $cover_intro
  * @property string|null $closing_text
@@ -49,6 +52,7 @@ final class Retrospective extends Model
         'since',
         'until',
         'status',
+        'cover_kind',
         'cover_title',
         'cover_intro',
         'closing_text',
@@ -85,6 +89,26 @@ final class Retrospective extends Model
     }
 
     /**
+     * Que edição do onboarding é esta: a posição entre as edições de onboarding,
+     * na ordem do início do período. Derivada e não digitada: um número que o
+     * operador esquece de atualizar mente no telão, e a ordem das edições já
+     * está no banco.
+     *
+     * Ancorada no `since` e não em "hoje": reabrir a 3ª edição em 2030 continua
+     * mostrando "3ª edição".
+     */
+    public function editionNumber(): int
+    {
+        $earlierEditions = self::query()
+            ->where('cover_kind', CoverKind::Onboarding->value)
+            ->whereKeyNot($this->getKey())
+            ->where('since', '<', $this->since)
+            ->count();
+
+        return $earlierEditions + 1;
+    }
+
+    /**
      * A edição publicada está exibindo números que não correspondem mais à curadoria
      * atual, porque um filtro que MEXE NO DADO mudou depois do publish.
      *
@@ -111,10 +135,11 @@ final class Retrospective extends Model
     }
 
     /**
-     * @param  Builder<Retrospective>  $query
-     * @return Builder<Retrospective>
+     * @param  Builder<self>  $query
+     * @return Builder<self>
      */
-    protected function scopePublished(Builder $query): Builder
+    #[Scope]
+    protected function published(Builder $query): Builder
     {
         return $query->where('status', RetrospectiveStatus::Published->value);
     }
@@ -126,6 +151,7 @@ final class Retrospective extends Model
             'until' => 'datetime',
             'published_at' => 'datetime',
             'status' => RetrospectiveStatus::class,
+            'cover_kind' => CoverKind::class,
             'hide_bots' => 'boolean',
             'deck_config' => AsDeckConfig::class,
             'snapshot' => AsRetrospectiveSnapshot::class,

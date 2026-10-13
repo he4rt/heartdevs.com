@@ -392,6 +392,7 @@ final class DiscordSource implements CuratableSource, MeasuresPerson, Retrospect
         $excludedMessages = $filters->refsWithPrefix('message:');
 
         return Message::query()
+            ->onPlatform(IdentityProvider::Discord)
             ->whereBetween('sent_at', [$period->since, $period->until])
             ->when(
                 $filters->hideBots,

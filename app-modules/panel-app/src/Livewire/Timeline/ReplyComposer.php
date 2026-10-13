@@ -88,7 +88,7 @@ final class ReplyComposer extends Component implements HasSchemas
         /** @var User $user */
         $user = auth()->user();
 
-        return $user->getFirstMediaUrl('avatar') ?: null;
+        return $user->getFilamentAvatarUrl();
     }
 
     public function render(): View

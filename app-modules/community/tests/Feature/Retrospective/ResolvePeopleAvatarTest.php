@@ -36,10 +36,25 @@ it('cai para o avatar do Discord quando não há conta GitHub', function (): voi
     expect($person->avatar)->toBe('https://cdn.discordapp.com/avatars/1/abc.png');
 });
 
-it('cai para o avatar do sistema quando não há GitHub nem Discord com avatar', function (): void {
+it('monta a URL da CDN quando o Discord guardou só o hash do avatar', function (): void {
+    $user = User::factory()->create();
+    ExternalIdentity::factory()->create([
+        'model_type' => $user->getMorphClass(),
+        'model_id' => $user->id,
+        'provider' => IdentityProvider::Discord,
+        'external_account_id' => '286313989237899276',
+        'metadata' => ['avatar' => 'abc123'],
+    ]);
+
+    $person = resolve(ResolvePeople::class)->execute([$user->id])[$user->id];
+
+    expect($person->avatar)->toBe('https://cdn.discordapp.com/avatars/286313989237899276/abc123.png');
+});
+
+it('devolve null para a view mostrar as iniciais quando não há GitHub, Discord nem upload', function (): void {
     $user = User::factory()->create(['username' => 'fulana']);
 
     $person = resolve(ResolvePeople::class)->execute([$user->id])[$user->id];
 
-    expect($person->avatar)->toBe('https://github.com/fulana.png');
+    expect($person->avatar)->toBeNull();
 });

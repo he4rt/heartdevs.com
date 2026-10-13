@@ -28,7 +28,7 @@ final class ArticleFeed
     {
         return $this->articles ??= array_values(
             ContentEntry::query()
-                ->with(['contentable', 'author'])
+                ->with(['contentable', 'author.media', 'author.providers'])
                 ->latest('published_at')
                 ->get()
                 ->map(fn (ContentEntry $entry): Article => Article::fromEntry($entry))
@@ -46,7 +46,7 @@ final class ArticleFeed
     {
         return array_values(
             ContentEntry::query()
-                ->with(['contentable', 'author'])
+                ->with(['contentable', 'author.media', 'author.providers'])
                 ->latest('published_at')
                 ->limit($limit)
                 ->get()

@@ -68,9 +68,10 @@ final class PostShow extends Component
     {
         $timeline = Timeline::query()
             ->where('id', $this->timelineId)->with([
-                'user',
+                'user.media',
+                'user.providers',
                 'postable',
-                'children' => fn (Relation $q) => $q->with('user', 'postable')->latest(),
+                'children' => fn (Relation $q) => $q->with('user.media', 'user.providers', 'postable')->latest(),
             ])
             ->withCount('children')
             ->firstOrFail();

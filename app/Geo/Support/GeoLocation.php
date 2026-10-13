@@ -68,23 +68,21 @@ final class GeoLocation
         $state = collect(self::statesPayload($iso3))
             ->firstWhere('name', $stateName);
 
-        if ($state === null) {
+        $stateId = $state['id'] ?? null;
+
+        if (!is_int($stateId)) {
             return [];
         }
 
-        /** @var list<array<string, mixed>> $cities */
-        $cities = $state['cities'] ?? [];
         $term = mb_trim((string) $search);
 
-        return collect($cities)
+        return collect(self::cityNames($stateId))
             ->when($term !== '', static fn (Collection $collection): Collection => $collection->filter(
-                static fn (array $city): bool => self::matches((string) $city['name'], $term),
+                static fn (string $name): bool => self::matches($name, $term),
             ))
-            ->sortBy('name')
+            ->sort()
             ->take(50)
-            ->mapWithKeys(static fn (array $city): array => [
-                (string) $city['name'] => (string) $city['name'],
-            ])
+            ->mapWithKeys(static fn (string $name): array => [$name => $name])
             ->all();
     }
 
@@ -123,6 +121,27 @@ final class GeoLocation
         });
 
         return $payload;
+    }
+
+    /**
+     * @return list<string>
+     */
+    private static function cityNames(int $stateId): array
+    {
+        /** @var list<string> $names */
+        $names = Cache::remember('geo.cities.'.$stateId, self::CACHE_TTL, static function () use ($stateId): array {
+            $names = [];
+
+            foreach (resolve(WorldApiClient::class)->cities($stateId) as $city) {
+                if (is_string($city['name'] ?? null)) {
+                    $names[] = $city['name'];
+                }
+            }
+
+            return $names;
+        });
+
+        return $names;
     }
 
     private static function matches(string $value, string $term): bool

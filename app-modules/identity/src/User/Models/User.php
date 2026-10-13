@@ -7,12 +7,17 @@ namespace He4rt\Identity\User\Models;
 use App\Concerns\HasAddress;
 use Carbon\CarbonInterface;
 use Filament\Models\Contracts\FilamentUser;
+use Filament\Models\Contracts\HasAvatar;
 use Filament\Models\Contracts\HasName;
 use Filament\Panel;
 use He4rt\Activity\Tracking\Concerns\HasInteractions;
 use He4rt\Gamification\Character\Models\Character;
+use He4rt\Identity\Authorization\Enums\UserRole;
 use He4rt\Identity\Database\Factories\UserFactory;
+use He4rt\Identity\ExternalIdentity\Enums\IdentityProvider;
 use He4rt\Identity\ExternalIdentity\Models\ExternalIdentity;
+use He4rt\Identity\User\Concerns\HasProfileImages;
+use He4rt\Identity\User\Enums\ProfileImage;
 use He4rt\Identity\User\Enums\UserSituation;
 use He4rt\Identity\User\Observers\UserObserver;
 use He4rt\Profile\Models\Profile;
@@ -21,14 +26,18 @@ use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Attributes\Table;
 use Illuminate\Database\Eloquent\Attributes\UseFactory;
 use Illuminate\Database\Eloquent\Casts\Attribute;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use PHPOpenSourceSaver\JWTAuth\Contracts\JWTSubject;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
+use Spatie\Permission\Models\Role;
+use Spatie\Permission\Traits\HasRoles;
 
 /**
  * @property string $id
@@ -43,24 +52,40 @@ use Spatie\MediaLibrary\InteractsWithMedia;
  * @property CarbonInterface|null $created_at
  * @property CarbonInterface|null $updated_at
  * @property-read UserSituation $situation
+ * @property-read Collection<int, Role> $roles
  */
 #[ObservedBy(classes: UserObserver::class)]
 #[UseFactory(factoryClass: UserFactory::class)]
 #[Table(name: 'users')]
 #[Hidden('password', 'remember_token', 'email_verified_at')]
-final class User extends Authenticatable implements FilamentUser, HasMedia, HasName
+final class User extends Authenticatable implements FilamentUser, HasAvatar, HasMedia, HasName, JWTSubject
 {
     use HasAddress;
     /** @use HasFactory<UserFactory> */
     use HasFactory;
     use HasInteractions;
+    use HasProfileImages;
+    use HasRoles;
     use HasUuids;
     use InteractsWithMedia;
     use Notifiable;
 
-    public function isAdmin(): bool
+    public function isSuperAdmin(): bool
     {
-        return in_array($this->username, str(config('he4rt.admins'))->explode(',')->toArray(), strict: true);
+        return $this->hasRole(UserRole::SuperAdmin);
+    }
+
+    public function getJWTIdentifier(): string
+    {
+        return $this->getKey();
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    public function getJWTCustomClaims(): array
+    {
+        return [];
     }
 
     /**
@@ -94,27 +119,25 @@ final class User extends Authenticatable implements FilamentUser, HasMedia, HasN
 
     public function registerMediaCollections(): void
     {
-        $this->addMediaCollection('avatar')
-            ->singleFile()
-            ->useDisk('public');
-
-        $this->addMediaCollection('cover')
-            ->singleFile()
-            ->useDisk('public');
+        $this->registerProfileImageCollections();
     }
 
     public function canAccessPanel(Panel $panel): bool
     {
         return match ($panel->getId()) {
-            'admin' => app()->isProduction() ? $this->isAdmin() : true,
+            'admin' => app()->isProduction() ? $this->isSuperAdmin() : true,
             default => true
         };
     }
 
-    public function getFilamentAvatarUrl(): string
+    /**
+     * The site username comes from the first OAuth provider (usually Discord), so it is never used to build an avatar URL.
+     */
+    public function getFilamentAvatarUrl(): ?string
     {
-
-        return sprintf('https://github.com/%s.png', $this->username);
+        return $this->imageUrl(ProfileImage::Avatar)
+            ?: $this->linkedIdentity(IdentityProvider::GitHub)?->avatarUrl()
+            ?: $this->linkedIdentity(IdentityProvider::Discord)?->avatarUrl();
     }
 
     /**
@@ -153,6 +176,15 @@ final class User extends Authenticatable implements FilamentUser, HasMedia, HasN
             'banned_at' => 'datetime',
             'first_login_at' => 'datetime',
         ];
+    }
+
+    private function linkedIdentity(IdentityProvider $provider): ?ExternalIdentity
+    {
+        return $this->providers
+            ->where('provider', $provider)
+            ->filter->isConnected()
+            ->sortByDesc('connected_at')
+            ->first();
     }
 
     private function resolveSituation(): UserSituation

@@ -34,13 +34,15 @@ final readonly class HandleOAuthCallbackAction
         $oauthUser = $client->getAuthenticatedUser($access);
 
         $user = match ($state->intent) {
-            OAuthIntent::Login => $this->findOrCreateUser->execute($oauthUser),
+            OAuthIntent::Login, OAuthIntent::MobileLogin => $this->findOrCreateUser->execute($oauthUser),
             OAuthIntent::Link => $this->resolveAuthenticatedUser(),
         };
 
-        $redirectUrl = $state->returnUrl ?? filament()
-            ->getPanel($state->panel)
-            ->getUrl();
+        // MobileLogin usa panel='mobile', que não é um panel Filament registrado —
+        // o redirect real é o deep link montado em OAuthController, não isso aqui.
+        $redirectUrl = $state->intent === OAuthIntent::MobileLogin
+            ? null
+            : $state->returnUrl ?? filament()->getPanel($state->panel)->getUrl();
 
         if ($state->intent === OAuthIntent::Link) {
             $mergeConflict = $this->detectMergeConflict->execute($user, $oauthUser, $access);

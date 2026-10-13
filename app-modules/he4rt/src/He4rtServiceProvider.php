@@ -13,5 +13,6 @@ class He4rtServiceProvider extends ServiceProvider
     public function boot(): void
     {
         $this->loadViewsFrom(__DIR__.'/../resources/views', 'he4rt');
+        $this->loadTranslationsFrom(__DIR__.'/../lang', 'he4rt');
     }
 }

@@ -9,6 +9,7 @@ use Filament\Pages\Page;
 use Filament\Support\Enums\Width;
 use Filament\Support\Icons\Heroicon;
 use He4rt\Activity\Message\Models\Message;
+use He4rt\Identity\ExternalIdentity\Enums\IdentityProvider;
 use He4rt\Identity\ExternalIdentity\Models\ExternalIdentity;
 use He4rt\PanelAdmin\Marketing\MarketingCluster;
 use Illuminate\Support\Collection;
@@ -62,6 +63,7 @@ class MeetingShowcasePage extends Page
 
         /** @var Collection<int, Message> $messageStats */
         $messageStats = Message::query()
+            ->onPlatform(IdentityProvider::Discord)
             ->where('channel_id', $this->channelId)
             ->whereBetween('sent_at', [$start, $end])
             ->whereNotNull('sent_at')

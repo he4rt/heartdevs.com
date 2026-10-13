@@ -25,9 +25,6 @@ interface CollectionInterface
 
 namespace Discord\Parts\User;
 
-use Discord\Helpers\CollectionInterface;
-use Discord\Parts\Guild\Role;
-
 /**
  * @property string $id
  * @property string $username
@@ -41,6 +38,25 @@ use Discord\Parts\Guild\Role;
 class User
 {
 }
+
+/**
+ * @property string $name
+ * @property int $type
+ * @property string|null $url
+ * @property string|null $application_id
+ * @property string|null $details
+ * @property string|null $state
+ */
+class Activity
+{
+}
+
+namespace Discord\Parts\Guild\Member;
+
+use Discord\Helpers\CollectionInterface;
+use Discord\Parts\Guild\Role\Role;
+use Discord\Parts\User\Activity;
+use Discord\Parts\User\User;
 
 /**
  * @property string $id
@@ -61,18 +77,6 @@ class Member
 {
 }
 
-/**
- * @property string $name
- * @property int $type
- * @property string|null $url
- * @property string|null $application_id
- * @property string|null $details
- * @property string|null $state
- */
-class Activity
-{
-}
-
 namespace Discord\Parts\Guild;
 
 /**
@@ -86,12 +90,14 @@ namespace Discord\Parts\Guild;
  * @property int|null $member_count
  * @property mixed $members
  * @property mixed $channels
- * @property \Discord\Helpers\CollectionInterface<Role> $roles
+ * @property \Discord\Helpers\CollectionInterface<\Discord\Parts\Guild\Role\Role> $roles
  * @property-read mixed $voice_states
  */
 class Guild
 {
 }
+
+namespace Discord\Parts\Guild\Role;
 
 /**
  * @property string $id
@@ -130,7 +136,7 @@ namespace Discord\Parts\WebSockets;
  * @property \Discord\Parts\Channel\Channel|null $channel
  * @property string $user_id
  * @property \Discord\Parts\User\User|null $user
- * @property \Discord\Parts\User\Member|null $member
+ * @property \Discord\Parts\Guild\Member\Member|null $member
  * @property string $session_id
  * @property bool $deaf
  * @property bool $mute

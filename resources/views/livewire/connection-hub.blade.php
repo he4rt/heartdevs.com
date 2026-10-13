@@ -36,7 +36,8 @@
                         default => '#6b7280',
                     };
 
-                    $scopes = $provider->getScopes($panel);
+                    $scopes = $provider->getScopes($panel, auth()->user());
+                    $missingScopes = $connected ? $connected->missingScopes($scopes) : [];
                 @endphp
                 <div
                     wire:key="provider-{{ $provider->value }}"
@@ -104,13 +105,24 @@
 
                         {{-- Action --}}
                         @if ($connected)
-                            <button
-                                wire:click="disconnect('{{ $provider->value }}')"
-                                type="button"
-                                class="shrink-0 rounded-md px-2 py-0.5 text-[11px] font-medium text-gray-500 ring-1 ring-gray-300 transition-all hover:text-red-500 hover:ring-red-400/40 dark:text-gray-400 dark:ring-gray-700/60 dark:hover:text-red-400 dark:hover:ring-red-500/40"
-                            >
-                                Disconnect
-                            </button>
+                            <div class="flex shrink-0 items-center gap-1.5">
+                                @if ($missingScopes !== [])
+                                    <x-filament::button
+                                        wire:click="connect('{{ $provider->value }}')"
+                                        size="xs"
+                                        color="warning"
+                                    >
+                                        Reautorizar
+                                    </x-filament::button>
+                                @endif
+                                <button
+                                    wire:click="disconnect('{{ $provider->value }}')"
+                                    type="button"
+                                    class="shrink-0 rounded-md px-2 py-0.5 text-[11px] font-medium text-gray-500 ring-1 ring-gray-300 transition-all hover:text-red-500 hover:ring-red-400/40 dark:text-gray-400 dark:ring-gray-700/60 dark:hover:text-red-400 dark:hover:ring-red-500/40"
+                                >
+                                    Disconnect
+                                </button>
+                            </div>
                         @else
                             <x-filament::button wire:click="connect('{{ $provider->value }}')" size="sm" class="shrink-0">
                                 Connect
@@ -152,6 +164,23 @@
                                         </code>
                                     @endforeach
                                 </div>
+                            </div>
+                        </div>
+                    @endif
+
+                    @if ($missingScopes !== [])
+                        <div class="border-t border-gray-200 px-2.5 py-1.5 dark:border-gray-800/50">
+                            <p class="text-[10px] text-amber-600 dark:text-amber-400">
+                                Faltam permissões. Reautorize para liberar:
+                            </p>
+                            <div class="mt-1 flex flex-wrap gap-1">
+                                @foreach ($missingScopes as $scope)
+                                    <code
+                                        class="rounded bg-amber-50 px-1 py-0.5 font-mono text-[9px] text-amber-700 ring-1 ring-amber-200 dark:bg-amber-500/10 dark:text-amber-300 dark:ring-amber-500/20"
+                                    >
+                                        {{ $scope }}
+                                    </code>
+                                @endforeach
                             </div>
                         </div>
                     @endif

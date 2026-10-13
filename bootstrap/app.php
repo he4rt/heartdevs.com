@@ -24,6 +24,20 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->web(append: [
             SetApplicationLocale::class,
         ]);
+
+        // O app não tem rota "login" — auth é só via OAuth (Filament cuida do
+        // próprio redirect nos painéis). Sem isso, o middleware `auth`/`auth:api`
+        // tenta redirect(route('login')) pra qualquer client sem "Accept:
+        // application/json" e quebra com 500 (RouteNotFoundException).
+        $middleware->redirectGuestsTo(redirect: null);
     })
-    ->withExceptions(static function (Exceptions $exceptions): void {})
+    ->withExceptions(static function (Exceptions $exceptions): void {
+        // Sem isso, um cliente de API que não manda "Accept: application/json"
+        // (curl puro, a maioria dos clientes HTTP mobile) recebe um 500 em vez
+        // de 401/erro em JSON: o handler padrão tenta redirect(route('login')),
+        // que não existe neste app — login é só via OAuth.
+        $exceptions->shouldRenderJsonWhen(
+            fn ($request, $throwable): bool => $request->is('api/*') || $request->expectsJson(),
+        );
+    })
     ->create();

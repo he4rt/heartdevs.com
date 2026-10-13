@@ -22,7 +22,7 @@
                 @continue (!$reply->postable || !$reply->user)
                 @php($replySummary = $reactionSummaries->get($reply->id))
                 <div class="flex gap-3">
-                    @php($replyAvatarUrl = $reply->user->getFirstMediaUrl('avatar') ?: null)
+                    @php($replyAvatarUrl = $reply->user->getFilamentAvatarUrl())
                     @if ($replyAvatarUrl)
                         <img
                             src="{{ $replyAvatarUrl }}"

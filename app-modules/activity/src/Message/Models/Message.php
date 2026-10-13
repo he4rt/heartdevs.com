@@ -9,8 +9,11 @@ use He4rt\Activity\Database\Factories\MessageFactory;
 use He4rt\Activity\Message\Enums\MessageKind;
 use He4rt\Activity\Message\Enums\MessageSourceKind;
 use He4rt\Activity\Reaction\Concerns\HasReactions;
+use He4rt\Identity\ExternalIdentity\Enums\IdentityProvider;
 use He4rt\Identity\ExternalIdentity\Models\ExternalIdentity;
+use Illuminate\Database\Eloquent\Attributes\Scope;
 use Illuminate\Database\Eloquent\Attributes\Table;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -20,6 +23,7 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
 
 /**
  * @property string $id
+ * @property IdentityProvider $platform
  * @property string $external_identity_id
  * @property string|null $provider_message_id
  * @property string|null $channel_id
@@ -110,10 +114,20 @@ final class Message extends Model
         return MessageFactory::new();
     }
 
+    /**
+     * @param  Builder<self>  $query
+     */
+    #[Scope]
+    protected function onPlatform(Builder $query, IdentityProvider $platform): void
+    {
+        $query->where('platform', $platform);
+    }
+
     /** @return array<string, mixed> */
     protected function casts(): array
     {
         return [
+            'platform' => IdentityProvider::class,
             'metadata' => 'array',
             'sent_at' => 'datetime',
             'edited_at' => 'datetime',

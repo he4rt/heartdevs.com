@@ -3,8 +3,11 @@
     'user' => null,
     'character' => null,
     'initials' => '',
-    'avatarPreviewUrl' => null,
-    'coverPreviewUrl' => null
+    'avatarDisplayUrl' => null,
+    'coverPreviewUrl' => null,
+    'coverAspectRatio',
+    'coverFocalY' => 50,
+    'avatarFocalY' => 50
 ])
 
 @php
@@ -82,9 +85,17 @@
     class="w-full overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm dark:border-white/10 dark:bg-gray-900"
 >
     {{-- Header gradient / cover --}}
-    <div class="relative h-24 bg-gradient-to-r from-purple-600 to-purple-500">
+    <div
+        class="relative bg-gradient-to-r from-purple-600 to-purple-500"
+        style="aspect-ratio: {{ $coverAspectRatio }}"
+    >
         @if ($coverPreviewUrl)
-            <img src="{{ $coverPreviewUrl }}" alt="" class="absolute inset-0 h-full w-full object-cover" />
+            <img
+                src="{{ $coverPreviewUrl }}"
+                alt=""
+                class="absolute inset-0 h-full w-full object-cover"
+                style="object-position: center {{ $coverFocalY }}%"
+            />
         @endif
 
         {{-- Level badge --}}
@@ -96,10 +107,11 @@
 
         {{-- Avatar --}}
         <div class="absolute -bottom-8 left-6">
-            @if ($avatarPreviewUrl)
+            @if ($avatarDisplayUrl)
                 <img
-                    src="{{ $avatarPreviewUrl }}"
+                    src="{{ $avatarDisplayUrl }}"
                     alt="{{ $name }}"
+                    style="object-position: center {{ $avatarFocalY }}%"
                     class="h-16 w-16 rounded-full border-4 border-white object-cover shadow-md dark:border-gray-800"
                 />
             @else

@@ -9,10 +9,14 @@ use Illuminate\Support\Facades\Crypt;
 
 abstract class OAuthAccessDTO
 {
+    /**
+     * @param  array<int, string>  $grantedScopes
+     */
     public function __construct(
         public string $accessToken,
         public string $refreshToken,
-        public ?int $expiresIn
+        public ?int $expiresIn,
+        public array $grantedScopes = [],
     ) {}
 
     /**
