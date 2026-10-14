@@ -8,10 +8,12 @@
     {{ Vite::fonts(['satoshi', 'fira-code']) }}
     @fluxAppearance
 </head>
-<body class="min-h-screen antialiased">
+<body class="flex min-h-screen flex-col antialiased">
     <x-portal::navbar />
 
     {{ $slot }}
+
+    <x-portal::footer />
     @fluxScripts
 </body>
 </html>
