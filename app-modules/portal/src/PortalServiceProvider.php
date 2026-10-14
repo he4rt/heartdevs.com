@@ -9,10 +9,12 @@ use He4rt\Portal\Gallery\AlbumPage;
 use He4rt\Portal\Gallery\GalleryPage;
 use He4rt\Portal\Home\HeroSection;
 use He4rt\Portal\Home\Homepage;
+use He4rt\Portal\Privacy\PrivacyPolicyPage;
 use He4rt\Portal\Retrospective\CommunityRetrospectivePage;
 use He4rt\Portal\ShortLink\ShortLinkRedirectController;
 use He4rt\Portal\Sitemap\SitemapController;
 use He4rt\Portal\SocialLinks\SocialLinksPage;
+use He4rt\Portal\Terms\TermsOfServicePage;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
 use Laravel\Head\HeadServiceProvider;
@@ -65,6 +67,20 @@ class PortalServiceProvider extends ServiceProvider
                 ->withHead(
                     title: 'Artigos da comunidade',
                     description: 'Os artigos publicados pela organização He4rt Developers no dev.to, por tema e por quem escreveu.',
+                );
+
+            Route::get('/privacidade', PrivacyPolicyPage::class)
+                ->name('privacy-policy')
+                ->withHead(
+                    title: 'Política de privacidade',
+                    description: 'Como a He4rt Developers trata os seus dados pessoais no site, nos painéis, no app mobile e no bot do Discord, conforme a LGPD.',
+                );
+
+            Route::get('/termos', TermsOfServicePage::class)
+                ->name('terms-of-service')
+                ->withHead(
+                    title: 'Termos de uso',
+                    description: 'As regras para usar o site, os painéis, o app mobile e o bot do Discord da He4rt Developers.',
                 );
 
             Route::get('/galeria', GalleryPage::class)

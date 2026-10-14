@@ -62,6 +62,16 @@ return [
     ],
 
     /*
+     * Pontos de contato do encarregado (LGPD, art. 41), exibidos em /privacidade
+     * e /termos. Lista vazia: as páginas apontam só para o Discord.
+     */
+    'privacy' => [
+        'contacts' => [
+            ['name' => 'Daniel Reis', 'email' => 'danielhe4rt@gmail.com'],
+        ],
+    ],
+
+    /*
      * Fonte única das redes sociais da He4rt. Alimenta a página /redes
      * (He4rt\Portal\Livewire\SocialLinksPage) e qualquer outro lugar que
      * precise dos links. `accent_dark` é opcional (cai no `accent` quando ausente).

@@ -26,6 +26,8 @@ final class SitemapController extends Controller
         'social-links' => ['changefreq' => 'monthly', 'priority' => '0.6'],
         'community.retrospective' => ['changefreq' => 'weekly', 'priority' => '0.7'],
         'gallery' => ['changefreq' => 'weekly', 'priority' => '0.7'],
+        'privacy-policy' => ['changefreq' => 'yearly', 'priority' => '0.3'],
+        'terms-of-service' => ['changefreq' => 'yearly', 'priority' => '0.3'],
     ];
 
     public function __invoke(): Response

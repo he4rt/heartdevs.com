@@ -25,7 +25,9 @@ it('serve as rotas do portal dentro do grupo web', function (string $name): void
     'community.retrospective.preview',
     'gallery',
     'gallery.album',
+    'privacy-policy',
     'social-links',
+    'terms-of-service',
 ]);
 
 it('inicia sessão na página pública, para o login do operador ser visível no preview', function (): void {
