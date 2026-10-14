@@ -69,6 +69,12 @@ final class Timeline extends Model
         return $this->hasMany(self::class, 'parent_id');
     }
 
+    /** @return HasMany<TimelineLike, $this> */
+    public function likes(): HasMany
+    {
+        return $this->hasMany(TimelineLike::class);
+    }
+
     protected static function newFactory(): TimelineFactory
     {
         return TimelineFactory::new();

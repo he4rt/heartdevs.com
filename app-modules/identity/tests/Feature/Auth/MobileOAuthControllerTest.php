@@ -123,3 +123,26 @@ test('a successful mobile login on the shared web callback redirects to the app 
         ->and(User::query()->where('username', 'mobile-user')->exists())->toBeTrue()
         ->and(Auth::check())->toBeFalse();
 });
+
+test('a successful mobile login works without a returnUrl, exactly like MobileOAuthController::redirect() builds the state', function (): void {
+    // Regressão: panel='mobile' não é um panel Filament registrado — sem
+    // returnUrl pra curto-circuitar o ??, HandleOAuthCallbackAction tentava
+    // filament()->getPanel('mobile')->getUrl() e quebrava com "Call to a
+    // member function getUrl() on null".
+    bindMobileGithubClient();
+
+    $state = new OAuthStateDTO(
+        intent: OAuthIntent::MobileLogin,
+        provider: IdentityProvider::GitHub,
+        panel: 'mobile',
+    );
+
+    $response = $this->get('/auth/oauth/github?'.http_build_query([
+        'state' => (string) $state,
+        'code' => 'auth-code',
+    ]));
+
+    $response->assertRedirect();
+
+    expect((string) $response->headers->get('Location'))->toStartWith('he4rtapp://oauth/callback?code=');
+});

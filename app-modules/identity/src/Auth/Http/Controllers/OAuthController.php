@@ -17,6 +17,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
+use LogicException;
 use RuntimeException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
@@ -95,13 +96,14 @@ final class OAuthController extends Controller
             return redirect()->to(MobileOAuthDeepLink::build('callback', code: $exchangeCode));
         }
 
+        $redirectUrl = $result->redirectUrl;
+        throw_if($redirectUrl === null, LogicException::class, 'OAuthResultDTO::redirectUrl só é nulo no fluxo mobile, já tratado acima.');
+
         if ($result->hasMergeConflict()) {
             session()->put('oauth_merge_pending', $result->mergeConflict->toSession());
 
-            return redirect()->to($result->redirectUrl);
+            return redirect()->to($redirectUrl);
         }
-
-        $redirectUrl = $result->redirectUrl;
 
         if ($result->intent === OAuthIntent::Login) {
             Auth::login($result->user, remember: true);

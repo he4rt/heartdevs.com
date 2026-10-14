@@ -8,12 +8,15 @@ use App\Http\Controllers\Controller;
 use He4rt\Activity\Timeline\Actions\CreatePost;
 use He4rt\Activity\Timeline\Actions\CreateReply;
 use He4rt\Activity\Timeline\Actions\DeleteReply;
+use He4rt\Activity\Timeline\Actions\LikePost;
+use He4rt\Activity\Timeline\Actions\UnlikePost;
 use He4rt\Activity\Timeline\DTOs\CreatePostDTO;
 use He4rt\Activity\Timeline\DTOs\CreateReplyDTO;
 use He4rt\Activity\Timeline\Http\Resources\TimelinePostResource;
 use He4rt\Activity\Timeline\Timeline;
 use He4rt\Identity\User\Models\User;
 use Illuminate\Auth\Access\AuthorizationException;
+use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
@@ -28,12 +31,16 @@ final class MobileTimelineController extends Controller
      *
      * Retorna os posts raiz da timeline, mais recentes primeiro.
      */
-    public function index(): AnonymousResourceCollection
+    public function index(Request $request): AnonymousResourceCollection
     {
+        /** @var User $user */
+        $user = $request->user();
+
         $posts = Timeline::query()
             ->feed()
             ->with(['user.media', 'user.providers', 'postable.media'])
-            ->withCount(['children', 'reactions'])
+            ->with(['likes' => fn (Relation $query): Relation => $query->where('user_id', $user->id)])
+            ->withCount(['children', 'reactions', 'likes'])
             ->simplePaginate(20);
 
         return TimelinePostResource::collection($posts);
@@ -58,7 +65,7 @@ final class MobileTimelineController extends Controller
             images: $this->storeImages($request),
         ));
 
-        return $this->postResponse($post, Response::HTTP_CREATED);
+        return $this->postResponse($request, $post, Response::HTTP_CREATED);
     }
 
     /**
@@ -82,7 +89,7 @@ final class MobileTimelineController extends Controller
             images: $this->storeImages($request),
         ));
 
-        return $this->postResponse($reply, Response::HTTP_CREATED);
+        return $this->postResponse($request, $reply, Response::HTTP_CREATED);
     }
 
     /**
@@ -106,6 +113,36 @@ final class MobileTimelineController extends Controller
     }
 
     /**
+     * Curtir post
+     *
+     * Idempotente — curtir de novo um post já curtido não tem efeito.
+     */
+    public function like(Request $request, Timeline $post, LikePost $likePost): JsonResponse
+    {
+        /** @var User $user */
+        $user = $request->user();
+
+        $likePost->handle($user, $post);
+
+        return $this->likeResponse($post, $user);
+    }
+
+    /**
+     * Descurtir post
+     *
+     * Idempotente — descurtir um post não curtido não tem efeito.
+     */
+    public function unlike(Request $request, Timeline $post, UnlikePost $unlikePost): JsonResponse
+    {
+        /** @var User $user */
+        $user = $request->user();
+
+        $unlikePost->handle($user, $post);
+
+        return $this->likeResponse($post, $user);
+    }
+
+    /**
      * @return array<int, string>
      */
     private function storeImages(Request $request): array
@@ -124,13 +161,30 @@ final class MobileTimelineController extends Controller
         );
     }
 
-    private function postResponse(Timeline $post, int $status): JsonResponse
+    private function postResponse(Request $request, Timeline $post, int $status): JsonResponse
     {
+        /** @var User $user */
+        $user = $request->user();
+
         // create() não preenche defaults de banco (pinned, is_ignored, views) no model em memória.
-        $post->refresh()->load(['user.media', 'user.providers', 'postable.media'])->loadCount(['children', 'reactions']);
+        $post->refresh()
+            ->load(['user.media', 'user.providers', 'postable.media'])
+            ->load(['likes' => fn (Relation $query): Relation => $query->where('user_id', $user->id)])
+            ->loadCount(['children', 'reactions', 'likes']);
 
         return new TimelinePostResource($post)
             ->response()
             ->setStatusCode($status);
+    }
+
+    private function likeResponse(Timeline $post, User $user): JsonResponse
+    {
+        $post->loadCount('likes');
+        $likedByMe = $post->likes()->where('user_id', $user->id)->exists();
+
+        return response()->json([
+            'likes_count' => $post->likes_count,
+            'liked_by_me' => $likedByMe,
+        ]);
     }
 }
