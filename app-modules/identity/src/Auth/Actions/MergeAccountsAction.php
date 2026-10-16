@@ -52,9 +52,9 @@ final class MergeAccountsAction
         }
 
         $canUpdateUsername = $target->username_manually_set_at === null
-            && $source->username !== $target->username
+            && mb_strtolower($source->username) !== mb_strtolower($target->username)
             && !User::query()
-                ->where('username', $source->username)
+                ->whereRaw('LOWER(username) = ?', [mb_strtolower($source->username)])
                 ->where('id', '!=', $target->id)
                 ->exists();
 

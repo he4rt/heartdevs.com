@@ -69,7 +69,6 @@ return [
         'expected_salary' => 'Monthly amount in BRL. Private, used only in proposals.',
         'skills' => 'Pick your skills and set your level and years of experience for each.',
         'username_modal_description' => 'Choose a new unique handle for your community profile.',
-        'username_cooldown_notice' => 'You will only be able to change your @ again after 7 days.',
         'username_rules_title' => 'Rules for your @',
         'username_rule_length' => 'Between 2 and 32 characters long (automatically converted to lowercase).',
         'username_rule_characters' => 'Allowed: letters (a-z), numbers (0-9), dots (.), hyphens (-), and underscores (_).',

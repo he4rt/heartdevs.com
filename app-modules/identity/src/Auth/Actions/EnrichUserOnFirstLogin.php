@@ -28,9 +28,9 @@ final class EnrichUserOnFirstLogin
         }
 
         $canUpdateUsername = $user->username_manually_set_at === null
-            && $oauthUser->username !== $user->username
+            && mb_strtolower($oauthUser->username) !== mb_strtolower($user->username)
             && !User::query()
-                ->where('username', $oauthUser->username)
+                ->whereRaw('LOWER(username) = ?', [mb_strtolower($oauthUser->username)])
                 ->where('id', '!=', $user->id)
                 ->exists();
 

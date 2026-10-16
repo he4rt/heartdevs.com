@@ -69,7 +69,6 @@ return [
         'skills' => 'Selecione suas skills e informe o nível e os anos de experiência em cada uma.',
         'city' => 'Se sua cidade não estiver na listagem, pesquise.',
         'username_modal_description' => 'Escolha um novo identificador único para seu perfil na comunidade.',
-        'username_cooldown_notice' => 'Você só poderá alterar seu @ novamente após 7 dias.',
         'username_rules_title' => 'Regras para o @',
         'username_rule_length' => 'Entre 2 e 32 caracteres (convertido automaticamente para minúsculo).',
         'username_rule_characters' => 'Permitido letras (a-z), números (0-9), ponto (.), hífen (-) e sublinhado (_).',

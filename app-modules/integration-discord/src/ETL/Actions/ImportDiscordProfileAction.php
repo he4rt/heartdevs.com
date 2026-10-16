@@ -80,9 +80,9 @@ final class ImportDiscordProfileAction
         $changes = [];
 
         $usernameChanged = $user->username_manually_set_at === null
-            && $user->username !== $dto->username
+            && mb_strtolower($user->username) !== mb_strtolower($dto->username)
             && !User::query()
-                ->where('username', $dto->username)
+                ->whereRaw('LOWER(username) = ?', [mb_strtolower($dto->username)])
                 ->where('id', '!=', $user->id)
                 ->exists();
 

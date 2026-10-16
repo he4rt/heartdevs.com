@@ -95,3 +95,13 @@ test('rejects reserved usernames case-insensitively', function (string $reserved
     ['TODOS', 'todos'],
     ['Aqui', 'aqui'],
 ]);
+
+test('loads reserved usernames from file and checks reservation', function (): void {
+    $reservedList = UsernameValidator::reservedUsernames();
+
+    expect($reservedList)->toBeArray()
+        ->and($reservedList)->toContain('admin', 'sistema', 'he4rt')
+        ->and(UsernameValidator::isReserved('admin'))->toBeTrue()
+        ->and(UsernameValidator::isReserved('ADMIN'))->toBeTrue()
+        ->and(UsernameValidator::isReserved('validuser'))->toBeFalse();
+});

@@ -33,9 +33,9 @@ final class MergeDuplicateDiscordUserAction
 
             $newUser->delete();
 
-            if ($oldUser->username_manually_set_at === null && $oldUser->username !== $targetUsername) {
+            if ($oldUser->username_manually_set_at === null && mb_strtolower($oldUser->username) !== mb_strtolower($targetUsername)) {
                 $taken = User::query()
-                    ->where('username', $targetUsername)
+                    ->whereRaw('LOWER(username) = ?', [mb_strtolower($targetUsername)])
                     ->where('id', '!=', $oldUser->id)
                     ->exists();
 

@@ -50,20 +50,16 @@ test('preserves username_manually_set_at on subsequent updates after cooldown', 
 test('throws exception when cooldown is still active', function (): void {
     Date::setTestNow('2026-09-08 12:00:00');
 
-    try {
-        $user = User::factory()->create([
-            'username' => 'currentuser',
-            'username_manually_set_at' => now()->subDays(3),
-            'username_updated_at' => now()->subDays(3),
-        ]);
+    $user = User::factory()->create([
+        'username' => 'currentuser',
+        'username_manually_set_at' => now()->subDays(3),
+        'username_updated_at' => now()->subDays(3),
+    ]);
 
-        $action = resolve(UpdateUsername::class);
+    $action = resolve(UpdateUsername::class);
 
-        expect(fn () => $action->handle($user, 'newhandle'))
-            ->toThrow(UsernameException::class, '12/09/2026 09:00'); // 2026-09-08 12:00 UTC - 3 days + 7 days = 2026-09-12 12:00 UTC = 09:00 America/Sao_Paulo
-    } finally {
-        Date::setTestNow();
-    }
+    expect(fn () => $action->handle($user, 'newhandle'))
+        ->toThrow(UsernameException::class, '12/09/2026 09:00'); // 2026-09-08 12:00 UTC - 3 days + 7 days = 2026-09-12 12:00 UTC = 09:00 America/Sao_Paulo
 });
 
 test('allows update after 7 days cooldown has elapsed', function (): void {

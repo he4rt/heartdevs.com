@@ -399,3 +399,35 @@ test('profile page localizes username error in english', function (): void {
         ])
     );
 });
+
+test('profile page halts action when regular user is in cooldown', function (): void {
+    $this->user->update([
+        'username_updated_at' => now()->subDays(2),
+    ]);
+
+    livewire(ProfilePage::class)
+        ->callAction('editUsername', [
+            'username' => 'new_handle_during_cooldown',
+        ])
+        ->assertActionHalted('editUsername')
+        ->assertNotified();
+
+    expect($this->user->fresh()->username)->not->toBe('new_handle_during_cooldown');
+});
+
+test('profile page allows super admin to change username during cooldown', function (): void {
+    $admin = User::factory()->superAdmin()->create([
+        'username_updated_at' => now()->subDays(2),
+    ]);
+
+    $this->actingAs($admin);
+
+    livewire(ProfilePage::class)
+        ->callAction('editUsername', [
+            'username' => 'super_admin_handle',
+        ])
+        ->assertHasNoActionErrors()
+        ->assertNotified(__('panel-app::profile.notifications.username_updated'));
+
+    expect($admin->fresh()->username)->toBe('super_admin_handle');
+});

@@ -9,44 +9,52 @@ use He4rt\Identity\User\Exceptions\UsernameException;
 final class UsernameValidator
 {
     /**
-     * @var list<string>
+     * @var list<string>|null
      */
-    public const array RESERVED_USERNAMES = [
-        'admin',
-        'administrator',
-        'administrador',
-        'administradora',
-        'system',
-        'sistema',
-        'root',
-        'he4rt',
-        'heart',
-        'he4rtdevs',
-        'mod',
-        'moderator',
-        'moderador',
-        'moderadora',
-        'staff',
-        'equipe',
-        'support',
-        'suporte',
-        'help',
-        'ajuda',
-        'official',
-        'oficial',
-        'api',
-        'bot',
-        'null',
-        'nulo',
-        'undefined',
-        'indefinido',
-        'anonymous',
-        'anonimo',
-        'everyone',
-        'todos',
-        'here',
-        'aqui',
-    ];
+    private static ?array $reservedUsernames = null;
+
+    /**
+     * @return list<string>
+     */
+    public static function reservedUsernames(): array
+    {
+        if (self::$reservedUsernames !== null) {
+            return self::$reservedUsernames;
+        }
+
+        $path = __DIR__.'/../../../resources/usernames/invalid-usernames.txt';
+
+        if (!file_exists($path)) {
+            return self::$reservedUsernames = [];
+        }
+
+        $lines = file($path, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+
+        if ($lines === false) {
+            return self::$reservedUsernames = [];
+        }
+
+        $reserved = [];
+
+        foreach ($lines as $line) {
+            $trimmed = mb_strtolower(mb_trim($line));
+
+            if ($trimmed === '' || str_starts_with($trimmed, '#')) {
+                continue;
+            }
+
+            $reserved[] = $trimmed;
+        }
+
+        return self::$reservedUsernames = array_values(array_unique($reserved));
+    }
+
+    public static function isReserved(string $username): bool
+    {
+        $normalized = mb_strtolower(mb_trim($username));
+
+        return in_array($normalized, self::reservedUsernames(), strict: true);
+    }
 
     /**
      * @throws UsernameException
@@ -84,7 +92,7 @@ final class UsernameValidator
             );
         }
 
-        if (in_array($normalized, self::RESERVED_USERNAMES, strict: true)) {
+        if (self::isReserved($normalized)) {
             throw UsernameException::reservedUsername($normalized);
         }
 
