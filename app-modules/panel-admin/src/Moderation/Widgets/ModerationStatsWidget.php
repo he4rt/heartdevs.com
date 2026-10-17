@@ -24,7 +24,7 @@ class ModerationStatsWidget extends StatsOverviewWidget
     protected int|string|array $columnSpan = 'full';
 
     /**
-     * @return Stat[]
+     * @return array<Stat>
      */
     protected function getStats(): array
     {
@@ -55,7 +55,7 @@ class ModerationStatsWidget extends StatsOverviewWidget
             ->count();
 
         $appealRate = $actionsCount > 0
-            ? round(($appealsCount / $actionsCount) * 100)
+            ? round($appealsCount / $actionsCount * 100)
             : 0;
 
         return [

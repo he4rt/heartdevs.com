@@ -23,7 +23,7 @@ class RichPresence extends Task
         $this->discord()->updatePresence($activities[array_rand($activities)]);
     }
 
-    /** @return Activity[] */
+    /** @return array<Activity> */
     private function makeActivities(): array
     {
         return [

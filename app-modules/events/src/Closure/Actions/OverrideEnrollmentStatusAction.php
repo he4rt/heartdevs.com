@@ -15,7 +15,6 @@ use Throwable;
 
 final readonly class OverrideEnrollmentStatusAction
 {
-    /** @var list<array{from: EnrollmentStatus, to: EnrollmentStatus}> */
     private const array ALLOWED_OVERRIDES = [
         ['from' => EnrollmentStatus::NoShow, 'to' => EnrollmentStatus::Attended],
         ['from' => EnrollmentStatus::Confirmed, 'to' => EnrollmentStatus::CheckedIn],

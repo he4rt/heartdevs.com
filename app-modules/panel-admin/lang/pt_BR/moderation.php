@@ -38,6 +38,9 @@ return [
             'test_match' => 'Match! Violação: :violation | Severidade: :severity | Ação: :action',
             'test_no_match' => 'Sem match — o texto não ativou esta regra.',
         ],
+        'validation' => [
+            'invalid_regex' => 'A expressão regular é inválida.',
+        ],
     ],
 
     'appeals' => [

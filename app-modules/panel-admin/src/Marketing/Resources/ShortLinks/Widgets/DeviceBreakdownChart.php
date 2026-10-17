@@ -11,7 +11,6 @@ use Illuminate\Database\Eloquent\Builder;
 
 class DeviceBreakdownChart extends ChartWidget
 {
-    /** @var array<int, string> */
     private const array PALETTE = [
         '#782bf1',
         '#a78bfa',

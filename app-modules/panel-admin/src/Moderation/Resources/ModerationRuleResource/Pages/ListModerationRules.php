@@ -13,7 +13,7 @@ class ListModerationRules extends ListRecords
     protected static string $resource = ModerationRuleResource::class;
 
     /**
-     * @return CreateAction[]
+     * @return array<CreateAction>
      */
     protected function getHeaderActions(): array
     {

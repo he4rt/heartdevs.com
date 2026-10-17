@@ -18,7 +18,8 @@ final class ToggleAvailability
                     'attribute' => 'start_availability',
                     'other' => 'available_for_proposals',
                     'value' => 'true',
-                ])],
+                ]),
+                ],
             ]);
         }
 

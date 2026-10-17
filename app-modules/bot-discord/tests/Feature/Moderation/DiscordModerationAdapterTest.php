@@ -19,6 +19,7 @@ use He4rt\Moderation\DTOs\ModerationContentDTO;
 use He4rt\Moderation\Enforcement\ModerationAction;
 use He4rt\Moderation\Enums\ActionType;
 use He4rt\Moderation\Enums\Platform;
+use Illuminate\Support\Facades\Exceptions;
 use Saloon\Http\Faking\MockClient;
 use Saloon\Http\Faking\MockResponse;
 
@@ -219,6 +220,23 @@ test('warn sends dm and returns success without calling guild api', function ():
     $mockClient->assertNotSent(ModifyMember::class);
     $mockClient->assertNotSent(CreateBan::class);
     $mockClient->assertNotSent(RemoveMember::class);
+});
+
+test('warn still succeeds and reports the exception when the dm notification throws', function (): void {
+    Exceptions::fake();
+
+    mockConnector([
+        CreateDmChannel::class => MockResponse::make([], 200)->throw(fn (): Throwable => new RuntimeException('Discord DM unavailable')),
+    ]);
+
+    $user = makeUserWithDiscord('887');
+    $action = makeAction($user, ActionType::Warn);
+
+    $result = DiscordModerationAdapter::make()->execute($action, $user);
+
+    expect($result->success)->toBeTrue();
+
+    Exceptions::assertReported(fn (RuntimeException $exception): bool => $exception->getMessage() === 'Discord DM unavailable');
 });
 
 test('content_remove sends dm and returns success without calling guild api', function (): void {

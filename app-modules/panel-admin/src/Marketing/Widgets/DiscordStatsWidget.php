@@ -17,7 +17,7 @@ class DiscordStatsWidget extends StatsOverviewWidget
     protected int|string|array $columnSpan = 'full';
 
     /**
-     * @return Stat[]
+     * @return array<Stat>
      */
     protected function getStats(): array
     {
@@ -61,6 +61,6 @@ class DiscordStatsWidget extends StatsOverviewWidget
             return 0.0;
         }
 
-        return round((($current - $previous) / $previous) * 100, 1);
+        return round(($current - $previous) / $previous * 100, 1);
     }
 }

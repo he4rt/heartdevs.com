@@ -13,7 +13,7 @@ final class ListAlbums extends ListRecords
     protected static string $resource = AlbumResource::class;
 
     /**
-     * @return CreateAction[]
+     * @return array<CreateAction>
      */
     protected function getHeaderActions(): array
     {

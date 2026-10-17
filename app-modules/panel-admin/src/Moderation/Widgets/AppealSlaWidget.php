@@ -72,7 +72,7 @@ class AppealSlaWidget extends TableWidget
             ->whereNotNull('resolved_at')
             ->count();
 
-        $rate = $totalResolved > 0 ? round(($resolvedInSla / $totalResolved) * 100) : 100;
+        $rate = $totalResolved > 0 ? round($resolvedInSla / $totalResolved * 100) : 100;
 
         return __('panel-admin::moderation.dashboard.appeal_sla.compliance', [
             'count' => $resolvedInSla,

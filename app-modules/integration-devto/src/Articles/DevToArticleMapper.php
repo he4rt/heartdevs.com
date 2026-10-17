@@ -70,7 +70,7 @@ final readonly class DevToArticleMapper
         $hasTagInfo = array_key_exists('tag_list', $payload) || array_key_exists('tags', $payload);
 
         return new ArticleDTO(
-            externalId: (is_int($externalId) || is_string($externalId)) ? (string) $externalId : $shallow->externalId,
+            externalId: is_int($externalId) || is_string($externalId) ? (string) $externalId : $shallow->externalId,
             authorHandle: is_string($authorHandle) && $authorHandle !== '' ? $authorHandle : $shallow->authorHandle,
             title: $this->stringOrNull($payload['title'] ?? null) ?? $shallow->title,
             url: $this->stringOrNull($payload['url'] ?? null) ?? $shallow->url,

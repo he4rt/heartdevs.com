@@ -47,7 +47,7 @@ class CasesByStatusChartWidget extends ChartWidget
 
         foreach (CaseStatus::cases() as $status) {
             $count = $counts->get($status->value, 0);
-            $pct = $total > 0 ? round(($count / $total) * 100) : 0;
+            $pct = $total > 0 ? round($count / $total * 100) : 0;
             $labels[] = $status->getLabel().sprintf(' (%s, %s%%)', $count, $pct);
             $data[] = $count;
             $colors[] = Color::convertToHex($status->getColor()[500]);

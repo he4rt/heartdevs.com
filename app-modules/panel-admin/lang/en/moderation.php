@@ -38,6 +38,9 @@ return [
             'test_match' => 'Match! Violation: :violation | Severity: :severity | Action: :action',
             'test_no_match' => 'No match — the text did not trigger this rule.',
         ],
+        'validation' => [
+            'invalid_regex' => 'The regular expression is invalid.',
+        ],
     ],
 
     'appeals' => [

@@ -14,7 +14,6 @@ use He4rt\Moderation\Enums\CaseStatus;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\InteractsWithQueue;
-use Throwable;
 
 final class IngestContent implements ShouldQueue
 {
@@ -31,15 +30,14 @@ final class IngestContent implements ShouldQueue
         $authorId = null;
 
         if ($this->content->authorExternalId !== '') {
-            try {
-                $identity = resolve(FindExternalIdentity::class)->handle(
+            // Author not found in system: proceed with a null author_id.
+            $authorId = rescue(
+                fn (): mixed => resolve(FindExternalIdentity::class)->handle(
                     provider: IdentityProvider::Discord->value,
                     providerId: $this->content->authorExternalId,
-                );
-                $authorId = $identity->model_id;
-            } catch (Throwable) {
-                // Author not found in system — proceed with null author_id
-            }
+                )->model_id,
+                report: false,
+            );
         }
 
         $case = ModerationCase::query()->create([

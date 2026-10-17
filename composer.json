@@ -77,6 +77,7 @@
         "laravel/pint": "^1.32.1",
         "mockery/mockery": "^1.6.15",
         "nunomaduro/collision": "^8.9.5",
+        "nunomaduro/phpinsights": "^2.15.0",
         "pestphp/pest": "^5.3.0",
         "pestphp/pest-plugin-faker": "^5.0.0",
         "pestphp/pest-plugin-laravel": "^5.0.1",
@@ -174,7 +175,8 @@
         "allow-plugins": {
             "pestphp/pest-plugin": true,
             "php-http/discovery": true,
-            "phpstan/extension-installer": true
+            "phpstan/extension-installer": true,
+            "dealerdirect/phpcodesniffer-composer-installer": true
         },
         "policy": {
             "abandoned": {

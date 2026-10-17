@@ -17,7 +17,6 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 final class MobileOAuthController extends Controller
 {
-    /** @var array<int, IdentityProvider> */
     private const array SUPPORTED_PROVIDERS = [
         IdentityProvider::Discord,
         IdentityProvider::GitHub,

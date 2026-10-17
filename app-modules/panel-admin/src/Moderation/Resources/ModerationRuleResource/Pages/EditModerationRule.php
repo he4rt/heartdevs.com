@@ -13,7 +13,7 @@ class EditModerationRule extends EditRecord
     protected static string $resource = ModerationRuleResource::class;
 
     /**
-     * @return Action[]
+     * @return array<Action>
      */
     protected function getHeaderActions(): array
     {

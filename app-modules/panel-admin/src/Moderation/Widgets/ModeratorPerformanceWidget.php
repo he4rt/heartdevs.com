@@ -80,7 +80,7 @@ class ModeratorPerformanceWidget extends TableWidget
                             ->where('status', 'overturned')
                             ->count();
 
-                        $rate = $totalActions > 0 ? round(($overturned / $totalActions) * 100) : 0;
+                        $rate = $totalActions > 0 ? round($overturned / $totalActions * 100) : 0;
 
                         return $rate.'%';
                     }),
@@ -102,7 +102,7 @@ class ModeratorPerformanceWidget extends TableWidget
             ->where('status', 'overturned')
             ->count();
 
-        $rate = $totalActions > 0 ? round(($overturned / $totalActions) * 100) : 0;
+        $rate = $totalActions > 0 ? round($overturned / $totalActions * 100) : 0;
 
         return __('panel-admin::moderation.dashboard.moderator_performance.overall_overturn', ['rate' => $rate]);
     }

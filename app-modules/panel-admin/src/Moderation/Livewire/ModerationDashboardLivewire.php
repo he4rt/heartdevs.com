@@ -114,7 +114,7 @@ class ModerationDashboardLivewire extends Component
         $actions = ModerationAction::query()->where('created_at', '>=', $this->periodStart)->count();
         $appeals = ModerationAppeal::query()->where('created_at', '>=', $this->periodStart)->count();
 
-        return $actions > 0 ? (int) round(($appeals / $actions) * 100) : 0;
+        return $actions > 0 ? (int) round($appeals / $actions * 100) : 0;
     }
 
     #[Computed]
@@ -199,7 +199,7 @@ class ModerationDashboardLivewire extends Component
         $total = ModerationAction::query()->where('created_at', '>=', $this->periodStart)->count();
         $auto = ModerationAction::query()->where('created_at', '>=', $this->periodStart)->where('automated', operator: true)->count();
 
-        return $total > 0 ? (int) round(($auto / $total) * 100) : 0;
+        return $total > 0 ? (int) round($auto / $total * 100) : 0;
     }
 
     /** @return array{auto: int, manual: int, total: int} */
@@ -248,7 +248,7 @@ class ModerationDashboardLivewire extends Component
                 ->where('status', 'overturned')
                 ->count();
 
-            $row->overturn_rate = $totalCases > 0 ? (int) round(($overturned / $totalCases) * 100) : 0;
+            $row->overturn_rate = $totalCases > 0 ? (int) round($overturned / $totalCases * 100) : 0;
 
             return $row;
         });
@@ -260,7 +260,7 @@ class ModerationDashboardLivewire extends Component
         $totalActions = ModerationAction::query()->where('created_at', '>=', $this->periodStart)->count();
         $overturned = ModerationAppeal::query()->where('created_at', '>=', $this->periodStart)->where('status', 'overturned')->count();
 
-        return $totalActions > 0 ? (int) round(($overturned / $totalActions) * 100) : 0;
+        return $totalActions > 0 ? (int) round($overturned / $totalActions * 100) : 0;
     }
 
     // ==================== TAB: APPEALS ====================
@@ -308,7 +308,7 @@ class ModerationDashboardLivewire extends Component
             ->whereColumn('resolved_at', '<=', 'sla_deadline')
             ->count();
 
-        return $resolved > 0 ? (int) round(($inSla / $resolved) * 100) : 100;
+        return $resolved > 0 ? (int) round($inSla / $resolved * 100) : 100;
     }
 
     // ==================== TAB: ACTIVITY ====================
@@ -398,7 +398,7 @@ class ModerationDashboardLivewire extends Component
         $total = (clone $base)->count();
         $dismissed = (clone $base)->where('status', 'dismissed')->count();
 
-        return $total > 0 ? (int) round(($dismissed / $total) * 100) : 0;
+        return $total > 0 ? (int) round($dismissed / $total * 100) : 0;
     }
 
     private function computeFpRateBySource(CarbonInterface $from, CarbonInterface $to, CaseSource $source): int
@@ -411,6 +411,6 @@ class ModerationDashboardLivewire extends Component
         $total = (clone $base)->count();
         $dismissed = (clone $base)->where('status', 'dismissed')->count();
 
-        return $total > 0 ? (int) round(($dismissed / $total) * 100) : 0;
+        return $total > 0 ? (int) round($dismissed / $total * 100) : 0;
     }
 }

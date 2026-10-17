@@ -19,8 +19,6 @@ final readonly class EmpresarialOverwritePlan
 {
     /**
      * Discord channel-permission keys that gate a private voice room.
-     *
-     * @var list<string>
      */
     public const array PRIVATE_ROOM_PERMISSIONS = [
         'view_channel',

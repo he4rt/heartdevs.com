@@ -116,16 +116,18 @@ final readonly class DiscordModerationAdapter implements ModerationPlatformContr
 
             $response = $this->executeAction($action, $guildId, $discordId);
 
-            // Best-effort: DM notification and content deletion are non-fatal.
+            // Best-effort: DM notification and content deletion are non-fatal, but failures must stay visible.
             try {
                 $this->sendDmNotification($discordId, $action);
-            } catch (Throwable) {
+            } catch (Throwable $exception) {
+                report($exception);
             }
 
             if ($this->shouldDeleteContent($action->action_type)) {
                 try {
                     $this->deleteOriginalMessage($action);
-                } catch (Throwable) {
+                } catch (Throwable $exception) {
+                    report($exception);
                 }
             }
 
@@ -340,7 +342,8 @@ final readonly class DiscordModerationAdapter implements ModerationPlatformContr
                 'footer' => [
                     'text' => __('moderation::notifications.discord_dm.footer'),
                 ],
-            ]],
+            ],
+            ],
         ]));
     }
 

@@ -36,8 +36,6 @@ final readonly class DailyActivitySeries
     /**
      * Colunas do streamgraph, na ordem em que o deck as nomeia. A chave é o campo
      * que o componente lê no dia; o enum é quem sabe o valor gravado no lake.
-     *
-     * @var array<string, array{type: ContributionType, label: string}>
      */
     private const array TYPES = [
         'prs' => ['type' => ContributionType::Pr, 'label' => 'PRs'],

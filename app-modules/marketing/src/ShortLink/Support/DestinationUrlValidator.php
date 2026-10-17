@@ -14,7 +14,6 @@ use He4rt\Marketing\ShortLink\Exceptions\InvalidDestinationUrl;
  */
 final class DestinationUrlValidator
 {
-    /** @var list<string> */
     public const array ALLOWED_SCHEMES = ['http', 'https'];
 
     /**
