@@ -103,7 +103,8 @@ final class UpsertProfile
             $errors['expected_salary_max'] = [__('validation.gte.numeric', [
                 'attribute' => 'expected_salary_max',
                 'value' => $dto->expectedSalaryMin,
-            ])];
+            ]),
+            ];
         }
 
         if ($dto->socialLinks !== null) {

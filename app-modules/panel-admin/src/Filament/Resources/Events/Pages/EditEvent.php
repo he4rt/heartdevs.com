@@ -31,7 +31,7 @@ final class EditEvent extends EditRecord
     }
 
     /**
-     * @return ViewComponent[]
+     * @return array<ViewComponent>
      */
     protected function getHeaderActions(): array
     {

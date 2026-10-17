@@ -19,8 +19,6 @@ final class ModuleColor
     /**
      * Curated colors for well-known modules. Keys are the normalized
      * (lower-case) module slugs.
-     *
-     * @var array<string, string>
      */
     private const array KNOWN = [
         'moderation' => '#782bf1',

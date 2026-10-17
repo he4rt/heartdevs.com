@@ -118,7 +118,8 @@ class FetchDiscordProfiles extends Command
                 (string) $totalFailed,
                 (string) $totalWaiting,
                 (string) count($pending),
-            ]],
+            ],
+            ],
         );
 
         if ($pending === []) {

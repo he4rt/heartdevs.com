@@ -18,8 +18,6 @@ final class SitemapController extends Controller
 {
     /**
      * Rotas nomeadas do portal e sua prioridade relativa no sitemap.
-     *
-     * @var array<string, array{changefreq: string, priority: string}>
      */
     private const array PAGES = [
         'home' => ['changefreq' => 'daily', 'priority' => '1.0'],

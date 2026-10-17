@@ -44,6 +44,6 @@ final readonly class CommunityActivitySnapshot
             return 0.0;
         }
 
-        return round((($current - $previous) / $previous) * 100, 1);
+        return round(($current - $previous) / $previous * 100, 1);
     }
 }

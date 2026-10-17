@@ -23,7 +23,7 @@ final readonly class ContributionMonth
             count: $count,
             // Mês sem contribuição some se a altura for zero; um traço mínimo
             // mostra que o mês existe e ficou vazio.
-            height: $peak > 0 ? max(2.0, round(($count / $peak) * 100, 2)) : 2.0,
+            height: $peak > 0 ? max(2.0, round($count / $peak * 100, 2)) : 2.0,
         );
     }
 }

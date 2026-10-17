@@ -342,7 +342,8 @@ final readonly class DiscordModerationAdapter implements ModerationPlatformContr
                 'footer' => [
                     'text' => __('moderation::notifications.discord_dm.footer'),
                 ],
-            ]],
+            ],
+            ],
         ]));
     }
 

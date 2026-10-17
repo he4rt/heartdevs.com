@@ -112,7 +112,8 @@ final readonly class TwitchUserAuthorization
             accessToken: Crypt::encrypt($accessToken),
             refreshToken: Crypt::encrypt(is_string($rotatedRefreshToken) && $rotatedRefreshToken !== '' ? $rotatedRefreshToken : $refreshToken),
             expiresIn: Crypt::encrypt((string) ($response->json('expires_in') ?? '')),
-        )]);
+        ),
+        ]);
 
         return $this->scopesIn($response->json('scope'));
     }

@@ -14,9 +14,6 @@ final class ApplicationLocale
 
     public const string PT_BR = 'pt_BR';
 
-    /**
-     * @var list<string>
-     */
     public const array SUPPORTED = [
         self::EN,
         self::PT_BR,

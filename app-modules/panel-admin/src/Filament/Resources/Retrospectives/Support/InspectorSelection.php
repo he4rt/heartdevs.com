@@ -35,7 +35,7 @@ final readonly class InspectorSelection
             $mode === InspectorMode::Cover, $mode === InspectorMode::Closing => new self($mode),
             // Bloco, slide, seção fixa e promoção são inúteis sem alvo: sem ele,
             // cai para a capa.
-            (in_array($mode, [InspectorMode::About, InspectorMode::Source, InspectorMode::Slide, InspectorMode::Promotion], strict: true)) && $target !== null && $target !== '' => new self($mode, $target),
+            in_array($mode, [InspectorMode::About, InspectorMode::Source, InspectorMode::Slide, InspectorMode::Promotion], strict: true) && $target !== null && $target !== '' => new self($mode, $target),
             default => self::cover(),
         };
     }

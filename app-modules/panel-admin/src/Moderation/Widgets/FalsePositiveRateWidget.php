@@ -28,7 +28,7 @@ class FalsePositiveRateWidget extends StatsOverviewWidget
     }
 
     /**
-     * @return Stat[]
+     * @return array<Stat>
      */
     protected function getStats(): array
     {
@@ -78,7 +78,7 @@ class FalsePositiveRateWidget extends StatsOverviewWidget
         $total = (clone $base)->count();
         $dismissed = (clone $base)->where('status', 'dismissed')->count();
 
-        return $total > 0 ? (int) round(($dismissed / $total) * 100) : 0;
+        return $total > 0 ? (int) round($dismissed / $total * 100) : 0;
     }
 
     private function fpRateBySource(mixed $from, mixed $to, CaseSource $source): int
@@ -91,6 +91,6 @@ class FalsePositiveRateWidget extends StatsOverviewWidget
         $total = (clone $base)->count();
         $dismissed = (clone $base)->where('status', 'dismissed')->count();
 
-        return $total > 0 ? (int) round(($dismissed / $total) * 100) : 0;
+        return $total > 0 ? (int) round($dismissed / $total * 100) : 0;
     }
 }

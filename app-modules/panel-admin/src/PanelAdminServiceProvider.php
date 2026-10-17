@@ -148,7 +148,6 @@ class PanelAdminServiceProvider extends ServiceProvider
             $requestPath->contains('discord/') => $this->discordNavigation($builder),
             default => $this->defaultNavigation($builder),
         };
-
     }
 
     private function defaultNavigation(NavigationBuilder $builder): NavigationBuilder

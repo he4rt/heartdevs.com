@@ -26,6 +26,6 @@ final readonly class PlanMetadata
             return 0;
         }
 
-        return (int) round(($this->completedSteps / $this->totalSteps) * 100);
+        return (int) round($this->completedSteps / $this->totalSteps * 100);
     }
 }

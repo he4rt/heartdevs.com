@@ -13,7 +13,7 @@ class EditGithubRepository extends EditRecord
     protected static string $resource = GithubRepositoryResource::class;
 
     /**
-     * @return DeleteAction[]
+     * @return array<DeleteAction>
      */
     protected function getHeaderActions(): array
     {

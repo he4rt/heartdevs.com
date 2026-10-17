@@ -13,7 +13,7 @@ final class EditAlbum extends EditRecord
     protected static string $resource = AlbumResource::class;
 
     /**
-     * @return DeleteAction[]
+     * @return array<DeleteAction>
      */
     protected function getHeaderActions(): array
     {

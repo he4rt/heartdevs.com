@@ -20,7 +20,7 @@ final readonly class ContributionSlice
         return new self(
             label: $type->getLabel(),
             count: $count,
-            share: $total > 0 ? round(($count / $total) * 100, 2) : 0.0,
+            share: $total > 0 ? round($count / $total * 100, 2) : 0.0,
             // A cor do tipo já tem dono: o enum. O portal só escolhe o tom que
             // funciona sobre o fundo escuro da home.
             color: $type->getColor()[400],

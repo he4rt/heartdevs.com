@@ -46,7 +46,7 @@ class ImportDiscordMembers extends Command
                 $githubMap[$conn['discord_id']] = $conn['github_username'];
             }
 
-            $this->info('Loaded '.count($githubMap).(' GitHub connections from '.$githubFile));
+            $this->info('Loaded '.count($githubMap).' GitHub connections from '.$githubFile);
         } else {
             $this->warn(sprintf('GitHub file not found (%s), skipping GitHub imports.', $githubFile));
         }

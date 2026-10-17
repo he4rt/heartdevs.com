@@ -18,7 +18,6 @@ use He4rt\Marketing\ShortLink\ValueObjects\UtmParameters;
  */
 final class FormPayloadNormalizer
 {
-    /** @var list<string> */
     public const array UTM_KEYS = ['source', 'medium', 'campaign', 'term', 'content'];
 
     /**

@@ -20,7 +20,7 @@ class DiscordStatsWidget extends StatsOverviewWidget
     protected int|string|array $columnSpan = 'full';
 
     /**
-     * @return Stat[]
+     * @return array<Stat>
      */
     protected function getStats(): array
     {

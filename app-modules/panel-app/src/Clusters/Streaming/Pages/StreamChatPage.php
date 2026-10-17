@@ -118,7 +118,7 @@ class StreamChatPage extends Page
     }
 
     /**
-     * @return Action[]
+     * @return array<Action>
      */
     protected function getHeaderActions(): array
     {

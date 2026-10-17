@@ -16,7 +16,7 @@ class EditExternalIdentity extends EditRecord
     protected static string $resource = ExternalIdentityResource::class;
 
     /**
-     * @return Action[]
+     * @return array<Action>
      */
     protected function getHeaderActions(): array
     {
