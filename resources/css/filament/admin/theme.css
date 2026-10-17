@@ -7,6 +7,21 @@
 @source '../../../../app-modules/**/resources/**/*';
 @source '../../../../app-modules/**/src/**/*';
 
+/* Paleta da He4rt Delas (Figma da marca). Usada só nos pontos de marca (tag, logo e ícone) da moderação He4rt Delas no cluster de Moderação. */
+@theme {
+    --color-delas-primary: #f485a2;
+    --color-delas-50: #ffd1ee;
+    --color-delas-100: #ffbbd7;
+    --color-delas-200: #ffa4c1;
+    --color-delas-300: #ff8fab;
+    --color-delas-400: #e77996;
+    --color-delas-500: #cf6481;
+    --color-delas-600: #b84f6d;
+    --color-delas-700: #a03a5a;
+    --color-delas-800: #8a2447;
+    --color-delas-900: #730835;
+}
+
 .fi-sidebar {
     @apply bg-gray-100 dark:bg-gray-900;
 }

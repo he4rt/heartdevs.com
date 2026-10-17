@@ -11,6 +11,7 @@ use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
 use He4rt\Identity\ExternalIdentity\Models\ExternalIdentity;
+use He4rt\PanelAdmin\Concerns\SuperAdminOnly;
 use He4rt\PanelAdmin\Filament\Resources\ExternalIdentities\Pages\CreateExternalIdentity;
 use He4rt\PanelAdmin\Filament\Resources\ExternalIdentities\Pages\EditExternalIdentity;
 use He4rt\PanelAdmin\Filament\Resources\ExternalIdentities\Pages\ListExternalIdentities;
@@ -24,6 +25,8 @@ use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 class ExternalIdentityResource extends Resource
 {
+    use SuperAdminOnly;
+
     protected static ?string $model = ExternalIdentity::class;
 
     protected static ?string $slug = 'external-identities';

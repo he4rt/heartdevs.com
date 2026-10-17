@@ -7,9 +7,12 @@ namespace He4rt\PanelAdmin\Twitch;
 use BackedEnum;
 use Filament\Clusters\Cluster;
 use Filament\Support\Icons\Heroicon;
+use He4rt\PanelAdmin\Concerns\SuperAdminOnly;
 
 class TwitchCluster extends Cluster
 {
+    use SuperAdminOnly;
+
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedTv;
 
     protected static ?int $navigationSort = 30;

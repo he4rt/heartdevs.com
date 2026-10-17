@@ -10,6 +10,7 @@ use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
+use He4rt\PanelAdmin\Concerns\SuperAdminOnly;
 use He4rt\PanelAdmin\Filament\Resources\Skills\Pages\CreateSkill;
 use He4rt\PanelAdmin\Filament\Resources\Skills\Pages\EditSkill;
 use He4rt\PanelAdmin\Filament\Resources\Skills\Pages\ListSkills;
@@ -20,6 +21,8 @@ use Illuminate\Database\Eloquent\Builder;
 
 class SkillResource extends Resource
 {
+    use SuperAdminOnly;
+
     protected static ?string $model = Skill::class;
 
     protected static ?string $slug = 'skills';

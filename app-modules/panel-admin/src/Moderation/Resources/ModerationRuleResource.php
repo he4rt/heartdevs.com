@@ -24,6 +24,7 @@ use He4rt\Moderation\Enums\Platform;
 use He4rt\Moderation\Enums\Severity;
 use He4rt\Moderation\Enums\ViolationType;
 use He4rt\Moderation\Rules\ModerationRule;
+use He4rt\PanelAdmin\Concerns\SuperAdminOnly;
 use He4rt\PanelAdmin\Moderation\ModerationCluster;
 use He4rt\PanelAdmin\Moderation\Resources\ModerationRuleResource\Pages\CreateModerationRule;
 use He4rt\PanelAdmin\Moderation\Resources\ModerationRuleResource\Pages\EditModerationRule;
@@ -31,6 +32,8 @@ use He4rt\PanelAdmin\Moderation\Resources\ModerationRuleResource\Pages\ListModer
 
 class ModerationRuleResource extends Resource
 {
+    use SuperAdminOnly;
+
     protected static ?string $cluster = ModerationCluster::class;
 
     protected static ?string $model = ModerationRule::class;

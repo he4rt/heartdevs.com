@@ -27,6 +27,7 @@ use Filament\Schemas\Components\Utilities\Set;
 use Filament\Schemas\JsContent;
 use Filament\Schemas\Schema;
 use Filament\Support\Enums\Width;
+use He4rt\Delas\TagRequest\Queries\DelasEligibility;
 use He4rt\Gamification\Character\Models\Character;
 use He4rt\Identity\User\Enums\ProfileImage;
 use He4rt\Identity\User\Models\User;
@@ -46,6 +47,7 @@ use He4rt\Profile\Models\Skill;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Str;
 use Livewire\Attributes\Computed;
+use Livewire\Attributes\On;
 use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
 use Livewire\WithFileUploads;
 
@@ -57,6 +59,7 @@ use Livewire\WithFileUploads;
  * @property-read string|null $coverPreviewUrl
  * @property-read int $avatarFocalY
  * @property-read int $coverFocalY
+ * @property-read bool $hasDelasTag
  */
 class ProfilePage extends Page
 {
@@ -523,6 +526,20 @@ class ProfilePage extends Page
             ->with('badges')
             ->where('user_id', auth()->id())
             ->first();
+    }
+
+    #[Computed]
+    public function hasDelasTag(): bool
+    {
+        $user = auth()->user();
+
+        return $user instanceof User && resolve(DelasEligibility::class)->hasTag($user);
+    }
+
+    #[On(event: 'delas-tag-updated')]
+    public function refreshDelasTag(): void
+    {
+        unset($this->hasDelasTag);
     }
 
     #[Computed]

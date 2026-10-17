@@ -7,9 +7,12 @@ namespace He4rt\PanelAdmin\Discord;
 use BackedEnum;
 use Filament\Clusters\Cluster;
 use Filament\Support\Icons\Heroicon;
+use He4rt\PanelAdmin\Concerns\SuperAdminOnly;
 
 class DiscordCluster extends Cluster
 {
+    use SuperAdminOnly;
+
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedChatBubbleLeftRight;
 
     protected static ?int $navigationSort = 40;

@@ -19,6 +19,8 @@
                     'birthdateForm' => $this->birthdateForm,
                 ])
 
+            <livewire:delas-profile-section />
+
             {{ $this->form }}
         </div>
 
@@ -34,7 +36,8 @@
                     'coverPreviewUrl' => $this->coverPreviewUrl,
                     'coverAspectRatio' => $this->coverAspectRatio,
                     'coverFocalY' => $this->coverFocalY,
-                    'avatarFocalY' => $this->avatarFocalY
+                    'avatarFocalY' => $this->avatarFocalY,
+                    'hasDelasTag' => $this->hasDelasTag
                 ])
 
             <div class="rounded-xl bg-white p-4 ring-1 ring-gray-950/5 dark:bg-gray-900 dark:ring-white/10">

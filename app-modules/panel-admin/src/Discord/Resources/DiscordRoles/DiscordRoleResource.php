@@ -11,6 +11,7 @@ use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
 use He4rt\IntegrationDiscord\Models\DiscordRole;
+use He4rt\PanelAdmin\Concerns\SuperAdminOnly;
 use He4rt\PanelAdmin\Discord\DiscordCluster;
 use He4rt\PanelAdmin\Discord\Resources\DiscordRoles\Pages\ListDiscordRoles;
 use He4rt\PanelAdmin\Discord\Resources\DiscordRoles\Pages\ViewDiscordRole;
@@ -21,6 +22,8 @@ use Illuminate\Database\Eloquent\Model;
 
 class DiscordRoleResource extends Resource
 {
+    use SuperAdminOnly;
+
     protected static ?string $cluster = DiscordCluster::class;
 
     protected static ?string $model = DiscordRole::class;
