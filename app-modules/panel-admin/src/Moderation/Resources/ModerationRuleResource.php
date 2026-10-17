@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace He4rt\PanelAdmin\Moderation\Resources;
 
 use BackedEnum;
+use Closure;
 use Filament\Actions\Action;
 use Filament\Actions\EditAction;
 use Filament\Forms\Components\Select;
@@ -14,6 +15,7 @@ use Filament\Forms\Components\Toggle;
 use Filament\Notifications\Notification;
 use Filament\Resources\Pages\PageRegistration;
 use Filament\Resources\Resource;
+use Filament\Schemas\Components\Utilities\Get;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Columns\TextColumn;
@@ -62,6 +64,15 @@ class ModerationRuleResource extends Resource
                 ->required(),
             Textarea::make('pattern')
                 ->required()
+                ->rule(static fn (Get $get): Closure => static function (string $attribute, mixed $value, Closure $fail) use ($get): void {
+                    if ($get('type') !== 'regex' || !is_string($value)) {
+                        return;
+                    }
+
+                    if (ModerationRule::regexError($value) !== null) {
+                        $fail(__('panel-admin::moderation.rules.validation.invalid_regex'));
+                    }
+                })
                 ->helperText('Keywords: comma-separated. Regex: pattern without delimiters.'),
             Select::make('platform')
                 ->options(Platform::class)

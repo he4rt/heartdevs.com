@@ -7,6 +7,7 @@ namespace App\Console\Commands;
 use Illuminate\Console\Attributes\Description;
 use Illuminate\Console\Attributes\Signature;
 use Illuminate\Console\Command;
+use Illuminate\Http\Client\Response;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Sleep;
@@ -15,6 +16,8 @@ use Illuminate\Support\Sleep;
 #[Signature(signature: 'discord:fetch-members {--limit=0 : Max members to fetch (0 = all)}')]
 class FetchDiscordMembers extends Command
 {
+    private const int MAX_RATE_LIMIT_RETRIES = 5;
+
     public function handle(): void
     {
         $token = config('he4rt.discord.token');
@@ -111,16 +114,26 @@ class FetchDiscordMembers extends Command
      */
     private function discordGet(string $token, string $endpoint, array $query = []): array
     {
-        retry:
-        $response = Http::withHeaders([
+        $request = fn (): Response => Http::withHeaders([
             'Authorization' => 'Bot '.$token,
         ])->get('https://discord.com/api/v10'.$endpoint, $query);
 
-        if ($response->status() === 429) {
+        $response = $request();
+        $retries = 0;
+
+        while ($response->status() === 429) {
+            if ($retries === self::MAX_RATE_LIMIT_RETRIES) {
+                $this->error(sprintf('Still rate limited after %d retries, giving up.', $retries));
+
+                return ['error' => true];
+            }
+
             $retryAfter = $response->json('retry_after', 5);
             $this->warn(sprintf('Rate limited. Waiting %ss...', $retryAfter));
             Sleep::sleep((int) ceil($retryAfter));
-            goto retry;
+
+            $response = $request();
+            $retries += 1;
         }
 
         if ($response->status() === 403) {

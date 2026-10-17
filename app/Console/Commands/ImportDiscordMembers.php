@@ -69,11 +69,8 @@ class ImportDiscordMembers extends Command
                 ->where('provider_id', $discordId)
                 ->first();
 
-            $user = null;
-
             if ($existing) {
                 $stats['existing']++;
-                $user = $existing->user;
 
                 // Update avatar and username on provider
                 if (!$isDryRun) {
@@ -86,12 +83,11 @@ class ImportDiscordMembers extends Command
                 $stats['created']++;
 
                 if (!$isDryRun) {
-                    $identity = $createAccount->handle(
+                    $createAccount->handle(
                         provider: IdentityProvider::Discord,
                         providerId: $discordId,
                         username: $username,
                     );
-                    $user = $identity->user;
                 }
             }
 
