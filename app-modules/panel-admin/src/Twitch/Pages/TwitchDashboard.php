@@ -8,6 +8,7 @@ use BackedEnum;
 use Filament\Pages\Page;
 use Filament\Support\Enums\Width;
 use Filament\Support\Icons\Heroicon;
+use He4rt\PanelAdmin\Concerns\SuperAdminOnly;
 use He4rt\PanelAdmin\Twitch\TwitchCluster;
 use He4rt\PanelAdmin\Twitch\Widgets\EventsByTypeChartWidget;
 use He4rt\PanelAdmin\Twitch\Widgets\EventsPerDayChartWidget;
@@ -15,6 +16,8 @@ use He4rt\PanelAdmin\Twitch\Widgets\TwitchStatsWidget;
 
 class TwitchDashboard extends Page
 {
+    use SuperAdminOnly;
+
     protected static ?string $cluster = TwitchCluster::class;
 
     protected Width|string|null $maxContentWidth = Width::Full;

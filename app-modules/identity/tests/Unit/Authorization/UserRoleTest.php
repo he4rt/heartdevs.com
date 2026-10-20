@@ -16,3 +16,8 @@ test('super admin is the red apex of the scale', function (): void {
     expect(UserRole::SuperAdmin->value)->toBe('super-admin')
         ->and(UserRole::GUARD)->toBe('web');
 });
+
+test('only super admin and moderation roles grant admin access', function (): void {
+    expect(UserRole::withAdminAccess())->toBe([UserRole::SuperAdmin, UserRole::DelasModerator, UserRole::DelasLead])
+        ->and(UserRole::Streamer->grantsAdminAccess())->toBeFalse();
+});

@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "3044d4f3dddf69acd834eca1f013788a",
+    "content-hash": "cc49a31c9de8f58e9b1b2a934ad73e9a",
     "packages": [
         {
             "name": "anourvalar/eloquent-serialize",
@@ -3535,6 +3535,45 @@
             "autoload-dev": {
                 "psr-4": {
                     "He4rt\\Contents\\Tests\\": "tests/"
+                }
+            },
+            "license": [
+                "proprietary"
+            ],
+            "transport-options": {
+                "symlink": true,
+                "relative": true
+            }
+        },
+        {
+            "name": "he4rt/delas",
+            "version": "1.0.0",
+            "dist": {
+                "type": "path",
+                "url": "app-modules/delas",
+                "reference": "b5d246ffe28b5c571da00174c00565e3e7762d0e"
+            },
+            "require": {
+                "he4rt/identity": "^1.0.0"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "He4rt\\Delas\\DelasServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "He4rt\\Delas\\": "src/",
+                    "He4rt\\Delas\\Database\\Factories\\": "database/factories/",
+                    "He4rt\\Delas\\Database\\Seeders\\": "database/seeders/"
+                }
+            },
+            "autoload-dev": {
+                "psr-4": {
+                    "He4rt\\Delas\\Tests\\": "tests/"
                 }
             },
             "license": [

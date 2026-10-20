@@ -1,0 +1,30 @@
+{
+    "name": "he4rt/delas",
+    "description": "",
+    "type": "library",
+    "version": "1.0.0",
+    "license": "proprietary",
+    "require": {
+        "he4rt/identity": "^1.0.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "He4rt\\Delas\\": "src/",
+            "He4rt\\Delas\\Database\\Factories\\": "database/factories/",
+            "He4rt\\Delas\\Database\\Seeders\\": "database/seeders/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "He4rt\\Delas\\Tests\\": "tests/"
+        }
+    },
+    "minimum-stability": "stable",
+    "extra": {
+        "laravel": {
+            "providers": [
+                "He4rt\\Delas\\DelasServiceProvider"
+            ]
+        }
+    }
+}

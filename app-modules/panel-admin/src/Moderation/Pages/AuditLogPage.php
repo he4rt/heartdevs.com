@@ -12,11 +12,13 @@ use Filament\Tables\Concerns\InteractsWithTable;
 use Filament\Tables\Contracts\HasTable;
 use Filament\Tables\Table;
 use He4rt\Moderation\Audit\ModerationAuditLog;
+use He4rt\PanelAdmin\Concerns\SuperAdminOnly;
 use He4rt\PanelAdmin\Moderation\ModerationCluster;
 
 class AuditLogPage extends Page implements HasTable
 {
     use InteractsWithTable;
+    use SuperAdminOnly;
 
     protected static ?string $cluster = ModerationCluster::class;
 

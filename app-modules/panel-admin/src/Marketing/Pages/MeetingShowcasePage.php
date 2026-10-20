@@ -11,6 +11,7 @@ use Filament\Support\Icons\Heroicon;
 use He4rt\Activity\Message\Models\Message;
 use He4rt\Identity\ExternalIdentity\Enums\IdentityProvider;
 use He4rt\Identity\ExternalIdentity\Models\ExternalIdentity;
+use He4rt\PanelAdmin\Concerns\SuperAdminOnly;
 use He4rt\PanelAdmin\Marketing\MarketingCluster;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Date;
@@ -18,6 +19,8 @@ use Illuminate\Support\Facades\DB;
 
 class MeetingShowcasePage extends Page
 {
+    use SuperAdminOnly;
+
     public string $channelId = '';
 
     public string $startDate = '';

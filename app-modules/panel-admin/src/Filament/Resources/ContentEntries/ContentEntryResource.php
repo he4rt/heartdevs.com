@@ -11,6 +11,7 @@ use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
 use He4rt\Contents\Models\ContentEntry;
+use He4rt\PanelAdmin\Concerns\SuperAdminOnly;
 use He4rt\PanelAdmin\Filament\Resources\ContentEntries\Pages\EditContentEntry;
 use He4rt\PanelAdmin\Filament\Resources\ContentEntries\Pages\ListContentEntries;
 use He4rt\PanelAdmin\Filament\Resources\ContentEntries\Pages\ViewContentEntry;
@@ -23,6 +24,8 @@ use Illuminate\Database\Eloquent\Model;
 
 class ContentEntryResource extends Resource
 {
+    use SuperAdminOnly;
+
     protected static ?string $model = ContentEntry::class;
 
     protected static ?string $slug = 'articles';
