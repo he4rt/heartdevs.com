@@ -56,6 +56,7 @@ test('cada cena abre com o canal privado e as configurações do streamer', func
             ->where('channel', $this->streamer->overlayChannel())
             ->where('authEndpoint', route('overlays.broadcasting.auth', ['token' => OVERLAY_TOKEN]))
             ->where('settings', $this->streamer->settings->forScene($scene)->toArray())
+            ->where('sources', expected: null)
             ->where('recentChat', [])
             ->where('session', expected: null));
 })->with([
@@ -225,4 +226,41 @@ test('a live em andamento vem nas props da overlay', function (): void {
             ->where('session.title', 'Refatorando o ETL')
             ->where('session.category', 'Software and Game Development')
             ->has('session.startedAt'));
+});
+
+test('a cena com fonte escolhida só traz o chat e a live dessa fonte', function (): void {
+    $pubChannel = StreamerSource::factory()->for($this->streamer)->readingChat()->create();
+    $ownChannel = StreamerSource::factory()->for($this->streamer)->readingChat()->create();
+    $pubMessage = overlayChatMessage($pubChannel, minutesAgo: 2);
+    overlayChatMessage($ownChannel, minutesAgo: 1);
+    StreamSession::factory()->forSource($ownChannel)->create(['title' => 'Live do canal pessoal']);
+    $this->streamer->update(['settings' => $this->streamer->settings->withSceneSources(OverlayScene::Pub, [$pubChannel->id])]);
+
+    $this->get('/overlay/'.OVERLAY_TOKEN.'/pub')
+        ->assertInertia(fn (AssertableInertia $page): AssertableInertia => $page
+            ->where('sources', [$pubChannel->id])
+            ->has('recentChat', 1)
+            ->where('recentChat.0.msgId', $pubMessage->provider_message_id)
+            ->where('recentChat.0.sourceId', $pubChannel->id)
+            ->where('session', expected: null));
+
+    $this->get('/overlay/'.OVERLAY_TOKEN.'/chat')
+        ->assertInertia(fn (AssertableInertia $page): AssertableInertia => $page
+            ->where('sources', expected: null)
+            ->has('recentChat', 2)
+            ->where('session.title', 'Live do canal pessoal')
+            ->where('session.sourceId', $ownChannel->id));
+});
+
+test('a cena volta a usar todas as fontes quando a fonte escolhida some', function (): void {
+    $source = StreamerSource::factory()->for($this->streamer)->readingChat()->create();
+    $gone = StreamerSource::factory()->for($this->streamer)->create();
+    $this->streamer->update(['settings' => $this->streamer->settings->withSceneSources(OverlayScene::Pub, [$gone->id])]);
+    $gone->delete();
+    overlayChatMessage($source, minutesAgo: 1);
+
+    $this->get('/overlay/'.OVERLAY_TOKEN.'/pub')
+        ->assertInertia(fn (AssertableInertia $page): AssertableInertia => $page
+            ->where('sources', expected: null)
+            ->has('recentChat', 1));
 });

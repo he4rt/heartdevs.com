@@ -28,14 +28,17 @@ class ShowOverlayController
 
         abort_unless($streamer instanceof Streamer, HttpResponse::HTTP_NOT_FOUND);
 
+        $sourceIds = $streamer->sourceIdsForScene($scene);
+
         return Inertia::render($this->component($scene), [
             'scene' => $scene->value,
             'handle' => $streamer->user->username,
             'channel' => $streamer->overlayChannel(),
             'authEndpoint' => route('overlays.broadcasting.auth', ['token' => $token]),
             'settings' => $streamer->settings->forScene($scene)->toArray(),
-            'recentChat' => $initialState->recentChat($streamer, self::RECENT_CHAT_LIMIT),
-            'session' => $initialState->openSession($streamer),
+            'sources' => $sourceIds,
+            'recentChat' => $initialState->recentChat($streamer, self::RECENT_CHAT_LIMIT, $sourceIds),
+            'session' => $initialState->openSession($streamer, $sourceIds),
             'pub' => $scene === OverlayScene::Pub ? $pubState->for($streamer) : null,
         ]);
     }
