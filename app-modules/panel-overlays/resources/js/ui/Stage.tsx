@@ -21,7 +21,7 @@ function fitStage(fillViewport: boolean): StageBox {
         return { scale, width: STAGE_W, height: STAGE_H };
     }
 
-    return { scale, width: window.innerWidth / scale, height: window.innerHeight / scale };
+    return { scale, width: Math.ceil(window.innerWidth / scale), height: Math.ceil(window.innerHeight / scale) };
 }
 
 export function Stage({ children, fillViewport = false }: StageProps) {
@@ -34,15 +34,19 @@ export function Stage({ children, fillViewport = false }: StageProps) {
         return () => window.removeEventListener('resize', onResize);
     }, [fillViewport]);
 
+    const anchorStyle: React.CSSProperties = fillViewport
+        ? { position: 'absolute', top: 0, left: 0, transformOrigin: '0 0' }
+        : { position: 'relative', transformOrigin: 'center' };
+
     return (
         <div className="fixed inset-0 flex items-center justify-center overflow-hidden bg-transparent">
             <div
-                className="relative flex-none overflow-hidden font-saira"
+                className="flex-none overflow-hidden font-saira"
                 style={{
+                    ...anchorStyle,
                     width: box.width,
                     height: box.height,
                     transform: `scale(${box.scale})`,
-                    transformOrigin: 'center',
                 }}
             >
                 {children}
