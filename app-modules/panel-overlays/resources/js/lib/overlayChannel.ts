@@ -12,8 +12,19 @@ import {
 
 type Listener = (dto: FeedEventDto) => void;
 
+interface SourcedPayload {
+    sourceId?: string | null;
+}
+
+export function isFromSceneSources({ sourceId }: SourcedPayload, sources: string[] | null | undefined): boolean {
+    const sceneUsesEverySource = !sources || sources.length === 0;
+    const payloadHasNoSource = !sourceId;
+
+    return sceneUsesEverySource || payloadHasNoSource || sources.includes(sourceId);
+}
+
 export function subscribeOverlayChannel(
-    { channel, authEndpoint }: OverlayChannelSource,
+    { channel, authEndpoint, scene, sources }: OverlayChannelSource,
     listener: Listener,
 ): () => void {
     const port = Number(import.meta.env.VITE_REVERB_PORT);
@@ -31,8 +42,16 @@ export function subscribeOverlayChannel(
     });
 
     echo.private(channel)
-        .listen('.alert.triggered', (alert: AlertPayload) => listener(toStreamEvent(alert)))
-        .listen('.chat.message', (message: ChatMessagePayload) => listener(toChatMessage(message)))
+        .listen('.alert.triggered', (alert: AlertPayload) => {
+            if (isFromSceneSources(alert, sources)) {
+                listener(toStreamEvent(alert));
+            }
+        })
+        .listen('.chat.message', (message: ChatMessagePayload) => {
+            if (isFromSceneSources(message, sources)) {
+                listener(toChatMessage(message));
+            }
+        })
         .listen('.chat.message-deleted', ({ msgId }: { msgId: string }) =>
             listener({ kind: 'chatMessageDeleted', msgId }),
         )
@@ -40,6 +59,11 @@ export function subscribeOverlayChannel(
             listener({ kind: 'chatterCleared', chatterId }),
         )
         .listen('.chat.cleared', () => listener({ kind: 'chatCleared' }))
+        .listen('.sources.updated', (payload: { scene: string }) => {
+            if (payload.scene === scene) {
+                window.location.reload();
+            }
+        })
         .listen('.settings.updated', ({ scene, settings }: SettingsPayload) =>
             listener(toOverlayConfig(scene, settings, Date.now())),
         )

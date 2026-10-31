@@ -16,12 +16,19 @@ function chatConfigOf(dto: OverlayConfigDto): ChatConfig | null {
     return values ? chatConfigFrom(values) : null;
 }
 
-export default function ChatOverlay({ channel, authEndpoint, settings, recentChat }: OverlayPageProps<ChatSettings>) {
+export default function ChatOverlay({
+    scene,
+    channel,
+    authEndpoint,
+    sources,
+    settings,
+    recentChat,
+}: OverlayPageProps<ChatSettings>) {
     const [config, setConfig] = useState(() => chatConfigFrom(settings));
     const chat = useChatMessages(recentChat.map(toChatMessage), MAX_MESSAGES);
 
     useOverlayFeed(
-        { channel, authEndpoint },
+        { channel, authEndpoint, scene, sources },
         {
             onChatMessage: chat.push,
             onChatDeleted: chat.remove,

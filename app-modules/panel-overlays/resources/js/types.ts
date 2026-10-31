@@ -68,6 +68,7 @@ export interface ChatBadgePayload {
 }
 
 export interface ChatMessagePayload {
+    sourceId?: string | null;
     msgId: string;
     chatterId: string;
     username: string;
@@ -77,6 +78,7 @@ export interface ChatMessagePayload {
 }
 
 export interface SessionPayload {
+    sourceId?: string;
     title: string | null;
     category: string | null;
     startedAt: string;
@@ -85,6 +87,8 @@ export interface SessionPayload {
 export interface OverlayChannelSource {
     channel: string;
     authEndpoint: string;
+    scene?: string;
+    sources?: string[] | null;
 }
 
 export interface OverlayPageProps<TSettings extends object = SceneSettings> extends OverlayChannelSource {

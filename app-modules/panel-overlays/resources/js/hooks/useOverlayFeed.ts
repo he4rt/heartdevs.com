@@ -30,16 +30,23 @@ export interface OverlayFeedHandlers {
     onPubQuestionPatch?(dto: PubQuestionPatchDto): void;
 }
 
-export function useOverlayFeed({ channel, authEndpoint }: OverlayChannelSource, handlers: OverlayFeedHandlers): void {
+export function useOverlayFeed(
+    { channel, authEndpoint, scene, sources }: OverlayChannelSource,
+    handlers: OverlayFeedHandlers,
+): void {
     const handlersRef = useRef(handlers);
     handlersRef.current = handlers;
+    const sourcesKey = sources?.join(',') ?? '';
 
     useEffect(() => {
         const listener = (dto: FeedEventDto) => dispatch(dto, handlersRef.current);
         const isDemo = new URLSearchParams(window.location.search).has('demo');
+        const sceneSources = sourcesKey === '' ? null : sourcesKey.split(',');
 
-        return isDemo ? subscribeDemoFeed(listener) : subscribeOverlayChannel({ channel, authEndpoint }, listener);
-    }, [channel, authEndpoint]);
+        return isDemo
+            ? subscribeDemoFeed(listener)
+            : subscribeOverlayChannel({ channel, authEndpoint, scene, sources: sceneSources }, listener);
+    }, [channel, authEndpoint, scene, sourcesKey]);
 }
 
 function dispatch(dto: FeedEventDto, handlers: OverlayFeedHandlers): void {

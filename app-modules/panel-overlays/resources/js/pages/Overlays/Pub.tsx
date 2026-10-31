@@ -12,12 +12,12 @@ import type { PubPageProps } from '../../types';
 
 const QUEUE_LIMIT = 3;
 
-export default function PubOverlay({ channel, authEndpoint, recentChat, pub }: PubPageProps) {
+export default function PubOverlay({ scene, channel, authEndpoint, sources, recentChat, pub }: PubPageProps) {
     const chat = useChatMessages(recentChat.map(toChatMessage));
     const questions = usePubQuestions(pub?.questions ?? []);
 
     useOverlayFeed(
-        { channel, authEndpoint },
+        { channel, authEndpoint, scene, sources },
         {
             onChatMessage: chat.push,
             onChatDeleted: chat.remove,

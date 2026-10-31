@@ -7,6 +7,7 @@ namespace He4rt\PanelApp\Clusters\Streaming\Pages;
 use BackedEnum;
 use Closure;
 use Filament\Actions\Action;
+use Filament\Forms\Components\CheckboxList;
 use Filament\Forms\Components\Radio;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
@@ -34,10 +35,16 @@ use He4rt\Streaming\Streamer\Data\PubSettings;
 use He4rt\Streaming\Streamer\Data\StartingSoonSettings;
 use He4rt\Streaming\Streamer\Data\VoiceSettings;
 use He4rt\Streaming\Streamer\Models\Streamer;
+use He4rt\Streaming\Streamer\Models\StreamerSource;
 use He4rt\Streaming\StreamEvent\Actions\TriggerTestAlert;
+use Illuminate\Database\Eloquent\Collection;
+use Livewire\Attributes\Computed;
 use Livewire\Attributes\Locked;
 use Livewire\Attributes\Renderless;
 
+/**
+ * @property-read Collection<int, StreamerSource> $overlaySources
+ */
 class StreamOverlaysPage extends Page
 {
     private const int SCENE_WIDTH = 1_920;
@@ -252,6 +259,60 @@ class StreamOverlaysPage extends Page
             });
     }
 
+    public function sceneSourcesAction(): Action
+    {
+        return Action::make('sceneSources')
+            ->label(fn (array $arguments): string => $this->sceneSourcesLabel($this->sceneOf($arguments)))
+            ->icon(Heroicon::OutlinedSignal)
+            ->color('gray')
+            ->size('sm')
+            ->modalHeading(fn (array $arguments): string => sprintf('Fontes: %s', $this->sceneOf($arguments)?->getLabel() ?? 'cena'))
+            ->modalDescription('De quais canais esta cena recebe chat e alertas. Sem nenhum marcado, ela usa todas as fontes ligadas. A overlay aberta no OBS recarrega sozinha.')
+            ->modalSubmitActionLabel('Salvar')
+            ->fillForm(fn (array $arguments): array => [
+                'sources' => $this->sceneOf($arguments) instanceof OverlayScene
+                    ? $this->currentStreamer()->settings->sceneSources->chosenFor($this->sceneOf($arguments))
+                    : [],
+            ])
+            ->schema([
+                CheckboxList::make('sources')
+                    ->hiddenLabel()
+                    ->options(fn (): array => $this->overlaySources->mapWithKeys(fn (StreamerSource $source): array => [$source->id => $this->sourceHandle($source)])->all())
+                    ->descriptions(fn (): array => $this->overlaySources->mapWithKeys(fn (StreamerSource $source): array => [
+                        $source->id => sprintf('%s · %s', $source->identity->provider->getLabel(), $source->enabled ? 'ligada' : 'desligada no Painel'),
+                    ])->all()),
+            ])
+            ->visible(fn (): bool => $this->overlaySources->count() > 1)
+            ->action(function (array $arguments, array $data, UpdateStreamerSettings $updateSettings): void {
+                $scene = $this->sceneOf($arguments);
+
+                if (!$scene instanceof OverlayScene) {
+                    return;
+                }
+
+                $submitted = is_array($data['sources'] ?? null) ? $data['sources'] : [];
+                $ownedSourceIds = array_values(array_intersect($submitted, $this->overlaySourceIds()));
+                $streamer = $this->currentStreamer();
+
+                $updateSettings->handle($streamer, $streamer->settings->withSceneSources($scene, $ownedSourceIds));
+
+                Notification::make()
+                    ->title('Fontes da cena atualizadas')
+                    ->body($ownedSourceIds === [] ? 'A cena volta a usar todas as fontes ligadas.' : null)
+                    ->success()
+                    ->send();
+            });
+    }
+
+    /**
+     * @return Collection<int, StreamerSource>
+     */
+    #[Computed]
+    public function overlaySources(): Collection
+    {
+        return $this->currentStreamer()->sources()->with('identity')->oldest()->get();
+    }
+
     public function testAlertAction(): Action
     {
         return Action::make('testAlert')
@@ -388,6 +449,49 @@ class StreamOverlaysPage extends Page
         $type = $arguments['type'] ?? null;
 
         return is_string($type) ? StreamEventType::tryFrom($type) : null;
+    }
+
+    /**
+     * @param  array<array-key, mixed>  $arguments
+     */
+    private function sceneOf(array $arguments): ?OverlayScene
+    {
+        $scene = $arguments['scene'] ?? null;
+
+        return is_string($scene) ? OverlayScene::tryFrom($scene) : null;
+    }
+
+    private function sceneSourcesLabel(?OverlayScene $scene): string
+    {
+        $chosenSourceIds = $scene instanceof OverlayScene
+            ? $this->currentStreamer()->settings->sceneSources->allowedFor($scene, $this->overlaySourceIds())
+            : null;
+
+        if ($chosenSourceIds === null) {
+            return 'Fontes: todas';
+        }
+
+        $handles = $this->overlaySources
+            ->filter(fn (StreamerSource $source): bool => in_array($source->id, $chosenSourceIds, strict: true))
+            ->map($this->sourceHandle(...))
+            ->implode(', ');
+
+        return 'Fontes: '.$handles;
+    }
+
+    /**
+     * @return list<string>
+     */
+    private function overlaySourceIds(): array
+    {
+        return array_values($this->overlaySources->map(fn (StreamerSource $source): string => $source->id)->all());
+    }
+
+    private function sourceHandle(StreamerSource $source): string
+    {
+        $username = $source->identity->metadata['username'] ?? null;
+
+        return '@'.(is_string($username) ? $username : $source->identity->external_account_id);
     }
 
     private function sceneUrl(OverlayScene $scene, string $token): string
