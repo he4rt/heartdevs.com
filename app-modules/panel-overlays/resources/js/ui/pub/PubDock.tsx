@@ -18,8 +18,10 @@ function QuestionOnAir({ question }: { question: SlidoQuestionPayload }) {
                 {authorOf(question)} pergunta
                 <span className="ml-[10px] text-pub-yellow">▲ {question.score}</span>
             </div>
-            <div className="line-clamp-2 bg-pub-yellow px-6 pt-[10px] pb-3 font-pub-cond text-[46px] leading-[1.02] font-extrabold text-pub-asphalt uppercase">
-                {question.text}
+            <div className="bg-pub-yellow px-6 pt-[10px] pb-3">
+                <p className="line-clamp-3 font-pub-cond text-[46px] leading-[1.02] font-extrabold text-pub-asphalt uppercase">
+                    {question.text}
+                </p>
             </div>
         </>
     );
@@ -32,7 +34,7 @@ function QuestionQueue({ queue }: { queue: SlidoQuestionPayload[] }) {
             {queue.map((question) => (
                 <div
                     key={question.id}
-                    className="grid grid-cols-[64px_1fr] items-baseline font-pub-sans text-[22px] leading-[1.55] font-medium text-white"
+                    className="grid grid-cols-[64px_minmax(0,1fr)] items-baseline font-pub-sans text-[22px] leading-[1.55] font-medium text-white"
                 >
                     <b className="font-pub-cond text-[26px] font-extrabold text-pub-yellow">▲ {question.score}</b>
                     <span className="truncate">{question.text}</span>
@@ -61,9 +63,9 @@ export function PubDock({ event, qrSvg, highlighted, queue }: PubDockProps) {
     const contentKey = highlighted ? `live-${highlighted.id}` : queue.length > 0 ? 'queue' : 'empty';
 
     return (
-        <div className="absolute bottom-0 left-0 flex max-w-[1200px] min-w-[900px] items-stretch border-t-4 border-pub-yellow bg-pub-asphalt/[.93]">
+        <div className="absolute bottom-0 left-0 flex items-end">
             {event && qrSvg ? (
-                <div className="flex w-[196px] flex-none flex-col items-center gap-2 border-r-2 border-pub-yellow/30 px-[14px] pt-[14px] pb-3">
+                <div className="flex w-[196px] flex-none flex-col items-center gap-2 border-t-4 border-pub-yellow bg-pub-asphalt/[.93] px-[14px] pt-[14px] pb-3">
                     <div
                         className="h-[160px] w-[160px] bg-white p-[7px] [&_svg]:h-full [&_svg]:w-full"
                         dangerouslySetInnerHTML={{ __html: qrSvg }}
@@ -79,7 +81,7 @@ export function PubDock({ event, qrSvg, highlighted, queue }: PubDockProps) {
 
             <div
                 key={contentKey}
-                className="flex min-w-0 flex-1 flex-col justify-center animate-[pubWipe_.5s_cubic-bezier(.2,.8,.2,1)_both]"
+                className="flex max-w-[1004px] min-w-[420px] flex-col border-t-4 border-l-2 border-pub-yellow border-l-pub-yellow/30 bg-pub-asphalt/[.93] animate-[pubWipe_.5s_cubic-bezier(.2,.8,.2,1)_both]"
             >
                 {highlighted ? (
                     <QuestionOnAir question={highlighted} />
