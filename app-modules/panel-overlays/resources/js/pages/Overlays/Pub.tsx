@@ -30,7 +30,7 @@ export default function PubOverlay({ channel, authEndpoint, recentChat, pub }: P
     );
 
     return (
-        <Stage>
+        <Stage fillViewport>
             <PubBrand />
             <PubChat edition={pub ? editionLabel(pub.event.name) : null} messages={chat.messages} />
             <PubDock
