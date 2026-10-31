@@ -13,6 +13,7 @@ final readonly class StreamerSettings
         public StartingSoonSettings $startingSoon = new StartingSoonSettings,
         public VoiceSettings $voice = new VoiceSettings,
         public ChatSettings $chat = new ChatSettings,
+        public PubSettings $pub = new PubSettings,
         public AlertSettings $alerts = new AlertSettings,
         public MutedChatters $mutedChatters = new MutedChatters,
     ) {}
@@ -31,6 +32,7 @@ final readonly class StreamerSettings
             startingSoon: StartingSoonSettings::fromArray(self::scenePayload($scenes, OverlayScene::StartingSoon)),
             voice: VoiceSettings::fromArray(self::scenePayload($scenes, OverlayScene::Voice)),
             chat: ChatSettings::fromArray(self::scenePayload($scenes, OverlayScene::Chat)),
+            pub: PubSettings::fromArray(self::scenePayload($scenes, OverlayScene::Pub)),
             alerts: AlertSettings::fromArray($alerts),
             mutedChatters: MutedChatters::fromArray($mutedChatters),
         );
@@ -43,6 +45,7 @@ final readonly class StreamerSettings
             OverlayScene::StartingSoon => $this->startingSoon,
             OverlayScene::Voice => $this->voice,
             OverlayScene::Chat => $this->chat,
+            OverlayScene::Pub => $this->pub,
         };
     }
 
@@ -53,6 +56,7 @@ final readonly class StreamerSettings
             startingSoon: $settings instanceof StartingSoonSettings ? $settings : $this->startingSoon,
             voice: $settings instanceof VoiceSettings ? $settings : $this->voice,
             chat: $settings instanceof ChatSettings ? $settings : $this->chat,
+            pub: $settings instanceof PubSettings ? $settings : $this->pub,
             alerts: $this->alerts,
             mutedChatters: $this->mutedChatters,
         );
@@ -60,12 +64,12 @@ final readonly class StreamerSettings
 
     public function withAlerts(AlertSettings $alerts): self
     {
-        return new self($this->coworking, $this->startingSoon, $this->voice, $this->chat, $alerts, $this->mutedChatters);
+        return new self($this->coworking, $this->startingSoon, $this->voice, $this->chat, $this->pub, $alerts, $this->mutedChatters);
     }
 
     public function withMutedChatters(MutedChatters $mutedChatters): self
     {
-        return new self($this->coworking, $this->startingSoon, $this->voice, $this->chat, $this->alerts, $mutedChatters);
+        return new self($this->coworking, $this->startingSoon, $this->voice, $this->chat, $this->pub, $this->alerts, $mutedChatters);
     }
 
     /**

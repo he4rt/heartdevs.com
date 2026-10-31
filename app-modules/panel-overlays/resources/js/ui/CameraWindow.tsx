@@ -1,16 +1,18 @@
 export interface CameraWindowProps {
     label?: string;
+    bottom?: number;
 }
 
-export function CameraWindow({ label }: CameraWindowProps) {
+export function CameraWindow({ label, bottom = 130 }: CameraWindowProps) {
     return (
         <>
             <div className="absolute left-[710px] top-[835px] bottom-0 w-[46px] bg-yellow" />
             <div className="absolute left-[710px] top-[868px] h-[170px] w-[46px] bg-black/[.18]" />
 
             <div
-                className="absolute left-[756px] top-[12px] right-[12px] bottom-[130px] overflow-hidden rounded-[22px]"
+                className="absolute left-[756px] top-[12px] right-[12px] overflow-hidden rounded-[22px]"
                 style={{
+                    bottom,
                     boxShadow:
                         '0 0 0 2px rgba(255,255,255,.22),0 0 0 6px rgba(20,10,31,.55),0 18px 60px rgba(0,0,0,.5)',
                 }}

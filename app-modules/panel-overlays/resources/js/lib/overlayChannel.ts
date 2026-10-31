@@ -1,7 +1,7 @@
 import Echo from 'laravel-echo';
 import Pusher from 'pusher-js';
 import type { FeedEventDto } from '../feed';
-import type { ChatMessagePayload, OverlayChannelSource } from '../types';
+import type { ChatMessagePayload, OverlayChannelSource, SlidoQuestionChanges, SlidoQuestionPayload } from '../types';
 import {
     toChatMessage,
     toOverlayConfig,
@@ -42,6 +42,13 @@ export function subscribeOverlayChannel(
         .listen('.chat.cleared', () => listener({ kind: 'chatCleared' }))
         .listen('.settings.updated', ({ scene, settings }: SettingsPayload) =>
             listener(toOverlayConfig(scene, settings, Date.now())),
+        )
+        .listen('.pub.questions', ({ questions }: { questions: SlidoQuestionPayload[] }) =>
+            listener({ kind: 'pubQuestions', questions }),
+        )
+        .listen('.pub.question', (question: SlidoQuestionPayload) => listener({ kind: 'pubQuestion', question }))
+        .listen('.pub.question-patch', ({ id, changes }: { id: number; changes: SlidoQuestionChanges }) =>
+            listener({ kind: 'pubQuestionPatch', id, changes }),
         );
 
     return () => echo.disconnect();

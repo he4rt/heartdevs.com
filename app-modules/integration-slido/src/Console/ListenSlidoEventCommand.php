@@ -20,7 +20,7 @@ use React\EventLoop\TimerInterface;
 use Throwable;
 
 #[Description(description: 'Escuta as perguntas de um evento do Slido e envia para a overlay do streamer')]
-#[Signature(signature: 'slido:listen {streamer : username do streamer dono da overlay} {event : hash do evento no Slido}')]
+#[Signature(signature: 'slido:listen {streamer : username do streamer dono da overlay} {event? : hash do evento no Slido (padrão: o configurado na cena He4rt Pub)}')]
 final class ListenSlidoEventCommand extends Command
 {
     private const string ORIGIN = 'https://wall.sli.do';
@@ -45,7 +45,15 @@ final class ListenSlidoEventCommand extends Command
             return self::FAILURE;
         }
 
-        $location = $client->locate((string) $this->argument('event'));
+        $eventHash = $this->argument('event') ?? $streamer->settings->pub->slidoEventHash;
+
+        if (!is_string($eventHash) || $eventHash === '') {
+            $this->error('Nenhum evento do Slido. Passe o hash ou configure a cena He4rt Pub no painel.');
+
+            return self::FAILURE;
+        }
+
+        $location = $client->locate($eventHash);
         $event = $client->event($location);
 
         $this->info(sprintf('Escutando "%s" (%s) para a overlay de %s.', $event->name, $location->uuid, $this->argument('streamer')));

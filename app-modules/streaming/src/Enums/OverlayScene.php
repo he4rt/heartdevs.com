@@ -14,6 +14,7 @@ enum OverlayScene: string implements HasColor, HasDescription, HasLabel
     case StartingSoon = 'starting';
     case Voice = 'voice';
     case Chat = 'chat';
+    case Pub = 'pub';
 
     public function getLabel(): string
     {
@@ -22,6 +23,7 @@ enum OverlayScene: string implements HasColor, HasDescription, HasLabel
             self::StartingSoon => 'A live vai começar',
             self::Voice => 'Sala de voz',
             self::Chat => 'Chat',
+            self::Pub => 'He4rt Pub',
         };
     }
 
@@ -32,6 +34,7 @@ enum OverlayScene: string implements HasColor, HasDescription, HasLabel
             self::StartingSoon => 'Cena de abertura com contagem regressiva.',
             self::Voice => 'Quem está na call do Discord, com fundo transparente, por cima de qualquer cena.',
             self::Chat => 'Só o chat da live, com fundo transparente, por cima de qualquer cena.',
+            self::Pub => 'Câmera, chat, perguntas do Slido e QR Code para o público mandar a pergunta.',
         };
     }
 
@@ -47,6 +50,7 @@ enum OverlayScene: string implements HasColor, HasDescription, HasLabel
             self::StartingSoon => 'info',
             self::Voice => 'success',
             self::Chat => 'warning',
+            self::Pub => 'danger',
         };
     }
 }

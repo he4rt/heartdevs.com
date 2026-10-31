@@ -5,6 +5,9 @@ import type {
     LevelProgressDto,
     NowPlayingDto,
     OverlayConfigDto,
+    PubQuestionDto,
+    PubQuestionPatchDto,
+    PubQuestionsDto,
     StreamEventDto,
     VoiceRosterDto,
 } from '../feed';
@@ -22,6 +25,9 @@ export interface OverlayFeedHandlers {
     onVoiceRoster?(dto: VoiceRosterDto): void;
     onOverlayConfig?(dto: OverlayConfigDto): void;
     onLevelProgress?(dto: LevelProgressDto): void;
+    onPubQuestions?(dto: PubQuestionsDto): void;
+    onPubQuestion?(dto: PubQuestionDto): void;
+    onPubQuestionPatch?(dto: PubQuestionPatchDto): void;
 }
 
 export function useOverlayFeed({ channel, authEndpoint }: OverlayChannelSource, handlers: OverlayFeedHandlers): void {
@@ -64,6 +70,15 @@ function dispatch(dto: FeedEventDto, handlers: OverlayFeedHandlers): void {
             break;
         case 'levelProgress':
             handlers.onLevelProgress?.(dto);
+            break;
+        case 'pubQuestions':
+            handlers.onPubQuestions?.(dto);
+            break;
+        case 'pubQuestion':
+            handlers.onPubQuestion?.(dto);
+            break;
+        case 'pubQuestionPatch':
+            handlers.onPubQuestionPatch?.(dto);
             break;
     }
 }

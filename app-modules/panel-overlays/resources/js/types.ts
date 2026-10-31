@@ -1,6 +1,6 @@
 import type { FragmentDto } from './feed';
 
-export type OverlayScene = 'coworking' | 'starting' | 'voice' | 'chat';
+export type OverlayScene = 'coworking' | 'starting' | 'voice' | 'chat' | 'pub';
 
 export type StartingSoonSettings = {
     title: string | null;
@@ -20,7 +20,46 @@ export type ChatSettings = {
     alignment: string;
 };
 
+export type PubSettings = {
+    slido_event_hash: string | null;
+};
+
 export type SceneSettings = Record<string, string | number | null>;
+
+export interface SlidoReplyPayload {
+    id: number;
+    text: string;
+    authorName: string | null;
+    isFromModerator: boolean;
+}
+
+export interface SlidoQuestionPayload {
+    id: number;
+    text: string;
+    authorName: string | null;
+    score: number;
+    isHighlighted: boolean;
+    isAnswered: boolean;
+    isVisible: boolean;
+    createdAt: string;
+    replies: SlidoReplyPayload[];
+}
+
+export type SlidoQuestionChanges = Partial<Pick<SlidoQuestionPayload, 'score' | 'isHighlighted' | 'isAnswered'>>;
+
+export interface SlidoEventPayload {
+    hash: string;
+    name: string;
+    code: string;
+    isActive: boolean;
+    participantUrl: string;
+}
+
+export interface PubSnapshot {
+    event: SlidoEventPayload;
+    questions: SlidoQuestionPayload[];
+    qrSvg: string;
+}
 
 export interface ChatBadgePayload {
     setId: string;
@@ -54,4 +93,8 @@ export interface OverlayPageProps<TSettings extends object = SceneSettings> exte
     settings: TSettings;
     recentChat: ChatMessagePayload[];
     session: SessionPayload | null;
+}
+
+export interface PubPageProps extends OverlayPageProps<PubSettings> {
+    pub: PubSnapshot | null;
 }
