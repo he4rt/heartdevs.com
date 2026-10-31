@@ -21,20 +21,29 @@ final class SlidoStreamSession
     private ?SlidoParticipantToken $token = null;
 
     /**
+     * @param  list<Streamer>  $streamers
      * @param  Closure(string): void  $log
      */
     public function __construct(
         private readonly SlidoClient $client,
         private readonly QuestionFeed $feed,
         private readonly SlidoEventLocation $location,
-        private readonly Streamer $streamer,
+        private array $streamers,
         private readonly Closure $log,
     ) {}
+
+    /**
+     * @param  list<Streamer>  $streamers
+     */
+    public function retarget(array $streamers): void
+    {
+        $this->streamers = $streamers;
+    }
 
     public function streamUrl(): string
     {
         $query = http_build_query([
-            'clientId' => mb_substr(md5($this->streamer->getKey()), 0, 15),
+            'clientId' => mb_substr(md5($this->location->uuid), 0, 15),
             'slidoappVersion' => 'SlidoPresentApp/88.7.0 (web)',
             'EIO' => 4,
             'transport' => 'websocket',
@@ -47,7 +56,7 @@ final class SlidoStreamSession
     {
         $questions = $this->client->questions($this->location, $this->token());
 
-        event(new SlidoQuestionsSynced($this->streamer, $questions));
+        event(new SlidoQuestionsSynced($this->streamers, $questions));
 
         ($this->log)(sprintf('Sincronizou %d pergunta(s) visíveis.', count($questions)));
     }
@@ -118,7 +127,7 @@ final class SlidoStreamSession
         $question = $this->feed->questionFrom($frame);
 
         if ($question instanceof SlidoQuestion) {
-            event(new SlidoQuestionChanged($this->streamer, $question));
+            event(new SlidoQuestionChanged($this->streamers, $question));
 
             return [];
         }
@@ -126,7 +135,7 @@ final class SlidoStreamSession
         $patch = $this->feed->patchFrom($frame);
 
         if ($patch instanceof SlidoQuestionPatch) {
-            event(new SlidoQuestionPatched($this->streamer, $patch));
+            event(new SlidoQuestionPatched($this->streamers, $patch));
 
             return [];
         }

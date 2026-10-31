@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace He4rt\IntegrationSlido;
 
-use He4rt\IntegrationSlido\Console\ListenSlidoEventCommand;
+use He4rt\IntegrationSlido\Console\ServeSlidoEventsCommand;
 use He4rt\IntegrationSlido\Transport\SlidoAuthConnector;
 use He4rt\IntegrationSlido\Transport\SlidoLookupConnector;
 use Illuminate\Support\ServiceProvider;
@@ -28,7 +28,7 @@ class IntegrationSlidoServiceProvider extends ServiceProvider
     public function boot(): void
     {
         if ($this->app->runningInConsole()) {
-            $this->commands([ListenSlidoEventCommand::class]);
+            $this->commands([ServeSlidoEventsCommand::class]);
         }
     }
 }

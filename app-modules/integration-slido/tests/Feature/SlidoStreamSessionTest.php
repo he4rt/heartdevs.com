@@ -15,6 +15,7 @@ use He4rt\IntegrationSlido\Transport\Requests\GetQuestions;
 use He4rt\IntegrationSlido\Transport\Requests\RefreshParticipantToken;
 use He4rt\IntegrationSlido\Transport\SlidoClient;
 use He4rt\Streaming\Streamer\Models\Streamer;
+use Illuminate\Broadcasting\PrivateChannel;
 use Illuminate\Support\Facades\Event;
 use Saloon\Http\Faking\MockClient;
 use Saloon\Http\Faking\MockResponse;
@@ -36,7 +37,7 @@ function streamSession(Streamer $streamer, array &$logs = []): SlidoStreamSessio
         client: resolve(SlidoClient::class),
         feed: new QuestionFeed,
         location: new SlidoEventLocation('jC9L7Lu93Vw3ssNhB92Pvb', STREAM_EVENT_UUID, 'eu1'),
-        streamer: $streamer,
+        streamers: [$streamer],
         log: function (string $line) use (&$logs): void {
             $logs[] = $line;
         },
@@ -77,11 +78,9 @@ test('faz o handshake e assina o evento com o token de participante', function (
         ->and($session->handle('2'))->toBe(['3']);
 });
 
-test('envia a pergunta atualizada para o canal da overlay do streamer', function (): void {
-    $streamer = Streamer::factory()->create();
-    $session = streamSession($streamer);
-
-    $session->handle(questionUpdateFrame([
+function highlightedQuestionFrame(): string
+{
+    return questionUpdateFrame([
         'event_question_id' => 122_180_089,
         'type' => 'Question',
         'text' => 'eaeaeaeaeaeaea',
@@ -92,12 +91,32 @@ test('envia a pergunta atualizada para o canal da overlay do streamer', function
         'is_answered' => false,
         'date_created' => '2026-10-31T18:23:13.000Z',
         'pinned_replies' => [],
-    ]));
+    ]);
+}
 
-    Event::assertDispatched(fn (SlidoQuestionChanged $event): bool => $event->streamer->is($streamer)
-        && $event->question->id === 122_180_089
+test('envia a pergunta atualizada para o canal da overlay do streamer', function (): void {
+    $streamer = Streamer::factory()->create();
+    $session = streamSession($streamer);
+
+    $session->handle(highlightedQuestionFrame());
+
+    Event::assertDispatched(fn (SlidoQuestionChanged $event): bool => $event->question->id === 122_180_089
         && $event->question->isHighlighted
-        && $event->broadcastOn()[0]->name === 'private-'.$streamer->overlayChannel());
+        && array_map(fn (PrivateChannel $channel): string => $channel->name, $event->broadcastOn()) === ['private-'.$streamer->overlayChannel()]);
+});
+
+test('passa a enviar para as overlays que abriram depois de conectar', function (): void {
+    $first = Streamer::factory()->create();
+    $second = Streamer::factory()->create();
+    $session = streamSession($first);
+
+    $session->retarget([$first, $second]);
+    $session->handle(highlightedQuestionFrame());
+
+    Event::assertDispatched(fn (SlidoQuestionChanged $event): bool => array_map(fn (PrivateChannel $channel): string => $channel->name, $event->broadcastOn()) === [
+        'private-'.$first->overlayChannel(),
+        'private-'.$second->overlayChannel(),
+    ]);
 });
 
 test('envia só o que mudou quando o Slido manda um patch ou uma ação do moderador', function (string $raw, array $changes): void {

@@ -246,7 +246,7 @@ class StreamOverlaysPage extends Page
 
                 Notification::make()
                     ->title('He4rt Pub atualizada')
-                    ->body('Reinicie o slido:listen para escutar o evento novo.')
+                    ->body('A overlay passa a mostrar as perguntas desse evento em alguns segundos.')
                     ->success()
                     ->send();
             });

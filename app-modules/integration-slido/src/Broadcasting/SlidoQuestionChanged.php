@@ -17,15 +17,18 @@ final class SlidoQuestionChanged implements ShouldBroadcastNow, ShouldRescue
     use Dispatchable;
     use InteractsWithSockets;
 
+    /**
+     * @param  list<Streamer>  $streamers
+     */
     public function __construct(
-        public Streamer $streamer,
+        public array $streamers,
         public SlidoQuestion $question,
     ) {}
 
     /** @return array<int, PrivateChannel> */
     public function broadcastOn(): array
     {
-        return [new PrivateChannel($this->streamer->overlayChannel())];
+        return array_map(fn (Streamer $streamer): PrivateChannel => new PrivateChannel($streamer->overlayChannel()), $this->streamers);
     }
 
     public function broadcastAs(): string

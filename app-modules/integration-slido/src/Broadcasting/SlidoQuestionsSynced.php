@@ -18,17 +18,18 @@ final class SlidoQuestionsSynced implements ShouldBroadcastNow, ShouldRescue
     use InteractsWithSockets;
 
     /**
+     * @param  list<Streamer>  $streamers
      * @param  list<SlidoQuestion>  $questions
      */
     public function __construct(
-        public Streamer $streamer,
+        public array $streamers,
         public array $questions,
     ) {}
 
     /** @return array<int, PrivateChannel> */
     public function broadcastOn(): array
     {
-        return [new PrivateChannel($this->streamer->overlayChannel())];
+        return array_map(fn (Streamer $streamer): PrivateChannel => new PrivateChannel($streamer->overlayChannel()), $this->streamers);
     }
 
     public function broadcastAs(): string
