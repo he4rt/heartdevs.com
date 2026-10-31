@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace He4rt\IntegrationSlido;
 
+use He4rt\IntegrationSlido\Console\ListenSlidoEventCommand;
 use He4rt\IntegrationSlido\Transport\SlidoAuthConnector;
 use He4rt\IntegrationSlido\Transport\SlidoLookupConnector;
 use Illuminate\Support\ServiceProvider;
@@ -22,5 +23,12 @@ class IntegrationSlidoServiceProvider extends ServiceProvider
         $this->app->bind(SlidoLookupConnector::class, fn (): SlidoLookupConnector => new SlidoLookupConnector(
             baseUrl: config()->string('integration-slido.lookup_url'),
         ));
+    }
+
+    public function boot(): void
+    {
+        if ($this->app->runningInConsole()) {
+            $this->commands([ListenSlidoEventCommand::class]);
+        }
     }
 }
