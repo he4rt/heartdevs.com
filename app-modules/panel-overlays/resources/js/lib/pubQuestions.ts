@@ -28,7 +28,3 @@ export function queuedQuestions(questions: SlidoQuestionPayload[], limit: number
         .sort((a, b) => b.score - a.score || a.createdAt.localeCompare(b.createdAt))
         .slice(0, limit);
 }
-
-export function pendingCount(questions: SlidoQuestionPayload[]): number {
-    return questions.filter((question) => !question.isAnswered).length;
-}

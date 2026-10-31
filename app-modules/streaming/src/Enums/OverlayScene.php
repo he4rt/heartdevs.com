@@ -34,13 +34,13 @@ enum OverlayScene: string implements HasColor, HasDescription, HasLabel
             self::StartingSoon => 'Cena de abertura com contagem regressiva.',
             self::Voice => 'Quem está na call do Discord, com fundo transparente, por cima de qualquer cena.',
             self::Chat => 'Só o chat da live, com fundo transparente, por cima de qualquer cena.',
-            self::Pub => 'Câmera, chat, perguntas do Slido e QR Code para o público mandar a pergunta.',
+            self::Pub => 'Camada transparente sobre a câmera: chat, perguntas do Slido, QR Code e a edição da He4rt Pub.',
         };
     }
 
     public function hasTransparentBackground(): bool
     {
-        return $this === self::Voice || $this === self::Chat;
+        return in_array($this, [self::Voice, self::Chat, self::Pub], strict: true);
     }
 
     public function getColor(): string

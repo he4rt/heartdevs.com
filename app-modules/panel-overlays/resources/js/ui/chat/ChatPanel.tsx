@@ -4,14 +4,11 @@ import He4rtLogo from '../He4rtLogo';
 export interface ChatPanelProps {
     title: string;
     children: ReactNode;
-    fullHeight?: boolean;
 }
 
-export function ChatPanel({ title, children, fullHeight = false }: ChatPanelProps) {
+export function ChatPanel({ title, children }: ChatPanelProps) {
     return (
-        <div
-            className={`absolute left-0 top-[100px] ${fullHeight ? 'bottom-0' : 'bottom-[122px]'} w-[710px] overflow-hidden border-t-2 border-brand/35 bg-[linear-gradient(180deg,var(--color-ink-900)_0%,var(--color-ink-950)_100%)]`}
-        >
+        <div className="absolute left-0 top-[100px] bottom-[122px] w-[710px] overflow-hidden border-t-2 border-brand/35 bg-[linear-gradient(180deg,var(--color-ink-900)_0%,var(--color-ink-950)_100%)]">
             <div className="pointer-events-none absolute inset-0 flex items-center justify-center overflow-hidden opacity-[.55]">
                 <He4rtLogo tone="brand" className="w-[520px]" style={{ transform: 'translateY(-4%)' }} />
             </div>
