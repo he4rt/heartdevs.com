@@ -56,7 +56,7 @@ final class ServeSlidoEventsCommand extends Command
      */
     private function reconcile(SlidoClient $client, QuestionFeed $feed, array $audience, LoopInterface $loop): void
     {
-        $plan = SlidoSubscriptionPlan::between(array_keys($audience), array_keys($this->connections));
+        $plan = SlidoSubscriptionPlan::between($this->hashesOf($audience), $this->hashesOf($this->connections));
 
         foreach ($plan->closing as $eventHash) {
             $this->connections[$eventHash]->close();
@@ -93,6 +93,17 @@ final class ServeSlidoEventsCommand extends Command
         $this->connections[$eventHash] = $connection;
         $log(sprintf('Conectando para %d overlay(s).', count($streamers)));
         $connection->open();
+    }
+
+    /**
+     * PHP turns a digit-only event hash into an integer array key.
+     *
+     * @param  array<array-key, mixed>  $keyedByHash
+     * @return list<string>
+     */
+    private function hashesOf(array $keyedByHash): array
+    {
+        return array_map(strval(...), array_keys($keyedByHash));
     }
 
     private function log(string $line): void

@@ -12,6 +12,7 @@ use He4rt\IntegrationSlido\Data\SlidoEventLocation;
 use He4rt\IntegrationSlido\Data\SlidoParticipantToken;
 use He4rt\IntegrationSlido\Data\SlidoQuestion;
 use He4rt\IntegrationSlido\Data\SlidoQuestionPatch;
+use He4rt\IntegrationSlido\Exceptions\SlidoSubscriptionRejected;
 use He4rt\IntegrationSlido\Transport\SlidoClient;
 use He4rt\Streaming\Streamer\Models\Streamer;
 use Throwable;
@@ -63,6 +64,8 @@ final class SlidoStreamSession
 
     /**
      * @return list<string>
+     *
+     * @throws SlidoSubscriptionRejected when Slido refuses the subscription; close the socket to recover
      */
     public function handle(string $raw): array
     {
@@ -72,9 +75,10 @@ final class SlidoStreamSession
             FrameKind::Open => [SocketIoFrame::CONNECT],
             FrameKind::Connected => [$this->subscribeFrame()],
             FrameKind::Ping => [SocketIoFrame::PONG],
-            FrameKind::Ack => $this->acknowledge($frame),
+            FrameKind::Ack => $this->acknowledge($frame, $raw),
             FrameKind::Event => $this->broadcast($frame),
-            FrameKind::ConnectError, FrameKind::Disconnected, FrameKind::Unknown => $this->ignore($frame, $raw),
+            FrameKind::ConnectError => $this->reject($raw),
+            FrameKind::Disconnected, FrameKind::Unknown => $this->ignore($frame, $raw),
         };
     }
 
@@ -112,11 +116,28 @@ final class SlidoStreamSession
     /**
      * @return list<string>
      */
-    private function acknowledge(SocketIoFrame $frame): array
+    private function acknowledge(SocketIoFrame $frame, string $raw): array
     {
-        ($this->log)($frame->isSubscriptionAccepted() ? 'Assinatura aceita pelo Slido.' : 'Slido recusou a assinatura.');
+        if (!$frame->isSubscriptionAccepted()) {
+            return $this->reject($raw);
+        }
+
+        ($this->log)('Assinatura aceita pelo Slido.');
+
+        try {
+            $this->syncQuestions();
+        } catch (Throwable $throwable) {
+            ($this->log)('Falhou ao sincronizar as perguntas: '.$throwable->getMessage());
+        }
 
         return [];
+    }
+
+    private function reject(string $raw): never
+    {
+        $this->token = null;
+
+        throw SlidoSubscriptionRejected::withFrame($raw);
     }
 
     /**

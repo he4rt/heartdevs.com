@@ -3866,7 +3866,12 @@
             "dist": {
                 "type": "path",
                 "url": "app-modules/integration-slido",
-                "reference": "78a17dedc2e5592ee5c59747d39aaeb6d1ed9cb1"
+                "reference": "d41d5a7edb9e555208fa461a3226db283102ff14"
+            },
+            "require": {
+                "ratchet/pawl": "^0.4.3",
+                "react/event-loop": "^1.6.0",
+                "saloonphp/saloon": "^4.5.0"
             },
             "type": "library",
             "extra": {

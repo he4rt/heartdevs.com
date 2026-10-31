@@ -34,3 +34,11 @@ test('monta o frame de subscribe com ack id 0', function (): void {
     expect(SocketIoFrame::subscribe('token-1', 'slido/events/abc/'))
         ->toBe('420["subscribe",{"accessToken":"token-1","targets":["slido/events/abc/"]}]');
 });
+
+test('lê o evento mesmo quando o servidor manda um id de ack antes do pacote', function (): void {
+    $frame = SocketIoFrame::parse('4212["newQuestion",{"params":{"event_question_id":5}}]');
+
+    expect($frame->kind)->toBe(FrameKind::Event)
+        ->and($frame->eventName)->toBe('newQuestion')
+        ->and($frame->params())->toBe(['event_question_id' => 5]);
+});

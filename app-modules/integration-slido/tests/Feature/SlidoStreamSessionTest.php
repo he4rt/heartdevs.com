@@ -6,6 +6,7 @@ use He4rt\IntegrationSlido\Broadcasting\SlidoQuestionChanged;
 use He4rt\IntegrationSlido\Broadcasting\SlidoQuestionPatched;
 use He4rt\IntegrationSlido\Broadcasting\SlidoQuestionsSynced;
 use He4rt\IntegrationSlido\Data\SlidoEventLocation;
+use He4rt\IntegrationSlido\Exceptions\SlidoSubscriptionRejected;
 use He4rt\IntegrationSlido\Stream\QuestionFeed;
 use He4rt\IntegrationSlido\Stream\SlidoStreamSession;
 use He4rt\IntegrationSlido\Transport\Requests\AuthorizeParticipant;
@@ -188,4 +189,46 @@ test('emite um token novo quando o refresh é recusado', function (): void {
 
     expect($session->refreshToken()[0])->toContain('"accessToken":"access-a"')
         ->and($logs[0])->toContain('Refresh recusado');
+});
+
+test('sincroniza as perguntas só depois que o Slido aceita a assinatura', function (): void {
+    fakeSlido([
+        GetEvent::class => MockResponse::make(['sections' => [['uuid' => 'section-1', 'is_active' => true]]]),
+        GetQuestions::class => MockResponse::make([['event_question_id' => 1, 'type' => 'Question', 'text' => 'Primeira', 'is_public' => true]]),
+    ]);
+    $session = streamSession(Streamer::factory()->create());
+
+    $session->handle('40{"sid":"s"}');
+    Event::assertNotDispatched(SlidoQuestionsSynced::class);
+
+    $session->handle('430[{"code":200,"message":"Subscribed"}]');
+    Event::assertDispatched(SlidoQuestionsSynced::class);
+});
+
+test('a assinatura recusada descarta o token para a reconexão emitir outro', function (string $raw): void {
+    $session = streamSession(Streamer::factory()->create());
+    $session->handle('40{"sid":"s"}');
+
+    expect(fn () => $session->handle($raw))->toThrow(SlidoSubscriptionRejected::class);
+
+    MockClient::getGlobal()?->assertSentCount(2);
+    $session->handle('40{"sid":"s2"}');
+    MockClient::getGlobal()?->assertSentCount(4);
+})->with([
+    'ack sem code 200' => ['430[{"code":401,"message":"Unauthorized"}]'],
+    'erro de conexão do socket.io' => ['44{"message":"unauthorized"}'],
+]);
+
+test('a pergunta com data inválida entra com a hora atual', function (): void {
+    $session = streamSession(Streamer::factory()->create());
+
+    $session->handle(questionUpdateFrame([
+        'event_question_id' => 7,
+        'type' => 'Question',
+        'text' => 'Data quebrada',
+        'is_public' => true,
+        'date_created' => 'ontem à noite',
+    ]));
+
+    Event::assertDispatched(fn (SlidoQuestionChanged $event): bool => $event->question->id === 7);
 });

@@ -14,6 +14,7 @@ use He4rt\Streaming\Enums\OverlayScene;
 use He4rt\Streaming\Enums\StreamEventType;
 use He4rt\Streaming\Enums\VoiceLayout;
 use He4rt\Streaming\Streamer\Actions\EnsureStreamer;
+use He4rt\Streaming\Streamer\Data\PubSettings;
 use He4rt\Streaming\Streamer\Models\Streamer;
 use He4rt\Streaming\Streamer\Models\StreamerSource;
 use He4rt\Streaming\StreamEvent\Actions\RecordStreamEvent;
@@ -158,4 +159,15 @@ test('cada cena com configuração tem o seu botão', function (): void {
         ->assertActionVisible('voiceSettings')
         ->assertActionVisible('chatSettings')
         ->assertActionVisible('alertSettings');
+});
+
+test('a He4rt Pub tira o Slido da overlay quando o link fica vazio', function (): void {
+    $this->streamer->update(['settings' => $this->streamer->settings->withScene(new PubSettings('jC9L7Lu93Vw3ssNhB92Pvb'))]);
+
+    livewire(StreamOverlaysPage::class)
+        ->callAction('pubSettings', data: ['slido_event' => ''])
+        ->assertHasNoActionErrors()
+        ->assertNotified('He4rt Pub atualizada');
+
+    expect(Streamer::query()->whereKey($this->streamer->id)->sole()->settings->pub->slidoEventHash)->toBeNull();
 });

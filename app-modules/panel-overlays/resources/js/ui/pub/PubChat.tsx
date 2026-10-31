@@ -25,18 +25,20 @@ export function PubChat({ edition, messages }: PubChatProps) {
                         className="font-pub-sans text-[23px] font-medium leading-[1.3] break-words text-pub-chalk [text-shadow:0_2px_10px_rgba(0,0,0,.85)] animate-[pubMessageIn_.4s_ease-out_both]"
                     >
                         <b className="block text-[18px] font-bold text-pub-yellow">{message.username}</b>
-                        {message.fragments.map((fragment, index) =>
-                            fragment.kind === 'emote' ? (
-                                <img
-                                    key={index}
-                                    src={fragment.url}
-                                    alt=""
-                                    className="inline-block h-7 w-7 align-middle"
-                                />
-                            ) : (
-                                <span key={index}>{fragment.text}</span>
-                            ),
-                        )}
+                        <span className="line-clamp-3">
+                            {message.fragments.map((fragment, index) =>
+                                fragment.kind === 'emote' ? (
+                                    <img
+                                        key={index}
+                                        src={fragment.url}
+                                        alt=""
+                                        className="inline-block h-7 w-7 align-middle"
+                                    />
+                                ) : (
+                                    <span key={index}>{fragment.text}</span>
+                                ),
+                            )}
+                        </span>
                     </div>
                 ))}
             </div>

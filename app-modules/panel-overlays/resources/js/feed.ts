@@ -165,6 +165,10 @@ export interface PubQuestionPatchDto {
     changes: SlidoQuestionChanges;
 }
 
+export interface ChannelReconnectedDto {
+    kind: 'channelReconnected';
+}
+
 export type FeedEventDto =
     | ChatMessageDto
     | ChatMessageDeletedDto
@@ -177,4 +181,5 @@ export type FeedEventDto =
     | LevelProgressDto
     | PubQuestionsDto
     | PubQuestionDto
-    | PubQuestionPatchDto;
+    | PubQuestionPatchDto
+    | ChannelReconnectedDto;

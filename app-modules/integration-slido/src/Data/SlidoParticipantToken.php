@@ -42,6 +42,6 @@ final readonly class SlidoParticipantToken
     {
         $seconds = (int) CarbonImmutable::now()->diffInSeconds($this->expiresAt->subSeconds(self::REFRESH_MARGIN_SECONDS), absolute: false);
 
-        return max($seconds, 0);
+        return max($seconds, 1);
     }
 }

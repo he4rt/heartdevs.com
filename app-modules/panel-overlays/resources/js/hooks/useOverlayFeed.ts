@@ -28,6 +28,7 @@ export interface OverlayFeedHandlers {
     onPubQuestions?(dto: PubQuestionsDto): void;
     onPubQuestion?(dto: PubQuestionDto): void;
     onPubQuestionPatch?(dto: PubQuestionPatchDto): void;
+    onChannelReconnected?(): void;
 }
 
 export function useOverlayFeed(
@@ -86,6 +87,9 @@ function dispatch(dto: FeedEventDto, handlers: OverlayFeedHandlers): void {
             break;
         case 'pubQuestionPatch':
             handlers.onPubQuestionPatch?.(dto);
+            break;
+        case 'channelReconnected':
+            handlers.onChannelReconnected?.();
             break;
     }
 }

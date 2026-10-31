@@ -29,7 +29,7 @@ final readonly class SocketIoFrame
             $raw === '2' => new self(FrameKind::Ping),
             str_starts_with($raw, '40') => new self(FrameKind::Connected, payload: self::decode(mb_substr($raw, 2))),
             str_starts_with($raw, '41') => new self(FrameKind::Disconnected),
-            str_starts_with($raw, '42') => self::event(mb_substr($raw, 2)),
+            str_starts_with($raw, '42') => self::event(self::withoutAckId(mb_substr($raw, 2))),
             str_starts_with($raw, '43') => new self(FrameKind::Ack, payload: self::decode(self::withoutAckId(mb_substr($raw, 2)))),
             str_starts_with($raw, '44') => new self(FrameKind::ConnectError, payload: self::decode(mb_substr($raw, 2))),
             str_starts_with($raw, '0') => new self(FrameKind::Open, payload: self::decode(mb_substr($raw, 1))),

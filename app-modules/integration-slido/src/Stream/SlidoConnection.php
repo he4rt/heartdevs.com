@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace He4rt\IntegrationSlido\Stream;
 
 use Closure;
+use He4rt\IntegrationSlido\Exceptions\SlidoSubscriptionRejected;
 use Ratchet\Client\Connector;
 use Ratchet\Client\WebSocket;
 use Ratchet\RFC6455\Messaging\MessageInterface;
@@ -43,12 +44,6 @@ final class SlidoConnection
             return;
         }
 
-        try {
-            $this->session->syncQuestions();
-        } catch (Throwable $throwable) {
-            ($this->log)('Falhou ao sincronizar as perguntas: '.$throwable->getMessage());
-        }
-
         (new Connector($this->loop))($this->session->streamUrl(), [], ['Origin' => self::ORIGIN])->then(
             function (WebSocket $socket): void {
                 if ($this->isClosed) {
@@ -59,10 +54,9 @@ final class SlidoConnection
 
                 $this->socket = $socket;
                 $this->reconnectAttempts = 0;
-                $this->scheduleTokenRefresh();
 
                 $socket->on('message', function (MessageInterface $message) use ($socket): void {
-                    $this->sendAll($socket, $this->session->handle((string) $message));
+                    $this->receive($socket, (string) $message);
                 });
 
                 $socket->on('close', function (?int $code = null, ?string $reason = null): void {
@@ -73,6 +67,13 @@ final class SlidoConnection
                     ($this->log)(sprintf('Conexão fechada (%s %s).', $code ?? '-', $reason ?? ''));
                     $this->reconnect();
                 });
+
+                try {
+                    $this->scheduleTokenRefresh();
+                } catch (Throwable $throwable) {
+                    ($this->log)('Falhou ao preparar o token: '.$throwable->getMessage());
+                    $socket->close();
+                }
             },
             function (Throwable $throwable): void {
                 ($this->log)('Falhou ao conectar no Slido: '.$throwable->getMessage());
@@ -87,6 +88,18 @@ final class SlidoConnection
         $this->cancelTimers();
         $this->socket?->close();
         $this->socket = null;
+    }
+
+    private function receive(WebSocket $socket, string $raw): void
+    {
+        try {
+            $this->sendAll($socket, $this->session->handle($raw));
+        } catch (SlidoSubscriptionRejected $rejected) {
+            ($this->log)($rejected->getMessage());
+            $socket->close();
+        } catch (Throwable $throwable) {
+            ($this->log)('Falhou ao tratar um frame do Slido: '.$throwable->getMessage());
+        }
     }
 
     private function reconnect(): void

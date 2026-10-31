@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace He4rt\IntegrationSlido\Data;
 
 use Carbon\CarbonImmutable;
+use Carbon\Exceptions\InvalidFormatException;
 
 final readonly class SlidoQuestion
 {
@@ -38,7 +39,7 @@ final readonly class SlidoQuestion
 
         $isPublic = ($payload['is_public'] ?? true) === true;
         $isDeleted = ($payload['date_deleted'] ?? null) !== null;
-        $createdAt = is_string($payload['date_created'] ?? null) ? $payload['date_created'] : 'now';
+        $createdAt = self::createdAtOf($payload['date_created'] ?? null);
         $pinnedReplies = is_array($payload['pinned_replies'] ?? null) ? $payload['pinned_replies'] : [];
 
         return new self(
@@ -49,7 +50,7 @@ final readonly class SlidoQuestion
             isHighlighted: ($payload['is_highlighted'] ?? false) === true,
             isAnswered: ($payload['is_answered'] ?? false) === true,
             isVisible: $isPublic && !$isDeleted,
-            createdAt: CarbonImmutable::parse($createdAt),
+            createdAt: $createdAt,
             replies: self::repliesOf($pinnedReplies),
         );
     }
@@ -85,6 +86,19 @@ final readonly class SlidoQuestion
             'createdAt' => $this->createdAt->toIso8601String(),
             'replies' => array_map(fn (SlidoReply $reply): array => $reply->toArray(), $this->replies),
         ];
+    }
+
+    private static function createdAtOf(mixed $value): CarbonImmutable
+    {
+        if (!is_string($value)) {
+            return CarbonImmutable::now();
+        }
+
+        try {
+            return CarbonImmutable::parse($value);
+        } catch (InvalidFormatException) {
+            return CarbonImmutable::now();
+        }
     }
 
     /**

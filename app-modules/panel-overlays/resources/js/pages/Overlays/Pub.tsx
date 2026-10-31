@@ -26,6 +26,14 @@ export default function PubOverlay({ scene, channel, authEndpoint, sources, rece
             onPubQuestions: questions.onSync,
             onPubQuestion: questions.onUpsert,
             onPubQuestionPatch: questions.onPatch,
+            onOverlayConfig: (dto) => {
+                const isPubSettingsChange = scene in dto.overlays;
+
+                if (isPubSettingsChange) {
+                    window.location.reload();
+                }
+            },
+            onChannelReconnected: () => window.location.reload(),
         },
     );
 

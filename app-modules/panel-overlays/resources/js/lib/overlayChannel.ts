@@ -75,5 +75,15 @@ export function subscribeOverlayChannel(
             listener({ kind: 'pubQuestionPatch', id, changes }),
         );
 
+    let hasConnectedBefore = false;
+
+    echo.connector.pusher.connection.bind('connected', () => {
+        if (hasConnectedBefore) {
+            listener({ kind: 'channelReconnected' });
+        }
+
+        hasConnectedBefore = true;
+    });
+
     return () => echo.disconnect();
 }

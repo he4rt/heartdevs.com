@@ -73,7 +73,7 @@ export function PubDock({ event, qrSvg, highlighted, queue }: PubDockProps) {
                     <strong className="font-pub-cond text-[24px] leading-none font-extrabold text-pub-yellow">
                         Pergunte aqui
                     </strong>
-                    <span className="-mt-1 font-pub-sans text-[14px] font-medium text-white">
+                    <span className="-mt-1 max-w-full text-center font-pub-sans text-[14px] font-medium break-all text-white">
                         slido.com #{event.code}
                     </span>
                 </div>

@@ -229,7 +229,7 @@ class StreamOverlaysPage extends Page
             ->color('gray')
             ->size('sm')
             ->modalHeading(OverlayScene::Pub->getLabel())
-            ->modalDescription('Cole o link do evento do Slido da edição. A overlay mostra as perguntas e o QR Code desse evento.')
+            ->modalDescription('Cole o link do evento do Slido da edição. A overlay mostra as perguntas e o QR Code desse evento. Deixe vazio para tirar o Slido da overlay.')
             ->modalSubmitActionLabel('Salvar')
             ->fillForm(fn (): array => ['slido_event' => $this->currentStreamer()->settings->pub->slidoEventHash])
             ->schema([
@@ -238,22 +238,23 @@ class StreamOverlaysPage extends Page
                     ->placeholder('https://app.sli.do/event/jC9L7Lu93Vw3ssNhB92Pvb')
                     ->helperText('Link do participante, do wall ou só o código do evento.')
                     ->rule(fn (): Closure => function (string $attribute, mixed $value, Closure $fail): void {
-                        if (!is_string($value) || SlidoEventHash::fromInput($value) === null) {
+                        $isFilledButUnknown = is_string($value) && $value !== '' && SlidoEventHash::fromInput($value) === null;
+
+                        if ($isFilledButUnknown) {
                             $fail('Não reconheci esse link do Slido.');
                         }
-                    })
-                    ->required(),
+                    }),
             ])
             ->action(function (array $data, UpdateStreamerSettings $updateSettings): void {
                 $streamer = $this->currentStreamer();
                 $slidoEvent = $data['slido_event'] ?? null;
-                $eventHash = is_string($slidoEvent) ? SlidoEventHash::fromInput($slidoEvent) : null;
+                $eventHash = is_string($slidoEvent) && $slidoEvent !== '' ? SlidoEventHash::fromInput($slidoEvent) : null;
 
                 $updateSettings->handle($streamer, $streamer->settings->withScene(new PubSettings($eventHash)));
 
                 Notification::make()
                     ->title('He4rt Pub atualizada')
-                    ->body('A overlay passa a mostrar as perguntas desse evento em alguns segundos.')
+                    ->body($eventHash === null ? 'A overlay deixa de mostrar o Slido.' : 'A overlay passa a mostrar as perguntas desse evento em alguns segundos.')
                     ->success()
                     ->send();
             });
