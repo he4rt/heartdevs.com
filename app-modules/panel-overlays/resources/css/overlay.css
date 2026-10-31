@@ -1,4 +1,5 @@
 @import url('https://fonts.googleapis.com/css2?family=Saira:ital,wght@0,400;0,500;0,600;0,700;0,800;1,600;1,700;1,800&family=Saira+Condensed:wght@600;700;800&family=Saira+Semi+Condensed:ital,wght@0,700;0,800;1,700;1,800&family=JetBrains+Mono:wght@400;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@700;800;900&family=Poppins:wght@500;600;700&family=Permanent+Marker&display=swap');
 @import 'tailwindcss' source('../');
 
 @theme {
@@ -25,6 +26,16 @@
 
     --color-yellow: #ffcb05;
     --color-spotify: #1ed760;
+
+    --font-pub-cond: 'Barlow Condensed', sans-serif;
+    --font-pub-sans: 'Poppins', sans-serif;
+    --font-pub-marker: 'Permanent Marker', cursive;
+
+    --color-pub-asphalt: #0b0b09;
+    --color-pub-yellow: #f3c506;
+    --color-pub-gold: #bf9905;
+    --color-pub-chalk: #e6e5e5;
+    --color-pub-purple: #7430f1;
 }
 
 html,
@@ -250,5 +261,21 @@ body,
     }
     50% {
         transform: scale(1.03);
+    }
+}
+
+@keyframes pubMessageIn {
+    from {
+        opacity: 0;
+        transform: translateY(12px);
+    }
+}
+
+@keyframes pubWipe {
+    from {
+        clip-path: inset(0 100% 0 0);
+    }
+    to {
+        clip-path: inset(0 0 0 0);
     }
 }

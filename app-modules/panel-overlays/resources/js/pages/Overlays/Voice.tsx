@@ -13,12 +13,18 @@ function layoutFrom(dto: OverlayConfigDto): DockLayout | null {
     return layout === 'row' || layout === 'col' ? layout : null;
 }
 
-export default function VoiceOverlay({ channel, authEndpoint, settings }: OverlayPageProps<VoiceSettings>) {
+export default function VoiceOverlay({
+    scene,
+    channel,
+    authEndpoint,
+    sources,
+    settings,
+}: OverlayPageProps<VoiceSettings>) {
     const voice = useVoiceRoster();
     const [layout, setLayout] = useState<DockLayout>(settings.layout);
 
     useOverlayFeed(
-        { channel, authEndpoint },
+        { channel, authEndpoint, scene, sources },
         {
             onVoiceRoster: voice.onDto,
             onOverlayConfig: (dto) => setLayout((current) => layoutFrom(dto) ?? current),

@@ -48,7 +48,7 @@ final readonly class RecordChatMessage
         $isMutedOnOverlay = $source->streamer->settings->mutedChatters->contains($incoming->platform, $incoming->chatterId);
 
         if ($message->wasRecentlyCreated && $source->showsChat() && !$isMutedOnOverlay) {
-            event(ChatMessageReceived::fromMessage($source->streamer, $message));
+            event(ChatMessageReceived::fromMessage($source->streamer, $message, $source->id));
         }
 
         return $message;

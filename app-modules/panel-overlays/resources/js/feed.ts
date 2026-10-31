@@ -1,3 +1,4 @@
+import type { SlidoQuestionChanges, SlidoQuestionPayload } from './types';
 export interface TextFragmentDto {
     kind: 'text';
     text: string;
@@ -148,6 +149,26 @@ export interface LevelProgressDto {
     xpToNext: number;
 }
 
+export interface PubQuestionsDto {
+    kind: 'pubQuestions';
+    questions: SlidoQuestionPayload[];
+}
+
+export interface PubQuestionDto {
+    kind: 'pubQuestion';
+    question: SlidoQuestionPayload;
+}
+
+export interface PubQuestionPatchDto {
+    kind: 'pubQuestionPatch';
+    id: number;
+    changes: SlidoQuestionChanges;
+}
+
+export interface ChannelReconnectedDto {
+    kind: 'channelReconnected';
+}
+
 export type FeedEventDto =
     | ChatMessageDto
     | ChatMessageDeletedDto
@@ -157,4 +178,8 @@ export type FeedEventDto =
     | NowPlayingDto
     | VoiceRosterDto
     | OverlayConfigDto
-    | LevelProgressDto;
+    | LevelProgressDto
+    | PubQuestionsDto
+    | PubQuestionDto
+    | PubQuestionPatchDto
+    | ChannelReconnectedDto;

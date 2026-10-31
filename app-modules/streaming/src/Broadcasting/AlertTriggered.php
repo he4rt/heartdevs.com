@@ -6,6 +6,7 @@ namespace He4rt\Streaming\Broadcasting;
 
 use He4rt\Streaming\Enums\StreamEventType;
 use He4rt\Streaming\Streamer\Models\Streamer;
+use He4rt\Streaming\Streamer\Models\StreamerSource;
 use He4rt\Streaming\StreamEvent\Data\StreamActor;
 use He4rt\Streaming\StreamEvent\Data\StreamEventDetails;
 use He4rt\Streaming\StreamEvent\Models\StreamEvent;
@@ -29,15 +30,22 @@ final class AlertTriggered implements ShouldBroadcastNow, ShouldDispatchAfterCom
         public ?StreamActor $actor = null,
         public ?StreamEventDetails $details = null,
         public bool $isTest = false,
+        public ?string $sourceId = null,
     ) {}
 
     public static function fromEvent(StreamEvent $event): self
     {
+        $sourceId = StreamerSource::query()
+            ->where('streamer_id', $event->streamer_id)
+            ->where('external_identity_id', $event->external_identity_id)
+            ->value('id');
+
         return new self(
             streamer: $event->streamer,
             type: $event->type,
             actor: $event->actor(),
             details: $event->details,
+            sourceId: is_string($sourceId) ? $sourceId : null,
         );
     }
 
@@ -53,11 +61,12 @@ final class AlertTriggered implements ShouldBroadcastNow, ShouldDispatchAfterCom
     }
 
     /**
-     * @return array{type: string, actor: array{login: string, displayName: string}|null, details: array<string, int|string|null>|null, isTest: bool}
+     * @return array{sourceId: string|null, type: string, actor: array{login: string, displayName: string}|null, details: array<string, int|string|null>|null, isTest: bool}
      */
     public function broadcastWith(): array
     {
         return [
+            'sourceId' => $this->sourceId,
             'type' => $this->type->value,
             'actor' => $this->actor?->toBroadcast(),
             'details' => $this->details?->toArray(),

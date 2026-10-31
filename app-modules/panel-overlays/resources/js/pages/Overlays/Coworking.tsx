@@ -22,7 +22,14 @@ import type { OverlayPageProps } from '../../types';
 
 const ALERT_DURATION_MS = 6000;
 
-export default function CoworkingOverlay({ handle, channel, authEndpoint, recentChat }: OverlayPageProps) {
+export default function CoworkingOverlay({
+    scene,
+    handle,
+    channel,
+    authEndpoint,
+    sources,
+    recentChat,
+}: OverlayPageProps) {
     const chat = useChatMessages(recentChat.map(toChatMessage));
     const footer = useFooterBar();
     const leveling = useLevelProgress();
@@ -31,7 +38,7 @@ export default function CoworkingOverlay({ handle, channel, authEndpoint, recent
     const presence = useVoicePresence(voice.roster);
 
     useOverlayFeed(
-        { channel, authEndpoint },
+        { channel, authEndpoint, scene, sources },
         {
             onChatMessage: chat.push,
             onChatDeleted: chat.remove,

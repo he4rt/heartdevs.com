@@ -28,6 +28,7 @@
         "he4rt/integration-devto": "^1.0.0",
         "he4rt/integration-discord": "^1.0.0",
         "he4rt/integration-github": "^1.0.0",
+        "he4rt/integration-slido": "^1.0.0",
         "he4rt/integration-twitch": "^1.0.0",
         "he4rt/integration-whatsapp": "^1.0.0",
         "he4rt/marketing": "^1.0.0",

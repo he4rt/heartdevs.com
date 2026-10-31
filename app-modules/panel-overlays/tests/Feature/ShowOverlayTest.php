@@ -3,23 +3,36 @@
 declare(strict_types=1);
 
 use He4rt\Activity\Message\Models\Message;
+use He4rt\IntegrationSlido\Transport\Requests\AuthorizeParticipant;
+use He4rt\IntegrationSlido\Transport\Requests\ExchangeAuthorizationCode;
+use He4rt\IntegrationSlido\Transport\Requests\GetEvent;
+use He4rt\IntegrationSlido\Transport\Requests\GetEventByHash;
+use He4rt\IntegrationSlido\Transport\Requests\GetQuestions;
+use He4rt\IntegrationSlido\Transport\Requests\LookupEvent;
 use He4rt\Streaming\Chat\Data\ChatMessageMetadata;
 use He4rt\Streaming\Enums\OverlayScene;
 use He4rt\Streaming\Enums\StreamerStatus;
 use He4rt\Streaming\Session\Models\StreamSession;
 use He4rt\Streaming\Streamer\Data\MutedChatter;
 use He4rt\Streaming\Streamer\Data\MutedChatters;
+use He4rt\Streaming\Streamer\Data\PubSettings;
 use He4rt\Streaming\Streamer\Models\Streamer;
 use He4rt\Streaming\Streamer\Models\StreamerSource;
 use He4rt\Streaming\StreamEvent\Models\StreamEvent;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use Inertia\Testing\AssertableInertia;
+use Saloon\Http\Faking\MockClient;
+use Saloon\Http\Faking\MockResponse;
 
 const OVERLAY_TOKEN = '3bfa1a2ce19eadd54f3242055ea3a1a9';
 
 beforeEach(function (): void {
     $this->streamer = Streamer::factory()->withToken(OVERLAY_TOKEN)->create();
+});
+
+afterEach(function (): void {
+    MockClient::destroyGlobal();
 });
 
 function overlayChatMessage(StreamerSource $source, int $minutesAgo): Message
@@ -43,6 +56,7 @@ test('cada cena abre com o canal privado e as configurações do streamer', func
             ->where('channel', $this->streamer->overlayChannel())
             ->where('authEndpoint', route('overlays.broadcasting.auth', ['token' => OVERLAY_TOKEN]))
             ->where('settings', $this->streamer->settings->forScene($scene)->toArray())
+            ->where('sources', expected: null)
             ->where('recentChat', [])
             ->where('session', expected: null));
 })->with([
@@ -50,7 +64,54 @@ test('cada cena abre com o canal privado e as configurações do streamer', func
     'a live vai começar' => [OverlayScene::StartingSoon, 'Overlays/StartingSoon'],
     'sala de voz' => [OverlayScene::Voice, 'Overlays/Voice'],
     'chat' => [OverlayScene::Chat, 'Overlays/Chat'],
+    'he4rt pub' => [OverlayScene::Pub, 'Overlays/Pub'],
 ]);
+
+test('a cena da He4rt Pub abre com a edição, as perguntas e o QR Code do Slido', function (): void {
+    $this->streamer->update(['settings' => $this->streamer->settings->withScene(new PubSettings('jC9L7Lu93Vw3ssNhB92Pvb'))]);
+
+    MockClient::global([
+        LookupEvent::class => MockResponse::make(['clusterId' => 'eu1', 'eventId' => '96d0aba7-efed-4b29-a78a-609e6e4074c0']),
+        GetEventByHash::class => MockResponse::make([
+            'name' => 'He4rt Pub #12',
+            'code' => '9410834',
+            'is_active' => true,
+            'url' => ['app' => 'https://app.sli.do/event/jC9L7Lu93Vw3ssNhB92Pvb'],
+        ]),
+        AuthorizeParticipant::class => MockResponse::make(['redirectUri' => 'https://wall.sli.do/event/x/oauth-callback?code=c1']),
+        ExchangeAuthorizationCode::class => MockResponse::make(['access_token' => 'a', 'refresh_token' => 'r', 'expires_in' => 600]),
+        GetEvent::class => MockResponse::make(['sections' => [['uuid' => 'section-1', 'is_active' => true]]]),
+        GetQuestions::class => MockResponse::make([
+            ['event_question_id' => 1, 'type' => 'Question', 'text' => 'Qual a próxima edição?', 'is_public' => true, 'is_highlighted' => true],
+        ]),
+    ]);
+
+    $this->get(route('overlays.show', ['token' => OVERLAY_TOKEN, 'scene' => OverlayScene::Pub]))
+        ->assertOk()
+        ->assertInertia(fn (AssertableInertia $page): AssertableInertia => $page
+            ->component('Overlays/Pub')
+            ->where('pub.event.name', 'He4rt Pub #12')
+            ->where('pub.event.code', '9410834')
+            ->where('pub.questions.0.text', 'Qual a próxima edição?')
+            ->where('pub.questions.0.isHighlighted', expected: true)
+            ->where('pub.qrSvg', fn (string $svg): bool => str_contains($svg, '<svg')));
+
+});
+
+test('a cena da He4rt Pub abre sem os dados do Slido quando ele está fora do ar', function (): void {
+    $this->streamer->update(['settings' => $this->streamer->settings->withScene(new PubSettings('jC9L7Lu93Vw3ssNhB92Pvb'))]);
+
+    MockClient::global([
+        LookupEvent::class => MockResponse::make(['message' => 'Bad Gateway'], 502),
+    ]);
+
+    $this->get(route('overlays.show', ['token' => OVERLAY_TOKEN, 'scene' => OverlayScene::Pub]))
+        ->assertOk()
+        ->assertInertia(fn (AssertableInertia $page): AssertableInertia => $page
+            ->component('Overlays/Pub')
+            ->where('pub', expected: null));
+
+});
 
 test('a barra da overlay mostra o usuário do streamer, não o canal privado', function (): void {
     $this->get('/overlay/'.OVERLAY_TOKEN.'/coworking')
@@ -165,4 +226,41 @@ test('a live em andamento vem nas props da overlay', function (): void {
             ->where('session.title', 'Refatorando o ETL')
             ->where('session.category', 'Software and Game Development')
             ->has('session.startedAt'));
+});
+
+test('a cena com fonte escolhida só traz o chat e a live dessa fonte', function (): void {
+    $pubChannel = StreamerSource::factory()->for($this->streamer)->readingChat()->create();
+    $ownChannel = StreamerSource::factory()->for($this->streamer)->readingChat()->create();
+    $pubMessage = overlayChatMessage($pubChannel, minutesAgo: 2);
+    overlayChatMessage($ownChannel, minutesAgo: 1);
+    StreamSession::factory()->forSource($ownChannel)->create(['title' => 'Live do canal pessoal']);
+    $this->streamer->update(['settings' => $this->streamer->settings->withSceneSources(OverlayScene::Pub, [$pubChannel->id])]);
+
+    $this->get('/overlay/'.OVERLAY_TOKEN.'/pub')
+        ->assertInertia(fn (AssertableInertia $page): AssertableInertia => $page
+            ->where('sources', [$pubChannel->id])
+            ->has('recentChat', 1)
+            ->where('recentChat.0.msgId', $pubMessage->provider_message_id)
+            ->where('recentChat.0.sourceId', $pubChannel->id)
+            ->where('session', expected: null));
+
+    $this->get('/overlay/'.OVERLAY_TOKEN.'/chat')
+        ->assertInertia(fn (AssertableInertia $page): AssertableInertia => $page
+            ->where('sources', expected: null)
+            ->has('recentChat', 2)
+            ->where('session.title', 'Live do canal pessoal')
+            ->where('session.sourceId', $ownChannel->id));
+});
+
+test('a cena volta a usar todas as fontes quando a fonte escolhida some', function (): void {
+    $source = StreamerSource::factory()->for($this->streamer)->readingChat()->create();
+    $gone = StreamerSource::factory()->for($this->streamer)->create();
+    $this->streamer->update(['settings' => $this->streamer->settings->withSceneSources(OverlayScene::Pub, [$gone->id])]);
+    $gone->delete();
+    overlayChatMessage($source, minutesAgo: 1);
+
+    $this->get('/overlay/'.OVERLAY_TOKEN.'/pub')
+        ->assertInertia(fn (AssertableInertia $page): AssertableInertia => $page
+            ->where('sources', expected: null)
+            ->has('recentChat', 1));
 });
