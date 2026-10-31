@@ -11,13 +11,7 @@ function authorOf(question: SlidoQuestionPayload): string {
     return question.authorName ?? 'Anônimo';
 }
 
-function moderatorReplyOf(question: SlidoQuestionPayload): string | null {
-    return question.replies.find((reply) => reply.isFromModerator)?.text ?? null;
-}
-
 function QuestionOnAir({ question }: { question: SlidoQuestionPayload }) {
-    const reply = moderatorReplyOf(question);
-
     return (
         <>
             <div className="px-6 pt-[10px] pb-2 font-pub-sans text-[20px] font-semibold text-white">
@@ -27,11 +21,6 @@ function QuestionOnAir({ question }: { question: SlidoQuestionPayload }) {
             <div className="line-clamp-2 bg-pub-yellow px-6 pt-[10px] pb-3 font-pub-cond text-[46px] leading-[1.02] font-extrabold text-pub-asphalt uppercase">
                 {question.text}
             </div>
-            {reply ? (
-                <div className="truncate px-6 pt-[9px] pb-3 font-pub-sans text-[20px] font-medium text-pub-chalk">
-                    <b className="text-pub-yellow">Moderação:</b> {reply}
-                </div>
-            ) : null}
         </>
     );
 }
