@@ -21,6 +21,8 @@ final class SlidoStreamSession
 {
     private ?SlidoParticipantToken $token = null;
 
+    private bool $isSubscribed = false;
+
     /**
      * @param  list<Streamer>  $streamers
      * @param  Closure(string): void  $log
@@ -39,6 +41,11 @@ final class SlidoStreamSession
     public function retarget(array $streamers): void
     {
         $this->streamers = $streamers;
+    }
+
+    public function isSubscribed(): bool
+    {
+        return $this->isSubscribed;
     }
 
     public function streamUrl(): string
@@ -122,6 +129,7 @@ final class SlidoStreamSession
             return $this->reject($raw);
         }
 
+        $this->isSubscribed = true;
         ($this->log)('Assinatura aceita pelo Slido.');
 
         try {
@@ -136,6 +144,7 @@ final class SlidoStreamSession
     private function reject(string $raw): never
     {
         $this->token = null;
+        $this->isSubscribed = false;
 
         throw SlidoSubscriptionRejected::withFrame($raw);
     }

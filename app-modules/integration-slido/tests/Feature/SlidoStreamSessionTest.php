@@ -232,3 +232,16 @@ test('a pergunta com data inválida entra com a hora atual', function (): void {
 
     Event::assertDispatched(fn (SlidoQuestionChanged $event): bool => $event->question->id === 7);
 });
+
+test('a sessão só conta como assinada depois do ack aceito', function (): void {
+    $session = streamSession(Streamer::factory()->create());
+    $session->handle('40{"sid":"s"}');
+
+    expect($session->isSubscribed())->toBeFalse();
+
+    $session->handle('430[{"code":200,"message":"Subscribed"}]');
+    expect($session->isSubscribed())->toBeTrue();
+
+    expect(fn () => $session->handle('44{"message":"unauthorized"}'))->toThrow(SlidoSubscriptionRejected::class);
+    expect($session->isSubscribed())->toBeFalse();
+});

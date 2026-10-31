@@ -53,7 +53,6 @@ final class SlidoConnection
                 }
 
                 $this->socket = $socket;
-                $this->reconnectAttempts = 0;
 
                 $socket->on('message', function (MessageInterface $message) use ($socket): void {
                     $this->receive($socket, (string) $message);
@@ -94,6 +93,10 @@ final class SlidoConnection
     {
         try {
             $this->sendAll($socket, $this->session->handle($raw));
+
+            if ($this->session->isSubscribed()) {
+                $this->reconnectAttempts = 0;
+            }
         } catch (SlidoSubscriptionRejected $rejected) {
             ($this->log)($rejected->getMessage());
             $socket->close();
