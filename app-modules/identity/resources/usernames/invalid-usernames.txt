@@ -1,0 +1,45 @@
+# Usernames reservados pelo sistema / invalid usernames
+# Um username por linha. Linhas vazias e comentários (#) são ignorados.
+
+# System / Administration (English & Portuguese)
+admin
+administrator
+administrador
+administradora
+system
+sistema
+root
+
+# Community / Staff
+he4rt
+heart
+he4rtdevs
+mod
+moderator
+moderador
+moderadora
+staff
+equipe
+support
+suporte
+help
+ajuda
+official
+oficial
+
+# Integrations / Technical
+api
+bot
+null
+nulo
+undefined
+indefinido
+anonymous
+anonimo
+
+# Broadcast / Mentions
+everyone
+todos
+here
+aqui
+
