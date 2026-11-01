@@ -821,6 +821,13 @@ final class DiscordSource implements CuratableSource, MeasuresPerson, Retrospect
      * @param  list<string>  $ids
      * @return array<string, string>
      */
+    /**
+     * Resolve o nome de exibicao do Discord para os external_identity_id do topo
+     * aplicando fallback para username no metadata, dados do usuario vinculado ou id externo.
+     *
+     * @param  list<string>  $ids
+     * @return array<string, string>
+     */
     private function displayNames(array $ids): array
     {
         if ($ids === []) {
@@ -828,13 +835,29 @@ final class DiscordSource implements CuratableSource, MeasuresPerson, Retrospect
         }
 
         return ExternalIdentity::query()
+            ->with('user')
             ->whereIn('id', array_unique($ids))
             ->get()
             ->mapWithKeys(function (ExternalIdentity $identity): array {
                 $metadata = $identity->metadata ?? [];
-                $username = is_string($metadata['username'] ?? null) ? $metadata['username'] : null;
 
-                return [$identity->id => $username ?? $identity->external_account_id ?? 'Anônimo'];
+                $candidates = [
+                    $metadata['username'] ?? null,
+                    $metadata['user']['username'] ?? null,
+                    $identity->user?->username,
+                    $identity->user?->name,
+                    $identity->external_account_id,
+                ];
+
+                $fallback = 'Anônimo';
+                foreach ($candidates as $candidate) {
+                    if (is_string($candidate) && trim($candidate) !== '') {
+                        $fallback = trim($candidate);
+                        break;
+                    }
+                }
+
+                return [$identity->id => $fallback];
             })
             ->all();
     }

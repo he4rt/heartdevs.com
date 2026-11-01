@@ -11,9 +11,15 @@ use He4rt\Identity\ExternalIdentity\Models\ExternalIdentity;
 
 final class ResolveExternalIdentity
 {
+    /**
+     * Resolve ou cria uma identidade externa e sincroniza o username caso esteja ausente ou alterado.
+     *
+     * @param  ResolveUserProviderDTO  $dto
+     * @return ExternalIdentity
+     */
     public function handle(ResolveUserProviderDTO $dto): ExternalIdentity
     {
-        return ExternalIdentity::query()->firstOrCreate(
+        $identity = ExternalIdentity::query()->firstOrCreate(
             [
                 'provider' => $dto->provider,
                 'external_account_id' => $dto->externalAccountId,
@@ -30,5 +36,14 @@ final class ResolveExternalIdentity
                 ]),
             ]
         );
+
+        $trimmedUsername = is_string($dto->username) ? trim($dto->username) : null;
+        if ($trimmedUsername !== null && $trimmedUsername !== '' && ($identity->metadata['username'] ?? null) !== $trimmedUsername) {
+            $metadata = $identity->metadata ?? [];
+            $metadata['username'] = $trimmedUsername;
+            $identity->update(['metadata' => $metadata]);
+        }
+
+        return $identity;
     }
 }
