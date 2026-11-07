@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace He4rt\BotDiscord\Disabled\Events;
+namespace He4rt\BotDiscord\Events;
 
 use Discord\Discord;
 use Discord\Parts\Channel\Message;
@@ -23,7 +23,9 @@ class GreetingsEvent extends Event
      */
     public function handle(Message $message, Discord $discord): void
     {
-        if ($message->author->bot) {
+        $mentionsBot = $message->mentions->get('id', $discord->id) !== null;
+
+        if ($message->author->bot || !$mentionsBot) {
             return;
         }
 
