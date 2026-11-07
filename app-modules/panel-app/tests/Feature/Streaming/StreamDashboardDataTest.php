@@ -171,7 +171,7 @@ test('faltam permissões quando o leitor escolhido não tem os escopos', functio
 test('as outras fontes aparecem separadas da conta da Twitch', function (): void {
     $mainSource = dashboardTwitchSource($this->user);
     $otherSource = StreamerSource::factory()->create(['streamer_id' => $mainSource->streamer_id]);
-    $otherSource->identity->update(['connected_at' => now(), 'disconnected_at' => null]);
+    $otherSource->identity->update(['connected_at' => now()->subHour(), 'disconnected_at' => null]);
 
     livewire(StreamDashboardPage::class)
         ->assertViewHas('otherSources', fn ($sources): bool => $sources->count() === 1 && $sources->first()->is($otherSource));

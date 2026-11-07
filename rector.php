@@ -6,10 +6,9 @@ use Pest\Rector\Rules\ChainExpectCallsRector;
 use Pest\Rector\Rules\Pest2ToPest3\UsesToExtendRector;
 use Pest\Rector\Set\PestSetList;
 use Rector\Caching\ValueObject\Storage\FileCacheStorage;
-use Rector\CodingStyle\Rector\PostInc\PostIncDecToPreIncDecRector;
 use Rector\Config\RectorConfig;
-use Rector\Transform\Rector\ArrayDimFetch\ArrayDimFetchToMethodCallRector;
 use Rector\TypeDeclaration\Rector\ArrowFunction\AddArrowFunctionReturnTypeRector;
+use Rector\TypeDeclarationDocblocks\Rector\Property\MergePhpstanDocTagIntoNativeRector;
 use RectorLaravel\Rector\Class_\AddHasFactoryToModelsRector;
 use RectorLaravel\Rector\Class_\AliasesPropertyToAliasesAttributeRector;
 use RectorLaravel\Rector\Class_\AppendsPropertyToAppendsAttributeRector;
@@ -78,9 +77,9 @@ return RectorConfig::configure()
     ->withSkip([
         AddArrowFunctionReturnTypeRector::class,
         AddHasFactoryToModelsRector::class,
-        PostIncDecToPreIncDecRector::class,
-        ArrayDimFetchToMethodCallRector::class,
         UsesToExtendRector::class,
+        ChainExpectCallsRector::class,
+        MergePhpstanDocTagIntoNativeRector::class,
         ...$laravel13Attributes,
         __DIR__.'/bootstrap/cache',
     ])
@@ -103,8 +102,7 @@ return RectorConfig::configure()
         instanceOf: true,
         earlyReturn: true,
         carbon: true,
-        rectorPreset: true,
-        phpunitCodeQuality: true,
+        rectorPreset: true
     )
     ->withRules([
         ApplyDefaultInsteadOfNullCoalesceRector::class,
@@ -124,7 +122,4 @@ return RectorConfig::configure()
         LaravelSetList::LARAVEL_TESTING,
         LaravelSetList::LARAVEL_TYPE_DECLARATIONS,
         PestSetList::CODING_STYLE,
-    ])
-    ->withConfiguredRule(ChainExpectCallsRector::class, [
-        ChainExpectCallsRector::MERGE_DIFFERENT_VARIABLES => false,
     ]);

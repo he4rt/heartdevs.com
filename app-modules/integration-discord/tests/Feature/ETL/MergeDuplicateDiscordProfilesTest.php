@@ -8,6 +8,7 @@ use He4rt\Identity\User\Models\User;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\File;
 use Ramsey\Uuid\Uuid;
 
 /**
@@ -162,7 +163,7 @@ test('merges via --pairs-file JSONL when provided (file-based strategy)', functi
 
     Artisan::call('discord:merge-duplicate-profiles', ['--pairs-file' => $path]);
 
-    @unlink($path);
+    File::delete($path);
 
     $orphan->refresh();
     $identity->refresh();
@@ -196,7 +197,7 @@ test('--pairs-file skips lines whose users no longer exist', function (): void {
 
     Artisan::call('discord:merge-duplicate-profiles', ['--pairs-file' => $path]);
 
-    @unlink($path);
+    File::delete($path);
 
     expect(User::query()->find($newUser->id))->toBeNull()
         ->and(User::query()->find($orphan->id))->not->toBeNull();

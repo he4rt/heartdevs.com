@@ -873,7 +873,7 @@ class CommunityReport extends Command
             ],
         );
 
-        if ($notInDiscord->count() > 0) {
+        if ($notInDiscord->isNotEmpty()) {
             warning($notInDiscord->count().' platform users are not in the Discord server (may have left).');
         }
 
