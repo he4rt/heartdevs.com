@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace He4rt\BotDiscord\Events;
+namespace He4rt\BotDiscord\Disabled\Events;
 
 use Discord\Parts\Channel\Message;
 use Discord\WebSockets\Event as Events;
