@@ -41,10 +41,11 @@ final class StreamSessionStarted implements ShouldBroadcastNow, ShouldDispatchAf
         return $this->source->enabled;
     }
 
-    /** @return array{title: string|null, category: string|null, startedAt: string} */
+    /** @return array{sourceId: string, title: string|null, category: string|null, startedAt: string} */
     public function broadcastWith(): array
     {
         return [
+            'sourceId' => $this->source->id,
             'title' => $this->session->title,
             'category' => $this->session->category,
             'startedAt' => $this->session->started_at->toIso8601String(),

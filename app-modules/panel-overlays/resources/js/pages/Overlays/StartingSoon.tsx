@@ -23,6 +23,7 @@ export default function StartingSoonOverlay({
     handle,
     channel,
     authEndpoint,
+    sources,
     settings,
     recentChat,
 }: OverlayPageProps<StartingSoonSettings>) {
@@ -33,7 +34,7 @@ export default function StartingSoonOverlay({
     const leveling = useLevelProgress();
 
     useOverlayFeed(
-        { channel, authEndpoint },
+        { channel, authEndpoint, scene, sources },
         {
             onChatMessage: chat.push,
             onChatDeleted: chat.remove,

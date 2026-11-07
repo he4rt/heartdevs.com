@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace He4rt\PanelOverlays\Http\Controllers;
 
+use He4rt\PanelOverlays\Pub\PubOverlayState;
 use He4rt\Streaming\Enums\OverlayScene;
 use He4rt\Streaming\Overlay\OverlayInitialState;
 use He4rt\Streaming\Streamer\Actions\ResolveOverlayToken;
@@ -21,10 +22,13 @@ class ShowOverlayController
         OverlayScene $scene,
         ResolveOverlayToken $resolveToken,
         OverlayInitialState $initialState,
+        PubOverlayState $pubState,
     ): Response {
         $streamer = $resolveToken->handle($token);
 
         abort_unless($streamer instanceof Streamer, HttpResponse::HTTP_NOT_FOUND);
+
+        $sourceIds = $streamer->sourceIdsForScene($scene);
 
         return Inertia::render($this->component($scene), [
             'scene' => $scene->value,
@@ -32,8 +36,10 @@ class ShowOverlayController
             'channel' => $streamer->overlayChannel(),
             'authEndpoint' => route('overlays.broadcasting.auth', ['token' => $token]),
             'settings' => $streamer->settings->forScene($scene)->toArray(),
-            'recentChat' => $initialState->recentChat($streamer, self::RECENT_CHAT_LIMIT),
-            'session' => $initialState->openSession($streamer),
+            'sources' => $sourceIds,
+            'recentChat' => $initialState->recentChat($streamer, self::RECENT_CHAT_LIMIT, $sourceIds),
+            'session' => $initialState->openSession($streamer, $sourceIds),
+            'pub' => $scene === OverlayScene::Pub ? $pubState->for($streamer) : null,
         ]);
     }
 
@@ -44,6 +50,7 @@ class ShowOverlayController
             OverlayScene::StartingSoon => 'Overlays/StartingSoon',
             OverlayScene::Voice => 'Overlays/Voice',
             OverlayScene::Chat => 'Overlays/Chat',
+            OverlayScene::Pub => 'Overlays/Pub',
         };
     }
 }

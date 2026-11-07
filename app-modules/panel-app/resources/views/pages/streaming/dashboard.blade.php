@@ -250,10 +250,16 @@
                                         <p class="truncate text-sm text-gray-700 dark:text-gray-200">
                                             {{ '@' . ($source->identity->metadata['username'] ?? $source->identity->external_account_id) }}
                                         </p>
-                                        <p class="truncate text-xs text-gray-500 dark:text-gray-400">
-                                            {{ $source->enabled ? 'Ligada' : 'Desligada' }} ·
-                                            {{ $source->chat_reader ? 'chat ' . \Illuminate\Support\Str::lcfirst($source->chat_reader->getLabel()) : 'sem chat na overlay' }}
-                                        </p>
+                                        @if ($this->sourceMissingScopes($source) !== [])
+                                            <p class="truncate text-xs text-warning-600 dark:text-warning-400">
+                                                Sem permissão na Twitch: não recebe chat nem alertas
+                                            </p>
+                                        @else
+                                            <p class="truncate text-xs text-gray-500 dark:text-gray-400">
+                                                {{ $source->enabled ? 'Ligada' : 'Desligada' }} ·
+                                                {{ $source->chat_reader ? 'chat ' . \Illuminate\Support\Str::lcfirst($source->chat_reader->getLabel()) : 'sem chat na overlay' }}
+                                            </p>
+                                        @endif
                                     </div>
                                     <x-filament-actions::group
                                         :actions="array_filter([
@@ -261,6 +267,7 @@
                                                 ? ($this->chatReaderAction)(['source' => $source->id])
                                                 : null,
                                             ($this->toggleSourceAction)(['source' => $source->id]),
+                                            ($this->reconnectSourceAction)(['source' => $source->id]),
                                         ])"
                                         icon="heroicon-m-ellipsis-vertical"
                                         color="gray"

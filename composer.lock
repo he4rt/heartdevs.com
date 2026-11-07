@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "b285a5280a19b8a9477bbd2d456d9249",
+    "content-hash": "4877f837d5d29e0e51215c1ea164fde4",
     "packages": [
         {
             "name": "anourvalar/eloquent-serialize",
@@ -3901,6 +3901,47 @@
             "autoload-dev": {
                 "psr-4": {
                     "He4rt\\IntegrationGithub\\Tests\\": "tests/"
+                }
+            },
+            "license": [
+                "proprietary"
+            ],
+            "transport-options": {
+                "symlink": true,
+                "relative": true
+            }
+        },
+        {
+            "name": "he4rt/integration-slido",
+            "version": "1.0.0",
+            "dist": {
+                "type": "path",
+                "url": "app-modules/integration-slido",
+                "reference": "d41d5a7edb9e555208fa461a3226db283102ff14"
+            },
+            "require": {
+                "ratchet/pawl": "^0.4.3",
+                "react/event-loop": "^1.6.0",
+                "saloonphp/saloon": "^4.5.0"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "He4rt\\IntegrationSlido\\IntegrationSlidoServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "He4rt\\IntegrationSlido\\": "src/",
+                    "He4rt\\IntegrationSlido\\Database\\Factories\\": "database/factories/",
+                    "He4rt\\IntegrationSlido\\Database\\Seeders\\": "database/seeders/"
+                }
+            },
+            "autoload-dev": {
+                "psr-4": {
+                    "He4rt\\IntegrationSlido\\Tests\\": "tests/"
                 }
             },
             "license": [

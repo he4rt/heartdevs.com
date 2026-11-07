@@ -52,6 +52,21 @@ test('o redirect pede à Twitch os escopos de streamer para quem tem a role', fu
     expect($query['scope'])->toBe('user:read:email moderator:read:followers channel:read:subscriptions bits:read');
 });
 
+test('vincular uma conta pede para a Twitch confirmar com qual conta entrar', function (OAuthIntent $intent, bool $forcesAccountChoice): void {
+    $redirectUrl = resolve(TwitchOAuthClient::class)->redirectUrl(new OAuthStateDTO(
+        intent: $intent,
+        provider: IdentityProvider::Twitch,
+        panel: 'app',
+    ));
+
+    parse_str((string) parse_url($redirectUrl, PHP_URL_QUERY), $query);
+
+    expect(($query['force_verify'] ?? null) === 'true')->toBe($forcesAccountChoice);
+})->with([
+    'vínculo pelo painel' => [OAuthIntent::Link, true],
+    'login' => [OAuthIntent::Login, false],
+]);
+
 test('o card mostra os mesmos escopos que o redirect pede', function (): void {
     $streamer = User::factory()->streamer()->create();
 

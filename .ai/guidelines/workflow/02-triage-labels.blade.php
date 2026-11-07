@@ -50,6 +50,7 @@ Every issue must be tagged with the module(s) it affects. Labels follow the patt
 | `mod:identity`           | `identity`               | Auth & user identity     |
 | `mod:integration-devto`  | `integration-devto`      | Dev.to integration       |
 | `mod:integration-discord`| `integration-discord`    | Discord OAuth/API        |
+| `mod:integration-slido`  | `integration-slido`      | Slido Q&A integration    |
 | `mod:integration-twitch` | `integration-twitch`     | Twitch integration       |
 | `mod:marketing`          | `marketing`              | Encurtador, campanhas    |
 | `mod:moderation`         | `moderation`             | Moderation pipeline      |

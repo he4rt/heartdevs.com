@@ -338,6 +338,31 @@ class StreamDashboardPage extends Page
             });
     }
 
+    public function reconnectSourceAction(): Action
+    {
+        return Action::make('reconnectSource')
+            ->label(fn (array $arguments): string => sprintf('Reconectar como @%s', $this->ownedSource($arguments)?->identity->metadata['username'] ?? 'conta'))
+            ->icon(Heroicon::OutlinedArrowPath)
+            ->color('warning')
+            ->size('sm')
+            ->url(fn (array $arguments): string => $this->twitchAuthorizationUrl($this->ownedSource($arguments)?->chat_reader))
+            ->visible(fn (array $arguments): bool => $this->sourceMissingScopes($this->ownedSource($arguments)) !== []);
+    }
+
+    /**
+     * @return array<int, string>
+     */
+    public function sourceMissingScopes(?StreamerSource $source): array
+    {
+        $isTwitchSource = $source?->identity->provider === IdentityProvider::Twitch;
+
+        if (!$source instanceof StreamerSource || !$isTwitchSource) {
+            return [];
+        }
+
+        return $source->identity->missingScopes($this->requiredTwitchScopes($source->chat_reader));
+    }
+
     public function chatReaderAction(): Action
     {
         return Action::make('chatReader')

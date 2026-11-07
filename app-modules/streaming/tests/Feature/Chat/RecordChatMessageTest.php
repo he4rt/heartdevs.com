@@ -59,6 +59,7 @@ test('o espectador novo vira identidade solta e a mensagem vai para a atividade 
         ->and(ChatMessageMetadata::fromArray($message?->metadata ?? [])->displayName)->toBe('MariaCoda');
     Event::assertDispatched(fn (ChatMessageReceived $broadcast): bool => $broadcast->broadcastAs() === 'chat.message'
         && $broadcast->broadcastWith() === [
+            'sourceId' => $source->id,
             'msgId' => 'msg-1',
             'chatterId' => '9911',
             'username' => 'MariaCoda',

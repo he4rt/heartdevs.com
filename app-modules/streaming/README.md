@@ -90,6 +90,11 @@ php artisan reverb:start --debug
 Com `--debug`, o terminal mostra cada broadcast, o que ajuda a conferir o nome do canal e o
 payload.
 
+A cena He4rt Pub precisa também do `slido:serve`. Com o lerd, ligue o worker `slido`. Sem o lerd,
+rode `php artisan slido:serve` junto do Reverb. O comando confere a cada 15 s quais streamers têm
+um evento do Slido na cena e uma overlay aberta, conecta em cada evento e desconecta quando a
+overlay fecha. Um evento usado por dois streamers abre uma conexão só.
+
 ### 2. Streamer e fonte
 
 1. Dê a role `streamer` ao seu usuário pelo painel admin.

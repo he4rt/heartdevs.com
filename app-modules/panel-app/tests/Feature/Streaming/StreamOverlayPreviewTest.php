@@ -54,7 +54,7 @@ test('cada card mostra a prévia da própria cena com dados de exemplo', functio
 test('só as cenas transparentes trocam o fundo da prévia', function (): void {
     $html = livewire(StreamOverlaysPage::class)->html();
 
-    expect(mb_substr_count($html, 'aria-label="Fundo da prévia"'))->toBe(2);
+    expect(mb_substr_count($html, 'aria-label="Fundo da prévia"'))->toBe(3);
 });
 
 test('a prévia recarrega depois de salvar a configuração', function (): void {
