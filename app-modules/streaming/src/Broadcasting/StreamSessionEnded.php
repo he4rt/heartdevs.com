@@ -41,10 +41,11 @@ final class StreamSessionEnded implements ShouldBroadcastNow, ShouldDispatchAfte
         return $this->source->enabled;
     }
 
-    /** @return array{endedAt: string|null} */
+    /** @return array{sourceId: string, endedAt: string|null} */
     public function broadcastWith(): array
     {
         return [
+            'sourceId' => $this->source->id,
             'endedAt' => $this->session->ended_at?->toIso8601String(),
         ];
     }

@@ -5,6 +5,9 @@ import type {
     LevelProgressDto,
     NowPlayingDto,
     OverlayConfigDto,
+    PubQuestionDto,
+    PubQuestionPatchDto,
+    PubQuestionsDto,
     StreamEventDto,
     VoiceRosterDto,
 } from '../feed';
@@ -22,18 +25,29 @@ export interface OverlayFeedHandlers {
     onVoiceRoster?(dto: VoiceRosterDto): void;
     onOverlayConfig?(dto: OverlayConfigDto): void;
     onLevelProgress?(dto: LevelProgressDto): void;
+    onPubQuestions?(dto: PubQuestionsDto): void;
+    onPubQuestion?(dto: PubQuestionDto): void;
+    onPubQuestionPatch?(dto: PubQuestionPatchDto): void;
+    onChannelReconnected?(): void;
 }
 
-export function useOverlayFeed({ channel, authEndpoint }: OverlayChannelSource, handlers: OverlayFeedHandlers): void {
+export function useOverlayFeed(
+    { channel, authEndpoint, scene, sources }: OverlayChannelSource,
+    handlers: OverlayFeedHandlers,
+): void {
     const handlersRef = useRef(handlers);
     handlersRef.current = handlers;
+    const sourcesKey = sources?.join(',') ?? '';
 
     useEffect(() => {
         const listener = (dto: FeedEventDto) => dispatch(dto, handlersRef.current);
         const isDemo = new URLSearchParams(window.location.search).has('demo');
+        const sceneSources = sourcesKey === '' ? null : sourcesKey.split(',');
 
-        return isDemo ? subscribeDemoFeed(listener) : subscribeOverlayChannel({ channel, authEndpoint }, listener);
-    }, [channel, authEndpoint]);
+        return isDemo
+            ? subscribeDemoFeed(listener)
+            : subscribeOverlayChannel({ channel, authEndpoint, scene, sources: sceneSources }, listener);
+    }, [channel, authEndpoint, scene, sourcesKey]);
 }
 
 function dispatch(dto: FeedEventDto, handlers: OverlayFeedHandlers): void {
@@ -64,6 +78,18 @@ function dispatch(dto: FeedEventDto, handlers: OverlayFeedHandlers): void {
             break;
         case 'levelProgress':
             handlers.onLevelProgress?.(dto);
+            break;
+        case 'pubQuestions':
+            handlers.onPubQuestions?.(dto);
+            break;
+        case 'pubQuestion':
+            handlers.onPubQuestion?.(dto);
+            break;
+        case 'pubQuestionPatch':
+            handlers.onPubQuestionPatch?.(dto);
+            break;
+        case 'channelReconnected':
+            handlers.onChannelReconnected?.();
             break;
     }
 }

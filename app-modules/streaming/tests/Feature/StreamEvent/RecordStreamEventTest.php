@@ -46,6 +46,7 @@ test('um follow novo é gravado e vira alerta no canal do streamer', function ()
     Event::assertDispatched(fn (AlertTriggered $alert): bool => $alert->broadcastOn()[0]->name === 'private-'.$source->streamer->overlayChannel()
         && $alert->broadcastAs() === 'alert.triggered'
         && $alert->broadcastWith() === [
+            'sourceId' => $source->id,
             'type' => 'follow',
             'actor' => ['login' => 'mariacoda', 'displayName' => 'MariaCoda'],
             'details' => null,

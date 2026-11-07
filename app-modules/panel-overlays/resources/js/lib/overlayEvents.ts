@@ -8,7 +8,7 @@ interface AlertActor {
     displayName: string;
 }
 
-export type AlertPayload = { actor: AlertActor | null; isTest: boolean } & (
+export type AlertPayload = { sourceId?: string | null; actor: AlertActor | null; isTest: boolean } & (
     | { type: 'follow'; details: null }
     | { type: 'sub'; details: { tier: TwitchTier; months: number; message: string | null } }
     | { type: 'gift_sub'; details: { tier: TwitchTier; total: number } }

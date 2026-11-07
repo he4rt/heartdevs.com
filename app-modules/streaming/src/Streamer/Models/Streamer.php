@@ -7,6 +7,7 @@ namespace He4rt\Streaming\Streamer\Models;
 use Carbon\CarbonInterface;
 use He4rt\Identity\User\Models\User;
 use He4rt\Streaming\Database\Factories\StreamerFactory;
+use He4rt\Streaming\Enums\OverlayScene;
 use He4rt\Streaming\Enums\StreamerStatus;
 use He4rt\Streaming\Session\Models\StreamSession;
 use He4rt\Streaming\Streamer\Casts\AsStreamerSettings;
@@ -77,6 +78,19 @@ final class Streamer extends Model
     public function isLive(): bool
     {
         return StreamSession::query()->open()->whereBelongsTo($this)->exists();
+    }
+
+    /**
+     * The sources a scene uses, or null when it uses every source.
+     *
+     * @return list<string>|null
+     */
+    public function sourceIdsForScene(OverlayScene $scene): ?array
+    {
+        /** @var list<string> $existingSourceIds */
+        $existingSourceIds = $this->sources()->pluck('id')->all();
+
+        return $this->settings->sceneSources->allowedFor($scene, $existingSourceIds);
     }
 
     public function overlayChannel(): string

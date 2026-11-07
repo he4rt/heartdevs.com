@@ -7,6 +7,7 @@ namespace He4rt\IntegrationTwitch\OAuth;
 use App\Contracts\OAuthClientContract;
 use He4rt\Identity\Auth\DTOs\OAuthAccessDTO;
 use He4rt\Identity\Auth\DTOs\OAuthStateDTO;
+use He4rt\Identity\Auth\Enums\OAuthIntent;
 use He4rt\Identity\Auth\Exceptions\OAuthFlowException;
 use He4rt\IntegrationTwitch\OAuth\DTO\TwitchOAuthAccessDTO;
 use He4rt\IntegrationTwitch\OAuth\DTO\TwitchOAuthDTO;
@@ -31,14 +32,15 @@ final readonly class TwitchOAuthClient implements OAuthClientContract
             TwitchStreamerFeature::fromValues($state->features ?? []),
         );
 
-        $callbackUrl = $this->callbackUrl();
+        $isLinkingToSignedInUser = $state?->intent === OAuthIntent::Link;
 
         return 'https://id.twitch.tv/oauth2/authorize?'.http_build_query([
             'client_id' => $this->oauthConnector->clientId,
-            'redirect_uri' => $callbackUrl,
+            'redirect_uri' => $this->callbackUrl(),
             'response_type' => 'code',
             'scope' => implode(' ', $scopes),
             'state' => (string) $state,
+            ...($isLinkingToSignedInUser ? ['force_verify' => 'true'] : []),
         ]);
     }
 

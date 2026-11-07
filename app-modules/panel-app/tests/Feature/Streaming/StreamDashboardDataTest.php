@@ -176,3 +176,20 @@ test('as outras fontes aparecem separadas da conta da Twitch', function (): void
     livewire(StreamDashboardPage::class)
         ->assertViewHas('otherSources', fn ($sources): bool => $sources->count() === 1 && $sources->first()->is($otherSource));
 });
+
+test('a outra fonte sem permissão na Twitch avisa e oferece reconectar', function (): void {
+    $mainSource = dashboardTwitchSource($this->user);
+    $otherSource = StreamerSource::factory()->create(['streamer_id' => $mainSource->streamer_id]);
+    $otherSource->identity->update([
+        'provider' => IdentityProvider::Twitch,
+        'connected_at' => now()->subMonth(),
+        'disconnected_at' => null,
+        'metadata' => ['username' => 'he4rtdevs'],
+    ]);
+
+    livewire(StreamDashboardPage::class)
+        ->assertSee('Sem permissão na Twitch')
+        ->assertActionVisible(TestAction::make('reconnectSource')->arguments(['source' => $otherSource->id]))
+        ->assertActionHasLabel(TestAction::make('reconnectSource')->arguments(['source' => $otherSource->id]), 'Reconectar como @he4rtdevs')
+        ->assertActionHidden(TestAction::make('reconnectSource')->arguments(['source' => $mainSource->id]));
+});

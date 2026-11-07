@@ -127,9 +127,13 @@
                             </p>
                         </div>
 
-                        @if ($item['settingsAction'])
-                            {{ $this->{$item['settingsAction']} }}
-                        @endif
+                        <div class="flex shrink-0 flex-col items-end gap-1">
+                            @if ($item['settingsAction'])
+                                {{ $this->{$item['settingsAction']} }}
+                            @endif
+
+                            {{ ($this->sceneSourcesAction)(['scene' => $item['scene']->value]) }}
+                        </div>
                     </div>
 
                     <div
