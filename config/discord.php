@@ -6,7 +6,7 @@ use Discord\WebSockets\Intents;
 
 return [
     'token' => env('DISCORD_TOKEN'),
-    'intents' => Intents::getDefaultIntents() | Intents::GUILD_MEMBERS | Intents::MESSAGE_CONTENT,
+    'intents' => Intents::getDefaultIntents(),
     'options' => [
         'useTransportCompression' => false, // Disable zlib-stream
         'usePayloadCompression' => true,

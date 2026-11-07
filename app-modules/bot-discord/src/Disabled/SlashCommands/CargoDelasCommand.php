@@ -2,12 +2,13 @@
 
 declare(strict_types=1);
 
-namespace He4rt\BotDiscord\SlashCommands;
+namespace He4rt\BotDiscord\Disabled\SlashCommands;
 
 use Discord\Parts\Guild\Member\Member;
 use Discord\Parts\Guild\Role\Role;
 use Discord\Parts\Interactions\Command\Option;
 use Discord\Parts\Interactions\Interaction;
+use He4rt\BotDiscord\SlashCommands\AbstractSlashCommand;
 
 class CargoDelasCommand extends AbstractSlashCommand
 {
