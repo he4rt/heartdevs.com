@@ -1,2 +1,7 @@
 parameters:
-    ignoreErrors: []
+    ignoreErrors:
+        -
+            message: '#^Parameter \#3 \$callback of method Illuminate\\Contracts\\Cache\\Repository::remember\(\) expects#'
+            identifier: argument.type
+            count: 1
+            path: src/Documentation.php
