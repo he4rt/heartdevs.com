@@ -35,9 +35,7 @@ class DiscordChannelsTable
                     ->getTitleFromRecordUsing(function (DiscordChannel $record): string {
                         $parent = $record->parent;
 
-                        return $parent === null
-                            ? __('panel-admin::discord.channels.groups.uncategorized')
-                            : $parent->name;
+                        return $parent->name ?? __('panel-admin::discord.channels.groups.uncategorized');
                     })
                     // O relacionamento parent é self-referential; a ordenação padrão do
                     // Group gera subquery sem alias e colide com a tabela externa.
