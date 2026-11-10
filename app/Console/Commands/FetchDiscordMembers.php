@@ -21,7 +21,7 @@ class FetchDiscordMembers extends Command
         $guildId = config('he4rt.discord.guild_id');
 
         if (!$token) {
-            $this->error('Discord bot token not configured (HE4RT_DISCORD_BOT_KEY).');
+            $this->error('Discord bot token not configured (DISCORD_BOT_TOKEN).');
 
             return;
         }
