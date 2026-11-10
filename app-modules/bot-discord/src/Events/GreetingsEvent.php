@@ -24,8 +24,10 @@ class GreetingsEvent extends Event
     public function handle(Message $message, Discord $discord): void
     {
         $mentionsBot = $message->mentions->get('id', $discord->id) !== null;
+        $mentionsNobody = $message->mentions->count() === 0;
+        $isAddressedToSomeoneElse = !$mentionsBot && !$mentionsNobody;
 
-        if ($message->author->bot || !$mentionsBot) {
+        if ($message->author->bot || $isAddressedToSomeoneElse) {
             return;
         }
 

@@ -58,6 +58,13 @@ it('greets a member who mentions the bot', function (): void {
     GreetingsEvent::make()->handle($message, $this->discord);
 });
 
+it('greets a member who mentions nobody', function (): void {
+    $message = greetingsMessage($this->discord, 'bom dia', []);
+    $message->shouldReceive('reply')->once()->with('Bom dia!');
+
+    GreetingsEvent::make()->handle($message, $this->discord);
+});
+
 it('ignores a greeting that does not mention the bot', function (): void {
     $message = greetingsMessage($this->discord, sprintf('<@%s> bom dia', GREETINGS_OTHER_BOT_ID), [GREETINGS_OTHER_BOT_ID]);
     $message->shouldNotReceive('reply');

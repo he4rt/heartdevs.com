@@ -3,5 +3,5 @@
 declare(strict_types=1);
 
 return [
-    'token' => env('DISCORD_TOKEN'),
+    'token' => env('DISCORD_BOT_TOKEN'),
 ];

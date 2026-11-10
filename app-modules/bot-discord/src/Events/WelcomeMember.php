@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace He4rt\BotDiscord\Disabled\Events;
+namespace He4rt\BotDiscord\Events;
 
 use Discord\Discord;
 use Discord\Parts\Guild\Member\Member;
