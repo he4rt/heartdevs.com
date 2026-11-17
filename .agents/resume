@@ -1,6 +1,0 @@
-#!/usr/bin/env bash
-# Runs on every orb wake: make sure PostgreSQL (dev + test databases) is accepting connections.
-set -euo pipefail
-
-sudo systemctl start postgresql@18-main
-pg_isready -q -h 127.0.0.1 -t 8

@@ -1,7 +1,0 @@
-interactive: true
-packageManager: npm
-format:
-  - group
-  - repo
-  - diff
-  - dep
