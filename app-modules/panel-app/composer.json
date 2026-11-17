@@ -1,0 +1,25 @@
+{
+    "name": "he4rt/panel-app",
+    "description": "Inertia panel for every user.",
+    "type": "library",
+    "version": "1.0.0",
+    "license": "proprietary",
+    "autoload": {
+        "psr-4": {
+            "He4rt\\PanelApp\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "He4rt\\PanelApp\\Tests\\": "tests/"
+        }
+    },
+    "minimum-stability": "stable",
+    "extra": {
+        "laravel": {
+            "providers": [
+                "He4rt\\PanelApp\\PanelAppServiceProvider"
+            ]
+        }
+    }
+}

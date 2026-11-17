@@ -1,0 +1,12 @@
+{
+    "$schema": "https://raw.githubusercontent.com/jonaspauleta/laramux/main/.laramux.schema.json",
+    "custom": [
+        {
+            "name": "scheduler",
+            "display_name": "Scheduler",
+            "hotkey": "d",
+            "command": "php",
+            "args": ["artisan", "schedule:work"]
+        }
+    ]
+}

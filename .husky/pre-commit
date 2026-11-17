@@ -1,0 +1,2 @@
+echo "#Lint Staged"
+lint-staged

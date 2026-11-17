@@ -1,0 +1,238 @@
+#!/usr/bin/env bash
+# Prepares a fresh Amp orb (Debian 12 or 13) for this repository. Must stay idempotent:
+# Amp reruns it on top of stale snapshots, so every step skips work that is already done.
+set -euo pipefail
+
+cd "$(dirname "${BASH_SOURCE[0]}")/.."
+
+export DEBIAN_FRONTEND=noninteractive
+# .php-version is a local lerd file, so a fresh checkout has none.
+PHP_VERSION="$(tr -d '[:space:]' 2>/dev/null <.php-version || true)"
+PHP_VERSION="${PHP_VERSION:-8.5}"
+PG_VERSION="$(sed -nE 's/^FROM postgres:([0-9]+).*/\1/p' docker/postgres.Dockerfile)"
+DEV_DATABASE=dev_he4rt
+TEST_DATABASE=test_he4rt
+
+step() {
+  local name=$1 began=$SECONDS
+  shift
+  echo "==> $name"
+  "$@"
+  echo "<== $name ($((SECONDS - began))s)"
+}
+
+system_packages() {
+  # PHP 8.5 builds OPcache in, so it has no package of its own.
+  local packages=(
+    "php$PHP_VERSION-cli" "php$PHP_VERSION-common" "php$PHP_VERSION-readline" "php$PHP_VERSION-bcmath"
+    "php$PHP_VERSION-curl" "php$PHP_VERSION-gd" "php$PHP_VERSION-intl" "php$PHP_VERSION-mbstring"
+    "php$PHP_VERSION-pgsql" "php$PHP_VERSION-xml" "php$PHP_VERSION-zip" "php$PHP_VERSION-pcov"
+    "postgresql-$PG_VERSION" jq unzip nano
+  )
+  local missing=()
+  for package in "${packages[@]}"; do
+    dpkg-query -W -f='${Status}' "$package" 2>/dev/null | grep -q 'install ok installed' || missing+=("$package")
+  done
+  if [ ${#missing[@]} -eq 0 ]; then
+    echo "all system packages present"
+    return
+  fi
+
+  # Follow the orb's own Debian release (bookworm or trixie): packages built for another
+  # release fail on renamed libraries such as libzip. Rewrite a source left by an older snapshot.
+  local codename sury pgdg
+  codename="$(. /etc/os-release && echo "$VERSION_CODENAME")"
+  sury="deb [signed-by=/etc/apt/keyrings/sury-php.gpg] https://packages.sury.org/php/ $codename main"
+  pgdg="deb [signed-by=/etc/apt/keyrings/pgdg.gpg] https://apt.postgresql.org/pub/repos/apt $codename-pgdg main"
+  sudo install -d -m 755 /etc/apt/keyrings
+  if [ "$(cat /etc/apt/sources.list.d/sury-php.list 2>/dev/null)" != "$sury" ]; then
+    curl -fsSL https://packages.sury.org/php/apt.gpg | sudo gpg --dearmor --yes -o /etc/apt/keyrings/sury-php.gpg
+    echo "$sury" | sudo tee /etc/apt/sources.list.d/sury-php.list >/dev/null
+  fi
+  if [ "$(cat /etc/apt/sources.list.d/pgdg.list 2>/dev/null)" != "$pgdg" ]; then
+    curl -fsSL https://www.postgresql.org/media/keys/ACCC4CF8.asc | sudo gpg --dearmor --yes -o /etc/apt/keyrings/pgdg.gpg
+    echo "$pgdg" | sudo tee /etc/apt/sources.list.d/pgdg.list >/dev/null
+  fi
+
+  sudo apt-get update -q
+  sudo apt-get install -y -q --no-install-recommends "${missing[@]}"
+  sudo update-alternatives --set php "/usr/bin/php$PHP_VERSION"
+}
+
+composer_binary() {
+  if command -v composer >/dev/null; then
+    composer --version --no-ansi 2>/dev/null | head -1
+    return
+  fi
+  local tmp
+  tmp="$(mktemp -d)"
+  curl -fsSL -o "$tmp/composer.phar" https://getcomposer.org/download/latest-stable/composer.phar
+  curl -fsSL -o "$tmp/composer.phar.sha256" https://getcomposer.org/download/latest-stable/composer.phar.sha256
+  echo "$(cat "$tmp/composer.phar.sha256")  $tmp/composer.phar" | sha256sum -c -
+  sudo install -m 755 "$tmp/composer.phar" /usr/local/bin/composer
+  rm -rf "$tmp"
+}
+
+bun_binary() {
+  local version asset tmp
+  version="$(jq -r '.packageManager | sub("^bun@"; "")' package.json)"
+  if [ "$(bun -v 2>/dev/null)" = "$version" ]; then
+    echo "bun $version"
+    return
+  fi
+  asset="bun-linux-$([ "$(uname -m)" = aarch64 ] && echo aarch64 || echo x64)"
+  tmp="$(mktemp -d)"
+  curl -fsSL -o "$tmp/$asset.zip" "https://github.com/oven-sh/bun/releases/download/bun-v$version/$asset.zip"
+  curl -fsSL -o "$tmp/SHASUMS256.txt" "https://github.com/oven-sh/bun/releases/download/bun-v$version/SHASUMS256.txt"
+  (cd "$tmp" && grep " $asset.zip\$" SHASUMS256.txt | sha256sum -c -)
+  unzip -q "$tmp/$asset.zip" -d "$tmp"
+  sudo install -m 755 "$tmp/$asset/bun" /usr/local/bin/bun
+  sudo ln -sf bun /usr/local/bin/bunx
+  rm -rf "$tmp"
+  bun -v
+}
+
+shell_prompt() {
+  command -v starship >/dev/null || curl -sS https://starship.rs/install.sh | sh -s -- --yes
+  local init='if [[ $- == *i* ]]; then eval "$(starship init bash)"; fi'
+  grep -Fqx "$init" "$HOME/.bashrc" 2>/dev/null || printf '\n%s\n' "$init" >>"$HOME/.bashrc"
+}
+
+database() {
+  # Ephemeral sandbox: trade durability for speed. The time zone matches docker-compose.yml.
+  local conf="/etc/postgresql/$PG_VERSION/main/conf.d/zz-orb.conf" settings
+  settings="$(
+    cat <<'EOF'
+fsync = off
+synchronous_commit = off
+full_page_writes = off
+max_connections = 250
+shared_buffers = 256MB
+timezone = 'Etc/UTC'
+log_timezone = 'Etc/UTC'
+EOF
+  )"
+  if [ "$(sudo cat "$conf" 2>/dev/null)" != "$settings" ]; then
+    echo "$settings" | sudo tee "$conf" >/dev/null
+    sudo systemctl restart "postgresql@$PG_VERSION-main"
+  fi
+  sudo systemctl start "postgresql@$PG_VERSION-main"
+  until pg_isready -q -h 127.0.0.1; do sleep 0.5; done
+
+  # Credentials match .env.example, .env.testing.example and docker-compose.yml.
+  sudo -u postgres psql -q -v ON_ERROR_STOP=1 <<SQL
+ALTER ROLE postgres WITH PASSWORD 'postgres';
+SELECT 'CREATE DATABASE $DEV_DATABASE' WHERE NOT EXISTS (SELECT FROM pg_database WHERE datname = '$DEV_DATABASE')\gexec
+SELECT 'CREATE DATABASE $TEST_DATABASE' WHERE NOT EXISTS (SELECT FROM pg_database WHERE datname = '$TEST_DATABASE')\gexec
+SQL
+}
+
+env_files() {
+  # Both examples already point at 127.0.0.1 with postgres/postgres, so they work as they are.
+  [ -f .env ] || cp -- .env.example .env
+  [ -f .env.testing ] || cp -- .env.testing.example .env.testing
+}
+
+js_deps() {
+  local stamp=node_modules/.orb-setup-stamp key
+  key="$(sha1sum bun.lock | cut -d' ' -f1) bun-$(bun -v)"
+  if [ -f "$stamp" ] && [ "$(cat "$stamp")" = "$key" ]; then
+    echo "node_modules up to date"
+    return
+  fi
+  bun ci
+  echo "$key" >"$stamp"
+}
+
+composer_deps() {
+  composer install --no-interaction --no-progress --prefer-dist
+}
+
+boost_guidelines() {
+  # AGENTS.md and .agents/skills are gitignored Boost output, so a fresh checkout has no
+  # project guidelines. A non-interactive install writes only for the agents in boost.json,
+  # which names Claude Code; point it at Amp for this run and keep the committed file.
+  local saved status=0
+  saved="$(mktemp)"
+  cp boost.json "$saved"
+  jq '.agents = ["amp"]' "$saved" >boost.json
+  php artisan boost:install --guidelines --skills --no-interaction || status=$?
+  cat "$saved" >boost.json
+  rm -f "$saved"
+  return "$status"
+}
+
+app() {
+  grep -q '^APP_KEY=base64:' .env || php artisan key:generate --force --no-interaction
+  grep -q '^APP_KEY=base64:' .env.testing || php artisan key:generate --env=testing --force --no-interaction
+  [ -L public/storage ] || php artisan storage:link --no-interaction
+  php artisan migrate --force --no-interaction
+
+  local users
+  users="$(sudo -u postgres psql -d "$DEV_DATABASE" -Atc 'SELECT count(*) FROM identity_users')"
+  if [ "$users" != 0 ]; then
+    php artisan sync:permissions --no-interaction
+    return
+  fi
+  # Seeds the roles and permissions, plus the admin@admin.com super admin.
+  php artisan db:seed --force --no-interaction
+}
+
+routes() {
+  # Typecheck and the editor read these without PHP; vite dev and build regenerate them.
+  bun run routes
+}
+
+assets() {
+  local stamp=public/build/.orb-setup-stamp key
+  key="$({
+    git ls-files -s resources routes app-modules app/Http vite.config.js bun.lock composer.lock
+    grep -E '^VITE_' .env
+  } | sha1sum | cut -d' ' -f1)"
+  if [ -f public/build/manifest.json ] && [ -f "$stamp" ] && [ "$(cat "$stamp")" = "$key" ]; then
+    echo "assets up to date"
+    return
+  fi
+  bun run build
+  echo "$key" >"$stamp"
+}
+
+agent_notes() {
+  local notes="$HOME/.config/amp/AGENTS.md" marker="# He4rt orb notes"
+  mkdir -p "$(dirname "$notes")"
+  # Replace this block (always the last one in the file) so updated notes reach stale snapshots.
+  local others
+  others="$(awk -v marker="$marker" '$0 == marker { exit } { print }' "$notes" 2>/dev/null || true)"
+  {
+    [ -z "$others" ] || printf '%s\n\n' "$others"
+    cat <<EOF
+$marker
+- PHP $PHP_VERSION (with pcov), Composer, bun and PostgreSQL $PG_VERSION are installed by .agents/setup.
+- PostgreSQL runs under systemd (\`sudo systemctl start postgresql@$PG_VERSION-main\`). Credentials: postgres/postgres.
+  Dev DB is $DEV_DATABASE (.env); tests use $TEST_DATABASE (.env.testing).
+- Queue, cache and session use the database driver, so there is no Redis. Mail goes to the log.
+- Run tests with \`composer test\` (or \`composer test:arch\`, \`test:feature\`, \`test:unit\`).
+- \`composer dev\` runs php artisan serve (port 8000), queue:listen, pail and vite together.
+  \`php artisan serve\` alone uses the assets that setup built.
+- Setup seeds $DEV_DATABASE once (DatabaseSeeder). Sign in to the admin at /admin/login as
+  admin@admin.com / password. The user panel signs in at /login.
+- After a route change, \`bun run routes\` regenerates resources/js/wayfinder. After a Data class
+  change, \`bun run types\` regenerates resources/js/generated/types.d.ts.
+EOF
+  } >"$notes.tmp"
+  mv "$notes.tmp" "$notes"
+}
+
+step "system packages" system_packages
+step "composer binary" composer_binary
+step "bun binary" bun_binary
+step "starship prompt" shell_prompt
+step "database" database
+step "env files" env_files
+step "JS dependencies" js_deps
+step "composer dependencies" composer_deps
+step "boost guidelines" boost_guidelines
+step "migrations and seed" app
+step "wayfinder routes" routes
+step "frontend assets" assets
+step "agent notes" agent_notes

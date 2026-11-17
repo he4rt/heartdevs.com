@@ -1,0 +1,17 @@
+parameters:
+    ignoreErrors:
+        -
+            message: '#^Method He4rt\\Identity\\Permissions\\Commands\\SyncPermissions\\SyncPermissionsCommand::syncPermissions\(\) should return Illuminate\\Support\\Collection<int, He4rt\\Identity\\Permissions\\Permission> but returns Illuminate\\Support\\Collection<\(int\|string\), mixed>\.$#'
+            identifier: return.type
+            count: 1
+            path: src/Permissions/Commands/SyncPermissions/SyncPermissionsCommand.php
+        -
+            message: '#^Parameter \#1 \$callback of method Illuminate\\Support\\Collection<\(int\|string\),mixed>::map\(\) expects callable\(mixed, int\|string\): He4rt\\Identity\\Permissions\\Commands\\SyncPermissions\\RolePermissions, Closure\(array, string\): He4rt\\Identity\\Permissions\\Commands\\SyncPermissions\\RolePermissions given\.$#'
+            identifier: argument.type
+            count: 1
+            path: src/Permissions/Commands/SyncPermissions/SyncPermissionsCommand.php
+        -
+            message: '#^Parameter \$resources of class He4rt\\Identity\\Permissions\\Commands\\SyncPermissions\\RolePermissions constructor expects array<class-string<Illuminate\\Database\\Eloquent\\Model>, list<He4rt\\Identity\\Permissions\\PermissionsEnum>>, array given\.$#'
+            identifier: argument.type
+            count: 1
+            path: src/Permissions/Commands/SyncPermissions/SyncPermissionsCommand.php

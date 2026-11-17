@@ -1,0 +1,24 @@
+{
+    "compilerOptions": {
+        "target": "ES2022",
+        "lib": ["ES2023", "DOM", "DOM.Iterable"],
+        "module": "ESNext",
+        "moduleResolution": "bundler",
+        "jsx": "react-jsx",
+        "strict": true,
+        "noUnusedLocals": true,
+        "noUnusedParameters": true,
+        "noFallthroughCasesInSwitch": true,
+        "isolatedModules": true,
+        "skipLibCheck": true,
+        "noEmit": true,
+        "types": ["vite/client"],
+        "paths": {
+            "@/*": ["./resources/js/*"],
+            "@admin/*": ["./app-modules/panel-admin/resources/js/*"],
+            "@app/*": ["./app-modules/panel-app/resources/js/*"]
+        }
+    },
+    "include": ["resources/js/**/*", "app-modules/*/resources/js/**/*"],
+    "exclude": ["resources/js/wayfinder/**"]
+}

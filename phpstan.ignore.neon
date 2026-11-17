@@ -1,0 +1,7 @@
+parameters:
+    ignoreErrors:
+        -
+            message: '#^Parameter \#1 \$path of function dirname expects string, string\|false given\.$#'
+            identifier: argument.type
+            count: 1
+            path: app/Providers/Tools/SpatieBackupServiceProvider.php

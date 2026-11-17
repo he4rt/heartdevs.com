@@ -1,0 +1,107 @@
+name: Continuous Integration
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+      - '*.x'
+      - 'feature/**'
+      - 'bugfix/**'
+      - 'chore/**'
+      - 'story/**'
+    types: [opened, reopened, synchronize, ready_for_review]
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+permissions: {}
+
+jobs:
+  setup:
+    name: Setup PHP
+    if: ${{ !github.event.pull_request.draft }}
+    permissions:
+      contents: read
+    uses: $/.github/workflows/_setup.yml
+
+  pint:
+    name: Perform Pint format
+    needs: [setup]
+    if: ${{ !github.event.pull_request.draft }}
+    permissions:
+      contents: read
+    uses: $/.github/workflows/_pint.yml
+    with:
+      CACHE_KEY: ${{ needs.setup.outputs.CACHE_KEY }}
+      COMPOSER_FLAGS: ${{ needs.setup.outputs.COMPOSER_FLAGS }}
+      PHP_EXTENSIONS: ${{ needs.setup.outputs.PHP_EXTENSIONS }}
+      PHP_INI_PROPERTIES: ${{ needs.setup.outputs.PHP_INI_PROPERTIES }}
+      PHP_VERSION: ${{ needs.setup.outputs.PHP_VERSION }}
+
+  rector:
+    name: Perform Rector Check
+    needs: [setup]
+    if: ${{ !github.event.pull_request.draft }}
+    permissions:
+      contents: read
+    uses: $/.github/workflows/_rector.yml
+    with:
+      CACHE_KEY: ${{ needs.setup.outputs.CACHE_KEY }}
+      COMPOSER_FLAGS: ${{ needs.setup.outputs.COMPOSER_FLAGS }}
+      PHP_EXTENSIONS: ${{ needs.setup.outputs.PHP_EXTENSIONS }}
+      PHP_INI_PROPERTIES: ${{ needs.setup.outputs.PHP_INI_PROPERTIES }}
+      PHP_VERSION: ${{ needs.setup.outputs.PHP_VERSION }}
+
+  phpstan:
+    name: Perform Phpstan Check
+    needs: [setup]
+    if: ${{ !github.event.pull_request.draft }}
+    permissions:
+      contents: read
+    uses: $/.github/workflows/_phpstan.yml
+    with:
+      CACHE_KEY: ${{ needs.setup.outputs.CACHE_KEY }}
+      COMPOSER_FLAGS: ${{ needs.setup.outputs.COMPOSER_FLAGS }}
+      PHP_EXTENSIONS: ${{ needs.setup.outputs.PHP_EXTENSIONS }}
+      PHP_INI_PROPERTIES: ${{ needs.setup.outputs.PHP_INI_PROPERTIES }}
+      PHP_VERSION: ${{ needs.setup.outputs.PHP_VERSION }}
+
+  pest:
+    name: Perform Pest Tests
+    needs: [setup]
+    if: ${{ !github.event.pull_request.draft }}
+    permissions:
+      contents: read
+    uses: $/.github/workflows/_pest.yml
+    with:
+      CACHE_KEY: ${{ needs.setup.outputs.CACHE_KEY }}
+      COMPOSER_FLAGS: ${{ needs.setup.outputs.COMPOSER_FLAGS }}
+      PHP_EXTENSIONS: ${{ needs.setup.outputs.PHP_EXTENSIONS }}
+      PHP_INI_PROPERTIES: ${{ needs.setup.outputs.PHP_INI_PROPERTIES }}
+      PHP_VERSION: ${{ needs.setup.outputs.PHP_VERSION }}
+
+  gate:
+    name: CI Gate
+    needs: [setup, pint, rector, phpstan, pest]
+    if: ${{ always() && !github.event.pull_request.draft }}
+    runs-on: ubuntu-slim
+    timeout-minutes: 5
+    permissions: {}
+    steps:
+      - name: Require every check to succeed
+        env:
+          RESULTS: ${{ join(needs.*.result, ', ') }}
+        run: |
+          echo "Dependency results: ${RESULTS}"
+          for result in ${RESULTS//,/ }; do
+            if [ "${result}" != "success" ]; then
+              echo "::error::CI did not pass cleanly (${RESULTS})."
+              exit 1
+            fi
+          done
+          echo "All CI checks passed."

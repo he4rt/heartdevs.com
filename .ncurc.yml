@@ -1,0 +1,6 @@
+interactive: true
+packageManager: bun
+format:
+  - group
+  - repo
+  - diff

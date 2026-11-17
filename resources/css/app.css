@@ -1,0 +1,165 @@
+@import 'tailwindcss';
+@import 'tw-animate-css';
+@import 'shadcn/tailwind.css';
+
+@plugin '@tailwindcss/typography';
+
+@source '../js';
+@source '../../app-modules/*/resources/js';
+@source '../../app-modules/*/resources/views';
+
+@custom-variant dark (&:is(.dark *));
+
+:root {
+    --radius: 0.5rem;
+    --background: oklch(0.972 0.006 75);
+    --foreground: oklch(0.215 0.012 60);
+    --card: oklch(0.995 0.003 75);
+    --card-foreground: oklch(0.215 0.012 60);
+    --popover: oklch(0.995 0.003 75);
+    --popover-foreground: oklch(0.215 0.012 60);
+    --primary: oklch(0.47 0.17 300);
+    --primary-foreground: oklch(0.985 0.006 75);
+    --secondary: oklch(0.928 0.009 75);
+    --secondary-foreground: oklch(0.27 0.012 60);
+    --muted: oklch(0.945 0.008 75);
+    --muted-foreground: oklch(0.48 0.014 65);
+    --accent: oklch(0.935 0.01 75);
+    --accent-foreground: oklch(0.215 0.012 60);
+    --destructive: oklch(0.53 0.2 27);
+    --success: oklch(0.5 0.12 152);
+    --warning: oklch(0.52 0.115 68);
+    --border: oklch(0.9 0.01 75);
+    --input: oklch(0.64 0.014 70);
+    --ring: oklch(0.58 0.17 300);
+    --chart-1: oklch(0.85 0.07 300);
+    --chart-2: oklch(0.74 0.12 300);
+    --chart-3: oklch(0.62 0.16 300);
+    --chart-4: oklch(0.47 0.17 300);
+    --chart-5: oklch(0.37 0.14 300);
+    --sidebar: oklch(0.955 0.009 75);
+    --sidebar-foreground: oklch(0.215 0.012 60);
+    --sidebar-primary: oklch(0.47 0.17 300);
+    --sidebar-primary-foreground: oklch(0.985 0.006 75);
+    --sidebar-accent: oklch(0.915 0.011 75);
+    --sidebar-accent-foreground: oklch(0.215 0.012 60);
+    --sidebar-border: oklch(0.895 0.01 75);
+    --sidebar-ring: oklch(0.58 0.17 300);
+
+    /* The data area is dense; the frame around it keeps its own rhythm. See DESIGN.md. */
+    --data-font-size: 0.8125rem;
+    --data-id-size: 0.75rem;
+    --data-head-h: 2rem;
+    --data-cell-px: 0.75rem;
+    --data-cell-py: 0.25rem;
+}
+
+.dark {
+    --background: oklch(0.19 0.008 60);
+    --foreground: oklch(0.93 0.008 75);
+    --card: oklch(0.232 0.009 60);
+    --card-foreground: oklch(0.93 0.008 75);
+    --popover: oklch(0.278 0.01 60);
+    --popover-foreground: oklch(0.93 0.008 75);
+    --primary: oklch(0.76 0.12 300);
+    --primary-foreground: oklch(0.19 0.012 60);
+    --secondary: oklch(0.3 0.01 60);
+    --secondary-foreground: oklch(0.93 0.008 75);
+    --muted: oklch(0.278 0.01 60);
+    --muted-foreground: oklch(0.75 0.012 70);
+    --accent: oklch(0.325 0.011 60);
+    --accent-foreground: oklch(0.95 0.008 75);
+    --destructive: oklch(0.78 0.12 25);
+    --success: oklch(0.77 0.13 152);
+    --warning: oklch(0.81 0.12 75);
+    --border: oklch(0.95 0.01 75 / 9%);
+    --input: oklch(0.95 0.01 75 / 40%);
+    --ring: oklch(0.68 0.14 300);
+    --chart-1: oklch(0.88 0.06 300);
+    --chart-2: oklch(0.78 0.11 300);
+    --chart-3: oklch(0.68 0.15 300);
+    --chart-4: oklch(0.58 0.17 300);
+    --chart-5: oklch(0.48 0.16 300);
+    --sidebar: oklch(0.16 0.008 60);
+    --sidebar-foreground: oklch(0.93 0.008 75);
+    --sidebar-primary: oklch(0.76 0.12 300);
+    --sidebar-primary-foreground: oklch(0.19 0.012 60);
+    --sidebar-accent: oklch(0.245 0.01 60);
+    --sidebar-accent-foreground: oklch(0.95 0.008 75);
+    --sidebar-border: oklch(0.95 0.01 75 / 8%);
+    --sidebar-ring: oklch(0.68 0.14 300);
+}
+
+@theme inline {
+    --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+    --font-mono: var(--font-jetbrains-mono), ui-monospace, monospace;
+    --font-heading: var(--font-bricolage-grotesque), var(--font-sans);
+    --text-title: 1.75rem;
+    --text-title--line-height: 2.125rem;
+    --text-title--letter-spacing: -0.02em;
+    --text-stat: 2rem;
+    --text-stat--line-height: 2.25rem;
+    --text-stat--letter-spacing: -0.02em;
+    --color-background: var(--background);
+    --color-foreground: var(--foreground);
+    --color-card: var(--card);
+    --color-card-foreground: var(--card-foreground);
+    --color-popover: var(--popover);
+    --color-popover-foreground: var(--popover-foreground);
+    --color-primary: var(--primary);
+    --color-primary-foreground: var(--primary-foreground);
+    --color-secondary: var(--secondary);
+    --color-secondary-foreground: var(--secondary-foreground);
+    --color-muted: var(--muted);
+    --color-muted-foreground: var(--muted-foreground);
+    --color-accent: var(--accent);
+    --color-accent-foreground: var(--accent-foreground);
+    --color-destructive: var(--destructive);
+    --color-success: var(--success);
+    --color-warning: var(--warning);
+    --color-border: var(--border);
+    --color-input: var(--input);
+    --color-ring: var(--ring);
+    --color-chart-1: var(--chart-1);
+    --color-chart-2: var(--chart-2);
+    --color-chart-3: var(--chart-3);
+    --color-chart-4: var(--chart-4);
+    --color-chart-5: var(--chart-5);
+    --color-sidebar: var(--sidebar);
+    --color-sidebar-foreground: var(--sidebar-foreground);
+    --color-sidebar-primary: var(--sidebar-primary);
+    --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+    --color-sidebar-accent: var(--sidebar-accent);
+    --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+    --color-sidebar-border: var(--sidebar-border);
+    --color-sidebar-ring: var(--sidebar-ring);
+    --radius-sm: calc(var(--radius) * 0.6);
+    --radius-md: calc(var(--radius) * 0.8);
+    --radius-lg: var(--radius);
+    --radius-xl: calc(var(--radius) * 1.4);
+    --radius-2xl: calc(var(--radius) * 1.8);
+    --radius-3xl: calc(var(--radius) * 2.2);
+    --radius-4xl: calc(var(--radius) * 2.6);
+}
+
+@layer base {
+    * {
+        @apply border-border outline-ring/50;
+    }
+
+    body {
+        @apply bg-background font-sans text-foreground antialiased;
+    }
+    h1,
+    h2,
+    h3 {
+        @apply font-heading;
+    }
+}
+
+/* A record identifier in a table cell: an email, a date, a slug. */
+@utility data-id {
+    font-family: var(--font-mono);
+    font-size: var(--data-id-size);
+    font-variant-numeric: tabular-nums;
+}

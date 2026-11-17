@@ -1,0 +1,13 @@
+node_modules
+dist
+.env*
+vendor/
+public/
+.git
+bun.lock
+composer.lock
+storage/
+.ai/guidelines/
+.ai/rules/
+resources/js/generated/
+resources/js/wayfinder/

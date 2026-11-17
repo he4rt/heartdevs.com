@@ -1,0 +1,25 @@
+{
+    "name": "he4rt/panel-admin",
+    "description": "Inertia admin application.",
+    "type": "library",
+    "version": "1.0.0",
+    "license": "proprietary",
+    "autoload": {
+        "psr-4": {
+            "He4rt\\PanelAdmin\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "He4rt\\PanelAdmin\\Tests\\": "tests/"
+        }
+    },
+    "minimum-stability": "stable",
+    "extra": {
+        "laravel": {
+            "providers": [
+                "He4rt\\PanelAdmin\\PanelAdminServiceProvider"
+            ]
+        }
+    }
+}

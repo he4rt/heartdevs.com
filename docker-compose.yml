@@ -1,0 +1,78 @@
+services:
+  he4rt-db:
+    build:
+      dockerfile: docker/postgres.Dockerfile
+      context: .
+    image: postgres.local:18
+    container_name: he4rt-db
+    restart: no
+    hostname: dev
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: dev_he4rt
+      TZ: Etc/UTC
+      PGTZ: Etc/UTC
+    ports:
+      - '5432:5432'
+    volumes:
+      - he4rt-db:/var/lib/postgresql
+    networks:
+      - dev-he4rt
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready --quiet --username=postgres --dbname=postgres || exit 1']
+      interval: 10s
+      retries: 5
+      timeout: 10s
+      start_period: 15s
+
+  he4rt-redis:
+    build:
+      dockerfile: docker/redis.Dockerfile
+      context: .
+    image: redis.local:8
+    container_name: he4rt-redis
+    restart: no
+    hostname: dev
+    ports:
+      - '6379:6379'
+    networks:
+      - dev-he4rt
+    healthcheck:
+      test: ['CMD-SHELL', 'redis-cli --raw incr ping || exit 1']
+      interval: 10s
+      retries: 5
+      timeout: 10s
+      start_period: 15s
+
+  he4rt-mailpit:
+    build:
+      dockerfile: docker/mailpit.Dockerfile
+      context: .
+    image: mailpit.local:1
+    container_name: he4rt-mailpit
+    restart: no
+    hostname: dev
+    ports:
+      - '1025:1025'
+      - '8025:8025'
+    networks:
+      - dev-he4rt
+    healthcheck:
+      test: ['CMD', '/mailpit', 'readyz']
+      interval: 10s
+      retries: 5
+      timeout: 10s
+      start_period: 10s
+
+volumes:
+  he4rt-db:
+    name: he4rt-db
+
+networks:
+  dev-he4rt:
+    name: dev-he4rt
+    driver: bridge
+    driver_opts:
+      com.docker.network.bridge.name: dev-he4rt
+      com.docker.network.bridge.host_binding_ipv4: '127.0.0.1'
